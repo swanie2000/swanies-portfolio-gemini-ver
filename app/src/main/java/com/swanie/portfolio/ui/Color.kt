@@ -1,4 +1,4 @@
-package com.example.swaniesportfolio.ui.theme
+package com.swanie.portfolio.ui
 
 import androidx.compose.ui.graphics.Color
 

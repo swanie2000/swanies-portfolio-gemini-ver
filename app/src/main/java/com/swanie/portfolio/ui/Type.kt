@@ -1,4 +1,4 @@
-package com.swanie.portfolio.ui.theme
+package com.swanie.portfolio.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
