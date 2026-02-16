@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.holdings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +67,9 @@ fun AmountEntryScreen(
     var price by remember { mutableDoubleStateOf(0.0) }
     var isLoading by remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
+    var showExitDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
 
     LaunchedEffect(coinId) {
         price = viewModel.getSingleCoinPrice(coinId)
@@ -72,6 +78,10 @@ fun AmountEntryScreen(
     }
 
     fun onSaveHolding() {
+        if (price <= 0) {
+            errorMessage = "Price not available. Please wait..."
+            return
+        }
         val amountHeld = amount.toDoubleOrNull() ?: 0.0
         if (amountHeld > 0) {
             val asset = AssetEntity(
@@ -89,6 +99,28 @@ fun AmountEntryScreen(
         }
     }
 
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("Discard Asset?") },
+            text = { Text("Are you sure you want to discard this new asset?") },
+            confirmButton = {
+                TextButton(onClick = onCancel) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
+    BackHandler {
+        showExitDialog = true
+    }
+
     Scaffold(containerColor = Color.Black) {
         Column(
             modifier = Modifier
@@ -98,7 +130,7 @@ fun AmountEntryScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = onCancel, modifier = Modifier.align(Alignment.CenterStart)) {
+                IconButton(onClick = { showExitDialog = true }, modifier = Modifier.align(Alignment.CenterStart)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
             }
@@ -130,7 +162,10 @@ fun AmountEntryScreen(
 
             OutlinedTextField(
                 value = amount,
-                onValueChange = { amount = it },
+                onValueChange = {
+                    amount = it
+                    errorMessage = null
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
@@ -153,6 +188,14 @@ fun AmountEntryScreen(
                     unfocusedContainerColor = Color.Transparent
                 )
             )
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
 
             Spacer(Modifier.weight(1f))
 

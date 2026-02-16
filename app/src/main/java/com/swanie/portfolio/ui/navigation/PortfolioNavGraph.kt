@@ -67,8 +67,13 @@ fun PortfolioNavGraph(
                         launchSingleTop = true
                     }
                 },
-                // THE FIX: New cancel handler
-                onCancel = { navController.popBackStack() }
+                onCancel = {
+                    navController.navigate(Routes.HOLDINGS) {
+                        popUpTo(Routes.HOLDINGS) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }
