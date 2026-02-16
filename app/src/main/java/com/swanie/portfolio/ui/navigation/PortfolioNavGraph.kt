@@ -5,8 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
+import com.swanie.portfolio.ui.holdings.AssetPickerScreen
+import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
 
 @Composable
 fun PortfolioNavGraph(
@@ -15,20 +16,28 @@ fun PortfolioNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.ASSET_PICKER,
+        // Start at the new Holdings screen for a more natural user flow
+        startDestination = Routes.HOLDINGS,
         modifier = modifier
     ) {
-        // 1. Asset Picker Screen
+
+        // 1. Holdings Dashboard (New Start Destination)
+        composable(Routes.HOLDINGS) {
+            MyHoldingsScreen(
+                onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) }
+            )
+        }
+
+        // 2. Asset Picker Screen
         composable(Routes.ASSET_PICKER) {
             AssetPickerScreen(
                 onAssetSelected = { assetInfo ->
-                    // assetInfo is expected to be a string like "coinId|symbol|name"
                     navController.navigate("${Routes.AMOUNT_ENTRY}/$assetInfo")
                 }
             )
         }
 
-        // 2. Amount Entry Screen
+        // 3. Amount Entry Screen
         composable("${Routes.AMOUNT_ENTRY}/{assetInfo}") { backStackEntry ->
             val assetInfo = backStackEntry.arguments?.getString("assetInfo") ?: "||"
             val (coinId, symbol, name) = assetInfo.split('|')
@@ -37,14 +46,13 @@ fun PortfolioNavGraph(
                 symbol = symbol,
                 name = name,
                 onSave = {
-                    navController.navigate(Routes.HOLDINGS)
+                    // Navigate to holdings and clear the backstack up to the graph's start destination
+                    navController.navigate(Routes.HOLDINGS) {
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
                 }
             )
-        }
-
-        // 3. Holdings Dashboard Placeholder
-        composable(Routes.HOLDINGS) {
-            // Future home of MyHoldingsScreen
         }
     }
 }
