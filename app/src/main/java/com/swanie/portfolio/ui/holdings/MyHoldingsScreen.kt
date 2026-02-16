@@ -45,7 +45,6 @@ fun MyHoldingsScreen(
     )
     val holdings by viewModel.holdings.collectAsState()
 
-    // 3. Calculate Total Portfolio Value
     val totalPortfolioValue = holdings.sumOf { it.amountHeld * it.currentPrice }
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
@@ -90,6 +89,14 @@ fun MyHoldingsScreen(
             style = MaterialTheme.typography.bodyMedium,
         )
 
+        // Total Assets Counter
+        Text(
+            text = "Total Assets: ${holdings.size}",
+            color = Color.Cyan.copy(alpha = 0.8f), // Cyan, slightly transparent
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = Color.DarkGray)
 
         // Display the List of Saved Assets
@@ -102,7 +109,6 @@ fun MyHoldingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        // 2.1 The Quantity
                         Text(
                             text = "${NumberFormat.getInstance().format(asset.amountHeld)} ${asset.symbol}",
                             color = Color.White,
@@ -110,7 +116,6 @@ fun MyHoldingsScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(Modifier.height(4.dp))
-                        // 2.2 The Calculated Value
                         Text(
                             text = "Value: ${currencyFormat.format(asset.amountHeld * asset.currentPrice)}",
                             color = Color.Gray,
