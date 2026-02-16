@@ -10,7 +10,8 @@ data class AssetEntity(
     val symbol: String,
     val name: String,
     val amountHeld: Double,
-    val currentPrice: Double,
+    val currentPrice: Double,    // Price per unit
     val change24h: Double,
-    val displayOrder: Int
+    val displayOrder: Int,
+    val lastUpdated: Long        // Epoch timestamp of the last price update
 )

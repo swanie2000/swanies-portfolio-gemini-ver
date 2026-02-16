@@ -76,14 +76,23 @@ fun AmountEntryScreen(
                 onClick = {
                     val amountHeld = amount.toDoubleOrNull() ?: 0.0
                     if (amountHeld > 0) {
+                        // For testing, let's use a placeholder price.
+                        val placeholderPrice = when(symbol) {
+                            "XRP" -> 0.52
+                            "BTC" -> 68000.0
+                            "ETH" -> 3400.0
+                            "Gold" -> 2300.0
+                            else -> 1.0
+                        }
                         val asset = AssetEntity(
                             coinId = coinId,
                             symbol = symbol,
                             name = name,
                             amountHeld = amountHeld,
-                            currentPrice = 0.0, // Placeholder, to be updated by network call
+                            currentPrice = placeholderPrice,
                             change24h = 0.0,    // Placeholder
-                            displayOrder = 0      // Placeholder, to be managed by holdings screen
+                            displayOrder = 0,     // Placeholder
+                            lastUpdated = System.currentTimeMillis() // Add current timestamp
                         )
                         viewModel.saveAsset(asset)
                         onSave()

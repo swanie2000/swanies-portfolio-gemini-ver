@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AssetDao {
@@ -13,7 +14,7 @@ interface AssetDao {
     suspend fun insertAsset(asset: AssetEntity)
 
     @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
-    suspend fun getAllAssets(): List<AssetEntity>
+    fun getAllAssets(): Flow<List<AssetEntity>>
 
     @Query("DELETE FROM assets WHERE coinId = :coinId")
     suspend fun deleteAsset(coinId: String)

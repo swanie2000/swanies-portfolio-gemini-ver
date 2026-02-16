@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,22 +15,39 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swanie.portfolio.data.local.AppDatabase
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun MyHoldingsScreen(
     onAddNewAsset: () -> Unit,
 ) {
-    // Placeholder data - will be replaced by ViewModel logic later
-    val holdings = listOf("XRP", "BTC", "ETH")
+    val context = LocalContext.current
+    val db = AppDatabase.getDatabase(context)
+    val viewModel: MyHoldingsViewModel = viewModel(
+        factory = MyHoldingsViewModelFactory(db.assetDao())
+    )
+    val holdings by viewModel.holdings.collectAsState()
+
+    // 3. Calculate Total Portfolio Value
+    val totalPortfolioValue = holdings.sumOf { it.amountHeld * it.currentPrice }
+    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
     Column(
         modifier = Modifier
@@ -53,14 +72,53 @@ fun MyHoldingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Asset", tint = Color.Black)
-                Text("Add New Asset", color = Color.Black, modifier = Modifier.padding(start = 4.dp))
+                Text("Add New", color = Color.Black, modifier = Modifier.padding(start = 4.dp))
             }
         }
 
-        // Placeholder List
-        LazyColumn(modifier = Modifier.padding(top = 24.dp)) {
-            items(holdings) { holding ->
-                Text(text = holding, color = Color.White, modifier = Modifier.padding(vertical = 8.dp))
+        // Total Portfolio Value Display
+        Text(
+            text = currencyFormat.format(totalPortfolioValue),
+            color = Color.Cyan,
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Text(
+            text = "Total Portfolio Value",
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = Color.DarkGray)
+
+        // Display the List of Saved Assets
+        LazyColumn {
+            items(holdings) { asset ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        // 2.1 The Quantity
+                        Text(
+                            text = "${NumberFormat.getInstance().format(asset.amountHeld)} ${asset.symbol}",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        // 2.2 The Calculated Value
+                        Text(
+                            text = "Value: ${currencyFormat.format(asset.amountHeld * asset.currentPrice)}",
+                            color = Color.Gray,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+                HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), modifier = Modifier.padding(top = 8.dp))
             }
         }
     }

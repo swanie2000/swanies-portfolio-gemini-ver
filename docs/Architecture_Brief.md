@@ -30,6 +30,23 @@ Feature Requirements (Phase 1)
 
     Flow: Asset Picker -> Amount Entry -> Save to Room -> MyHoldings View.
 
+
+## Database & Schema Management
+- **Room Persistence:** The app uses Room for local data storage of assets (XRP, Metals, etc.).
+- **Primary Key:** `assetId` (e.g., "XRP") is used as the unique identifier. Saving an existing asset will **overwrite (Replace)** the previous quantity to reflect the user's current total holdings.
+- **Migration Strategy:** During the development phase, the database is configured with `fallbackToDestructiveMigration()`.
+    - *Note:* If the `AssetEntity` schema changes (e.g., adding new fields like `currentPrice` or `lastUpdated`), the database version must be incremented in `AssetDatabase.kt`.
+    - *Warning:* Destructive migration will wipe local data on the device to reconcile the new schema. For production, manual migrations should be implemented to preserve user data.
+- **Calculations:** The `MyHoldingsScreen` performs real-time UI calculations (`quantity * currentPrice`) and aggregates the `Total Portfolio Value` using Kotlin's `sumOf` logic.
+
+
+
+
+
+
+
+
+
 🚀 Next Step: Triggering the Agent
 
 Now that you have the
