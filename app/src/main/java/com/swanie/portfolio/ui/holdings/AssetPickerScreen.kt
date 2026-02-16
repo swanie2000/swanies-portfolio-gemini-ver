@@ -1,15 +1,29 @@
 package com.swanie.portfolio.ui.holdings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.swanie.portfolio.ui.components.AlphaKeyboard
 
 @Composable
 fun AssetPickerScreen(onAssetSelected: (String) -> Unit) {
@@ -19,47 +33,58 @@ fun AssetPickerScreen(onAssetSelected: (String) -> Unit) {
     val allAssets = listOf("XRP", "BTC", "ETH", "DOGE", "SOL", "ADA")
     val filteredAssets = allAssets.filter { it.contains(searchQuery, ignoreCase = true) }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A))) {
-        // Search Header
-        Surface(
-            modifier = Modifier.fillMaxWidth().height(100.dp),
-            color = Color.Black
-        ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.Center) {
-                Text(
-                    text = if (searchQuery.isEmpty()) "SEARCH..." else searchQuery,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = Color.Cyan
-                )
-            }
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0A0A0A)) // Near-black background
+            .padding(16.dp)
+    ) {
+        // Native Text Field for search input
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text("SEARCH...", color = Color.Gray) },
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Characters,
+                imeAction = ImeAction.Search
+            ),
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Color.Cyan,
+                focusedBorderColor = Color.Cyan,
+                unfocusedBorderColor = Color.DarkGray,
+                focusedContainerColor = Color.Black,
+                unfocusedContainerColor = Color.Black
+            )
+        )
 
         // Results List
-        LazyColumn(modifier = Modifier.weight(1f).padding(16.dp)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
             items(filteredAssets) { asset ->
                 TextButton(
                     onClick = {
                         // Passing a placeholder coinId, the symbol, and the name
                         onAssetSelected("ripple|${asset}|${asset}")
-                     },
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = asset,
                         color = Color.White,
                         modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.headlineSmall
+                        textAlign = TextAlign.Center
                     )
                 }
-                HorizontalDivider(color = Color.DarkGray)
+                HorizontalDivider(color = Color.DarkGray, thickness = 1.dp)
             }
         }
-
-        // Custom Keyboard
-        AlphaKeyboard(
-            onKeyClick = { searchQuery += it },
-            onBackSpace = { if (searchQuery.isNotEmpty()) searchQuery = searchQuery.dropLast(1) },
-            onClear = { searchQuery = "" }
-        )
+        // The custom AlphaKeyboard component has been removed.
     }
 }
