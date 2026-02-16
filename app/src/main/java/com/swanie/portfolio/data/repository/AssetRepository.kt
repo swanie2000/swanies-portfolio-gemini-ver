@@ -4,7 +4,6 @@ import android.util.Log
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.CoinGeckoApiService
-import com.swanie.portfolio.data.network.MarketData
 import kotlinx.coroutines.flow.first
 
 class AssetRepository(
@@ -22,6 +21,17 @@ class AssetRepository(
             else -> asset.coinId
         }
     }
+
+    suspend fun getSingleCoinPrice(coinId: String): Double {
+        return try {
+            val priceMap = coinGeckoApiService.getSimplePrice(ids = coinId)
+            priceMap[coinId]?.get("usd") ?: 0.0
+        } catch (e: Exception) {
+            Log.e("AssetRepository", "Failed to get single coin price for $coinId", e)
+            0.0
+        }
+    }
+
 
     suspend fun refreshAssetPrices() {
         val heldAssets = allAssets.first()
@@ -45,15 +55,25 @@ class AssetRepository(
         }
     }
 
-    suspend fun searchCoinsWithPrices(query: String): List<MarketData> {
+    suspend fun searchCoins(query: String): List<AssetEntity> {
         if (query.length < 2) return emptyList()
         return try {
             val searchResult = coinGeckoApiService.search(query)
-            if (searchResult.coins.isEmpty()) return emptyList()
-            val ids = searchResult.coins.joinToString(",") { it.id }
-            coinGeckoApiService.getMarkets(ids = ids)
+            searchResult.coins.map { coin ->
+                AssetEntity(
+                    coinId = coin.id,
+                    symbol = coin.symbol,
+                    name = coin.name,
+                    imageUrl = coin.large,
+                    amountHeld = 0.0,
+                    currentPrice = 0.0,
+                    change24h = 0.0,
+                    displayOrder = 0,
+                    lastUpdated = 0L
+                )
+            }
         } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to search coins with prices: $query", e)
+            Log.e("AssetRepository", "Failed to search coins for query: $query", e)
             emptyList()
         }
     }

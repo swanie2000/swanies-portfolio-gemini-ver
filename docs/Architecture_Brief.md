@@ -1,52 +1,53 @@
+Architecture_Brief.md
+
+    MANDATORY PROTOCOL: Read this entire brief before every task. Do not refactor multiple layers (Repository, ViewModel, UI) simultaneously. Implement changes atomically, one file at a time, to maintain build stability.
+
 Project Intent
 
     Goal: A premium, personal portfolio tracker for Crypto (XRP focus) and Metals.
 
     Target: Personal use first, then Google Play Store (commercial).
 
-    Aesthetic: Dark/Neon theme utilizing custom high-res keyboard assets.
+    Aesthetic: Dark/Neon theme. Note: Use standard Android system keyboards; custom high-res keyboard assets have been deprecated.
 
 Technical Stack
 
     Language: Kotlin / Jetpack Compose.
 
-    Database: Room (for persistent local storage of assets and amounts).
+    Database: Room (Persistent local storage).
 
-    API: Retrofit (connecting to Coingecko for real-time prices/icons).
+    API: Retrofit (CoinGecko integration).
 
-    Navigation: Compose Navigation with type-safe routes.
+    Navigation: Compose Navigation with URL-encoded argument passing.
 
 Feature Requirements (Phase 1)
 
-    Data Persistence: Local Asset table containing: coinId, symbol, name, amountHeld, currentPrice, change24h, and displayOrder.
+    Data Persistence: AssetEntity contains: coinId, symbol, name, imageUrl, amountHeld, currentPrice, change24h, displayOrder, and lastUpdated.
 
-    Asset Picker: Custom Search screen using AlphaKeyboard linked to a live API list.
+    The "Lean Search" Logic: - Asset Picker: Search results must remain Price-Blind to avoid API rate limits. It only provides id, name, symbol, and imageUrl.
 
-    Holdings Dashboard: A list of cards showing holdings.
+        Handoff: Navigation must pass all 4 string arguments (URL-encoded) from Picker to Amount Entry.
 
-        Interactive Cards: Must include a drag-handle for manual reordering and a delete button.
+    Amount Entry Screen: This screen is responsible for the Targeted Price Fetch.
 
-        Visuals: Icon, Price, 24h % change with up/down indicators.
+        It must fetch the price for the specific coinId on launch.
 
-    Flow: Asset Picker -> Amount Entry -> Save to Room -> MyHoldings View.
+        The UI should display the price/icon and allow the user to input quantity.
 
+    Holdings Dashboard: Displays cards with drag-handle reordering and delete functionality.
 
-## Database & Schema Management
-- **Room Persistence:** The app uses Room for local data storage of assets (XRP, Metals, etc.).
-- **Primary Key:** `assetId` (e.g., "XRP") is used as the unique identifier. Saving an existing asset will **overwrite (Replace)** the previous quantity to reflect the user's current total holdings.
-- **Migration Strategy:** During the development phase, the database is configured with `fallbackToDestructiveMigration()`.
-    - *Note:* If the `AssetEntity` schema changes (e.g., adding new fields like `currentPrice` or `lastUpdated`), the database version must be incremented in `AssetDatabase.kt`.
-    - *Warning:* Destructive migration will wipe local data on the device to reconcile the new schema. For production, manual migrations should be implemented to preserve user data.
-- **Calculations:** The `MyHoldingsScreen` performs real-time UI calculations (`quantity * currentPrice`) and aggregates the `Total Portfolio Value` using Kotlin's `sumOf` logic.
+Database & Schema Management
 
+    Primary Key: coinId (Unique identifier).
 
+    Conflict Strategy: OnConflictStrategy.REPLACE. Saving an entry updates the quantity for that asset.
 
+    Migration: Development uses fallbackToDestructiveMigration(). Increment database version in AppDatabase.kt whenever AssetEntity fields change.
 
+Performance & API Stability
 
+    Rate Limiting: Strictly Forbidden to perform price lookups in the Search List or during onValueChange in the Picker.
 
+    Debounce: Search queries must have a 500ms delay to protect API credits.
 
-
-
-🚀 Next Step: Triggering the Agent
-
-Now that you have the
+    Calculations: UI performs quantity * currentPrice. Totals are calculated via sumOf.

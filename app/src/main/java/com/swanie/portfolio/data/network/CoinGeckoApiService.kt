@@ -13,17 +13,8 @@ data class CoinSearchResult(
 data class CoinSummary(
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
-    @SerializedName("symbol") val symbol: String
-)
-
-// Rich data model for /coins/markets endpoint
-data class MarketData(
-    @SerializedName("id") val id: String,
     @SerializedName("symbol") val symbol: String,
-    @SerializedName("name") val name: String,
-    @SerializedName("image") val imageUrl: String,
-    @SerializedName("current_price") val currentPrice: Double?,
-    @SerializedName("price_change_percentage_24h") val priceChangePercentage24h: Double?
+    @SerializedName("large") val large: String
 )
 
 // --- API Service Interface ---
@@ -40,11 +31,4 @@ interface CoinGeckoApiService {
     suspend fun search(
         @Query("query") query: String
     ): CoinSearchResult
-
-    // New endpoint for fetching detailed market data
-    @GET("coins/markets")
-    suspend fun getMarkets(
-        @Query("vs_currency") vsCurrency: String = "usd",
-        @Query("ids") ids: String // Comma-separated list of coin IDs
-    ): List<MarketData>
 }

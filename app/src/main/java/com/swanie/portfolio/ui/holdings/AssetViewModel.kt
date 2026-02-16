@@ -3,7 +3,6 @@ package com.swanie.portfolio.ui.holdings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.data.network.MarketData
 import com.swanie.portfolio.data.repository.AssetRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,8 +22,8 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
             initialValue = emptyList()
         )
 
-    private val _searchResults = MutableStateFlow<List<MarketData>>(emptyList())
-    val searchResults: StateFlow<List<MarketData>> = _searchResults.asStateFlow()
+    private val _searchResults = MutableStateFlow<List<AssetEntity>>(emptyList())
+    val searchResults: StateFlow<List<AssetEntity>> = _searchResults.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
@@ -33,6 +32,10 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
 
     init {
         refreshPrices()
+    }
+
+    suspend fun getSingleCoinPrice(coinId: String): Double {
+        return repository.getSingleCoinPrice(coinId)
     }
 
     fun refreshPrices() {
@@ -51,19 +54,14 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
         }
         searchJob = viewModelScope.launch {
             delay(500)
-            val results = repository.searchCoinsWithPrices(query)
+            val results = repository.searchCoins(query)
             _searchResults.value = results
         }
     }
 
-    /**
-     * THE FIX: A single function to save an asset and then immediately refresh prices,
-     * ensuring the UI gets the final, correct data.
-     */
     fun saveNewAsset(asset: AssetEntity, onSaveComplete: () -> Unit) {
         viewModelScope.launch {
             repository.saveAsset(asset)
-            repository.refreshAssetPrices() // Refresh prices for all assets after saving
             onSaveComplete()
         }
     }

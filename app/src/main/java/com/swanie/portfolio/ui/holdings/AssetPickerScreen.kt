@@ -33,16 +33,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String) -> Unit) {
@@ -56,7 +52,6 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
         factory = AssetViewModelFactory(db.assetDao())
     )
     val searchResults by viewModel.searchResults.collectAsState()
-    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -103,32 +98,23 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
                 .fillMaxWidth()
                 .padding(top = 16.dp)
         ) {
-            items(searchResults) { marketData ->
+            items(searchResults) { asset ->
                 TextButton(
-                    // Pass the imageUrl to the navigation callback
-                    onClick = { onAssetSelected(marketData.id, marketData.symbol.uppercase(), marketData.name, marketData.imageUrl) },
+                    onClick = { onAssetSelected(asset.coinId, asset.symbol.uppercase(), asset.name, asset.imageUrl) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.Start
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            AsyncImage(
-                                model = marketData.imageUrl,
-                                contentDescription = "${marketData.name} icon",
-                                modifier = Modifier.size(30.dp)
-                            )
-                            Spacer(Modifier.width(16.dp))
-                            Text("${marketData.name} (${marketData.symbol.uppercase()})", color = Color.White)
-                        }
-                        Text(
-                            text = currencyFormat.format(marketData.currentPrice ?: 0.0),
-                            color = Color.Cyan,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                        AsyncImage(
+                            model = asset.imageUrl,
+                            contentDescription = "${asset.name} icon",
+                            modifier = Modifier.size(30.dp)
                         )
+                        Spacer(Modifier.width(16.dp))
+                        Text("${asset.name} (${asset.symbol.uppercase()})", color = Color.White)
                     }
                 }
                 HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)

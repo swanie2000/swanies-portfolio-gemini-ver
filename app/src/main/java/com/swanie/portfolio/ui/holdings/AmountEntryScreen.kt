@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +42,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun AmountEntryScreen(
@@ -52,15 +56,18 @@ fun AmountEntryScreen(
 ) {
     val context = LocalContext.current
     val db = AppDatabase.getDatabase(context)
-    // THE FIX: Use the single, shared AssetViewModel
     val viewModel: AssetViewModel = viewModel(
         factory = AssetViewModelFactory(db.assetDao())
     )
 
     var amount by remember { mutableStateOf("") }
+    var price by remember { mutableDoubleStateOf(0.0) }
+    var isLoading by remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(coinId) {
+        price = viewModel.getSingleCoinPrice(coinId)
+        isLoading = false
         focusRequester.requestFocus()
     }
 
@@ -72,13 +79,12 @@ fun AmountEntryScreen(
                 symbol = symbol,
                 name = name,
                 amountHeld = amountHeld,
-                currentPrice = 0.0, // This will be updated by the refresh logic
+                currentPrice = price, // Use the fetched price
                 change24h = 0.0,
                 displayOrder = 0,
                 lastUpdated = System.currentTimeMillis(),
-                imageUrl = imageUrl // Save the image URL
+                imageUrl = imageUrl
             )
-            // This call now saves the asset, refreshes all prices, and then navigates.
             viewModel.saveNewAsset(asset, onSaveComplete = onSave)
         }
     }
@@ -111,6 +117,15 @@ fun AmountEntryScreen(
                 style = MaterialTheme.typography.displaySmall,
                 color = Color.White
             )
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 8.dp))
+            } else {
+                Text(
+                    text = NumberFormat.getCurrencyInstance(Locale.US).format(price),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.Cyan
+                )
+            }
             Spacer(Modifier.height(32.dp))
 
             OutlinedTextField(
