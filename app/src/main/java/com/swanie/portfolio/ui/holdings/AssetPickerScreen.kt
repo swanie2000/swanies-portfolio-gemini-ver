@@ -2,6 +2,8 @@ package com.swanie.portfolio.ui.holdings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,32 +12,50 @@ import androidx.compose.ui.unit.dp
 import com.swanie.portfolio.ui.components.AlphaKeyboard
 
 @Composable
-fun AssetPickerScreen() {
+fun AssetPickerScreen(onAssetSelected: (String) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
 
-    // Using a dark background to match your keyboard's neon/dark aesthetic
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0F0F0F))) {
+    // Placeholder list - will be replaced by API logic later
+    val allAssets = listOf("XRP", "BTC", "ETH", "DOGE", "SOL", "ADA")
+    val filteredAssets = allAssets.filter { it.contains(searchQuery, ignoreCase = true) }
 
-        // Display what we are typing
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0A))) {
+        // Search Header
         Surface(
-            modifier = Modifier.fillMaxWidth().height(120.dp),
-            color = Color.Black.copy(alpha = 0.8f)
+            modifier = Modifier.fillMaxWidth().height(100.dp),
+            color = Color.Black
         ) {
-            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.Center) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = if (searchQuery.isEmpty()) "SEARCH ASSETS..." else searchQuery,
-                    style = MaterialTheme.typography.headlineMedium,
+                    text = if (searchQuery.isEmpty()) "SEARCH..." else searchQuery,
+                    style = MaterialTheme.typography.displaySmall,
                     color = Color.Cyan
                 )
             }
         }
 
-        // Placeholder for results list
-        Box(modifier = Modifier.weight(1f)) {
-            // We will add the API search results here soon
+        // Results List
+        LazyColumn(modifier = Modifier.weight(1f).padding(16.dp)) {
+            items(filteredAssets) { asset ->
+                TextButton(
+                    onClick = {
+                        // Passing a placeholder coinId, the symbol, and the name
+                        onAssetSelected("ripple|${asset}|${asset}")
+                     },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = asset,
+                        color = Color.White,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                }
+                HorizontalDivider(color = Color.DarkGray)
+            }
         }
 
-        // Our Custom Keyboard at the bottom
+        // Custom Keyboard
         AlphaKeyboard(
             onKeyClick = { searchQuery += it },
             onBackSpace = { if (searchQuery.isNotEmpty()) searchQuery = searchQuery.dropLast(1) },
