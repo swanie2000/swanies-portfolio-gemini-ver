@@ -6,12 +6,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "assets")
 data class AssetEntity(
     @PrimaryKey
-    val coinId: String,
-    val symbol: String,
+    val coinId: String, // e.g., "ripple", "bitcoin"
+    val symbol: String,   // e.g., "XRP", "BTC"
     val name: String,
     val amountHeld: Double,
-    val currentPrice: Double,    // Price per unit
+    val currentPrice: Double,
     val change24h: Double,
     val displayOrder: Int,
-    val lastUpdated: Long        // Epoch timestamp of the last price update
+    val lastUpdated: Long,
+    val imageUrl: String // THE FIX: Add image URL field
 )

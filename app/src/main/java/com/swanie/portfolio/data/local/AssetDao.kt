@@ -13,7 +13,8 @@ interface AssetDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAsset(asset: AssetEntity)
 
-    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
+    // THE FIX: Order by the lastUpdated timestamp in descending order.
+    @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
     fun getAllAssets(): Flow<List<AssetEntity>>
 
     @Query("DELETE FROM assets WHERE coinId = :coinId")

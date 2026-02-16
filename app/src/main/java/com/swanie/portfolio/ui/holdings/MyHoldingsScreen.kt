@@ -9,19 +9,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +38,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
+import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -40,13 +50,26 @@ fun MyHoldingsScreen(
 ) {
     val context = LocalContext.current
     val db = AppDatabase.getDatabase(context)
-    val viewModel: MyHoldingsViewModel = viewModel(
-        factory = MyHoldingsViewModelFactory(db.assetDao())
+    val viewModel: AssetViewModel = viewModel(
+        factory = AssetViewModelFactory(db.assetDao())
     )
     val holdings by viewModel.holdings.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     val totalPortfolioValue = holdings.sumOf { it.amountHeld * it.currentPrice }
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+
+    var countdown by remember { mutableStateOf(60) }
+
+    LaunchedEffect(key1 = isRefreshing) {
+        if (!isRefreshing) {
+            countdown = 60
+            while (countdown > 0) {
+                delay(1000)
+                countdown--
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -83,23 +106,33 @@ fun MyHoldingsScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 8.dp)
         )
-        Text(
-            text = "Total Portfolio Value",
-            color = Color.Gray,
-            style = MaterialTheme.typography.bodyMedium,
-        )
 
-        // Total Assets Counter
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Total Portfolio Value",
+                color = Color.Gray,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = { viewModel.refreshPrices() }, enabled = countdown == 0 && !isRefreshing) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Refresh Prices",
+                    tint = if (countdown == 0 && !isRefreshing) Color.Cyan else Color.DarkGray
+                )
+            }
+        }
+
         Text(
-            text = "Total Assets: ${holdings.size}",
-            color = Color.Cyan.copy(alpha = 0.8f), // Cyan, slightly transparent
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 8.dp)
+            text = if (isRefreshing) "Refreshing..." else if (countdown > 0) "Next update in ${countdown}s" else "Ready to refresh",
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = Color.DarkGray)
 
-        // Display the List of Saved Assets
+        // Holdings List
         LazyColumn {
             items(holdings) { asset ->
                 Row(
@@ -108,6 +141,13 @@ fun MyHoldingsScreen(
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // THE FIX: Add the crypto icon
+                    AsyncImage(
+                        model = asset.imageUrl,
+                        contentDescription = "${asset.name} icon",
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "${NumberFormat.getInstance().format(asset.amountHeld)} ${asset.symbol}",

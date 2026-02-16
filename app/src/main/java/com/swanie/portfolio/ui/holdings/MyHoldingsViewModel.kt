@@ -5,34 +5,52 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.network.RetrofitClient
+import com.swanie.portfolio.data.repository.AssetRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class MyHoldingsViewModel(assetDao: AssetDao) : ViewModel() {
+class MyHoldingsViewModel(private val repository: AssetRepository) : ViewModel() {
 
-    /**
-     * Holds the state of the asset list from the database, observed as a StateFlow.
-     * This will automatically update the UI whenever the data in the 'assets' table changes.
-     */
-    val holdings: StateFlow<List<AssetEntity>> = assetDao.getAllAssets()
+    // Expose the holdings from the repository. The UI will collect this.
+    val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .stateIn(
             scope = viewModelScope,
-            // Keep the data alive for 5 seconds after the UI is gone, to avoid re-querying on quick configuration changes.
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    init {
+        // Fetch prices automatically when the app starts.
+        refreshPrices()
+    }
+
+    /**
+     * Triggers a refresh of the asset prices from the CoinGecko API.
+     * It sets the isRefreshing state to true during the operation.
+     */
+    fun refreshPrices() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            repository.refreshAssetPrices()
+            _isRefreshing.value = false
+        }
+    }
 }
 
-/**
- * Factory for creating MyHoldingsViewModel with a constructor that takes an AssetDao.
- * This allows us to inject the DAO dependency into the ViewModel.
- */
 class MyHoldingsViewModelFactory(private val assetDao: AssetDao) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MyHoldingsViewModel::class.java)) {
+            val repository = AssetRepository(assetDao, RetrofitClient.instance)
             @Suppress("UNCHECKED_CAST")
-            return MyHoldingsViewModel(assetDao) as T
+            return MyHoldingsViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

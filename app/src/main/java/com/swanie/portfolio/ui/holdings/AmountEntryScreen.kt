@@ -1,31 +1,43 @@
 package com.swanie.portfolio.ui.holdings
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
 
@@ -34,33 +46,87 @@ fun AmountEntryScreen(
     coinId: String,
     symbol: String,
     name: String,
-    onSave: () -> Unit
+    imageUrl: String,
+    onSave: () -> Unit,
+    onCancel: () -> Unit
 ) {
     val context = LocalContext.current
     val db = AppDatabase.getDatabase(context)
-    val viewModel: AmountEntryViewModel = viewModel(
-        factory = AmountEntryViewModelFactory(db.assetDao())
+    // THE FIX: Use the single, shared AssetViewModel
+    val viewModel: AssetViewModel = viewModel(
+        factory = AssetViewModelFactory(db.assetDao())
     )
 
     var amount by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
 
-    Scaffold(
-        containerColor = Color.Black
-    ) {
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    fun onSaveHolding() {
+        val amountHeld = amount.toDoubleOrNull() ?: 0.0
+        if (amountHeld > 0) {
+            val asset = AssetEntity(
+                coinId = coinId,
+                symbol = symbol,
+                name = name,
+                amountHeld = amountHeld,
+                currentPrice = 0.0, // This will be updated by the refresh logic
+                change24h = 0.0,
+                displayOrder = 0,
+                lastUpdated = System.currentTimeMillis(),
+                imageUrl = imageUrl // Save the image URL
+            )
+            // This call now saves the asset, refreshes all prices, and then navigates.
+            viewModel.saveNewAsset(asset, onSaveComplete = onSave)
+        }
+    }
+
+    Scaffold(containerColor = Color.Black) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                IconButton(onClick = onCancel, modifier = Modifier.align(Alignment.CenterStart)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "$name Icon",
+                modifier = Modifier.size(120.dp)
+            )
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = name,
+                style = MaterialTheme.typography.displaySmall,
+                color = Color.White
+            )
+            Spacer(Modifier.height(32.dp))
+
             OutlinedTextField(
                 value = amount,
                 onValueChange = { amount = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
                 label = { Text("Enter Amount for $symbol", color = Color.Gray) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSaveHolding() }
+                ),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -72,35 +138,14 @@ fun AmountEntryScreen(
                     unfocusedContainerColor = Color.Transparent
                 )
             )
+
+            Spacer(Modifier.weight(1f))
+
             Button(
-                onClick = {
-                    val amountHeld = amount.toDoubleOrNull() ?: 0.0
-                    if (amountHeld > 0) {
-                        // For testing, let's use a placeholder price.
-                        val placeholderPrice = when(symbol) {
-                            "XRP" -> 0.52
-                            "BTC" -> 68000.0
-                            "ETH" -> 3400.0
-                            "Gold" -> 2300.0
-                            else -> 1.0
-                        }
-                        val asset = AssetEntity(
-                            coinId = coinId,
-                            symbol = symbol,
-                            name = name,
-                            amountHeld = amountHeld,
-                            currentPrice = placeholderPrice,
-                            change24h = 0.0,    // Placeholder
-                            displayOrder = 0,     // Placeholder
-                            lastUpdated = System.currentTimeMillis() // Add current timestamp
-                        )
-                        viewModel.saveAsset(asset)
-                        onSave()
-                    }
-                },
+                onClick = { onSaveHolding() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 24.dp),
+                    .padding(bottom = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
             ) {
                 Text("Save Asset", color = Color.Black)

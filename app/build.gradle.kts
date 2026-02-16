@@ -47,14 +47,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network)
     implementation(libs.retrofit.main)
     implementation(libs.retrofit.gson)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.coil.compose) // Correct alias
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

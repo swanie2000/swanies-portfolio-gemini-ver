@@ -1,10 +1,15 @@
 package com.swanie.portfolio.ui.holdings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,60 +20,71 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.swanie.portfolio.data.local.AppDatabase
+import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun AssetPickerScreen(onAssetSelected: (String) -> Unit) {
+fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
 
-    // 1. Seed List for testing
-    val assets = listOf("XRP", "BTC", "ETH", "Gold", "Silver", "Platinum", "Palladium")
+    val context = LocalContext.current
+    val db = AppDatabase.getDatabase(context)
+    val viewModel: AssetViewModel = viewModel(
+        factory = AssetViewModelFactory(db.assetDao())
+    )
+    val searchResults by viewModel.searchResults.collectAsState()
+    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
-    // 2. Filter Logic
-    val filteredAssets = if (searchQuery.isBlank()) {
-        assets
-    } else {
-        assets.filter { it.contains(searchQuery, ignoreCase = true) }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        keyboardController?.show()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A0A0A)) // Near-black background
+            .background(Color(0xFF0A0A0A))
             .padding(16.dp)
     ) {
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("SEARCH...", color = Color.Gray) },
+            onValueChange = {
+                searchQuery = it
+                viewModel.searchCoins(it)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+            placeholder = { Text("Search (e.g., Bitcoin, Gold)", color = Color.Gray) },
             keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Characters,
+                capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Search
             ),
-            // 4. Keyboard Action to select the first result
             keyboardActions = KeyboardActions(
-                onSearch = {
-                    if (filteredAssets.isNotEmpty()) {
-                        val firstAsset = filteredAssets.first()
-                        // Use a placeholder coinId for navigation
-                        val coinId = firstAsset.lowercase(Locale.ROOT)
-                        onAssetSelected("$coinId|$firstAsset|$firstAsset")
-                        keyboardController?.hide()
-                    }
-                }
+                onSearch = { keyboardController?.hide() }
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
@@ -87,23 +103,35 @@ fun AssetPickerScreen(onAssetSelected: (String) -> Unit) {
                 .fillMaxWidth()
                 .padding(top = 16.dp)
         ) {
-            items(filteredAssets) { asset ->
-                // 3. Click Action
+            items(searchResults) { marketData ->
                 TextButton(
-                    onClick = {
-                        val coinId = asset.lowercase(Locale.ROOT)
-                        onAssetSelected("$coinId|$asset|$asset")
-                    },
+                    // Pass the imageUrl to the navigation callback
+                    onClick = { onAssetSelected(marketData.id, marketData.symbol.uppercase(), marketData.name, marketData.imageUrl) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = asset,
-                        color = Color.White,
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            AsyncImage(
+                                model = marketData.imageUrl,
+                                contentDescription = "${marketData.name} icon",
+                                modifier = Modifier.size(30.dp)
+                            )
+                            Spacer(Modifier.width(16.dp))
+                            Text("${marketData.name} (${marketData.symbol.uppercase()})", color = Color.White)
+                        }
+                        Text(
+                            text = currencyFormat.format(marketData.currentPrice ?: 0.0),
+                            color = Color.Cyan,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
-                HorizontalDivider(color = Color.DarkGray, thickness = 1.dp)
+                HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
             }
         }
     }
