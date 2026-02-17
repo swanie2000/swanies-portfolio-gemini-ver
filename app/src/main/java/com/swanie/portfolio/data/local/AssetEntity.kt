@@ -14,5 +14,6 @@ data class AssetEntity(
     val change24h: Double,
     val displayOrder: Int,
     val lastUpdated: Long,
-    val imageUrl: String // THE FIX: Add image URL field
+    val imageUrl: String, // THE FIX: Add image URL field
+    val category: String = "crypto" // New field for categorization
 )
