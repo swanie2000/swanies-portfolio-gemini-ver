@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.SwaniesPortfolio" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#000416</item>
+    </style>
 
-    <style name="Theme.SwaniesPortfolio" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#000416</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_swanie</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.SwaniesPortfolio</item>
+    </style>
 </resources>

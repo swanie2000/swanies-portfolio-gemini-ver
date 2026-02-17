@@ -7,42 +7,42 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.swanie.portfolio.ui.holdings.AmountEntryScreen
-import com.swanie.portfolio.ui.holdings.AssetPickerScreen
+import com.swanie.portfolio.ui.features.HomeScreen
+import com.swanie.portfolio.ui.features.SettingsScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
+import com.swanie.portfolio.ui.holdings.AssetPickerScreen
+import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import java.net.URLDecoder
-import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
-fun PortfolioNavGraph(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
+fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOLDINGS,
+        startDestination = Routes.HOME,
         modifier = modifier
     ) {
+        composable(Routes.HOME) {
+            HomeScreen(navController)
+        }
 
         composable(Routes.HOLDINGS) {
-            MyHoldingsScreen(
-                onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) }
-            )
+            MyHoldingsScreen(onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) })
+        }
+
+        composable(Routes.SETTINGS) {
+            SettingsScreen()
         }
 
         composable(Routes.ASSET_PICKER) {
-            AssetPickerScreen(
-                onAssetSelected = { coinId, symbol, name, imageUrl ->
-                    // Encode the URL to handle special characters safely
-                    val encodedUrl = URLEncoder.encode(imageUrl, StandardCharsets.UTF_8.toString())
-                    navController.navigate("${Routes.AMOUNT_ENTRY}/$coinId/$symbol/$name/$encodedUrl")
-                }
-            )
+            AssetPickerScreen(onAssetSelected = { id, sym, name, url ->
+                val encodedUrl = java.net.URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+                navController.navigate("amount_entry/$id/$sym/$name/$encodedUrl")
+            })
         }
 
         composable(
-            route = "${Routes.AMOUNT_ENTRY}/{coinId}/{symbol}/{name}/{imageUrl}",
+            route = Routes.AMOUNT_ENTRY,
             arguments = listOf(
                 navArgument("coinId") { type = NavType.StringType },
                 navArgument("symbol") { type = NavType.StringType },
@@ -63,16 +63,11 @@ fun PortfolioNavGraph(
                 imageUrl = decodedUrl,
                 onSave = {
                     navController.navigate(Routes.HOLDINGS) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
+                        popUpTo(Routes.HOLDINGS) { inclusive = true }
                     }
                 },
                 onCancel = {
-                    navController.navigate(Routes.HOLDINGS) {
-                        popUpTo(Routes.HOLDINGS) {
-                            inclusive = true
-                        }
-                    }
+                    navController.popBackStack()
                 }
             )
         }
