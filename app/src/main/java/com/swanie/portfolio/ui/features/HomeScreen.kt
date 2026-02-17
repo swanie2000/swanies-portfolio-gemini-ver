@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 fun HomeScreen(navController: NavHostController) {
     var animateStart by remember { mutableStateOf(false) }
     val offsetY by animateDpAsState(
-        targetValue = if (animateStart) (-100).dp else 0.dp,
+        targetValue = if (animateStart) (-150).dp else 0.dp,
         animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
         label = "SwanGlide"
     )
@@ -30,13 +30,12 @@ fun HomeScreen(navController: NavHostController) {
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF000416)) {
-        Column(
+        Box(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.ic_launcher_swanie),
+                painter = painterResource(id = R.drawable.swanie_splash),
                 contentDescription = "Swan",
                 modifier = Modifier.size(120.dp).offset(y = offsetY)
             )
@@ -45,7 +44,10 @@ fun HomeScreen(navController: NavHostController) {
                 visible = animateStart,
                 enter = fadeIn(animationSpec = tween(1000))
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(top = 160.dp) // Adjust padding to reveal text
+                ) {
                     Text("Swanie's Portfolio", style = MaterialTheme.typography.headlineMedium, color = Color.White)
                     Text("Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge, color = Color.LightGray)
                     Spacer(modifier = Modifier.height(40.dp))
