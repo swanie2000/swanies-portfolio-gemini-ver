@@ -28,22 +28,35 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
+    private val _isRefreshEnabled = MutableStateFlow(true)
+    val isRefreshEnabled: StateFlow<Boolean> = _isRefreshEnabled.asStateFlow()
+
     private var searchJob: Job? = null
 
     init {
-        refreshPrices()
+        // Perform an automatic refresh on initial load
+        refreshAllPrices()
+    }
+
+    fun refreshAllPrices() {
+        viewModelScope.launch {
+            if (!_isRefreshEnabled.value) return@launch // Exit if on cooldown
+
+            _isRefreshing.value = true
+            _isRefreshEnabled.value = false
+
+            repository.refreshAssetPrices()
+
+            _isRefreshing.value = false
+
+            // Start 60-second cooldown
+            delay(60000)
+            _isRefreshEnabled.value = true
+        }
     }
 
     suspend fun getSingleCoinPrice(coinId: String): Double {
         return repository.getSingleCoinPrice(coinId)
-    }
-
-    fun refreshPrices() {
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            repository.refreshAssetPrices()
-            _isRefreshing.value = false
-        }
     }
 
     fun searchCoins(query: String) {
@@ -53,7 +66,7 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
             return
         }
         searchJob = viewModelScope.launch {
-            delay(500)
+            delay(500) // Debounce search input
             val results = repository.searchCoins(query)
             _searchResults.value = results
         }

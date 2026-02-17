@@ -16,7 +16,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,8 +43,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun AmountEntryScreen(
@@ -64,39 +60,34 @@ fun AmountEntryScreen(
     )
 
     var amount by remember { mutableStateOf("") }
-    var price by remember { mutableDoubleStateOf(0.0) }
-    var isLoading by remember { mutableStateOf(true) }
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-
-    LaunchedEffect(coinId) {
-        price = viewModel.getSingleCoinPrice(coinId)
-        isLoading = false
+    // Request focus on launch
+    LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
 
-    fun onSaveHolding() {
-        if (price <= 0) {
-            errorMessage = "Price not available. Please wait..."
+    fun executeSave() {
+        val amountHeld = amount.toDoubleOrNull()
+        if (amountHeld == null || amountHeld <= 0) {
+            errorMessage = "Please enter a valid amount."
             return
         }
-        val amountHeld = amount.toDoubleOrNull() ?: 0.0
-        if (amountHeld > 0) {
-            val asset = AssetEntity(
-                coinId = coinId,
-                symbol = symbol,
-                name = name,
-                amountHeld = amountHeld,
-                currentPrice = price, // Use the fetched price
-                change24h = 0.0,
-                displayOrder = 0,
-                lastUpdated = System.currentTimeMillis(),
-                imageUrl = imageUrl
-            )
-            viewModel.saveNewAsset(asset, onSaveComplete = onSave)
-        }
+
+        val asset = AssetEntity(
+            coinId = coinId,
+            symbol = symbol,
+            name = name,
+            amountHeld = amountHeld,
+            currentPrice = 0.0, // Price-blind save
+            change24h = 0.0,
+            displayOrder = 0,
+            lastUpdated = System.currentTimeMillis(),
+            imageUrl = imageUrl
+        )
+        viewModel.saveNewAsset(asset, onSaveComplete = onSave)
     }
 
     if (showExitDialog) {
@@ -149,15 +140,7 @@ fun AmountEntryScreen(
                 style = MaterialTheme.typography.displaySmall,
                 color = Color.White
             )
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.padding(top = 8.dp))
-            } else {
-                Text(
-                    text = NumberFormat.getCurrencyInstance(Locale.US).format(price),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.Cyan
-                )
-            }
+
             Spacer(Modifier.height(32.dp))
 
             OutlinedTextField(
@@ -175,7 +158,7 @@ fun AmountEntryScreen(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { onSaveHolding() }
+                    onDone = { executeSave() }
                 ),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -192,19 +175,19 @@ fun AmountEntryScreen(
                 Text(
                     text = it,
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
-
 
             Spacer(Modifier.weight(1f))
 
             Button(
-                onClick = { onSaveHolding() },
+                onClick = { executeSave() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan),
+                enabled = amount.isNotBlank()
             ) {
                 Text("Save Asset", color = Color.Black)
             }

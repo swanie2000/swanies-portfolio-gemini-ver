@@ -23,12 +23,13 @@ class AssetRepository(
     }
 
     suspend fun getSingleCoinPrice(coinId: String): Double {
-        return try {
+        try {
             val priceMap = coinGeckoApiService.getSimplePrice(ids = coinId)
-            priceMap[coinId]?.get("usd") ?: 0.0
+            return priceMap[coinId]?.get("usd")
+                ?: throw IllegalStateException("Price not found for coin $coinId")
         } catch (e: Exception) {
             Log.e("AssetRepository", "Failed to get single coin price for $coinId", e)
-            0.0
+            throw e
         }
     }
 
@@ -45,8 +46,7 @@ class AssetRepository(
                 val canonicalId = getCanonicalApiId(asset)
                 val newPrice = priceMap[canonicalId]?.get("usd")
                 asset.copy(
-                    currentPrice = newPrice ?: asset.currentPrice,
-                    lastUpdated = System.currentTimeMillis()
+                    currentPrice = newPrice ?: asset.currentPrice
                 )
             }
             updatedAssets.forEach { assetDao.insertAsset(it) }
@@ -65,8 +65,9 @@ class AssetRepository(
                     symbol = coin.symbol,
                     name = coin.name,
                     imageUrl = coin.large,
+                    // These fields are not provided by the search endpoint
                     amountHeld = 0.0,
-                    currentPrice = 0.0,
+                    currentPrice = 0.0, // Price is intentionally not fetched
                     change24h = 0.0,
                     displayOrder = 0,
                     lastUpdated = 0L

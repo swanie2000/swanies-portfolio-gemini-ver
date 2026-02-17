@@ -24,12 +24,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
-import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -55,21 +50,10 @@ fun MyHoldingsScreen(
     )
     val holdings by viewModel.holdings.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isRefreshEnabled by viewModel.isRefreshEnabled.collectAsState()
 
     val totalPortfolioValue = holdings.sumOf { it.amountHeld * it.currentPrice }
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
-
-    var countdown by remember { mutableStateOf(60) }
-
-    LaunchedEffect(key1 = isRefreshing) {
-        if (!isRefreshing) {
-            countdown = 60
-            while (countdown > 0) {
-                delay(1000)
-                countdown--
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -114,17 +98,21 @@ fun MyHoldingsScreen(
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.weight(1f))
-            IconButton(onClick = { viewModel.refreshPrices() }, enabled = countdown == 0 && !isRefreshing) {
+            IconButton(onClick = { viewModel.refreshAllPrices() }, enabled = isRefreshEnabled && !isRefreshing) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
                     contentDescription = "Refresh Prices",
-                    tint = if (countdown == 0 && !isRefreshing) Color.Cyan else Color.DarkGray
+                    tint = if (isRefreshEnabled && !isRefreshing) Color.Cyan else Color.DarkGray
                 )
             }
         }
 
         Text(
-            text = if (isRefreshing) "Refreshing..." else if (countdown > 0) "Next update in ${countdown}s" else "Ready to refresh",
+            text = when {
+                isRefreshing -> "Refreshing..."
+                !isRefreshEnabled -> "Please wait to refresh"
+                else -> "Ready to refresh"
+            },
             color = Color.Gray,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(top = 4.dp)
@@ -141,7 +129,6 @@ fun MyHoldingsScreen(
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // THE FIX: Add the crypto icon
                     AsyncImage(
                         model = asset.imageUrl,
                         contentDescription = "${asset.name} icon",
