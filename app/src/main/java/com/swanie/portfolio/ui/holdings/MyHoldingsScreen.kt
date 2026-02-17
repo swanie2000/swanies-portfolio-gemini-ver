@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -186,14 +187,14 @@ fun MyHoldingsScreen(
             modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             items(filteredHoldings) { asset ->
-                AssetRow(asset)
+                HoldingItemCard(asset)
             }
         }
     }
 }
 
 @Composable
-fun AssetRow(asset: AssetEntity) {
+fun HoldingItemCard(asset: AssetEntity) {
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
     val numberFormat = NumberFormat.getNumberInstance()
     val changeColor = if (asset.change24h >= 0) Color(0xFF00C853) else Color.Red
@@ -204,30 +205,34 @@ fun AssetRow(asset: AssetEntity) {
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Start Section: Icon and Name/Symbol
+        // Left Column: Identity
         AsyncImage(
             model = asset.imageUrl,
             contentDescription = "${asset.name} icon",
             modifier = Modifier.size(40.dp)
         )
         Spacer(Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1.5f)
-        ) {
-            Text(
-                text = asset.name,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+        if (asset.name.equals(asset.symbol, ignoreCase = true)) {
             Text(
                 text = asset.symbol.uppercase(),
-                color = Color.Gray,
-                fontSize = 14.sp
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        } else {
+            Text(
+                text = asset.symbol.uppercase(),
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
-        // Middle Section: Sparkline and 24h Change
+        // Middle Column: Visuals
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -250,28 +255,33 @@ fun AssetRow(asset: AssetEntity) {
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = "${String.format("%.2f", asset.change24h)}%",
+                    text = "${String.format(Locale.US, "%.2f", asset.change24h)}%",
                     color = changeColor,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
 
-        // End Section: Amount Held and Value
+        // Right Column: Financials
         Column(
-            modifier = Modifier.weight(1.5f),
             horizontalAlignment = Alignment.End
         ) {
             Text(
                 text = currencyFormat.format(asset.amountHeld * asset.currentPrice),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "${numberFormat.format(asset.amountHeld)} ${asset.symbol.uppercase()}",
                 color = Color.Gray,
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
