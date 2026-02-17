@@ -31,25 +31,31 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
     private val _isRefreshEnabled = MutableStateFlow(true)
     val isRefreshEnabled: StateFlow<Boolean> = _isRefreshEnabled.asStateFlow()
 
+    private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
+    val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
+
     private var searchJob: Job? = null
 
     init {
-        // Perform an automatic refresh on initial load
         refreshAllPrices()
     }
 
     fun refreshAllPrices() {
         viewModelScope.launch {
-            if (!_isRefreshEnabled.value) return@launch // Exit if on cooldown
+            if (!_isRefreshEnabled.value) return@launch
 
             _isRefreshing.value = true
             _isRefreshEnabled.value = false
 
-            repository.refreshAssetPrices()
+            try {
+                repository.refreshAssetPrices()
+                _lastSyncTimestamp.value = System.currentTimeMillis()
+            } catch (e: Exception) {
+                // Handle error appropriately
+            }
 
             _isRefreshing.value = false
 
-            // Start 60-second cooldown
             delay(60000)
             _isRefreshEnabled.value = true
         }
@@ -66,7 +72,7 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
             return
         }
         searchJob = viewModelScope.launch {
-            delay(500) // Debounce search input
+            delay(500)
             val results = repository.searchCoins(query)
             _searchResults.value = results
         }
