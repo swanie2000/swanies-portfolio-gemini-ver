@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -111,31 +109,46 @@ fun MyHoldingsScreen(
                 .background(deepNavy)
         ) {
             // Header
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.swanie_foreground),
                         contentDescription = "Swan Logo",
-                        modifier = Modifier.size(96.dp)
+                        modifier = Modifier.size(100.dp)
                     )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = "Portfolio",
                         fontSize = 36.sp,
                         color = silver,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
                     )
+                    Text(
+                        text = currencyFormat.format(totalPortfolioValue),
+                        color = Color.White,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
                     IconButton(
-                        onClick = onAddNewAsset
+                        onClick = onAddNewAsset,
                     ) {
                         Icon(
                             Icons.Default.Add,
@@ -145,12 +158,6 @@ fun MyHoldingsScreen(
                         )
                     }
                 }
-                Text(
-                    text = currencyFormat.format(totalPortfolioValue),
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                )
             }
 
 
