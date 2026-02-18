@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -18,20 +20,34 @@ fun BottomNavigationBar(navController: NavHostController) {
         containerColor = Color(0xFF000416),
         contentColor = Color.White
     ) {
+        val itemColors = NavigationBarItemDefaults.colors(
+            unselectedIconColor = Color.White,
+            selectedIconColor = Color.White
+        )
+
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            label = { Text("") },
             selected = false,
-            onClick = { navController.navigate(Routes.HOME) }
+            onClick = { navController.navigate(Routes.HOME) },
+            alwaysShowLabel = false,
+            colors = itemColors
         )
         NavigationBarItem(
             icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = "Holdings") },
+            label = { Text("") },
             selected = false,
-            onClick = { navController.navigate(Routes.HOLDINGS) }
+            onClick = { navController.navigate(Routes.HOLDINGS) },
+            alwaysShowLabel = false,
+            colors = itemColors
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+            label = { Text("") },
             selected = false,
-            onClick = { /* TODO */ }
+            onClick = { /* TODO */ },
+            alwaysShowLabel = false,
+            colors = itemColors
         )
     }
 }
