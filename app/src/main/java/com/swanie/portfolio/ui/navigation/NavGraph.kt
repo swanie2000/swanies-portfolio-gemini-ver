@@ -9,8 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.HomeScreen
+import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -35,8 +38,31 @@ fun NavGraph(navController: NavHostController) {
 
         composable(Routes.ASSET_PICKER) {
             AssetPickerScreen(onAssetSelected = { coinId, symbol, name, imageUrl ->
-                navController.popBackStack()
+                val encodedUrl = URLEncoder.encode(imageUrl, "UTF-8")
+                navController.navigate("amount_entry/$coinId/$symbol/$name/$encodedUrl")
             })
+        }
+
+        composable(Routes.AMOUNT_ENTRY) { backStackEntry ->
+            val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
+            val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+            val decodedUrl = URLDecoder.decode(imageUrl, "UTF-8")
+
+
+            AmountEntryScreen(
+                coinId = coinId,
+                symbol = symbol,
+                name = name,
+                imageUrl = decodedUrl,
+                onSave = {
+                    navController.navigate(Routes.HOLDINGS) {
+                        popUpTo(Routes.HOLDINGS) { inclusive = true }
+                    }
+                },
+                onCancel = { navController.popBackStack() }
+            )
         }
     }
 }

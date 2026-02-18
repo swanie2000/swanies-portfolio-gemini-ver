@@ -34,7 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
@@ -45,54 +48,41 @@ import kotlin.math.min
 fun HomeScreen(navController: NavHostController) {
     var animateSwan by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
-    var animateTwinkle by remember { mutableStateOf(false) }
+    var showSparkleOnS by remember { mutableStateOf(false) }
+    var showSparkleOnSwanHead by remember { mutableStateOf(false) }
+
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.66f).dp
 
-    // Stage 1: The High Slide (The Swan)
     val offsetY by animateDpAsState(
         targetValue = if (animateSwan) -60.dp else -500.dp,
         animationSpec = tween(
             durationMillis = 1200,
-            easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f) // EaseOutQuart
+            easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)
         ),
-        label = "SwanGlide"
+        label = "SwanGlide",
+        finishedListener = { animateText = true }
     )
-    val swanAlpha by animateFloatAsState(
+
+    val alpha by animateFloatAsState(
         targetValue = if (animateSwan) 1f else 0f,
         animationSpec = tween(durationMillis = 1200),
         label = "SwanAlpha"
     )
-    val glowAlpha by animateFloatAsState(
-        targetValue = if (animateSwan) 0.4f else 0f,
-        animationSpec = tween(durationMillis = 1200),
-        label = "GlowAlpha"
-    )
 
-    // Stage 3: The Twinkle
-    var twinkleTargetAlpha by remember { mutableStateOf(0f) }
-    val twinkleAlpha by animateFloatAsState(
-        targetValue = twinkleTargetAlpha,
-        animationSpec = tween(durationMillis = 400),
-        label = "TwinkleAlpha"
-    )
-
-    LaunchedEffect(Unit) {
-        delay(500) // Initial delay for window transition
-        animateSwan = true
-        delay(1200 * 0.8.toLong()) // 80% of swan animation
-        animateText = true
-        delay(600) // Wait a bit after text appears
-        animateTwinkle = true
+    LaunchedEffect(animateText) {
+        if (animateText) {
+            delay(1000) // Wait for text fade-in. Total delay: 1200 (glide) + 1000 = 2200ms
+            showSparkleOnS = true
+            delay(500) // Total delay: 2200 + 500 = 2700ms
+            showSparkleOnSwanHead = true
+        }
     }
 
-    LaunchedEffect(animateTwinkle) {
-        if (animateTwinkle) {
-            twinkleTargetAlpha = 0.8f
-            delay(500)
-            twinkleTargetAlpha = 0f
-        }
+    LaunchedEffect(Unit) {
+        delay(500)
+        animateSwan = true
     }
 
     Box(
@@ -101,86 +91,86 @@ fun HomeScreen(navController: NavHostController) {
             .background(Color(0xFF000416)),
         contentAlignment = Alignment.Center
     ) {
-        // Middle Layer: The Glow
-        Spacer(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(alpha = glowAlpha)
-                .offset(y = offsetY)
-                .drawBehind {
-                    val radius = logoSize.toPx() * 0.3f
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color.White, Color.Transparent),
-                            center = center,
-                            radius = radius
-                        ),
-                        radius = radius,
-                        center = center
-                    )
-                }
-        )
 
-        // Stage 3: The Twinkles
-        if (animateTwinkle) {
-            // Twinkle 1 (Left Wing)
+        // Container for Swan and Glow
+        Box(
+            modifier = Modifier
+                .offset(y = offsetY)
+                .graphicsLayer(clip = false) // Technical Guardrail
+                .zIndex(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            // The Glow
             Spacer(
                 modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.Center)
-                    .offset(x = -logoSize * 0.2f, y = offsetY + logoSize * 0.1f)
-                    .graphicsLayer(alpha = twinkleAlpha)
+                    .size(logoSize)
+                    .graphicsLayer(alpha = alpha * 0.8f)
                     .drawBehind {
+                        val radius = size.minDimension * 0.4f
                         drawCircle(
-                            brush = Brush.radialGradient(listOf(Color.White, Color.Transparent)),
-                            radius = size.minDimension / 2
+                            brush = Brush.radialGradient(
+                                colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent),
+                                radius = radius
+                            ),
+                            radius = radius
                         )
                     }
             )
-            // Twinkle 2 (Head)
-            Spacer(
+
+            // The Swan
+            Image(
+                painter = painterResource(id = R.drawable.swanie_foreground),
+                contentDescription = "Swan Logo",
                 modifier = Modifier
-                    .size(15.dp)
-                    .align(Alignment.Center)
-                    .offset(x = logoSize * 0.05f, y = offsetY - logoSize * 0.3f)
-                    .graphicsLayer(alpha = twinkleAlpha)
-                    .drawBehind {
-                        drawCircle(
-                            brush = Brush.radialGradient(listOf(Color.White, Color.Transparent)),
-                            radius = size.minDimension / 2
-                        )
-                    }
+                    .size(logoSize)
+                    .graphicsLayer(alpha = alpha)
             )
+
+            // Sparkle 2: On Swan's head
+            if (showSparkleOnSwanHead) {
+                MetallicShimmer(
+                    modifier = Modifier
+                        .offset(x = 45.dp, y = -50.dp)
+                        .zIndex(2f)
+                )
+            }
         }
 
-        // Top Layer: The Swan
-        Image(
-            painter = painterResource(id = R.drawable.swanie_foreground),
-            contentDescription = "Swan Logo",
-            modifier = Modifier
-                .size(logoSize)
-                .graphicsLayer(alpha = swanAlpha)
-                .offset(y = offsetY)
-        )
-
-        // Stage 2: The Brand Reveal
         AnimatedVisibility(
             visible = animateText,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
+            enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 200)),
             modifier = Modifier.offset(y = 80.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(top = 20.dp)
             ) {
-                Text(
-                    text = "Swanie's Portfolio",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White
-                )
+                // Sparkle 1: Anchor to 'S'
+                Box(modifier = Modifier.graphicsLayer(clip = false)) { // Technical Guardrail
+                    Text(
+                        text = "Swanie's Portfolio",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White
+                    )
+                    if (showSparkleOnS) {
+                        MetallicShimmer(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 18.dp, y = 2.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Fine-Point Typography
                 Text(
                     text = "Crypto & Precious Metals",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Thin,
+                        fontSize = 12.sp,
+                        letterSpacing = 3.sp
+                    ),
                     color = Color.LightGray.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.height(60.dp))
@@ -193,4 +183,41 @@ fun HomeScreen(navController: NavHostController) {
             }
         }
     }
+}
+
+@Composable
+private fun MetallicShimmer(modifier: Modifier = Modifier) {
+    var scaleState by remember { mutableStateOf(0f) }
+    var rotationState by remember { mutableStateOf(45f) }
+
+    val scale by animateFloatAsState(
+        targetValue = scaleState,
+        animationSpec = tween(durationMillis = 400, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)),
+        label = "ShimmerScale"
+    )
+
+    val rotation by animateFloatAsState(
+        targetValue = rotationState,
+        animationSpec = tween(durationMillis = 700),
+        label = "ShimmerRotation"
+    )
+
+    LaunchedEffect(Unit) {
+        // Pop in
+        scaleState = 1.4f
+        rotationState = 180f
+        delay(400L)
+        scaleState = 0f
+    }
+
+    Box(
+        modifier = modifier
+            .size(4.dp)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale,
+                rotationZ = rotation
+            )
+            .background(Color.White) // Diamond shape via rotation
+    )
 }
