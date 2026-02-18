@@ -57,6 +57,7 @@ import java.util.Locale
 @Composable
 fun MyHoldingsScreen(
     onAddNewAsset: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val db = AppDatabase.getDatabase(context)
@@ -81,7 +82,7 @@ fun MyHoldingsScreen(
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {

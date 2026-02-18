@@ -1,6 +1,7 @@
 package com.swanie.portfolio.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -41,14 +42,8 @@ fun AlphaKeyboard(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1.85f)
+            .background(Color(0xFF1A1A1A))
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.keyboard_bg),
-            contentDescription = "Keyboard Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds
-        )
-
         // Container for all touch targets, with a vertical offset to align properly.
         Column(
             modifier = Modifier

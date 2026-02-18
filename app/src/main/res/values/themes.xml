@@ -6,7 +6,7 @@
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#000416</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/swanie_splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/swanie_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.SwaniesPortfolio</item>
     </style>
 </resources>
