@@ -28,6 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -207,14 +209,28 @@ fun MyHoldingsScreen(
 
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = deepNavy,
-                contentColor = Color.Cyan,
+                containerColor = Color.Transparent,
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                        height = 3.dp,
+                        color = silver
+                    )
+                },
+                divider = { }
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        text = { Text(title) }
+                        text = {
+                            Text(
+                                text = title,
+                                fontWeight = if (selectedTab == index) FontWeight.ExtraBold else FontWeight.Normal,
+                                color = if (selectedTab == index) Color.White else Color.Gray,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
                     )
                 }
             }
