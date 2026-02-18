@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.swanie.portfolio.ui.SwaniesPortfolioTheme
 import com.swanie.portfolio.ui.navigation.NavGraph
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
             fadeOut.start()
         }
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
         setContent {
             SwaniesPortfolioTheme {

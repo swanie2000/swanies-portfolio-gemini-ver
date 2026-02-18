@@ -1,9 +1,12 @@
 package com.swanie.portfolio.ui.components
 
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -17,15 +20,18 @@ fun BottomNavigationBar(navController: NavHostController) {
     ) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home", color = Color.White) },
             selected = false,
             onClick = { navController.navigate(Routes.HOME) }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.List, contentDescription = "Holdings") },
-            label = { Text("Holdings", color = Color.White) },
+            icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = "Holdings") },
             selected = false,
             onClick = { navController.navigate(Routes.HOLDINGS) }
+        )
+        NavigationBarItem(
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+            selected = false,
+            onClick = { /* TODO */ }
         )
     }
 }

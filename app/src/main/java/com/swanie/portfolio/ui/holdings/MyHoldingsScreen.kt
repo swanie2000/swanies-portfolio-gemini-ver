@@ -1,12 +1,15 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,18 +23,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,20 +40,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 @Composable
 fun MyHoldingsScreen(
@@ -66,8 +71,6 @@ fun MyHoldingsScreen(
     )
     val holdings by viewModel.holdings.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val isRefreshEnabled by viewModel.isRefreshEnabled.collectAsState()
-    val lastSyncTimestamp by viewModel.lastSyncTimestamp.collectAsState()
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -81,116 +84,173 @@ fun MyHoldingsScreen(
     val totalPortfolioValue = filteredHoldings.sumOf { it.amountHeld * it.currentPrice }
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Portfolio",
-                style = MaterialTheme.typography.displayMedium,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-            Button(
-                onClick = onAddNewAsset,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Asset", tint = Color.Black)
-                Text("Add New", color = Color.Black, modifier = Modifier.padding(start = 4.dp))
-            }
-        }
+    var countdown by remember { mutableStateOf(30) }
+    var isTimerRunning by remember { mutableStateOf(true) }
 
-        Card(
+    val deepNavy = Color(0xFF000416)
+    val silver = Color(0xFFC0C0C0)
+
+    LaunchedEffect(countdown, isTimerRunning) {
+        if (isTimerRunning && countdown > 0) {
+            delay(1000)
+            countdown--
+        } else if (countdown == 0) {
+            isTimerRunning = false
+        }
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        containerColor = deepNavy
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(deepNavy)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "Total Portfolio Value",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+            // Header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.swanie_foreground),
+                        contentDescription = "Swan Logo",
+                        modifier = Modifier.size(96.dp)
+                    )
+                    Text(
+                        text = "Portfolio",
+                        fontSize = 36.sp,
+                        color = silver,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    IconButton(
+                        onClick = onAddNewAsset
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add New Asset",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
                 Text(
                     text = currencyFormat.format(totalPortfolioValue),
-                    color = Color.Cyan,
-                    style = MaterialTheme.typography.headlineLarge,
+                    color = Color.White,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                 )
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = {
-                    if (isRefreshEnabled) {
-                        viewModel.refreshAllPrices()
-                    } else {
-                        Toast.makeText(context, "Please wait before refreshing again.", Toast.LENGTH_SHORT).show()
+
+            // Refresh Bar Section
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SmoothProgressBar(
+                        progress = (30 - countdown) / 30f,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        modifier = Modifier.size(24.dp),
+                        onClick = {
+                            if (countdown == 0 && !isRefreshing) {
+                                viewModel.refreshAllPrices()
+                                countdown = 30 // Reset timer
+                                isTimerRunning = true
+                            } else {
+                                val message =
+                                    if (isRefreshing) "Sync in progress." else "Please wait for the timer."
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        enabled = countdown == 0 && !isRefreshing
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Refresh Prices",
+                            tint = if (countdown == 0 && !isRefreshing) Color.Cyan else Color.DarkGray
+                        )
                     }
-                },
-                enabled = isRefreshEnabled && !isRefreshing
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh Prices",
-                    tint = if (isRefreshEnabled && !isRefreshing) Color.Cyan else Color.DarkGray
+                }
+                Text(
+                    text = "LIVE MARKET",
+                    color = silver,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 2.sp,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End
                 )
             }
-            Column {
-                Text(
-                    text = if (isRefreshing) "Refreshing..." else if (!isRefreshEnabled) "Ready in 60s" else "Ready to refresh",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                lastSyncTimestamp?.let {
-                    val sdf = SimpleDateFormat("hh:mm:ss a", Locale.getDefault())
-                    Text(
-                        text = "Last Sync: ${sdf.format(Date(it))}",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodySmall,
+
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = deepNavy,
+                contentColor = Color.Cyan,
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
                     )
                 }
             }
-        }
 
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = Color.Black,
-            contentColor = Color.Cyan
-        ) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTab == index,
-                    onClick = { selectedTab = index },
-                    text = { Text(title) }
-                )
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
+                items(filteredHoldings) { asset ->
+                    HoldingItemCard(asset)
+                }
             }
         }
+    }
+}
 
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            items(filteredHoldings) { asset ->
-                HoldingItemCard(asset)
-            }
+@Composable
+fun SmoothProgressBar(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    height: Dp = 2.dp
+) {
+    Canvas(
+        modifier = modifier
+            .height(height)
+            .fillMaxWidth()
+    ) {
+        val activeColor = when {
+            progress >= (21f / 30f) -> Color.Green
+            progress >= (11f / 30f) -> Color.Yellow
+            else -> Color.Red
         }
+
+        // Draw the background track
+        drawRect(
+            color = Color.DarkGray,
+            size = size
+        )
+
+        // Draw the active progress portion
+        drawRect(
+            color = activeColor,
+            size = Size(width = size.width * progress, height = size.height)
+        )
     }
 }
 
@@ -203,7 +263,7 @@ fun HoldingItemCard(asset: AssetEntity) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left Column: Identity
@@ -245,7 +305,12 @@ fun HoldingItemCard(asset: AssetEntity) {
                     .width(80.dp)
                     .background(Color.DarkGray.copy(alpha = 0.5f))
             ) {
-                Text("Sparkline", color = Color.Gray, fontSize = 8.sp, modifier = Modifier.align(Alignment.Center))
+                Text(
+                    "Sparkline",
+                    color = Color.Gray,
+                    fontSize = 8.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
             Spacer(Modifier.height(4.dp))
             Row {
