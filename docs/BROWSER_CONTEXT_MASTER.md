@@ -171,6 +171,22 @@ KNOWN PROBLEMS / RISKS
 - (fill in)
 CURRENT FEATURE STATUS
 - (fill in)
+CURRENT APP FLOW
+- (fill in)
+KEY FILE INDEX (high signal files)
+- (fill in)
+KNOWN PROBLEMS / RISKS
+- (fill in)
+CURRENT FEATURE STATUS
+- (fill in)
+CURRENT APP FLOW
+- (fill in)
+KEY FILE INDEX (high signal files)
+- (fill in)
+KNOWN PROBLEMS / RISKS
+- (fill in)
+CURRENT FEATURE STATUS
+- (fill in)
 
 CURRENT APP FLOW
 - (fill in)
@@ -189,13 +205,16 @@ CURRENT FEATURE STATUS
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 02/20/2026 10:16:48.94
+Generated: Fri 02/20/2026 10:26:54.12
 
 Branch:
 main
 Commit:
-12f8000df92076ba459381530636a9e269fc4f0a
+98541625c92fbba9bf4fd2b8f8b761080398117b
 Working tree status (git status --porcelain):
+ M docs/BROWSER_CONTEXT_MASTER.md
+?? docs/__narrative_reset.txt
+?? docs/__narrative_tmp.md
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
