@@ -163,6 +163,14 @@ NARRATIVE SECTION (PRESERVED - EDIT BETWEEN MARKERS)
 ### BEGIN_NARRATIVE
 PROJECT OVERVIEW
 - (fill in)
+CURRENT APP FLOW
+- (fill in)
+KEY FILE INDEX (high signal files)
+- (fill in)
+KNOWN PROBLEMS / RISKS
+- (fill in)
+CURRENT FEATURE STATUS
+- (fill in)
 
 CURRENT APP FLOW
 - (fill in)
@@ -181,15 +189,13 @@ CURRENT FEATURE STATUS
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 02/20/2026 10:04:48.12
+Generated: Fri 02/20/2026 10:16:48.94
 
 Branch:
 main
 Commit:
-72e9d5bb7193f1d6d9f13d15deecc51f2f2b094d
+12f8000df92076ba459381530636a9e269fc4f0a
 Working tree status (git status --porcelain):
- M docs/BROWSER_CONTEXT_MASTER.md
- M docs/rebuild_browser_context_dump.bat
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
@@ -206,67 +212,67 @@ app\src\main\AndroidManifest.xml
 SOURCE FILE INDEX (Kotlin/Java paths)
 --------------------------------------------------
 
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\MainActivity.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AppDatabase.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AssetDao.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AssetEntity.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\network\CoinGeckoApiService.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\network\RetrofitClient.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\repository\AssetRepository.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Color.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Theme.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Type.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\components\AlphaKeyboard.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\components\BottomNavigationBar.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\features\HomeScreen.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\features\SettingsScreen.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryScreen.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryViewModel.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryViewModelFactory.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetPickerScreen.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetViewModel.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetViewModelFactory.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\MyHoldingsScreen.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\MyHoldingsViewModel.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\navigation\NavGraph.kt
-app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\navigation\Routes.kt
+app/src/main/java/com/swanie/portfolio/MainActivity.kt
+app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
+app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
+app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
+app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
+app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
+app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
+app/src/main/java/com/swanie/portfolio/ui/Color.kt
+app/src/main/java/com/swanie/portfolio/ui/Theme.kt
+app/src/main/java/com/swanie/portfolio/ui/Type.kt
+app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
+app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
+app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/features/SettingsScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModelFactory.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModelFactory.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
+app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
 
 --------------------------------------------------
 RESOURCES INDEX (res paths)
 --------------------------------------------------
 
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\bg_navy_gradient.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\ic_launcher_background.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\ic_launcher_foreground.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\swanie_foreground.png
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\swanie_splash.png
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26\ic_launcher.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26\ic_launcher_round.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi\ic_launcher.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi\ic_launcher_round.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi\ic_launcher.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi\ic_launcher_round.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi\ic_launcher.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi\ic_launcher_round.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi\ic_launcher.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi\ic_launcher_round.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher_round.webp
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher_swanie.png
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\colors.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\strings.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\themes.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml\backup_rules.xml
-app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml\data_extraction_rules.xml
+app/src/main/res/drawable
+app/src/main/res/mipmap-anydpi-v26
+app/src/main/res/mipmap-hdpi
+app/src/main/res/mipmap-mdpi
+app/src/main/res/mipmap-xhdpi
+app/src/main/res/mipmap-xxhdpi
+app/src/main/res/mipmap-xxxhdpi
+app/src/main/res/values
+app/src/main/res/xml
+app/src/main/res/drawable/bg_navy_gradient.xml
+app/src/main/res/drawable/ic_launcher_background.xml
+app/src/main/res/drawable/ic_launcher_foreground.xml
+app/src/main/res/drawable/swanie_foreground.png
+app/src/main/res/drawable/swanie_splash.png
+app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+app/src/main/res/mipmap-hdpi/ic_launcher.webp
+app/src/main/res/mipmap-hdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-mdpi/ic_launcher.webp
+app/src/main/res/mipmap-mdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xxhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp
+app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp
+app/src/main/res/mipmap-xxxhdpi/ic_launcher_swanie.png
+app/src/main/res/values/colors.xml
+app/src/main/res/values/strings.xml
+app/src/main/res/values/themes.xml
+app/src/main/res/xml/backup_rules.xml
+app/src/main/res/xml/data_extraction_rules.xml
 
 --------------------------------------------------
 BROWSER AI REMINDERS
