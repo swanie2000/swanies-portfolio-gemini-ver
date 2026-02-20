@@ -1,0 +1,23 @@
+READ-ONLY SCAN + NARRATIVE REFRESH TASK (NO CODE CHANGES)
+
+Goal:
+Update the human-readable narrative sections of my browser context
+system so new browser AIs understand the project correctly.
+
+Rules:
+- DO NOT modify code.
+- DO NOT refactor.
+- Only read and report what exists.
+
+Output ONLY the following sections, ready to paste into a doc:
+
+1) PROJECT OVERVIEW (purpose, architecture, key libraries, versions if found)
+2) CURRENT APP FLOW (startup -> screens -> data flow)
+3) KEY FILE INDEX (high-signal files only; file path + purpose)
+4) KNOWN PROBLEMS / RISKS (only what you can infer from code)
+5) CURRENT FEATURE STATUS (implemented vs not)
+
+Keep it accurate, specific, and based on files.
+If you need to read files not already open, say which ones.
+
+END
