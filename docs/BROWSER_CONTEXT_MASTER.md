@@ -162,34 +162,58 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
 PROJECT OVERVIEW
-- (fill in)
+- Android portfolio tracking app (Swanie’s Portfolio).
+- Uses local Room database + CoinGecko API.
+- Focus is stability and incremental improvements.
+- AI agents must avoid large refactors.
 
 CURRENT APP FLOW
-- (fill in)
+- HomeScreen displays overview.
+- MyHoldings manages assets.
+- AmountEntryScreen handles numeric input.
+- AssetPicker used for selecting coins/assets.
 
 KEY FILE INDEX (high signal files)
-- (fill in)
+- ui/holdings/AmountEntryScreen.kt (numeric input flow)
+- ui/holdings/AmountEntryViewModel.kt (entry logic)
+- data/repository/AssetRepository.kt (data source bridge)
+- ui/navigation/NavGraph.kt (navigation wiring)
 
 KNOWN PROBLEMS / RISKS
-- (fill in)
+- Numeric keyboard/input is sensitive; avoid rewrites.
+- CoinGecko integration still evolving.
+- UI architecture still stabilizing.
+- Prefer single-file fixes.
 
 CURRENT FEATURE STATUS
-- (fill in)
+- Basic navigation working.
+- Holdings flow functional.
+- Custom assets partially supported.
+- UX polish ongoing.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 02/20/2026 11:30:24.16
+Generated: Fri 02/20/2026 15:12:18.52
 
 Branch:
 main
 Commit:
-1c456fa4366363baf05d4ebc26698ba9d568b142
+41100dccdeefa02ade62c59def08acc30de2982d
 Working tree status (git status --porcelain):
+ D .idea/.gitignore
+ M .idea/deploymentTargetSelector.xml
+ D .idea/deviceManager.xml
+ M .idea/gradle.xml
+ D .idea/markdown.xml
+ M .idea/misc.xml
+ M .idea/vcs.xml
+ M app/src/main/AndroidManifest.xml
+ M app/src/main/res/drawable/ic_launcher_foreground.xml
+ M app/src/main/res/drawable/swan_launcher_icon.png
  M docs/BROWSER_CONTEXT_MASTER.md
- M docs/rebuild_browser_context_dump.bat
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
@@ -249,6 +273,7 @@ app/src/main/res/drawable/ic_launcher_background.xml
 app/src/main/res/drawable/ic_launcher_foreground.xml
 app/src/main/res/drawable/swanie_foreground.png
 app/src/main/res/drawable/swanie_splash.png
+app/src/main/res/drawable/swan_launcher_icon.png
 app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
 app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 app/src/main/res/mipmap-hdpi/ic_launcher.webp
