@@ -53,6 +53,7 @@ REM 2) Narrative (always from the narrative source file)
 >>"%TMP%" echo ============================================================
 >>"%TMP%" echo ### BEGIN_NARRATIVE
 type docs\BROWSER_CONTEXT_NARRATIVE.md >>"%TMP%"
+>>"%TMP%" echo.
 >>"%TMP%" echo ### END_NARRATIVE
 >>"%TMP%" echo.
 

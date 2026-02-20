@@ -158,34 +158,10 @@ Confirm you understand the Level-4 rules and reviewer mindset before giving advi
 END CONTROL HEADER
 ============================================================
 ============================================================
-NARRATIVE SECTION (PRESERVED - EDIT BETWEEN MARKERS)
+NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
 PROJECT OVERVIEW
-- (fill in)
-CURRENT APP FLOW
-- (fill in)
-KEY FILE INDEX (high signal files)
-- (fill in)
-KNOWN PROBLEMS / RISKS
-- (fill in)
-CURRENT FEATURE STATUS
-- (fill in)
-CURRENT APP FLOW
-- (fill in)
-KEY FILE INDEX (high signal files)
-- (fill in)
-KNOWN PROBLEMS / RISKS
-- (fill in)
-CURRENT FEATURE STATUS
-- (fill in)
-CURRENT APP FLOW
-- (fill in)
-KEY FILE INDEX (high signal files)
-- (fill in)
-KNOWN PROBLEMS / RISKS
-- (fill in)
-CURRENT FEATURE STATUS
 - (fill in)
 
 CURRENT APP FLOW
@@ -205,16 +181,15 @@ CURRENT FEATURE STATUS
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 02/20/2026 10:26:54.12
+Generated: Fri 02/20/2026 11:30:24.16
 
 Branch:
 main
 Commit:
-98541625c92fbba9bf4fd2b8f8b761080398117b
+1c456fa4366363baf05d4ebc26698ba9d568b142
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_MASTER.md
-?? docs/__narrative_reset.txt
-?? docs/__narrative_tmp.md
+ M docs/rebuild_browser_context_dump.bat
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
