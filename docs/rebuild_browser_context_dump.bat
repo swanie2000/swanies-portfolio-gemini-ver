@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 
 REM ==========================================================
 REM rebuild_browser_context_dump.bat
-REM ONE-FILE SYSTEM (MASTER ONLY)
+REM MASTER-ONLY SYSTEM (NO EXTRA DUMP FILES)
 REM
 REM Creates/Updates:
 REM   - docs\BROWSER_CONTEXT_MASTER.md   (PASTE THIS INTO AI CHATS)
@@ -16,6 +16,10 @@ REM Preserves:
 REM   - Narrative block between:
 REM       ### BEGIN_NARRATIVE
 REM       ### END_NARRATIVE
+REM
+REM NOTE:
+REM   Temp files are created in %TEMP% (NOT inside the repo)
+REM   so they never appear in git status or inside the dump.
 REM ==========================================================
 
 REM Move to project root (one level up from docs folder)
@@ -25,14 +29,10 @@ echo.
 echo Rebuilding BROWSER_CONTEXT_MASTER.md (MASTER ONLY)...
 echo.
 
-REM ----------------------------------------------------------
 REM Ensure docs folder exists
-REM ----------------------------------------------------------
 if not exist docs mkdir docs
 
-REM ----------------------------------------------------------
 REM Verify header exists
-REM ----------------------------------------------------------
 if not exist docs\BROWSER_CONTEXT_HEADER.txt (
     echo ERROR: docs\BROWSER_CONTEXT_HEADER.txt not found.
     echo Fix: create docs\BROWSER_CONTEXT_HEADER.txt with your Level 4 header text.
@@ -41,16 +41,21 @@ if not exist docs\BROWSER_CONTEXT_HEADER.txt (
 )
 
 set "MASTER=docs\BROWSER_CONTEXT_MASTER.md"
-set "TMP=docs\__master_tmp.md"
-set "NARR=docs\__narrative_tmp.md"
+
+REM Temp files OUTSIDE repo
+set "TMP=%TEMP%\sw_master_tmp_%RANDOM%%RANDOM%.md"
+set "NARR=%TEMP%\sw_narrative_tmp_%RANDOM%%RANDOM%.txt"
 
 set "BEGIN_MARK=### BEGIN_NARRATIVE"
 set "END_MARK=### END_NARRATIVE"
 
+REM Project root for path stripping (ensure trailing backslash)
+set "ROOT=%CD%\"
+
 REM ----------------------------------------------------------
 REM Extract existing narrative block (if MASTER exists)
 REM ----------------------------------------------------------
-del /q "%NARR%" 2>nul
+if exist "%NARR%" del /q "%NARR%" >nul 2>&1
 
 set "foundNarr=0"
 set "inNarr=0"
@@ -73,23 +78,29 @@ if exist "%MASTER%" (
 )
 
 REM ----------------------------------------------------------
-REM If no narrative exists yet, create a starter narrative block
+REM If no narrative exists yet, create a clean starter narrative
 REM ----------------------------------------------------------
 if "%foundNarr%"=="0" (
-    >"%NARR%" echo (Paste weekly Studio-agent narrative refresh here.)
-    >>"%NARR%" echo
-    >>"%NARR%" echo Suggested sections:
-    >>"%NARR%" echo - PROJECT OVERVIEW
-    >>"%NARR%" echo - CURRENT APP FLOW
-    >>"%NARR%" echo - KEY FILE INDEX (high signal files)
-    >>"%NARR%" echo - KNOWN PROBLEMS / RISKS
-    >>"%NARR%" echo - CURRENT FEATURE STATUS
+    >"%NARR%" echo PROJECT OVERVIEW
+    >>"%NARR%" echo - (fill in)
+    >>"%NARR%" echo.
+    >>"%NARR%" echo CURRENT APP FLOW
+    >>"%NARR%" echo - (fill in)
+    >>"%NARR%" echo.
+    >>"%NARR%" echo KEY FILE INDEX (high signal files)
+    >>"%NARR%" echo - (fill in)
+    >>"%NARR%" echo.
+    >>"%NARR%" echo KNOWN PROBLEMS / RISKS
+    >>"%NARR%" echo - (fill in)
+    >>"%NARR%" echo.
+    >>"%NARR%" echo CURRENT FEATURE STATUS
+    >>"%NARR%" echo - (fill in)
 )
 
 REM ----------------------------------------------------------
 REM Build MASTER file into TMP, then replace MASTER
 REM ----------------------------------------------------------
-del /q "%TMP%" 2>nul
+if exist "%TMP%" del /q "%TMP%" >nul 2>&1
 
 REM 1) Header (rules)
 copy /Y docs\BROWSER_CONTEXT_HEADER.txt "%TMP%" >nul
@@ -120,7 +131,7 @@ git rev-parse HEAD >>"%TMP%"
 git status --porcelain >>"%TMP%"
 >>"%TMP%" echo.
 
-REM Key config files list (paths only; keeps size reasonable)
+REM Key config files list (paths only)
 >>"%TMP%" echo --------------------------------------------------
 >>"%TMP%" echo KEY CONFIG FILES (paths)
 >>"%TMP%" echo --------------------------------------------------
@@ -136,27 +147,48 @@ if exist app\build.gradle     >>"%TMP%" echo app\build.gradle
 if exist app\src\main\AndroidManifest.xml >>"%TMP%" echo app\src\main\AndroidManifest.xml
 >>"%TMP%" echo.
 
-REM Source index (paths only)
+REM ----------------------------------------------------------
+REM SOURCE FILE INDEX (repo-relative)
+REM ----------------------------------------------------------
 >>"%TMP%" echo --------------------------------------------------
 >>"%TMP%" echo SOURCE FILE INDEX (Kotlin/Java paths)
 >>"%TMP%" echo --------------------------------------------------
 >>"%TMP%" echo.
+
 if exist app\src\main\java (
-  dir app\src\main\java /s /b | findstr /i "\.kt$ \.java$" >>"%TMP%"
+    for /f "delims=" %%F in ('dir /s /b app\src\main\java ^| findstr /i "\.kt$ \.java$"') do (
+        set "FULL=%%F"
+        set "REL=!FULL:%ROOT%=!"
+        >>"%TMP%" echo !REL:\=/!
+    )
 )
+
 if exist app\src\main\kotlin (
-  dir app\src\main\kotlin /s /b | findstr /i "\.kt$ \.java$" >>"%TMP%"
+    for /f "delims=" %%F in ('dir /s /b app\src\main\kotlin ^| findstr /i "\.kt$ \.java$"') do (
+        set "FULL=%%F"
+        set "REL=!FULL:%ROOT%=!"
+        >>"%TMP%" echo !REL:\=/!
+    )
 )
+
 >>"%TMP%" echo.
 
-REM Resources index (paths only)
+REM ----------------------------------------------------------
+REM RESOURCES INDEX (repo-relative)
+REM ----------------------------------------------------------
 >>"%TMP%" echo --------------------------------------------------
 >>"%TMP%" echo RESOURCES INDEX (res paths)
 >>"%TMP%" echo --------------------------------------------------
 >>"%TMP%" echo.
+
 if exist app\src\main\res (
-  dir app\src\main\res /s /b >>"%TMP%"
+    for /f "delims=" %%R in ('dir /s /b app\src\main\res') do (
+        set "FULL=%%R"
+        set "REL=!FULL:%ROOT%=!"
+        >>"%TMP%" echo !REL:\=/!
+    )
 )
+
 >>"%TMP%" echo.
 
 REM Browser AI reminders
@@ -174,9 +206,9 @@ REM Browser AI reminders
 REM Swap in the new MASTER
 copy /Y "%TMP%" "%MASTER%" >nul
 
-REM Cleanup
-del /q "%TMP%" 2>nul
-del /q "%NARR%" 2>nul
+REM Cleanup temp files ALWAYS (outside repo)
+if exist "%TMP%" del /q "%TMP%" >nul 2>&1
+if exist "%NARR%" del /q "%NARR%" >nul 2>&1
 
 echo.
 echo DONE.

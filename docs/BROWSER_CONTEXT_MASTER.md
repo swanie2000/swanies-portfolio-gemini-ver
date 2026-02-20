@@ -1,189 +1,279 @@
-@echo off
-cls
-setlocal EnableDelayedExpansion
+============================================================
+LEVEL 4 AI CONTROL HEADER — SWANIE'S PORTFOLIO
+============================================================
 
-REM ==========================================================
-REM rebuild_browser_context_dump.bat
-REM ONE-FILE SYSTEM (MASTER ONLY)
-REM
-REM Creates/Updates:
-REM   - docs\BROWSER_CONTEXT_MASTER.md   (PASTE THIS INTO AI CHATS)
-REM
-REM Uses:
-REM   - docs\BROWSER_CONTEXT_HEADER.txt  (Level-4 rules template)
-REM
-REM Preserves:
-REM   - Narrative block between:
-REM       ### BEGIN_NARRATIVE
-REM       ### END_NARRATIVE
-REM ==========================================================
+THIS DOCUMENT IS THE SINGLE SOURCE OF TRUTH.
 
-REM Move to project root (one level up from docs folder)
-cd /d "%~dp0.."
+The browser AI does NOT have file access.
+All decisions must be based ONLY on this document.
 
-echo.
-echo Rebuilding BROWSER_CONTEXT_MASTER.md (MASTER ONLY)...
-echo.
+------------------------------------------------------------
+ROLE ASSIGNMENT
+------------------------------------------------------------
 
-REM Ensure docs folder exists
-if not exist docs mkdir docs
+Android Studio Agent:
+- Implementation agent
+- Can see files
+- Makes code changes
 
-REM Verify header exists
-if not exist docs\BROWSER_CONTEXT_HEADER.txt (
-echo ERROR: docs\BROWSER_CONTEXT_HEADER.txt not found.
-echo Fix: create docs\BROWSER_CONTEXT_HEADER.txt with your Level 4 header text.
-pause
-exit /b 1
-)
+Browser AI:
+- Architecture + reasoning advisor
+- NEVER assumes files not listed here
+- NEVER invents structure
+- Must request files when needed
 
-set "MASTER=docs\BROWSER_CONTEXT_MASTER.md"
-set "TMP=docs\__master_tmp.md"
-set "NARR=docs\__narrative_tmp.md"
+------------------------------------------------------------
+MANDATORY BEHAVIOR RULES
+------------------------------------------------------------
+1) NEVER make code changes unless the user explicitly asks for implementation.
+2) DO NOT assume missing files.
+3) If code detail is required, request:
 
-set "BEGIN_MARK=### BEGIN_NARRATIVE"
-set "END_MARK=### END_NARRATIVE"
+   NEED FILE: path/to/file
 
-REM ----------------------------------------------------------
-REM Extract existing narrative block (if MASTER exists)
-REM ----------------------------------------------------------
-if exist "%NARR%" del /q "%NARR%" >nul 2>&1
+4) Prefer minimal, safe edits.
+5) Avoid large refactors unless explicitly asked.
+6) Explain reasoning BEFORE suggesting code changes.
 
-set "foundNarr=0"
-set "inNarr=0"
+------------------------------------------------------------
+SESSION START CHECKLIST (ALWAYS)
+------------------------------------------------------------
 
-if exist "%MASTER%" (
-for /f "usebackq delims=" %%L in ("%MASTER%") do (
-set "line=%%L"
+Before giving advice, remind user to:
 
-        if "!line!"=="%BEGIN_MARK%" (
-            set "inNarr=1"
-            set "foundNarr=1"
-        ) else if "!line!"=="%END_MARK%" (
-            set "inNarr=0"
-        ) else (
-            if "!inNarr!"=="1" (
-                >>"%NARR%" echo %%L
-            )
-        )
-    )
-)
+[ ] git pull
+[ ] regenerate context dump if older than 24 hours
+[ ] confirm working branch
+[ ] verify this dump matches current files before major decisions
 
-REM ----------------------------------------------------------
-REM If no narrative exists yet, create a clean starter narrative
-REM ----------------------------------------------------------
-if "%foundNarr%"=="0" (
->"%NARR%" echo PROJECT OVERVIEW
->>"%NARR%" echo - (fill in)
->>"%NARR%" echo.
->>"%NARR%" echo CURRENT APP FLOW
->>"%NARR%" echo - (fill in)
->>"%NARR%" echo.
->>"%NARR%" echo KEY FILE INDEX (high signal files)
->>"%NARR%" echo - (fill in)
->>"%NARR%" echo.
->>"%NARR%" echo KNOWN PROBLEMS / RISKS
->>"%NARR%" echo - (fill in)
->>"%NARR%" echo.
->>"%NARR%" echo CURRENT FEATURE STATUS
->>"%NARR%" echo - (fill in)
-)
+------------------------------------------------------------
+WORKFLOW RULES
+------------------------------------------------------------
 
-REM ----------------------------------------------------------
-REM Build MASTER file into TMP, then replace MASTER
-REM ----------------------------------------------------------
-if exist "%TMP%" del /q "%TMP%" >nul 2>&1
+- Context dump should be refreshed regularly.
+- After milestones:
+  remind user to commit + push.
+- Browser AI gives guidance only.
+- Studio agent performs edits.
 
-REM 1) Header (rules)
-copy /Y docs\BROWSER_CONTEXT_HEADER.txt "%TMP%" >nul
+------------------------------------------------------------
+USER WORKING STYLE (IMPORTANT)
+------------------------------------------------------------
 
-REM 2) Narrative block (preserved across rebuilds)
->>"%TMP%" echo.
->>"%TMP%" echo ============================================================
->>"%TMP%" echo NARRATIVE SECTION (PRESERVED - EDIT BETWEEN MARKERS)
->>"%TMP%" echo ============================================================
->>"%TMP%" echo %BEGIN_MARK%
-type "%NARR%" >>"%TMP%"
->>"%TMP%" echo %END_MARK%
->>"%TMP%" echo.
+- Provide FULL FILE outputs when code changes are needed.
+- Avoid partial snippets unless requested.
+- Give step-by-step instructions.
+- Reduce complexity; avoid large rewrites.
 
-REM 3) Auto-generated daily section (rebuilt every run)
->>"%TMP%" echo ============================================================
->>"%TMP%" echo AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
->>"%TMP%" echo ============================================================
->>"%TMP%" echo.
->>"%TMP%" echo Generated: %date% %time%
->>"%TMP%" echo.
+------------------------------------------------------------
+LEVEL 4 MODE (IMPORTANT)
+------------------------------------------------------------
 
->>"%TMP%" echo Branch:
-git branch --show-current >>"%TMP%"
->>"%TMP%" echo Commit:
-git rev-parse HEAD >>"%TMP%"
->>"%TMP%" echo Working tree status (git status --porcelain):
-git status --porcelain >>"%TMP%"
->>"%TMP%" echo.
+Act as a SENIOR REVIEWER.
 
-REM Key config files list (paths only)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo KEY CONFIG FILES (paths)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo.
-if exist settings.gradle.kts >>"%TMP%" echo settings.gradle.kts
-if exist settings.gradle     >>"%TMP%" echo settings.gradle
-if exist build.gradle.kts    >>"%TMP%" echo build.gradle.kts
-if exist build.gradle        >>"%TMP%" echo build.gradle
-if exist gradle.properties   >>"%TMP%" echo gradle.properties
-if exist gradle\wrapper\gradle-wrapper.properties >>"%TMP%" echo gradle\wrapper\gradle-wrapper.properties
-if exist app\build.gradle.kts >>"%TMP%" echo app\build.gradle.kts
-if exist app\build.gradle     >>"%TMP%" echo app\build.gradle
-if exist app\src\main\AndroidManifest.xml >>"%TMP%" echo app\src\main\AndroidManifest.xml
->>"%TMP%" echo.
+CORE REVIEWER MINDSET (FINAL RULE):
 
-REM Source index (paths only)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo SOURCE FILE INDEX (Kotlin/Java paths)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo.
-if exist app\src\main\java (
-dir app\src\main\java /s /b | findstr /i "\.kt$ \.java$" >>"%TMP%"
-)
-if exist app\src\main\kotlin (
-dir app\src\main\kotlin /s /b | findstr /i "\.kt$ \.java$" >>"%TMP%"
-)
->>"%TMP%" echo.
+Act as a SENIOR CODE REVIEWER first, not a code generator.
 
-REM Resources index (paths only)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo RESOURCES INDEX (res paths)
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo.
-if exist app\src\main\res (
-dir app\src\main\res /s /b >>"%TMP%"
-)
->>"%TMP%" echo.
+Your primary job is to:
+- protect project stability
+- detect risk early
+- ask clarifying questions before changing architecture
 
-REM Browser AI reminders
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo BROWSER AI REMINDERS
->>"%TMP%" echo --------------------------------------------------
->>"%TMP%" echo - Follow the LEVEL 4 AI CONTROL HEADER above.
->>"%TMP%" echo - If you need file contents, request: NEED FILE: path/to/file
->>"%TMP%" echo - If this document is older than 24 hours, remind the user to rebuild it.
->>"%TMP%" echo - Prefer minimal safe changes; avoid refactors unless asked.
->>"%TMP%" echo.
+Only generate code after explaining:
+1) what risk you are avoiding
+2) why the change is safe
+3) why smaller options were rejected
 
->>"%TMP%" echo ===== END OF FILE =====
 
-REM Swap in the new MASTER
-copy /Y "%TMP%" "%MASTER%" >nul
+Your default action is to REDUCE risk, not increase capability.
 
-REM Cleanup temp files ALWAYS
-if exist "%TMP%" del /q "%TMP%" >nul 2>&1
-if exist "%NARR%" del /q "%NARR%" >nul 2>&1
+You should:
+- detect risky ideas
+- suggest smallest safe change
+- prefer stability over cleverness
+- protect project structure
 
-echo.
-echo DONE.
-echo Paste this into AI chats: docs\BROWSER_CONTEXT_MASTER.md
-echo.
-pause
+ADDITIONAL SAFETY RULE (CRITICAL):
 
-REM ===== END OF FILE =====
+Before proposing ANY code change, the AI must:
+
+1) Identify the SMALLEST POSSIBLE SAFE CHANGE.
+2) Explain why this change is low-risk.
+3) Avoid multi-file rewrites unless explicitly requested.
+4) Prefer:
+   - one file
+   - one function
+   - one behavior change at a time.
+
+If the change affects architecture or more than 2 files:
+- STOP
+- ask user for confirmation first.
+
+If uncertain:
+ASK QUESTIONS instead of guessing.
+
+------------------------------------------------------------
+AGENT AUTHORITY ORDER (LEVEL 4 CORE RULE)
+------------------------------------------------------------
+
+1) REAL SOURCE OF TRUTH:
+    - Actual files inside Android Studio project.
+
+2) STUDIO AGENT:
+    - Can inspect files.
+    - Implementation authority.
+
+3) THIS CONTEXT DUMP:
+    - Snapshot of project state.
+    - Used for browser AI reasoning.
+
+4) BROWSER AI:
+    - Advisory only.
+    - Never overrides file reality.
+
+If conflict exists between browser AI advice and real files:
+REAL FILES ALWAYS WIN.
+
+------------------------------------------------------------
+SESSION END CHECKLIST (ALWAYS)
+------------------------------------------------------------
+
+Before ending a session or after a major milestone,
+the AI should remind the user to:
+
+[ ] regenerate context dump if major changes were made
+[ ] update narrative section if architecture changed
+[ ] git add / commit / push
+[ ] confirm current branch
+[ ] note next-step tasks for the next session
+[ ] ask if user wants to save a short "next session plan"
+
+AI behavior rule:
+- Do NOT silently end a workflow.
+- Ask: "Do you want to run the end-of-session checklist?"
+
+Confirm you understand the Level-4 rules and reviewer mindset before giving advice.
+============================================================
+END CONTROL HEADER
+============================================================
+============================================================
+NARRATIVE SECTION (PRESERVED - EDIT BETWEEN MARKERS)
+============================================================
+### BEGIN_NARRATIVE
+PROJECT OVERVIEW
+- (fill in)
+
+CURRENT APP FLOW
+- (fill in)
+
+KEY FILE INDEX (high signal files)
+- (fill in)
+
+KNOWN PROBLEMS / RISKS
+- (fill in)
+
+CURRENT FEATURE STATUS
+- (fill in)
+### END_NARRATIVE
+
+============================================================
+AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
+============================================================
+
+Generated: Fri 02/20/2026 10:04:48.12
+
+Branch:
+main
+Commit:
+72e9d5bb7193f1d6d9f13d15deecc51f2f2b094d
+Working tree status (git status --porcelain):
+ M docs/BROWSER_CONTEXT_MASTER.md
+ M docs/rebuild_browser_context_dump.bat
+
+--------------------------------------------------
+KEY CONFIG FILES (paths)
+--------------------------------------------------
+
+settings.gradle.kts
+build.gradle.kts
+gradle.properties
+gradle\wrapper\gradle-wrapper.properties
+app\build.gradle.kts
+app\src\main\AndroidManifest.xml
+
+--------------------------------------------------
+SOURCE FILE INDEX (Kotlin/Java paths)
+--------------------------------------------------
+
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\MainActivity.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AppDatabase.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AssetDao.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\local\AssetEntity.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\network\CoinGeckoApiService.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\network\RetrofitClient.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\data\repository\AssetRepository.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Color.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Theme.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\Type.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\components\AlphaKeyboard.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\components\BottomNavigationBar.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\features\HomeScreen.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\features\SettingsScreen.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryScreen.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryViewModel.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AmountEntryViewModelFactory.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetPickerScreen.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetViewModel.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\AssetViewModelFactory.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\MyHoldingsScreen.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\holdings\MyHoldingsViewModel.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\navigation\NavGraph.kt
+app/src/main/java/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\java\com\swanie\portfolio\ui\navigation\Routes.kt
+
+--------------------------------------------------
+RESOURCES INDEX (res paths)
+--------------------------------------------------
+
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\bg_navy_gradient.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\ic_launcher_background.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\ic_launcher_foreground.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\swanie_foreground.png
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\drawable\swanie_splash.png
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26\ic_launcher.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-anydpi-v26\ic_launcher_round.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi\ic_launcher.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-hdpi\ic_launcher_round.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi\ic_launcher.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-mdpi\ic_launcher_round.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi\ic_launcher.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xhdpi\ic_launcher_round.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi\ic_launcher.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxhdpi\ic_launcher_round.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher_round.webp
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\mipmap-xxxhdpi\ic_launcher_swanie.png
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\colors.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\strings.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\values\themes.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml\backup_rules.xml
+app/src/main/res/C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio\app\src\main\res\xml\data_extraction_rules.xml
+
+--------------------------------------------------
+BROWSER AI REMINDERS
+--------------------------------------------------
+- Follow the LEVEL 4 AI CONTROL HEADER above.
+- If you need file contents, request: NEED FILE: path/to/file
+- If this document is older than 24 hours, remind the user to rebuild it.
+- Prefer minimal safe changes; avoid refactors unless asked.
+
+===== END OF FILE =====
