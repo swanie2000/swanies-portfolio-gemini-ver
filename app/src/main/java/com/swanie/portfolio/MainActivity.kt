@@ -7,20 +7,23 @@ import android.view.animation.AccelerateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
-import com.swanie.portfolio.ui.SwaniesPortfolioTheme
+import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.ui.navigation.NavGraph
+import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // installSplashScreen MUST be before super.onCreate
         installSplashScreen().setOnExitAnimationListener { splashScreenView ->
             val fadeOut = ObjectAnimator.ofFloat(
-                splashScreenView.view, // The view to animate
-                View.ALPHA, // The property to animate
+                splashScreenView.view,
+                View.ALPHA,
                 1f,
                 0f
             ).apply {
@@ -33,10 +36,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
+
+        // Create an instance of our DataStore manager
+        val themePreferences = ThemePreferences(this)
+
         setContent {
-            SwaniesPortfolioTheme {
+            // Collect the theme settings as state
+            val themeIndex by themePreferences.themeIndex.collectAsState(initial = 0)
+            val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = true)
+
+            SwaniesPortfolioTheme(
+                themeIndex = themeIndex,
+                darkTheme = isDarkMode
+            ) {
                 val navController = rememberNavController()
-                // Directly call NavGraph. We will add Scaffold inside the screens that need it.
                 NavGraph(navController = navController)
             }
         }
