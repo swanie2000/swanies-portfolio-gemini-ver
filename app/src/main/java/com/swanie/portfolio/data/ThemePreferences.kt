@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,13 +19,13 @@ class ThemePreferences(context: Context) {
 
     // Define keys for the preferences
     private object PreferencesKeys {
-        val THEME_INDEX = intPreferencesKey("theme_index")
+        val THEME_COLOR_HEX = stringPreferencesKey("theme_color_hex")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
     }
 
-    // Flow to get the current theme index
-    val themeIndex: Flow<Int> = appContext.dataStore.data.map {
-        it[PreferencesKeys.THEME_INDEX] ?: 0 // Default to 0 (Navy)
+    // Flow to get the current theme color HEX
+    val themeColorHex: Flow<String> = appContext.dataStore.data.map {
+        it[PreferencesKeys.THEME_COLOR_HEX] ?: "#000416" // Default to Swanie Navy
     }
 
     // Flow to get the dark mode setting
@@ -33,10 +33,10 @@ class ThemePreferences(context: Context) {
         it[PreferencesKeys.IS_DARK_MODE] ?: true // Default to dark mode
     }
 
-    // Function to save the theme index
-    suspend fun saveThemeIndex(index: Int) {
+    // Function to save the theme color HEX
+    suspend fun saveThemeColorHex(hex: String) {
         appContext.dataStore.edit {
-            it[PreferencesKeys.THEME_INDEX] = index
+            it[PreferencesKeys.THEME_COLOR_HEX] = hex
         }
     }
 

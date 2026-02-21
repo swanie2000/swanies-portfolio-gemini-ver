@@ -88,7 +88,7 @@ fun HomeScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF000416)),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
 
@@ -150,7 +150,7 @@ fun HomeScreen(navController: NavHostController) {
                     Text(
                         text = "Swanie's Portfolio",
                         style = MaterialTheme.typography.headlineLarge,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (showSparkleOnS) {
                         MetallicShimmer(
@@ -176,9 +176,9 @@ fun HomeScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(60.dp))
                 Button(
                     onClick = { navController.navigate(Routes.HOLDINGS) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0055FF))
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("ENTER DASHBOARD", color = Color.White)
+                    Text("ENTER DASHBOARD", color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }

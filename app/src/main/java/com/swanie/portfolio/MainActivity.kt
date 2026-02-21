@@ -42,11 +42,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             // Collect the theme settings as state
-            val themeIndex by themePreferences.themeIndex.collectAsState(initial = 0)
+            val seedColorHex by themePreferences.themeColorHex.collectAsState(initial = "#000416")
             val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = true)
 
             SwaniesPortfolioTheme(
-                themeIndex = themeIndex,
+                seedColorHex = seedColorHex,
                 darkTheme = isDarkMode
             ) {
                 val navController = rememberNavController()

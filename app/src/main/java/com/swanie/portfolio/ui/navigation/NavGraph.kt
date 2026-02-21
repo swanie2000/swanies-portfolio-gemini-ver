@@ -12,6 +12,7 @@ import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
+import com.swanie.portfolio.ui.settings.SettingsScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -25,12 +26,17 @@ fun NavGraph(navController: NavHostController) {
             HomeScreen(navController)
         }
 
+        composable(Routes.SETTINGS) {
+            SettingsScreen(navController)
+        }
+
         composable(Routes.HOLDINGS) {
             Scaffold(
                 bottomBar = { BottomNavigationBar(navController = navController) }
             ) { innerPadding ->
                 MyHoldingsScreen(
                     onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) },
+                    navController = navController, // Pass the NavController
                     modifier = Modifier.padding(innerPadding)
                 )
             }

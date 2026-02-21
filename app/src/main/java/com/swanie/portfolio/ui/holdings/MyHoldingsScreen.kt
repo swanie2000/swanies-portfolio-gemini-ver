@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
@@ -62,6 +64,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun MyHoldingsScreen(
     onAddNewAsset: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -87,8 +90,7 @@ fun MyHoldingsScreen(
     var countdown by remember { mutableStateOf(30) }
     var isTimerRunning by remember { mutableStateOf(true) }
 
-    val deepNavy = Color(0xFF000416)
-    val silver = Color(0xFFC0C0C0)
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
 
     LaunchedEffect(countdown, isTimerRunning) {
         if (isTimerRunning && countdown > 0) {
@@ -102,13 +104,13 @@ fun MyHoldingsScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = deepNavy
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(deepNavy)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             // Header
             Row(
@@ -117,29 +119,19 @@ fun MyHoldingsScreen(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.swanie_foreground),
-                        contentDescription = "Swan Logo",
-                        modifier = Modifier.size(100.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.weight(1f)) // Spacer to balance the add icon
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Portfolio",
-                        fontSize = 36.sp,
-                        color = silver,
-                        fontWeight = FontWeight.Bold,
+                    Image(
+                        painter = painterResource(id = R.drawable.swanie_foreground),
+                        contentDescription = "Swan Logo",
+                        modifier = Modifier.size(80.dp)
                     )
                     Text(
                         text = currencyFormat.format(totalPortfolioValue),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -147,7 +139,7 @@ fun MyHoldingsScreen(
 
                 Box(
                     modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.CenterEnd
                 ) {
                     IconButton(
                         onClick = onAddNewAsset,
@@ -155,7 +147,7 @@ fun MyHoldingsScreen(
                         Icon(
                             Icons.Default.Add,
                             contentDescription = "Add New Asset",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -171,7 +163,8 @@ fun MyHoldingsScreen(
                 ) {
                     SmoothProgressBar(
                         progress = (30 - countdown) / 30f,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        trackColor = surfaceVariantColor
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
@@ -189,16 +182,17 @@ fun MyHoldingsScreen(
                         },
                         enabled = countdown == 0 && !isRefreshing
                     ) {
+                        val refreshColor = if (countdown == 0 && !isRefreshing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh Prices",
-                            tint = if (countdown == 0 && !isRefreshing) Color.Cyan else Color.DarkGray
+                            tint = refreshColor
                         )
                     }
                 }
                 Text(
                     text = "LIVE MARKET",
-                    color = silver,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 2.sp,
@@ -211,10 +205,10 @@ fun MyHoldingsScreen(
                 selectedTabIndex = selectedTab,
                 containerColor = Color.Transparent,
                 indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
+                    TabRowDefaults.SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
                         height = 3.dp,
-                        color = silver
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 divider = { }
@@ -227,7 +221,7 @@ fun MyHoldingsScreen(
                             Text(
                                 text = title,
                                 fontWeight = if (selectedTab == index) FontWeight.ExtraBold else FontWeight.Normal,
-                                color = if (selectedTab == index) Color.White else Color.Gray,
+                                color = if (selectedTab == index) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
                         }
@@ -250,7 +244,8 @@ fun MyHoldingsScreen(
 fun SmoothProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
-    height: Dp = 2.dp
+    height: Dp = 2.dp,
+    trackColor: Color
 ) {
     Canvas(
         modifier = modifier
@@ -258,14 +253,14 @@ fun SmoothProgressBar(
             .fillMaxWidth()
     ) {
         val activeColor = when {
-            progress >= (21f / 30f) -> Color.Green
-            progress >= (11f / 30f) -> Color.Yellow
-            else -> Color.Red
+            progress >= (21f / 30f) -> Color(0xFF00C853) // Green
+            progress >= (11f / 30f) -> Color(0xFFFFD600) // Yellow
+            else -> Color(0xFFD32F2F) // Red
         }
 
         // Draw the background track
         drawRect(
-            color = Color.DarkGray,
+            color = trackColor,
             size = size
         )
 
@@ -299,7 +294,7 @@ fun HoldingItemCard(asset: AssetEntity) {
         if (asset.name.equals(asset.symbol, ignoreCase = true)) {
             Text(
                 text = asset.symbol.uppercase(),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 maxLines = 1,
@@ -308,7 +303,7 @@ fun HoldingItemCard(asset: AssetEntity) {
         } else {
             Text(
                 text = asset.symbol.uppercase(),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 maxLines = 1,
@@ -326,11 +321,11 @@ fun HoldingItemCard(asset: AssetEntity) {
                 modifier = Modifier
                     .height(20.dp)
                     .width(80.dp)
-                    .background(Color.DarkGray.copy(alpha = 0.5f))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             ) {
                 Text(
                     "Sparkline",
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 8.sp,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -359,7 +354,7 @@ fun HoldingItemCard(asset: AssetEntity) {
         ) {
             Text(
                 text = currencyFormat.format(asset.amountHeld * asset.currentPrice),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 maxLines = 1,
@@ -367,12 +362,12 @@ fun HoldingItemCard(asset: AssetEntity) {
             )
             Text(
                 text = "${numberFormat.format(asset.amountHeld)} ${asset.symbol.uppercase()}",
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 14.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
     }
-    HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f))
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
 }

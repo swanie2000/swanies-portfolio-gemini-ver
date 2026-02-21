@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -32,8 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -67,7 +66,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF000416))
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         OutlinedTextField(
@@ -79,7 +78,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            placeholder = { Text("Search (e.g., Bitcoin, Gold)", color = Color.LightGray) },
+            placeholder = { Text("Search (e.g., Bitcoin, Gold)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Search
@@ -89,13 +88,13 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                cursorColor = Color.White,
-                focusedBorderColor = Color.White,
-                unfocusedBorderColor = Color.DarkGray,
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
             )
         )
 
@@ -104,14 +103,13 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.weight(0.2f)) // Drastically reduced weight to move image much higher
+                Spacer(modifier = Modifier.weight(0.2f))
                 Image(
                     painter = painterResource(id = R.drawable.swan_launcher_icon),
                     contentDescription = "Empty Search Results",
-                    colorFilter = ColorFilter.tint(Color.White), // Keep white for visibility
                     modifier = Modifier
                         .size(200.dp)
-                        .alpha(0.2f) // Restore ghost effect
+                        .alpha(0.1f)
                 )
                 Spacer(modifier = Modifier.weight(3f))
             }
@@ -137,10 +135,10 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
                                 modifier = Modifier.size(30.dp)
                             )
                             Spacer(Modifier.width(16.dp))
-                            Text("${asset.name} (${asset.symbol.uppercase()})", color = Color.White)
+                            Text("${asset.name} (${asset.symbol.uppercase()})", color = MaterialTheme.colorScheme.onBackground)
                         }
                     }
-                    HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), thickness = 1.dp)
                 }
             }
         }
