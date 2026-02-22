@@ -143,13 +143,16 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 80.dp)
         ) {
-            AuthTray(onLoginClick = { navController.navigate(Routes.HOLDINGS) })
+            AuthTray(
+                onLoginClick = { navController.navigate(Routes.HOLDINGS) },
+                onCreateAccountClick = { navController.navigate(Routes.CREATE_ACCOUNT) }
+            )
         }
     }
 }
 
 @Composable
-fun AuthTray(onLoginClick: () -> Unit) {
+fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(0.90f),
         shape = RoundedCornerShape(32.dp),
@@ -171,7 +174,7 @@ fun AuthTray(onLoginClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            TextButton(onClick = { /* TODO */ }) {
+            TextButton(onClick = onCreateAccountClick) {
                 Text("Create Account", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
 

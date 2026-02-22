@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.ui.components.BottomNavigationBar
+import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
@@ -25,6 +26,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
     ) {
         composable(Routes.HOME) {
             HomeScreen(navController, mainViewModel)
+        }
+
+        composable(Routes.CREATE_ACCOUNT) {
+            CreateAccountScreen(navController, mainViewModel)
         }
 
         composable(Routes.SETTINGS) {
