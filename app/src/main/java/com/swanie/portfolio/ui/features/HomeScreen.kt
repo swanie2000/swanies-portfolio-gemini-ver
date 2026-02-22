@@ -6,26 +6,14 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -53,163 +41,144 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
-    var isReady by remember { mutableStateOf(false) } // Controls the bloom animation
+    var isReady by remember { mutableStateOf(false) }
 
     val themeColorHex by mainViewModel.themeColorHex.collectAsStateWithLifecycle()
-
     val navyColor = Color(0xFF000416)
-    val userSelectedColor = try {
-        Color(themeColorHex.toColorInt())
-    } catch (e: IllegalArgumentException) {
-        navyColor // Fallback to navy if hex is invalid
-    }
+    val userSelectedColor = try { Color(themeColorHex.toColorInt()) } catch (e: Exception) { navyColor }
 
-    val progress by animateFloatAsState(
-        targetValue = if (isReady) 1f else 0f,
-        animationSpec = tween(1000),
-        label = "BloomProgress"
-    )
+    val progress by animateFloatAsState(targetValue = if (isReady) 1f else 0f, animationSpec = tween(800))
 
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.66f).dp
 
-    val offsetY by animateDpAsState(
-        targetValue = if (animateSwan) -60.dp else -500.dp,
-        animationSpec = tween(
-            durationMillis = 1200,
-            easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)
-        ),
-        label = "SwanGlide",
+    // SWAN GLIDE: Slightly faster glide (1000ms vs 1200ms)
+    val swanYOffset by animateDpAsState(
+        targetValue = if (animateSwan) (-100).dp else (-600).dp,
+        animationSpec = tween(1000, easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)),
         finishedListener = { animateText = true }
     )
 
-    val alpha by animateFloatAsState(
-        targetValue = if (animateSwan) 1f else 0f,
-        animationSpec = tween(durationMillis = 1200),
-        label = "SwanAlpha"
-    )
+    val alpha by animateFloatAsState(targetValue = if (animateSwan) 1f else 0f, animationSpec = tween(1000))
 
     LaunchedEffect(animateText) {
         if (animateText) {
-            delay(1000) // Wait for text fade-in. Total delay: 1200 (glide) + 1000 = 2200ms
+            delay(600) // Sparkles appear sooner
             showSparkleOnS = true
-            delay(500) // Total delay: 2200 + 500 = 2700ms
+            delay(300)
             showSparkleOnSwanHead = true
         }
     }
 
     LaunchedEffect(Unit) {
-        delay(100) // Sync with background morph
+        delay(50) // Reduced initial hang time
         animateSwan = true
-        isReady = true // Start the bloom
+        isReady = true
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .drawBehind {
-                // 1. Draw the Navy background first
                 drawRect(color = navyColor)
-
-                // 2. Draw the User Color as a circle that grows
-                drawCircle(
-                    color = userSelectedColor,
-                    radius = size.maxDimension * progress * 1.5f,
-                    center = center
-                )
-            },
-        contentAlignment = Alignment.Center
+                drawCircle(color = userSelectedColor, radius = size.maxDimension * progress * 1.5f, center = center)
+            }
     ) {
-
-        // Container for Swan and Glow
+        // 1. THE SWAN
         Box(
             modifier = Modifier
-                .offset(y = offsetY)
-                .graphicsLayer(clip = false) // Technical Guardrail
+                .align(Alignment.Center)
+                .offset(y = swanYOffset)
                 .zIndex(1f),
             contentAlignment = Alignment.Center
         ) {
-            // The Glow
-            Spacer(
-                modifier = Modifier
-                    .size(logoSize)
-                    .graphicsLayer(alpha = alpha * 0.8f)
-                    .drawBehind {
-                        val radius = size.minDimension * 0.4f
-                        drawCircle(
-                            brush = Brush.radialGradient(
-                                colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent),
-                                radius = radius
-                            ),
-                            radius = radius
-                        )
-                    }
-            )
+            Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
+                drawCircle(brush = Brush.radialGradient(colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent), radius = size.minDimension * 0.4f))
+            })
+            Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
 
-            // The Swan
-            Image(
-                painter = painterResource(id = R.drawable.swanie_foreground),
-                contentDescription = "Swan Logo",
-                modifier = Modifier
-                    .size(logoSize)
-                    .graphicsLayer(alpha = alpha)
-            )
-
-            // Sparkle 2: On Swan's head
             if (showSparkleOnSwanHead) {
-                MetallicShimmer(
-                    modifier = Modifier
-                        .offset(x = 45.dp, y = -50.dp)
-                        .zIndex(2f)
+                MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = -50.dp).zIndex(2f))
+            }
+        }
+
+        // 2. THE TEXT: Faster fade (700ms)
+        AnimatedVisibility(
+            visible = animateText,
+            enter = fadeIn(animationSpec = tween(700, 100)),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .offset(y = (-10).dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(modifier = Modifier.graphicsLayer(clip = false)) {
+                    Text(
+                        text = "Swanie's Portfolio",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (showSparkleOnS) {
+                        MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
+                    }
+                }
+                Text(
+                    text = "Crypto & Precious Metals",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp),
+                    color = Color.LightGray.copy(alpha = 0.8f)
                 )
             }
         }
 
+        // 3. THE AUTH TRAY: Snappy entrance (400ms delay, 700ms duration)
         AnimatedVisibility(
             visible = animateText,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 200)),
-            modifier = Modifier.offset(y = 80.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 20.dp)
-            ) {
-                // Sparkle 1: Anchor to 'S'
-                Box(modifier = Modifier.graphicsLayer(clip = false)) { // Technical Guardrail
-                    Text(
-                        text = "Swanie's Portfolio",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    if (showSparkleOnS) {
-                        MetallicShimmer(
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .offset(x = 18.dp, y = 2.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Fine-Point Typography
-                Text(
-                    text = "Crypto & Precious Metals",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Thin,
-                        fontSize = 12.sp,
-                        letterSpacing = 3.sp
+            enter = fadeIn(animationSpec = tween(700, 400)) +
+                    slideInVertically(
+                        initialOffsetY = { it / 2 }, // Starts closer to final position for a faster "pop"
+                        animationSpec = tween(700, 400)
                     ),
-                    color = Color.LightGray.copy(alpha = 0.8f)
-                )
-                Spacer(modifier = Modifier.height(60.dp))
-                Button(
-                    onClick = { navController.navigate(Routes.HOLDINGS) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("ENTER DASHBOARD", color = MaterialTheme.colorScheme.onPrimary)
-                }
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp)
+        ) {
+            AuthTray(onLoginClick = { navController.navigate(Routes.HOLDINGS) })
+        }
+    }
+}
+
+@Composable
+fun AuthTray(onLoginClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(0.90f),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 40.dp, horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                onClick = onLoginClick,
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("LOGIN", color = Color.Black, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            TextButton(onClick = { /* TODO */ }) {
+                Text("Create Account", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(onClick = { /* TODO */ }) {
+                Text("Forgot Password?", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         }
     }
@@ -219,35 +188,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 private fun MetallicShimmer(modifier: Modifier = Modifier) {
     var scaleState by remember { mutableStateOf(0f) }
     var rotationState by remember { mutableStateOf(45f) }
-
-    val scale by animateFloatAsState(
-        targetValue = scaleState,
-        animationSpec = tween(durationMillis = 400, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)),
-        label = "ShimmerScale"
-    )
-
-    val rotation by animateFloatAsState(
-        targetValue = rotationState,
-        animationSpec = tween(durationMillis = 700),
-        label = "ShimmerRotation"
-    )
-
+    val scale by animateFloatAsState(targetValue = scaleState, animationSpec = tween(300, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)))
+    val rotation by animateFloatAsState(targetValue = rotationState, animationSpec = tween(500))
     LaunchedEffect(Unit) {
-        // Pop in
         scaleState = 1.4f
         rotationState = 180f
-        delay(400L)
+        delay(300L)
         scaleState = 0f
     }
-
-    Box(
-        modifier = modifier
-            .size(4.dp)
-            .graphicsLayer(
-                scaleX = scale,
-                scaleY = scale,
-                rotationZ = rotation
-            )
-            .background(Color.White) // Diamond shape via rotation
-    )
+    Box(modifier = modifier.size(4.dp).graphicsLayer(scaleX = scale, scaleY = scale, rotationZ = rotation).background(Color.White))
 }
