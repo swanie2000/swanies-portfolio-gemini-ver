@@ -154,6 +154,8 @@ AI behavior rule:
 - Ask: "Do you want to run the end-of-session checklist?"
 
 Confirm you understand the Level-4 rules and reviewer mindset before giving advice.
+
+DO NOT START PROCESSING ANYTHING UNTIL THE USER CONFIRMS.!!!!!!!!!!!!
 ============================================================
 END CONTROL HEADER
 ============================================================
@@ -210,14 +212,14 @@ Great work today, Michael. You've built a solid bridge between your Home Screen 
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 02/21/2026 23:58:16.50
+Generated: Sun 02/22/2026 11:43:51.34
 
 Branch:
 main
 Commit:
-4b3de030b79d95e0b1295347ef4629e191eb321b
+35114bdfafe2d46434c025d209915be3e3385c5b
 Working tree status (git status --porcelain):
- M docs/BROWSER_CONTEXT_NARRATIVE.md
+ M docs/BROWSER_CONTEXT_HEADER.txt
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)

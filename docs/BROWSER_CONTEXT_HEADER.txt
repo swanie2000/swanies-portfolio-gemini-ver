@@ -154,6 +154,8 @@ AI behavior rule:
 - Ask: "Do you want to run the end-of-session checklist?"
 
 Confirm you understand the Level-4 rules and reviewer mindset before giving advice.
+
+DO NOT START PROCESSING ANYTHING UNTIL THE USER CONFIRMS.!!!!!!!!!!!!
 ============================================================
 END CONTROL HEADER
 ============================================================
