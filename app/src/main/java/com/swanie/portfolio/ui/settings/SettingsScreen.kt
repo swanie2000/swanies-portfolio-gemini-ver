@@ -70,6 +70,7 @@ fun SettingsScreen(navController: NavController) {
     val savedHex by viewModel.themeColorHex.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
     val isGradientEnabled by viewModel.isGradientEnabled.collectAsState()
+    val isCompactViewEnabled by viewModel.isCompactViewEnabled.collectAsState()
 
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
@@ -141,6 +142,17 @@ fun SettingsScreen(navController: NavController) {
             ) {
                 Text("Gradient Background", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
                 Switch(checked = isGradientEnabled, onCheckedChange = { viewModel.saveIsGradientEnabled(it) })
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Compact Holdings View", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Switch(checked = isCompactViewEnabled, onCheckedChange = { viewModel.saveIsCompactViewEnabled(it) })
             }
 
             Spacer(Modifier.height(32.dp))

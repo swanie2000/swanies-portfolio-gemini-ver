@@ -14,6 +14,9 @@ data class AssetEntity(
     val change24h: Double,
     val displayOrder: Int,
     val lastUpdated: Long,
-    val imageUrl: String, // THE FIX: Add image URL field
-    val category: String = "crypto" // New field for categorization
+    val imageUrl: String,
+    val category: String = "crypto", // New field for categorization
+    val sparklineData: List<Double> = emptyList(),
+    val marketCapRank: Int = 0,
+    val priceChange24h: Double = 0.0
 )

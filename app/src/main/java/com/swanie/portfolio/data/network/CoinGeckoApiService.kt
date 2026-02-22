@@ -31,4 +31,12 @@ interface CoinGeckoApiService {
     suspend fun search(
         @Query("query") query: String
     ): CoinSearchResult
+
+    @GET("coins/markets")
+    suspend fun getCoinMarkets(
+        @Query("vs_currency") vsCurrency: String = "usd",
+        @Query("ids") ids: String,
+        @Query("sparkline") sparkline: Boolean = true,
+        @Query("price_change_percentage") priceChange: String = "24h"
+    ): List<CoinMarketResponse>
 }

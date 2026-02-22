@@ -22,6 +22,7 @@ class ThemePreferences(context: Context) {
         val THEME_COLOR_HEX = stringPreferencesKey("theme_color_hex")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val IS_GRADIENT_ENABLED = booleanPreferencesKey("is_gradient_enabled")
+        val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
     }
 
     // Flow to get the current theme color HEX
@@ -37,6 +38,10 @@ class ThemePreferences(context: Context) {
     // Flow to get the gradient setting
     val isGradientEnabled: Flow<Boolean> = appContext.dataStore.data.map {
         it[PreferencesKeys.IS_GRADIENT_ENABLED] ?: false // Default to false
+    }
+
+    val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+        it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false // Default to full view
     }
 
     // Function to save the theme color HEX
@@ -57,6 +62,12 @@ class ThemePreferences(context: Context) {
     suspend fun saveIsGradientEnabled(enabled: Boolean) {
         appContext.dataStore.edit {
             it[PreferencesKeys.IS_GRADIENT_ENABLED] = enabled
+        }
+    }
+
+    suspend fun saveIsCompactViewEnabled(enabled: Boolean) {
+        appContext.dataStore.edit {
+            it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled
         }
     }
 }

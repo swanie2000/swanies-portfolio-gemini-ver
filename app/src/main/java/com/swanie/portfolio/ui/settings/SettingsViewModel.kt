@@ -19,6 +19,9 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
     val isGradientEnabled: StateFlow<Boolean> = themePreferences.isGradientEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun saveThemeColorHex(hex: String) {
         viewModelScope.launch {
             themePreferences.saveThemeColorHex(hex)
@@ -37,11 +40,18 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
         }
     }
 
+    fun saveIsCompactViewEnabled(isEnabled: Boolean) {
+        viewModelScope.launch {
+            themePreferences.saveIsCompactViewEnabled(isEnabled)
+        }
+    }
+
     fun saveDefaultTheme() {
         viewModelScope.launch {
             themePreferences.saveThemeColorHex("#000416")
             themePreferences.saveIsDarkMode(true)
             themePreferences.saveIsGradientEnabled(false)
+            themePreferences.saveIsCompactViewEnabled(false) // Reset the compact view
         }
     }
 }

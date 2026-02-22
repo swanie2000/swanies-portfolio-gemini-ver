@@ -4,6 +4,7 @@ import android.util.Log
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.CoinGeckoApiService
+import com.swanie.portfolio.data.network.CoinMarketResponse
 import kotlinx.coroutines.flow.first
 
 class AssetRepository(
@@ -13,45 +14,40 @@ class AssetRepository(
 
     val allAssets = assetDao.getAllAssets()
 
-    private fun getCanonicalApiId(asset: AssetEntity): String {
-        return when (asset.symbol.uppercase()) {
-            "XRP" -> "ripple"
-            "BTC" -> "bitcoin"
-            "ETH" -> "ethereum"
-            else -> asset.coinId
-        }
-    }
-
-    suspend fun getSingleCoinPrice(coinId: String): Double {
-        try {
-            val priceMap = coinGeckoApiService.getSimplePrice(ids = coinId)
-            return priceMap[coinId]?.get("usd")
-                ?: throw IllegalStateException("Price not found for coin $coinId")
-        } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to get single coin price for $coinId", e)
-            throw e
-        }
-    }
-
-
-    suspend fun refreshAssetPrices() {
-        val heldAssets = allAssets.first()
-        if (heldAssets.isEmpty()) return
-
-        val apiIds = heldAssets.map { getCanonicalApiId(it) }.joinToString(",")
+    suspend fun refreshAssets() {
+        val heldAssetIds = assetDao.getAllCoinIds()
+        if (heldAssetIds.isEmpty()) return
 
         try {
-            val priceMap = coinGeckoApiService.getSimplePrice(ids = apiIds)
-            val updatedAssets = heldAssets.map { asset ->
-                val canonicalId = getCanonicalApiId(asset)
-                val newPrice = priceMap[canonicalId]?.get("usd")
-                asset.copy(
-                    currentPrice = newPrice ?: asset.currentPrice
-                )
+            val marketData: List<CoinMarketResponse> = coinGeckoApiService.getCoinMarkets(ids = heldAssetIds.joinToString(","))
+
+            // Create a map for quick lookups
+            val marketDataMap = marketData.associateBy { it.id }
+
+            // Get the current state of assets from the database to preserve user-specific data like amountHeld
+            val currentAssets = allAssets.first().associateBy { it.coinId }
+
+            val updatedAssets = heldAssetIds.mapNotNull { coinId ->
+                val marketInfo = marketDataMap[coinId]
+                val currentAsset = currentAssets[coinId]
+
+                if (marketInfo != null && currentAsset != null) {
+                    currentAsset.copy(
+                        currentPrice = marketInfo.currentPrice ?: currentAsset.currentPrice,
+                        priceChange24h = marketInfo.priceChange24h ?: currentAsset.priceChange24h,
+                        marketCapRank = marketInfo.marketCapRank ?: currentAsset.marketCapRank,
+                        sparklineData = marketInfo.sparklineIn7d?.price ?: currentAsset.sparklineData,
+                        lastUpdated = System.currentTimeMillis()
+                    )
+                } else {
+                    null // This coin is no longer in the market data, or we don't have it locally.
+                }
             }
-            updatedAssets.forEach { assetDao.insertAsset(it) }
+
+            assetDao.upsertAll(updatedAssets)
+
         } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to refresh asset prices", e)
+            Log.e("AssetRepository", "Failed to refresh assets from market data", e)
         }
     }
 
@@ -65,12 +61,14 @@ class AssetRepository(
                     symbol = coin.symbol,
                     name = coin.name,
                     imageUrl = coin.large,
-                    // These fields are not provided by the search endpoint
                     amountHeld = 0.0,
-                    currentPrice = 0.0, // Price is intentionally not fetched
+                    currentPrice = 0.0,
                     change24h = 0.0,
                     displayOrder = 0,
-                    lastUpdated = 0L
+                    lastUpdated = 0L,
+                    sparklineData = emptyList(),
+                    marketCapRank = 0,
+                    priceChange24h = 0.0
                 )
             }
         } catch (e: Exception) {
@@ -79,9 +77,6 @@ class AssetRepository(
         }
     }
 
-    /**
-     * THE FIX: Simple function to insert/update a single asset.
-     */
     suspend fun saveAsset(asset: AssetEntity) {
         assetDao.insertAsset(asset)
     }

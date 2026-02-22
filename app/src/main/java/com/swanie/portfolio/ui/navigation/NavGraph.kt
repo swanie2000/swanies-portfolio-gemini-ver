@@ -41,6 +41,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 bottomBar = { BottomNavigationBar(navController = navController) }
             ) { innerPadding ->
                 MyHoldingsScreen(
+                    mainViewModel = mainViewModel, // Pass the MainViewModel
                     onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) },
                     navController = navController, // Pass the NavController
                     modifier = Modifier.padding(innerPadding)

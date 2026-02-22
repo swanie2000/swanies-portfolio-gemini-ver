@@ -37,10 +37,10 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
     private var searchJob: Job? = null
 
     init {
-        refreshAllPrices()
+        refreshAssets()
     }
 
-    fun refreshAllPrices() {
+    fun refreshAssets() {
         viewModelScope.launch {
             if (!_isRefreshEnabled.value) return@launch
 
@@ -48,7 +48,7 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
             _isRefreshEnabled.value = false
 
             try {
-                repository.refreshAssetPrices()
+                repository.refreshAssets() // Updated function call
                 _lastSyncTimestamp.value = System.currentTimeMillis()
             } catch (e: Exception) {
                 // Handle error appropriately
@@ -56,13 +56,9 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
 
             _isRefreshing.value = false
 
-            delay(60000)
+            delay(60000) // Cooldown to prevent spamming the refresh
             _isRefreshEnabled.value = true
         }
-    }
-
-    suspend fun getSingleCoinPrice(coinId: String): Double {
-        return repository.getSingleCoinPrice(coinId)
     }
 
     fun searchCoins(query: String) {

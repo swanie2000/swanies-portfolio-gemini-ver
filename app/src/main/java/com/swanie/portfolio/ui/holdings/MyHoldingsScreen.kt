@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,27 +23,34 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,29 +59,36 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
 import java.text.NumberFormat
 import java.util.Locale
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyHoldingsScreen(
+    mainViewModel: MainViewModel,
     onAddNewAsset: () -> Unit,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val db = AppDatabase.getDatabase(context)
-    val viewModel: AssetViewModel = viewModel(
-        factory = AssetViewModelFactory(db.assetDao())
+    val viewModel: MyHoldingsViewModel = viewModel(
+        factory = MyHoldingsViewModelFactory(db.assetDao())
     )
     val holdings by viewModel.holdings.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -92,12 +107,33 @@ fun MyHoldingsScreen(
 
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
 
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var selectedAssetForSheet by remember { mutableStateOf<AssetEntity?>(null) }
+
+    LaunchedEffect(Unit) { // Refresh on first composition
+        viewModel.refreshAssets()
+    }
+
     LaunchedEffect(countdown, isTimerRunning) {
         if (isTimerRunning && countdown > 0) {
             delay(1000)
             countdown--
         } else if (countdown == 0) {
             isTimerRunning = false
+        }
+    }
+
+    if (sheetState.isVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { scope.launch { sheetState.hide() }.invokeOnCompletion { selectedAssetForSheet = null } },
+            sheetState = sheetState
+        ) {
+            selectedAssetForSheet?.let { asset ->
+                Box(Modifier.padding(16.dp)) {
+                    FullAssetCard(asset = asset)
+                }
+            }
         }
     }
 
@@ -171,7 +207,7 @@ fun MyHoldingsScreen(
                         modifier = Modifier.size(24.dp),
                         onClick = {
                             if (countdown == 0 && !isRefreshing) {
-                                viewModel.refreshAllPrices()
+                                viewModel.refreshAssets() // Corrected function call
                                 countdown = 30 // Reset timer
                                 isTimerRunning = true
                             } else {
@@ -233,7 +269,14 @@ fun MyHoldingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 items(filteredHoldings) { asset ->
-                    HoldingItemCard(asset)
+                    if (isCompactViewEnabled) {
+                        CompactAssetCard(asset = asset, onClick = {
+                            selectedAssetForSheet = asset
+                            scope.launch { sheetState.show() }
+                        })
+                    } else {
+                        FullAssetCard(asset)
+                    }
                 }
             }
         }
@@ -273,10 +316,10 @@ fun SmoothProgressBar(
 }
 
 @Composable
-fun HoldingItemCard(asset: AssetEntity) {
+fun FullAssetCard(asset: AssetEntity) {
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
     val numberFormat = NumberFormat.getNumberInstance()
-    val changeColor = if (asset.change24h >= 0) Color(0xFF00C853) else Color.Red
+    val changeColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color.Red
 
     Row(
         modifier = Modifier
@@ -291,55 +334,32 @@ fun HoldingItemCard(asset: AssetEntity) {
             modifier = Modifier.size(40.dp)
         )
         Spacer(Modifier.width(16.dp))
-        if (asset.name.equals(asset.symbol, ignoreCase = true)) {
-            Text(
-                text = asset.symbol.uppercase(),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        } else {
-            Text(
-                text = asset.symbol.uppercase(),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+        // Simplified name display logic
+        Text(
+            text = asset.symbol.uppercase(),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
 
         // Middle Column: Visuals
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Placeholder for Sparkline
-            Box(
-                modifier = Modifier
-                    .height(20.dp)
-                    .width(80.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            ) {
-                Text(
-                    "Sparkline",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 8.sp,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            SparklineChart(sparklineData = asset.sparklineData, changeColor = changeColor)
             Spacer(Modifier.height(4.dp))
             Row {
                 Icon(
-                    imageVector = if (asset.change24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                    imageVector = if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                     contentDescription = "24h change",
                     tint = changeColor,
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = "${String.format(Locale.US, "%.2f", asset.change24h)}%",
+                    text = "${String.format(Locale.US, "%.2f", asset.priceChange24h)}%",
                     color = changeColor,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -370,4 +390,123 @@ fun HoldingItemCard(asset: AssetEntity) {
         }
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+}
+
+@Composable
+fun CompactAssetCard(asset: AssetEntity, onClick: () -> Unit) {
+    val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+    val changeColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color.Red
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AsyncImage(
+            model = asset.imageUrl,
+            contentDescription = "${asset.name} icon",
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = asset.symbol.uppercase(),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(Modifier.weight(1f))
+        Text(
+            text = currencyFormat.format(asset.currentPrice),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(Modifier.width(12.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                contentDescription = "24h change",
+                tint = changeColor,
+                modifier = Modifier.size(18.dp)
+            )
+            Text(
+                text = "${String.format(Locale.US, "%.2f", asset.priceChange24h)}%",
+                color = changeColor,
+                fontSize = 14.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.End
+            )
+        }
+    }
+    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+}
+
+@Composable
+fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Modifier = Modifier) {
+    if (sparklineData.size < 2) {
+        Box(modifier = modifier.height(30.dp).width(80.dp)) // Placeholder if not enough data
+        return
+    }
+
+    val minPrice = sparklineData.minOrNull() ?: 0.0
+    val maxPrice = sparklineData.maxOrNull() ?: 0.0
+    val priceRange = if ((maxPrice - minPrice) > 0) maxPrice - minPrice else 1.0
+
+    val strokeWidth = 1.5.dp
+
+    Canvas(modifier = modifier.height(30.dp).width(80.dp)) { 
+        val linePath = Path().apply {
+            moveTo(
+                0f,
+                size.height - ((sparklineData.first() - minPrice) / priceRange * size.height).toFloat()
+            )
+            sparklineData.forEachIndexed { index, price ->
+                val x = index.toFloat() / (sparklineData.size - 1) * size.width
+                val y = size.height - ((price - minPrice) / priceRange * size.height).toFloat()
+                lineTo(x, y)
+            }
+        }
+
+        drawPath(
+            path = linePath,
+            color = changeColor,
+            style = Stroke(width = strokeWidth.toPx())
+        )
+
+        val fillPath = Path().apply {
+            // Start from the beginning of the line path
+            moveTo(
+                0f,
+                size.height - ((sparklineData.first() - minPrice) / priceRange * size.height).toFloat()
+            )
+            // Draw the line segments from the original path
+            sparklineData.forEachIndexed { index, price ->
+                val x = index.toFloat() / (sparklineData.size - 1) * size.width
+                val y = size.height - ((price - minPrice) / priceRange * size.height).toFloat()
+                lineTo(x, y)
+            }
+            // Close the path for the fill
+            lineTo(size.width, size.height)
+            lineTo(0f, size.height)
+            close()
+        }
+
+        drawPath(
+            path = fillPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(changeColor.copy(alpha = 0.3f), Color.Transparent),
+                startY = 0f,
+                endY = size.height
+            )
+        )
+    }
 }

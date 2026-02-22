@@ -27,19 +27,14 @@ class MyHoldingsViewModel(private val repository: AssetRepository) : ViewModel()
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    init {
-        // Fetch prices automatically when the app starts.
-        refreshPrices()
-    }
-
     /**
-     * Triggers a refresh of the asset prices from the CoinGecko API.
+     * Triggers a refresh of all asset data from the CoinGecko API.
      * It sets the isRefreshing state to true during the operation.
      */
-    fun refreshPrices() {
+    fun refreshAssets() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            repository.refreshAssetPrices()
+            repository.refreshAssets()
             _isRefreshing.value = false
         }
     }

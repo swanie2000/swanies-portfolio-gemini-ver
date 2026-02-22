@@ -25,6 +25,9 @@ class MainViewModel(themePreferences: ThemePreferences) : ViewModel() {
     val isGradientEnabled: StateFlow<Boolean> = themePreferences.isGradientEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     init {
         // This ensures the splash screen waits until the initial values are loaded.
         viewModelScope.launch {
@@ -32,6 +35,7 @@ class MainViewModel(themePreferences: ThemePreferences) : ViewModel() {
             themeColorHex.first()
             isDarkMode.first()
             isGradientEnabled.first()
+            isCompactViewEnabled.first() // Add the new preference here
             _isThemeReady.value = true
         }
     }
