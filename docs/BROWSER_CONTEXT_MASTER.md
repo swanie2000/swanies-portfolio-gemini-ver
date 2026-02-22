@@ -161,50 +161,61 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-Project Narrative: Swanie’s Portfolio Development
+Updated Project Narrative: Swanie’s Portfolio Development
+
 I. Current State & Recent Technical Wins
 
-The project is currently at a stable, high-performance baseline following a successful "Git Reset" to a known-good state. The architecture now supports a professional-grade customization engine.
+The project is currently at a stable, high-performance baseline. The architecture supports a professional-grade customization engine and a newly established authentication UI flow.
 
-    Stable HSV Color Engine: Implemented a non-reactive sliding logic that separates Hue, Saturation, and Value states. This eliminated "slider jumping" and UI stuttering by decoupling the movement from the database write.
+    Stable HSV Color Engine: Implemented a non-reactive sliding logic that separates Hue, Saturation, and Value states, decoupling UI movement from database writes to eliminate stuttering.
 
-    The "Stage & Commit" Pattern: Introduced a Color Preview Box and Manual Hex Input. Users can fine-tune their brand colors in real-time with an instant visual feedback loop, only "committing" the change to the app-wide theme via the Apply button.
+    The "Stage & Commit" Pattern: Includes a Color Preview Box and Manual Hex Input, allowing users to fine-tune brand colors with a visual feedback loop before committing to the app-wide theme.
 
-    Brand Recovery: The "Default" button is now a high-priority UX feature, instantly restoring the signature Swanie Navy (#000416) across the entire application in a single click.
+    Brand Recovery: The "Default" button remains a high-priority feature, instantly restoring the signature Swanie Navy (#000416) across the entire app.
 
-    Version Control Discipline: The repository is currently clean at commit c7aa3a8, serving as the "Stable Master" for all future UI experiments.
+    UI Expansion (The Auth Flow): Successfully implemented the CreateAccountScreen. This includes a "Big Swan" hero header (160.dp), glassmorphism-styled input cards, and expanded data collection (Full Name, Email, Phone, and Terms/Conditions).
 
-II. The "Tonal Gradient" Roadmap
+    M3 Navigation & Compatibility: The app now features a robust NavHost wiring the HomeScreen to the CreateAccountScreen. Resolved critical Material 3 compilation errors by migrating to OutlinedTextFieldDefaults.colors().
 
-The next phase of development focuses on moving from flat colors to dynamic depth. The goal is to implement an optional vertical gradient that derives its light/dark tones mathematically from the user's selected primary color.
+    Version Control Discipline: The repository is clean at commit 4b3de03, which marks the successful "locking in" of the expanded onboarding UI.
+
+II. The "Tonal Gradient" & Logic Roadmap
+
+The next phase moves from UI shell construction to functional logic and depth.
 
     Mathematical Depth: Utilizing HSV "Value" shifts (±15%) to create top and bottom anchors for a Brush.verticalGradient.
 
-    Architectural Robustness: To prevent previous compilation failures, the app will transition to a Universal Brush Architecture. This means both solid colors and gradients will be rendered using a Brush object, ensuring the Kotlin compiler has a consistent parameter type.
+    Architectural Robustness: Transitioning to a Universal Brush Architecture for consistent background rendering.
 
-    User Control: A new isGradientEnabled preference will be added to the DataStore, toggled via a professional-style Switch in the Settings menu.
+    Dynamic Theming: The CreateAccountScreen now uses drawBehind and collectAsStateWithLifecycle to observe the user’s custom color choice in real-time, layering it over the navy base.
+
+    Onboarding Logic: Future steps include implementing Firebase Authentication for the "Sign Up" button and setting up Input Validation (Email formatting and Password matching).
 
 III. Build & Safety Standards
 
-    Named Parameters: All background modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...) or Modifier.background(color = ...)) to avoid function overloading ambiguity.
+    Named Parameters: All background modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...) or Modifier.background(color = ...)) to avoid ambiguity.
 
-    Input Validation: Hex strings must be strictly validated for a length of 6 and valid hexadecimal characters before parsing to prevent StringIndexOutOfBoundsException.
+    Input Validation: Hex strings must be strictly validated. Onboarding forms require validation logic to ensure data integrity before server-side calls.
+
+    Keyboard Awareness: Forms must utilize .imePadding() or .navigationBarsPadding() within scrollable containers to ensure visibility during text input.
 
 How to use this file
 
-You can keep this in a docs/NARRATIVE.md file in your project. It acts as the "Source of Truth" for your AI Agent. If the Agent ever gets lost again, you can paste this narrative to remind it exactly what the architectural rules and current progress are.
+Keep this in a docs/NARRATIVE.md file. It acts as the "Source of Truth." If the AI Agent gets lost, paste this narrative to remind it of the architectural rules, the specific brand identity (The Swan), and the current progress.
+
+Great work today, Michael. You've built a solid bridge between your Home Screen and your user's future data.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 02/21/2026 17:41:13.23
+Generated: Sat 02/21/2026 23:58:16.50
 
 Branch:
 main
 Commit:
-c7aa3a857d4e598dc617e500b403256f773c3b96
+4b3de030b79d95e0b1295347ef4629e191eb321b
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -224,6 +235,8 @@ SOURCE FILE INDEX (Kotlin/Java paths)
 --------------------------------------------------
 
 app/src/main/java/com/swanie/portfolio/MainActivity.kt
+app/src/main/java/com/swanie/portfolio/MainViewModel.kt
+app/src/main/java/com/swanie/portfolio/MainViewModelFactory.kt
 app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
@@ -234,6 +247,7 @@ app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
 app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
+app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/SettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
@@ -272,6 +286,7 @@ app/src/main/res/drawable/ic_launcher_foreground.xml
 app/src/main/res/drawable/swanie_foreground.png
 app/src/main/res/drawable/swanie_splash.png
 app/src/main/res/drawable/swan_launcher_icon.png
+app/src/main/res/drawable/swan_splash_icon_wrapper.xml
 app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
 app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 app/src/main/res/mipmap-hdpi/ic_launcher.webp
