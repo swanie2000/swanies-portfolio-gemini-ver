@@ -16,6 +16,9 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
     val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
+    val isGradientEnabled: StateFlow<Boolean> = themePreferences.isGradientEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun saveThemeColorHex(hex: String) {
         viewModelScope.launch {
             themePreferences.saveThemeColorHex(hex)
@@ -25,6 +28,20 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
     fun saveIsDarkMode(isDark: Boolean) {
         viewModelScope.launch {
             themePreferences.saveIsDarkMode(isDark)
+        }
+    }
+
+    fun saveIsGradientEnabled(isEnabled: Boolean) {
+        viewModelScope.launch {
+            themePreferences.saveIsGradientEnabled(isEnabled)
+        }
+    }
+
+    fun saveDefaultTheme() {
+        viewModelScope.launch {
+            themePreferences.saveThemeColorHex("#000416")
+            themePreferences.saveIsDarkMode(true)
+            themePreferences.saveIsGradientEnabled(false)
         }
     }
 }

@@ -161,59 +161,52 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT OVERVIEW
-- Android portfolio tracking app (Swanie’s Portfolio).
-- Uses local Room database + CoinGecko API.
-- Focus is stability and incremental improvements.
-- AI agents must avoid large refactors.
+Project Narrative: Swanie’s Portfolio Development
+I. Current State & Recent Technical Wins
 
-CURRENT APP FLOW
-- HomeScreen displays overview.
-- MyHoldings manages assets.
-- AmountEntryScreen handles numeric input.
-- AssetPicker used for selecting coins/assets.
+The project is currently at a stable, high-performance baseline following a successful "Git Reset" to a known-good state. The architecture now supports a professional-grade customization engine.
 
-KEY FILE INDEX (high signal files)
-- ui/holdings/AmountEntryScreen.kt (numeric input flow)
-- ui/holdings/AmountEntryViewModel.kt (entry logic)
-- data/repository/AssetRepository.kt (data source bridge)
-- ui/navigation/NavGraph.kt (navigation wiring)
+    Stable HSV Color Engine: Implemented a non-reactive sliding logic that separates Hue, Saturation, and Value states. This eliminated "slider jumping" and UI stuttering by decoupling the movement from the database write.
 
-KNOWN PROBLEMS / RISKS
-- Numeric keyboard/input is sensitive; avoid rewrites.
-- CoinGecko integration still evolving.
-- UI architecture still stabilizing.
-- Prefer single-file fixes.
+    The "Stage & Commit" Pattern: Introduced a Color Preview Box and Manual Hex Input. Users can fine-tune their brand colors in real-time with an instant visual feedback loop, only "committing" the change to the app-wide theme via the Apply button.
 
-CURRENT FEATURE STATUS
-- Basic navigation working.
-- Holdings flow functional.
-- Custom assets partially supported.
-- UX polish ongoing.
+    Brand Recovery: The "Default" button is now a high-priority UX feature, instantly restoring the signature Swanie Navy (#000416) across the entire application in a single click.
+
+    Version Control Discipline: The repository is currently clean at commit c7aa3a8, serving as the "Stable Master" for all future UI experiments.
+
+II. The "Tonal Gradient" Roadmap
+
+The next phase of development focuses on moving from flat colors to dynamic depth. The goal is to implement an optional vertical gradient that derives its light/dark tones mathematically from the user's selected primary color.
+
+    Mathematical Depth: Utilizing HSV "Value" shifts (±15%) to create top and bottom anchors for a Brush.verticalGradient.
+
+    Architectural Robustness: To prevent previous compilation failures, the app will transition to a Universal Brush Architecture. This means both solid colors and gradients will be rendered using a Brush object, ensuring the Kotlin compiler has a consistent parameter type.
+
+    User Control: A new isGradientEnabled preference will be added to the DataStore, toggled via a professional-style Switch in the Settings menu.
+
+III. Build & Safety Standards
+
+    Named Parameters: All background modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...) or Modifier.background(color = ...)) to avoid function overloading ambiguity.
+
+    Input Validation: Hex strings must be strictly validated for a length of 6 and valid hexadecimal characters before parsing to prevent StringIndexOutOfBoundsException.
+
+How to use this file
+
+You can keep this in a docs/NARRATIVE.md file in your project. It acts as the "Source of Truth" for your AI Agent. If the Agent ever gets lost again, you can paste this narrative to remind it exactly what the architectural rules and current progress are.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 02/20/2026 15:12:18.52
+Generated: Sat 02/21/2026 17:41:13.23
 
 Branch:
 main
 Commit:
-41100dccdeefa02ade62c59def08acc30de2982d
+c7aa3a857d4e598dc617e500b403256f773c3b96
 Working tree status (git status --porcelain):
- D .idea/.gitignore
- M .idea/deploymentTargetSelector.xml
- D .idea/deviceManager.xml
- M .idea/gradle.xml
- D .idea/markdown.xml
- M .idea/misc.xml
- M .idea/vcs.xml
- M app/src/main/AndroidManifest.xml
- M app/src/main/res/drawable/ic_launcher_foreground.xml
- M app/src/main/res/drawable/swan_launcher_icon.png
- M docs/BROWSER_CONTEXT_MASTER.md
+ M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
@@ -231,14 +224,13 @@ SOURCE FILE INDEX (Kotlin/Java paths)
 --------------------------------------------------
 
 app/src/main/java/com/swanie/portfolio/MainActivity.kt
+app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
 app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
-app/src/main/java/com/swanie/portfolio/ui/Color.kt
-app/src/main/java/com/swanie/portfolio/ui/Theme.kt
 app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
@@ -254,6 +246,12 @@ app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/ColorPicker.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModelFactory.kt
+app/src/main/java/com/swanie/portfolio/ui/theme/Color.kt
+app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
 
 --------------------------------------------------
 RESOURCES INDEX (res paths)

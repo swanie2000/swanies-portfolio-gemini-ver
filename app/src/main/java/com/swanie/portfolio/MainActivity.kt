@@ -44,10 +44,12 @@ class MainActivity : ComponentActivity() {
             // Collect the theme settings as state
             val seedColorHex by themePreferences.themeColorHex.collectAsState(initial = "#000416")
             val isDarkMode by themePreferences.isDarkMode.collectAsState(initial = true)
+            val isGradientEnabled by themePreferences.isGradientEnabled.collectAsState(initial = false)
 
             SwaniesPortfolioTheme(
                 seedColorHex = seedColorHex,
-                darkTheme = isDarkMode
+                darkTheme = isDarkMode,
+                isGradientEnabled = isGradientEnabled
             ) {
                 val navController = rememberNavController()
                 NavGraph(navController = navController)

@@ -1,38 +1,32 @@
-### BEGIN_NARRATIVE
-PROJECT OVERVIEW
-- Android portfolio tracking app (Swanie’s Portfolio).
-- Uses local Room database + CoinGecko API.
-- Focus is stability and incremental improvements.
-- AI agents must avoid large refactors unless directed for architecture (Level 4).
+Project Narrative: Swanie’s Portfolio Development
+I. Current State & Recent Technical Wins
 
-CURRENT APP FLOW
-- HomeScreen displays overview with custom splash-to-home animation.
-- MyHoldings manages assets and features a header-integrated settings link.
-- AmountEntryScreen handles numeric input.
-- AssetPicker used for selecting coins/assets (Branded with Swan logo).
-- SettingsScreen allows user-defined themes (Persistent via DataStore).
-- Branding: Dynamic engine supporting Dark Navy (#000416) default, plus Emerald, Royal, Charcoal, and Burgundy.
+The project is currently at a stable, high-performance baseline following a successful "Git Reset" to a known-good state. The architecture now supports a professional-grade customization engine.
 
-KEY FILE INDEX (high signal files)
-- ui/theme/Theme.kt (Global theme logic & color scheme mapping)
-- ui/theme/Color.kt (Primary brand color definitions)
-- data/ThemePreferences.kt (DataStore logic for persistent settings)
-- ui/settings/SettingsScreen.kt (Theme selection & Light/Dark toggle UI)
-- ui/settings/SettingsViewModel.kt (Theme state management)
-- app/src/main/res/drawable/swan_launcher_icon.png (Primary brand asset)
-- ui/navigation/NavGraph.kt (Navigation wiring including Settings route)
+    Stable HSV Color Engine: Implemented a non-reactive sliding logic that separates Hue, Saturation, and Value states. This eliminated "slider jumping" and UI stuttering by decoupling the movement from the database write.
 
-KNOWN PROBLEMS / RISKS
-- UI Scoping: Ensure @Composable calls stay within correct scopes to avoid build errors.
-- Role-based theming: Avoid hardcoded colors; use MaterialTheme.colorScheme.background for screen roots.
-- Gradle sync: Rebuild project after theme changes to ensure R classes update.
+    The "Stage & Commit" Pattern: Introduced a Color Preview Box and Manual Hex Input. Users can fine-tune their brand colors in real-time with an instant visual feedback loop, only "committing" the change to the app-wide theme via the Apply button.
 
-CURRENT FEATURE STATUS
-- COMPLETED: Refactored theme files to dedicated ui/theme package.
-- COMPLETED: Integrated Jetpack DataStore for persistent theme and dark mode settings.
-- COMPLETED: Implemented 5-color selectable theme system.
-- COMPLETED: Connected all major screens (Holdings, Settings, AssetPicker) to the dynamic theme engine.
-- IN PROGRESS: Visual polish for Light Mode tonal palettes.
-- PLANNED: Visual "Rainbow" color picker (HSV) for custom color selection.
-- PLANNED: Sync Splash Screen and Adaptive Icon color to user-selected theme.
-### END_NARRATIVE
+    Brand Recovery: The "Default" button is now a high-priority UX feature, instantly restoring the signature Swanie Navy (#000416) across the entire application in a single click.
+
+    Version Control Discipline: The repository is currently clean at commit c7aa3a8, serving as the "Stable Master" for all future UI experiments.
+
+II. The "Tonal Gradient" Roadmap
+
+The next phase of development focuses on moving from flat colors to dynamic depth. The goal is to implement an optional vertical gradient that derives its light/dark tones mathematically from the user's selected primary color.
+
+    Mathematical Depth: Utilizing HSV "Value" shifts (±15%) to create top and bottom anchors for a Brush.verticalGradient.
+
+    Architectural Robustness: To prevent previous compilation failures, the app will transition to a Universal Brush Architecture. This means both solid colors and gradients will be rendered using a Brush object, ensuring the Kotlin compiler has a consistent parameter type.
+
+    User Control: A new isGradientEnabled preference will be added to the DataStore, toggled via a professional-style Switch in the Settings menu.
+
+III. Build & Safety Standards
+
+    Named Parameters: All background modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...) or Modifier.background(color = ...)) to avoid function overloading ambiguity.
+
+    Input Validation: Hex strings must be strictly validated for a length of 6 and valid hexadecimal characters before parsing to prevent StringIndexOutOfBoundsException.
+
+How to use this file
+
+You can keep this in a docs/NARRATIVE.md file in your project. It acts as the "Source of Truth" for your AI Agent. If the Agent ever gets lost again, you can paste this narrative to remind it exactly what the architectural rules and current progress are.

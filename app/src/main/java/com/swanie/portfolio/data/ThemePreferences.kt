@@ -21,6 +21,7 @@ class ThemePreferences(context: Context) {
     private object PreferencesKeys {
         val THEME_COLOR_HEX = stringPreferencesKey("theme_color_hex")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
+        val IS_GRADIENT_ENABLED = booleanPreferencesKey("is_gradient_enabled")
     }
 
     // Flow to get the current theme color HEX
@@ -31,6 +32,11 @@ class ThemePreferences(context: Context) {
     // Flow to get the dark mode setting
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map {
         it[PreferencesKeys.IS_DARK_MODE] ?: true // Default to dark mode
+    }
+
+    // Flow to get the gradient setting
+    val isGradientEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+        it[PreferencesKeys.IS_GRADIENT_ENABLED] ?: false // Default to false
     }
 
     // Function to save the theme color HEX
@@ -44,6 +50,13 @@ class ThemePreferences(context: Context) {
     suspend fun saveIsDarkMode(isDark: Boolean) {
         appContext.dataStore.edit {
             it[PreferencesKeys.IS_DARK_MODE] = isDark
+        }
+    }
+
+    // Function to save the gradient setting
+    suspend fun saveIsGradientEnabled(enabled: Boolean) {
+        appContext.dataStore.edit {
+            it[PreferencesKeys.IS_GRADIENT_ENABLED] = enabled
         }
     }
 }

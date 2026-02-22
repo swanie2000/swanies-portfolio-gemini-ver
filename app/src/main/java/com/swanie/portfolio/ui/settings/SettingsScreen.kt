@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -53,6 +55,8 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import com.swanie.portfolio.ui.theme.toHsv
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,11 +69,14 @@ fun SettingsScreen(navController: NavController) {
 
     val savedHex by viewModel.themeColorHex.collectAsState()
     val isDarkMode by viewModel.isDarkMode.collectAsState()
+    val isGradientEnabled by viewModel.isGradientEnabled.collectAsState()
 
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
     var value by remember { mutableFloatStateOf(1f) }
     var hexInput by remember { mutableStateOf("") }
+
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(savedHex) {
         try {
@@ -78,7 +85,7 @@ fun SettingsScreen(navController: NavController) {
             saturation = hsv[1]
             value = hsv[2]
         } catch (e: IllegalArgumentException) {
-            val hsv = Color(0xFF000416).toHsv()
+            val hsv = Color(android.graphics.Color.parseColor("#000416")).toHsv()
             hue = hsv[0]
             saturation = hsv[1]
             value = hsv[2]
@@ -102,14 +109,15 @@ fun SettingsScreen(navController: NavController) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(brush = LocalBackgroundBrush.current)
+                .verticalScroll(scrollState)
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
@@ -122,6 +130,17 @@ fun SettingsScreen(navController: NavController) {
             ) {
                 Text("Dark Mode", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
                 Switch(checked = isDarkMode, onCheckedChange = { viewModel.saveIsDarkMode(it) })
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Gradient Background", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Switch(checked = isGradientEnabled, onCheckedChange = { viewModel.saveIsGradientEnabled(it) })
             }
 
             Spacer(Modifier.height(32.dp))
@@ -189,12 +208,11 @@ fun SettingsScreen(navController: NavController) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Button(
                     onClick = {
-                        val hsv = Color(0xFF000416).toHsv()
+                        val hsv = Color(android.graphics.Color.parseColor("#000416")).toHsv()
                         hue = hsv[0]
                         saturation = hsv[1]
                         value = hsv[2]
-                        viewModel.saveThemeColorHex("#000416")
-                        viewModel.saveIsDarkMode(true)
+                        viewModel.saveDefaultTheme()
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer, contentColor = MaterialTheme.colorScheme.onSecondaryContainer)
@@ -211,6 +229,7 @@ fun SettingsScreen(navController: NavController) {
                     Text("Apply Theme")
                 }
             }
+            Spacer(Modifier.height(48.dp))
         }
     }
 }
