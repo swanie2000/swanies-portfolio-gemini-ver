@@ -2,4 +2,5 @@
 <resources>
     <color name="splash_background_color">#000416</color>
     <color name="launcher_navy">#000416</color>
+    <color name="navy">#000416</color>
 </resources>

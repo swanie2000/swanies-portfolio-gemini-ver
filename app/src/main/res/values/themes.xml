@@ -5,8 +5,13 @@
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Lock the background to Swanie Navy for a consistent cold start. -->
         <item name="windowSplashScreenBackground">#000416</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/swanie_foreground</item>
+        <item name="android:windowBackground">#000416</item>
+
+        <!-- Use the inset wrapper to scale the icon correctly. -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/swan_splash_icon_wrapper</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
         <item name="postSplashScreenTheme">@style/Theme.SwaniesPortfolio</item>
     </style>
 </resources>

@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
@@ -17,13 +18,13 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
     NavHost(
         navController = navController,
         startDestination = Routes.HOME
     ) {
         composable(Routes.HOME) {
-            HomeScreen(navController)
+            HomeScreen(navController, mainViewModel)
         }
 
         composable(Routes.SETTINGS) {
