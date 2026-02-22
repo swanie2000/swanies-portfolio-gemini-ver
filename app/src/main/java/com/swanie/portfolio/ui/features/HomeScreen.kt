@@ -1,7 +1,6 @@
 package com.swanie.portfolio.ui.features
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,27 +53,21 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
+    var isReady by remember { mutableStateOf(false) } // Controls the bloom animation
 
     val themeColorHex by mainViewModel.themeColorHex.collectAsStateWithLifecycle()
 
-    val navyBackground = Color(0xFF000416)
+    val navyColor = Color(0xFF000416)
     val userSelectedColor = try {
         Color(themeColorHex.toColorInt())
     } catch (e: IllegalArgumentException) {
-        navyBackground // Fallback to navy if hex is invalid
+        navyColor // Fallback to navy if hex is invalid
     }
 
-    // Guarantees the animation starts from Navy
-    var animatedTargetColor by remember { mutableStateOf(navyBackground) }
-    LaunchedEffect(userSelectedColor) {
-        animatedTargetColor = userSelectedColor
-    }
-
-    // The animation state
-    val backgroundColor by animateColorAsState(
-        targetValue = animatedTargetColor,
-        animationSpec = tween(durationMillis = 800), // Smooth 0.8s morph
-        label = "BackgroundMorph"
+    val progress by animateFloatAsState(
+        targetValue = if (isReady) 1f else 0f,
+        animationSpec = tween(1000),
+        label = "BloomProgress"
     )
 
     val configuration = LocalConfiguration.current
@@ -110,104 +102,113 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     LaunchedEffect(Unit) {
         delay(100) // Sync with background morph
         animateSwan = true
+        isReady = true // Start the bloom
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = backgroundColor // Apply the animated color here
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .drawBehind {
+                // 1. Draw the Navy background first
+                drawRect(color = navyColor)
+
+                // 2. Draw the User Color as a circle that grows
+                drawCircle(
+                    color = userSelectedColor,
+                    radius = size.maxDimension * progress * 1.5f,
+                    center = center
+                )
+            },
+        contentAlignment = Alignment.Center
     ) {
+
+        // Container for Swan and Glow
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .offset(y = offsetY)
+                .graphicsLayer(clip = false) // Technical Guardrail
+                .zIndex(1f),
             contentAlignment = Alignment.Center
         ) {
-            // Container for Swan and Glow
-            Box(
+            // The Glow
+            Spacer(
                 modifier = Modifier
-                    .offset(y = offsetY)
-                    .graphicsLayer(clip = false) // Technical Guardrail
-                    .zIndex(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                // The Glow
-                Spacer(
-                    modifier = Modifier
-                        .size(logoSize)
-                        .graphicsLayer(alpha = alpha * 0.8f)
-                        .drawBehind {
-                            val radius = size.minDimension * 0.4f
-                            drawCircle(
-                                brush = Brush.radialGradient(
-                                    colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent),
-                                    radius = radius
-                                ),
+                    .size(logoSize)
+                    .graphicsLayer(alpha = alpha * 0.8f)
+                    .drawBehind {
+                        val radius = size.minDimension * 0.4f
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent),
                                 radius = radius
-                            )
-                        }
-                )
-
-                // The Swan
-                Image(
-                    painter = painterResource(id = R.drawable.swanie_foreground),
-                    contentDescription = "Swan Logo",
-                    modifier = Modifier
-                        .size(logoSize)
-                        .graphicsLayer(alpha = alpha)
-                )
-
-                // Sparkle 2: On Swan's head
-                if (showSparkleOnSwanHead) {
-                    MetallicShimmer(
-                        modifier = Modifier
-                            .offset(x = 45.dp, y = -50.dp)
-                            .zIndex(2f)
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = animateText,
-                enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 200)),
-                modifier = Modifier.offset(y = 80.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(top = 20.dp)
-                ) {
-                    // Sparkle 1: Anchor to 'S'
-                    Box(modifier = Modifier.graphicsLayer(clip = false)) { // Technical Guardrail
-                        Text(
-                            text = "Swanie's Portfolio",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = MaterialTheme.colorScheme.onBackground
+                            ),
+                            radius = radius
                         )
-                        if (showSparkleOnS) {
-                            MetallicShimmer(
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .offset(x = 18.dp, y = 2.dp)
-                            )
-                        }
                     }
+            )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+            // The Swan
+            Image(
+                painter = painterResource(id = R.drawable.swanie_foreground),
+                contentDescription = "Swan Logo",
+                modifier = Modifier
+                    .size(logoSize)
+                    .graphicsLayer(alpha = alpha)
+            )
 
-                    // Fine-Point Typography
+            // Sparkle 2: On Swan's head
+            if (showSparkleOnSwanHead) {
+                MetallicShimmer(
+                    modifier = Modifier
+                        .offset(x = 45.dp, y = -50.dp)
+                        .zIndex(2f)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = animateText,
+            enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 200)),
+            modifier = Modifier.offset(y = 80.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                // Sparkle 1: Anchor to 'S'
+                Box(modifier = Modifier.graphicsLayer(clip = false)) { // Technical Guardrail
                     Text(
-                        text = "Crypto & Precious Metals",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Thin,
-                            fontSize = 12.sp,
-                            letterSpacing = 3.sp
-                        ),
-                        color = Color.LightGray.copy(alpha = 0.8f)
+                        text = "Swanie's Portfolio",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    Spacer(modifier = Modifier.height(60.dp))
-                    Button(
-                        onClick = { navController.navigate(Routes.HOLDINGS) },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("ENTER DASHBOARD", color = MaterialTheme.colorScheme.onPrimary)
+                    if (showSparkleOnS) {
+                        MetallicShimmer(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 18.dp, y = 2.dp)
+                        )
                     }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Fine-Point Typography
+                Text(
+                    text = "Crypto & Precious Metals",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Thin,
+                        fontSize = 12.sp,
+                        letterSpacing = 3.sp
+                    ),
+                    color = Color.LightGray.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.height(60.dp))
+                Button(
+                    onClick = { navController.navigate(Routes.HOLDINGS) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("ENTER DASHBOARD", color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         }
