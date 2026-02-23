@@ -19,6 +19,7 @@ import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
 import com.swanie.portfolio.ui.settings.SettingsScreen
+import com.swanie.portfolio.ui.settings.ThemeStudioScreen
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -40,6 +41,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
             composable(Routes.SETTINGS) {
                 SettingsScreen(navController)
+            }
+
+            composable(Routes.THEME_STUDIO) { // New Destination
+                ThemeStudioScreen(navController)
             }
 
             composable(Routes.HOLDINGS) {
