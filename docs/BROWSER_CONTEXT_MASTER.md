@@ -166,59 +166,67 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 Updated Project Narrative: Swanie’s Portfolio Development
 I. Current State & Recent Technical Wins
 
-The project has graduated from a UI-focused prototype to a data-driven application with a focus on professional-grade visual density and layout stability.
+The project has evolved from a Crypto-only tracker into a Multi-Asset Financial Suite, supporting both digital assets and physical commodities (Precious Metals) within a unified architecture.
 
-    Adaptive Display Engine: Implemented a theme-isolated display system. Asset cards now support a "Light vs. Dark" preference, while the Global UI (Header/Logo/Tabs) remains anchored in a high-contrast White theme for consistent branding.
+    Hybrid Data Engine: Integrated a MetalsProvider to work alongside the AssetRepository. The app now successfully merges remote API data (Crypto) with local spot-price logic (Metals).
 
-    Responsive Layout Logic: Integrated auto-scaling text constraints within the Asset Cards. This ensures that large currency figures and long asset names (e.g., "Wrapped Bitcoin") do not clip or break the UI.
+    Type-Safe Asset Categorization: Migrated the data model from String-based categories to a robust AssetCategory Enum (CRYPTO vs. METAL).
 
-    Batch-Sync Data Engine: Migrated to a high-performance "Batch" strategy using the CoinGecko /coins/markets endpoint. Updates price, 24h trends, and sparklines for all assets in a single call.
+    Database Schema Evolution (v4): Implemented Room TypeConverters for the new Enum type and enabled fallbackToDestructiveMigration() to ensure schema stability during rapid development.
 
-    Dual-View Holdings System: Implemented a "Compact vs. Full" toggle. Users can switch between a slim, high-density list and detailed asset cards.
+    Intelligent Search UI: The search engine now performs "Global Discovery," returning both coins and bullion in a single list, differentiated by custom UI badges and icons.
 
-    Interactive Detail Pop-ups: ModalBottomSheet logic allows Compact Mode users to view a "Full Card" detail on-tap without navigating away from the main list.
+    High-Energy Home Entrance: Perfected the Splash-to-Home transition. The "Radial Burst" (1000ms) and "Swan Glide" (900ms) now overlap with a precise 120ms delay, creating a snappy, premium feel.
 
-    Persistent Sparkline Caching: Integrated Room TypeConverters to store 168-point sparkline arrays locally for instant "no-internet" visualization.
+    Adaptive Asset Icons: Implemented conditional rendering logic. Metals display high-fidelity, color-coded circular vectors (Gold/Silver/Platinum), while Crypto continues to utilize remote-fetched thumbnails.
 
 II. Architectural Standards & Roadmap
 
-The project follows a "Single Source of Truth" (SSOT) pattern where the UI exclusively observes the Room database.
+The project utilizes a "Global Vault" strategy, treating different asset classes as a single unified stream for the UI while maintaining strict data-source separation in the background.
 
-    Universal Brush Architecture: Site-wide backgrounds utilize a Brush.verticalGradient. This is managed globally and must remain unaffected by the "Light Card" user preference.
+    Window Inset Management: Applied statusBarsPadding across primary screens to ensure the UI respects system boundaries (clock/notches) while maintaining an edge-to-edge immersive look.
 
-    The Repository Pattern: All network logic flows through AssetRepository. The UI triggers refreshAssets(), and the UI reacts to the resulting DB update.
+    The "Hybrid" ViewModel: The AssetViewModel now functions as an aggregator, pulling from disparate sources and sorting them (Metals prioritized) before exposing them to the View.
+
+    Current "Work-in-Progress" Blocks:
+
+        Tab Filtering Logic: Currently refining the strict separation in MyHoldingsScreen to ensure Metals and Crypto occupy their respective tabs exclusively.
+
+        Metals Pricing: Currently utilizing "Local Mock" pricing (e.g., Gold at $2000) while the external Commodity API bridge is being constructed.
 
     Next Logic Steps:
 
-        Persistence Layer: Implement Jetpack DataStore to make the "Light/Dark Card" and "Compact View" toggles persistent across app restarts.
+        Tab Logic Fix: Resolve the filteredHoldings conflict to ensure metals do not "leak" into the Crypto tab.
 
-        Card Completion: Build out the refined Compact Card UI to match the new adaptive theming logic used in the Full Cards.
+        Portfolio Analytics: Implement the Donut Chart visualization to show the percentage split between Digital (Crypto) and Physical (Metals) holdings.
 
-        Authentication: Wire Firebase to the "Sign Up" button and implement input validation.
-
-        Visual Polish: Transition sparkline drawing from jagged lines to smooth Bezier curves.
+        Live Metal Feeds: Integrate a dedicated Metals API (e.g., GoldAPI.io) to replace placeholder spot prices.
 
 III. Build & Safety Standards
 
-    Navigation Guardrails: Maintain explicit navController parameters in screen-level Composables to ensure NavGraph stability.
+    Enum Safety: All category checks must use AssetCategory Enums. Comparison against raw Strings is strictly deprecated to prevent compilation errors.
 
-    Database Migrations: Currently at v3. Use .fallbackToDestructiveMigration() during this rapid development phase.
+    Database Versioning: Currently at v4. Destructive migration is active; any schema change will wipe local test data to maintain integrity.
 
-    Rate-Limit Awareness: The 30-second "Live Market" timer is a hard constraint for the CoinGecko API.
+    UI Constraints: Ensure statusBarsPadding() is present on all new full-screen Composables to prevent collision with Android System UI.
 
-    AI Agent Context: After a "rollback" or "timeout" event, the Agent must be re-aligned using the latest version of this NARRATIVE file to prevent regression of color isolation and layout fixes.
+    AI Agent Context: When resuming, the Agent must prioritize the Enum-based filtering logic in MyHoldingsScreen.kt to resolve the current tab-leakage issue.
+
+Next Step for Michael
+
+I've saved this narrative to my memory for our next session. When you're ready to jump back in, would you like me to immediately target the Tab Filtering logic so we can get your Gold and Bitcoin into their proper rooms?
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 02/22/2026 23:09:55.86
+Generated: Mon 02/23/2026 15:52:29.51
 
 Branch:
 main
 Commit:
-b34839e775309891ea1b4fcab2b62c62b3029ea6
+6824e211456ca6805d84b733409b9072fc74f42c
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -240,6 +248,7 @@ SOURCE FILE INDEX (Kotlin/Java paths)
 app/src/main/java/com/swanie/portfolio/MainActivity.kt
 app/src/main/java/com/swanie/portfolio/MainViewModel.kt
 app/src/main/java/com/swanie/portfolio/MainViewModelFactory.kt
+app/src/main/java/com/swanie/portfolio/data/MetalsProvider.kt
 app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
