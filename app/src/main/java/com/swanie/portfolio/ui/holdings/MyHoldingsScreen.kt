@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -463,52 +464,50 @@ fun CompactAssetCard(asset: AssetEntity, onClick: () -> Unit) {
 @Composable
 fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Modifier = Modifier) {
     if (sparklineData.size < 2) {
-        Box(modifier = modifier.height(30.dp).width(80.dp)) // Placeholder if not enough data
+        Box(modifier = modifier.height(30.dp).width(80.dp))
         return
     }
 
     val minPrice = sparklineData.minOrNull() ?: 0.0
     val maxPrice = sparklineData.maxOrNull() ?: 0.0
     val priceRange = if ((maxPrice - minPrice) > 0) maxPrice - minPrice else 1.0
-
     val strokeWidth = 1.5.dp
 
-    Canvas(modifier = modifier.height(30.dp).width(80.dp)) { 
-        val linePath = Path().apply {
-            moveTo(
-                0f,
-                size.height - ((sparklineData.first() - minPrice) / priceRange * size.height).toFloat()
-            )
-            sparklineData.forEachIndexed { index, price ->
-                val x = index.toFloat() / (sparklineData.size - 1) * size.width
-                val y = size.height - ((price - minPrice) / priceRange * size.height).toFloat()
-                lineTo(x, y)
+    Canvas(modifier = modifier.height(30.dp).width(80.dp)) {
+        val points = sparklineData.mapIndexed { index, price ->
+            val x = index.toFloat() / (sparklineData.size - 1) * size.width
+            val y = size.height - ((price - minPrice) / priceRange * size.height).toFloat()
+            androidx.compose.ui.geometry.Offset(x, y)
+        }
+
+        fun Path.drawBezierPath() {
+            if (points.isEmpty()) return
+            moveTo(points[0].x, points[0].y)
+            for (i in 1 until points.size) {
+                val prev = points[i - 1]
+                val curr = points[i]
+                val cp1x = prev.x + (curr.x - prev.x) / 2f
+                cubicTo(
+                    x1 = cp1x, y1 = prev.y,
+                    x2 = cp1x, y2 = curr.y,
+                    x3 = curr.x, y3 = curr.y
+                )
             }
+        }
+
+        val linePath = Path().apply { drawBezierPath() }
+        val fillPath = Path().apply {
+            drawBezierPath()
+            lineTo(size.width, size.height)
+            lineTo(0f, size.height)
+            close()
         }
 
         drawPath(
             path = linePath,
             color = changeColor,
-            style = Stroke(width = strokeWidth.toPx())
+            style = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
         )
-
-        val fillPath = Path().apply {
-            // Start from the beginning of the line path
-            moveTo(
-                0f,
-                size.height - ((sparklineData.first() - minPrice) / priceRange * size.height).toFloat()
-            )
-            // Draw the line segments from the original path
-            sparklineData.forEachIndexed { index, price ->
-                val x = index.toFloat() / (sparklineData.size - 1) * size.width
-                val y = size.height - ((price - minPrice) / priceRange * size.height).toFloat()
-                lineTo(x, y)
-            }
-            // Close the path for the fill
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-            close()
-        }
 
         drawPath(
             path = fillPath,

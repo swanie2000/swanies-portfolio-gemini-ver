@@ -1,4 +1,4 @@
-============================================================
+`============================================================
 LEVEL 4 AI CONTROL HEADER — SWANIE'S PORTFOLIO
 ============================================================
 
@@ -213,16 +213,13 @@ III. Build & Safety Standards
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 02/22/2026 13:09:10.61
+Generated: Sun 02/22/2026 19:40:55.75
 
 Branch:
 main
 Commit:
-012229a8d4237c8adfedf41f11fe97990f3ef4d9
+4a46fcad3edd12fbb00d0f20f628b6201e747fec
 Working tree status (git status --porcelain):
- M docs/BROWSER_CONTEXT_MASTER.md
- M docs/BROWSER_CONTEXT_NARRATIVE.md
- D test_write.txt
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
@@ -254,6 +251,7 @@ app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
 app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
+app/src/main/java/com/swanie/portfolio/ui/components/CustomToast.kt
 app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/SettingsScreen.kt
@@ -271,6 +269,7 @@ app/src/main/java/com/swanie/portfolio/ui/settings/ColorPicker.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModelFactory.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/ThemeStudioScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Color.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
 
@@ -318,7 +317,7 @@ BROWSER AI REMINDERS
 --------------------------------------------------
 - Follow the LEVEL 4 AI CONTROL HEADER above.
 - If you need file contents, request: NEED FILE: path/to/file
-- If this document is older than 24 hours, remind the user to rebuild it.
+`- If this document is older than 24 hours, remind the user to rebuild it.
 - Prefer minimal safe changes; avoid refactors unless asked.
 
 ===== END OF FILE =====
