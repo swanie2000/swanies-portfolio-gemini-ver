@@ -1,44 +1,44 @@
 Updated Project Narrative: Swanie’s Portfolio Development
 I. Current State & Recent Technical Wins
 
-The project has graduated from a UI-focused prototype to a data-driven application. The architecture now supports real-time market data persistence and a flexible, user-defined display system.
+The project has graduated from a UI-focused prototype to a data-driven application with a focus on professional-grade visual density and layout stability.
 
-    Batch-Sync Data Engine: Migrated from individual asset refreshes to a high-performance "Batch" strategy using the CoinGecko /coins/markets endpoint. This allows updating price, 24h trends, and sparklines for all assets in a single network call, significantly reducing API rate-limit risks.
+    Adaptive Display Engine: Implemented a theme-isolated display system. Asset cards now support a "Light vs. Dark" preference, while the Global UI (Header/Logo/Tabs) remains anchored in a high-contrast White theme for consistent branding.
+
+    Responsive Layout Logic: Integrated auto-scaling text constraints within the Asset Cards. This ensures that large currency figures and long asset names (e.g., "Wrapped Bitcoin") do not clip or break the UI.
+
+    Batch-Sync Data Engine: Migrated to a high-performance "Batch" strategy using the CoinGecko /coins/markets endpoint. Updates price, 24h trends, and sparklines for all assets in a single call.
 
     Dual-View Holdings System: Implemented a "Compact vs. Full" toggle. Users can switch between a slim, high-density list and detailed asset cards.
 
-    Persistent Sparkline Caching: Integrated Room TypeConverters to store 168-point sparkline arrays locally. This ensures that visual data is available instantly upon app launch, even before the first network refresh.
+    Interactive Detail Pop-ups: ModalBottomSheet logic allows Compact Mode users to view a "Full Card" detail on-tap without navigating away from the main list.
 
-    Interactive Detail Pop-ups: Implemented ModalBottomSheet logic. When in Compact Mode, clicking an asset triggers a slide-up "Full Card" view, maintaining a clean UI without sacrificing data depth.
-
-    Stable HSV Color Engine: Decoupled Hue, Saturation, and Value states from database writes, ensuring that the custom theme picker remains fluid and stutter-free.
-
-    Onboarding UI Shell: The CreateAccountScreen is fully wired with glassmorphism-styled input cards and a hero header, ready for authentication logic.
+    Persistent Sparkline Caching: Integrated Room TypeConverters to store 168-point sparkline arrays locally for instant "no-internet" visualization.
 
 II. Architectural Standards & Roadmap
 
 The project follows a "Single Source of Truth" (SSOT) pattern where the UI exclusively observes the Room database.
 
-    Universal Brush Architecture: Site-wide backgrounds utilize a Brush.verticalGradient derived from HSV "Value" shifts (±15%). This is already implemented and must be maintained across all new feature screens.
+    Universal Brush Architecture: Site-wide backgrounds utilize a Brush.verticalGradient. This is managed globally and must remain unaffected by the "Light Card" user preference.
 
-    The Repository Pattern: All network logic must flow through the AssetRepository. The UI should never call the API directly; it triggers a refreshAssets() call in the Repository, which then updates the Local DB.
-
-    Canvas Rendering: Sparklines are custom-drawn on a Canvas using a Path with vertical gradient fills. Any future charts should follow this coordinate-normalization math to ensure performance.
+    The Repository Pattern: All network logic flows through AssetRepository. The UI triggers refreshAssets(), and the UI reacts to the resulting DB update.
 
     Next Logic Steps:
+
+        Persistence Layer: Implement Jetpack DataStore to make the "Light/Dark Card" and "Compact View" toggles persistent across app restarts.
+
+        Card Completion: Build out the refined Compact Card UI to match the new adaptive theming logic used in the Full Cards.
 
         Authentication: Wire Firebase to the "Sign Up" button and implement input validation.
 
         Visual Polish: Transition sparkline drawing from jagged lines to smooth Bezier curves.
 
-        Settings Expansion: Add "Currency Selection" (USD/EUR/BTC) to the Batch-Sync parameters.
-
 III. Build & Safety Standards
 
-    Database Migrations: Due to the introduction of sparklineData and marketCapRank, the database version is currently at v3. Use .fallbackToDestructiveMigration(dropAllTables = true) during this rapid development phase.
+    Navigation Guardrails: Maintain explicit navController parameters in screen-level Composables to ensure NavGraph stability.
 
-    Rate-Limit Awareness: The 30-second "Live Market" timer is a hard constraint for the free-tier CoinGecko API. Do not bypass the timer logic in the ViewModel.
+    Database Migrations: Currently at v3. Use .fallbackToDestructiveMigration() during this rapid development phase.
 
-    Named Parameters: All Compose modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...)).
+    Rate-Limit Awareness: The 30-second "Live Market" timer is a hard constraint for the CoinGecko API.
 
-    Source of Truth: The docs/ folder contains the latest master headers. Always refer to the NARRATIVE file to re-align the AI Agent after a major refactor or "rollback" event.
+    AI Agent Context: After a "rollback" or "timeout" event, the Agent must be re-aligned using the latest version of this NARRATIVE file to prevent regression of color isolation and layout fixes.
