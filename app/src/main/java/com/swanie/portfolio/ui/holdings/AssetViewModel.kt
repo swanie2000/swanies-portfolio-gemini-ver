@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.holdings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.data.MetalsProvider
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import kotlinx.coroutines.Job
@@ -68,9 +69,16 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
             return
         }
         searchJob = viewModelScope.launch {
-            delay(500)
-            val results = repository.searchCoins(query)
-            _searchResults.value = results
+            delay(300) // Slightly faster search delay
+
+            // 1. Search Metals (Local and Fast)
+            val metalResults = MetalsProvider.searchMetals(query)
+
+            // 2. Search Cryptos (From API/Repository)
+            val cryptoResults = repository.searchCoins(query)
+
+            // 3. Combine and Update
+            _searchResults.value = metalResults + cryptoResults
         }
     }
 

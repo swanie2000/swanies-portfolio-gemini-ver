@@ -35,6 +35,7 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.text.DecimalFormat
@@ -66,8 +67,8 @@ fun MyHoldingsScreen(
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
     val filteredHoldings = when (tabs[selectedTab]) {
-        "CRYPTO" -> holdings.filter { it.category == "crypto" }
-        "METAL" -> holdings.filter { it.category == "metal" }
+        "CRYPTO" -> holdings.filter { it.category == AssetCategory.CRYPTO }
+        "METAL" -> holdings.filter { it.category == AssetCategory.METAL }
         else -> holdings
     }
 
@@ -245,7 +246,26 @@ fun FullAssetCard(asset: AssetEntity, isUserDarkMode: Boolean, isLightText: Bool
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
-                    AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)))
+                    when (asset.category) {
+                        AssetCategory.METAL -> {
+                            val color = when (asset.symbol) {
+                                "XAU" -> Color(0xFFFFD700) // Gold
+                                "XAG" -> Color(0xFFC0C0C0) // Silver
+                                "XPT" -> Color(0xFFE5E4E2) // Platinum
+                                "XPD" -> Color(0xFFE5E4E2) // Palladium
+                                else -> Color.Gray
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(color)
+                            )
+                        }
+                        AssetCategory.CRYPTO -> {
+                            AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)))
+                        }
+                    }
                     Spacer(Modifier.height(6.dp))
                     Text(text = asset.symbol.uppercase(), color = cardContentTextColor, fontWeight = FontWeight.Black, fontSize = 15.sp, maxLines = 1)
                 }
@@ -352,13 +372,32 @@ fun CompactAssetCard(
                 modifier = Modifier.weight(1.2f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = asset.imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                )
+                when (asset.category) {
+                    AssetCategory.METAL -> {
+                        val color = when (asset.symbol) {
+                            "XAU" -> Color(0xFFFFD700) // Gold
+                            "XAG" -> Color(0xFFC0C0C0) // Silver
+                            "XPT" -> Color(0xFFE5E4E2) // Platinum
+                            "XPD" -> Color(0xFFE5E4E2) // Palladium
+                            else -> Color.Gray
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(color)
+                        )
+                    }
+                    AssetCategory.CRYPTO -> {
+                        AsyncImage(
+                            model = asset.imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                        )
+                    }
+                }
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = asset.symbol.uppercase(),

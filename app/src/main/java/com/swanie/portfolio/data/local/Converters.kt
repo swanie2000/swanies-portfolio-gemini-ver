@@ -10,4 +10,10 @@ class Converters {
     @TypeConverter
     fun toSparkline(list: List<Double>?): String =
         list?.joinToString(",") ?: ""
+
+    @TypeConverter
+    fun toAssetCategory(value: String) = enumValueOf<AssetCategory>(value)
+
+    @TypeConverter
+    fun fromAssetCategory(value: AssetCategory) = value.name
 }

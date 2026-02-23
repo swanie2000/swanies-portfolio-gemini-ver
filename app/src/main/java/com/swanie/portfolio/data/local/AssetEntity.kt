@@ -3,6 +3,11 @@ package com.swanie.portfolio.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+enum class AssetCategory {
+    CRYPTO,
+    METAL
+}
+
 @Entity(tableName = "assets")
 data class AssetEntity(
     @PrimaryKey
@@ -15,7 +20,7 @@ data class AssetEntity(
     val displayOrder: Int,
     val lastUpdated: Long,
     val imageUrl: String,
-    val category: String = "crypto", // New field for categorization
+    val category: AssetCategory = AssetCategory.CRYPTO, // New field for categorization
     val sparklineData: List<Double> = emptyList(),
     val marketCapRank: Int = 0,
     val priceChange24h: Double = 0.0
