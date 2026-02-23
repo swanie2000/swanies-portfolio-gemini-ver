@@ -1,9 +1,15 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.widget.Toast
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -27,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -46,17 +54,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,6 +76,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.text.NumberFormat
 import java.util.Locale
 import kotlinx.coroutines.delay
@@ -105,8 +115,6 @@ fun MyHoldingsScreen(
     var countdown by remember { mutableStateOf(30) }
     var isTimerRunning by remember { mutableStateOf(true) }
 
-    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var selectedAssetForSheet by remember { mutableStateOf<AssetEntity?>(null) }
@@ -140,13 +148,13 @@ fun MyHoldingsScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = Color.Transparent // Let the background show through
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(brush = LocalBackgroundBrush.current)
         ) {
             // Header
             Row(
@@ -167,7 +175,7 @@ fun MyHoldingsScreen(
                     )
                     Text(
                         text = currencyFormat.format(totalPortfolioValue),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Color.White, // Lock to white for branding
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -197,18 +205,53 @@ fun MyHoldingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    SmoothProgressBar(
-                        progress = (30 - countdown) / 30f,
-                        modifier = Modifier.weight(1f),
-                        trackColor = surfaceVariantColor
-                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f),
+                                RoundedCornerShape(4.dp)
+                            )
+                            .padding(2.dp)
+                    ) {
+                        LinearProgressIndicator(
+                            progress = { (30 - countdown) / 30f },
+                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(2.dp)),
+                            color = when {
+                                countdown <= 10 -> Color(0xFF00C853)
+                                countdown <= 20 -> Color(0xFFFFD600)
+                                else -> Color(0xFFD32F2F)
+                            },
+                            trackColor = Color.Transparent,
+                            strokeCap = StrokeCap.Round
+                        )
+                    }
+
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    val pulseAnim = if (countdown == 0 && !isRefreshing) {
+                        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                        infiniteTransition.animateFloat(
+                            initialValue = 0.6f,
+                            targetValue = 1f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1000),
+                                repeatMode = RepeatMode.Reverse
+                            ), label = "pulse_alpha"
+                        ).value
+                    } else {
+                        1f
+                    }
+
                     IconButton(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(24.dp).graphicsLayer { alpha = pulseAnim },
                         onClick = {
                             if (countdown == 0 && !isRefreshing) {
-                                viewModel.refreshAssets() // Corrected function call
-                                countdown = 30 // Reset timer
+                                viewModel.refreshAssets()
+                                countdown = 30
                                 isTimerRunning = true
                             } else {
                                 val message =
@@ -218,11 +261,10 @@ fun MyHoldingsScreen(
                         },
                         enabled = countdown == 0 && !isRefreshing
                     ) {
-                        val refreshColor = if (countdown == 0 && !isRefreshing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh Prices",
-                            tint = refreshColor
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -280,38 +322,6 @@ fun MyHoldingsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun SmoothProgressBar(
-    progress: Float,
-    modifier: Modifier = Modifier,
-    height: Dp = 2.dp,
-    trackColor: Color
-) {
-    Canvas(
-        modifier = modifier
-            .height(height)
-            .fillMaxWidth()
-    ) {
-        val activeColor = when {
-            progress >= (21f / 30f) -> Color(0xFF00C853) // Green
-            progress >= (11f / 30f) -> Color(0xFFFFD600) // Yellow
-            else -> Color(0xFFD32F2F) // Red
-        }
-
-        // Draw the background track
-        drawRect(
-            color = trackColor,
-            size = size
-        )
-
-        // Draw the active progress portion
-        drawRect(
-            color = activeColor,
-            size = Size(width = size.width * progress, height = size.height)
-        )
     }
 }
 

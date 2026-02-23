@@ -12,6 +12,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.ui.navigation.Routes
@@ -22,15 +24,16 @@ fun BottomNavigationBar(navController: NavHostController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        containerColor = Color.Transparent,
+        tonalElevation = 0.dp, // Remove M3 elevation tint
+        contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         val itemColors = NavigationBarItemDefaults.colors(
-            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-            indicatorColor = MaterialTheme.colorScheme.surfaceVariant
+            selectedIconColor = MaterialTheme.colorScheme.onBackground,
+            unselectedIconColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            selectedTextColor = MaterialTheme.colorScheme.onBackground,
+            unselectedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            indicatorColor = Color.Transparent // No pill indicator
         )
 
         NavigationBarItem(
@@ -46,7 +49,7 @@ fun BottomNavigationBar(navController: NavHostController) {
             label = { Text("Holdings") },
             selected = currentRoute == Routes.HOLDINGS,
             onClick = { navController.navigate(Routes.HOLDINGS) },
-            alwaysShowLabel = false,
+            alwaysShowLabel = true, // Main screen should always have label
             colors = itemColors
         )
         NavigationBarItem(

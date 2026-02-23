@@ -1,43 +1,44 @@
 Updated Project Narrative: Swanie’s Portfolio Development
-
 I. Current State & Recent Technical Wins
 
-The project is currently at a stable, high-performance baseline. The architecture supports a professional-grade customization engine and a newly established authentication UI flow.
+The project has graduated from a UI-focused prototype to a data-driven application. The architecture now supports real-time market data persistence and a flexible, user-defined display system.
 
-    Stable HSV Color Engine: Implemented a non-reactive sliding logic that separates Hue, Saturation, and Value states, decoupling UI movement from database writes to eliminate stuttering.
+    Batch-Sync Data Engine: Migrated from individual asset refreshes to a high-performance "Batch" strategy using the CoinGecko /coins/markets endpoint. This allows updating price, 24h trends, and sparklines for all assets in a single network call, significantly reducing API rate-limit risks.
 
-    The "Stage & Commit" Pattern: Includes a Color Preview Box and Manual Hex Input, allowing users to fine-tune brand colors with a visual feedback loop before committing to the app-wide theme.
+    Dual-View Holdings System: Implemented a "Compact vs. Full" toggle. Users can switch between a slim, high-density list and detailed asset cards.
 
-    Brand Recovery: The "Default" button remains a high-priority feature, instantly restoring the signature Swanie Navy (#000416) across the entire app.
+    Persistent Sparkline Caching: Integrated Room TypeConverters to store 168-point sparkline arrays locally. This ensures that visual data is available instantly upon app launch, even before the first network refresh.
 
-    UI Expansion (The Auth Flow): Successfully implemented the CreateAccountScreen. This includes a "Big Swan" hero header (160.dp), glassmorphism-styled input cards, and expanded data collection (Full Name, Email, Phone, and Terms/Conditions).
+    Interactive Detail Pop-ups: Implemented ModalBottomSheet logic. When in Compact Mode, clicking an asset triggers a slide-up "Full Card" view, maintaining a clean UI without sacrificing data depth.
 
-    M3 Navigation & Compatibility: The app now features a robust NavHost wiring the HomeScreen to the CreateAccountScreen. Resolved critical Material 3 compilation errors by migrating to OutlinedTextFieldDefaults.colors().
+    Stable HSV Color Engine: Decoupled Hue, Saturation, and Value states from database writes, ensuring that the custom theme picker remains fluid and stutter-free.
 
-    Version Control Discipline: The repository is clean at commit 4b3de03, which marks the successful "locking in" of the expanded onboarding UI.
+    Onboarding UI Shell: The CreateAccountScreen is fully wired with glassmorphism-styled input cards and a hero header, ready for authentication logic.
 
-II. The "Tonal Gradient" & Logic Roadmap
+II. Architectural Standards & Roadmap
 
-The next phase moves from UI shell construction to functional logic and depth.
+The project follows a "Single Source of Truth" (SSOT) pattern where the UI exclusively observes the Room database.
 
-    Mathematical Depth: Utilizing HSV "Value" shifts (±15%) to create top and bottom anchors for a Brush.verticalGradient.
+    Universal Brush Architecture: Site-wide backgrounds utilize a Brush.verticalGradient derived from HSV "Value" shifts (±15%). This is already implemented and must be maintained across all new feature screens.
 
-    Architectural Robustness: Transitioning to a Universal Brush Architecture for consistent background rendering.
+    The Repository Pattern: All network logic must flow through the AssetRepository. The UI should never call the API directly; it triggers a refreshAssets() call in the Repository, which then updates the Local DB.
 
-    Dynamic Theming: The CreateAccountScreen now uses drawBehind and collectAsStateWithLifecycle to observe the user’s custom color choice in real-time, layering it over the navy base.
+    Canvas Rendering: Sparklines are custom-drawn on a Canvas using a Path with vertical gradient fills. Any future charts should follow this coordinate-normalization math to ensure performance.
 
-    Onboarding Logic: Future steps include implementing Firebase Authentication for the "Sign Up" button and setting up Input Validation (Email formatting and Password matching).
+    Next Logic Steps:
+
+        Authentication: Wire Firebase to the "Sign Up" button and implement input validation.
+
+        Visual Polish: Transition sparkline drawing from jagged lines to smooth Bezier curves.
+
+        Settings Expansion: Add "Currency Selection" (USD/EUR/BTC) to the Batch-Sync parameters.
 
 III. Build & Safety Standards
 
-    Named Parameters: All background modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...) or Modifier.background(color = ...)) to avoid ambiguity.
+    Database Migrations: Due to the introduction of sparklineData and marketCapRank, the database version is currently at v3. Use .fallbackToDestructiveMigration(dropAllTables = true) during this rapid development phase.
 
-    Input Validation: Hex strings must be strictly validated. Onboarding forms require validation logic to ensure data integrity before server-side calls.
+    Rate-Limit Awareness: The 30-second "Live Market" timer is a hard constraint for the free-tier CoinGecko API. Do not bypass the timer logic in the ViewModel.
 
-    Keyboard Awareness: Forms must utilize .imePadding() or .navigationBarsPadding() within scrollable containers to ensure visibility during text input.
+    Named Parameters: All Compose modifiers must explicitly use named parameters (e.g., Modifier.background(brush = ...)).
 
-How to use this file
-
-Keep this in a docs/NARRATIVE.md file. It acts as the "Source of Truth." If the AI Agent gets lost, paste this narrative to remind it of the architectural rules, the specific brand identity (The Swan), and the current progress.
-
-Great work today, Michael. You've built a solid bridge between your Home Screen and your user's future data.
+    Source of Truth: The docs/ folder contains the latest master headers. Always refer to the NARRATIVE file to re-align the AI Agent after a major refactor or "rollback" event.

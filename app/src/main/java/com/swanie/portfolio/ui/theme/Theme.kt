@@ -15,51 +15,30 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.ui.Typography
 
-/**
- * A CompositionLocal to hold the background brush.
- * This allows us to switch between a solid color and a gradient background.
- */
 val LocalBackgroundBrush = staticCompositionLocalOf<Brush> {
     error("No background brush provided")
 }
 
-/**
- * Converts a Compose [Color] to its HSV (Hue, Saturation, Value) representation.
- * Accessible within the :app module.
- */
 internal fun Color.toHsv(): FloatArray {
     val hsv = FloatArray(3)
     android.graphics.Color.colorToHSV(this.toArgb(), hsv)
     return hsv
 }
 
-/**
- * Generates a light and dark color scheme from a given HEX color string.
- * @param seedColorHex The primary color to base the theme on, e.g., "#0056D2".
- */
-fun generateColorSchemeFromHex(seedColorHex: String): Pair<ColorScheme, ColorScheme> {
-    val seed = try {
-        Color(seedColorHex.toColorInt())
-    } catch (e: IllegalArgumentException) {
-        // Fallback to a default if the hex is invalid
-        Color(0xFF000416)
-    }
-
-    // For light theme, use a very light tint of the seed color for the background.
+fun generateColorSchemeFromHex(seedColor: Color): Pair<ColorScheme, ColorScheme> {
     val lightScheme = lightColorScheme(
-        primary = seed,
-        background = seed.copy(alpha = 0.05f), // Faint tonal surface (95% white)
-        surface = seed.copy(alpha = 0.05f),
-        onBackground = Color(0xFF1A1A1A), // Use a dark grey instead of pure black
+        primary = seedColor,
+        background = Color.Transparent, // Decoupled from theme
+        surface = Color.Transparent,    // Decoupled from theme
+        onBackground = Color(0xFF1A1A1A), // Dark text for light backgrounds
         onSurface = Color(0xFF1A1A1A)
     )
 
-    // For dark theme, the seed color itself becomes the background.
     val darkScheme = darkColorScheme(
-        primary = seed,
-        background = seed,
-        surface = seed,
-        onBackground = Color.White,
+        primary = seedColor,
+        background = Color.Transparent, // Decoupled from theme
+        surface = Color.Transparent,    // Decoupled from theme
+        onBackground = Color.White,         // Light text for dark backgrounds
         onSurface = Color.White
     )
 
@@ -68,44 +47,46 @@ fun generateColorSchemeFromHex(seedColorHex: String): Pair<ColorScheme, ColorSch
 
 @Composable
 fun SwaniesPortfolioTheme(
-    seedColorHex: String = "#000416", // Default to Swanie Navy
+    seedColorHex: String = "#000416",
     darkTheme: Boolean = true,
     isGradientEnabled: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val (lightScheme, darkScheme) = generateColorSchemeFromHex(seedColorHex)
-
-    val colorScheme = if (darkTheme) {
-        darkScheme
-    } else {
-        lightScheme
+    val seedColor = try {
+        Color(seedColorHex.toColorInt())
+    } catch (e: IllegalArgumentException) {
+        Color(0xFF000416) // Fallback to Swanie Navy
     }
 
+    val (lightScheme, darkScheme) = generateColorSchemeFromHex(seedColor)
+
+    val colorScheme = if (darkTheme) darkScheme else lightScheme
+
     val backgroundBrush = if (isGradientEnabled) {
-        val hsv = colorScheme.background.toHsv()
+        val hsv = seedColor.toHsv()
         val hue = hsv[0]
         val saturation = hsv[1]
         val value = hsv[2]
 
         val topColor = Color.hsv(
             hue,
-            (saturation * 0.8f).coerceIn(0f, 1f), // Decrease saturation for the highlight effect
-            (value * 1.40f).coerceIn(0f, 1f)  // Increase value for a brighter top color
+            (saturation * 0.8f).coerceIn(0f, 1f),
+            (value * 1.40f).coerceIn(0f, 1f)
         )
 
         val bottomColor = Color.hsv(
             hue,
-            (saturation * 1.1f).coerceIn(0f, 1f), // Increase saturation for a richer shadow
-            (value * 0.60f).coerceIn(0f, 1f)   // Decrease value for a darker bottom color
+            (saturation * 1.1f).coerceIn(0f, 1f),
+            (value * 0.60f).coerceIn(0f, 1f)
         )
 
         Brush.linearGradient(
             colors = listOf(topColor, bottomColor),
-            start = Offset(0f, 0f),       // Top-Left
-            end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY) // Bottom-Right
+            start = Offset.Zero,
+            end = Offset.Infinite
         )
     } else {
-        SolidColor(colorScheme.background)
+        SolidColor(seedColor)
     }
 
     CompositionLocalProvider(LocalBackgroundBrush provides backgroundBrush) {

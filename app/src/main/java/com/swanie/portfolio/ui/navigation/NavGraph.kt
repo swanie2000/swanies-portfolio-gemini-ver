@@ -1,9 +1,13 @@
 package com.swanie.portfolio.ui.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,67 +19,70 @@ import com.swanie.portfolio.ui.holdings.AmountEntryScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
 import com.swanie.portfolio.ui.settings.SettingsScreen
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.net.URLDecoder
 import java.net.URLEncoder
 
 @Composable
 fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
-    NavHost(
-        navController = navController,
-        startDestination = Routes.HOME
-    ) {
-        composable(Routes.HOME) {
-            HomeScreen(navController, mainViewModel)
-        }
+    Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
+        NavHost(
+            navController = navController,
+            startDestination = Routes.HOME,
+        ) {
+            composable(Routes.HOME) {
+                HomeScreen(navController, mainViewModel)
+            }
 
-        composable(Routes.CREATE_ACCOUNT) {
-            CreateAccountScreen(navController, mainViewModel)
-        }
+            composable(Routes.CREATE_ACCOUNT) {
+                CreateAccountScreen(navController, mainViewModel)
+            }
 
-        composable(Routes.SETTINGS) {
-            SettingsScreen(navController)
-        }
+            composable(Routes.SETTINGS) {
+                SettingsScreen(navController)
+            }
 
-        composable(Routes.HOLDINGS) {
-            Scaffold(
-                bottomBar = { BottomNavigationBar(navController = navController) }
-            ) { innerPadding ->
-                MyHoldingsScreen(
-                    mainViewModel = mainViewModel, // Pass the MainViewModel
-                    onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) },
-                    navController = navController, // Pass the NavController
-                    modifier = Modifier.padding(innerPadding)
+            composable(Routes.HOLDINGS) {
+                Scaffold(
+                    containerColor = Color.Transparent, // Let the background brush show through
+                    bottomBar = { BottomNavigationBar(navController = navController) }
+                ) { innerPadding ->
+                    MyHoldingsScreen(
+                        mainViewModel = mainViewModel,
+                        onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) },
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+            }
+
+            composable(Routes.ASSET_PICKER) {
+                AssetPickerScreen(onAssetSelected = { coinId, symbol, name, imageUrl ->
+                    val encodedUrl = URLEncoder.encode(imageUrl, "UTF-8")
+                    navController.navigate("amount_entry/$coinId/$symbol/$name/$encodedUrl")
+                })
+            }
+
+            composable(Routes.AMOUNT_ENTRY) { backStackEntry ->
+                val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
+                val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
+                val name = backStackEntry.arguments?.getString("name") ?: ""
+                val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
+                val decodedUrl = URLDecoder.decode(imageUrl, "UTF-8")
+
+                AmountEntryScreen(
+                    coinId = coinId,
+                    symbol = symbol,
+                    name = name,
+                    imageUrl = decodedUrl,
+                    onSave = {
+                        navController.navigate(Routes.HOLDINGS) {
+                            popUpTo(Routes.HOLDINGS) { inclusive = true }
+                        }
+                    },
+                    onCancel = { navController.popBackStack() }
                 )
             }
-        }
-
-        composable(Routes.ASSET_PICKER) {
-            AssetPickerScreen(onAssetSelected = { coinId, symbol, name, imageUrl ->
-                val encodedUrl = URLEncoder.encode(imageUrl, "UTF-8")
-                navController.navigate("amount_entry/$coinId/$symbol/$name/$encodedUrl")
-            })
-        }
-
-        composable(Routes.AMOUNT_ENTRY) { backStackEntry ->
-            val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
-            val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
-            val name = backStackEntry.arguments?.getString("name") ?: ""
-            val imageUrl = backStackEntry.arguments?.getString("imageUrl") ?: ""
-            val decodedUrl = URLDecoder.decode(imageUrl, "UTF-8")
-
-
-            AmountEntryScreen(
-                coinId = coinId,
-                symbol = symbol,
-                name = name,
-                imageUrl = decodedUrl,
-                onSave = {
-                    navController.navigate(Routes.HOLDINGS) {
-                        popUpTo(Routes.HOLDINGS) { inclusive = true }
-                    }
-                },
-                onCancel = { navController.popBackStack() }
-            )
         }
     }
 }

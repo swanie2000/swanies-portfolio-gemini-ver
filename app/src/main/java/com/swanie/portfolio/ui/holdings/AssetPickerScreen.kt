@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -43,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 
 @Composable
 fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String) -> Unit) {
@@ -66,7 +68,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(brush = LocalBackgroundBrush.current) // Use the theme brush
             .padding(16.dp)
     ) {
         OutlinedTextField(
@@ -78,7 +80,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            placeholder = { Text("Search (e.g., Bitcoin, Gold)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+            placeholder = { Text("Search (e.g., Bitcoin, Gold)") },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Search
@@ -88,13 +90,17 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                focusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
             )
         )
 

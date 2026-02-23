@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 
 @Composable
 fun AmountEntryScreen(
@@ -64,7 +66,6 @@ fun AmountEntryScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Request focus on launch
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
@@ -112,11 +113,11 @@ fun AmountEntryScreen(
         showExitDialog = true
     }
 
-    Scaffold(containerColor = MaterialTheme.colorScheme.background) {
+    Scaffold(containerColor = Color.Transparent) { // Let background show through
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(brush = LocalBackgroundBrush.current) // Use the theme brush
                 .padding(it)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -153,7 +154,7 @@ fun AmountEntryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
-                label = { Text("Enter Amount for $symbol", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                label = { Text("Enter Amount for $symbol") },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done
@@ -163,13 +164,15 @@ fun AmountEntryScreen(
                 ),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    cursorColor = MaterialTheme.colorScheme.onBackground,
+                    focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    focusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
                 )
             )
             errorMessage?.let {
@@ -187,10 +190,13 @@ fun AmountEntryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
                 enabled = amount.isNotBlank()
             ) {
-                Text("Save Asset", color = MaterialTheme.colorScheme.onSecondary)
+                Text("Save Asset")
             }
         }
     }

@@ -23,13 +23,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -129,8 +130,16 @@ fun SettingsScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Dark Mode", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
-                Switch(checked = isDarkMode, onCheckedChange = { viewModel.saveIsDarkMode(it) })
+                Text("Use Light Text", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp) // Label updated
+                Checkbox(
+                    checked = isDarkMode,
+                    onCheckedChange = { viewModel.saveIsDarkMode(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.onBackground,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                    )
+                )
             }
 
             Spacer(Modifier.height(16.dp))
@@ -141,7 +150,15 @@ fun SettingsScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Gradient Background", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
-                Switch(checked = isGradientEnabled, onCheckedChange = { viewModel.saveIsGradientEnabled(it) })
+                Checkbox(
+                    checked = isGradientEnabled,
+                    onCheckedChange = { viewModel.saveIsGradientEnabled(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.onBackground,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                    )
+                )
             }
 
             Spacer(Modifier.height(16.dp))
@@ -152,7 +169,15 @@ fun SettingsScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Compact Holdings View", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
-                Switch(checked = isCompactViewEnabled, onCheckedChange = { viewModel.saveIsCompactViewEnabled(it) })
+                Checkbox(
+                    checked = isCompactViewEnabled,
+                    onCheckedChange = { viewModel.saveIsCompactViewEnabled(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.onBackground,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                    )
+                )
             }
 
             Spacer(Modifier.height(32.dp))

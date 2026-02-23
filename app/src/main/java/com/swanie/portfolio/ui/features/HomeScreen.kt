@@ -26,12 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.graphics.toColorInt
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.delay
 import kotlin.math.min
 
@@ -41,19 +40,11 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
-    var isReady by remember { mutableStateOf(false) }
-
-    val themeColorHex by mainViewModel.themeColorHex.collectAsStateWithLifecycle()
-    val navyColor = Color(0xFF000416)
-    val userSelectedColor = try { Color(themeColorHex.toColorInt()) } catch (e: Exception) { navyColor }
-
-    val progress by animateFloatAsState(targetValue = if (isReady) 1f else 0f, animationSpec = tween(800))
 
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.66f).dp
 
-    // SWAN GLIDE: Slightly faster glide (1000ms vs 1200ms)
     val swanYOffset by animateDpAsState(
         targetValue = if (animateSwan) (-100).dp else (-600).dp,
         animationSpec = tween(1000, easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)),
@@ -64,7 +55,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     LaunchedEffect(animateText) {
         if (animateText) {
-            delay(600) // Sparkles appear sooner
+            delay(600)
             showSparkleOnS = true
             delay(300)
             showSparkleOnSwanHead = true
@@ -72,18 +63,14 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     }
 
     LaunchedEffect(Unit) {
-        delay(50) // Reduced initial hang time
+        delay(50)
         animateSwan = true
-        isReady = true
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .drawBehind {
-                drawRect(color = navyColor)
-                drawCircle(color = userSelectedColor, radius = size.maxDimension * progress * 1.5f, center = center)
-            }
+            .background(brush = LocalBackgroundBrush.current) // Use the theme brush
     ) {
         // 1. THE SWAN
         Box(
@@ -103,7 +90,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             }
         }
 
-        // 2. THE TEXT: Faster fade (700ms)
+        // 2. THE TEXT
         AnimatedVisibility(
             visible = animateText,
             enter = fadeIn(animationSpec = tween(700, 100)),
@@ -116,7 +103,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     Text(
                         text = "Swanie's Portfolio",
                         style = MaterialTheme.typography.headlineLarge,
-                        color = Color.White,
+                        color = Color.White, // Lock to white for branding
                         fontWeight = FontWeight.Bold
                     )
                     if (showSparkleOnS) {
@@ -126,17 +113,17 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 Text(
                     text = "Crypto & Precious Metals",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp),
-                    color = Color.LightGray.copy(alpha = 0.8f)
+                    color = Color.White.copy(alpha = 0.8f) // Lock to white for branding
                 )
             }
         }
 
-        // 3. THE AUTH TRAY: Snappy entrance (400ms delay, 700ms duration)
+        // 3. THE AUTH TRAY
         AnimatedVisibility(
             visible = animateText,
             enter = fadeIn(animationSpec = tween(700, 400)) +
                     slideInVertically(
-                        initialOffsetY = { it / 2 }, // Starts closer to final position for a faster "pop"
+                        initialOffsetY = { it / 2 },
                         animationSpec = tween(700, 400)
                     ),
             modifier = Modifier
