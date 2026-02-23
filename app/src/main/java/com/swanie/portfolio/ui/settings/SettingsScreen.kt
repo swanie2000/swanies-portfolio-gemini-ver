@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -20,7 +21,6 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,15 +56,19 @@ fun SettingsScreen(navController: NavController) {
     val isCompactViewEnabled by viewModel.isCompactViewEnabled.collectAsState()
     val isLightTextEnabled by viewModel.isLightTextEnabled.collectAsState()
 
+    val textColor = if (isLightTextEnabled) Color.White else Color(0xFF1C1C1E)
+    val checkmarkColor = if (isLightTextEnabled) Color(0xFF1C1C1E) else Color.White
+    val settingsFontSize = 12.sp
+
     val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Settings", color = MaterialTheme.colorScheme.onBackground) },
+                title = { Text("Settings", color = textColor, fontSize = 20.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
@@ -77,79 +82,94 @@ fun SettingsScreen(navController: NavController) {
                 .background(brush = LocalBackgroundBrush.current)
                 .verticalScroll(scrollState)
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(horizontal = 4.dp) // Apply horizontal padding here
         ) {
-            Text("Appearance", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
-            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "APPEARANCE",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                textAlign = TextAlign.Center,
+                fontSize = 18.sp, // Reduced header size
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+
+            // Asset Cards Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Text("Dark Asset Cards", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Text("ASSET CARDS", fontSize = settingsFontSize, color = textColor, softWrap = false)
+                Spacer(Modifier.width(8.dp))
                 Checkbox(
                     checked = isDarkMode,
-                    onCheckedChange = { viewModel.saveIsDarkMode(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.onBackground,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
-                    )
+                    onCheckedChange = { viewModel.saveIsDarkMode(true) },
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
                 )
+                Spacer(Modifier.width(4.dp))
+                Text("Dark", fontSize = settingsFontSize, color = textColor, softWrap = false)
+                Spacer(Modifier.width(8.dp))
+                Checkbox(
+                    checked = !isDarkMode,
+                    onCheckedChange = { viewModel.saveIsDarkMode(false) },
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text("Light", fontSize = settingsFontSize, color = textColor, softWrap = false)
             }
-            Spacer(Modifier.height(16.dp))
+
+            // Asset Text Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Text("Use Light Text", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Text("ASSET TEXT  ", fontSize = settingsFontSize, color = textColor, softWrap = false) // Extra space for alignment
+                Spacer(Modifier.width(8.dp))
+                Checkbox(
+                    checked = !isLightTextEnabled,
+                    onCheckedChange = { viewModel.saveIsLightTextEnabled(false) },
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text("Dark", fontSize = settingsFontSize, color = textColor, softWrap = false)
+                Spacer(Modifier.width(8.dp))
                 Checkbox(
                     checked = isLightTextEnabled,
-                    onCheckedChange = { viewModel.saveIsLightTextEnabled(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.onBackground,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isLightTextEnabled) Color.Black else Color.White
-                    )
+                    onCheckedChange = { viewModel.saveIsLightTextEnabled(true) },
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
                 )
+                Spacer(Modifier.width(4.dp))
+                Text("Light", fontSize = settingsFontSize, color = textColor, softWrap = false)
             }
 
-            Spacer(Modifier.height(16.dp))
-
+            // Gradient Background Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Text("Gradient Background", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Text("Use gradient on background", fontSize = settingsFontSize, color = textColor, softWrap = false)
                 Checkbox(
                     checked = isGradientEnabled,
                     onCheckedChange = { viewModel.saveIsGradientEnabled(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.onBackground,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isGradientEnabled) Color.Black else Color.White
-                    )
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
-
+            // Compact View Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Text("Compact Holdings View", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Text("Use compact asset cards", fontSize = settingsFontSize, color = textColor, softWrap = false)
                 Checkbox(
                     checked = isCompactViewEnabled,
                     onCheckedChange = { viewModel.saveIsCompactViewEnabled(it) },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.onBackground,
-                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isCompactViewEnabled) Color.Black else Color.White
-                    )
+                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
                 )
             }
 
@@ -159,9 +179,10 @@ fun SettingsScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { navController.navigate(Routes.THEME_STUDIO) },
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Text("Adjust Theme Color", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
+                Text("Adjust Theme Color", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = textColor, softWrap = false)
             }
         }
     }

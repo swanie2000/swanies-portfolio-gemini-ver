@@ -48,7 +48,6 @@ fun generateColorSchemeFromHex(seedColor: Color): Pair<ColorScheme, ColorScheme>
 @Composable
 fun SwaniesPortfolioTheme(
     seedColorHex: String = "#000416",
-    darkTheme: Boolean = true,
     isGradientEnabled: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -58,9 +57,9 @@ fun SwaniesPortfolioTheme(
         Color(0xFF000416) // Fallback to Swanie Navy
     }
 
-    val (lightScheme, darkScheme) = generateColorSchemeFromHex(seedColor)
+    val (_, darkScheme) = generateColorSchemeFromHex(seedColor)
 
-    val colorScheme = if (darkTheme) darkScheme else lightScheme
+    val colorScheme = darkScheme
 
     val backgroundBrush = if (isGradientEnabled) {
         val hsv = seedColor.toHsv()

@@ -32,19 +32,18 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val seedColorHex by viewModel.themeColorHex.collectAsStateWithLifecycle()
-            val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
             val isGradientEnabled by viewModel.isGradientEnabled.collectAsStateWithLifecycle()
+            val isLightTextEnabled by viewModel.isLightTextEnabled.collectAsStateWithLifecycle()
 
             // This effect synchronizes the system bar icon colors with the current theme.
-            LaunchedEffect(isDarkMode) {
+            LaunchedEffect(isLightTextEnabled) {
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-                insetsController.isAppearanceLightStatusBars = !isDarkMode
-                insetsController.isAppearanceLightNavigationBars = !isDarkMode
+                insetsController.isAppearanceLightStatusBars = !isLightTextEnabled
+                insetsController.isAppearanceLightNavigationBars = !isLightTextEnabled
             }
 
             SwaniesPortfolioTheme(
                 seedColorHex = seedColorHex,
-                darkTheme = isDarkMode,
                 isGradientEnabled = isGradientEnabled
             ) {
                 val navController = rememberNavController()
