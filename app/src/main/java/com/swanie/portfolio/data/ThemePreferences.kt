@@ -23,6 +23,7 @@ class ThemePreferences(context: Context) {
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val IS_GRADIENT_ENABLED = booleanPreferencesKey("is_gradient_enabled")
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
+        val IS_LIGHT_TEXT_ENABLED = booleanPreferencesKey("is_light_text_enabled")
     }
 
     // Flow to get the current theme color HEX
@@ -42,6 +43,10 @@ class ThemePreferences(context: Context) {
 
     val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map {
         it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false // Default to full view
+    }
+
+    val isLightTextEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+        it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] ?: true // Default to Light Text
     }
 
     // Function to save the theme color HEX
@@ -69,5 +74,9 @@ class ThemePreferences(context: Context) {
         appContext.dataStore.edit {
             it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled
         }
+    }
+
+    suspend fun saveIsLightTextEnabled(enabled: Boolean) {
+        appContext.dataStore.edit { it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] = enabled }
     }
 }

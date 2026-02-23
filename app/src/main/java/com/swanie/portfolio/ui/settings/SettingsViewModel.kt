@@ -22,6 +22,9 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
     val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isLightTextEnabled: StateFlow<Boolean> = themePreferences.isLightTextEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     fun saveThemeColorHex(hex: String) {
         viewModelScope.launch {
             themePreferences.saveThemeColorHex(hex)
@@ -44,6 +47,10 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
         viewModelScope.launch {
             themePreferences.saveIsCompactViewEnabled(isEnabled)
         }
+    }
+
+    fun saveIsLightTextEnabled(enabled: Boolean) {
+        viewModelScope.launch { themePreferences.saveIsLightTextEnabled(enabled) }
     }
 
     fun saveDefaultTheme() {

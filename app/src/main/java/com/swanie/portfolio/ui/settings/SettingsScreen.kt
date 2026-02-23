@@ -53,6 +53,7 @@ fun SettingsScreen(navController: NavController) {
     val isDarkMode by viewModel.isDarkMode.collectAsState()
     val isGradientEnabled by viewModel.isGradientEnabled.collectAsState()
     val isCompactViewEnabled by viewModel.isCompactViewEnabled.collectAsState()
+    val isLightTextEnabled by viewModel.isLightTextEnabled.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -85,7 +86,7 @@ fun SettingsScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Use Light Text", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Text("Dark Asset Cards", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
                 Checkbox(
                     checked = isDarkMode,
                     onCheckedChange = { viewModel.saveIsDarkMode(it) },
@@ -93,6 +94,23 @@ fun SettingsScreen(navController: NavController) {
                         checkedColor = MaterialTheme.colorScheme.onBackground,
                         uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
                         checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                    )
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Use Light Text", color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)
+                Checkbox(
+                    checked = isLightTextEnabled,
+                    onCheckedChange = { viewModel.saveIsLightTextEnabled(it) },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.onBackground,
+                        uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                        checkmarkColor = if (isLightTextEnabled) Color.Black else Color.White
                     )
                 )
             }
@@ -111,7 +129,7 @@ fun SettingsScreen(navController: NavController) {
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.onBackground,
                         uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                        checkmarkColor = if (isGradientEnabled) Color.Black else Color.White
                     )
                 )
             }
@@ -130,7 +148,7 @@ fun SettingsScreen(navController: NavController) {
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.onBackground,
                         uncheckedColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-                        checkmarkColor = if (isDarkMode) Color.Black else Color.White
+                        checkmarkColor = if (isCompactViewEnabled) Color.Black else Color.White
                     )
                 )
             }

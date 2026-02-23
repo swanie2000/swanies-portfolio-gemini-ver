@@ -5,6 +5,8 @@ The project has graduated from a UI-focused prototype to a data-driven applicati
 
     Adaptive Display Engine: Implemented a theme-isolated display system. Asset cards now support a "Light vs. Dark" preference, while the Global UI (Header/Logo/Tabs) remains anchored in a high-contrast White theme for consistent branding.
 
+    Decoupled Theme Logic: Separate toggles for Card Background and Text Color implemented.
+
     Responsive Layout Logic: Integrated auto-scaling text constraints within the Asset Cards. This ensures that large currency figures and long asset names (e.g., "Wrapped Bitcoin") do not clip or break the UI.
 
     Batch-Sync Data Engine: Migrated to a high-performance "Batch" strategy using the CoinGecko /coins/markets endpoint. Updates price, 24h trends, and sparklines for all assets in a single call.

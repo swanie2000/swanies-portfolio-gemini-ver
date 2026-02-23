@@ -59,6 +59,8 @@ fun MyHoldingsScreen(
     val holdings by viewModel.holdings.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
+    val isUserDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle()
+    val isLightTextEnabled by mainViewModel.isLightTextEnabled.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -99,7 +101,7 @@ fun MyHoldingsScreen(
             sheetState = sheetState
         ) {
             selectedAssetForSheet?.let { asset ->
-                Box(Modifier.padding(16.dp)) { FullAssetCard(asset = asset) }
+                Box(Modifier.padding(16.dp)) { FullAssetCard(asset = asset, isUserDarkMode = isUserDarkMode, isLightText = isLightTextEnabled) }
             }
         }
     }
@@ -192,9 +194,18 @@ fun MyHoldingsScreen(
             ) {
                 items(filteredHoldings) { asset ->
                     if (isCompactViewEnabled) {
-                        CompactAssetCard(asset = asset, onClick = { selectedAssetForSheet = asset; scope.launch { sheetState.show() } })
+                        CompactAssetCard(
+                            asset = asset,
+                            isUserDarkMode = isUserDarkMode,
+                            isLightText = isLightTextEnabled,
+                            onClick = { selectedAssetForSheet = asset; scope.launch { sheetState.show() } }
+                        )
                     } else {
-                        FullAssetCard(asset)
+                        FullAssetCard(
+                            asset = asset,
+                            isUserDarkMode = isUserDarkMode,
+                            isLightText = isLightTextEnabled
+                        )
                     }
                 }
             }
@@ -203,15 +214,18 @@ fun MyHoldingsScreen(
 }
 
 @Composable
-fun FullAssetCard(asset: AssetEntity) {
+fun FullAssetCard(asset: AssetEntity, isUserDarkMode: Boolean, isLightText: Boolean) {
     val numberFormat = NumberFormat.getNumberInstance()
-    val isDark = isSystemInDarkTheme()
-
-    // Card logic: Dark card for Dark mode, Light card for Light mode
-    val cardContentTextColor = if (isDark) Color.White else Color(0xFF1C1C1E)
-    val cardBgColor = if (isDark) Color(0xFF2C2C2E) else Color(0xFFE5E5EA)
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
-    val subLabelColor = cardContentTextColor.copy(alpha = 0.4f)
+    // Dark Card: Steel Grey (0xFF636366)
+    // Light Card: Deep Silver (0xFFB0B0B3) - Darkened from 0xFFE5E5EA to support white text
+    val cardBgColor = if (isUserDarkMode) Color(0xFF636366) else Color(0xFFB0B0B3)
+    val cardContentTextColor = if (isLightText) Color.White else Color(0xFF1C1C1E)
+    // Adjust border to stay subtle but defined on the new Silver background
+    val borderColor = if (isUserDarkMode) 
+        Color.White.copy(alpha = 0.12f) 
+    else 
+        Color.Black.copy(alpha = 0.15f)
+    val subLabelColor = cardContentTextColor.copy(alpha = 0.6f)
 
     val isPositive = asset.priceChange24h >= 0
     val trendColor = if (isPositive) Color(0xFF00C853) else Color(0xFFD32F2F)
@@ -294,27 +308,99 @@ fun FullAssetCard(asset: AssetEntity) {
 }
 
 @Composable
-fun CompactAssetCard(asset: AssetEntity, onClick: () -> Unit) {
-    val isDark = isSystemInDarkTheme()
-    val textColor = if (isDark) Color.White else Color(0xFF1C1C1E)
-    val cardBgColor = if (isDark) Color(0xFF2C2C2E) else Color(0xFFE5E5EA)
+fun CompactAssetCard(
+    asset: AssetEntity, 
+    isUserDarkMode: Boolean,
+    isLightText: Boolean,
+    onClick: () -> Unit
+) {
+    val numberFormat = NumberFormat.getNumberInstance()
+    
+    // Adaptive Color Engine logic (Shared with Full Card style)
+    // Dark Card: Steel Grey (0xFF636366)
+    // Light Card: Deep Silver (0xFFB0B0B3) - Darkened from 0xFFE5E5EA to support white text
+    val cardBgColor = if (isUserDarkMode) Color(0xFF636366) else Color(0xFFB0B0B3)
+    val cardContentTextColor = if (isLightText) Color.White else Color(0xFF1C1C1E)
+    // Adjust border to stay subtle but defined on the new Silver background
+    val borderColor = if (isUserDarkMode) 
+        Color.White.copy(alpha = 0.12f) 
+    else 
+        Color.Black.copy(alpha = 0.15f)
+    
     val isPositive = asset.priceChange24h >= 0
     val trendColor = if (isPositive) Color(0xFF00C853) else Color(0xFFD32F2F)
 
+    val priceFormatter = if (asset.currentPrice < 0.10) DecimalFormat("$#,##0.0000") else DecimalFormat("$#,##0.00")
+    val assetPriceString = priceFormatter.format(asset.currentPrice)
+
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = cardBgColor),
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, textColor.copy(alpha = 0.05f))
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(32.dp))
-            Spacer(Modifier.width(12.dp))
-            Text(text = asset.symbol.uppercase(), color = textColor, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Spacer(Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {
-                Text(DecimalFormat("$#,##0.00").format(asset.currentPrice), color = textColor, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                Text("${if(isPositive) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Section 1: Icon & Symbol
+            Row(
+                modifier = Modifier.weight(1.2f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = asset.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = asset.symbol.uppercase(),
+                    color = cardContentTextColor,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 14.sp,
+                    maxLines = 1
+                )
+            }
+
+            // Section 2: Mini Bezier Sparkline
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(24.dp)
+                    .padding(horizontal = 8.dp)
+            ) {
+                SparklineChart(
+                    sparklineData = asset.sparklineData,
+                    changeColor = trendColor,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // Section 3: Price & Trend with scaling
+            Column(
+                modifier = Modifier.weight(1.3f),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = assetPriceString,
+                    color = cardContentTextColor,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = if (assetPriceString.length > 10) 13.sp else 15.sp,
+                    maxLines = 1
+                )
+                Text(
+                    text = "${if (isPositive) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%",
+                    color = trendColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
         }
     }

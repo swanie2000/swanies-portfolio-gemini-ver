@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class MainViewModel(themePreferences: ThemePreferences) : ViewModel() {
+class MainViewModel(private val themePreferences: ThemePreferences) : ViewModel() {
 
     private val _isThemeReady = MutableStateFlow(false)
     val isThemeReady: StateFlow<Boolean> = _isThemeReady.asStateFlow()
@@ -28,6 +28,9 @@ class MainViewModel(themePreferences: ThemePreferences) : ViewModel() {
     val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isLightTextEnabled: StateFlow<Boolean> = themePreferences.isLightTextEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     init {
         // This ensures the splash screen waits until the initial values are loaded.
         viewModelScope.launch {
@@ -35,7 +38,8 @@ class MainViewModel(themePreferences: ThemePreferences) : ViewModel() {
             themeColorHex.first()
             isDarkMode.first()
             isGradientEnabled.first()
-            isCompactViewEnabled.first() // Add the new preference here
+            isCompactViewEnabled.first()
+            isLightTextEnabled.first()
             _isThemeReady.value = true
         }
     }
