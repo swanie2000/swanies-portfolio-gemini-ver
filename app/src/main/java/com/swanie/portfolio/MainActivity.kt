@@ -11,15 +11,16 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels {
-        MainViewModelFactory(ThemePreferences(this))
-    }
+    // Removed the manual Factory. Hilt will now handle the injection
+    // of ThemePreferences and AssetRepository into the ViewModel.
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()

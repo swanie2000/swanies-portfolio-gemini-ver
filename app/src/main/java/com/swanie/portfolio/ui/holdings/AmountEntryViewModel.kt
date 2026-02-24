@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-class AmountEntryViewModel(private val assetDao: AssetDao) : ViewModel() {
+@HiltViewModel
+class AmountEntryViewModel @Inject constructor(private val assetDao: AssetDao) : ViewModel() {
 
     fun saveAsset(asset: AssetEntity) {
         viewModelScope.launch {

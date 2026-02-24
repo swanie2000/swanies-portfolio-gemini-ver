@@ -3,9 +3,7 @@ package com.swanie.portfolio.ui.holdings
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,26 +20,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
-import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,18 +48,15 @@ fun MyHoldingsScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val db = AppDatabase.getDatabase(context)
-    val viewModel: MyHoldingsViewModel = viewModel(
-        factory = MyHoldingsViewModelFactory(db.assetDao())
-    )
-    val holdings by viewModel.holdings.collectAsState()
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
-    val isUserDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle()
-    val isLightTextEnabled by mainViewModel.isLightTextEnabled.collectAsStateWithLifecycle()
+    val viewModel: MyHoldingsViewModel = hiltViewModel()
 
-    var selectedTab by remember { mutableStateOf(0) }
+    val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
+    val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle(initialValue = false)
+    val isUserDarkMode by mainViewModel.isDarkMode.collectAsStateWithLifecycle(initialValue = false)
+    val isLightTextEnabled by mainViewModel.isLightTextEnabled.collectAsStateWithLifecycle(initialValue = true)
+
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
     val filteredHoldings = remember(selectedTab, holdings) {
@@ -98,7 +90,13 @@ fun MyHoldingsScreen(
             sheetState = sheetState
         ) {
             selectedAssetForSheet?.let { asset ->
-                Box(Modifier.padding(16.dp)) { FullAssetCard(asset = asset, isUserDarkMode = isUserDarkMode, isLightText = isLightTextEnabled) }
+                Box(Modifier.padding(16.dp)) { 
+                    FullAssetCard(
+                        asset = asset, 
+                        isUserDarkMode = isUserDarkMode, 
+                        isLightText = isLightTextEnabled
+                    ) 
+                }
             }
         }
     }

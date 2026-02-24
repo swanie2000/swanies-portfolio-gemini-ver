@@ -8,8 +8,11 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AssetRepository(
+@Singleton
+class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService
 ) {
@@ -94,7 +97,7 @@ class AssetRepository(
                     displayOrder = 0,
                     lastUpdated = 0L,
                     sparklineData = emptyList(),
-                    marketCapRank = 0,
+                    marketCapRank = 0, // Corrected: marketCapRank is not in the search result
                     priceChange24h = 0.0,
                     category = AssetCategory.CRYPTO
                 )

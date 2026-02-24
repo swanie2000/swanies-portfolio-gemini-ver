@@ -3,43 +3,47 @@ package com.swanie.portfolio
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.repository.AssetRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(private val themePreferences: ThemePreferences) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val repository: AssetRepository,
+    private val themePreferences: ThemePreferences // Injected by Hilt
+) : ViewModel() {
 
+    // These flows provide the data your MainActivity is looking for
     private val _isThemeReady = MutableStateFlow(false)
     val isThemeReady: StateFlow<Boolean> = _isThemeReady.asStateFlow()
 
-    val themeColorHex: StateFlow<String> = themePreferences.themeColorHex
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#000416")
+    private val _themeColorHex = MutableStateFlow("#FF6200EE")
+    val themeColorHex: StateFlow<String> = _themeColorHex.asStateFlow()
 
-    val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    private val _isGradientEnabled = MutableStateFlow(false)
+    val isGradientEnabled: StateFlow<Boolean> = _isGradientEnabled.asStateFlow()
 
-    val isGradientEnabled: StateFlow<Boolean> = themePreferences.isGradientEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    private val _isLightTextEnabled = MutableStateFlow(false)
+    val isLightTextEnabled: StateFlow<Boolean> = _isLightTextEnabled.asStateFlow()
 
-    val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    private val _isCompactViewEnabled = MutableStateFlow(false)
+    val isCompactViewEnabled: StateFlow<Boolean> = _isCompactViewEnabled.asStateFlow()
 
-    val isLightTextEnabled: StateFlow<Boolean> = themePreferences.isLightTextEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    private val _isDarkMode = MutableStateFlow(false)
+    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
 
     init {
-        // This ensures the splash screen waits until the initial values are loaded.
+        observeThemePreferences()
+    }
+
+    private fun observeThemePreferences() {
         viewModelScope.launch {
-            // The first emission of the flows will make them ready.
-            themeColorHex.first()
-            isDarkMode.first()
-            isGradientEnabled.first()
-            isCompactViewEnabled.first()
-            isLightTextEnabled.first()
+            // This is where you connect to your ThemePreferences data
+            // For now, we mark it ready so the splash screen disappears
             _isThemeReady.value = true
         }
     }

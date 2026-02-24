@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
@@ -40,8 +41,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
 
-    // THEME BINDING
-    val themeColorHex by mainViewModel.themeColorHex.collectAsState()
+    // THEME BINDING - Updated to use collectAsStateWithLifecycle() to match MainActivity
+    val themeColorHex by mainViewModel.themeColorHex.collectAsStateWithLifecycle()
     val userThemeColor = remember(themeColorHex) {
         try { Color(android.graphics.Color.parseColor(themeColorHex)) }
         catch (e: Exception) { Color(0xFF1A237E) }

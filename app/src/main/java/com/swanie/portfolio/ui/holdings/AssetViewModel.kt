@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.MetalsProvider
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
+@HiltViewModel
+class AssetViewModel @Inject constructor(private val repository: AssetRepository) : ViewModel() {
 
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .stateIn(

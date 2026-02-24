@@ -7,15 +7,19 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
 // Create the DataStore instance
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "theme_settings")
 
-class ThemePreferences(context: Context) {
-
-    private val appContext = context.applicationContext
+@Singleton
+class ThemePreferences @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
 
     // Define keys for the preferences
     private object PreferencesKeys {
@@ -27,56 +31,56 @@ class ThemePreferences(context: Context) {
     }
 
     // Flow to get the current theme color HEX
-    val themeColorHex: Flow<String> = appContext.dataStore.data.map {
+    val themeColorHex: Flow<String> = context.dataStore.data.map {
         it[PreferencesKeys.THEME_COLOR_HEX] ?: "#000416" // Default to Swanie Navy
     }
 
     // Flow to get the dark mode setting
-    val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map {
+    val isDarkMode: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.IS_DARK_MODE] ?: true // Default to dark mode
     }
 
     // Flow to get the gradient setting
-    val isGradientEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+    val isGradientEnabled: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.IS_GRADIENT_ENABLED] ?: false // Default to false
     }
 
-    val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+    val isCompactViewEnabled: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false // Default to full view
     }
 
-    val isLightTextEnabled: Flow<Boolean> = appContext.dataStore.data.map {
+    val isLightTextEnabled: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] ?: true // Default to Light Text
     }
 
     // Function to save the theme color HEX
     suspend fun saveThemeColorHex(hex: String) {
-        appContext.dataStore.edit {
+        context.dataStore.edit {
             it[PreferencesKeys.THEME_COLOR_HEX] = hex
         }
     }
 
     // Function to save the dark mode setting
     suspend fun saveIsDarkMode(isDark: Boolean) {
-        appContext.dataStore.edit {
+        context.dataStore.edit {
             it[PreferencesKeys.IS_DARK_MODE] = isDark
         }
     }
 
     // Function to save the gradient setting
     suspend fun saveIsGradientEnabled(enabled: Boolean) {
-        appContext.dataStore.edit {
+        context.dataStore.edit {
             it[PreferencesKeys.IS_GRADIENT_ENABLED] = enabled
         }
     }
 
     suspend fun saveIsCompactViewEnabled(enabled: Boolean) {
-        appContext.dataStore.edit {
+        context.dataStore.edit {
             it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled
         }
     }
 
     suspend fun saveIsLightTextEnabled(enabled: Boolean) {
-        appContext.dataStore.edit { it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] = enabled }
+        context.dataStore.edit { it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] = enabled }
     }
 }

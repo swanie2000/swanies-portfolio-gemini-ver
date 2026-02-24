@@ -38,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,10 +45,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
-import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
@@ -63,12 +61,7 @@ fun AssetPickerScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
 
-    val context = LocalContext.current
-    val db = AppDatabase.getDatabase(context)
-    val assetRepository = db.assetDao()
-    val viewModel: AssetViewModel = viewModel(
-        factory = AssetViewModelFactory(assetRepository)
-    )
+    val viewModel: AssetViewModel = hiltViewModel()
     val searchResults by viewModel.searchResults.collectAsState()
 
     LaunchedEffect(Unit) {

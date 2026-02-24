@@ -2,10 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // Apply the KSP and Hilt plugins
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
 }
 
 android {
@@ -40,7 +38,7 @@ kotlin {
 }
 
 dependencies {
-    // Platform & Compose
+    // Core Android & Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -58,18 +56,18 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
 
-    // Storage (Room)
+    // Room Database (Using KSP)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler) // Room compiler uses KSP
+    ksp(libs.androidx.room.compiler)
 
-    // Lifecycle & DataStore
+    // Lifecycle & Storage
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.datastore:datastore-preferences:1.2.0")
 
-    // Hilt Dependency Injection (The fix for your Navigation error)
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    // HILT - UPGRADED TO 2.54
+    implementation("com.google.dagger:hilt-android:2.54")
+    ksp("com.google.dagger:hilt-android-compiler:2.54")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Testing
