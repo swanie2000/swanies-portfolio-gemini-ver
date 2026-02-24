@@ -109,6 +109,19 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun saveAsset(asset: AssetEntity) {
-        assetDao.insertAsset(asset)
+        val existingAsset = assetDao.getAssetById(asset.coinId)
+        if (existingAsset != null) {
+            val updatedAsset = existingAsset.copy(
+                amountHeld = existingAsset.amountHeld + asset.amountHeld,
+                lastUpdated = System.currentTimeMillis()
+            )
+            assetDao.upsertAsset(updatedAsset)
+        } else {
+            assetDao.upsertAsset(asset.copy(lastUpdated = System.currentTimeMillis()))
+        }
+    }
+
+    suspend fun updateAssetOrder(assets: List<AssetEntity>) {
+        assetDao.updateAssetOrder(assets)
     }
 }

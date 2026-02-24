@@ -52,7 +52,6 @@ fun SettingsScreen(navController: NavController) {
     )
 
     val isDarkMode by viewModel.isDarkMode.collectAsState()
-    val isGradientEnabled by viewModel.isGradientEnabled.collectAsState()
     val isCompactViewEnabled by viewModel.isCompactViewEnabled.collectAsState()
     val isLightTextEnabled by viewModel.isLightTextEnabled.collectAsState()
 
@@ -143,20 +142,6 @@ fun SettingsScreen(navController: NavController) {
                 )
                 Spacer(Modifier.width(4.dp))
                 Text("Light", fontSize = settingsFontSize, color = textColor, softWrap = false)
-            }
-
-            // Gradient Background Row
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text("Use gradient on background", fontSize = settingsFontSize, color = textColor, softWrap = false)
-                Checkbox(
-                    checked = isGradientEnabled,
-                    onCheckedChange = { viewModel.saveIsGradientEnabled(it) },
-                    colors = CheckboxDefaults.colors(checkedColor = textColor, checkmarkColor = checkmarkColor)
-                )
             }
 
             // Compact View Row

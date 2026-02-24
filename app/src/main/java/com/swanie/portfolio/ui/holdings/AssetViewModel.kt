@@ -14,13 +14,29 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+enum class SortOrder {
+    VALUE, NAME, CATEGORY, MANUAL
+}
 
 @HiltViewModel
 class AssetViewModel @Inject constructor(private val repository: AssetRepository) : ViewModel() {
 
+    private val _sortOrder = MutableStateFlow(SortOrder.VALUE)
+    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
+
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
+        .combine(_sortOrder) { assets, order ->
+            when (order) {
+                SortOrder.VALUE -> assets.sortedByDescending { it.currentPrice * it.amountHeld }
+                SortOrder.NAME -> assets.sortedBy { it.name }
+                SortOrder.CATEGORY -> assets.sortedBy { it.category.name }
+                SortOrder.MANUAL -> assets.sortedBy { it.displayOrder }
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -40,6 +56,10 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
 
     init {
         refreshAssets()
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        _sortOrder.value = order
     }
 
     fun refreshAssets() {
@@ -84,20 +104,22 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
         }
     }
 
-    // FIXED: This function now forces the category and price to persist into the DB
     fun saveNewAsset(asset: AssetEntity, amount: Double, onSaveComplete: () -> Unit) {
         viewModelScope.launch {
             val holdingToSave = asset.copy(
                 amountHeld = amount,
-                category = asset.category, // Explicitly keep the METAL category
-                currentPrice = asset.currentPrice, // Ensure price isn't saved as 0.0
+                category = asset.category,
+                currentPrice = asset.currentPrice,
                 lastUpdated = System.currentTimeMillis()
             )
-
-            Log.d("PortfolioDebug", "Saving ${holdingToSave.name} as ${holdingToSave.category} with price ${holdingToSave.currentPrice}")
-
             repository.saveAsset(holdingToSave)
             onSaveComplete()
+        }
+    }
+
+    fun updateAssetOrder(assets: List<AssetEntity>) {
+        viewModelScope.launch {
+            repository.updateAssetOrder(assets)
         }
     }
 }

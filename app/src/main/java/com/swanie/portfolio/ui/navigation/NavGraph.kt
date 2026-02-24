@@ -60,8 +60,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 ) { innerPadding ->
                     MyHoldingsScreen(
                         mainViewModel = mainViewModel,
-                        onAddNewAsset = { navController.navigate(Routes.ASSET_PICKER) },
-                        onAddCustomAsset = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) },
                         navController = navController,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -69,7 +67,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.ASSET_PICKER) {
-                AssetPickerScreen(onAssetSelected = { coinId, symbol, name, imageUrl, category, price ->
+                AssetPickerScreen(navController = navController, onAssetSelected = { coinId, symbol, name, imageUrl, category, price ->
                     val encodedUrl = URLEncoder.encode(imageUrl, "UTF-8")
                     navController.navigate("amount_entry/$coinId/$symbol/$name/$encodedUrl/${category.name}/$price")
                 })

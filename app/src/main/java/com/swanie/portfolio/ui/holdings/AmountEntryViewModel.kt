@@ -13,7 +13,7 @@ class AmountEntryViewModel @Inject constructor(private val assetDao: AssetDao) :
 
     fun saveAsset(asset: AssetEntity) {
         viewModelScope.launch {
-            assetDao.insertAsset(asset)
+            assetDao.upsertAsset(asset)
         }
     }
 }

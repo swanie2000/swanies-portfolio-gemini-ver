@@ -46,15 +46,17 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 
 @Composable
 fun AssetPickerScreen(
-    // UPDATED: Added category and price to the callback parameters
+    navController: NavController,
     onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -77,6 +79,9 @@ fun AssetPickerScreen(
             .background(brush = LocalBackgroundBrush.current)
             .padding(16.dp)
     ) {
+        TextButton(onClick = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) }) {
+            Text("Manual Add Asset")
+        }
         OutlinedTextField(
             value = searchQuery,
             onValueChange = {
@@ -143,12 +148,10 @@ fun AssetPickerScreen(
 @Composable
 fun CoinItem(
     asset: AssetEntity,
-    // UPDATED: Signature matches AssetPickerScreen
     onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
 ) {
     TextButton(
         onClick = {
-            // UPDATED: Passing category and currentPrice through
             onAssetSelected(
                 asset.coinId,
                 asset.symbol.uppercase(),

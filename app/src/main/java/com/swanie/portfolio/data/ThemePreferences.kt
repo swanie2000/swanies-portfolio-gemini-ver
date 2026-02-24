@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// Create the DataStore instance
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "theme_settings")
 
 @Singleton
@@ -21,28 +20,38 @@ class ThemePreferences @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    // Define keys for the preferences
     private object PreferencesKeys {
-        val THEME_COLOR_HEX = stringPreferencesKey("theme_color_hex")
+        val CARD_BACKGROUND_COLOR = stringPreferencesKey("card_background_color")
+        val CARD_TEXT_COLOR = stringPreferencesKey("card_text_color")
+        val SITE_BACKGROUND_COLOR = stringPreferencesKey("site_background_color")
+        val SITE_TEXT_COLOR = stringPreferencesKey("site_text_color")
+        val USE_GRADIENT = booleanPreferencesKey("use_gradient")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
-        val IS_GRADIENT_ENABLED = booleanPreferencesKey("is_gradient_enabled")
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
         val IS_LIGHT_TEXT_ENABLED = booleanPreferencesKey("is_light_text_enabled")
     }
 
-    // Flow to get the current theme color HEX
-    val themeColorHex: Flow<String> = context.dataStore.data.map {
-        it[PreferencesKeys.THEME_COLOR_HEX] ?: "#000416" // Default to Swanie Navy
+    val cardBackgroundColor: Flow<String> = context.dataStore.data.map {
+        it[PreferencesKeys.CARD_BACKGROUND_COLOR] ?: "#FFFFFF"
     }
 
-    // Flow to get the dark mode setting
+    val cardTextColor: Flow<String> = context.dataStore.data.map {
+        it[PreferencesKeys.CARD_TEXT_COLOR] ?: "#000000"
+    }
+
+    val siteBackgroundColor: Flow<String> = context.dataStore.data.map {
+        it[PreferencesKeys.SITE_BACKGROUND_COLOR] ?: "#FFFFFF"
+    }
+
+    val siteTextColor: Flow<String> = context.dataStore.data.map {
+        it[PreferencesKeys.SITE_TEXT_COLOR] ?: "#000000"
+    }
+
+    val useGradient: Flow<Boolean> = context.dataStore.data.map {
+        it[PreferencesKeys.USE_GRADIENT] ?: false
+    }
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.IS_DARK_MODE] ?: true // Default to dark mode
-    }
-
-    // Flow to get the gradient setting
-    val isGradientEnabled: Flow<Boolean> = context.dataStore.data.map {
-        it[PreferencesKeys.IS_GRADIENT_ENABLED] ?: false // Default to false
     }
 
     val isCompactViewEnabled: Flow<Boolean> = context.dataStore.data.map {
@@ -53,24 +62,38 @@ class ThemePreferences @Inject constructor(
         it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] ?: true // Default to Light Text
     }
 
-    // Function to save the theme color HEX
-    suspend fun saveThemeColorHex(hex: String) {
+    suspend fun saveCardBackgroundColor(hex: String) {
         context.dataStore.edit {
-            it[PreferencesKeys.THEME_COLOR_HEX] = hex
+            it[PreferencesKeys.CARD_BACKGROUND_COLOR] = hex
         }
     }
 
-    // Function to save the dark mode setting
+    suspend fun saveCardTextColor(hex: String) {
+        context.dataStore.edit {
+            it[PreferencesKeys.CARD_TEXT_COLOR] = hex
+        }
+    }
+
+    suspend fun saveSiteBackgroundColor(hex: String) {
+        context.dataStore.edit {
+            it[PreferencesKeys.SITE_BACKGROUND_COLOR] = hex
+        }
+    }
+
+    suspend fun saveSiteTextColor(hex: String) {
+        context.dataStore.edit {
+            it[PreferencesKeys.SITE_TEXT_COLOR] = hex
+        }
+    }
+
+    suspend fun saveUseGradient(enabled: Boolean) {
+        context.dataStore.edit {
+            it[PreferencesKeys.USE_GRADIENT] = enabled
+        }
+    }
     suspend fun saveIsDarkMode(isDark: Boolean) {
         context.dataStore.edit {
             it[PreferencesKeys.IS_DARK_MODE] = isDark
-        }
-    }
-
-    // Function to save the gradient setting
-    suspend fun saveIsGradientEnabled(enabled: Boolean) {
-        context.dataStore.edit {
-            it[PreferencesKeys.IS_GRADIENT_ENABLED] = enabled
         }
     }
 

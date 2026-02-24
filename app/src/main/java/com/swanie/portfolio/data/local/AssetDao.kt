@@ -5,20 +5,23 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AssetDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAsset(asset: AssetEntity)
+    @Upsert
+    suspend fun upsertAsset(asset: AssetEntity)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertAll(assets: List<AssetEntity>)
 
-    // THE FIX: Order by the lastUpdated timestamp in descending order.
     @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
     fun getAllAssets(): Flow<List<AssetEntity>>
+
+    @Query("SELECT * FROM assets WHERE coinId = :coinId")
+    suspend fun getAssetById(coinId: String): AssetEntity?
 
     @Query("SELECT coinId FROM assets")
     suspend fun getAllCoinIds(): List<String>
@@ -29,13 +32,11 @@ interface AssetDao {
     @Transaction
     suspend fun updateAssetOrder(assets: List<AssetEntity>) {
         assets.forEachIndexed { index, asset ->
-            updateAsset(asset.copy(displayOrder = index))
+            val updatedAsset = asset.copy(displayOrder = index)
+            upsertAsset(updatedAsset)
         }
     }
 
     @Query("UPDATE assets SET amountHeld = :amount, currentPrice = :price, change24h = :change WHERE coinId = :coinId")
     suspend fun updateAsset(coinId: String, amount: Double, price: Double, change: Double)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateAsset(asset: AssetEntity)
 }
