@@ -48,7 +48,7 @@ fun MyHoldingsScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: MyHoldingsViewModel = hiltViewModel()
+    val viewModel: AssetViewModel = hiltViewModel()
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
