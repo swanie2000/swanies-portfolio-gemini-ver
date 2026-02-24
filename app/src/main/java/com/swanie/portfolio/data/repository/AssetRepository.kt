@@ -1,8 +1,10 @@
 package com.swanie.portfolio.data.repository
 
 import android.util.Log
+import com.swanie.portfolio.data.MetalsProvider
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
 import kotlinx.coroutines.flow.first
@@ -15,39 +17,64 @@ class AssetRepository(
     val allAssets = assetDao.getAllAssets()
 
     suspend fun refreshAssets() {
-        val heldAssetIds = assetDao.getAllCoinIds()
-        if (heldAssetIds.isEmpty()) return
+        val allLocalAssets = allAssets.first()
+        if (allLocalAssets.isEmpty()) return
 
-        try {
-            val marketData: List<CoinMarketResponse> = coinGeckoApiService.getCoinMarkets(ids = heldAssetIds.joinToString(","))
+        val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
+        val metalAssets = allLocalAssets.filter { it.category == AssetCategory.METAL }
 
-            // Create a map for quick lookups
-            val marketDataMap = marketData.associateBy { it.id }
+        val cryptoIds = cryptoAssets.map { it.coinId }
 
-            // Get the current state of assets from the database to preserve user-specific data like amountHeld
-            val currentAssets = allAssets.first().associateBy { it.coinId }
+        val updatedAssets = mutableListOf<AssetEntity>()
 
-            val updatedAssets = heldAssetIds.mapNotNull { coinId ->
-                val marketInfo = marketDataMap[coinId]
-                val currentAsset = currentAssets[coinId]
+        if (cryptoIds.isNotEmpty()) {
+            try {
+                val marketData: List<CoinMarketResponse> = coinGeckoApiService.getCoinMarkets(ids = cryptoIds.joinToString(","))
+                val marketDataMap = marketData.associateBy { it.id }
 
-                if (marketInfo != null && currentAsset != null) {
-                    currentAsset.copy(
-                        currentPrice = marketInfo.currentPrice ?: currentAsset.currentPrice,
-                        priceChange24h = marketInfo.priceChange24h ?: currentAsset.priceChange24h,
-                        marketCapRank = marketInfo.marketCapRank ?: currentAsset.marketCapRank,
-                        sparklineData = marketInfo.sparklineIn7d?.price ?: currentAsset.sparklineData,
+                cryptoAssets.forEach { currentAsset ->
+                    val marketInfo = marketDataMap[currentAsset.coinId]
+                    if (marketInfo != null) {
+                        updatedAssets.add(currentAsset.copy(
+                            currentPrice = marketInfo.currentPrice ?: currentAsset.currentPrice,
+                            priceChange24h = marketInfo.priceChange24h ?: currentAsset.priceChange24h,
+                            marketCapRank = marketInfo.marketCapRank ?: currentAsset.marketCapRank,
+                            sparklineData = marketInfo.sparklineIn7d?.price ?: currentAsset.sparklineData,
+                            lastUpdated = System.currentTimeMillis()
+                        ))
+                    } else {
+                        updatedAssets.add(currentAsset)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AssetRepository", "Crypto refresh failed", e)
+                updatedAssets.addAll(cryptoAssets)
+            }
+        }
+
+        metalAssets.forEach { currentMetal ->
+            if (currentMetal.isCustom) {
+                val spotPrice = MetalsProvider.preciousMetals.find { it.symbol == currentMetal.baseSymbol }?.currentPrice ?: 0.0
+                val pricePerUnit = (spotPrice + currentMetal.premium)
+                updatedAssets.add(currentMetal.copy(
+                    currentPrice = pricePerUnit,
+                    lastUpdated = System.currentTimeMillis()
+                ))
+            } else {
+                val providerData = MetalsProvider.preciousMetals.find { it.coinId == currentMetal.coinId }
+                if (providerData != null) {
+                    updatedAssets.add(currentMetal.copy(
+                        currentPrice = providerData.currentPrice,
                         lastUpdated = System.currentTimeMillis()
-                    )
+                    ))
                 } else {
-                    null // This coin is no longer in the market data, or we don't have it locally.
+                    updatedAssets.add(currentMetal)
                 }
             }
+        }
 
+        if (updatedAssets.isNotEmpty()) {
             assetDao.upsertAll(updatedAssets)
-
-        } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to refresh assets from market data", e)
         }
     }
 
@@ -68,11 +95,12 @@ class AssetRepository(
                     lastUpdated = 0L,
                     sparklineData = emptyList(),
                     marketCapRank = 0,
-                    priceChange24h = 0.0
+                    priceChange24h = 0.0,
+                    category = AssetCategory.CRYPTO
                 )
             }
         } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to search coins for query: $query", e)
+            Log.e("AssetRepository", "Failed to search coins", e)
             emptyList()
         }
     }

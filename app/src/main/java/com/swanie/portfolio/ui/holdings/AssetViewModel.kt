@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.holdings
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.MetalsProvider
@@ -32,9 +33,6 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
     private val _isRefreshEnabled = MutableStateFlow(true)
     val isRefreshEnabled: StateFlow<Boolean> = _isRefreshEnabled.asStateFlow()
 
-    private val _lastSyncTimestamp = MutableStateFlow<Long?>(null)
-    val lastSyncTimestamp: StateFlow<Long?> = _lastSyncTimestamp.asStateFlow()
-
     private var searchJob: Job? = null
 
     init {
@@ -44,47 +42,58 @@ class AssetViewModel(private val repository: AssetRepository) : ViewModel() {
     fun refreshAssets() {
         viewModelScope.launch {
             if (!_isRefreshEnabled.value) return@launch
-
             _isRefreshing.value = true
             _isRefreshEnabled.value = false
-
             try {
-                repository.refreshAssets() // Updated function call
-                _lastSyncTimestamp.value = System.currentTimeMillis()
+                repository.refreshAssets()
             } catch (e: Exception) {
-                // Handle error appropriately
+                Log.e("AssetViewModel", "Refresh failed", e)
+            } finally {
+                _isRefreshing.value = false
+                delay(30000)
+                _isRefreshEnabled.value = true
             }
-
-            _isRefreshing.value = false
-
-            delay(60000) // Cooldown to prevent spamming the refresh
-            _isRefreshEnabled.value = true
         }
     }
 
     fun searchCoins(query: String) {
         searchJob?.cancel()
-        if (query.length < 2) {
+        val cleanQuery = query.trim()
+
+        if (cleanQuery.length < 2) {
             _searchResults.value = emptyList()
             return
         }
+
         searchJob = viewModelScope.launch {
-            delay(300) // Slightly faster search delay
+            delay(300)
 
-            // 1. Search Metals (Local and Fast)
-            val metalResults = MetalsProvider.searchMetals(query)
+            val metalResults = MetalsProvider.searchMetals(cleanQuery)
+            _searchResults.value = metalResults
 
-            // 2. Search Cryptos (From API/Repository)
-            val cryptoResults = repository.searchCoins(query)
-
-            // 3. Combine and Update
-            _searchResults.value = metalResults + cryptoResults
+            try {
+                val cryptoResults = repository.searchCoins(cleanQuery)
+                _searchResults.value = (metalResults + cryptoResults).distinctBy { it.coinId }
+            } catch (e: Exception) {
+                Log.e("AssetViewModel", "Search error", e)
+                _searchResults.value = metalResults
+            }
         }
     }
 
-    fun saveNewAsset(asset: AssetEntity, onSaveComplete: () -> Unit) {
+    // FIXED: This function now forces the category and price to persist into the DB
+    fun saveNewAsset(asset: AssetEntity, amount: Double, onSaveComplete: () -> Unit) {
         viewModelScope.launch {
-            repository.saveAsset(asset)
+            val holdingToSave = asset.copy(
+                amountHeld = amount,
+                category = asset.category, // Explicitly keep the METAL category
+                currentPrice = asset.currentPrice, // Ensure price isn't saved as 0.0
+                lastUpdated = System.currentTimeMillis()
+            )
+
+            Log.d("PortfolioDebug", "Saving ${holdingToSave.name} as ${holdingToSave.category} with price ${holdingToSave.currentPrice}")
+
+            repository.saveAsset(holdingToSave)
             onSaveComplete()
         }
     }

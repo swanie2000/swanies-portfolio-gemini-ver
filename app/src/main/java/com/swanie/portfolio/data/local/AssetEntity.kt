@@ -23,5 +23,9 @@ data class AssetEntity(
     val category: AssetCategory = AssetCategory.CRYPTO, // New field for categorization
     val sparklineData: List<Double> = emptyList(),
     val marketCapRank: Int = 0,
-    val priceChange24h: Double = 0.0
+    val priceChange24h: Double = 0.0,
+    val weight: Double = 1.0,
+    val premium: Double = 0.0,
+    val isCustom: Boolean = false,
+    val baseSymbol: String = "" // e.g. XAU, XAG
 )

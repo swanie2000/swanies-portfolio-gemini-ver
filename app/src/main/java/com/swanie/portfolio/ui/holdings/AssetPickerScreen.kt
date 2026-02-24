@@ -55,7 +55,10 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 
 @Composable
-fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String) -> Unit) {
+fun AssetPickerScreen(
+    // UPDATED: Added category and price to the callback parameters
+    onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
+) {
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -69,7 +72,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
     val searchResults by viewModel.searchResults.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.searchCoins("") // Clear previous search results
+        viewModel.searchCoins("")
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -77,7 +80,7 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding() // This pushes the UI below the clock
+            .statusBarsPadding()
             .background(brush = LocalBackgroundBrush.current)
             .padding(16.dp)
     ) {
@@ -145,9 +148,23 @@ fun AssetPickerScreen(onAssetSelected: (coinId: String, symbol: String, name: St
 }
 
 @Composable
-fun CoinItem(asset: AssetEntity, onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String) -> Unit) {
+fun CoinItem(
+    asset: AssetEntity,
+    // UPDATED: Signature matches AssetPickerScreen
+    onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
+) {
     TextButton(
-        onClick = { onAssetSelected(asset.coinId, asset.symbol.uppercase(), asset.name, asset.imageUrl) },
+        onClick = {
+            // UPDATED: Passing category and currentPrice through
+            onAssetSelected(
+                asset.coinId,
+                asset.symbol.uppercase(),
+                asset.name,
+                asset.imageUrl,
+                asset.category,
+                asset.currentPrice
+            )
+        },
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -158,10 +175,10 @@ fun CoinItem(asset: AssetEntity, onAssetSelected: (coinId: String, symbol: Strin
             when (asset.category) {
                 AssetCategory.METAL -> {
                     val color = when (asset.symbol) {
-                        "XAU" -> Color(0xFFFFD700) // Gold
-                        "XAG" -> Color(0xFFC0C0C0) // Silver
-                        "XPT" -> Color(0xFFE5E4E2) // Platinum
-                        "XPD" -> Color(0xFFE5E4E2) // Palladium
+                        "XAU" -> Color(0xFFFFD700)
+                        "XAG" -> Color(0xFFC0C0C0)
+                        "XPT" -> Color(0xFFE5E4E2)
+                        "XPD" -> Color(0xFFE5E4E2)
                         else -> Color.Gray
                     }
                     Box(

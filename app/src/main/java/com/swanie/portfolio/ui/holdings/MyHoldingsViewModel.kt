@@ -7,6 +7,7 @@ import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.RetrofitClient
 import com.swanie.portfolio.data.repository.AssetRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,6 @@ import kotlinx.coroutines.launch
 
 class MyHoldingsViewModel(private val repository: AssetRepository) : ViewModel() {
 
-    // Expose the holdings from the repository. The UI will collect this.
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .stateIn(
             scope = viewModelScope,
@@ -27,15 +27,16 @@ class MyHoldingsViewModel(private val repository: AssetRepository) : ViewModel()
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
-    /**
-     * Triggers a refresh of all asset data from the CoinGecko API.
-     * It sets the isRefreshing state to true during the operation.
-     */
     fun refreshAssets() {
         viewModelScope.launch {
+            if (_isRefreshing.value) return@launch
             _isRefreshing.value = true
-            repository.refreshAssets()
-            _isRefreshing.value = false
+            delay(500)
+            try {
+                repository.refreshAssets()
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 }

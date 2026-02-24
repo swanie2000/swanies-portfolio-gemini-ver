@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 
@@ -52,6 +53,8 @@ fun AmountEntryScreen(
     symbol: String,
     name: String,
     imageUrl: String,
+    category: AssetCategory,
+    currentPrice: Double,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -61,7 +64,7 @@ fun AmountEntryScreen(
         factory = AssetViewModelFactory(db.assetDao())
     )
 
-    var amount by remember { mutableStateOf("") }
+    var amountText by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -71,24 +74,34 @@ fun AmountEntryScreen(
     }
 
     fun executeSave() {
-        val amountHeld = amount.toDoubleOrNull()
-        if (amountHeld == null || amountHeld <= 0) {
+        val amountValue = amountText.toDoubleOrNull()
+        if (amountValue == null || amountValue <= 0) {
             errorMessage = "Please enter a valid amount."
             return
         }
 
+        // FIXED: Added all missing parameters required by the AssetEntity constructor
         val asset = AssetEntity(
             coinId = coinId,
             symbol = symbol,
             name = name,
-            amountHeld = amountHeld,
-            currentPrice = 0.0, // Price-blind save
-            change24h = 0.0,
-            displayOrder = 0,
+            amountHeld = amountValue,
+            currentPrice = currentPrice,
+            category = category,
+            imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            imageUrl = imageUrl
+            change24h = 0.0,      // Provided default to fix build error
+            displayOrder = 0,     // Provided default to fix build error
+            priceChange24h = 0.0,
+            marketCapRank = 0,
+            sparklineData = emptyList()
         )
-        viewModel.saveNewAsset(asset, onSaveComplete = onSave)
+
+        viewModel.saveNewAsset(
+            asset = asset,
+            amount = amountValue,
+            onSaveComplete = onSave
+        )
     }
 
     if (showExitDialog) {
@@ -113,28 +126,52 @@ fun AmountEntryScreen(
         showExitDialog = true
     }
 
-    Scaffold(containerColor = Color.Transparent) { // Let background show through
+    Scaffold(containerColor = Color.Transparent) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(brush = LocalBackgroundBrush.current) // Use the theme brush
-                .padding(it)
+                .background(brush = LocalBackgroundBrush.current)
+                .padding(padding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 IconButton(onClick = { showExitDialog = true }, modifier = Modifier.align(Alignment.CenterStart)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
 
             Spacer(Modifier.height(32.dp))
 
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "$name Icon",
-                modifier = Modifier.size(120.dp)
-            )
+            if (imageUrl.isNotEmpty()) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "$name Icon",
+                    modifier = Modifier.size(120.dp)
+                )
+            } else {
+                // Placeholder for assets (like metals) without URLs
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                            shape = MaterialTheme.shapes.medium
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = symbol.take(1),
+                        style = MaterialTheme.typography.displayMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
 
             Text(
@@ -146,9 +183,9 @@ fun AmountEntryScreen(
             Spacer(Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = amount,
+                value = amountText,
                 onValueChange = {
-                    amount = it
+                    amountText = it
                     errorMessage = null
                 },
                 modifier = Modifier
@@ -194,7 +231,7 @@ fun AmountEntryScreen(
                     containerColor = MaterialTheme.colorScheme.onBackground,
                     contentColor = MaterialTheme.colorScheme.background
                 ),
-                enabled = amount.isNotBlank()
+                enabled = amountText.isNotBlank()
             ) {
                 Text("Save Asset")
             }
