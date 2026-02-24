@@ -6,18 +6,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.swanie.portfolio.MainViewModel
-import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.CreateAccountScreen
@@ -79,13 +76,11 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.MANUAL_ASSET_ENTRY) {
-                val context = LocalContext.current
-                val db = remember { AppDatabase.getDatabase(context) }
-                val assetViewModel: AssetViewModel = viewModel() // This will share the existing instance
+                val viewModel: AssetViewModel = hiltViewModel()
 
                 ManualAssetEntryScreen(
                     onSave = {
-                        assetViewModel.saveNewAsset(it, it.amountHeld) { // amountHeld is now part of AssetEntity
+                        viewModel.saveNewAsset(it, it.amountHeld) { // amountHeld is now part of AssetEntity
                             navController.navigate(Routes.HOLDINGS) {
                                 popUpTo(Routes.HOLDINGS) { inclusive = true }
                             }
