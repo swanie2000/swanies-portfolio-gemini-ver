@@ -1,7 +1,5 @@
 package com.swanie.portfolio.ui.settings
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
@@ -51,30 +49,35 @@ class ThemeViewModel @Inject constructor(
     }
 
     fun saveCardBackgroundColor(hex: String) {
+        _cardBackgroundColor.value = hex
         viewModelScope.launch {
             themePreferences.saveCardBackgroundColor(hex)
         }
     }
 
     fun saveCardTextColor(hex: String) {
+        _cardTextColor.value = hex
         viewModelScope.launch {
             themePreferences.saveCardTextColor(hex)
         }
     }
 
     fun saveSiteBackgroundColor(hex: String) {
+        _siteBackgroundColor.value = hex
         viewModelScope.launch {
             themePreferences.saveSiteBackgroundColor(hex)
         }
     }
 
     fun saveSiteTextColor(hex: String) {
+        _siteTextColor.value = hex
         viewModelScope.launch {
             themePreferences.saveSiteTextColor(hex)
         }
     }
 
     fun saveUseGradient(useGradient: Boolean) {
+        _useGradient.value = useGradient
         viewModelScope.launch {
             themePreferences.saveUseGradient(useGradient)
         }

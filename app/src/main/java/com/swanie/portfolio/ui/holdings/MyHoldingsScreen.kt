@@ -11,9 +11,9 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -64,6 +64,7 @@ fun MyHoldingsScreen(
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
+    val cardBgColor by themeViewModel.cardBackgroundColor.collectAsState()
     val useGradient by themeViewModel.useGradient.collectAsState()
 
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -119,11 +120,6 @@ fun MyHoldingsScreen(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.Transparent,
-        floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Asset")
-            }
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -147,34 +143,73 @@ fun MyHoldingsScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort Assets", tint = Color(siteTextColor.toColorInt()))
-                        }
-                        DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
-                            DropdownMenuItem(text = { Text("Value") }, onClick = { viewModel.setSortOrder(SortOrder.VALUE); showSortMenu = false })
-                            DropdownMenuItem(text = { Text("Name") }, onClick = { viewModel.setSortOrder(SortOrder.NAME); showSortMenu = false })
-                            DropdownMenuItem(text = { Text("Category") }, onClick = { viewModel.setSortOrder(SortOrder.CATEGORY); showSortMenu = false })
-                            DropdownMenuItem(text = { Text("Manual") }, onClick = { viewModel.setSortOrder(SortOrder.MANUAL); showSortMenu = false })
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .background(color = Color(cardBgColor.toColorInt()), shape = RoundedCornerShape(50))
+                                    .clickable { showSortMenu = true }
+                                    .padding(horizontal = 14.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = "SORT",
+                                    color = Color(siteTextColor.toColorInt()),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Black,
+                                )
+                            }
+                            DropdownMenu(expanded = showSortMenu, onDismissRequest = { showSortMenu = false }) {
+                                DropdownMenuItem(text = { Text("Value") }, onClick = { viewModel.setSortOrder(SortOrder.VALUE); showSortMenu = false })
+                                DropdownMenuItem(text = { Text("Name") }, onClick = { viewModel.setSortOrder(SortOrder.NAME); showSortMenu = false })
+                                DropdownMenuItem(text = { Text("Category") }, onClick = { viewModel.setSortOrder(SortOrder.CATEGORY); showSortMenu = false })
+                                DropdownMenuItem(text = { Text("Manual") }, onClick = { viewModel.setSortOrder(SortOrder.MANUAL); showSortMenu = false })
+                            }
                         }
 
-                        Spacer(modifier = Modifier.weight(1f))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Image(
                                 painter = painterResource(id = R.drawable.swanie_foreground),
                                 contentDescription = "Swan Logo",
-                                modifier = Modifier.size(80.dp)
+                                modifier = Modifier.size(120.dp)
                             )
                             Text(
                                 text = currencyFormat.format(totalPortfolioValue),
                                 color = Color(siteTextColor.toColorInt()),
-                                fontSize = 28.sp,
+                                fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
                             )
                         }
-                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) { /* Spacer */ }
+
+                        Box(
+                            modifier = Modifier.weight(1f),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .background(color = Color(cardBgColor.toColorInt()), shape = CircleShape)
+                                    .clickable { navController.navigate(Routes.ASSET_PICKER) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Add",
+                                    tint = Color(siteTextColor.toColorInt())
+                                )
+                            }
+                        }
                     }
 
                     TabRow(

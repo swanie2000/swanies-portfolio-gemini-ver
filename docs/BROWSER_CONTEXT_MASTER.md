@@ -169,85 +169,86 @@ I. Current State & Recent Technical Wins
 The project has transitioned into a Customizable Multi-Asset Financial Suite, supporting digital assets, physical commodities, and manual entries within a unified, high-performance architecture.
 The "Total Customization" Engine (Major Win)
 
-    Dynamic Theme Center: Implemented a ThemeViewModel and centralized ThemePreferences. Users can now customize four distinct areas: Asset Card BG, Asset Card Text, Site BG, and Site Text.
+    Dynamic Theme Center: Implemented a ThemeViewModel and centralized ThemePreferences. Users can now customize four distinct areas: Card Background, Card Text, App Background, and App Text.
 
-    Tabbed Theme UI: The Color Picker has been overhauled into a 4-tab interface with a global "Apply" logic and a "Use Gradient" toggle.
+    The "Command Center" Studio (Today's Win):
 
-    Manual Sort & Reorder: Integrated a high-fidelity drag-and-drop system in the Holdings list. Users can now manually rank their "Favorite" assets, with the order persisting in the database via a new displayOrder column.
+        Symmetrical Branding: A balanced header featuring a 120dp Swan Logo (center), a Back button (left), and a Default button (right) that resets the app to its signature Navy Blue (#000416) and White theme.
+
+        Live Contrast Grid: A 2x2 selection layout where "Text" buttons dynamically inherit their respective "Background" colors. This allows users to test text readability in real-time before applying.
+
+        Interactive Apply Logic: A high-visibility Yellow & Black "Apply" button featuring a 100ms White Flash animation to provide tactile visual feedback on click.
+
+        Inline Validation: Abandoned system Toasts for a custom red "INVALID HEX" alert positioned specifically in the upper header gap to ensure visibility above the keyboard.
+
+    Manual Sort & Reorder: Integrated a high-fidelity drag-and-drop system in the Holdings list. Users can now manually rank assets, with persistence via a displayOrder column.
 
 The "Hilt" Foundation & Data Integrity
 
     Dagger Hilt Migration: Fully eliminated manual ViewModelFactories. The project now uses standardized Dependency Injection for all ViewModels and Repositories.
 
-    Smart Upsert Logic: Refactored the AssetDao and Repository to use @Upsert. Adding an existing metal (e.g., Silver) now intelligently updates the quantity of the existing card rather than creating a duplicate.
+    Smart Upsert Logic: Refactored AssetDao and Repository to use @Upsert. Adding existing metals now intelligently updates quantities rather than creating duplicates.
 
-    Shared ViewModel Strategy: All primary screens now observe the AssetViewModel as the single source of truth for portfolio data.
+    Shared ViewModel Strategy: All primary screens observe the AssetViewModel as the single source of truth.
 
 UI/UX Refinements
 
-    The "Neon Thread" Sync: Replaced the "Charging Bar" with a modern, 2dp high LinearProgressIndicator at the top of the screen that pulses during CoinGecko/API refreshes.
+    The "Neon Thread" Sync: A modern, 2dp high LinearProgressIndicator at the top of the screen that pulses during API refreshes.
 
-    Restored Navigation: The "+" Floating Action Button (FAB) has been restored, and the "Manual Add" entry point has been prioritized at the top of the Asset Picker.
+    Restored Navigation: The "+" FAB is restored, with "Manual Add" prioritized at the top of the Asset Picker.
 
-    Modern Animations: Implemented Modifier.animateItem() to provide smooth, sliding transitions when assets are reordered or filtered.
+    Modern Animations: Implemented Modifier.animateItem() for smooth transitions during reordering and filtering.
 
 II. Architectural Standards & Roadmap
 Core Standards
 
-    Theme Consumption: All Composables must now pull colors from the ThemeViewModel state to ensure user customizations are respected site-wide.
+    Theme Consumption: All Composables must pull colors from the ThemeViewModel state to ensure user customizations (App/Card colors) are respected site-wide.
 
-    Stable Keys: Every LazyColumn item must use a stable key (e.g., key = { it.coinId }) to support reordering animations and prevent state flickering.
+    Stable Keys: Every LazyColumn item must use a stable key (e.g., key = { it.coinId }) to support reordering animations.
 
-    DI Integrity: All new services must be registered in DatabaseModule.kt using the @Provides pattern to remain accessible via Hilt.
+    DI Integrity: All new services must be registered in DatabaseModule.kt using the @Provides pattern.
 
 Current Work-in-Progress
 
-    Compact Card Reconstruction: Rebuilding the CompactAssetCard to support the new dynamic theme variables while maintaining a dense, high-info layout.
+    Holdings Screen Integration: Wiring the Holdings list to consume the new appBgColor and cardBgColor variables defined in today's Theme Studio.
 
-    Manual Asset Expansion: Extending the manual entry logic to support Stocks and unique collectibles, allowing for a 100% comprehensive portfolio.
+    Compact Card Reconstruction: Updating the CompactAssetCard to support dynamic text colors while maintaining a dense, high-info layout.
 
 The Roadmap
 
-    Portfolio Analytics: Implement the Donut Chart visualization to show the percentage split between Digital (Crypto) and Physical (Metals) based on real-time value.
+    Portfolio Analytics: Implement the Donut Chart visualization to show the percentage split between Digital (Crypto) and Physical (Metals).
 
     Live Metal Feeds: Replace "Local Mock" pricing with a dedicated Metals API (e.g., GoldAPI.io).
 
-    Manual Sort Polish: Ensure the displayOrder logic handles large lists efficiently without collision.
+    Manual Sort Polish: Finalize handling for large lists to ensure displayOrder logic avoids collisions.
 
 III. Build & Safety Standards
 
-    Experimental APIs: Use @file:OptIn(ExperimentalFoundationApi::class) for list animations and advanced UI gestures.
+    Experimental APIs: Use @file:OptIn(ExperimentalFoundationApi::class) for list animations and advanced gestures.
 
-    Database Versioning: Currently at v4. fallbackToDestructiveMigration() is active; any schema changes will wipe local test data.
+    Database Versioning: Currently at v4. fallbackToDestructiveMigration() is active; schema changes will wipe local test data.
 
     Git Hygiene: Follow the "Checkpointed" workflow: Verify Build -> Sync Gradle -> Commit Success -> Push.
 
-Michael, now that the "Master Doc" reflects this huge leap forward, would you like to perform the "Manual Sort" test? We can verify that moving a card actually saves that position to the database permanently.
+Michael, we’ve officially "stopped fighting" the layout and won. The Studio is solid. When you're ready to pick this back up, we can apply these new colors to your Holdings cards so your Navy Blue and White (or whatever you design next) looks perfect across the whole app.
+
+Sleep well! Should we start with the Holdings Screen color injection when you've had your coffee tomorrow?
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 02/24/2026 15:55:44.45
+Generated: Tue 02/24/2026 21:43:01.67
 
 Branch:
 wip-hilt-fix
 Commit:
-44a8a15be47b913569e8e5fa5e98c8554d4f0441
+3a4e8c3b67b1e87dfd093903d7f4164e78e358a2
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
- M app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
  M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeStudioScreen.kt
-AM app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
