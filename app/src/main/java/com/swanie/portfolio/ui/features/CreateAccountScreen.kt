@@ -3,39 +3,13 @@ package com.swanie.portfolio.ui.features
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,14 +19,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
-import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainViewModel) {
+fun CreateAccountScreen(
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    viewModel: ThemeViewModel = hiltViewModel()
+) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -60,10 +40,16 @@ fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainVie
     var confirmPassword by remember { mutableStateOf("") }
     var agreedToTerms by remember { mutableStateOf(false) }
 
+    val bgColor by viewModel.siteBackgroundColor.collectAsState()
+    val textColor by viewModel.siteTextColor.collectAsState()
+
+    val primaryTextColor = Color(textColor.toColorInt())
+    val backgroundColor = Color(bgColor.toColorInt())
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = LocalBackgroundBrush.current) // Use the theme brush
+            .background(backgroundColor)
     ) {
         Column(
             modifier = Modifier
@@ -84,7 +70,7 @@ fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainVie
                 text = "Swanie's Portfolio",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground // Use theme color
+                color = primaryTextColor
             )
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -93,21 +79,21 @@ fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainVie
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
                 shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
+                colors = CardDefaults.cardColors(containerColor = primaryTextColor.copy(alpha = 0.05f)),
+                border = BorderStroke(1.dp, primaryTextColor.copy(alpha = 0.1f))
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val textFieldColors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        cursorColor = MaterialTheme.colorScheme.onBackground,
-                        focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                        focusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                        focusedTextColor = primaryTextColor,
+                        unfocusedTextColor = primaryTextColor,
+                        cursorColor = primaryTextColor,
+                        focusedBorderColor = primaryTextColor,
+                        unfocusedBorderColor = primaryTextColor.copy(alpha = 0.5f),
+                        focusedLabelColor = primaryTextColor.copy(alpha = 0.7f),
+                        unfocusedLabelColor = primaryTextColor.copy(alpha = 0.7f)
                     )
 
                     OutlinedTextField(
@@ -174,25 +160,27 @@ fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainVie
                             checked = agreedToTerms,
                             onCheckedChange = { agreedToTerms = it },
                             colors = CheckboxDefaults.colors(
-                                checkedColor = MaterialTheme.colorScheme.onBackground,
-                                checkmarkColor = MaterialTheme.colorScheme.background,
-                                uncheckedColor = MaterialTheme.colorScheme.onBackground
+                                checkedColor = primaryTextColor,
+                                checkmarkColor = backgroundColor,
+                                uncheckedColor = primaryTextColor
                             )
                         )
                         Text(
                             text = "I agree to the Terms of Service and Privacy Policy",
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                            color = primaryTextColor.copy(alpha = 0.7f),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = { /* TODO: Implement Firebase/Auth Logic */ },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onBackground,
-                            contentColor = MaterialTheme.colorScheme.background
+                            containerColor = primaryTextColor,
+                            contentColor = backgroundColor
                         )
                     ) {
                         Text(
@@ -206,7 +194,7 @@ fun CreateAccountScreen(navController: NavHostController, mainViewModel: MainVie
             TextButton(onClick = { navController.popBackStack() }) {
                 Text(
                     text = "Already have an account? Login",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
+                    color = primaryTextColor.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
             }

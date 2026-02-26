@@ -2,36 +2,41 @@ package com.swanie.portfolio.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue // CRITICAL MISSING IMPORT
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.ui.components.BottomNavigationBar
-import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import com.swanie.portfolio.ui.navigation.Routes
 
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
-    settingsViewModel: SettingsViewModel // Use the correct ViewModel type
+    settingsViewModel: SettingsViewModel,
+    themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
-    // 1. Observe the correct state names from your SettingsViewModel
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
+    val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
-    // THE SOVEREIGN COLUMN (Locked Layout)
+    val primaryTextColor = Color(siteTextColor.toColorInt())
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = LocalBackgroundBrush.current)
+            .background(Color(siteBgColor.toColorInt()))
             .statusBarsPadding()
     ) {
-        // HEADER
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -40,12 +45,11 @@ fun SettingsScreen(
             Text(
                 text = "Settings",
                 style = MaterialTheme.typography.headlineMedium,
-                color = Color.White,
+                color = primaryTextColor,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        // CONTENT AREA (Weight 1f creates the Hard Stop floor)
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -56,26 +60,27 @@ fun SettingsScreen(
                 title = "Use Compact Cards",
                 subtitle = "Shrink asset cards to show more on screen",
                 checked = isCompactMode,
-                onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) }
+                onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
+                textColor = primaryTextColor
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // THEME STUDIO SHORTCUT
             Button(
-                onClick = { navController.navigate("theme_studio") },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.1f)),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+                onClick = { navController.navigate(Routes.THEME_STUDIO) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = primaryTextColor.copy(alpha = 0.1f)),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Open Theme Studio", color = Color.White)
+                Text("Open Theme Studio", color = primaryTextColor)
             }
         }
 
-        // THE HARD STOP NAVIGATION DOCK
         Surface(
-            modifier = Modifier.fillMaxWidth().height(80.dp),
-            color = Color.Black.copy(alpha = 0.2f),
+            modifier = Modifier.fillMaxWidth(),
+            color = Color(siteBgColor.toColorInt()),
             tonalElevation = 0.dp
         ) {
             Column {
@@ -91,7 +96,8 @@ fun SettingsToggleItem(
     title: String,
     subtitle: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    textColor: Color
 ) {
     Row(
         modifier = Modifier
@@ -100,16 +106,17 @@ fun SettingsToggleItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            Text(text = subtitle, color = Color.White.copy(alpha = 0.6f), fontSize = 14.sp)
+            Text(text = title, color = textColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = subtitle, color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = Color.Gray.copy(alpha = 0.8f),
-                uncheckedTrackColor = Color.Black.copy(alpha = 0.3f)
+                checkedThumbColor = textColor,
+                checkedTrackColor = textColor.copy(alpha = 0.5f),
+                uncheckedThumbColor = textColor.copy(alpha = 0.5f),
+                uncheckedTrackColor = textColor.copy(alpha = 0.2f)
             )
         )
     }
