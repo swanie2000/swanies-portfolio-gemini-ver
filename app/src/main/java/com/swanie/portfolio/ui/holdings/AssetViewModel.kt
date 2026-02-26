@@ -117,6 +117,17 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
         }
     }
 
+    // ADDED: This function connects the Swipe-to-Delete UI to the Database
+    fun deleteAsset(asset: AssetEntity) {
+        viewModelScope.launch {
+            try {
+                repository.deleteAsset(asset)
+            } catch (e: Exception) {
+                Log.e("AssetViewModel", "Delete failed for ${asset.name}", e)
+            }
+        }
+    }
+
     fun updateAssetOrder(assets: List<AssetEntity>) {
         viewModelScope.launch {
             repository.updateAssetOrder(assets)

@@ -97,7 +97,7 @@ class AssetRepository @Inject constructor(
                     displayOrder = 0,
                     lastUpdated = 0L,
                     sparklineData = emptyList(),
-                    marketCapRank = 0, // Corrected: marketCapRank is not in the search result
+                    marketCapRank = 0,
                     priceChange24h = 0.0,
                     category = AssetCategory.CRYPTO
                 )
@@ -119,6 +119,11 @@ class AssetRepository @Inject constructor(
         } else {
             assetDao.upsertAsset(asset.copy(lastUpdated = System.currentTimeMillis()))
         }
+    }
+
+    // FIXED: Passing asset.coinId instead of the whole asset object
+    suspend fun deleteAsset(asset: AssetEntity) {
+        assetDao.deleteAsset(asset.coinId)
     }
 
     suspend fun updateAssetOrder(assets: List<AssetEntity>) {

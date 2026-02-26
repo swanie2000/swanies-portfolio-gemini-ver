@@ -51,6 +51,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
 
+    // Drag-to-reorder
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
     // Networking & Images
     implementation(libs.retrofit.main)
     implementation(libs.retrofit.gson)
