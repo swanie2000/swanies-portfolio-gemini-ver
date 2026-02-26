@@ -2,35 +2,14 @@ package com.swanie.portfolio.ui.holdings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -52,13 +31,21 @@ import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.navigation.Routes
-import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 
 @Composable
 fun AssetPickerScreen(
     navController: NavController,
     onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
 ) {
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+
+    // Safely parse hex colors
+    val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex)) }
+    val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex)) }
+
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -76,12 +63,13 @@ fun AssetPickerScreen(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(brush = LocalBackgroundBrush.current)
+            .background(bgColor) // Apply Dynamic Background
             .padding(16.dp)
     ) {
         TextButton(onClick = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) }) {
-            Text("Manual Add Asset")
+            Text("Manual Add Asset", color = textColor)
         }
+
         OutlinedTextField(
             value = searchQuery,
             onValueChange = {
@@ -91,7 +79,7 @@ fun AssetPickerScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
-            placeholder = { Text("Search (e.g., Bitcoin, Gold)") },
+            placeholder = { Text("Search (e.g., Bitcoin, Gold)", color = textColor.copy(alpha = 0.5f)) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Search
@@ -101,17 +89,15 @@ fun AssetPickerScreen(
             ),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                cursorColor = MaterialTheme.colorScheme.onBackground,
-                focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                focusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedTextColor = textColor,
+                unfocusedTextColor = textColor,
+                cursorColor = textColor,
+                focusedBorderColor = textColor,
+                unfocusedBorderColor = textColor.copy(alpha = 0.5f),
+                focusedLabelColor = textColor.copy(alpha = 0.7f),
+                unfocusedLabelColor = textColor.copy(alpha = 0.7f),
                 focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
+                unfocusedContainerColor = Color.Transparent
             )
         )
 
@@ -137,8 +123,15 @@ fun AssetPickerScreen(
                     .padding(top = 16.dp)
             ) {
                 items(searchResults) { asset ->
-                    CoinItem(asset = asset, onAssetSelected = onAssetSelected)
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), thickness = 1.dp)
+                    CoinItem(
+                        asset = asset,
+                        textColor = textColor,
+                        onAssetSelected = onAssetSelected
+                    )
+                    HorizontalDivider(
+                        color = textColor.copy(alpha = 0.2f),
+                        thickness = 1.dp
+                    )
                 }
             }
         }
@@ -148,6 +141,7 @@ fun AssetPickerScreen(
 @Composable
 fun CoinItem(
     asset: AssetEntity,
+    textColor: Color,
     onAssetSelected: (coinId: String, symbol: String, name: String, imageUrl: String, category: AssetCategory, price: Double) -> Unit
 ) {
     TextButton(
@@ -193,23 +187,26 @@ fun CoinItem(
                 }
             }
             Spacer(Modifier.width(16.dp))
-            Text("${asset.name} (${asset.symbol.uppercase()})", color = MaterialTheme.colorScheme.onBackground)
+            Text(
+                text = "${asset.name} (${asset.symbol.uppercase()})",
+                color = textColor
+            )
             Spacer(Modifier.width(8.dp))
-            Chip(label = asset.category.name)
+            Chip(label = asset.category.name, textColor = textColor)
         }
     }
 }
 
 @Composable
-fun Chip(label: String) {
+fun Chip(label: String, textColor: Color) {
     Box(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), CircleShape)
+            .background(textColor.copy(alpha = 0.1f), CircleShape)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = label,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = textColor,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold
         )

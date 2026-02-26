@@ -2,48 +2,28 @@ package com.swanie.portfolio.ui.holdings
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp // FIXED: Added missing import
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 
 @Composable
 fun AmountEntryScreen(
@@ -56,6 +36,15 @@ fun AmountEntryScreen(
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
+    // Inject Theme State
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+
+    // Safely parse hex colors
+    val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex)) }
+    val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex)) }
+
     val viewModel: AmountEntryViewModel = hiltViewModel()
 
     var amountText by remember { mutableStateOf("") }
@@ -74,7 +63,6 @@ fun AmountEntryScreen(
             return
         }
 
-        // FIXED: Added all missing parameters required by the AssetEntity constructor
         val asset = AssetEntity(
             coinId = coinId,
             symbol = symbol,
@@ -84,8 +72,8 @@ fun AmountEntryScreen(
             category = category,
             imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            change24h = 0.0,      // Provided default to fix build error
-            displayOrder = 0,     // Provided default to fix build error
+            change24h = 0.0,
+            displayOrder = 0,
             priceChange24h = 0.0,
             marketCapRank = 0,
             sparklineData = emptyList()
@@ -98,16 +86,17 @@ fun AmountEntryScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Discard Asset?") },
-            text = { Text("Are you sure you want to discard this new asset?") },
+            containerColor = bgColor,
+            title = { Text("Discard Asset?", color = textColor) },
+            text = { Text("Are you sure you want to discard this new asset?", color = textColor.copy(alpha = 0.7f)) },
             confirmButton = {
                 TextButton(onClick = onCancel) {
-                    Text("Yes")
+                    Text("Yes", color = Color.Red, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text("No")
+                    Text("No", color = textColor)
                 }
             }
         )
@@ -117,11 +106,10 @@ fun AmountEntryScreen(
         showExitDialog = true
     }
 
-    Scaffold(containerColor = Color.Transparent) { padding ->
+    Scaffold(containerColor = bgColor) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(brush = LocalBackgroundBrush.current)
                 .padding(padding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -131,7 +119,7 @@ fun AmountEntryScreen(
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = textColor
                     )
                 }
             }
@@ -145,12 +133,11 @@ fun AmountEntryScreen(
                     modifier = Modifier.size(120.dp)
                 )
             } else {
-                // Placeholder for assets (like metals) without URLs
                 Box(
                     modifier = Modifier
                         .size(120.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+                            color = textColor.copy(alpha = 0.1f),
                             shape = MaterialTheme.shapes.medium
                         ),
                     contentAlignment = Alignment.Center
@@ -158,7 +145,7 @@ fun AmountEntryScreen(
                     Text(
                         text = symbol.take(1),
                         style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = textColor
                     )
                 }
             }
@@ -168,7 +155,7 @@ fun AmountEntryScreen(
             Text(
                 text = name,
                 style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.onBackground
+                color = textColor
             )
 
             Spacer(Modifier.height(32.dp))
@@ -182,7 +169,7 @@ fun AmountEntryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
-                label = { Text("Enter Amount for $symbol") },
+                label = { Text("Enter Amount for $symbol", color = textColor.copy(alpha = 0.6f)) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done
@@ -192,13 +179,13 @@ fun AmountEntryScreen(
                 ),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    cursorColor = MaterialTheme.colorScheme.onBackground,
-                    focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                    focusedTextColor = textColor,
+                    unfocusedTextColor = textColor,
+                    cursorColor = textColor,
+                    focusedBorderColor = textColor,
+                    unfocusedBorderColor = textColor.copy(alpha = 0.5f),
+                    focusedLabelColor = textColor.copy(alpha = 0.7f),
+                    unfocusedLabelColor = textColor.copy(alpha = 0.7f),
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent
                 )
@@ -206,7 +193,7 @@ fun AmountEntryScreen(
             errorMessage?.let {
                 Text(
                     text = it,
-                    color = MaterialTheme.colorScheme.error,
+                    color = Color.Red,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -217,14 +204,15 @@ fun AmountEntryScreen(
                 onClick = { executeSave() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 16.dp)
+                    .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onBackground,
-                    contentColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Yellow,
+                    contentColor = Color.Black
                 ),
                 enabled = amountText.isNotBlank()
             ) {
-                Text("Save Asset")
+                Text("Save Asset", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
         }
     }
