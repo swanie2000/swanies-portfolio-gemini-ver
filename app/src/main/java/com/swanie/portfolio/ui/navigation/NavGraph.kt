@@ -3,11 +3,8 @@ package com.swanie.portfolio.ui.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,7 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
@@ -54,16 +50,12 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.HOLDINGS) {
-                Scaffold(
-                    containerColor = Color.Transparent,
-                    bottomBar = { BottomNavigationBar(navController = navController) }
-                ) { innerPadding ->
-                    MyHoldingsScreen(
-                        mainViewModel = mainViewModel,
-                        navController = navController,
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                // FIXED: Removed the extra Box and the duplicate BottomNavigationBar.
+                // MyHoldingsScreen already contains its own nav dock at the bottom.
+                MyHoldingsScreen(
+                    mainViewModel = mainViewModel,
+                    navController = navController
+                )
             }
 
             composable(Routes.ASSET_PICKER) {
@@ -78,7 +70,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
                 ManualAssetEntryScreen(
                     onSave = {
-                        viewModel.saveNewAsset(it, it.amountHeld) { // amountHeld is now part of AssetEntity
+                        viewModel.saveNewAsset(it, it.amountHeld) {
                             navController.navigate(Routes.HOLDINGS) {
                                 popUpTo(Routes.HOLDINGS) { inclusive = true }
                             }
