@@ -25,49 +25,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.min
 
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
-    // --- ANIMATION STATE ---
+    // --- THEME BINDING ---
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+
+    // The "Burst" color - what the user chose
+    val userThemeBgColor = remember(siteBgHex) {
+        try { Color(android.graphics.Color.parseColor(siteBgHex)) }
+        catch (e: Exception) { Color(0xFF000416) }
+    }
+    // The Global Text color
+    val userThemeTextColor = remember(siteTextHex) {
+        try { Color(android.graphics.Color.parseColor(siteTextHex)) }
+        catch (e: Exception) { Color.White }
+    }
+
+    // --- ANIMATION STATE (UNTOUCHED - DO NOT MODIFY) ---
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
 
-    // THEME BINDING - Updated to use collectAsStateWithLifecycle() to match MainActivity
-    val themeColorHex by mainViewModel.themeColorHex.collectAsStateWithLifecycle()
-    val userThemeColor = remember(themeColorHex) {
-        try { Color(android.graphics.Color.parseColor(themeColorHex)) }
-        catch (e: Exception) { Color(0xFF1A237E) }
-    }
-
-    // 1. RADIAL BURST (Quick 800ms reveal)
     val radiusPercent by animateFloatAsState(
         targetValue = if (animationStarted) 1.5f else 0f,
         animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
         label = "RadialBurst"
     )
 
-    // 2. SWAN GLIDE (Delay cut another 70% -> ~120ms)
     val swanYOffset by animateDpAsState(
         targetValue = if (animationStarted) (-100).dp else (-600).dp,
         animationSpec = tween(
             durationMillis = 900,
-            delayMillis = 120, // Rapid-fire start
+            delayMillis = 120,
             easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)
         ),
         finishedListener = { animateText = true },
         label = "SwanGlide"
     )
 
-    // 3. SWAN ALPHA (Synced with new ultra-short delay)
     val alpha by animateFloatAsState(
         targetValue = if (animationStarted) 1f else 0f,
         animationSpec = tween(durationMillis = 700, delayMillis = 120),
@@ -81,7 +88,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     LaunchedEffect(animateText) {
         if (animateText) {
-            delay(400) // Shorter delay for sparkles too to match the pace
+            delay(400)
             showSparkleOnS = true
             delay(200)
             showSparkleOnSwanHead = true
@@ -96,15 +103,15 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     // --- UI LAYOUT ---
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // LAYER 1: STATIC NAVY BASE
+        // LAYER 1: STATIC NAVY BASE (Preserved for Splash Screen Handoff)
         Box(modifier = Modifier.fillMaxSize().background(Color(0xFF000416)))
 
-        // LAYER 2: THE ANIMATED RADIAL REVEAL
+        // LAYER 2: THE ANIMATED RADIAL REVEAL (This "paints" the user's color)
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerPoint = Offset(size.width / 2f, size.height / 2f)
             val maxDim = size.width.coerceAtLeast(size.height)
             drawCircle(
-                color = userThemeColor,
+                color = userThemeBgColor,
                 radius = maxDim * radiusPercent,
                 center = centerPoint
             )
@@ -121,10 +128,11 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     .zIndex(1f),
                 contentAlignment = Alignment.Center
             ) {
+                // Background Glow - Uses a subtle version of text color
                 Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
                     drawCircle(
                         brush = Brush.radialGradient(
-                            colors = listOf(Color.White.copy(alpha = 0.5f), Color.Transparent),
+                            colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent),
                             radius = size.minDimension * 0.4f
                         )
                     )
@@ -137,11 +145,14 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 )
 
                 if (showSparkleOnSwanHead) {
-                    MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = -50.dp).zIndex(2f))
+                    MetallicShimmer(
+                        modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f),
+                        shimmerColor = Color.White // Keep sparkles white for that "pop"
+                    )
                 }
             }
 
-            // THE TEXT
+            // THE TEXT (Observing Studio Colors)
             AnimatedVisibility(
                 visible = animateText,
                 enter = fadeIn(animationSpec = tween(500, 50)),
@@ -154,11 +165,14 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         Text(
                             text = "Swanie's Portfolio",
                             style = MaterialTheme.typography.headlineLarge,
-                            color = Color.White,
+                            color = userThemeTextColor,
                             fontWeight = FontWeight.Bold
                         )
                         if (showSparkleOnS) {
-                            MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
+                            MetallicShimmer(
+                                modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp),
+                                shimmerColor = Color.White
+                            )
                         }
                     }
                     Text(
@@ -168,7 +182,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                             fontSize = 12.sp,
                             letterSpacing = 3.sp
                         ),
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = userThemeTextColor.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -187,7 +201,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             ) {
                 AuthTray(
                     onLoginClick = { navController.navigate(Routes.HOLDINGS) },
-                    onCreateAccountClick = { navController.navigate(Routes.CREATE_ACCOUNT) }
+                    onCreateAccountClick = { navController.navigate(Routes.CREATE_ACCOUNT) },
+                    trayTextColor = userThemeTextColor
                 )
             }
         }
@@ -195,12 +210,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit) {
+fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTextColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(0.90f),
         shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.12f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
+        colors = CardDefaults.cardColors(containerColor = trayTextColor.copy(alpha = 0.12f)),
+        border = BorderStroke(1.dp, trayTextColor.copy(alpha = 0.2f))
     ) {
         Column(
             modifier = Modifier.padding(vertical = 40.dp, horizontal = 24.dp),
@@ -209,29 +224,32 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit) {
             Button(
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("LOGIN", color = Color.Black, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
             TextButton(onClick = onCreateAccountClick) {
-                Text("Create Account", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = { /* Forgot Password */ }) {
-                Text("Forgot Password?", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+                Text("Forgot Password?", color = trayTextColor.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         }
     }
 }
 
 @Composable
-private fun MetallicShimmer(modifier: Modifier = Modifier) {
+private fun MetallicShimmer(modifier: Modifier = Modifier, shimmerColor: Color = Color.White) {
     var scaleState by remember { mutableStateOf(0f) }
     var rotationState by remember { mutableStateOf(45f) }
 
@@ -257,6 +275,6 @@ private fun MetallicShimmer(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(4.dp)
             .graphicsLayer(scaleX = scale, scaleY = scale, rotationZ = rotation)
-            .background(Color.White)
+            .background(shimmerColor)
     )
 }

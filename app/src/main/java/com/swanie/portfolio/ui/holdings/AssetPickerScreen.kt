@@ -14,9 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.FocusRequester // ADDED
+import androidx.compose.ui.focus.focusRequester // ADDED
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,13 +43,12 @@ fun AssetPickerScreen(
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
 
-    // Safely parse hex colors
     val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex)) }
     val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex)) }
 
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() }
+    val focusRequester = remember { FocusRequester() } // Now recognized
 
     val viewModel: AssetViewModel = hiltViewModel()
     val searchResults by viewModel.searchResults.collectAsState()
@@ -63,7 +63,7 @@ fun AssetPickerScreen(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .background(bgColor) // Apply Dynamic Background
+            .background(bgColor)
             .padding(16.dp)
     ) {
         TextButton(onClick = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) }) {
@@ -101,20 +101,21 @@ fun AssetPickerScreen(
             )
         )
 
-        if (searchResults.isEmpty() && searchQuery.isNotEmpty()) {
+        if (searchResults.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.weight(0.2f))
+                Spacer(modifier = Modifier.weight(0.1f))
                 Image(
                     painter = painterResource(id = R.drawable.swan_launcher_icon),
-                    contentDescription = "Empty Search Results",
+                    contentDescription = "Ghost Swan",
                     modifier = Modifier
-                        .size(200.dp)
-                        .alpha(0.1f)
+                        .size(220.dp)
+                        .alpha(0.08f),
+                    colorFilter = ColorFilter.tint(textColor)
                 )
-                Spacer(modifier = Modifier.weight(3f))
+                Spacer(modifier = Modifier.weight(3.0f))
             }
         } else {
             LazyColumn(
