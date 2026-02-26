@@ -21,7 +21,9 @@ import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.ManualAssetEntryScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
 import com.swanie.portfolio.ui.settings.SettingsScreen
+import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -41,17 +43,22 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 CreateAccountScreen(navController, mainViewModel)
             }
 
+            // FIXED: Added hiltViewModel() and passed it to SettingsScreen
             composable(Routes.SETTINGS) {
-                SettingsScreen(navController)
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                SettingsScreen(
+                    navController = navController,
+                    settingsViewModel = settingsViewModel
+                )
             }
 
+            // FIXED: Added hiltViewModel() for ThemeStudio
             composable(Routes.THEME_STUDIO) {
+                val themeViewModel: ThemeViewModel = hiltViewModel()
                 ThemeStudioScreen(navController)
             }
 
             composable(Routes.HOLDINGS) {
-                // FIXED: Removed the extra Box and the duplicate BottomNavigationBar.
-                // MyHoldingsScreen already contains its own nav dock at the bottom.
                 MyHoldingsScreen(
                     mainViewModel = mainViewModel,
                     navController = navController

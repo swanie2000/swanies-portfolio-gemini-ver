@@ -3,12 +3,17 @@ package com.swanie.portfolio.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewModel() {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val themePreferences: ThemePreferences
+) : ViewModel() {
 
     val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
@@ -32,13 +37,15 @@ class SettingsViewModel(private val themePreferences: ThemePreferences) : ViewMo
     }
 
     fun saveIsLightTextEnabled(enabled: Boolean) {
-        viewModelScope.launch { themePreferences.saveIsLightTextEnabled(enabled) }
+        viewModelScope.launch {
+            themePreferences.saveIsLightTextEnabled(enabled)
+        }
     }
 
     fun saveDefaultTheme() {
         viewModelScope.launch {
             themePreferences.saveIsDarkMode(true)
-            themePreferences.saveIsCompactViewEnabled(false) // Reset the compact view
+            themePreferences.saveIsCompactViewEnabled(false)
         }
     }
 }
