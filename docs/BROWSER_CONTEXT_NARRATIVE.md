@@ -1,36 +1,73 @@
-Project Narrative: Swanie’s Portfolio Development
+BROWSER_CONTEXT_NARRATIVE.md
+1. Project Overview
 
-I. Current State & Recent Technical Wins
+   App Name: Swanie's Portfolio
 
-The project has transitioned into a Customizable Multi-Asset Financial Suite. While the theme engine is now powerful, the asset management logic (sorting/deleting) remains the primary technical debt.
+   Purpose: Crypto & Precious Metals tracking with a high-end, custom-themed UI.
 
-The "Total Customization" Engine (Today's Major Win)
-- Global Theme Consumption: Successfully injected dynamic theme colors. MyHoldingsScreen.kt and CompactAssetCard now live-update based on ThemeViewModel state.
-- The "Command Center" Studio:
-    - Professional Branding: 120dp Swan Logo with AutoMirrored Back Arrow.
-    - Tight Typography: Two-line "DEFAULT COLOR" button (10.sp) with negative spacing for better touch-targets.
-    - Global Reset: Hardcoded Navy Blue (#000416) and White recovery state.
-- Live Contrast Grid: 2x2 selection layout for real-time readability testing.
+   Current Branch: wip-hilt-fix
 
-Data & Architecture
-- Dagger Hilt: Standardized DI for all ViewModels.
-- Theme Persistence: ThemePreferences is the source of truth for app-wide visuals.
+   Tech Stack: Kotlin, Jetpack Compose, Hilt (Dependency Injection), Room, Retrofit, StateFlow.
 
-II. Critical Gaps & Roadmap (The "Must-Haves")
+2. Architectural Status (The "Hilt" Restoration)
 
-The list is currently static. The following features are the HIGHEST priority:
-1. Asset Deletion: Implement "Swipe-to-Dismiss" or a Long-Press menu to remove assets from the database.
-2. Manual Reordering: Implement Drag-and-Drop logic using displayOrder persistence to allow users to rank assets.
-3. Live Pricing: Transition from mock data to live API feeds.
+Today we successfully completed the migration from a broken manual ViewModel factory system to a clean Hilt-injected architecture.
 
-III. Build & Safety Standards
-- Risk Control: Before implementing Drag-and-Drop, we must ensure the AssetDao supports positional updates to prevent data collisions.
-- Git Hygiene: Branch 'wip-hilt-fix' is pushed and up-to-date.
+    ThemeViewModel: Acts as the single source of truth for UI colors. It persists hex strings for siteBackgroundColor and siteTextColor.
 
-Michael, I've noted the gaps. The app looks great, but it's "locked" right now. We need to build the tools to let you manage those assets.
+    MainViewModel: Handles core app logic, currently observing themeColorHex for legacy compatibility where needed.
 
-Checklist for next session:
-[ ] git pull
-[ ] Regenerate Context Dump
-[ ] Priority 1: Implement Asset Deletion (Long-press or Swipe)
-[ ] Priority 2: Implement Manual Sorting (Drag-and-Drop)
+    Injection Pattern: Screens now use hiltViewModel<ThemeViewModel>() to observe theme changes in real-time without "ghost instances."
+
+3. Feature Map & UI Status
+   🟢 Completed & Themed
+
+   Home Screen:
+
+        Preserved the "Splash-to-App" transition.
+
+        Layer 1 remains hardcoded Navy (#000416) to match the Android Splash Screen.
+
+        Layer 2 (Radial Burst) and all text/buttons are now dynamic.
+
+   Theme Studio: Full interactive control over site colors with real-time preview and "Reset to Default" logic.
+
+   Asset Picker:
+
+        Implemented "Ghost Swan" empty state that appears instantly.
+
+        Swan is positioned at weight(0.1f) top / weight(3.0f) bottom to stay above the software keyboard.
+
+   Holdings & Create Account: Full theme observation with high-contrast button logic.
+
+🟡 In Progress / Refinement Needed
+
+    Manual Asset Entry: UI exists but needs logic for custom price/weight inputs for non-API assets.
+
+    Asset Logic: AssetViewModel is searching correctly, but the "Add to Database" flow needs a final verification.
+
+🔴 Upcoming Features
+
+    Swipe-to-Delete: Needs to be added to the Holdings LazyColumn.
+
+    Portfolio Analytics: Donut chart visualization for the breakdown of Metals vs. Crypto.
+
+4. Key Logic Snippets (Theming)
+
+We use a remember block with android.graphics.Color.parseColor to safely convert persisted hex strings into Compose Color objects, ensuring the UI doesn't crash on malformed hex strings:
+Kotlin
+
+val bgColor = remember(siteBgHex) {
+try { Color(android.graphics.Color.parseColor(siteBgHex)) }
+catch (e: Exception) { Color(0xFF000416) }
+}
+
+5. Active Branch Instructions
+
+   Git Commit History: Last commit 5bbd2f3 locked in the Home Screen and Asset Picker refinements.
+
+   Build Status: Passing. All Unresolved reference errors regarding FocusRequester and CoinItem were resolved.
+
+Next Session Goal: Start the Portfolio Analytics module or finalize Swipe-to-Delete on the Holdings screen.
+
+Would you like me to help you brainstorm the layout for that Analytics Donut Chart when you start your next session?

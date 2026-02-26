@@ -163,92 +163,92 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-Project Narrative: Swanie’s Portfolio Development
-I. Current State & Recent Technical Wins
+BROWSER_CONTEXT_NARRATIVE.md
+1. Project Overview
 
-The project has transitioned into a Customizable Multi-Asset Financial Suite, supporting digital assets, physical commodities, and manual entries within a unified, high-performance architecture.
-The "Total Customization" Engine (Major Win)
+   App Name: Swanie's Portfolio
 
-    Dynamic Theme Center: Implemented a ThemeViewModel and centralized ThemePreferences. Users can now customize four distinct areas: Card Background, Card Text, App Background, and App Text.
+   Purpose: Crypto & Precious Metals tracking with a high-end, custom-themed UI.
 
-    The "Command Center" Studio (Today's Win):
+   Current Branch: wip-hilt-fix
 
-        Symmetrical Branding: A balanced header featuring a 120dp Swan Logo (center), a Back button (left), and a Default button (right) that resets the app to its signature Navy Blue (#000416) and White theme.
+   Tech Stack: Kotlin, Jetpack Compose, Hilt (Dependency Injection), Room, Retrofit, StateFlow.
 
-        Live Contrast Grid: A 2x2 selection layout where "Text" buttons dynamically inherit their respective "Background" colors. This allows users to test text readability in real-time before applying.
+2. Architectural Status (The "Hilt" Restoration)
 
-        Interactive Apply Logic: A high-visibility Yellow & Black "Apply" button featuring a 100ms White Flash animation to provide tactile visual feedback on click.
+Today we successfully completed the migration from a broken manual ViewModel factory system to a clean Hilt-injected architecture.
 
-        Inline Validation: Abandoned system Toasts for a custom red "INVALID HEX" alert positioned specifically in the upper header gap to ensure visibility above the keyboard.
+    ThemeViewModel: Acts as the single source of truth for UI colors. It persists hex strings for siteBackgroundColor and siteTextColor.
 
-    Manual Sort & Reorder: Integrated a high-fidelity drag-and-drop system in the Holdings list. Users can now manually rank assets, with persistence via a displayOrder column.
+    MainViewModel: Handles core app logic, currently observing themeColorHex for legacy compatibility where needed.
 
-The "Hilt" Foundation & Data Integrity
+    Injection Pattern: Screens now use hiltViewModel<ThemeViewModel>() to observe theme changes in real-time without "ghost instances."
 
-    Dagger Hilt Migration: Fully eliminated manual ViewModelFactories. The project now uses standardized Dependency Injection for all ViewModels and Repositories.
+3. Feature Map & UI Status
+   🟢 Completed & Themed
 
-    Smart Upsert Logic: Refactored AssetDao and Repository to use @Upsert. Adding existing metals now intelligently updates quantities rather than creating duplicates.
+   Home Screen:
 
-    Shared ViewModel Strategy: All primary screens observe the AssetViewModel as the single source of truth.
+        Preserved the "Splash-to-App" transition.
 
-UI/UX Refinements
+        Layer 1 remains hardcoded Navy (#000416) to match the Android Splash Screen.
 
-    The "Neon Thread" Sync: A modern, 2dp high LinearProgressIndicator at the top of the screen that pulses during API refreshes.
+        Layer 2 (Radial Burst) and all text/buttons are now dynamic.
 
-    Restored Navigation: The "+" FAB is restored, with "Manual Add" prioritized at the top of the Asset Picker.
+   Theme Studio: Full interactive control over site colors with real-time preview and "Reset to Default" logic.
 
-    Modern Animations: Implemented Modifier.animateItem() for smooth transitions during reordering and filtering.
+   Asset Picker:
 
-II. Architectural Standards & Roadmap
-Core Standards
+        Implemented "Ghost Swan" empty state that appears instantly.
 
-    Theme Consumption: All Composables must pull colors from the ThemeViewModel state to ensure user customizations (App/Card colors) are respected site-wide.
+        Swan is positioned at weight(0.1f) top / weight(3.0f) bottom to stay above the software keyboard.
 
-    Stable Keys: Every LazyColumn item must use a stable key (e.g., key = { it.coinId }) to support reordering animations.
+   Holdings & Create Account: Full theme observation with high-contrast button logic.
 
-    DI Integrity: All new services must be registered in DatabaseModule.kt using the @Provides pattern.
+🟡 In Progress / Refinement Needed
 
-Current Work-in-Progress
+    Manual Asset Entry: UI exists but needs logic for custom price/weight inputs for non-API assets.
 
-    Holdings Screen Integration: Wiring the Holdings list to consume the new appBgColor and cardBgColor variables defined in today's Theme Studio.
+    Asset Logic: AssetViewModel is searching correctly, but the "Add to Database" flow needs a final verification.
 
-    Compact Card Reconstruction: Updating the CompactAssetCard to support dynamic text colors while maintaining a dense, high-info layout.
+🔴 Upcoming Features
 
-The Roadmap
+    Swipe-to-Delete: Needs to be added to the Holdings LazyColumn.
 
-    Portfolio Analytics: Implement the Donut Chart visualization to show the percentage split between Digital (Crypto) and Physical (Metals).
+    Portfolio Analytics: Donut chart visualization for the breakdown of Metals vs. Crypto.
 
-    Live Metal Feeds: Replace "Local Mock" pricing with a dedicated Metals API (e.g., GoldAPI.io).
+4. Key Logic Snippets (Theming)
 
-    Manual Sort Polish: Finalize handling for large lists to ensure displayOrder logic avoids collisions.
+We use a remember block with android.graphics.Color.parseColor to safely convert persisted hex strings into Compose Color objects, ensuring the UI doesn't crash on malformed hex strings:
+Kotlin
 
-III. Build & Safety Standards
+val bgColor = remember(siteBgHex) {
+try { Color(android.graphics.Color.parseColor(siteBgHex)) }
+catch (e: Exception) { Color(0xFF000416) }
+}
 
-    Experimental APIs: Use @file:OptIn(ExperimentalFoundationApi::class) for list animations and advanced gestures.
+5. Active Branch Instructions
 
-    Database Versioning: Currently at v4. fallbackToDestructiveMigration() is active; schema changes will wipe local test data.
+   Git Commit History: Last commit 5bbd2f3 locked in the Home Screen and Asset Picker refinements.
 
-    Git Hygiene: Follow the "Checkpointed" workflow: Verify Build -> Sync Gradle -> Commit Success -> Push.
+   Build Status: Passing. All Unresolved reference errors regarding FocusRequester and CoinItem were resolved.
 
-Michael, we’ve officially "stopped fighting" the layout and won. The Studio is solid. When you're ready to pick this back up, we can apply these new colors to your Holdings cards so your Navy Blue and White (or whatever you design next) looks perfect across the whole app.
+Next Session Goal: Start the Portfolio Analytics module or finalize Swipe-to-Delete on the Holdings screen.
 
-Sleep well! Should we start with the Holdings Screen color injection when you've had your coffee tomorrow?
+Would you like me to help you brainstorm the layout for that Analytics Donut Chart when you start your next session?
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 02/24/2026 21:43:01.67
+Generated: Wed 02/25/2026 21:12:17.18
 
 Branch:
 wip-hilt-fix
 Commit:
-3a4e8c3b67b1e87dfd093903d7f4164e78e358a2
+5bbd2f363967e1590b08f0f7bb7cc4867698d82d
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeStudioScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -286,7 +286,6 @@ app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
 app/src/main/java/com/swanie/portfolio/ui/components/CustomToast.kt
 app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
-app/src/main/java/com/swanie/portfolio/ui/features/SettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
