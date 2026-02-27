@@ -463,27 +463,35 @@ fun MyHoldingsScreen(
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
+
+                    // Make selected + unselected identical brightness (theme-consistent)
+                    val iconColor = Color(textColorInt)
                     val itemColors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(textColorInt),
-                        unselectedIconColor = Color(textColorInt).copy(0.5f),
+                        selectedIconColor = iconColor,
+                        unselectedIconColor = iconColor,
                         indicatorColor = Color.Transparent
                     )
 
+                    val isHomeSelected = currentRoute == Routes.HOME
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, null) },
-                        selected = currentRoute == Routes.HOME,
+                        icon = { Icon(Icons.Default.Home, null, tint = iconColor) },
+                        selected = isHomeSelected,
                         onClick = { navController.navigate(Routes.HOME) },
                         colors = itemColors
                     )
+
+                    val isHoldingsSelected = currentRoute == Routes.HOLDINGS
                     NavigationBarItem(
-                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null) },
-                        selected = currentRoute == Routes.HOLDINGS,
+                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = iconColor) },
+                        selected = isHoldingsSelected,
                         onClick = { navController.navigate(Routes.HOLDINGS) },
                         colors = itemColors
                     )
+
+                    val isSettingsSelected = currentRoute == Routes.SETTINGS
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Settings, null) },
-                        selected = currentRoute == Routes.SETTINGS,
+                        icon = { Icon(Icons.Default.Settings, null, tint = iconColor) },
+                        selected = isSettingsSelected,
                         onClick = { navController.navigate(Routes.SETTINGS) },
                         colors = itemColors
                     )
@@ -554,8 +562,12 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
     val isPositive = asset.priceChange24h >= 0
     val trendColor = if (isPositive) Color(0xFF00C853) else Color(0xFFD32F2F)
     val priceFormatter = if (asset.currentPrice < 0.10) DecimalFormat("$#,##0.0000") else DecimalFormat("$#,##0.00")
-    val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld
-    val totalValueString = if (totalValue >= 1_000_000) DecimalFormat("$#,##0").format(totalValue) else DecimalFormat("$#,##0.00").format(totalValue)
+    val totalValue =
+        if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld)
+        else asset.currentPrice * asset.amountHeld
+    val totalValueString =
+        if (totalValue >= 1_000_000) DecimalFormat("$#,##0").format(totalValue)
+        else DecimalFormat("$#,##0.00").format(totalValue)
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -777,3 +789,5 @@ fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Mo
         )
     }
 }
+
+// ===== END OF FILE =====
