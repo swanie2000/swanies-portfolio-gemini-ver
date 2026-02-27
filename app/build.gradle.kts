@@ -51,8 +51,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
 
-    // Drag-to-reorder
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+    // Drag-to-reorder (maintained)
+    implementation("sh.calvin.reorderable:reorderable:3.0.0")
 
     // Networking & Images
     implementation(libs.retrofit.main)
@@ -81,3 +81,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
+
+// ===== END OF FILE =====
