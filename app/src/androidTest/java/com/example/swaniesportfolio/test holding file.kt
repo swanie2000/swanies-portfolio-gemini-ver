@@ -28,8 +28,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,11 +65,11 @@ fun MyHoldingsScreen(
     val themeViewModel: ThemeViewModel = hiltViewModel()
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
-    var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
+    val localHoldings = remember { mutableStateListOf<AssetEntity>() }
 
     LaunchedEffect(holdings) {
         if (localHoldings.isEmpty() && holdings.isNotEmpty()) {
-            localHoldings = holdings
+            localHoldings.addAll(holdings)
         }
     }
 
@@ -86,33 +84,22 @@ fun MyHoldingsScreen(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    // PURE RELATIVE MATH STATE
-    val draggedItemId = remember { mutableStateOf<String?>(null) }
-    val dragOffsetX = remember { mutableFloatStateOf(0f) }
-    val dragOffsetY = remember { mutableFloatStateOf(0f) }
-
-    val isOverTrash = remember { mutableStateOf(false) }
-    val showDeleteDialog = remember { mutableStateOf(false) }
-    val assetToDelete = remember { mutableStateOf<AssetEntity?>(null) }
+    var draggedItemId by remember { mutableStateOf<String?>(null) }
+    var draggingOffset by remember { mutableStateOf(Offset.Zero) }
+    var isOverTrash by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var assetToDelete by remember { mutableStateOf<AssetEntity?>(null) }
     var reorderJob by remember { mutableStateOf<Job?>(null) }
+
+    val listSpacing by animateDpAsState(
+        targetValue = if (draggedItemId != null) 32.dp else 8.dp,
+        animationSpec = spring(stiffness = 50f),
+        label = "listSpacing"
+    )
 
     val bgColorInt = siteBgColor.toColorInt()
     val textColorInt = siteTextColor.toColorInt()
     val isDarkTheme = ColorUtils.calculateLuminance(bgColorInt) < 0.5
-
-    val spacingPx = with(LocalDensity.current) { 8.dp.toPx() }
-
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("ALL", "CRYPTO", "METAL")
-    val filteredHoldings = remember(selectedTab, localHoldings) {
-        when (selectedTab) {
-            1 -> localHoldings.filter { it.category == AssetCategory.CRYPTO }
-            2 -> localHoldings.filter { it.category == AssetCategory.METAL }
-            else -> localHoldings
-        }
-    }
-
-    val currentLocalHoldings by rememberUpdatedState(localHoldings)
 
     val view = LocalView.current
     SideEffect {
@@ -122,34 +109,44 @@ fun MyHoldingsScreen(
         insetsController.isAppearanceLightStatusBars = !isDarkTheme
     }
 
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf("ALL", "CRYPTO", "METAL")
+    val filteredHoldings = remember(selectedTab, localHoldings.toList()) {
+        when (selectedTab) {
+            1 -> localHoldings.filter { it.category == AssetCategory.CRYPTO }
+            2 -> localHoldings.filter { it.category == AssetCategory.METAL }
+            else -> localHoldings.toList()
+        }
+    }
+
     val totalPortfolioValue = holdings.sumOf { asset ->
         if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld)
         else asset.currentPrice * asset.amountHeld
     }
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
-    if (showDeleteDialog.value && assetToDelete.value != null) {
+    if (showDeleteDialog && assetToDelete != null) {
         AlertDialog(
-            onDismissRequest = { showDeleteDialog.value = false; assetToDelete.value = null },
+            onDismissRequest = { showDeleteDialog = false; assetToDelete = null },
             containerColor = Color(cardBgColor.toColorInt()),
             titleContentColor = Color(cardTextColor.toColorInt()),
             textContentColor = Color(cardTextColor.toColorInt()),
             title = { Text("DELETE ASSET?", fontWeight = FontWeight.Black) },
-            text = { Text("Remove ${assetToDelete.value?.name} from your holdings?") },
+            text = { Text("Remove ${assetToDelete?.name} from your holdings?") },
             confirmButton = {
                 Button(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White),
                     onClick = {
-                        assetToDelete.value?.let { asset ->
-                            viewModel.deleteAsset(asset)
-                            localHoldings = localHoldings.filterNot { it.coinId == asset.coinId }
+                        assetToDelete?.let {
+                            viewModel.deleteAsset(it)
+                            localHoldings.remove(it)
                         }
-                        showDeleteDialog.value = false; assetToDelete.value = null
+                        showDeleteDialog = false; assetToDelete = null
                     }
                 ) { Text("DELETE", fontWeight = FontWeight.Bold) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog.value = false; assetToDelete.value = null }) {
+                TextButton(onClick = { showDeleteDialog = false; assetToDelete = null }) {
                     Text("CANCEL", color = Color(cardTextColor.toColorInt()))
                 }
             }
@@ -218,109 +215,59 @@ fun MyHoldingsScreen(
                 }
             }
 
-            Box(modifier = Modifier.weight(1f).fillMaxWidth().clipToBounds().pointerInput(selectedTab) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth().clipToBounds().pointerInput(filteredHoldings) {
                 detectDragGesturesAfterLongPress(
                     onDragStart = { offset ->
-                        val itemInfo = listState.layoutInfo.visibleItemsInfo
-                            .firstOrNull { offset.y.toInt() in it.offset..(it.offset + it.size) }
-
-                        itemInfo?.let {
-                            draggedItemId.value = it.key as String
-                            dragOffsetX.floatValue = 0f
-                            dragOffsetY.floatValue = 0f
-                        }
+                        val item = listState.layoutInfo.visibleItemsInfo
+                            .firstOrNull { item -> offset.y.toInt() in item.offset..(item.offset + item.size) }
+                        item?.let { draggedItemId = filteredHoldings[it.index].coinId }
                     },
                     onDragEnd = {
                         reorderJob?.cancel()
-                        if (isOverTrash.value) {
-                            assetToDelete.value = currentLocalHoldings.find { it.coinId == draggedItemId.value }
-                            showDeleteDialog.value = true
+                        if (isOverTrash) {
+                            assetToDelete = localHoldings.find { it.coinId == draggedItemId }
+                            showDeleteDialog = true
                         } else {
-                            viewModel.updateAssetOrder(currentLocalHoldings)
+                            viewModel.updateAssetOrder(localHoldings.toList())
                         }
-                        draggedItemId.value = null; dragOffsetX.floatValue = 0f; dragOffsetY.floatValue = 0f; isOverTrash.value = false
+                        draggedItemId = null; draggingOffset = Offset.Zero; isOverTrash = false
                     },
                     onDragCancel = {
                         reorderJob?.cancel()
-                        draggedItemId.value = null; dragOffsetX.floatValue = 0f; dragOffsetY.floatValue = 0f; isOverTrash.value = false
+                        draggedItemId = null; draggingOffset = Offset.Zero; isOverTrash = false
                     },
                     onDrag = { change, dragAmount ->
                         change.consume()
-
-                        val draggedId = draggedItemId.value
-                        val currentIndex = if (draggedId != null) currentLocalHoldings.indexOfFirst { it.coinId == draggedId } else -1
-
-                        dragOffsetX.floatValue += dragAmount.x
-                        dragOffsetY.floatValue += dragAmount.y
+                        draggingOffset += dragAmount
 
                         val globalPos = change.position
-                        isOverTrash.value = globalPos.x > size.width * 0.65f && globalPos.y > size.height * 0.7f
+                        isOverTrash = globalPos.x > size.width * 0.65f && globalPos.y > size.height * 0.7f
 
-                        if (reorderJob?.isActive != true && currentIndex != -1) {
+                        if (reorderJob?.isActive != true) {
                             reorderJob = scope.launch {
-                                val currentItemInfo = listState.layoutInfo.visibleItemsInfo.find { it.key == draggedId }
+                                val id = draggedItemId ?: return@launch
+                                val fromIndex = localHoldings.indexOfFirst { it.coinId == id }
+                                if (fromIndex == -1) return@launch
 
-                                if (currentItemInfo != null) {
-                                    // Physical boundaries of the visual dragged card
-                                    val draggedTopY = currentItemInfo.offset + dragOffsetY.floatValue
-                                    val draggedBottomY = draggedTopY + currentItemInfo.size
+                                val itemSize = listState.layoutInfo.visibleItemsInfo.find { it.index == fromIndex }?.size ?: 300
+                                val threshold = itemSize.toFloat() * 0.25f
 
-                                    var targetIndexToSwap = -1
-                                    var shiftAmount = 0f
-
-                                    // 20% OVERLAP: MOVING UP
-                                    if (dragAmount.y < 0) {
-                                        val itemAbove = listState.layoutInfo.visibleItemsInfo.find { it.index == currentIndex - 1 }
-                                        if (itemAbove != null) {
-                                            val itemAboveBottom = itemAbove.offset + itemAbove.size
-                                            val threshold = itemAboveBottom - (itemAbove.size * 0.20f)
-
-                                            // The moment the top of your card hits the bottom 20% of the card above
-                                            if (draggedTopY < threshold) {
-                                                targetIndexToSwap = currentIndex - 1
-                                                shiftAmount = itemAbove.size.toFloat() + spacingPx
-                                            }
-                                        }
-                                    }
-                                    // 20% OVERLAP: MOVING DOWN
-                                    else if (dragAmount.y > 0) {
-                                        val itemBelow = listState.layoutInfo.visibleItemsInfo.find { it.index == currentIndex + 1 }
-                                        if (itemBelow != null) {
-                                            val itemBelowTop = itemBelow.offset
-                                            val threshold = itemBelowTop + (itemBelow.size * 0.20f)
-
-                                            // The moment the bottom of your card hits the top 20% of the card below
-                                            if (draggedBottomY > threshold) {
-                                                targetIndexToSwap = currentIndex + 1
-                                                shiftAmount = -(itemBelow.size.toFloat() + spacingPx)
-                                            }
-                                        }
-                                    }
-
-                                    // Execution of the Swap
-                                    if (targetIndexToSwap != -1) {
-                                        val firstIdx = listState.firstVisibleItemIndex
-                                        val firstOffset = listState.firstVisibleItemScrollOffset
-
-                                        val newList = currentLocalHoldings.toMutableList()
-                                        newList.add(targetIndexToSwap, newList.removeAt(currentIndex))
-                                        localHoldings = newList
-
-                                        // PURE RELATIVE MATH: Invert the layout shift instantly so visual card never jumps
-                                        dragOffsetY.floatValue += shiftAmount
-
-                                        if (firstIdx == currentIndex || firstIdx == targetIndexToSwap) {
-                                            scope.launch { listState.scrollToItem(firstIdx, firstOffset) }
-                                        }
-                                    }
+                                val targetIndex = when {
+                                    draggingOffset.y > threshold -> fromIndex + 1
+                                    draggingOffset.y < -threshold -> fromIndex - 1
+                                    else -> fromIndex
                                 }
-                                delay(30)
+
+                                if (targetIndex in localHoldings.indices && targetIndex != fromIndex) {
+                                    localHoldings.add(targetIndex, localHoldings.removeAt(fromIndex))
+                                    draggingOffset = Offset(draggingOffset.x, draggingOffset.y + (if (targetIndex > fromIndex) -itemSize.toFloat() else itemSize.toFloat()))
+                                }
+                                delay(600)
                             }
                         }
 
-                        // DIRECTIONAL AUTO-SCROLL FIX: Only scroll if moving in the correct direction to avoid top-limit fighting
-                        if (globalPos.y < 150f && dragAmount.y < 0) { scope.launch { listState.scrollBy(-40f) } }
-                        if (globalPos.y > size.height - 150f && dragAmount.y > 0) { scope.launch { listState.scrollBy(40f) } }
+                        if (globalPos.y < 120f) { scope.launch { listState.scrollBy(-30f) } }
+                        if (globalPos.y > size.height - 120f) { scope.launch { listState.scrollBy(30f) } }
                     }
                 )
             }) {
@@ -328,32 +275,29 @@ fun MyHoldingsScreen(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(listSpacing)
                 ) {
-                    itemsIndexed(filteredHoldings, key = { _, item -> item.coinId }) { _, asset ->
-                        val isDraggingThisItem = draggedItemId.value == asset.coinId
+                    itemsIndexed(filteredHoldings, key = { _, item -> item.coinId }) { index, asset ->
+                        val isDraggingThisItem = draggedItemId == asset.coinId
                         val scale by animateFloatAsState(if (isDraggingThisItem) 1.05f else 1f, label = "scale")
 
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .zIndex(if (isDraggingThisItem) 100f else 0f)
                                 .animateItem(
-                                    fadeInSpec = null,
-                                    fadeOutSpec = null,
-                                    placementSpec = if (isDraggingThisItem) snap() else spring(
-                                        stiffness = Spring.StiffnessMediumLow,
+                                    placementSpec = spring(
+                                        stiffness = 5f,
+                                        // SINGLE CHANGE: Changed from HighBouncy to NoBouncy to remove the "boing"
                                         dampingRatio = Spring.DampingRatioNoBouncy
                                     )
                                 )
+                                .zIndex(if (isDraggingThisItem) 1f else 0f)
                                 .graphicsLayer {
                                     scaleX = scale; scaleY = scale
-                                    shadowElevation = if (isDraggingThisItem) 30f else 0f
-
-                                    // Bypassing Layout Lookups entirely.
-                                    // 100% immune to rendering lag and flickering.
-                                    translationX = if (isDraggingThisItem) dragOffsetX.floatValue else 0f
-                                    translationY = if (isDraggingThisItem) dragOffsetY.floatValue else 0f
+                                    if (isDraggingThisItem) {
+                                        translationX = draggingOffset.x
+                                        translationY = draggingOffset.y
+                                    }
                                 }
                         ) {
                             if (isCompactViewEnabled) {
@@ -381,12 +325,12 @@ fun MyHoldingsScreen(
         }
 
         AnimatedVisibility(
-            visible = draggedItemId.value != null,
+            visible = draggedItemId != null,
             enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut(),
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp)
         ) {
             Box(
-                modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape),
+                modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash) Color.White else Color.Transparent, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
@@ -395,7 +339,6 @@ fun MyHoldingsScreen(
     }
 }
 
-// ... Card UI components remain completely identical below this line ...
 @Composable
 fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
     val themeViewModel: ThemeViewModel = hiltViewModel()

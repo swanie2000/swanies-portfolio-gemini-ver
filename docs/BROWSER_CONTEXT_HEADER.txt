@@ -156,6 +156,16 @@ AI behavior rule:
 Confirm you understand the Level-4 rules and reviewer mindset before giving advice.
 
 DO NOT START PROCESSING ANYTHING UNTIL THE USER CONFIRMS.!!!!!!!!!!!!
+
+USER WORKING STYLE (IMPORTANT)
+------------------------------------------------------------
+
+- Provide FULL FILE outputs when code changes are needed.
+- Avoid partial snippets unless requested.
+- Give step-by-step instructions.
+- Reduce complexity; avoid large rewrites.
+
+
 ============================================================
 END CONTROL HEADER
 ============================================================
