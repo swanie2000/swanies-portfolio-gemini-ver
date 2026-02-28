@@ -236,28 +236,14 @@ fun MyHoldingsScreen(
                     .wrapContentHeight()
                     .background(Color(bgColorInt))
                     .statusBarsPadding()
-                    .padding(bottom = 40.dp) // Large gap above the tabs
+                    .padding(bottom = 40.dp)
             ) {
-                // LEFT AREA: Icons
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(start = 16.dp)
-                        .width(70.dp)
-                        .height(120.dp),
+                    modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp).width(70.dp).height(120.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        IconButton(
-                            onClick = {
-                                if (!isRefreshing) {
-                                    scope.launch {
-                                        isRefreshing = true
-                                        viewModel.refreshAssets()
-                                    }
-                                }
-                            }
-                        ) {
+                        IconButton(onClick = { if (!isRefreshing) { scope.launch { isRefreshing = true; viewModel.refreshAssets() } } }) {
                             Icon(Icons.Default.Refresh, null, tint = if (isRefreshing) Color(textColorInt).copy(0.2f) else Color(textColorInt), modifier = Modifier.size(28.dp))
                         }
                         IconButton(onClick = { showInfoDialog = true }, modifier = Modifier.size(24.dp)) {
@@ -266,212 +252,76 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                // CENTER AREA: Swan + High-Positioned Bar + Value
-                Column(
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.swanie_foreground),
-                        contentDescription = null,
-                        modifier = Modifier.size(120.dp)
-                    )
-
-                    // PULLED UP: Charging bar sits immediately under Swan
+                Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
                     Box(modifier = Modifier.height(12.dp), contentAlignment = Alignment.TopCenter) {
                         if (isRefreshing) {
-                            LinearProgressIndicator(
-                                progress = { refreshProgress },
-                                modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape).border(1.dp, Color(textColorInt).copy(0.1f), CircleShape),
-                                color = Color(textColorInt).copy(alpha = 0.7f),
-                                trackColor = Color(textColorInt).copy(alpha = 0.05f)
-                            )
+                            LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape).border(1.dp, Color(textColorInt).copy(0.1f), CircleShape), color = Color(textColorInt).copy(alpha = 0.7f), trackColor = Color(textColorInt).copy(alpha = 0.05f))
                         }
                     }
-
-                    // INCREASED GAP: Gives the numbers room below the bar
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = currencyFormat.format(totalPortfolioValue),
-                        color = Color(textColorInt),
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Black
-                    )
+                    Text(text = currencyFormat.format(totalPortfolioValue), color = Color(textColorInt), fontSize = 26.sp, fontWeight = FontWeight.Black)
                 }
 
-                // RIGHT AREA: Yellow Add Button
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 16.dp)
-                        .width(70.dp)
-                        .height(120.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        onClick = { navController.navigate(Routes.ASSET_PICKER) },
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Color.Yellow)
-                            .size(44.dp)
-                    ) {
+                Box(modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
+                    IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
                         Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(28.dp))
                     }
                 }
             }
 
-            // --- SOFT PILL TABS ---
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.height(44.dp).padding(horizontal = 20.dp),
-                containerColor = Color.Transparent,
-                indicator = { },
-                divider = { }
+                containerColor = Color.Transparent, indicator = { }, divider = { }
             ) {
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTab == index
                     Tab(
-                        selected = isSelected,
-                        onClick = { selectedTab = index },
-                        modifier = Modifier
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
-                            .clip(CircleShape)
-                            .background(if (isSelected) Color(safeCardBgHex.toColorInt()).copy(0.9f) else Color.Transparent)
-                            .border(width = 1.dp, color = if (isSelected) Color.Transparent else Color(textColorInt).copy(0.15f), shape = CircleShape)
+                        selected = isSelected, onClick = { selectedTab = index },
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) Color(safeCardBgHex.toColorInt()).copy(0.9f) else Color.Transparent).border(width = 1.dp, color = if (isSelected) Color.Transparent else Color(textColorInt).copy(0.15f), shape = CircleShape)
                     ) {
                         Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) Color(safeCardTextHex.toColorInt()) else Color(textColorInt).copy(0.5f), modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
             }
 
-            // --- ASSET LIST area ---
             Box(modifier = Modifier.weight(1f).fillMaxWidth().clipToBounds()) {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(items = filteredHoldings, key = { it.coinId }) { asset ->
                         if (isReorderEnabled) {
                             ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                 val scale by animateFloatAsState(targetValue = if (isDragging) 1.05f else 1f, label = "scale")
                                 val elevation by animateFloatAsState(targetValue = if (isDragging) 30f else 0f, label = "elevation")
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .zIndex(if (isDragging) 100f else 0f)
-                                        .longPressDraggableHandle(
-                                            onDragStarted = {
-                                                draggedItemId.value = asset.coinId
-                                                isDraggingActive.value = true
-                                            },
-                                            onDragStopped = {
-                                                val shouldDelete = isOverTrash.value
-                                                isDraggingActive.value = false
-                                                isOverTrash.value = false
-                                                if (shouldDelete) {
-                                                    assetToDelete.value = localHoldings.find { it.coinId == asset.coinId }
-                                                    showDeleteDialog.value = true
-                                                } else {
-                                                    viewModel.updateAssetOrder(localHoldings)
-                                                }
-                                                draggedItemId.value = null
-                                            }
-                                        )
-                                        .graphicsLayer {
-                                            scaleX = scale
-                                            scaleY = scale
-                                            shadowElevation = elevation
-                                            shape = RoundedCornerShape(16.dp)
-                                            clip = true
-                                        }
-                                ) {
-                                    if (isCompactViewEnabled) {
-                                        CompactAssetCard(asset = asset, modifier = Modifier)
-                                    } else {
-                                        FullAssetCard(asset = asset, modifier = Modifier)
-                                    }
+                                Box(modifier = Modifier.fillMaxWidth().zIndex(if (isDragging) 100f else 0f).longPressDraggableHandle(onDragStarted = { draggedItemId.value = asset.coinId; isDraggingActive.value = true }, onDragStopped = { val shouldDelete = isOverTrash.value; isDraggingActive.value = false; isOverTrash.value = false; if (shouldDelete) { assetToDelete.value = localHoldings.find { it.coinId == asset.coinId }; showDeleteDialog.value = true } else { viewModel.updateAssetOrder(localHoldings) }; draggedItemId.value = null }).graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation; shape = RoundedCornerShape(16.dp); clip = true }) {
+                                    if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier) else FullAssetCard(asset = asset, modifier = Modifier)
                                 }
                             }
                         } else {
                             Box(modifier = Modifier.fillMaxWidth()) {
-                                if (isCompactViewEnabled) {
-                                    CompactAssetCard(asset = asset, modifier = Modifier)
-                                } else {
-                                    FullAssetCard(asset = asset, modifier = Modifier)
-                                }
+                                if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier) else FullAssetCard(asset = asset, modifier = Modifier)
                             }
                         }
                     }
                 }
             }
 
-            // --- BOTTOM NAVIGATION ---
             Surface(modifier = Modifier.fillMaxWidth().height(40.dp), color = Color(bgColorInt)) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
+                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
                     val iconColor = Color(textColorInt)
-                    val itemColors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = iconColor,
-                        unselectedIconColor = iconColor,
-                        indicatorColor = Color.Transparent
-                    )
-
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, null, tint = iconColor) },
-                        selected = currentRoute == Routes.HOME,
-                        onClick = { navController.navigate(Routes.HOME) },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = iconColor) },
-                        selected = currentRoute == Routes.HOLDINGS,
-                        onClick = { navController.navigate(Routes.HOLDINGS) },
-                        colors = itemColors
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Settings, null, tint = iconColor) },
-                        selected = currentRoute == Routes.SETTINGS,
-                        onClick = { navController.navigate(Routes.SETTINGS) },
-                        colors = itemColors
-                    )
+                    val itemColors = NavigationBarItemDefaults.colors(selectedIconColor = iconColor, unselectedIconColor = iconColor, indicatorColor = Color.Transparent)
+                    NavigationBarItem(icon = { Icon(Icons.Default.Home, null, tint = iconColor) }, selected = currentRoute == Routes.HOME, onClick = { navController.navigate(Routes.HOME) }, colors = itemColors)
+                    NavigationBarItem(icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = iconColor) }, selected = currentRoute == Routes.HOLDINGS, onClick = { navController.navigate(Routes.HOLDINGS) }, colors = itemColors)
+                    NavigationBarItem(icon = { Icon(Icons.Default.Settings, null, tint = iconColor) }, selected = currentRoute == Routes.SETTINGS, onClick = { navController.navigate(Routes.SETTINGS) }, colors = itemColors)
                 }
             }
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(Color(bgColorInt)))
         }
 
-        // Trash Zone
-        AnimatedVisibility(
-            visible = isDraggingActive.value && isReorderEnabled,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut(),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = 100.dp)
-                .onGloballyPositioned { coords ->
-                    val pos = coords.positionInRoot()
-                    val size: IntSize = coords.size
-                    trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + size.width, pos.y + size.height)
-                }
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-                    .background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f))
-                    .border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
-            }
+        AnimatedVisibility(visible = isDraggingActive.value && isReorderEnabled, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut(), modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); val size: IntSize = coords.size; trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + size.width, pos.y + size.height) }) {
+            Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp)) }
         }
     }
 }
@@ -515,7 +365,21 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
                 Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("YOUR HOLDING", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     Text(NumberFormat.getNumberInstance().format(asset.amountHeld), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                    Box(modifier = Modifier.height(34.dp), contentAlignment = Alignment.Center) { Text(text = asset.name.uppercase(), color = Color(safeCardText.toColorInt()), fontSize = 11.sp, textAlign = TextAlign.Center, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 13.sp, fontWeight = FontWeight.Bold) }
+                    // FIX: Increased Box height to 40.dp and enforced softWrap = true for two-line stacking
+                    Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = asset.name.uppercase(),
+                            color = Color(safeCardText.toColorInt()),
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            minLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            softWrap = true
+                        )
+                    }
                 }
                 Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
                     SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp))

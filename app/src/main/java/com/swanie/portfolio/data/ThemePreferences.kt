@@ -31,76 +31,63 @@ class ThemePreferences @Inject constructor(
         val IS_LIGHT_TEXT_ENABLED = booleanPreferencesKey("is_light_text_enabled")
     }
 
+    // FIXED: Fallbacks set to Brand Navy and Dark Card style
     val cardBackgroundColor: Flow<String> = context.dataStore.data.map {
-        it[PreferencesKeys.CARD_BACKGROUND_COLOR] ?: "#FFFFFF"
+        it[PreferencesKeys.CARD_BACKGROUND_COLOR] ?: "#121212"
     }
 
     val cardTextColor: Flow<String> = context.dataStore.data.map {
-        it[PreferencesKeys.CARD_TEXT_COLOR] ?: "#000000"
+        it[PreferencesKeys.CARD_TEXT_COLOR] ?: "#FFFFFF"
     }
 
     val siteBackgroundColor: Flow<String> = context.dataStore.data.map {
-        it[PreferencesKeys.SITE_BACKGROUND_COLOR] ?: "#FFFFFF"
+        it[PreferencesKeys.SITE_BACKGROUND_COLOR] ?: "#000416"
     }
 
     val siteTextColor: Flow<String> = context.dataStore.data.map {
-        it[PreferencesKeys.SITE_TEXT_COLOR] ?: "#000000"
+        it[PreferencesKeys.SITE_TEXT_COLOR] ?: "#FFFFFF"
     }
 
     val useGradient: Flow<Boolean> = context.dataStore.data.map {
         it[PreferencesKeys.USE_GRADIENT] ?: false
     }
     val isDarkMode: Flow<Boolean> = context.dataStore.data.map {
-        it[PreferencesKeys.IS_DARK_MODE] ?: true // Default to dark mode
+        it[PreferencesKeys.IS_DARK_MODE] ?: true
     }
 
     val isCompactViewEnabled: Flow<Boolean> = context.dataStore.data.map {
-        it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false // Default to full view
+        it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false
     }
 
     val isLightTextEnabled: Flow<Boolean> = context.dataStore.data.map {
-        it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] ?: true // Default to Light Text
+        it[PreferencesKeys.IS_LIGHT_TEXT_ENABLED] ?: true
     }
 
     suspend fun saveCardBackgroundColor(hex: String) {
-        context.dataStore.edit {
-            it[PreferencesKeys.CARD_BACKGROUND_COLOR] = hex
-        }
+        context.dataStore.edit { it[PreferencesKeys.CARD_BACKGROUND_COLOR] = hex }
     }
 
     suspend fun saveCardTextColor(hex: String) {
-        context.dataStore.edit {
-            it[PreferencesKeys.CARD_TEXT_COLOR] = hex
-        }
+        context.dataStore.edit { it[PreferencesKeys.CARD_TEXT_COLOR] = hex }
     }
 
     suspend fun saveSiteBackgroundColor(hex: String) {
-        context.dataStore.edit {
-            it[PreferencesKeys.SITE_BACKGROUND_COLOR] = hex
-        }
+        context.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = hex }
     }
 
     suspend fun saveSiteTextColor(hex: String) {
-        context.dataStore.edit {
-            it[PreferencesKeys.SITE_TEXT_COLOR] = hex
-        }
+        context.dataStore.edit { it[PreferencesKeys.SITE_TEXT_COLOR] = hex }
     }
 
     suspend fun saveUseGradient(enabled: Boolean) {
-        context.dataStore.edit {
-            it[PreferencesKeys.USE_GRADIENT] = enabled
-        }
+        context.dataStore.edit { it[PreferencesKeys.USE_GRADIENT] = enabled }
     }
     suspend fun saveIsDarkMode(isDark: Boolean) {
-        context.dataStore.edit {
-            it[PreferencesKeys.IS_DARK_MODE] = isDark
-        }
+        context.dataStore.edit { it[PreferencesKeys.IS_DARK_MODE] = isDark }
     }
 
     suspend fun saveIsCompactViewEnabled(enabled: Boolean) {
-        context.dataStore.edit {
-            it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled
-        }
+        context.dataStore.edit { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled }
     }
 
     suspend fun saveIsLightTextEnabled(enabled: Boolean) {
