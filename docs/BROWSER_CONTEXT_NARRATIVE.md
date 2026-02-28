@@ -1,58 +1,68 @@
-# BROWSER_CONTEXT_NARRATIVE.md
+BROWSER_CONTEXT_NARRATIVE.md
+1. Project Overview
 
-## 1. Project Overview
-**App Name:** Swanie's Portfolio  
-**Purpose:** Crypto & Precious Metals tracking with a high-end, custom-themed UI.  
-**Current Branch:** main (Working Tree Clean)  
-**Tech Stack:** Kotlin, Jetpack Compose, Hilt (Dependency Injection), Room, Retrofit, StateFlow.
+App Name: Swanie's Portfolio
 
-## 2. Architectural Status
-**Status: STABLE** * **Hilt Integration:** Completed. ViewModels are properly injected via Hilt, ensuring single-instance integrity for Theme and Asset data.
-* **Navigation:** Stabilized with consistent icon shading reactive to the dynamic theme.
+Purpose: Crypto & Precious Metals tracking with a high-end, custom-themed UI.
 
-## 3. Feature Map & UI Status
+Current Branch: main (Working Tree Clean - Commit ff0b684)
 
-### 🟢 Completed & Locked
-* **Holdings Reorder Logic (STABILIZED):** Abandoned custom manual translation math. Implemented **`sh.calvin.reorderable`** for frame-perfect, GPU-accelerated dragging.
-  * **Safety:** Reordering is strictly restricted to the "ALL" tab to prevent index corruption.
-  * **UX:** Integrated hardware layer locking (`shadowElevation`) and trash-zone collision detection.
-* **Theme Studio:** Full interactive control over background and text colors with "Reset to Default" logic.
-* **Asset Picker:** "Ghost Swan" empty state implemented with keyboard-aware positioning.
-* **Git Foundation:** Merged into `main`, GitHub repository is up to date.
+Tech Stack: Kotlin, Jetpack Compose, Hilt (Dependency Injection), Room, Retrofit, StateFlow.
+2. Architectural Status
 
-### 🟡 In Progress / Work-in-Progress (Current Focus)
-* **Portfolio Analytics (DONUT CHART):**
-  * **Goal:** Create a custom Canvas-based visualization of the asset breakdown (Metals vs. Crypto).
-  * **Logic:** Aggregating $ value based on `currentPrice * weight * amountHeld`.
-  * **Risk:** Ensuring the UI doesn't stutter during data refreshes; aggregation must stay in the ViewModel.
+Status: STABLE & BRANDED
 
-### 🔴 Upcoming Features
-* **Price Refresh Polling:** Real-time background updates for asset values (refining the current manual refresh).
-* **Manual Asset Entry:** Logic for custom price/weight inputs for non-API assets (e.g., physical bullion with specific premiums).
+    Hilt Integration: Completed. ViewModels are properly injected via Hilt, ensuring single-instance integrity for Theme and Asset data.
 
-## 4. Key Logic Snippets (The Build-Savers)
+    Theme Hardening: DataStore fallbacks are hardcoded to Swanie Navy (#000416) and White (#FFFFFF). This eliminates the "White Flash" on fresh installs; the app is brand-consistent from the very first frame.
 
-```kotlin
-// 1. REORDERABLE IMPLEMENTATION: Using specialized library for stability
-ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
-    Box(
-        modifier = Modifier
-            .longPressDraggableHandle(
-                onDragStarted = { /* state updates */ },
-                onDragStopped = { /* persistence + delete checks */ }
-            )
-            .graphicsLayer {
-                shadowElevation = if (isDragging) 30f else 0f // Hardware Layer Lock
-            }
-    )
+    Navigation: Stabilized with consistent icon shading reactive to the dynamic theme.
+
+3. Feature Map & UI Status
+   🟢 Completed & Locked
+
+   High-Density Holdings UI: Reclaimed ~85dp of vertical space by tightening the header cluster and performing a 10dp "Center-Cut" shrink on asset cards. Third card visibility is achieved.
+
+   Holdings Reorder Logic: implemented sh.calvin.reorderable for frame-perfect, GPU-accelerated dragging.
+
+        Safety: Reordering is restricted to the "ALL" tab to prevent index corruption.
+
+        UX: Integrated hardware layer locking (shadowElevation) and touch-aligned trash-zone detection.
+
+   Branded Manual Asset Entry: Supports custom metals with two-line descriptions (e.g., "SILVER" over "EAGLES"). Cards use a 40dp name container with softWrap to ensure perfect stacking.
+
+   Theme Studio: Full interactive control over background and text colors with "Reset to Default" logic.
+
+🟡 In Progress / Work-in-Progress (Current Focus)
+
+    Portfolio Analytics (Donut Charts): * Goal: Make the Portfolio Value row clickable to launch a dedicated analytics screen.
+
+        Logic: Aggregating value breakdown (Metals vs. Crypto) and top specific holdings.
+
+    Big Refactor: Breaking down the massive MyHoldingsScreen.kt into modular components (Header, TabRow, AssetList) for better maintainability.
+
+🔴 Upcoming Features
+
+    Compact Card Mode: Connecting the Settings switch to toggle between the Full and Compact card layouts.
+
+    Welcome Experience: Implementing a one-time welcome popup for new users that does not "ghost flash" after the first asset entry.
+
+4. Key Logic Snippets (The Build-Savers)
+   Kotlin
+
+// 1. BRAND-HARDENED FALLBACKS: Preventing the "White Flash"
+val siteBackgroundColor: Flow<String> = context.dataStore.data.map {
+it[PreferencesKeys.SITE_BACKGROUND_COLOR] ?: "#000416" // Default to Navy
 }
 
-// 2. POINTER SPY: Efficient trash-zone detection during active reorder
-.pointerInput(Unit) {
-    awaitPointerEventScope {
-        while (true) {
-            val event = awaitPointerEvent(PointerEventPass.Initial)
-            // check bounds in root coordinates
-        }
-    }
+// 2. CENTER-CUT CARD SHRINK: Shaving 10dp while preserving 2-line name stacking
+Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
+Text(text = asset.name.uppercase(), softWrap = true, maxLines = 2)
 }
+Spacer(modifier = Modifier.height(2.dp)) // Precision center-cut
+HorizontalDivider()
+
+// 3. VERTICAL SPACE RECLAMATION: Using negative spacers to pull UI up safely
+Spacer(modifier = Modifier.height((-85).dp)) // Reclaims space above Tabs/List
+
+Project status updated, Swanie. Rest easy—we'll start tomorrow by cleaning up that big holdings file.

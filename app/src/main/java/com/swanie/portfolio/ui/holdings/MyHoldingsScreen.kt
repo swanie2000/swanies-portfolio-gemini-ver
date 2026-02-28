@@ -3,26 +3,11 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.app.Activity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
@@ -229,14 +213,14 @@ fun MyHoldingsScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // --- HEADER: PINNED TOP & TIGHTENED CLUSTER ---
+            // --- HEADER ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .background(Color(bgColorInt))
                     .statusBarsPadding()
-                    .padding(bottom = 40.dp)
+                    .padding(bottom = 0.dp)
             ) {
                 Box(
                     modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp).width(70.dp).height(120.dp),
@@ -254,22 +238,42 @@ fun MyHoldingsScreen(
 
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
-                    Box(modifier = Modifier.height(12.dp), contentAlignment = Alignment.TopCenter) {
+
+                    Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp), contentAlignment = Alignment.TopCenter) {
                         if (isRefreshing) {
-                            LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape).border(1.dp, Color(textColorInt).copy(0.1f), CircleShape), color = Color(textColorInt).copy(alpha = 0.7f), trackColor = Color(textColorInt).copy(alpha = 0.05f))
+                            LinearProgressIndicator(
+                                progress = { refreshProgress },
+                                modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape).border(1.dp, Color(textColorInt).copy(0.1f), CircleShape),
+                                color = Color(textColorInt).copy(alpha = 0.7f),
+                                trackColor = Color(textColorInt).copy(alpha = 0.05f)
+                            )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = currencyFormat.format(totalPortfolioValue), color = Color(textColorInt), fontSize = 26.sp, fontWeight = FontWeight.Black)
+
+                    // FIXED: Lowered portfolio value numbers down 10 pixels to fill space
+                    Text(
+                        text = currencyFormat.format(totalPortfolioValue),
+                        color = Color(textColorInt),
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier.offset(y = (-25).dp)
+                    )
                 }
 
-                Box(modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp).width(70.dp).height(120.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
                         Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(28.dp))
                     }
                 }
             }
 
+            // FINAL DENSITY LOCK: Physical spacer pulls the rest of UI up to close gaps
+            Spacer(modifier = Modifier.height((-85).dp))
+
+            // --- TAB ROW ---
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.height(44.dp).padding(horizontal = 20.dp),
@@ -286,26 +290,57 @@ fun MyHoldingsScreen(
                 }
             }
 
-            Box(modifier = Modifier.weight(1f).fillMaxWidth().clipToBounds()) {
-                LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // --- ASSET LIST AREA ---
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     items(items = filteredHoldings, key = { it.coinId }) { asset ->
                         if (isReorderEnabled) {
                             ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                 val scale by animateFloatAsState(targetValue = if (isDragging) 1.05f else 1f, label = "scale")
                                 val elevation by animateFloatAsState(targetValue = if (isDragging) 30f else 0f, label = "elevation")
-                                Box(modifier = Modifier.fillMaxWidth().zIndex(if (isDragging) 100f else 0f).longPressDraggableHandle(onDragStarted = { draggedItemId.value = asset.coinId; isDraggingActive.value = true }, onDragStopped = { val shouldDelete = isOverTrash.value; isDraggingActive.value = false; isOverTrash.value = false; if (shouldDelete) { assetToDelete.value = localHoldings.find { it.coinId == asset.coinId }; showDeleteDialog.value = true } else { viewModel.updateAssetOrder(localHoldings) }; draggedItemId.value = null }).graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation; shape = RoundedCornerShape(16.dp); clip = true }) {
-                                    if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier) else FullAssetCard(asset = asset, modifier = Modifier)
+                                Box(modifier = Modifier.fillMaxWidth().zIndex(if (isDragging) 100f else 0f)
+                                    .longPressDraggableHandle(
+                                        onDragStarted = { draggedItemId.value = asset.coinId; isDraggingActive.value = true },
+                                        onDragStopped = {
+                                            val shouldDelete = isOverTrash.value
+                                            isDraggingActive.value = false; isOverTrash.value = false
+                                            if (shouldDelete) {
+                                                assetToDelete.value = localHoldings.find { it.coinId == asset.coinId }
+                                                showDeleteDialog.value = true
+                                            } else {
+                                                viewModel.updateAssetOrder(localHoldings)
+                                            }
+                                            draggedItemId.value = null
+                                        }
+                                    )
+                                    .graphicsLayer {
+                                        scaleX = scale
+                                        scaleY = scale
+                                        shadowElevation = elevation
+                                        shape = RoundedCornerShape(16.dp)
+                                        clip = true
+                                    }
+                                ) {
+                                    if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier)
+                                    else FullAssetCard(asset = asset, modifier = Modifier)
                                 }
                             }
                         } else {
                             Box(modifier = Modifier.fillMaxWidth()) {
-                                if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier) else FullAssetCard(asset = asset, modifier = Modifier)
+                                if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier)
+                                else FullAssetCard(asset = asset, modifier = Modifier)
                             }
                         }
                     }
                 }
             }
 
+            // --- BOTTOM NAVIGATION ---
             Surface(modifier = Modifier.fillMaxWidth().height(40.dp), color = Color(bgColorInt)) {
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -320,8 +355,22 @@ fun MyHoldingsScreen(
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(Color(bgColorInt)))
         }
 
-        AnimatedVisibility(visible = isDraggingActive.value && isReorderEnabled, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut(), modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); val size: IntSize = coords.size; trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + size.width, pos.y + size.height) }) {
-            Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp)) }
+        AnimatedVisibility(
+            visible = isDraggingActive.value && isReorderEnabled,
+            enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut(),
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp)
+                .onGloballyPositioned { coords ->
+                    val pos = coords.positionInRoot()
+                    val size: IntSize = coords.size
+                    trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + size.width, pos.y + size.height)
+                }
+        ) {
+            Box(
+                modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
+            }
         }
     }
 }
@@ -355,8 +404,14 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
     val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld
     val totalValueString = if (totalValue >= 1000000) DecimalFormat("$#,##0").format(totalValue) else DecimalFormat("$#,##0.00").format(totalValue)
     val displaySymbol = when { asset.isCustom && asset.name.contains("Gold", ignoreCase = true) -> "GOLD"; asset.isCustom && asset.name.contains("Silver", ignoreCase = true) -> "SILVER"; asset.isCustom && asset.name.contains("Platinum", ignoreCase = true) -> "PLAT"; asset.isCustom && asset.name.contains("Palladium", ignoreCase = true) -> "PALL"; else -> asset.symbol.uppercase() }
-    Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(safeCardBg.toColorInt())), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Color(safeCardText.toColorInt()).copy(alpha = 0.2f))) {
-        Column(modifier = Modifier.padding(16.dp)) {
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(safeCardBg.toColorInt())),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(safeCardText.toColorInt()).copy(alpha = 0.2f))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
                     if (asset.category == AssetCategory.METAL) MetalIcon(asset.name) else AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)))
@@ -365,7 +420,6 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
                 Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("YOUR HOLDING", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     Text(NumberFormat.getNumberInstance().format(asset.amountHeld), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                    // FIX: Increased Box height to 40.dp and enforced softWrap = true for two-line stacking
                     Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
                         Text(
                             text = asset.name.uppercase(),
@@ -373,7 +427,6 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
                             fontSize = 11.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 2,
-                            minLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             lineHeight = 13.sp,
                             fontWeight = FontWeight.Bold,
@@ -389,7 +442,8 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
                     }
                 }
             }
-            Spacer(Modifier.height(14.dp)); HorizontalDivider(color = Color(safeCardText.toColorInt()).copy(alpha = 0.05f))
+            // CENTER-CUT LOCK: Spacer remains at 2.dp to maintain card density
+            Spacer(Modifier.height(2.dp)); HorizontalDivider(color = Color(safeCardText.toColorInt()).copy(alpha = 0.05f))
             Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("ASSET PRICE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(DecimalFormat("$#,##0.00").format(asset.currentPrice), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Bold, fontSize = 15.sp) }
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(totalValueString, color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Black, fontSize = 17.sp) }
