@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
@@ -28,12 +29,16 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
@@ -115,6 +120,9 @@ fun MyHoldingsScreen(
     val isOverTrash = remember { mutableStateOf(false) }
     val showDeleteDialog = remember { mutableStateOf(false) }
     val assetToDelete = remember { mutableStateOf<AssetEntity?>(null) }
+    
+    // State for the floating popup
+    var selectedAssetForPopup by remember { mutableStateOf<AssetEntity?>(null) }
 
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -250,7 +258,6 @@ fun MyHoldingsScreen(
                         }
                     }
 
-                    // FIXED: Lowered portfolio value numbers down 10 pixels to fill space
                     Text(
                         text = currencyFormat.format(totalPortfolioValue),
                         color = Color(textColorInt),
@@ -270,7 +277,6 @@ fun MyHoldingsScreen(
                 }
             }
 
-            // FINAL DENSITY LOCK: Physical spacer pulls the rest of UI up to close gaps
             Spacer(modifier = Modifier.height((-85).dp))
 
             // --- TAB ROW ---
@@ -326,14 +332,28 @@ fun MyHoldingsScreen(
                                         clip = true
                                     }
                                 ) {
-                                    if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier)
-                                    else FullAssetCard(asset = asset, modifier = Modifier)
+                                    if (isCompactViewEnabled) {
+                                        CompactAssetCard(
+                                            asset = asset,
+                                            onCardClick = { selectedAssetForPopup = it },
+                                            modifier = Modifier
+                                        )
+                                    } else {
+                                        FullAssetCard(asset = asset, modifier = Modifier)
+                                    }
                                 }
                             }
                         } else {
                             Box(modifier = Modifier.fillMaxWidth()) {
-                                if (isCompactViewEnabled) CompactAssetCard(asset = asset, modifier = Modifier)
-                                else FullAssetCard(asset = asset, modifier = Modifier)
+                                if (isCompactViewEnabled) {
+                                    CompactAssetCard(
+                                        asset = asset,
+                                        onCardClick = { selectedAssetForPopup = it },
+                                        modifier = Modifier
+                                    )
+                                } else {
+                                    FullAssetCard(asset = asset, modifier = Modifier)
+                                }
                             }
                         }
                     }
@@ -372,7 +392,71 @@ fun MyHoldingsScreen(
                 Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
             }
         }
+
+        // Floating Popup for Full Asset Card
+        if (selectedAssetForPopup != null) {
+            Dialog(
+                onDismissRequest = { selectedAssetForPopup = null },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { selectedAssetForPopup = null } // Click outside to dismiss
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(modifier = Modifier.clickable(enabled = false) { }) { // Prevent click propagation inside card
+                        FullAssetCard(
+                            asset = selectedAssetForPopup!!,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+        }
     }
+}
+
+// -------------------- UTILS --------------------
+
+fun formatCurrency(value: Double): String {
+    val pattern = if (value >= 1_000_000) {
+        "$#,##0"
+    } else if (value < 0.01) {
+        "$#,##0.0000"
+    } else {
+        "$#,##0.00"
+    }
+    return DecimalFormat(pattern).format(value)
+}
+
+@Composable
+fun AutoResizingText(
+    text: String,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+    minFontSize: TextUnit = 8.sp
+) {
+    var fontSizeValue by remember { mutableStateOf(style.fontSize) }
+    var readyToDraw by remember { mutableStateOf(false) }
+
+    Text(
+        text = text,
+        style = style.copy(fontSize = fontSizeValue),
+        modifier = modifier.drawWithContent { if (readyToDraw) drawContent() },
+        maxLines = maxLines,
+        softWrap = false,
+        overflow = TextOverflow.Clip,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.hasVisualOverflow && fontSizeValue > minFontSize) {
+                fontSizeValue *= 0.9f
+            } else {
+                readyToDraw = true
+            }
+        }
+    )
 }
 
 // -------------------- COMPONENTS --------------------
@@ -402,7 +486,7 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
     val trendColor = when { isPositive -> Color(0xFF00C853); isNeutral -> Color.Gray; else -> Color(0xFFD32F2F) }
     val trendIcon = when { isPositive -> Icons.Filled.ArrowDropUp; isNeutral -> Icons.Filled.FiberManualRecord; else -> Icons.Filled.ArrowDropDown }
     val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld
-    val totalValueString = if (totalValue >= 1000000) DecimalFormat("$#,##0").format(totalValue) else DecimalFormat("$#,##0.00").format(totalValue)
+    
     val displaySymbol = when { asset.isCustom && asset.name.contains("Gold", ignoreCase = true) -> "GOLD"; asset.isCustom && asset.name.contains("Silver", ignoreCase = true) -> "SILVER"; asset.isCustom && asset.name.contains("Platinum", ignoreCase = true) -> "PLAT"; asset.isCustom && asset.name.contains("Palladium", ignoreCase = true) -> "PALL"; else -> asset.symbol.uppercase() }
 
     Card(
@@ -442,41 +526,119 @@ fun FullAssetCard(asset: AssetEntity, modifier: Modifier) {
                     }
                 }
             }
-            // CENTER-CUT LOCK: Spacer remains at 2.dp to maintain card density
             Spacer(Modifier.height(2.dp)); HorizontalDivider(color = Color(safeCardText.toColorInt()).copy(alpha = 0.05f))
             Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("ASSET PRICE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(DecimalFormat("$#,##0.00").format(asset.currentPrice), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Bold, fontSize = 15.sp) }
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(totalValueString, color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Black, fontSize = 17.sp) }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("ASSET PRICE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(formatCurrency(asset.currentPrice), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Bold, fontSize = 15.sp) }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(formatCurrency(totalValue), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Black, fontSize = 17.sp) }
             }
         }
     }
 }
 
 @Composable
-fun CompactAssetCard(asset: AssetEntity, modifier: Modifier) {
+fun CompactAssetCard(
+    asset: AssetEntity,
+    onCardClick: (AssetEntity) -> Unit,
+    modifier: Modifier
+) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val cardBgColor by themeViewModel.cardBackgroundColor.collectAsState()
     val cardTextColor by themeViewModel.cardTextColor.collectAsState()
     val safeCardBg = cardBgColor.ifBlank { "#121212" }; val safeCardText = cardTextColor.ifBlank { "#FFFFFF" }
-    val isPositive = asset.priceChange24h > 0; val isNeutral = asset.priceChange24h == 0.0
+    
+    val isPositive = asset.priceChange24h > 0
+    val isNeutral = asset.priceChange24h == 0.0
     val trendColor = when { isPositive -> Color(0xFF00C853); isNeutral -> Color.Gray; else -> Color(0xFFD32F2F) }
     val trendIcon = when { isPositive -> Icons.Filled.ArrowDropUp; isNeutral -> Icons.Filled.FiberManualRecord; else -> Icons.Filled.ArrowDropDown }
+    
     val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld
-    Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(safeCardBg.toColorInt())), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, Color(safeCardText.toColorInt()).copy(alpha = 0.2f))) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Row(modifier = Modifier.weight(1.1f), verticalAlignment = Alignment.CenterVertically) {
-                if (asset.category == AssetCategory.METAL) MetalIcon(asset.name, size = 32) else AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp)))
-                Spacer(Modifier.width(8.dp))
-                Column {
-                    Text(asset.symbol.uppercase(), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Black, fontSize = 14.sp)
-                    val compactValue = if (totalValue >= 1000000) DecimalFormat("$#,##0").format(totalValue) else DecimalFormat("$#,##0.00").format(totalValue)
-                    Text(compactValue, color = Color(safeCardText.toColorInt()).copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onCardClick(asset) },
+        colors = CardDefaults.cardColors(containerColor = Color(safeCardBg.toColorInt())),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, Color(safeCardText.toColorInt()).copy(alpha = 0.2f))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // FAR LEFT: Asset Icon (Aligned Top) & Asset Info
+            Column(modifier = Modifier.weight(1.3f)) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                        if (asset.category == AssetCategory.METAL) {
+                            MetalIcon(asset.name, size = 32)
+                        } else {
+                            AsyncImage(
+                                model = asset.imageUrl,
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp))
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    AutoResizingText(
+                        text = asset.symbol.uppercase(),
+                        style = TextStyle(
+                            color = Color(safeCardText.toColorInt()),
+                            fontWeight = FontWeight.Black,
+                            fontSize = 14.sp
+                        ),
+                        modifier = Modifier.width(85.dp),
+                        maxLines = 1
+                    )
                 }
+                Spacer(Modifier.height(2.dp))
+                // Total Value Held starts under the symbol/icon area
+                Text(
+                    text = formatCurrency(totalValue),
+                    color = Color(safeCardText.toColorInt()).copy(0.6f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 0.dp), // Can adjust this padding to align precisely
+                    maxLines = 1
+                )
             }
-            Box(modifier = Modifier.weight(0.7f).height(24.dp)) { SparklineChart(asset.sparklineData, trendColor, Modifier.fillMaxSize()) }
-            Row(modifier = Modifier.weight(1.4f), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                Column(horizontalAlignment = Alignment.End) { Text(DecimalFormat("$#,##0.00").format(asset.currentPrice), color = Color(safeCardText.toColorInt()), fontWeight = FontWeight.Bold, fontSize = 13.sp); Text("${if (isPositive) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 10.sp, fontWeight = FontWeight.Black, maxLines = 1, softWrap = false) }
-                Icon(trendIcon, null, tint = trendColor, modifier = Modifier.size(32.dp).offset(x = 4.dp))
+
+            // CENTER: Sparkline Graph
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(24.dp)
+                    .padding(horizontal = 4.dp)
+            ) {
+                SparklineChart(asset.sparklineData, trendColor, Modifier.fillMaxSize())
+            }
+
+            // FAR RIGHT: Price & Trend
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = formatCurrency(asset.currentPrice),
+                    color = Color(safeCardText.toColorInt()),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    maxLines = 1
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "${if (isPositive) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%",
+                        color = trendColor,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1
+                    )
+                    Icon(
+                        imageVector = trendIcon,
+                        contentDescription = null,
+                        tint = trendColor,
+                        modifier = Modifier.size(18.dp).offset(x = 2.dp)
+                    )
+                }
             }
         }
     }

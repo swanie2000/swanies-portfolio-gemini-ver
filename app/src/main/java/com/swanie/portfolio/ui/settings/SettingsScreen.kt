@@ -1,6 +1,7 @@
 package com.swanie.portfolio.ui.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -102,21 +103,21 @@ fun SettingsToggleItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 12.dp)
+            .clickable { onCheckedChange(!checked) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, color = textColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Text(text = subtitle, color = textColor.copy(alpha = 0.6f), fontSize = 14.sp)
         }
-        Switch(
+        Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = textColor,
-                checkedTrackColor = textColor.copy(alpha = 0.5f),
-                uncheckedThumbColor = textColor.copy(alpha = 0.5f),
-                uncheckedTrackColor = textColor.copy(alpha = 0.2f)
+            colors = CheckboxDefaults.colors(
+                checkedColor = textColor,
+                uncheckedColor = textColor.copy(alpha = 0.6f),
+                checkmarkColor = Color.Black // Assuming a dark theme background, checkmark should be visible
             )
         )
     }

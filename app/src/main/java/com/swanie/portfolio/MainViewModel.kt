@@ -8,33 +8,30 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: AssetRepository,
-    private val themePreferences: ThemePreferences // Injected by Hilt
+    private val themePreferences: ThemePreferences
 ) : ViewModel() {
 
-    // These flows provide the data your MainActivity is looking for
     private val _isThemeReady = MutableStateFlow(false)
     val isThemeReady: StateFlow<Boolean> = _isThemeReady.asStateFlow()
 
-    private val _themeColorHex = MutableStateFlow("#FF6200EE")
+    private val _themeColorHex = MutableStateFlow("#000416")
     val themeColorHex: StateFlow<String> = _themeColorHex.asStateFlow()
 
     private val _isGradientEnabled = MutableStateFlow(false)
     val isGradientEnabled: StateFlow<Boolean> = _isGradientEnabled.asStateFlow()
 
-    private val _isLightTextEnabled = MutableStateFlow(false)
+    private val _isLightTextEnabled = MutableStateFlow(true)
     val isLightTextEnabled: StateFlow<Boolean> = _isLightTextEnabled.asStateFlow()
 
     private val _isCompactViewEnabled = MutableStateFlow(false)
     val isCompactViewEnabled: StateFlow<Boolean> = _isCompactViewEnabled.asStateFlow()
-
-    private val _isDarkMode = MutableStateFlow(false)
-    val isDarkMode: StateFlow<Boolean> = _isDarkMode.asStateFlow()
 
     init {
         observeThemePreferences()
@@ -42,8 +39,34 @@ class MainViewModel @Inject constructor(
 
     private fun observeThemePreferences() {
         viewModelScope.launch {
-            // This is where you connect to your ThemePreferences data
-            // For now, we mark it ready so the splash screen disappears
+            // Launch separate collectors to ensure all state is updated independently
+            launch {
+                themePreferences.siteBackgroundColor.collectLatest { hex ->
+                    _themeColorHex.value = hex
+                    checkReady()
+                }
+            }
+            launch {
+                themePreferences.useGradient.collectLatest { enabled ->
+                    _isGradientEnabled.value = enabled
+                }
+            }
+            launch {
+                themePreferences.isLightTextEnabled.collectLatest { enabled ->
+                    _isLightTextEnabled.value = enabled
+                }
+            }
+            launch {
+                themePreferences.isCompactViewEnabled.collectLatest { enabled ->
+                    _isCompactViewEnabled.value = enabled
+                }
+            }
+        }
+    }
+
+    private fun checkReady() {
+        // Mark as ready once we have at least the primary background color
+        if (!_isThemeReady.value) {
             _isThemeReady.value = true
         }
     }
