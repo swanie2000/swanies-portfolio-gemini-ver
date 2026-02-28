@@ -39,4 +39,7 @@ interface AssetDao {
 
     @Query("UPDATE assets SET amountHeld = :amount, currentPrice = :price, change24h = :change WHERE coinId = :coinId")
     suspend fun updateAsset(coinId: String, amount: Double, price: Double, change: Double)
+
+    @Upsert
+    suspend fun updateAssetEntity(asset: AssetEntity)
 }

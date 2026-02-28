@@ -121,12 +121,15 @@ class AssetRepository @Inject constructor(
         }
     }
 
-    // FIXED: Passing asset.coinId instead of the whole asset object
     suspend fun deleteAsset(asset: AssetEntity) {
         assetDao.deleteAsset(asset.coinId)
     }
 
     suspend fun updateAssetOrder(assets: List<AssetEntity>) {
         assetDao.updateAssetOrder(assets)
+    }
+
+    suspend fun updateAssetEntity(asset: AssetEntity) {
+        assetDao.updateAssetEntity(asset)
     }
 }

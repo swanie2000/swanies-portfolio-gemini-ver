@@ -117,7 +117,6 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
         }
     }
 
-    // ADDED: This function connects the Swipe-to-Delete UI to the Database
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
             try {
@@ -131,6 +130,19 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
     fun updateAssetOrder(assets: List<AssetEntity>) {
         viewModelScope.launch {
             repository.updateAssetOrder(assets)
+        }
+    }
+
+    // New function to update asset details from the edit popup
+    fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newDecimalPreference: Int) {
+        viewModelScope.launch {
+            val updatedAsset = asset.copy(
+                name = newName,
+                amountHeld = newAmount,
+                decimalPreference = newDecimalPreference,
+                lastUpdated = System.currentTimeMillis()
+            )
+            repository.updateAssetEntity(updatedAsset)
         }
     }
 }
