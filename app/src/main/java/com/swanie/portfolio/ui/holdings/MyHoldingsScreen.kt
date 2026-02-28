@@ -85,6 +85,10 @@ fun MyHoldingsScreen(
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var showEditButtonId by remember { mutableStateOf<String?>(null) }
 
+    // TAB STATE LOGIC
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf("ALL", "CRYPTO", "METAL")
+
     LaunchedEffect(holdings) {
         if (!isDraggingActive.value && !isSavingOrder.value && assetBeingEdited == null) {
             localHoldings = holdings
@@ -168,8 +172,7 @@ fun MyHoldingsScreen(
 
             Spacer(modifier = Modifier.height((-85).dp))
 
-            val selectedTab by remember { mutableIntStateOf(0) }
-            val tabs = listOf("ALL", "CRYPTO", "METAL")
+            // FIXED: TABS NOW UPDATE STATE
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.height(44.dp).padding(horizontal = 20.dp),
@@ -178,7 +181,8 @@ fun MyHoldingsScreen(
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTab == index
                     Tab(
-                        selected = isSelected, onClick = { },
+                        selected = isSelected,
+                        onClick = { selectedTab = index }, // FIX: Update index on click
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) Color(textColorInt).copy(0.15f) else Color.Transparent).border(width = 1.dp, color = if (isSelected) Color.Transparent else Color(textColorInt).copy(0.15f), shape = CircleShape)
                     ) {
                         Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) Color(textColorInt) else Color(textColorInt).copy(0.5f), modifier = Modifier.padding(vertical = 6.dp))
@@ -190,7 +194,14 @@ fun MyHoldingsScreen(
 
             // --- ASSET LIST ---
             LazyColumn(state = lazyListState, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(items = localHoldings, key = { it.coinId }) { asset ->
+                // FIXED: FILTERING LOGIC
+                val filteredHoldings = when(selectedTab) {
+                    1 -> localHoldings.filter { it.category == AssetCategory.CRYPTO }
+                    2 -> localHoldings.filter { it.category == AssetCategory.METAL }
+                    else -> localHoldings
+                }
+
+                items(items = filteredHoldings, key = { it.coinId }) { asset ->
                     ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
