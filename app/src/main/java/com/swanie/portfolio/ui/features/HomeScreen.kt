@@ -9,13 +9,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -61,28 +59,23 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     val radiusPercent by animateFloatAsState(
         targetValue = if (animationStarted) 1.5f else 0f,
-        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+        animationSpec = tween(800, easing = FastOutSlowInEasing),
         label = "RadialBurst"
     )
 
     val swanYOffset by animateDpAsState(
         targetValue = if (animationStarted) (-100).dp else (-600).dp,
-        animationSpec = tween(
-            durationMillis = 900,
-            delayMillis = 120,
-            easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)
-        ),
+        animationSpec = tween(900, delayMillis = 120, easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)),
         finishedListener = { animateText = true },
         label = "SwanGlide"
     )
 
     val alpha by animateFloatAsState(
         targetValue = if (animationStarted) 1f else 0f,
-        animationSpec = tween(durationMillis = 700, delayMillis = 120),
+        animationSpec = tween(700, delayMillis = 120),
         label = "SwanAlpha"
     )
 
-    // --- LOGIC ---
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.66f).dp
@@ -101,105 +94,50 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         animationStarted = true
     }
 
-    // --- UI LAYOUT ---
+    // --- UI LAYOUT WRAPPED IN SCAFFOLD ---
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            // This ensures the 4 icons are identical to Holdings/Analytics
+            // Unified 4-Icon Navigation
             BottomNavigationBar(navController = navController)
         },
-        containerColor = Color(0xFF000416) // Splash base
+        containerColor = Color(0xFF000416) // Splash handoff color
     ) { innerPadding ->
+        // innerPadding is respected to keep content from sliding behind the nav bar
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
 
-            // LAYER 2: THE ANIMATED RADIAL REVEAL
+            // ANIMATED RADIAL REVEAL
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val centerPoint = Offset(size.width / 2f, size.height / 2f)
                 val maxDim = size.width.coerceAtLeast(size.height)
-                drawCircle(
-                    color = userThemeBgColor,
-                    radius = maxDim * radiusPercent,
-                    center = centerPoint
-                )
+                drawCircle(color = userThemeBgColor, radius = maxDim * radiusPercent, center = centerPoint)
             }
 
             // THE SWAN LOGO
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = swanYOffset)
-                    .zIndex(1f),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
                 Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent),
-                            radius = size.minDimension * 0.4f
-                        )
-                    )
+                    drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
                 })
-
-                Image(
-                    painter = painterResource(id = R.drawable.swanie_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha)
-                )
-
-                if (showSparkleOnSwanHead) {
-                    MetallicShimmer(
-                        modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f),
-                        shimmerColor = Color.White
-                    )
-                }
+                Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
+                if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
             }
 
-            // THE TEXT
-            AnimatedVisibility(
-                visible = animateText,
-                enter = fadeIn(animationSpec = tween(500, 50)),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(y = (-10).dp)
-            ) {
+            // BRAND TEXT
+            AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(modifier = Modifier.graphicsLayer(clip = false)) {
-                        Text(
-                            text = "Swanie's Portfolio",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = userThemeTextColor,
-                            fontWeight = FontWeight.Bold
-                        )
-                        if (showSparkleOnS) {
-                            MetallicShimmer(
-                                modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp),
-                                shimmerColor = Color.White
-                            )
-                        }
+                        Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
+                        if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
                     }
-                    Text(
-                        text = "Crypto & Precious Metals",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Thin,
-                            fontSize = 12.sp,
-                            letterSpacing = 3.sp
-                        ),
-                        color = userThemeTextColor.copy(alpha = 0.8f)
-                    )
+                    Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
                 }
             }
 
-            // THE AUTHENTICATION TRAY
+            // AUTH TRAY (Login, Create, and RESTORED Forgot Password)
             AnimatedVisibility(
                 visible = animateText,
-                enter = fadeIn(animationSpec = tween(500, 200)) +
-                        slideInVertically(
-                            initialOffsetY = { it / 2 },
-                            animationSpec = tween(500, 200)
-                        ),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 20.dp) // Adjusted for Scaffold/Nav interaction
+                enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp)
             ) {
                 AuthTray(
                     onLoginClick = { navController.navigate(Routes.HOLDINGS) },
@@ -219,26 +157,23 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
         colors = CardDefaults.cardColors(containerColor = trayTextColor.copy(alpha = 0.12f)),
         border = BorderStroke(1.dp, trayTextColor.copy(alpha = 0.2f))
     ) {
-        Column(
-            modifier = Modifier.padding(vertical = 30.dp, horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(vertical = 30.dp, horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Button(
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
             TextButton(onClick = onCreateAccountClick) {
                 Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            }
+            // RESTORED LINK
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = { /* Handle Forgot Password logic here */ }) {
+                Text("Forgot Password?", color = trayTextColor.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         }
     }
@@ -248,29 +183,8 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
 private fun MetallicShimmer(modifier: Modifier = Modifier, shimmerColor: Color = Color.White) {
     var scaleState by remember { mutableStateOf(0f) }
     var rotationState by remember { mutableStateOf(45f) }
-
-    val scale by animateFloatAsState(
-        targetValue = scaleState,
-        animationSpec = tween(300, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)),
-        label = "ShimmerScale"
-    )
-    val rotation by animateFloatAsState(
-        targetValue = rotationState,
-        animationSpec = tween(500),
-        label = "ShimmerRotation"
-    )
-
-    LaunchedEffect(Unit) {
-        scaleState = 1.4f
-        rotationState = 180f
-        delay(300L)
-        scaleState = 0f
-    }
-
-    Box(
-        modifier = modifier
-            .size(4.dp)
-            .graphicsLayer(scaleX = scale, scaleY = scale, rotationZ = rotation)
-            .background(shimmerColor)
-    )
+    val scale by animateFloatAsState(targetValue = scaleState, animationSpec = tween(300, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)), label = "ShimmerScale")
+    val rotation by animateFloatAsState(targetValue = rotationState, animationSpec = tween(500), label = "ShimmerRotation")
+    LaunchedEffect(Unit) { scaleState = 1.4f; rotationState = 180f; delay(300L); scaleState = 0f }
+    Box(modifier = modifier.size(4.dp).graphicsLayer(scaleX = scale, scaleY = scale, rotationZ = rotation).background(shimmerColor))
 }
