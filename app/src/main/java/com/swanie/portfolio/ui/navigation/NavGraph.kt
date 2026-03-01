@@ -16,6 +16,7 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
+import com.swanie.portfolio.ui.holdings.AnalyticsScreen // RESTORED IMPORT
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.ManualAssetEntryScreen
@@ -43,7 +44,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 CreateAccountScreen(navController, mainViewModel)
             }
 
-            // FIXED: Added hiltViewModel() and passed it to SettingsScreen
             composable(Routes.SETTINGS) {
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 SettingsScreen(
@@ -52,7 +52,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 )
             }
 
-            // FIXED: Added hiltViewModel() for ThemeStudio
             composable(Routes.THEME_STUDIO) {
                 val themeViewModel: ThemeViewModel = hiltViewModel()
                 ThemeStudioScreen(navController)
@@ -63,6 +62,11 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     mainViewModel = mainViewModel,
                     navController = navController
                 )
+            }
+
+            // NEW: REGISTERED ANALYTICS ROUTE
+            composable(Routes.ANALYTICS) {
+                AnalyticsScreen(navController = navController)
             }
 
             composable(Routes.ASSET_PICKER) {

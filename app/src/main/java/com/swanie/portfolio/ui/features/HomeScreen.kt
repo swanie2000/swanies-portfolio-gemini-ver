@@ -9,11 +9,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -29,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
@@ -41,18 +44,16 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
 
-    // The "Burst" color - what the user chose
     val userThemeBgColor = remember(siteBgHex) {
         try { Color(android.graphics.Color.parseColor(siteBgHex)) }
         catch (e: Exception) { Color(0xFF000416) }
     }
-    // The Global Text color
     val userThemeTextColor = remember(siteTextHex) {
         try { Color(android.graphics.Color.parseColor(siteTextHex)) }
         catch (e: Exception) { Color.White }
     }
 
-    // --- ANIMATION STATE (UNTOUCHED - DO NOT MODIFY) ---
+    // --- ANIMATION STATE ---
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
@@ -101,24 +102,26 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     }
 
     // --- UI LAYOUT ---
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            // This ensures the 4 icons are identical to Holdings/Analytics
+            BottomNavigationBar(navController = navController)
+        },
+        containerColor = Color(0xFF000416) // Splash base
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
 
-        // LAYER 1: STATIC NAVY BASE (Preserved for Splash Screen Handoff)
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF000416)))
-
-        // LAYER 2: THE ANIMATED RADIAL REVEAL (This "paints" the user's color)
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val centerPoint = Offset(size.width / 2f, size.height / 2f)
-            val maxDim = size.width.coerceAtLeast(size.height)
-            drawCircle(
-                color = userThemeBgColor,
-                radius = maxDim * radiusPercent,
-                center = centerPoint
-            )
-        }
-
-        // LAYER 3: INTERACTIVE CONTENT
-        Box(modifier = Modifier.fillMaxSize()) {
+            // LAYER 2: THE ANIMATED RADIAL REVEAL
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val centerPoint = Offset(size.width / 2f, size.height / 2f)
+                val maxDim = size.width.coerceAtLeast(size.height)
+                drawCircle(
+                    color = userThemeBgColor,
+                    radius = maxDim * radiusPercent,
+                    center = centerPoint
+                )
+            }
 
             // THE SWAN LOGO
             Box(
@@ -128,7 +131,6 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     .zIndex(1f),
                 contentAlignment = Alignment.Center
             ) {
-                // Background Glow - Uses a subtle version of text color
                 Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
                     drawCircle(
                         brush = Brush.radialGradient(
@@ -147,12 +149,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 if (showSparkleOnSwanHead) {
                     MetallicShimmer(
                         modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f),
-                        shimmerColor = Color.White // Keep sparkles white for that "pop"
+                        shimmerColor = Color.White
                     )
                 }
             }
 
-            // THE TEXT (Observing Studio Colors)
+            // THE TEXT
             AnimatedVisibility(
                 visible = animateText,
                 enter = fadeIn(animationSpec = tween(500, 50)),
@@ -187,7 +189,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 }
             }
 
-            // THE AUTHENTICATION BUTTONS
+            // THE AUTHENTICATION TRAY
             AnimatedVisibility(
                 visible = animateText,
                 enter = fadeIn(animationSpec = tween(500, 200)) +
@@ -197,7 +199,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         ),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp)
+                    .padding(bottom = 20.dp) // Adjusted for Scaffold/Nav interaction
             ) {
                 AuthTray(
                     onLoginClick = { navController.navigate(Routes.HOLDINGS) },
@@ -218,7 +220,7 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
         border = BorderStroke(1.dp, trayTextColor.copy(alpha = 0.2f))
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 40.dp, horizontal = 24.dp),
+            modifier = Modifier.padding(vertical = 30.dp, horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
@@ -233,16 +235,10 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
                 Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = onCreateAccountClick) {
                 Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextButton(onClick = { /* Forgot Password */ }) {
-                Text("Forgot Password?", color = trayTextColor.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         }
     }

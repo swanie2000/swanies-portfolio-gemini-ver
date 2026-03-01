@@ -161,7 +161,16 @@ fun MyHoldingsScreen(
                     Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp)) {
                         if (isRefreshing) LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape), color = Color(textColorInt).copy(0.7f), trackColor = Color(textColorInt).copy(0.05f))
                     }
-                    Text(text = currencyFormat.format(totalPortfolioValue), color = Color(textColorInt), fontSize = 26.sp, fontWeight = FontWeight.Black, modifier = Modifier.offset(y = (-25).dp).clickable { navController.navigate(Routes.HOME) })
+                    // FIX: Clickable shortcut to ANALYTICS instead of HOME
+                    Text(
+                        text = currencyFormat.format(totalPortfolioValue),
+                        color = Color(textColorInt),
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier
+                            .offset(y = (-25).dp)
+                            .clickable { navController.navigate(Routes.ANALYTICS) }
+                    )
                 }
                 Box(modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
                     IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
@@ -172,7 +181,6 @@ fun MyHoldingsScreen(
 
             Spacer(modifier = Modifier.height((-85).dp))
 
-            // FIXED: TABS NOW UPDATE STATE
             TabRow(
                 selectedTabIndex = selectedTab,
                 modifier = Modifier.height(44.dp).padding(horizontal = 20.dp),
@@ -182,7 +190,7 @@ fun MyHoldingsScreen(
                     val isSelected = selectedTab == index
                     Tab(
                         selected = isSelected,
-                        onClick = { selectedTab = index }, // FIX: Update index on click
+                        onClick = { selectedTab = index },
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) Color(textColorInt).copy(0.15f) else Color.Transparent).border(width = 1.dp, color = if (isSelected) Color.Transparent else Color(textColorInt).copy(0.15f), shape = CircleShape)
                     ) {
                         Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) Color(textColorInt) else Color(textColorInt).copy(0.5f), modifier = Modifier.padding(vertical = 6.dp))
@@ -194,7 +202,6 @@ fun MyHoldingsScreen(
 
             // --- ASSET LIST ---
             LazyColumn(state = lazyListState, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // FIXED: FILTERING LOGIC
                 val filteredHoldings = when(selectedTab) {
                     1 -> localHoldings.filter { it.category == AssetCategory.CRYPTO }
                     2 -> localHoldings.filter { it.category == AssetCategory.METAL }
@@ -251,7 +258,7 @@ fun MyHoldingsScreen(
                 }
             }
 
-            // BOTTOM NAVIGATION: Synchronized with siteTextColor
+            // BOTTOM NAVIGATION: Added 4th Pie Chart icon
             Surface(modifier = Modifier.fillMaxWidth().height(40.dp).background(Color(bgColorInt))) {
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -263,6 +270,10 @@ fun MyHoldingsScreen(
                     }
                     IconButton(onClick = { navController.navigate(Routes.HOLDINGS) }) {
                         Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(currentRoute == Routes.HOLDINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
+                    }
+                    // NEW: Analytics Icon
+                    IconButton(onClick = { navController.navigate(Routes.ANALYTICS) }) {
+                        Icon(Icons.Default.PieChart, null, tint = if(currentRoute == Routes.ANALYTICS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                     }
                     IconButton(onClick = { navController.navigate(Routes.SETTINGS) }) {
                         Icon(Icons.Default.Settings, null, tint = if(currentRoute == Routes.SETTINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
@@ -410,8 +421,6 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, onExpandToggle: ()
         }
     }
 }
-
-// -------------------- UTILS --------------------
 
 fun formatCurrency(value: Double, decimalPreference: Int = 2): String {
     val df = DecimalFormat("$#,##0"); df.minimumFractionDigits = 0; df.maximumFractionDigits = decimalPreference

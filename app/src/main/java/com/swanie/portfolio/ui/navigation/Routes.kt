@@ -4,6 +4,7 @@ object Routes {
     const val HOME = "home"
     const val CREATE_ACCOUNT = "create_account"
     const val HOLDINGS = "my_holdings"
+    const val ANALYTICS = "analytics" // NEW: Portfolio breakdown shortcut
     const val SETTINGS = "settings"
     const val THEME_STUDIO = "theme_studio"
     const val ASSET_PICKER = "asset_picker"
