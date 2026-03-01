@@ -18,34 +18,30 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // Removed the manual Factory. Hilt will now handle the injection
-    // of ThemePreferences and AssetRepository into the ViewModel.
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // Keep the splash screen visible until the theme is ready.
         splashScreen.setKeepOnScreenCondition { !viewModel.isThemeReady.value }
 
         enableEdgeToEdge()
 
         setContent {
-            val seedColorHex by viewModel.themeColorHex.collectAsStateWithLifecycle()
-            val isGradientEnabled by viewModel.isGradientEnabled.collectAsStateWithLifecycle()
-            val isLightTextEnabled by viewModel.isLightTextEnabled.collectAsStateWithLifecycle()
+            val siteBgColor by viewModel.siteBackgroundColor.collectAsStateWithLifecycle()
+            val useGradient by viewModel.useGradient.collectAsStateWithLifecycle()
+            val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
 
-            // This effect synchronizes the system bar icon colors with the current theme.
-            LaunchedEffect(isLightTextEnabled) {
+            LaunchedEffect(isDarkMode) {
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-                insetsController.isAppearanceLightStatusBars = !isLightTextEnabled
-                insetsController.isAppearanceLightNavigationBars = !isLightTextEnabled
+                insetsController.isAppearanceLightStatusBars = !isDarkMode
+                insetsController.isAppearanceLightNavigationBars = !isDarkMode
             }
 
             SwaniesPortfolioTheme(
-                seedColorHex = seedColorHex,
-                isGradientEnabled = isGradientEnabled
+                seedColorHex = siteBgColor,
+                isGradientEnabled = useGradient
             ) {
                 val navController = rememberNavController()
                 NavGraph(navController = navController, mainViewModel = viewModel)

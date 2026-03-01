@@ -37,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -74,6 +73,7 @@ fun MyHoldingsScreen(
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
+    val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
 
     val lazyListState = rememberLazyListState()
     val isDraggingActive = remember { mutableStateOf(false) }
@@ -84,6 +84,9 @@ fun MyHoldingsScreen(
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var showEditButtonId by remember { mutableStateOf<String?>(null) }
+
+    // NEW: STATE FOR DELETE DIALOG
+    var assetPendingDeletion by remember { mutableStateOf<AssetEntity?>(null) }
 
     // TAB STATE LOGIC
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -161,7 +164,6 @@ fun MyHoldingsScreen(
                     Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp)) {
                         if (isRefreshing) LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape), color = Color(textColorInt).copy(0.7f), trackColor = Color(textColorInt).copy(0.05f))
                     }
-                    // FIX: Clickable shortcut to ANALYTICS instead of HOME
                     Text(
                         text = currencyFormat.format(totalPortfolioValue),
                         color = Color(textColorInt),
@@ -222,7 +224,12 @@ fun MyHoldingsScreen(
                                     onDragStarted = { isDraggingActive.value = true },
                                     onDragStopped = {
                                         isDraggingActive.value = false
-                                        scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                        if (isOverTrash.value) {
+                                            if (confirmDelete) { assetPendingDeletion = asset }
+                                            else { viewModel.deleteAsset(asset) }
+                                        } else {
+                                            scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                        }
                                     }
                                 )
                             )
@@ -249,7 +256,12 @@ fun MyHoldingsScreen(
                                     onDragStarted = { isDraggingActive.value = true },
                                     onDragStopped = {
                                         isDraggingActive.value = false
-                                        scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                        if (isOverTrash.value) {
+                                            if (confirmDelete) { assetPendingDeletion = asset }
+                                            else { viewModel.deleteAsset(asset) }
+                                        } else {
+                                            scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                        }
                                     }
                                 )
                             )
@@ -258,7 +270,7 @@ fun MyHoldingsScreen(
                 }
             }
 
-            // BOTTOM NAVIGATION: Added 4th Pie Chart icon
+            // BOTTOM NAVIGATION
             Surface(modifier = Modifier.fillMaxWidth().height(40.dp).background(Color(bgColorInt))) {
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -271,7 +283,6 @@ fun MyHoldingsScreen(
                     IconButton(onClick = { navController.navigate(Routes.HOLDINGS) }) {
                         Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(currentRoute == Routes.HOLDINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                     }
-                    // NEW: Analytics Icon
                     IconButton(onClick = { navController.navigate(Routes.ANALYTICS) }) {
                         Icon(Icons.Default.PieChart, null, tint = if(currentRoute == Routes.ANALYTICS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                     }
@@ -307,8 +318,29 @@ fun MyHoldingsScreen(
             }
         }
 
+        // TRASH CAN UI
         AnimatedVisibility(visible = isDraggingActive.value, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut(), modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); val size: IntSize = coords.size; trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + size.width, pos.y + size.height) }) {
             Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp)) }
+        }
+
+        // NEW: THEMED CONFIRMATION DIALOG
+        if (assetPendingDeletion != null) {
+            AlertDialog(
+                onDismissRequest = { assetPendingDeletion = null },
+                containerColor = Color(bgColorInt),
+                title = { Text("Are you sure?", color = Color(textColorInt), fontWeight = FontWeight.Black) },
+                text = { Text("Do you really want to remove ${assetPendingDeletion?.name} from your portfolio?", color = Color(textColorInt).copy(0.7f)) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.deleteAsset(assetPendingDeletion!!); assetPendingDeletion = null }) {
+                        Text("DELETE", color = Color.Red, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { assetPendingDeletion = null }) {
+                        Text("CANCEL", color = Color(textColorInt))
+                    }
+                }
+            )
         }
     }
 }
@@ -386,7 +418,7 @@ fun FullAssetCard(
             Spacer(Modifier.height(2.dp)); HorizontalDivider(color = safeCardText.copy(alpha = 0.05f))
             Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("ASSET PRICE", color = safeCardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(formatCurrency(asset.currentPrice, asset.decimalPreference), color = safeCardText, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = safeCardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld; Text(formatCurrency(totalValue, asset.decimalPreference), color = safeCardText, fontWeight = FontWeight.Black, fontSize = 17.sp) }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = safeCardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld; Text(formatCurrency(totalValue, asset.decimalPreference), color = safeCardText, fontWeight = FontWeight.Black, fontSize = 17.sp) }
             }
             AnimatedVisibility(visible = isEditing) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {

@@ -21,7 +21,7 @@ class SettingsViewModel @Inject constructor(
     val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val isLightTextEnabled: StateFlow<Boolean> = themePreferences.isLightTextEnabled
+    val confirmDelete: StateFlow<Boolean> = themePreferences.confirmDelete
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     fun saveIsDarkMode(isDark: Boolean) {
@@ -36,9 +36,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun saveIsLightTextEnabled(enabled: Boolean) {
+    fun saveConfirmDelete(enabled: Boolean) {
         viewModelScope.launch {
-            themePreferences.saveIsLightTextEnabled(enabled)
+            themePreferences.saveConfirmDelete(enabled)
         }
     }
 
@@ -46,6 +46,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             themePreferences.saveIsDarkMode(true)
             themePreferences.saveIsCompactViewEnabled(false)
+            themePreferences.saveConfirmDelete(true)
         }
     }
 }
