@@ -18,13 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.navigation.Routes
 
 @Composable
 fun SettingsScreen(
-    navController: NavHostController,
+    navController: NavController,
     settingsViewModel: SettingsViewModel,
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
@@ -35,33 +35,24 @@ fun SettingsScreen(
     val safeBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        containerColor = safeBg
-    ) { padding ->
+    Column(modifier = Modifier.fillMaxSize().background(safeBg)) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+                .weight(1f)
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            // Header
-            Box(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
-                Text("SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
-            }
+            Text(
+                text = "SETTINGS",
+                color = safeText,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(24.dp).statusBarsPadding()
+            )
 
-            // Content
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                SettingsToggleItem(
-                    title = "Use Compact Cards",
-                    subtitle = "Shrink asset cards to show more on screen",
-                    checked = isCompactMode,
-                    onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
-                    themeColor = safeText
-                )
-
+                SettingsToggleItem("Use Compact Cards", "Shrink asset cards to show more on screen", isCompactMode, { settingsViewModel.saveIsCompactViewEnabled(it) }, safeText)
                 Spacer(modifier = Modifier.height(32.dp))
-
                 Button(
                     onClick = { navController.navigate(Routes.THEME_STUDIO) },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
@@ -70,19 +61,11 @@ fun SettingsScreen(
                 ) {
                     Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { navController.navigate(Routes.ANALYTICS) },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("VIEW PORTFOLIO BREAKDOWN", color = safeText, fontWeight = FontWeight.Bold)
-                }
             }
         }
+
+        // UNIFIED NAV BAR
+        BottomNavigationBar(navController = navController)
     }
 }
 
