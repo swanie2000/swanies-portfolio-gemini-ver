@@ -118,6 +118,10 @@ fun MyHoldingsScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     var refreshProgress by remember { mutableFloatStateOf(0f) }
 
+    // --- NEW: SCAN FLASH ANIMATION STATE ---
+    var showScanFlash by remember { mutableStateOf(false) }
+    val scanOffset = remember { Animatable(-1f) }
+
     // THE NAV GATE: Pause data sync until animation finishes
     LaunchedEffect(Unit) {
         delay(400)
@@ -129,6 +133,34 @@ fun MyHoldingsScreen(
             if (localHoldings != holdings) {
                 localHoldings = holdings
             }
+        }
+    }
+
+    // --- REFRESH TIMER & FLASH TRIGGER ---
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            // Trigger the Quick Scan Flash
+            showScanFlash = true
+            scanOffset.snapTo(-1f)
+            scope.launch {
+                scanOffset.animateTo(
+                    targetValue = 2f,
+                    animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing)
+                )
+                showScanFlash = false
+            }
+
+            // Standard 30s Progress Logic
+            val startTime = System.currentTimeMillis()
+            val duration = 30000L
+            while (isRefreshing && (System.currentTimeMillis() - startTime) < duration) {
+                refreshProgress = (System.currentTimeMillis() - startTime).toFloat() / duration
+                delay(50)
+            }
+            refreshProgress = 1f
+            delay(200)
+            isRefreshing = false
+            refreshProgress = 0f
         }
     }
 
@@ -155,16 +187,51 @@ fun MyHoldingsScreen(
             }
         }
     }) {
+        // --- THE SCAN FLASH OVERLAY ---
+        if (showScanFlash) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(999f)
+                    .background(
+                        Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.45f to Color.White.copy(alpha = 0.15f),
+                            0.5f to Color.White.copy(alpha = 0.35f),
+                            0.55f to Color.White.copy(alpha = 0.15f),
+                            1f to Color.Transparent,
+                            startY = scanOffset.value * 2000f,
+                            endY = (scanOffset.value * 2000f) + 600f
+                        )
+                    )
+            )
+        }
+
         Column(modifier = Modifier.fillMaxSize()) {
             // --- HEADER ---
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(bgColor).statusBarsPadding()) {
                 Box(modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
-                    IconButton(onClick = { if (!isRefreshing) { scope.launch { isRefreshing = true; viewModel.refreshAssets(); delay(2000); isRefreshing = false } } }) {
+                    IconButton(onClick = { if (!isRefreshing) { isRefreshing = true; viewModel.refreshAssets() } }) {
                         Icon(Icons.Default.Refresh, null, tint = if (isRefreshing) textColor.copy(0.2f) else textColor, modifier = Modifier.size(28.dp))
                     }
                 }
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
+
+                    Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp)) {
+                        if (isRefreshing) {
+                            LinearProgressIndicator(
+                                progress = { refreshProgress },
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(6.dp)
+                                    .clip(CircleShape),
+                                color = textColor.copy(0.7f),
+                                trackColor = textColor.copy(0.05f)
+                            )
+                        }
+                    }
+
                     Text(
                         text = totalValueFormatted,
                         color = textColor,
