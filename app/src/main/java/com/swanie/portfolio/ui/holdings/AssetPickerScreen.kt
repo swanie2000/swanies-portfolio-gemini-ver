@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.holdings
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,10 +68,7 @@ fun AssetPickerScreen(
             .background(bgColor)
             .padding(16.dp)
     ) {
-        TextButton(onClick = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) }) {
-            Text("Manual Add Asset", color = textColor)
-        }
-
+        // --- SEARCH BAR (TOP) ---
         OutlinedTextField(
             value = searchQuery,
             onValueChange = {
@@ -93,9 +92,34 @@ fun AssetPickerScreen(
                 unfocusedTextColor = textColor,
                 cursorColor = textColor,
                 focusedBorderColor = textColor,
-                unfocusedBorderColor = textColor.copy(alpha = 0.5f)
+                unfocusedBorderColor = textColor.copy(alpha = 0.5f),
+                focusedLabelColor = textColor.copy(alpha = 0.7f),
+                unfocusedLabelColor = textColor.copy(alpha = 0.7f),
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent
             )
         )
+
+        // --- ANIMATED MANUAL ADD BUTTON (DISAPPEARS ON TYPE) ---
+        AnimatedVisibility(
+            visible = searchQuery.isEmpty(),
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), contentAlignment = Alignment.Center) {
+                TextButton(
+                    onClick = { navController.navigate(Routes.MANUAL_ASSET_ENTRY) }
+                ) {
+                    Text(
+                        text = "Manual Add Asset",
+                        color = textColor.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
 
         if (searchResults.isEmpty()) {
             Column(
@@ -106,16 +130,29 @@ fun AssetPickerScreen(
                 Image(
                     painter = painterResource(id = R.drawable.swan_launcher_icon),
                     contentDescription = "Ghost Swan",
-                    modifier = Modifier.size(220.dp).alpha(0.08f),
+                    modifier = Modifier
+                        .size(220.dp)
+                        .alpha(0.08f),
                     colorFilter = ColorFilter.tint(textColor)
                 )
                 Spacer(modifier = Modifier.weight(3.0f))
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
                 items(searchResults) { asset ->
-                    CoinItem(asset = asset, textColor = textColor, onAssetSelected = onAssetSelected)
-                    HorizontalDivider(color = textColor.copy(alpha = 0.2f), thickness = 1.dp)
+                    CoinItem(
+                        asset = asset,
+                        textColor = textColor,
+                        onAssetSelected = onAssetSelected
+                    )
+                    HorizontalDivider(
+                        color = textColor.copy(alpha = 0.1f),
+                        thickness = 1.dp
+                    )
                 }
             }
         }
@@ -130,11 +167,22 @@ fun CoinItem(
 ) {
     TextButton(
         onClick = {
-            onAssetSelected(asset.coinId, asset.symbol.uppercase(), asset.name, asset.imageUrl, asset.category, asset.currentPrice)
+            onAssetSelected(
+                asset.coinId,
+                asset.symbol.uppercase(),
+                asset.name,
+                asset.imageUrl,
+                asset.category,
+                asset.currentPrice
+            )
         },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
             when (asset.category) {
                 AssetCategory.METAL -> {
                     val color = when (asset.symbol) {
@@ -143,17 +191,39 @@ fun CoinItem(
                         "XPT", "XPD" -> Color(0xFFE5E4E2)
                         else -> Color.Gray
                     }
-                    Box(modifier = Modifier.size(30.dp).clip(CircleShape).background(color))
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                    )
                 }
                 AssetCategory.CRYPTO -> {
-                    AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(30.dp))
+                    AsyncImage(
+                        model = asset.imageUrl,
+                        contentDescription = "${asset.name} icon",
+                        modifier = Modifier.size(30.dp)
+                    )
                 }
             }
             Spacer(Modifier.width(16.dp))
-            Text(text = "${asset.name} (${asset.symbol.uppercase()})", color = textColor)
+            Text(
+                text = "${asset.name} (${asset.symbol.uppercase()})",
+                color = textColor,
+                fontWeight = FontWeight.Medium
+            )
             Spacer(Modifier.width(8.dp))
-            Box(modifier = Modifier.background(textColor.copy(0.1f), CircleShape).padding(horizontal = 8.dp, vertical = 4.dp)) {
-                Text(text = asset.category.name, color = textColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            Box(
+                modifier = Modifier
+                    .background(textColor.copy(alpha = 0.1f), CircleShape)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = asset.category.name,
+                    color = textColor,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
