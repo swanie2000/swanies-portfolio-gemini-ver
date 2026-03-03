@@ -16,21 +16,23 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.AmountEntryScreen
-import com.swanie.portfolio.ui.holdings.AnalyticsScreen // RESTORED IMPORT
+import com.swanie.portfolio.ui.holdings.AnalyticsScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.AssetViewModel
-import com.swanie.portfolio.ui.holdings.ManualAssetEntryScreen
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
 import com.swanie.portfolio.ui.settings.SettingsScreen
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
-import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import java.net.URLDecoder
 import java.net.URLEncoder
 
 @Composable
 fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
+    // Initializing the ViewModel at the top level of the NavGraph
+    // so it can be used by the Picker callback
+    val assetViewModel: AssetViewModel = hiltViewModel()
+
     Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
         NavHost(
             navController = navController,
@@ -53,7 +55,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.THEME_STUDIO) {
-                val themeViewModel: ThemeViewModel = hiltViewModel()
                 ThemeStudioScreen(navController)
             }
 
@@ -64,32 +65,29 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 )
             }
 
-            // NEW: REGISTERED ANALYTICS ROUTE
             composable(Routes.ANALYTICS) {
                 AnalyticsScreen(navController = navController)
             }
 
             composable(Routes.ASSET_PICKER) {
-                AssetPickerScreen(navController = navController, onAssetSelected = { coinId, symbol, name, imageUrl, category, price ->
-                    val encodedUrl = URLEncoder.encode(imageUrl, "UTF-8")
-                    navController.navigate("amount_entry/$coinId/$symbol/$name/$encodedUrl/${category.name}/$price")
-                })
-            }
-
-            composable(Routes.MANUAL_ASSET_ENTRY) {
-                val viewModel: AssetViewModel = hiltViewModel()
-
-                ManualAssetEntryScreen(
-                    onSave = {
-                        viewModel.saveNewAsset(it, it.amountHeld) {
-                            navController.navigate(Routes.HOLDINGS) {
-                                popUpTo(Routes.HOLDINGS) { inclusive = true }
+                AssetPickerScreen(
+                    navController = navController,
+                    onAssetSelected = { asset ->
+                        if (asset.category == AssetCategory.METAL) {
+                            // FIX: Using your actual ViewModel method name 'saveNewAsset'
+                            assetViewModel.saveNewAsset(asset, asset.amountHeld) {
+                                navController.popBackStack()
                             }
+                        } else {
+                            // For Crypto, navigate to the standard amount entry screen
+                            val encodedUrl = URLEncoder.encode(asset.imageUrl, "UTF-8")
+                            navController.navigate("amount_entry/${asset.coinId}/${asset.symbol}/${asset.name}/$encodedUrl/${asset.category.name}/${asset.currentPrice}")
                         }
-                    },
-                    onCancel = { navController.popBackStack() }
+                    }
                 )
             }
+
+            // Routes.MANUAL_ASSET_ENTRY removed as it's now handled by the Picker funnel
 
             composable(
                 route = Routes.AMOUNT_ENTRY,
