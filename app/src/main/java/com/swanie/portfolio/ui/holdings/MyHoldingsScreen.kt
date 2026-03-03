@@ -200,10 +200,23 @@ fun MyHoldingsScreen(
                     ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
+
+                        // Disable dragging when filtered to prevent flickering and jumpy indices
+                        val dragModifier = if (selectedTab == 0) {
+                            Modifier.longPressDraggableHandle(
+                                onDragStarted = { isDraggingActive.value = true },
+                                onDragStopped = {
+                                    isDraggingActive.value = false
+                                    if (isOverTrash.value) { assetPendingDeletion = asset }
+                                    else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } }
+                                }
+                            )
+                        } else Modifier
+
                         if (isCompactViewEnabled && !isExpanded) {
-                            CompactAssetCard(asset = asset, isDragging = isDragging, cardBg = cardBg, cardText = cardText, onExpandToggle = { expandedAssetId = asset.coinId; showEditButtonId = null }, modifier = Modifier.longPressDraggableHandle(onDragStarted = { isDraggingActive.value = true }, onDragStopped = { isDraggingActive.value = false; if (isOverTrash.value) { assetPendingDeletion = asset } else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } } }))
+                            CompactAssetCard(asset = asset, isDragging = isDragging, cardBg = cardBg, cardText = cardText, onExpandToggle = { expandedAssetId = asset.coinId; showEditButtonId = null }, modifier = dragModifier)
                         } else {
-                            FullAssetCard(asset = asset, isExpanded = isExpanded, isEditing = false, isDragging = isDragging, showEditButton = isEditButtonVisible, cardBg = cardBg, cardText = cardText, onExpandToggle = { if (isCompactViewEnabled) { if (expandedAssetId == asset.coinId) { if (isEditButtonVisible) { expandedAssetId = null; showEditButtonId = null } else { showEditButtonId = asset.coinId } } else { expandedAssetId = asset.coinId; showEditButtonId = null } } else { showEditButtonId = if (isEditButtonVisible) null else asset.coinId } }, onEditRequest = { assetBeingEdited = asset }, onSave = { _, _, _, _ -> }, modifier = Modifier.longPressDraggableHandle(onDragStarted = { isDraggingActive.value = true }, onDragStopped = { isDraggingActive.value = false; if (isOverTrash.value) { assetPendingDeletion = asset } else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } } }))
+                            FullAssetCard(asset = asset, isExpanded = isExpanded, isEditing = false, isDragging = isDragging, showEditButton = isEditButtonVisible, cardBg = cardBg, cardText = cardText, onExpandToggle = { if (isCompactViewEnabled) { if (expandedAssetId == asset.coinId) { if (isEditButtonVisible) { expandedAssetId = null; showEditButtonId = null } else { showEditButtonId = asset.coinId } } else { expandedAssetId = asset.coinId; showEditButtonId = null } } else { showEditButtonId = if (isEditButtonVisible) null else asset.coinId } }, onEditRequest = { assetBeingEdited = asset }, onSave = { _, _, _, _ -> }, modifier = dragModifier)
                         }
                     }
                 }
@@ -220,7 +233,6 @@ fun MyHoldingsScreen(
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(bgColor))
         }
 
-        // --- RESTORED EDIT OVERLAY: Split Lines 1 & 2 ---
         AnimatedVisibility(visible = assetBeingEdited != null, enter = fadeIn() + slideInVertically { -it }, exit = fadeOut() + slideOutVertically { -it }, modifier = Modifier.zIndex(1000f)) {
             Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.7f)).statusBarsPadding()) {
                 assetBeingEdited?.let { asset ->
@@ -268,7 +280,6 @@ fun FullAssetCard(
     onCancel: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    // RESTORED: Splitting Name into two lines for editing
     val initialLines = remember(asset.name) { asset.name.split("\n").let { if(it.size >= 2) it[0] to it[1] else it.first() to "" } }
     var editLine1 by remember(asset) { mutableStateOf(initialLines.first) }
     var editLine2 by remember(asset) { mutableStateOf(initialLines.second) }
@@ -280,7 +291,8 @@ fun FullAssetCard(
     val elevation by animateDpAsState(if (isDragging) 30.dp else 0.dp, label = "")
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "")
 
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); shape = RoundedCornerShape(16.dp); clip = true }.animateContentSize().clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+    // RESTORED: Removed animateContentSize() to stop jumping/flickering during reorder
+    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); shape = RoundedCornerShape(16.dp); clip = true }.clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -294,13 +306,12 @@ fun FullAssetCard(
 
                     Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
                         if (isEditing) {
-                            // RESTORED: Two-line editor
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 BasicTextField(value = editLine1, onValueChange = { if(it.length <= 12) editLine1 = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center), modifier = Modifier.background(cardText.copy(0.05f), RoundedCornerShape(2.dp)).padding(2.dp))
                                 BasicTextField(value = editLine2, onValueChange = { if(it.length <= 12) editLine2 = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center), modifier = Modifier.background(cardText.copy(0.05f), RoundedCornerShape(2.dp)).padding(2.dp))
                             }
                         } else {
-                            // FIXED: Force multi-line centered display with lineHeight
+                            // RESTORED: Fixed display for two-line names
                             Text(
                                 text = asset.name.uppercase(),
                                 color = cardText,
@@ -308,6 +319,7 @@ fun FullAssetCard(
                                 textAlign = TextAlign.Center,
                                 fontWeight = FontWeight.Bold,
                                 lineHeight = 12.sp,
+                                maxLines = 2,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -343,7 +355,6 @@ fun FullAssetCard(
     }
 }
 
-// Helpers unchanged for brevity, but retained in full build
 @Composable
 fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
