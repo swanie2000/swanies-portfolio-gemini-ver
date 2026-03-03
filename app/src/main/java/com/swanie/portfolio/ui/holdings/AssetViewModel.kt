@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.MetalsProvider
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,10 +29,17 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
     private val _sortOrder = MutableStateFlow(SortOrder.VALUE)
     val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
 
+    // --- REFACTORED HOLDINGS FLOW: Calculation now respects Weight ---
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .combine(_sortOrder) { assets, order ->
             when (order) {
-                SortOrder.VALUE -> assets.sortedByDescending { it.currentPrice * it.amountHeld }
+                SortOrder.VALUE -> assets.sortedByDescending { asset ->
+                    if (asset.isCustom || asset.category == AssetCategory.METAL) {
+                        asset.currentPrice * (asset.weight * asset.amountHeld)
+                    } else {
+                        asset.currentPrice * asset.amountHeld
+                    }
+                }
                 SortOrder.NAME -> assets.sortedBy { it.name }
                 SortOrder.CATEGORY -> assets.sortedBy { it.category.name }
                 SortOrder.MANUAL -> assets.sortedBy { it.displayOrder }
@@ -133,12 +141,19 @@ class AssetViewModel @Inject constructor(private val repository: AssetRepository
         }
     }
 
-    // New function to update asset details from the edit popup
-    fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newDecimalPreference: Int) {
+    // --- REFACTORED: Now handles New Weight from the UI ---
+    fun updateAsset(
+        asset: AssetEntity,
+        newName: String,
+        newAmount: Double,
+        newWeight: Double, // Added parameter
+        newDecimalPreference: Int
+    ) {
         viewModelScope.launch {
             val updatedAsset = asset.copy(
                 name = newName,
                 amountHeld = newAmount,
+                weight = newWeight, // Now saving weight
                 decimalPreference = newDecimalPreference,
                 lastUpdated = System.currentTimeMillis()
             )

@@ -68,25 +68,13 @@ fun ManualAssetEntryScreen(
     Scaffold(
         containerColor = bgColor,
         topBar = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .height(130.dp)
-                    .padding(horizontal = 16.dp)
-            ) {
+            Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(130.dp).padding(horizontal = 16.dp)) {
                 Box(modifier = Modifier.align(Alignment.CenterStart).size(60.dp), contentAlignment = Alignment.Center) {
                     IconButton(onClick = onCancel) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor, modifier = Modifier.size(28.dp))
                     }
                 }
-
-                Image(
-                    painter = painterResource(id = R.drawable.swanie_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.Center).size(120.dp)
-                )
-
+                Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.align(Alignment.Center).size(120.dp))
                 Box(modifier = Modifier.align(Alignment.CenterEnd).size(60.dp), contentAlignment = Alignment.Center) {
                     IconButton(
                         onClick = {
@@ -95,110 +83,52 @@ fun ManualAssetEntryScreen(
                                 else -> "CUSTOM"
                             }
                             val spotPrice = MetalsProvider.preciousMetals.find { it.symbol == baseSymbol }?.currentPrice ?: 0.0
-                            val weightVal = weight.toDoubleOrNull() ?: 0.0
+                            val weightVal = weight.toDoubleOrNull() ?: 1.0
                             val premiumVal = premium.toDoubleOrNull() ?: 0.0
-                            val qtyVal = quantity.toDoubleOrNull() ?: 0.0
-
-                            val displaySymbol = if (selectedMetalType == "Custom") {
-                                customCategoryName.take(4).uppercase().ifBlank { "CUST" }
-                            } else {
-                                when (selectedMetalType) {
-                                    "Gold" -> "GOLD"; "Silver" -> "SILVER"; "Platinum" -> "PLAT"; "Palladium" -> "PALL"
-                                    else -> "CUST"
-                                }
-                            }
-
-                            // FIXED: Preserving the stackable two-line structure using newline character
+                            val qtyVal = quantity.toDoubleOrNull() ?: 1.0
+                            val displaySymbol = if (selectedMetalType == "Custom") customCategoryName.take(4).uppercase().ifBlank { "CUST" }
+                            else when (selectedMetalType) { "Gold" -> "GOLD"; "Silver" -> "SILVER"; "Platinum" -> "PLAT"; "Palladium" -> "PALL"; else -> "CUST" }
                             val fullName = "${line1.trim()}\n${line2.trim()}"
+                            val unitPremium = if (weightVal > 0) premiumVal / weightVal else premiumVal
 
                             val newAsset = AssetEntity(
-                                coinId = "custom_${UUID.randomUUID()}",
-                                symbol = displaySymbol,
-                                name = fullName,
-                                amountHeld = qtyVal,
-                                currentPrice = (spotPrice * weightVal) + premiumVal,
-                                category = AssetCategory.METAL,
-                                isCustom = true,
-                                weight = weightVal,
-                                premium = premiumVal,
-                                baseSymbol = baseSymbol,
-                                lastUpdated = System.currentTimeMillis(),
-                                imageUrl = "", change24h = 0.0, displayOrder = 0, priceChange24h = 0.0, marketCapRank = 0, sparklineData = emptyList()
+                                coinId = "custom_${UUID.randomUUID()}", symbol = displaySymbol, name = fullName, amountHeld = qtyVal,
+                                currentPrice = spotPrice + unitPremium, change24h = 0.0, displayOrder = 0, lastUpdated = System.currentTimeMillis(),
+                                imageUrl = "", category = AssetCategory.METAL, weight = weightVal, premium = premiumVal, isCustom = true, baseSymbol = baseSymbol, decimalPreference = 2
                             )
                             onSave(newAsset)
                         },
                         modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Save", tint = Color.Black, modifier = Modifier.size(28.dp))
-                    }
+                    ) { Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(28.dp)) }
                 }
             }
         }
     ) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 24.dp).verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 24.dp).verticalScroll(scrollState), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Add Asset Card", color = textColor, fontSize = 22.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center, modifier = Modifier.padding(bottom = 20.dp))
-
             Text("Select Type", color = textColor.copy(0.7f), fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.Center) {
                 row1Metals.forEach { metal ->
-                    FilterChip(
-                        selected = selectedMetalType == metal, onClick = { selectedMetalType = metal },
-                        label = { Text(metal, fontSize = 13.sp) }, shape = CircleShape, modifier = Modifier.padding(horizontal = 4.dp),
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = textColor, selectedLabelColor = bgColor, labelColor = textColor),
-                        border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedMetalType == metal, borderColor = textColor.copy(alpha = 0.3f), selectedBorderColor = textColor)
-                    )
+                    FilterChip(selected = selectedMetalType == metal, onClick = { selectedMetalType = metal }, label = { Text(metal, fontSize = 13.sp) }, shape = CircleShape, modifier = Modifier.padding(horizontal = 4.dp), colors = FilterChipDefaults.filterChipColors(selectedContainerColor = textColor, selectedLabelColor = bgColor, labelColor = textColor), border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedMetalType == metal, borderColor = textColor.copy(alpha = 0.3f), selectedBorderColor = textColor))
                 }
             }
-
             Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.Center) {
                 row2Metals.forEach { metal ->
-                    FilterChip(
-                        selected = selectedMetalType == metal, onClick = { selectedMetalType = metal },
-                        label = { Text(metal, fontSize = 13.sp) }, shape = CircleShape, modifier = Modifier.padding(horizontal = 4.dp),
-                        colors = FilterChipDefaults.filterChipColors(selectedContainerColor = textColor, selectedLabelColor = bgColor, labelColor = textColor),
-                        border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedMetalType == metal, borderColor = textColor.copy(alpha = 0.3f), selectedBorderColor = textColor)
-                    )
+                    FilterChip(selected = selectedMetalType == metal, onClick = { selectedMetalType = metal }, label = { Text(metal, fontSize = 13.sp) }, shape = CircleShape, modifier = Modifier.padding(horizontal = 4.dp), colors = FilterChipDefaults.filterChipColors(selectedContainerColor = textColor, selectedLabelColor = bgColor, labelColor = textColor), border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selectedMetalType == metal, borderColor = textColor.copy(alpha = 0.3f), selectedBorderColor = textColor))
                 }
             }
-
             AnimatedVisibility(visible = selectedMetalType == "Custom") {
-                OutlinedTextField(
-                    value = customCategoryName, onValueChange = { customCategoryName = it },
-                    label = { Text("Custom Category Name") }, shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textColor, unfocusedTextColor = textColor, focusedBorderColor = textColor, focusedLabelColor = textColor),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).onFocusChanged { if(it.isFocused) customCategoryName = "" },
-                    singleLine = true
-                )
+                OutlinedTextField(value = customCategoryName, onValueChange = { customCategoryName = it }, label = { Text("Custom Category Name") }, shape = RoundedCornerShape(12.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textColor, unfocusedTextColor = textColor, focusedBorderColor = textColor, focusedLabelColor = textColor), modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).onFocusChanged { if(it.isFocused) customCategoryName = "" }, singleLine = true)
             }
-
             Spacer(Modifier.height(24.dp))
             val fieldColors = OutlinedTextFieldDefaults.colors(focusedTextColor = textColor, unfocusedTextColor = textColor, focusedBorderColor = textColor, unfocusedBorderColor = textColor.copy(0.3f), focusedLabelColor = textColor, cursorColor = textColor)
-
-            OutlinedTextField(
-                value = line1, onValueChange = { if (it.length <= charLimit) line1 = it },
-                label = { Text("Card Line 1 (Max $charLimit)") },
-                shape = RoundedCornerShape(12.dp), colors = fieldColors,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { if(it.isFocused) line1 = "" },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), singleLine = true
-            )
-            OutlinedTextField(
-                value = line2, onValueChange = { if (it.length <= charLimit) line2 = it },
-                label = { Text("Card Line 2 (Max $charLimit)") },
-                shape = RoundedCornerShape(12.dp), colors = fieldColors,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { if(it.isFocused) line2 = "" },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), singleLine = true
-            )
-
+            OutlinedTextField(value = line1, onValueChange = { if (it.length <= charLimit) line1 = it }, label = { Text("Card Line 1 (Max $charLimit)") }, shape = RoundedCornerShape(12.dp), colors = fieldColors, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { if(it.isFocused) line1 = "" }, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), singleLine = true)
+            OutlinedTextField(value = line2, onValueChange = { if (it.length <= charLimit) line2 = it }, label = { Text("Card Line 2 (Max $charLimit)") }, shape = RoundedCornerShape(12.dp), colors = fieldColors, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).onFocusChanged { if(it.isFocused) line2 = "" }, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), singleLine = true)
             Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(value = weight, onValueChange = { weight = it }, label = { Text("Weight (oz)") }, shape = RoundedCornerShape(12.dp), colors = fieldColors, modifier = Modifier.weight(1f).onFocusChanged { if(it.isFocused) weight = "" }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next), singleLine = true)
                 OutlinedTextField(value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity") }, shape = RoundedCornerShape(12.dp), colors = fieldColors, modifier = Modifier.weight(1f).onFocusChanged { if(it.isFocused) quantity = "" }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next), singleLine = true)
             }
             OutlinedTextField(value = premium, onValueChange = { premium = it }, label = { Text("Premium per oz (USD)") }, shape = RoundedCornerShape(12.dp), colors = fieldColors, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).onFocusChanged { if(it.isFocused) premium = "" }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }), singleLine = true)
-
             Spacer(modifier = Modifier.height(250.dp))
         }
     }

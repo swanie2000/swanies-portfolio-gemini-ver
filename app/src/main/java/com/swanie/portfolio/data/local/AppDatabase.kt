@@ -6,7 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [AssetEntity::class], version = 7, exportSchema = false)
+// Bumping to version 8 to lock in schema changes for Weight and Premium
+@Database(entities = [AssetEntity::class], version = 8, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -22,8 +23,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "asset_database"
-                ).fallbackToDestructiveMigration(dropAllTables = true)
-                .build()
+                )
+                    .fallbackToDestructiveMigration() // Ensures version 8 triggers a clean schema
+                    .build()
                 INSTANCE = instance
                 instance
             }

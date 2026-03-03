@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -72,10 +71,8 @@ fun MyHoldingsScreen(
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
 
-    // --- DATA & THEME ---
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
-    val confirmDelete by mainViewModel.confirmDelete.collectAsStateWithLifecycle(initialValue = true)
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle(initialValue = false)
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
@@ -89,21 +86,16 @@ fun MyHoldingsScreen(
     val cardText = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
     val isDarkTheme = ColorUtils.calculateLuminance(bgColor.toArgb()) < 0.5
 
-    // --- PERFORMANCE: NAV GATE & FORMATTING ---
     var isScreenLoaded by remember { mutableStateOf(false) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     val totalValueFormatted by remember(holdings) {
         derivedStateOf {
-            val total = holdings.sumOf { asset ->
-                if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld)
-                else asset.currentPrice * asset.amountHeld
-            }
+            val total = holdings.sumOf { asset -> asset.currentPrice * (asset.weight * asset.amountHeld) }
             currencyFormatter.format(total)
         }
     }
 
-    // --- UI STATES ---
     val lazyListState = rememberLazyListState()
     val isDraggingActive = remember { mutableStateOf(false) }
     val isSavingOrder = remember { mutableStateOf(false) }
@@ -117,50 +109,27 @@ fun MyHoldingsScreen(
     val tabs = listOf("ALL", "CRYPTO", "METAL")
     var isRefreshing by remember { mutableStateOf(false) }
     var refreshProgress by remember { mutableFloatStateOf(0f) }
-
-    // --- NEW: SCAN FLASH ANIMATION STATE ---
     var showScanFlash by remember { mutableStateOf(false) }
     val scanOffset = remember { Animatable(-1f) }
 
-    // THE NAV GATE: Pause data sync until animation finishes
-    LaunchedEffect(Unit) {
-        delay(400)
-        isScreenLoaded = true
-    }
+    LaunchedEffect(Unit) { delay(400); isScreenLoaded = true }
 
     LaunchedEffect(holdings, isScreenLoaded) {
         if (isScreenLoaded && !isDraggingActive.value && !isSavingOrder.value && assetBeingEdited == null) {
-            if (localHoldings != holdings) {
-                localHoldings = holdings
-            }
+            if (localHoldings != holdings) { localHoldings = holdings }
         }
     }
 
-    // --- REFRESH TIMER & FLASH TRIGGER ---
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
-            // Trigger the Quick Scan Flash
-            showScanFlash = true
-            scanOffset.snapTo(-1f)
-            scope.launch {
-                scanOffset.animateTo(
-                    targetValue = 2f,
-                    animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing)
-                )
-                showScanFlash = false
-            }
-
-            // Standard 30s Progress Logic
-            val startTime = System.currentTimeMillis()
-            val duration = 30000L
+            showScanFlash = true; scanOffset.snapTo(-1f)
+            scope.launch { scanOffset.animateTo(2f, tween(800, easing = LinearOutSlowInEasing)); showScanFlash = false }
+            val startTime = System.currentTimeMillis(); val duration = 30000L
             while (isRefreshing && (System.currentTimeMillis() - startTime) < duration) {
                 refreshProgress = (System.currentTimeMillis() - startTime).toFloat() / duration
                 delay(50)
             }
-            refreshProgress = 1f
-            delay(200)
-            isRefreshing = false
-            refreshProgress = 0f
+            refreshProgress = 1f; delay(200); isRefreshing = false; refreshProgress = 0f
         }
     }
 
@@ -181,34 +150,15 @@ fun MyHoldingsScreen(
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
                 val change = event.changes.firstOrNull() ?: continue
-                trashBoundsInRoot.value?.let { bounds ->
-                    isOverTrash.value = isDraggingActive.value && bounds.contains(change.position)
-                }
+                trashBoundsInRoot.value?.let { bounds -> isOverTrash.value = isDraggingActive.value && bounds.contains(change.position) }
             }
         }
     }) {
-        // --- THE SCAN FLASH OVERLAY ---
         if (showScanFlash) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(999f)
-                    .background(
-                        Brush.verticalGradient(
-                            0f to Color.Transparent,
-                            0.45f to Color.White.copy(alpha = 0.15f),
-                            0.5f to Color.White.copy(alpha = 0.35f),
-                            0.55f to Color.White.copy(alpha = 0.15f),
-                            1f to Color.Transparent,
-                            startY = scanOffset.value * 2000f,
-                            endY = (scanOffset.value * 2000f) + 600f
-                        )
-                    )
-            )
+            Box(modifier = Modifier.fillMaxSize().zIndex(999f).background(Brush.verticalGradient(0f to Color.Transparent, 0.45f to Color.White.copy(0.15f), 0.5f to Color.White.copy(0.35f), 0.55f to Color.White.copy(0.15f), 1f to Color.Transparent, startY = scanOffset.value * 2000f, endY = (scanOffset.value * 2000f) + 600f)))
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // --- HEADER ---
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(bgColor).statusBarsPadding()) {
                 Box(modifier = Modifier.align(Alignment.TopStart).padding(start = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
                     IconButton(onClick = { if (!isRefreshing) { isRefreshing = true; viewModel.refreshAssets() } }) {
@@ -217,28 +167,12 @@ fun MyHoldingsScreen(
                 }
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
-
                     Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp)) {
                         if (isRefreshing) {
-                            LinearProgressIndicator(
-                                progress = { refreshProgress },
-                                modifier = Modifier
-                                    .width(140.dp)
-                                    .height(6.dp)
-                                    .clip(CircleShape),
-                                color = textColor.copy(0.7f),
-                                trackColor = textColor.copy(0.05f)
-                            )
+                            LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape), color = textColor.copy(0.7f), trackColor = textColor.copy(0.05f))
                         }
                     }
-
-                    Text(
-                        text = totalValueFormatted,
-                        color = textColor,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.offset(y = (-25).dp).clickable { navController.navigate(Routes.ANALYTICS) }
-                    )
+                    Text(text = totalValueFormatted, color = textColor, fontSize = 26.sp, fontWeight = FontWeight.Black, modifier = Modifier.offset(y = (-25).dp).clickable { navController.navigate(Routes.ANALYTICS) })
                 }
                 Box(modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp).width(70.dp).height(120.dp), contentAlignment = Alignment.Center) {
                     IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
@@ -249,18 +183,10 @@ fun MyHoldingsScreen(
 
             Spacer(modifier = Modifier.height((-85).dp))
 
-            TabRow(
-                selectedTabIndex = selectedTab,
-                modifier = Modifier.height(44.dp).padding(horizontal = 20.dp),
-                containerColor = Color.Transparent, indicator = { }, divider = { }
-            ) {
+            TabRow(selectedTabIndex = selectedTab, modifier = Modifier.height(44.dp).padding(horizontal = 20.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
                 tabs.forEachIndexed { index, title ->
                     val isSelected = selectedTab == index
-                    Tab(
-                        selected = isSelected,
-                        onClick = { selectedTab = index },
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(width = 1.dp, color = if (isSelected) Color.Transparent else textColor.copy(0.15f), shape = CircleShape)
-                    ) {
+                    Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
                         Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 6.dp))
                     }
                 }
@@ -268,89 +194,46 @@ fun MyHoldingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- ASSET LIST ---
             LazyColumn(state = lazyListState, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 val filtered = if (selectedTab == 0) localHoldings else localHoldings.filter { it.category == if(selectedTab == 1) AssetCategory.CRYPTO else AssetCategory.METAL }
                 items(items = filtered, key = { it.coinId }) { asset ->
                     ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
-
                         if (isCompactViewEnabled && !isExpanded) {
-                            CompactAssetCard(
-                                asset = asset, isDragging = isDragging, cardBg = cardBg, cardText = cardText,
-                                onExpandToggle = { expandedAssetId = asset.coinId; showEditButtonId = null },
-                                modifier = Modifier.longPressDraggableHandle(
-                                    onDragStarted = { isDraggingActive.value = true },
-                                    onDragStopped = {
-                                        isDraggingActive.value = false
-                                        if (isOverTrash.value) { assetPendingDeletion = asset }
-                                        else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } }
-                                    }
-                                )
-                            )
+                            CompactAssetCard(asset = asset, isDragging = isDragging, cardBg = cardBg, cardText = cardText, onExpandToggle = { expandedAssetId = asset.coinId; showEditButtonId = null }, modifier = Modifier.longPressDraggableHandle(onDragStarted = { isDraggingActive.value = true }, onDragStopped = { isDraggingActive.value = false; if (isOverTrash.value) { assetPendingDeletion = asset } else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } } }))
                         } else {
-                            FullAssetCard(
-                                asset = asset, isExpanded = isExpanded, isEditing = false, isDragging = isDragging,
-                                showEditButton = isEditButtonVisible, cardBg = cardBg, cardText = cardText,
-                                onExpandToggle = {
-                                    if (isCompactViewEnabled) {
-                                        if (expandedAssetId == asset.coinId) {
-                                            if (isEditButtonVisible) { expandedAssetId = null; showEditButtonId = null }
-                                            else { showEditButtonId = asset.coinId }
-                                        } else { expandedAssetId = asset.coinId; showEditButtonId = null }
-                                    } else {
-                                        showEditButtonId = if (isEditButtonVisible) null else asset.coinId
-                                    }
-                                },
-                                onEditRequest = { assetBeingEdited = asset },
-                                onSave = { _, _, _ -> },
-                                modifier = Modifier.longPressDraggableHandle(
-                                    onDragStarted = { isDraggingActive.value = true },
-                                    onDragStopped = {
-                                        isDraggingActive.value = false
-                                        if (isOverTrash.value) { assetPendingDeletion = asset }
-                                        else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } }
-                                    }
-                                )
-                            )
+                            FullAssetCard(asset = asset, isExpanded = isExpanded, isEditing = false, isDragging = isDragging, showEditButton = isEditButtonVisible, cardBg = cardBg, cardText = cardText, onExpandToggle = { if (isCompactViewEnabled) { if (expandedAssetId == asset.coinId) { if (isEditButtonVisible) { expandedAssetId = null; showEditButtonId = null } else { showEditButtonId = asset.coinId } } else { expandedAssetId = asset.coinId; showEditButtonId = null } } else { showEditButtonId = if (isEditButtonVisible) null else asset.coinId } }, onEditRequest = { assetBeingEdited = asset }, onSave = { _, _, _, _ -> }, modifier = Modifier.longPressDraggableHandle(onDragStarted = { isDraggingActive.value = true }, onDragStopped = { isDraggingActive.value = false; if (isOverTrash.value) { assetPendingDeletion = asset } else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } } }))
                         }
                     }
                 }
             }
 
-            // --- BOTTOM NAV BAR ---
             Surface(modifier = Modifier.fillMaxWidth().height(40.dp).background(bgColor)) {
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
                     val icons = listOf(Icons.Default.Home to Routes.HOME, Icons.AutoMirrored.Filled.FormatListBulleted to Routes.HOLDINGS, Icons.Default.PieChart to Routes.ANALYTICS, Icons.Default.Settings to Routes.SETTINGS)
-                    icons.forEach { (icon, route) ->
-                        IconButton(onClick = { navController.navigate(route) }) {
-                            Icon(icon, null, tint = if(currentRoute == route) textColor else textColor.copy(0.3f))
-                        }
-                    }
+                    icons.forEach { (icon, route) -> IconButton(onClick = { navController.navigate(route) }) { Icon(icon, null, tint = if(currentRoute == route) textColor else textColor.copy(0.3f)) } }
                 }
             }
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(bgColor))
         }
 
-        // --- OVERLAYS ---
+        // --- RESTORED EDIT OVERLAY: Split Lines 1 & 2 ---
         AnimatedVisibility(visible = assetBeingEdited != null, enter = fadeIn() + slideInVertically { -it }, exit = fadeOut() + slideOutVertically { -it }, modifier = Modifier.zIndex(1000f)) {
             Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.7f)).statusBarsPadding()) {
                 assetBeingEdited?.let { asset ->
                     FullAssetCard(
                         asset = asset, isExpanded = true, isEditing = true, isDragging = false, showEditButton = true,
-                        cardBg = cardBg, cardText = cardText,
-                        onExpandToggle = { }, onEditRequest = { },
-                        onSave = { name, amount, decimals ->
+                        cardBg = cardBg, cardText = cardText, onExpandToggle = { }, onEditRequest = { },
+                        onSave = { updatedName, amount, weight, decimals ->
                             scope.launch {
                                 isSavingOrder.value = true
-                                localHoldings = localHoldings.map { if (it.coinId == asset.coinId) it.copy(name = name, amountHeld = amount, decimalPreference = decimals) else it }
-                                viewModel.updateAsset(asset, name, amount, decimals)
+                                localHoldings = localHoldings.map { if (it.coinId == asset.coinId) it.copy(name = updatedName, amountHeld = amount, weight = weight, decimalPreference = decimals) else it }
+                                viewModel.updateAsset(asset, updatedName, amount, weight, decimals)
                                 viewModel.updateAssetOrder(localHoldings)
-                                delay(500)
-                                isSavingOrder.value = false; assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null
+                                delay(500); isSavingOrder.value = false; assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null
                             }
                         },
                         onCancel = { assetBeingEdited = null },
@@ -365,33 +248,10 @@ fun MyHoldingsScreen(
         }
 
         if (assetPendingDeletion != null) {
-            AlertDialog(
-                onDismissRequest = { assetPendingDeletion = null },
-                containerColor = bgColor,
-                title = { Text("Are you sure?", color = textColor, fontWeight = FontWeight.Black) },
-                text = { Text("Remove ${assetPendingDeletion?.name}?", color = textColor.copy(0.7f)) },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val assetToDelete = assetPendingDeletion
-                        if (assetToDelete != null) {
-                            viewModel.deleteAsset(assetToDelete)
-                        }
-                        assetPendingDeletion = null
-                    }) {
-                        Text("DELETE", color = Color.Red, fontWeight = FontWeight.Bold)
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { assetPendingDeletion = null }) {
-                        Text("CANCEL", color = textColor)
-                    }
-                }
-            )
+            AlertDialog(onDismissRequest = { assetPendingDeletion = null }, containerColor = bgColor, title = { Text("Are you sure?", color = textColor, fontWeight = FontWeight.Black) }, text = { Text("Remove ${assetPendingDeletion?.name}?", color = textColor.copy(0.7f)) }, confirmButton = { TextButton(onClick = { val assetToDelete = assetPendingDeletion; if (assetToDelete != null) { viewModel.deleteAsset(assetToDelete) }; assetPendingDeletion = null }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Bold) } }, dismissButton = { TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = textColor) } })
         }
     }
 }
-
-// -------------------- COMPONENTS (THE BODY) --------------------
 
 @Composable
 fun FullAssetCard(
@@ -404,21 +264,23 @@ fun FullAssetCard(
     cardText: Color,
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit,
-    onSave: (String, Double, Int) -> Unit,
+    onSave: (String, Double, Double, Int) -> Unit,
     onCancel: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var editName by remember(asset) { mutableStateOf(asset.name) }
+    // RESTORED: Splitting Name into two lines for editing
+    val initialLines = remember(asset.name) { asset.name.split("\n").let { if(it.size >= 2) it[0] to it[1] else it.first() to "" } }
+    var editLine1 by remember(asset) { mutableStateOf(initialLines.first) }
+    var editLine2 by remember(asset) { mutableStateOf(initialLines.second) }
     var editAmount by remember(asset) { mutableStateOf(asset.amountHeld.toString()) }
+    var editWeight by remember(asset) { mutableStateOf(asset.weight.toString()) }
     var editDecimals by remember(asset) { mutableFloatStateOf(asset.decimalPreference.toFloat()) }
+
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val elevation by animateDpAsState(if (isDragging) 30.dp else 0.dp, label = "")
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "")
 
-    Card(
-        modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); shape = RoundedCornerShape(16.dp); clip = true }.animateContentSize().clickable(enabled = !isEditing) { onExpandToggle() },
-        colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
-    ) {
+    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); shape = RoundedCornerShape(16.dp); clip = true }.animateContentSize().clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -426,61 +288,72 @@ fun FullAssetCard(
                     Spacer(Modifier.height(4.dp)); Text(asset.symbol.uppercase(), color = cardText.copy(0.7f), fontWeight = FontWeight.Bold, fontSize = 10.sp)
                 }
                 Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("YOUR HOLDING", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     if (isEditing) BasicTextField(value = editAmount, onValueChange = { editAmount = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.background(cardText.copy(0.1f), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp))
                     else Text(formatAmount(asset.amountHeld), color = cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
+
                     Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
-                        if (isEditing) BasicTextField(value = editName, onValueChange = { editName = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center), modifier = Modifier.background(cardText.copy(0.1f), RoundedCornerShape(4.dp)).padding(4.dp))
-                        else Text(asset.name.uppercase(), color = cardText, fontSize = 11.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold, softWrap = true)
+                        if (isEditing) {
+                            // RESTORED: Two-line editor
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                BasicTextField(value = editLine1, onValueChange = { if(it.length <= 12) editLine1 = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center), modifier = Modifier.background(cardText.copy(0.05f), RoundedCornerShape(2.dp)).padding(2.dp))
+                                BasicTextField(value = editLine2, onValueChange = { if(it.length <= 12) editLine2 = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center), modifier = Modifier.background(cardText.copy(0.05f), RoundedCornerShape(2.dp)).padding(2.dp))
+                            }
+                        } else {
+                            // FIXED: Force multi-line centered display with lineHeight
+                            Text(
+                                text = asset.name.uppercase(),
+                                color = cardText,
+                                fontSize = 11.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 12.sp,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
                 Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
-                    if (showEditButton && !isEditing) {
-                        IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, contentDescription = "Edit Asset", tint = Color.Black, modifier = Modifier.size(22.dp)) }
-                    } else {
-                        SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp))
-                    }
+                    if (showEditButton && !isEditing) IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black, modifier = Modifier.size(22.dp)) }
+                    else SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp))
                     Spacer(Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(end = 4.dp)) {
-                        Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(24.dp))
-                        Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(end = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(24.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) }
                 }
             }
             Spacer(Modifier.height(2.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f))
             Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("ASSET PRICE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(formatCurrency(asset.currentPrice, asset.decimalPreference), color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld; Text(formatCurrency(totalValue, asset.decimalPreference), color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp) }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("PRICE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); Text(formatCurrency(asset.currentPrice, asset.decimalPreference), color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    val label = if (asset.category == AssetCategory.METAL) "UNIT WEIGHT" else "MULTIPLIER"
+                    val unit = if (asset.category == AssetCategory.METAL) " oz" else ""
+                    Text(label, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    if (isEditing) BasicTextField(value = editWeight, onValueChange = { editWeight = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.background(cardText.copy(0.1f), RoundedCornerShape(4.dp)).padding(horizontal = 8.dp))
+                    else Text("${asset.weight}$unit", color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                }
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); val totalVal = asset.currentPrice * (asset.weight * asset.amountHeld); Text(formatCurrency(totalVal, asset.decimalPreference), color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp) }
             }
             AnimatedVisibility(visible = isEditing) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {
                     Text("DECIMAL PREFERENCE: ${editDecimals.toInt()}", color = cardText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     Slider(value = editDecimals, onValueChange = { editDecimals = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { IconButton(onClick = { onCancel() }, modifier = Modifier.size(36.dp).background(Color.Red, CircleShape)) { Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(20.dp)) }; Spacer(Modifier.width(16.dp)); IconButton(onClick = { onSave(editName, editAmount.toDoubleOrNull() ?: asset.amountHeld, editDecimals.toInt()) }, modifier = Modifier.size(36.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Check, null, tint = Color.Black, modifier = Modifier.size(20.dp)) } }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { IconButton(onClick = { onCancel() }, modifier = Modifier.size(36.dp).background(Color.Red, CircleShape)) { Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(20.dp)) }; Spacer(Modifier.width(16.dp)); IconButton(onClick = { onSave("${editLine1.trim()}\n${editLine2.trim()}", editAmount.toDoubleOrNull() ?: asset.amountHeld, editWeight.toDoubleOrNull() ?: asset.weight, editDecimals.toInt()) }, modifier = Modifier.size(36.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Check, null, tint = Color.Black, modifier = Modifier.size(20.dp)) } }
                 }
             }
         }
     }
 }
 
+// Helpers unchanged for brevity, but retained in full build
 @Composable
-fun CompactAssetCard(
-    asset: AssetEntity,
-    isDragging: Boolean,
-    cardBg: Color,
-    cardText: Color,
-    onExpandToggle: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val elevation by animateDpAsState(if (isDragging) 30.dp else 0.dp, label = "")
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "")
-
     Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); shape = RoundedCornerShape(12.dp); clip = true }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
         Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(modifier = Modifier.weight(1.2f), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) { if (asset.category == AssetCategory.METAL) MetalIcon(asset.name, size = 32) else AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp))) }
-                Spacer(Modifier.width(8.dp)); Column(modifier = Modifier.width(80.dp)) { AutoResizingText(text = asset.symbol.uppercase(), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp)); val totalValue = if (asset.isCustom) asset.currentPrice * (asset.weight * asset.amountHeld) else asset.currentPrice * asset.amountHeld; AutoResizingText(text = formatCurrency(totalValue, asset.decimalPreference), style = TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) }
+                Spacer(Modifier.width(8.dp)); Column(modifier = Modifier.width(80.dp)) { AutoResizingText(text = asset.symbol.uppercase(), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp)); val totalVal = asset.currentPrice * (asset.weight * asset.amountHeld); AutoResizingText(text = formatCurrency(totalVal, asset.decimalPreference), style = TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) }
             }
             Box(modifier = Modifier.weight(0.7f).height(24.dp).padding(horizontal = 4.dp)) { SparklineChart(asset.sparklineData, trendColor, Modifier.fillMaxSize()) }
             Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.Center) { AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 13.sp)); Row(verticalAlignment = Alignment.CenterVertically) { Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 10.sp, fontWeight = FontWeight.Black); Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(24.dp).offset(x = 4.dp)) } }
@@ -488,17 +361,11 @@ fun CompactAssetCard(
     }
 }
 
-// -------------------- HELPERS --------------------
-
 @Composable
 fun AutoResizingText(text: String, style: TextStyle, modifier: Modifier = Modifier, maxLines: Int = 1) {
     var fontSizeValue by remember { mutableStateOf(style.fontSize) }
     var readyToDraw by remember { mutableStateOf(false) }
-    Text(
-        text = text, style = style.copy(fontSize = fontSizeValue), modifier = modifier.drawWithContent { if (readyToDraw) drawContent() },
-        maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip,
-        onTextLayout = { textLayoutResult -> if (textLayoutResult.hasVisualOverflow && fontSizeValue > 8.sp) fontSizeValue *= 0.9f else readyToDraw = true }
-    )
+    Text(text = text, style = style.copy(fontSize = fontSizeValue), modifier = modifier.drawWithContent { if (readyToDraw) drawContent() }, maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip, onTextLayout = { textLayoutResult -> if (textLayoutResult.hasVisualOverflow && fontSizeValue > 8.sp) fontSizeValue *= 0.9f else readyToDraw = true })
 }
 
 fun formatCurrency(value: Double, decimalPreference: Int = 2): String {

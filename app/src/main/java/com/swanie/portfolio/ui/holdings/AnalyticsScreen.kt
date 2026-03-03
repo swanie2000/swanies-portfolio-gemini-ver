@@ -30,7 +30,9 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.swanie.portfolio.R
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -59,13 +61,13 @@ fun AnalyticsScreen(navController: NavController) {
         Color(0xFF2979FF), Color(0xFFEEFF41), Color(0xFFB2FF59)
     )
 
-    val totalValue = holdings.sumOf { it.currentPrice * it.amountHeld }
+    val totalValue = holdings.sumOf { it.currentPrice * (it.weight * it.amountHeld) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     var selectedAssetId by remember { mutableStateOf<String?>(null) }
 
     val assetSegments = holdings.mapIndexed { index, asset ->
-        val assetValue = asset.currentPrice * asset.amountHeld
+        val assetValue = asset.currentPrice * (asset.weight * asset.amountHeld)
         AssetSegment(
             asset = asset,
             value = assetValue,
@@ -84,7 +86,6 @@ fun AnalyticsScreen(navController: NavController) {
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            // --- THE SWAN ---
             Box(modifier = Modifier.fillMaxWidth().statusBarsPadding(), contentAlignment = Alignment.Center) {
                 Image(
                     painter = painterResource(R.drawable.swanie_foreground),
@@ -93,7 +94,6 @@ fun AnalyticsScreen(navController: NavController) {
                 )
             }
 
-            // --- CENTERED TITLE ---
             Text(
                 text = "PORTFOLIO INTELLIGENCE",
                 color = safeText,
@@ -103,7 +103,6 @@ fun AnalyticsScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
             )
 
-            // --- THE BLACK FRAME DASHBOARD ---
             Surface(
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 8.dp)
@@ -114,7 +113,6 @@ fun AnalyticsScreen(navController: NavController) {
                 border = BorderStroke(1.dp, Color.White.copy(0.12f))
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // Page Indicator Pips
                     Row(
                         Modifier.height(40.dp).fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -138,7 +136,6 @@ fun AnalyticsScreen(navController: NavController) {
                         }
                     }
 
-                    // --- JUMP-FREE CENTERED DASHBOARD FOOTER ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -153,7 +150,6 @@ fun AnalyticsScreen(navController: NavController) {
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 if (segment != null) {
-                                    // CENTERED ASSET FOCUS
                                     Text(
                                         text = segment.asset.name.replace("\n", " ").uppercase(),
                                         color = segment.color,
@@ -178,22 +174,9 @@ fun AnalyticsScreen(navController: NavController) {
                                         textAlign = TextAlign.Center
                                     )
                                 } else {
-                                    // CENTERED TOTAL PORTFOLIO (With Phantom Line for Symmetry)
-                                    Text(
-                                        text = "TOTAL PORTFOLIO VALUE",
-                                        color = Color.White.copy(0.4f),
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center
-                                    )
-                                    Text(
-                                        text = currencyFormatter.format(totalValue),
-                                        color = Color.White,
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Black,
-                                        textAlign = TextAlign.Center
-                                    )
-                                    Text(text = " ", fontSize = 12.sp) // Symmetry Lock
+                                    Text(text = "TOTAL PORTFOLIO VALUE", color = Color.White.copy(0.4f), fontSize = 10.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                    Text(text = currencyFormatter.format(totalValue), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                                    Text(text = " ", fontSize = 12.sp)
                                 }
                             }
                         }
@@ -201,7 +184,6 @@ fun AnalyticsScreen(navController: NavController) {
                 }
             }
 
-            // --- LEGEND ---
             Text(
                 text = "HOLDINGS KEY",
                 color = safeText.copy(0.5f),
@@ -224,7 +206,8 @@ fun AnalyticsScreen(navController: NavController) {
     }
 }
 
-// --- POP OUT PIE ---
+// --- SUB COMPONENTS ---
+
 @Composable
 fun PopOutPieChart(segments: List<AssetSegment>, selectedId: String?, onSelect: (String) -> Unit) {
     val animateSweep = remember { Animatable(0f) }
@@ -255,7 +238,6 @@ fun PopOutPieChart(segments: List<AssetSegment>, selectedId: String?, onSelect: 
     }
 }
 
-// --- INTERACTIVE DONUT ---
 @Composable
 fun InteractiveDonutChart(segments: List<AssetSegment>, selectedId: String?, baseColor: Color, onSelect: (String) -> Unit) {
     val focusedSegment = segments.find { it.asset.coinId == selectedId }
@@ -285,7 +267,6 @@ fun InteractiveDonutChart(segments: List<AssetSegment>, selectedId: String?, bas
     }
 }
 
-// --- INTERACTIVE BAR ---
 @Composable
 fun InteractiveBarChart(segments: List<AssetSegment>, selectedId: String?, onSelect: (String) -> Unit) {
     val displaySegments = segments.take(6)
@@ -310,21 +291,64 @@ fun InteractiveBarChart(segments: List<AssetSegment>, selectedId: String?, onSel
     }
 }
 
-// --- LEGEND ROW ---
 @Composable
 fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean, onClick: () -> Unit) {
     val bgColor by animateColorAsState(if (isSelected) segment.color.copy(0.12f) else Color.Transparent, label = "")
     val borderColor by animateColorAsState(if (isSelected) segment.color.copy(0.5f) else Color.Transparent, label = "")
+
+    val symbol = segment.asset.symbol.uppercase()
+    val cleanName = segment.asset.name.replace("\n", " ").trim().uppercase()
+    val displayTitle = if (symbol == cleanName) symbol else "$symbol • $cleanName"
+
     Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(bgColor).border(1.dp, borderColor, RoundedCornerShape(12.dp)).clickable { onClick() }.padding(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(bgColor)
+            .border(1.dp, borderColor, RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(segment.color))
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(text = "${segment.asset.symbol.uppercase()}  ${segment.asset.name.replace("\n", " ").uppercase()}", color = if(isSelected) segment.color else textColor, fontSize = 13.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            // ICON BOX (Cleaned up, no ring)
+            Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                if (segment.asset.category == AssetCategory.METAL) {
+                    MetalIcon(segment.asset.name, size = 30)
+                } else {
+                    AsyncImage(
+                        model = segment.asset.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(26.dp).clip(CircleShape)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(14.dp))
+
+            // NAME + PILL BAR STACK
+            Column(verticalArrangement = Arrangement.Center) {
+                Text(
+                    text = displayTitle,
+                    color = if(isSelected) segment.color else textColor,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(4.dp))
+                // THE PILL BAR
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(segment.color)
+                )
+            }
         }
+
         Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.End) {
             Text(NumberFormat.getCurrencyInstance(Locale.US).format(segment.value), color = textColor, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
             Text("${String.format("%.1f", segment.ratio * 100)}%", color = segment.color, fontSize = 11.sp, fontWeight = FontWeight.Black)

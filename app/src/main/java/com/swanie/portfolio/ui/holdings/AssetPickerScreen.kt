@@ -14,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester // ADDED
-import androidx.compose.ui.focus.focusRequester // ADDED
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -48,7 +48,7 @@ fun AssetPickerScreen(
 
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() } // Now recognized
+    val focusRequester = remember { FocusRequester() }
 
     val viewModel: AssetViewModel = hiltViewModel()
     val searchResults by viewModel.searchResults.collectAsState()
@@ -93,11 +93,7 @@ fun AssetPickerScreen(
                 unfocusedTextColor = textColor,
                 cursorColor = textColor,
                 focusedBorderColor = textColor,
-                unfocusedBorderColor = textColor.copy(alpha = 0.5f),
-                focusedLabelColor = textColor.copy(alpha = 0.7f),
-                unfocusedLabelColor = textColor.copy(alpha = 0.7f),
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
+                unfocusedBorderColor = textColor.copy(alpha = 0.5f)
             )
         )
 
@@ -110,29 +106,16 @@ fun AssetPickerScreen(
                 Image(
                     painter = painterResource(id = R.drawable.swan_launcher_icon),
                     contentDescription = "Ghost Swan",
-                    modifier = Modifier
-                        .size(220.dp)
-                        .alpha(0.08f),
+                    modifier = Modifier.size(220.dp).alpha(0.08f),
                     colorFilter = ColorFilter.tint(textColor)
                 )
                 Spacer(modifier = Modifier.weight(3.0f))
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
                 items(searchResults) { asset ->
-                    CoinItem(
-                        asset = asset,
-                        textColor = textColor,
-                        onAssetSelected = onAssetSelected
-                    )
-                    HorizontalDivider(
-                        color = textColor.copy(alpha = 0.2f),
-                        thickness = 1.dp
-                    )
+                    CoinItem(asset = asset, textColor = textColor, onAssetSelected = onAssetSelected)
+                    HorizontalDivider(color = textColor.copy(alpha = 0.2f), thickness = 1.dp)
                 }
             }
         }
@@ -147,69 +130,31 @@ fun CoinItem(
 ) {
     TextButton(
         onClick = {
-            onAssetSelected(
-                asset.coinId,
-                asset.symbol.uppercase(),
-                asset.name,
-                asset.imageUrl,
-                asset.category,
-                asset.currentPrice
-            )
+            onAssetSelected(asset.coinId, asset.symbol.uppercase(), asset.name, asset.imageUrl, asset.category, asset.currentPrice)
         },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
             when (asset.category) {
                 AssetCategory.METAL -> {
                     val color = when (asset.symbol) {
                         "XAU" -> Color(0xFFFFD700)
                         "XAG" -> Color(0xFFC0C0C0)
-                        "XPT" -> Color(0xFFE5E4E2)
-                        "XPD" -> Color(0xFFE5E4E2)
+                        "XPT", "XPD" -> Color(0xFFE5E4E2)
                         else -> Color.Gray
                     }
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                    )
+                    Box(modifier = Modifier.size(30.dp).clip(CircleShape).background(color))
                 }
                 AssetCategory.CRYPTO -> {
-                    AsyncImage(
-                        model = asset.imageUrl,
-                        contentDescription = "${asset.name} icon",
-                        modifier = Modifier.size(30.dp)
-                    )
+                    AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(30.dp))
                 }
             }
             Spacer(Modifier.width(16.dp))
-            Text(
-                text = "${asset.name} (${asset.symbol.uppercase()})",
-                color = textColor
-            )
+            Text(text = "${asset.name} (${asset.symbol.uppercase()})", color = textColor)
             Spacer(Modifier.width(8.dp))
-            Chip(label = asset.category.name, textColor = textColor)
+            Box(modifier = Modifier.background(textColor.copy(0.1f), CircleShape).padding(horizontal = 8.dp, vertical = 4.dp)) {
+                Text(text = asset.category.name, color = textColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+            }
         }
-    }
-}
-
-@Composable
-fun Chip(label: String, textColor: Color) {
-    Box(
-        modifier = Modifier
-            .background(textColor.copy(alpha = 0.1f), CircleShape)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    ) {
-        Text(
-            text = label,
-            color = textColor,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
