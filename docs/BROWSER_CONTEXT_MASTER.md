@@ -180,108 +180,93 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 
    Purpose: Crypto & Precious Metals tracking with a high-end, custom-themed UI.
 
-   Current Branch: main (Working Tree Clean - Commit 49cdc75)
+   Current Branch: main (Working Tree Clean - Commit b977b0d)
 
    Tech Stack: Kotlin, Jetpack Compose, Hilt, Room, Retrofit, StateFlow, DataStore.
 
 2. Architectural Status
 
-   Status: MULTI-LEVEL CALCULATIONS ENABLED
+   Status: TAB-AWARE TOTALS & PRECISION FORMATTING ENABLED
 
-        The "Heavy" Math Engine: Upgraded the Room database to Version 8. Assets now support a weight and premium field. The portfolio logic now calculates value as: ((SpotPrice×Weight)+Premium)×Quantity.
+        Segmented Portfolio Totals: The main header total now dynamically switches based on the active tab (ALL, CRYPTO, or METAL), providing category-specific valuations.
 
-        State-Lock Reordering: Restored reorder stability by stripping out animateContentSize which caused UI "jitter." Implemented a cross-tab mapping logic that allows dragging on CRYPTO and METAL tabs to update the master list order correctly.
+        Isolated Decimal Precision: Implemented a split formatting logic where the Unit Price respects user-defined slider precision (essential for low-satoshi crypto), while Total Value and Portfolio Totals are hard-locked to standard 2-decimal currency ($#,##0.00).
 
-        UI Component Consolidation: Centralized shared components (FullAssetCard, MetalIcon, SparklineChart) within MyHoldingsScreen.kt to prevent "Double Vision" compiler errors across the package.
+        Integrated Entry & Edit Flow: The 5-step funnel handles all new entries, while the refined FullAssetCard handles edits, both feeding into the unit-aware math engine.
 
 3. Feature Map & UI Status
+   🟢 Completed & Locked
 
-🟢 Completed & Locked
+   Segmented Header Logic: Switching tabs now instantly updates the top portfolio value to reflect only the assets in view.
 
-    Tactile Grab Feedback: Restored the 1.05f scale-up and shadow elevation when long-pressing cards. The app feels "physical" again.
+   Currency Standardization: Fixed the "Too Many Decimals" bug in the balance displays. Your net worth now always displays as clean, standard currency.
 
-    The Intelligence Suite: Full-screen "Scan Flash" and the logo-centered "Charging Bar" are fully restored and linked to the manual refresh trigger.
+   Edit Overlay Logic: Swapped the field order for better flow—Quantity/Weight (Logical variables) are now on top, while Name/Precision (Descriptive variables) are on the bottom.
 
-    Universal Tab Reordering: Drag-to-sort and Drag-to-delete now function seamlessly across all three view filters (ALL, CRYPTO, METAL).
-
-    Analytics Legend Update: The Holdings Key now features rectangular color-coded pills under each asset name, providing an immediate visual link to the chart slices.
+   Unit-Aware Math Engine: Fully handles KILO, GRAM, and DWT conversions relative to troy ounce spot prices.
 
 🟡 In Progress / Work-in-Progress
 
-    Ghost Card Entry (Manual Add): Implemented a "What You See Is What You Get" entry card. Fields use a pulsing "Breathing Glow" to invite interaction.
+    Edit Screen Layout (Keyboard Obstruction): In the current edit overlay, the software keyboard covers the "Save/Cancel" buttons on smaller screens or when many fields are present.
 
-        Known Bug: Manual entry flow needs a final pass to ensure all fields persist correctly to the DB on the first click.
-
-    Dynamic Identity Mapping: Manual assets now intelligently assign symbols (GOLD, SILV, PLAT) based on the selected metal type instead of a hardcoded "CUST" tag.
+    Focus Management: Ensuring the Quantity field in the Edit Overlay auto-clears and focuses as reliably as it does in the Add Funnel.
 
 🔴 Upcoming Features
 
-    Premium Logic Toggles: Adding a switch to enter Premium as "Total Amount" vs "Per Ounce."
+    IME Inset Padding: Implementing Modifier.imePadding() or WindowInsets.ime to ensure the Edit Overlay slides up when the keyboard is active.
 
-    Interactive Donut Deep-Dive: Allowing legend clicks to trigger the "Full Asset Card" overlay directly from the Analytics screen.
+    Interactive Donut Deep-Dive: Legend clicks on the Analytics screen triggering the asset detail overlay.
+
+    Premium Logic Toggles: Adding a switch to enter Premium as "Total Amount" vs "Per Ounce."
 
 4. Key Logic Snippets (The Build-Savers)
    Kotlin
 
-// 1. THE WEIGHT-BASED ENGINE (Room v8)
-// Portfolio Value = ((Price * Weight) + TotalPremium) * Quantity
-val totalVal = asset.currentPrice * (asset.weight * asset.amountHeld)
+// 1. ISOLATED PRECISION FORMATTING
+// Price uses slider pref; Total Value uses hard-coded 2 decimals
+Text("PRICE: " + formatCurrency(asset.currentPrice, asset.decimalPreference))
+Text("TOTAL: " + formatCurrency(calculatedTotal, 2))
 
-// 2. UNIVERSAL REORDER MAPPING (Filtered Tab Support)
-// Finds the actual database index even when viewing a filtered list
-val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
-val fromItem = filteredList[from.index]
-val toItem = filteredList[to.index]
-val newList = localHoldings.toMutableList()
-val fromIdxMaster = newList.indexOfFirst { it.coinId == fromItem.coinId }
-val toIdxMaster = newList.indexOfFirst { it.coinId == toItem.coinId }
-
-    if (fromIdxMaster != -1 && toIdxMaster != -1) {
-        newList.add(toIdxMaster, newList.removeAt(fromIdxMaster))
-        localHoldings = newList
-    }
+// 2. DYNAMIC TAB-BASED TOTALS
+val totalValueFormatted by remember(holdings, selectedTab) {
+derivedStateOf {
+val filtered = when (selectedTab) {
+1 -> holdings.filter { it.category == AssetCategory.CRYPTO }
+2 -> holdings.filter { it.category == AssetCategory.METAL }
+else -> holdings
+}
+val sum = filtered.sumOf { it.currentPrice * getUnitMultiplier(it) * it.weight * it.amountHeld }
+formatCurrency(sum, 2)
+}
 }
 
-// 3. AUTO-CLEAR FOCUS LOGIC
-// Wipes sample text (1.0, 0.0) the moment the user taps the field
-modifier = Modifier.onFocusChanged {
-if (it.isFocused && (quantity == "1" || quantity == "0")) quantity = ""
-}
+// 3. VISUAL HIERARCHY (EDIT MODE)
+// Dimming non-editable elements to highlight the Yellow input fields
+val activeTint = if(isEditing) Color.Yellow else cardText
+val backgroundAlpha = if(isEditing) 0.3f else 1.0f
 
 🛡️ Narrative Synchronized
-The record is straight, Michael. We ended the day with a codebase that is mathematically more powerful and visually more responsive.
-🎯 Next Steps
+The portfolio now behaves like a professional financial tool—precise where it needs to be (unit price) and standard where it counts (account balance).
 
-I've noted the Manual Add Asset bugs for our next session. We’ll finish polishing those "Breathing" fields and ensure the save logic is 100% bulletproof.
+🎯 Next Steps (Session Kickoff)
 
-Would you like me to generate a checklist of those specific manual entry bugs so we don't miss anything next time?
+    Keyboard Fix: Apply Inset handling to the MyHoldingsScreen edit overlay so the "Save" button is always reachable.
 
-
-Here is the targeted punch-list for our next session to ensure the "Ghost Card" manual entry is as bulletproof as the rest of the app:
-📝 Manual Entry Bug Checklist
-
-    Field Persistence Check: Verify that the "Premium per oz" and "Unit Weight" values are correctly saved to the Room database on the initial "Add" click.
-
-    Keyboard "ImeAction" Flow: Ensure that hitting "Next" on the soft keyboard moves the cursor logically through the card fields (Quantity → Line 1 → Line 2 → Weight → Premium) and "Done" hides the keyboard.
-
-    Symbol Refinement: Confirm that the first-four-letters logic for "Custom" metals looks clean in the compact view (e.g., ensuring "BRONZE" becomes "BRON" without awkward clipping).
-
-    Zero-State Validation: Prevent saving the asset if Line 1 is empty to avoid "Ghost Assets" in the main list.
-
-    Focus Reset: Ensure that when the "Add" operation is cancelled or finished, all internal state variables (line1, line2, etc.) are wiped clean for the next entry.
+    State Persistence: Verify that the "Weight" field updates correctly when editing existing assets vs. new funnel entries.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 03/02/2026 21:46:04.09
+Generated: Tue 03/03/2026 15:55:07.88
 
 Branch:
 main
 Commit:
-49cdc75e1606e1595840aa35feb89e90f912bb6d
+b977b0d76c326d22bbc9497d31afad63ad895138
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -324,7 +309,6 @@ app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
-app/src/main/java/com/swanie/portfolio/ui/holdings/ManualAssetEntryScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
