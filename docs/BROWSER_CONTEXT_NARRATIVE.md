@@ -3,78 +3,76 @@
 
    App Name: Swanie's Portfolio
 
-   Purpose: Crypto & Precious Metals tracking with a high-end, custom-themed UI.
+   Purpose: Professional-grade Crypto & Precious Metals tracking with a high-end, user-curated visual theme.
 
-   Current Branch: main (Working Tree Clean - Commit b977b0d)
+   Current Branch: main (Personal Vault & Unified Funnel Logic Locked)
 
    Tech Stack: Kotlin, Jetpack Compose, Hilt, Room, Retrofit, StateFlow, DataStore.
 
 2. Architectural Status
 
-   Status: TAB-AWARE TOTALS & PRECISION FORMATTING ENABLED
+Status: UNIFIED FUNNEL & PERSONAL VAULT ENABLED
 
-        Segmented Portfolio Totals: The main header total now dynamically switches based on the active tab (ALL, CRYPTO, or METAL), providing category-specific valuations.
+    The Personal Vault: Assets can now be designated as "True Custom." This allows for manual valuation of non-tracked items (watches, heirlooms, collectibles) using a manual price-per-unit engine while still contributing to the total portfolio balance.
 
-        Isolated Decimal Precision: Implemented a split formatting logic where the Unit Price respects user-defined slider precision (essential for low-satoshi crypto), while Total Value and Portfolio Totals are hard-locked to standard 2-decimal currency ($#,##0.00).
+    Unified Funnel System: Add and Edit flows are now merged into a single multi-step Dialog system. This solved the "Keyboard Obstruction" issue by centering inputs and focus, providing a consistent UX across the app.
 
-        Integrated Entry & Edit Flow: The 5-step funnel handles all new entries, while the refined FullAssetCard handles edits, both feeding into the unit-aware math engine.
+    Hero Visuals (Swan Logic): Implemented a high-priority rendering check for custom assets. If no photo is uploaded, a solid white, 1.5x scaled Swan logo is forced as the hero icon to maintain branding.
+
+    Themed Confirmation Engine: The "Are You Sure" deletion safety switch is now fully wired. It respects the user's confirmDelete preference and dynamically pulls colors from the active cardBg and cardText theme choices.
 
 3. Feature Map & UI Status
-   🟢 Completed & Locked
 
-   Segmented Header Logic: Switching tabs now instantly updates the top portfolio value to reflect only the assets in view.
+🟢 Completed & Locked
 
-   Currency Standardization: Fixed the "Too Many Decimals" bug in the balance displays. Your net worth now always displays as clean, standard currency.
+    True Custom Branching: Funnel logic now successfully maps "Icon Name" to symbol and "Description Lines" to center-card text.
 
-   Edit Overlay Logic: Swapped the field order for better flow—Quantity/Weight (Logical variables) are now on top, while Name/Precision (Descriptive variables) are on the bottom.
+    Photo Integration: Support for local URI icon uploads with circular cropping and themed borders.
 
-   Unit-Aware Math Engine: Fully handles KILO, GRAM, and DWT conversions relative to troy ounce spot prices.
+    Themed Safety Switches: Deletion popups follow user-defined styling and toggle on/off via Settings.
 
-🟡 In Progress / Work-in-Progress
+    Zero-State Inputs: Custom funnel fields now start empty with greyed-out placeholders for faster, friction-free data entry.
 
-    Edit Screen Layout (Keyboard Obstruction): In the current edit overlay, the software keyboard covers the "Save/Cancel" buttons on smaller screens or when many fields are present.
-
-    Focus Management: Ensuring the Quantity field in the Edit Overlay auto-clears and focuses as reliably as it does in the Add Funnel.
+    Segmented Tab Totals: ALL, CRYPTO, and METAL tabs accurately filter the header's total valuation.
 
 🔴 Upcoming Features
 
-    IME Inset Padding: Implementing Modifier.imePadding() or WindowInsets.ime to ensure the Edit Overlay slides up when the keyboard is active.
+    Interactive Donut Deep-Dive: Enabling legend-clicks on the Analytics screen to trigger the asset detail overlay.
 
-    Interactive Donut Deep-Dive: Legend clicks on the Analytics screen triggering the asset detail overlay.
-
-    Premium Logic Toggles: Adding a switch to enter Premium as "Total Amount" vs "Per Ounce."
+    Premium Logic Toggles: A switch to toggle Premium entry between "Total Amount" and "Per Ounce/Unit."
 
 4. Key Logic Snippets (The Build-Savers)
    Kotlin
 
-// 1. ISOLATED PRECISION FORMATTING
-// Price uses slider pref; Total Value uses hard-coded 2 decimals
-Text("PRICE: " + formatCurrency(asset.currentPrice, asset.decimalPreference))
-Text("TOTAL: " + formatCurrency(calculatedTotal, 2))
-
-// 2. DYNAMIC TAB-BASED TOTALS
-val totalValueFormatted by remember(holdings, selectedTab) {
-derivedStateOf {
-val filtered = when (selectedTab) {
-1 -> holdings.filter { it.category == AssetCategory.CRYPTO }
-2 -> holdings.filter { it.category == AssetCategory.METAL }
-else -> holdings
-}
-val sum = filtered.sumOf { it.currentPrice * getUnitMultiplier(it) * it.weight * it.amountHeld }
-formatCurrency(sum, 2)
+// 1. HERO SWAN PRIORITY
+// Forces the Swan logo to 1.5x scale if "SWAN_DEFAULT" flag is present
+if (imageUrl == "SWAN_DEFAULT") {
+Box(modifier = Modifier.size((size * 1.2).dp).clip(CircleShape)) {
+Image(painter = painterResource(R.drawable.swanie_foreground),
+modifier = Modifier.fillMaxSize().scale(1.5f))
 }
 }
 
-// 3. VISUAL HIERARCHY (EDIT MODE)
-// Dimming non-editable elements to highlight the Yellow input fields
-val activeTint = if(isEditing) Color.Yellow else cardText
-val backgroundAlpha = if(isEditing) 0.3f else 1.0f
+// 2. THEMED SAFETY SWITCH
+// Checks MainViewModel preference before launching the popup
+if (isOverTrash.value) {
+if (confirmDeleteSetting) {
+assetPendingDeletion = asset
+} else {
+viewModel.deleteAsset(asset)
+}
+}
+
+// 3. TRUE CUSTOM MAPPING
+// funnelMetal -> icon label | line1 + line2 -> center card text
+val displaySymbol = if(isTrueCust) funnelMetal.uppercase() else "CUST"
+val finalName = if(isTrueCust) "$line1\n$line2" else standardName
 
 🛡️ Narrative Synchronized
-The portfolio now behaves like a professional financial tool—precise where it needs to be (unit price) and standard where it counts (account balance).
+The app now functions as a comprehensive wealth vault. It correctly handles identity mapping for custom items and enforces a high-end visual hierarchy regardless of the user's data choice.
 
-🎯 Next Steps (Session Kickoff)
+🎯 Next Steps (Future Session)
 
-    Keyboard Fix: Apply Inset handling to the MyHoldingsScreen edit overlay so the "Save" button is always reachable.
+    Donut Interaction: Wire the Analytics screen legend to the holdings detail.
 
-    State Persistence: Verify that the "Weight" field updates correctly when editing existing assets vs. new funnel entries.
+    Premium Toggle: Implement the Unit vs. Total premium math.

@@ -3,6 +3,9 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.app.Activity
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -21,23 +24,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
@@ -58,8 +68,8 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.util.Locale
+import java.util.UUID
 
 @Composable
 fun MyHoldingsScreen(
@@ -73,7 +83,9 @@ fun MyHoldingsScreen(
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
+
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle(initialValue = false)
+    val confirmDeleteSetting by mainViewModel.confirmDelete.collectAsStateWithLifecycle(initialValue = true)
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
@@ -91,6 +103,7 @@ fun MyHoldingsScreen(
     val isSavingOrder = remember { mutableStateOf(false) }
     val isOverTrash = remember { mutableStateOf(false) }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
+
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var showEditButtonId by remember { mutableStateOf<String?>(null) }
@@ -100,15 +113,15 @@ fun MyHoldingsScreen(
 
     val totalValueFormatted by remember(holdings, selectedTab) {
         derivedStateOf {
-            val filteredForTotal = when (selectedTab) {
+            val filtered = when (selectedTab) {
                 1 -> holdings.filter { it.category == AssetCategory.CRYPTO }
                 2 -> holdings.filter { it.category == AssetCategory.METAL }
                 else -> holdings
             }
-            val total = filteredForTotal.sumOf {
+            val total = filtered.sumOf {
                 val multiplier = when {
-                    it.name.contains("KILO", ignoreCase = true) || it.name.contains("KG", ignoreCase = true) -> 32.1507
-                    it.name.contains("GRAM", ignoreCase = true) || it.name.contains(" G", ignoreCase = true) -> 0.0321507
+                    it.name.contains("KILO", ignoreCase = true) -> 32.1507
+                    it.name.contains("GRAM", ignoreCase = true) -> 0.0321507
                     it.name.contains("DWT", ignoreCase = true) -> 0.0514426
                     else -> 1.0
                 }
@@ -138,9 +151,8 @@ fun MyHoldingsScreen(
                 showScanFlash = false
             }
             val startTime = System.currentTimeMillis()
-            val duration = 30000L
-            while (isRefreshing && (System.currentTimeMillis() - startTime) < duration) {
-                refreshProgress = (System.currentTimeMillis() - startTime).toFloat() / duration
+            while (isRefreshing && (System.currentTimeMillis() - startTime) < 30000L) {
+                refreshProgress = (System.currentTimeMillis() - startTime).toFloat() / 30000L
                 delay(100)
             }
             refreshProgress = 1f; delay(500); isRefreshing = false; refreshProgress = 0f
@@ -148,8 +160,7 @@ fun MyHoldingsScreen(
     }
 
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val filtered = if (selectedTab == 0) localHoldings
-        else localHoldings.filter { it.category == if(selectedTab == 1) AssetCategory.CRYPTO else AssetCategory.METAL }
+        val filtered = if (selectedTab == 0) localHoldings else localHoldings.filter { it.category == if(selectedTab == 1) AssetCategory.CRYPTO else AssetCategory.METAL }
         val newList = localHoldings.toMutableList()
         val fromIdx = newList.indexOfFirst { it.coinId == filtered[from.index].coinId }
         val toIdx = newList.indexOfFirst { it.coinId == filtered[to.index].coinId }
@@ -217,8 +228,15 @@ fun MyHoldingsScreen(
                             onDragStarted = { isDraggingActive.value = true },
                             onDragStopped = {
                                 isDraggingActive.value = false
-                                if (isOverTrash.value) { assetPendingDeletion = asset }
-                                else { scope.launch { isDraggingActive.value = false; isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false } }
+                                if (isOverTrash.value) {
+                                    if (confirmDeleteSetting) {
+                                        assetPendingDeletion = asset
+                                    } else {
+                                        viewModel.deleteAsset(asset)
+                                    }
+                                } else {
+                                    scope.launch { isDraggingActive.value = false; isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                }
                             }
                         )
 
@@ -242,25 +260,39 @@ fun MyHoldingsScreen(
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(bgColor))
         }
 
-        AnimatedVisibility(visible = assetBeingEdited != null, enter = fadeIn() + slideInVertically { -it }, exit = fadeOut() + slideOutVertically { -it }, modifier = Modifier.zIndex(1000f)) {
-            Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(0.7f)).statusBarsPadding()) {
-                assetBeingEdited?.let { asset ->
-                    FullAssetCard(
-                        asset = asset, isExpanded = true, isEditing = true, isDragging = false, showEditButton = true,
-                        cardBg = cardBg, cardText = cardText, onExpandToggle = { }, onEditRequest = { },
-                        onSave = { updatedName, amount, weight, decimals ->
-                            scope.launch {
-                                isSavingOrder.value = true
-                                localHoldings = localHoldings.map { if (it.coinId == asset.coinId) it.copy(name = updatedName, amountHeld = amount, weight = weight, decimalPreference = decimals) else it }
-                                viewModel.updateAsset(asset, updatedName, amount, weight, decimals)
-                                viewModel.updateAssetOrder(localHoldings)
-                                delay(500); isSavingOrder.value = false; assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null
-                            }
-                        },
-                        onCancel = { assetBeingEdited = null },
-                        modifier = Modifier.padding(16.dp).align(Alignment.TopCenter)
-                    )
-                }
+        if (assetBeingEdited != null) {
+            val asset = assetBeingEdited!!
+            if (asset.category == AssetCategory.METAL) {
+                MetalSelectionFunnel(
+                    initialMetal = if(asset.baseSymbol == "CUSTOM") asset.symbol else (asset.name.split("\n").getOrNull(0) ?: "Silver"),
+                    initialForm = asset.name,
+                    initialWeight = asset.weight,
+                    initialQty = asset.amountHeld.toString(),
+                    initialPrem = asset.premium.toString(),
+                    initialManualPrice = if(asset.baseSymbol == "CUSTOM") asset.currentPrice.toString() else "0.0",
+                    onDismiss = { assetBeingEdited = null },
+                    onConfirmed = { fMetal, fForm, fWeight, isKilo, fQty, fPrem, iconUri, isTrueCust, manualPrice ->
+                        scope.launch {
+                            val finalName = if(isTrueCust) fForm else "${fMetal.uppercase()}\n${if (isKilo) "KILO" else fForm.uppercase()}"
+                            val price = if(isTrueCust) (manualPrice.toDoubleOrNull() ?: 0.0) else asset.currentPrice
+
+                            viewModel.updateAsset(asset.copy(
+                                symbol = if(isTrueCust) fMetal.uppercase() else asset.symbol,
+                                name = finalName,
+                                amountHeld = fQty.toDoubleOrNull() ?: asset.amountHeld,
+                                weight = fWeight,
+                                currentPrice = price,
+                                imageUrl = iconUri ?: if(isTrueCust) "SWAN_DEFAULT" else asset.imageUrl,
+                                baseSymbol = if(isTrueCust) "CUSTOM" else asset.baseSymbol
+                            ), finalName, fQty.toDoubleOrNull() ?: asset.amountHeld, fWeight, asset.decimalPreference)
+                            assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null
+                        }
+                    }
+                )
+            } else {
+                CryptoEditFunnel(asset = asset, onDismiss = { assetBeingEdited = null }, onSave = { updatedName, amount, decimals ->
+                    scope.launch { viewModel.updateAsset(asset, updatedName, amount, asset.weight, decimals); assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null }
+                })
             }
         }
 
@@ -269,176 +301,51 @@ fun MyHoldingsScreen(
         }
 
         if (assetPendingDeletion != null) {
-            AlertDialog(onDismissRequest = { assetPendingDeletion = null }, containerColor = bgColor, title = { Text("Are you sure?", color = textColor, fontWeight = FontWeight.Black) }, text = { Text("Remove ${assetPendingDeletion?.name}?", color = textColor.copy(0.7f)) }, confirmButton = { TextButton(onClick = { val assetToDelete = assetPendingDeletion; if (assetToDelete != null) { viewModel.deleteAsset(assetToDelete) }; assetPendingDeletion = null }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Bold) } }, dismissButton = { TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = textColor) } })
+            // UPDATED ALERT DIALOG TO FOLLOW USER THEME
+            AlertDialog(
+                onDismissRequest = { assetPendingDeletion = null },
+                containerColor = cardBg, // FOLLOWS USER CARD BACKGROUND
+                titleContentColor = cardText, // FOLLOWS USER CARD TEXT
+                textContentColor = cardText.copy(alpha = 0.7f),
+                title = { Text("Are you sure?", fontWeight = FontWeight.Black) },
+                text = { Text("Remove ${assetPendingDeletion?.name?.replace("\n", " ")}?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val assetToDelete = assetPendingDeletion
+                        if (assetToDelete != null) { viewModel.deleteAsset(assetToDelete) }
+                        assetPendingDeletion = null
+                    }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Black) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { assetPendingDeletion = null }) {
+                        Text("CANCEL", color = cardText.copy(alpha = 0.5f))
+                    }
+                }
+            )
         }
     }
 }
 
+// --- SHARED COMPONENTS ---
+
 @Composable
-fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
-    val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
-    val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
-
-    Card(
-        modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }.clickable(enabled = !isEditing) { onExpandToggle() },
-        colors = CardDefaults.cardColors(containerColor = cardBg),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            if (asset.category == AssetCategory.METAL) {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        MetalIcon(asset.name)
-                        Spacer(Modifier.height(6.dp))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy((-2).dp)) {
-                            Text(text = asset.weight.toString(), color = if(isEditing) Color.Yellow else cardText, fontWeight = FontWeight.Black, fontSize = 11.sp, lineHeight = 11.sp)
-                            val displayUnit = when {
-                                asset.name.contains("KILO", ignoreCase = true) -> "KILO"
-                                asset.name.contains("GRAM", ignoreCase = true) -> "GRAM"
-                                asset.name.contains("DWT", ignoreCase = true) -> "DWT"
-                                else -> "OZ"
-                            }
-                            Text(text = displayUnit, color = if(isEditing) Color.Yellow.copy(0.6f) else cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp, lineHeight = 9.sp)
-                        }
-                    }
-                    Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        Text(formatAmount(asset.amountHeld), color = if(isEditing) Color.Yellow else cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                        Box(modifier = Modifier.height(44.dp), contentAlignment = Alignment.Center) {
-                            val forcedName = if (asset.name.contains(" ") && !asset.name.contains("\n")) asset.name.replaceFirst(" ", "\n") else asset.name
-                            Text(text = forcedName.uppercase(), color = if(isEditing) Color.Yellow else cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 13.sp, maxLines = 2)
-                        }
-                    }
-                    Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
-                        if (showEditButton && !isEditing) IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) }
-                        else {
-                            SparklineChart(asset.sparklineData, if(isEditing) Color.Gray.copy(0.3f) else trendColor, Modifier.width(75.dp).height(32.dp))
-                            Spacer(Modifier.height(4.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(if(isEditing) Color.Gray.copy(0.05f) else trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) {
-                                Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = if(isEditing) Color.Gray else trendColor, modifier = Modifier.size(20.dp))
-                                Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = if(isEditing) Color.Gray else trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                            }
-                        }
-                    }
-                }
-            } else {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.CenterHorizontally) { AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)).then(if(isEditing) Modifier.graphicsLayer { alpha = 0.3f } else Modifier)); Spacer(Modifier.height(4.dp)); Text(asset.symbol.uppercase(), color = if(isEditing) cardText.copy(0.2f) else cardText.copy(0.7f), fontWeight = FontWeight.Bold, fontSize = 10.sp) }
-                    Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        Text(formatAmount(asset.amountHeld), color = if(isEditing) Color.Yellow else cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                        Text(text = asset.name.uppercase(), color = if(isEditing) Color.Yellow else cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 12.sp, maxLines = 2, modifier = Modifier.fillMaxWidth())
-                    }
-                    Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
-                        if (showEditButton && !isEditing) IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) }
-                        else {
-                            SparklineChart(asset.sparklineData, if(isEditing) Color.Gray.copy(0.3f) else trendColor, Modifier.width(75.dp).height(32.dp))
-                            Spacer(Modifier.height(4.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(if(isEditing) Color.Gray.copy(0.05f) else trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) {
-                                Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = if(isEditing) Color.Gray else trendColor, modifier = Modifier.size(20.dp))
-                                Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = if(isEditing) Color.Gray else trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(8.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f)); Spacer(Modifier.height(8.dp))
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-                val multiplier = when {
-                    asset.name.contains("KILO", ignoreCase = true) || asset.name.contains("KG", ignoreCase = true) -> 32.1507
-                    asset.name.contains("GRAM", ignoreCase = true) || asset.name.contains(" G", ignoreCase = true) -> 0.0321507
-                    asset.name.contains("DWT", ignoreCase = true) -> 0.0514426
-                    else -> 1.0
-                }
-                Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("PRICE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                    AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = if(isEditing) cardText.copy(0.2f) else cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
-                }
-                Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black)
-                    AutoResizingText(text = formatCurrency(asset.currentPrice * multiplier * asset.weight * asset.amountHeld, 2), style = TextStyle(color = if(isEditing) cardText.copy(0.2f) else cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
-                }
-            }
-
-            AnimatedVisibility(visible = isEditing) {
-                var editAmount by remember(asset) { mutableStateOf(asset.amountHeld.toString()) }
-                var editWeight by remember(asset) { mutableStateOf(asset.weight.toString()) }
-                var editDecimals by remember(asset) { mutableFloatStateOf(asset.decimalPreference.toFloat()) }
-                var editNameState by remember(asset) { mutableStateOf(asset.name) }
-
-                Column(modifier = Modifier.padding(top = 12.dp)) {
-
-                    // --- Logical Variables (Quantity/Weight) now at TOP of edit block ---
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("HOLDING QUANTITY:", color = cardText.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                            BasicTextField(value = editAmount, onValueChange = { editAmount = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().background(cardText.copy(0.05f), RoundedCornerShape(4.dp)).padding(8.dp))
-                        }
-                        if (asset.category == AssetCategory.METAL) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("UNIT WEIGHT:", color = cardText.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                BasicTextField(value = editWeight, onValueChange = { editWeight = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().background(cardText.copy(0.05f), RoundedCornerShape(4.dp)).padding(8.dp))
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    // --- Descriptive Variables (Name/Precision) now at BOTTOM ---
-                    Text("EDIT NAME:", color = cardText.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    BasicTextField(value = editNameState, onValueChange = { editNameState = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth().background(cardText.copy(0.05f), RoundedCornerShape(4.dp)).padding(8.dp))
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Text("PRICE DECIMAL PREFERENCE: ${editDecimals.toInt()}", color = cardText.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Slider(value = editDecimals, onValueChange = { editDecimals = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow, inactiveTrackColor = cardText.copy(0.1f)))
-
-                    Row(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.End) {
-                        IconButton(onClick = { onCancel() }, modifier = Modifier.size(36.dp).background(Color.Red, CircleShape)) { Icon(Icons.Default.Close, null, tint = Color.White) }
-                        Spacer(Modifier.width(16.dp))
-                        IconButton(onClick = { onSave(editNameState.trim(), editAmount.toDoubleOrNull() ?: asset.amountHeld, editWeight.toDoubleOrNull() ?: asset.weight, editDecimals.toInt()) }, modifier = Modifier.size(36.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Check, null, tint = Color.Black) }
-                    }
-                }
-            }
+fun MetalIcon(name: String, size: Int = 44, imageUrl: String = "") {
+    if (imageUrl == "SWAN_DEFAULT") {
+        Box(modifier = Modifier.size((size * 1.2).dp).clip(CircleShape).background(Color.White.copy(0.1f)), contentAlignment = Alignment.Center) {
+            Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
         }
-    }
-}
-
-@Composable
-fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
-    val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
-    val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(0.3f)) { if (asset.category == AssetCategory.METAL) MetalIcon(asset.name, size = 32) else AsyncImage(model = asset.imageUrl, contentDescription = null, modifier = Modifier.size(32.dp).clip(RoundedCornerShape(6.dp))) }
-            Column(modifier = Modifier.weight(1f)) {
-                AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp));
-                val multiplier = when {
-                    asset.name.contains("KILO", ignoreCase = true) -> 32.1507
-                    asset.name.contains("GRAM", ignoreCase = true) -> 0.03215
-                    else -> 1.0
-                }
-                AutoResizingText(formatCurrency(asset.currentPrice * multiplier * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold))
-            }
-            SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp))
+    } else if (imageUrl.startsWith("content://") || imageUrl.startsWith("file://")) {
+        AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size.dp).clip(CircleShape).border(1.dp, Color.White.copy(0.2f), CircleShape))
+    } else if (imageUrl.isNotEmpty()) {
+        AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size.dp).clip(RoundedCornerShape(8.dp)))
+    } else {
+        val metalColors = if (name.contains("Gold", true)) listOf(Color(0xFFFFD700), Color(0xFFB8860B))
+        else if (name.contains("Silver", true)) listOf(Color(0xFFE0E0E0), Color(0xFF757575))
+        else listOf(Color(0xFFCED4DA), Color(0xFF495057))
+        val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true) || name.contains("GRAM", true)
+        Box(modifier = Modifier.size(size.dp).clip(if (isBar) RoundedCornerShape(4.dp) else CircleShape).background(Brush.radialGradient(metalColors, center = Offset.Zero)).border(1.dp, Color.White.copy(0.2f), if (isBar) RoundedCornerShape(4.dp) else CircleShape), contentAlignment = Alignment.Center) {
+            Icon(imageVector = if (isBar) Icons.Default.ViewAgenda else Icons.Default.Toll, contentDescription = null, tint = Color.Black.copy(0.2f), modifier = Modifier.size((size * 0.6).dp))
         }
-    }
-}
-
-@Composable
-fun MetalIcon(name: String, size: Int = 44) {
-    val metalColors = if (name.contains("Gold", true)) listOf(Color(0xFFFFD700), Color(0xFFB8860B))
-    else if (name.contains("Silver", true)) listOf(Color(0xFFE0E0E0), Color(0xFF757575))
-    else if (name.contains("Platinum", true)) listOf(Color(0xFFF5F5F5), Color(0xFFBDBDBD))
-    else if (name.contains("Palladium", true)) listOf(Color(0xFFCED4DA), Color(0xFF8E9196))
-    else listOf(Color(0xFFCED4DA), Color(0xFF495057))
-    val isBar = name.contains("Bar", ignoreCase = true) || name.contains("Ingot", ignoreCase = true) || name.contains("KILO", ignoreCase = true) || name.contains("GRAM", ignoreCase = true)
-    Box(modifier = Modifier.size(size.dp).clip(if (isBar) RoundedCornerShape(4.dp) else CircleShape).background(Brush.radialGradient(metalColors, center = Offset.Zero)).border(1.dp, Color.White.copy(0.2f), if (isBar) RoundedCornerShape(4.dp) else CircleShape), contentAlignment = Alignment.Center) {
-        Icon(imageVector = if (isBar) Icons.Default.ViewAgenda else Icons.Default.Toll, contentDescription = null, tint = Color.Black.copy(0.2f), modifier = Modifier.size((size * 0.6).dp))
     }
 }
 
@@ -457,26 +364,176 @@ fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Mo
 }
 
 @Composable
-fun AutoResizingText(text: String, style: TextStyle, modifier: Modifier = Modifier, maxLines: Int = 1) {
-    var fontSizeValue by remember { mutableStateOf(style.fontSize) }
-    var readyToDraw by remember { mutableStateOf(false) }
-    Text(
-        text = text, style = style.copy(fontSize = fontSizeValue),
-        modifier = modifier.drawWithContent { if (readyToDraw) drawContent() },
-        maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip,
-        onTextLayout = { textLayoutResult ->
-            if (textLayoutResult.hasVisualOverflow && fontSizeValue > 8.sp) { fontSizeValue *= 0.95f }
-            else { readyToDraw = true }
+fun FunnelGrid(options: List<String>, selected: String, onSelect: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        options.chunked(2).forEach { rowItems ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                rowItems.forEach { option ->
+                    val isSelected = option.equals(selected, ignoreCase = true)
+                    Box(modifier = Modifier.weight(1f).height(55.dp).clip(RoundedCornerShape(12.dp)).background(if (isSelected) Color.Yellow else Color.White.copy(0.05f)).clickable { onSelect(option) }.border(1.dp, if (isSelected) Color.Transparent else Color.White.copy(0.1f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                        Text(text = option.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = 11.sp)
+                    }
+                }
+                if (rowItems.size == 1) Spacer(Modifier.weight(1f))
+            }
         }
-    )
+    }
+}
+
+@Composable
+fun MetalSelectionFunnel(
+    initialMetal: String, initialForm: String, initialWeight: Double, initialQty: String, initialPrem: String, initialManualPrice: String,
+    onDismiss: () -> Unit, onConfirmed: (String, String, Double, Boolean, String, String, String?, Boolean, String) -> Unit
+) {
+    var step by remember { mutableIntStateOf(1) }
+    var selectedMetal by remember { mutableStateOf("") }
+    var l1 by remember { mutableStateOf("") }
+    var l2 by remember { mutableStateOf("") }
+    var selectedWeight by remember { mutableDoubleStateOf(initialWeight) }
+    var isKiloSelected by remember { mutableStateOf(false) }
+    var qtyInput by remember { mutableStateOf("") }
+    var premInput by remember { mutableStateOf("") }
+    var manualPriceInput by remember { mutableStateOf("") }
+    var customIconUri by remember { mutableStateOf<String?>(null) }
+    var isTrueManualFlag by remember { mutableStateOf(false) }
+
+    val focus = remember { FocusRequester() }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> customIconUri = uri?.toString() }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
+            Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = when(step) { 1 -> "SELECT TYPE"; 10 -> "NAME"; 11 -> "ICON"; 12 -> "LABELS"; 13 -> "VALUE"; 4 -> "QUANTITY"; else -> "PREMIUM" }, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Spacer(Modifier.height(20.dp))
+                when (step) {
+                    1 -> FunnelGrid(listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"), selectedMetal) {
+                        if (it == "Custom") { isTrueManualFlag = true; selectedMetal = ""; step = 10 }
+                        else { isTrueManualFlag = false; selectedMetal = it; step = 2 }
+                    }
+                    10 -> {
+                        LaunchedEffect(Unit) { focus.requestFocus() }
+                        Text("LABEL UNDER ICON", color = Color.White.copy(0.5f), fontSize = 10.sp)
+                        OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text("Enter Name...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                    }
+                    11 -> {
+                        Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) { if (customIconUri != null) AsyncImage(model = customIconUri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) else Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f)) }
+                        Text("TAP PHOTO (OR SWAN)", color = Color.White.copy(0.5f), fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp)); Button(onClick = { step = 12 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                    }
+                    12 -> {
+                        LaunchedEffect(Unit) { focus.requestFocus() }
+                        Text("DESCRIPTION LINES", color = Color.White.copy(0.5f), fontSize = 10.sp)
+                        OutlinedTextField(value = l1, onValueChange = { l1 = it }, placeholder = { Text("Line 1...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Spacer(Modifier.height(8.dp)); OutlinedTextField(value = l2, onValueChange = { l2 = it }, placeholder = { Text("Line 2...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth(), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { step = 4 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                    }
+                    13 -> {
+                        LaunchedEffect(Unit) { focus.requestFocus() }
+                        Text("UNIT VALUE", color = Color.White.copy(0.5f), fontSize = 10.sp); OutlinedTextField(value = manualPriceInput, onValueChange = { manualPriceInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, false, qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                    }
+                    2 -> FunnelGrid(listOf("Bars", "Coins", "Rounds", "Custom"), l1) { l1 = it; step = 3 }
+                    3 -> FunnelGrid(listOf("1/10 OZ", "1 OZ", "10 OZ", "100 OZ", "1 KILO", "1 GRAM", "Custom"), "") { label ->
+                        val common = mapOf("1/10 OZ" to (0.1 to false), "1 OZ" to (1.0 to false), "10 OZ" to (10.0 to false), "100 OZ" to (100.0 to false), "1 KILO" to (1.0 to true), "1 GRAM" to (1.0 to false))
+                        val data = common[label] ?: (1.0 to false); selectedWeight = data.first; isKiloSelected = data.second; step = 4
+                    }
+                    4 -> {
+                        LaunchedEffect(Unit) { focus.requestFocus() }
+                        OutlinedTextField(value = qtyInput, onValueChange = { qtyInput = it }, placeholder = { Text("Enter Quantity...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { if(qtyInput.isNotBlank()) { if(isTrueManualFlag) step = 13 else step = 5 } }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                    }
+                    else -> {
+                        LaunchedEffect(Unit) { focus.requestFocus() }
+                        OutlinedTextField(value = premInput, onValueChange = { premInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, isKiloSelected, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                    }
+                }
+                if (step > 1) { val prev = when(step) { 10 -> 1; 11 -> 10; 12 -> 11; 13 -> 4; else -> step - 1 }; TextButton(onClick = { step = prev }) { Text("BACK", color = Color.Gray) } }
+            }
+        }
+    }
+}
+
+@Composable
+fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String, Double, Int) -> Unit) {
+    var amt by remember { mutableStateOf(asset.amountHeld.toString()) }
+    var dec by remember { mutableFloatStateOf(asset.decimalPreference.toFloat()) }
+    val focus = remember { FocusRequester() }
+    Dialog(onDismissRequest = onDismiss) {
+        Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
+            Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("${asset.symbol.uppercase()} SETTINGS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp); Spacer(Modifier.height(24.dp))
+                Text("QUANTITY HELD", color = Color.White.copy(0.6f), fontSize = 10.sp); BasicTextField(value = amt, onValueChange = { amt = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 28.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().focusRequester(focus))
+                Spacer(Modifier.height(20.dp)); Text("PRICE DECIMALS: ${dec.toInt()}", color = Color.White.copy(0.6f), fontSize = 10.sp); Slider(value = dec, onValueChange = { dec = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
+                Button(onClick = { onSave(asset.name, amt.toDoubleOrNull() ?: asset.amountHeld, dec.toInt()) }, modifier = Modifier.fillMaxWidth().padding(top = 30.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("SAVE CHANGES", fontWeight = FontWeight.Black) }
+                TextButton(onClick = onDismiss) { Text("CANCEL", color = Color.Gray) }
+            }
+        }
+    }
+    LaunchedEffect(Unit) { focus.requestFocus() }
+}
+
+@Composable
+fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
+    val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
+    val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
+    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }.clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    MetalIcon(asset.name, imageUrl = asset.imageUrl)
+                    if (asset.baseSymbol != "CUSTOM") {
+                        Spacer(Modifier.height(6.dp))
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
+                    } else {
+                        Text(asset.symbol, color = cardText, fontWeight = FontWeight.Black, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+                Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold);
+                    Text(formatAmount(asset.amountHeld), color = cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp);
+                    Box(modifier = Modifier.height(55.dp), contentAlignment = Alignment.Center) {
+                        val forced = if (asset.name.contains(" ") && !asset.name.contains("\n")) asset.name.replaceFirst(" ", "\n") else asset.name;
+                        Text(text = forced.uppercase(), color = cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 13.sp, maxLines = 3)
+                    }
+                }
+                Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) { if (showEditButton && !isEditing) IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) } else { SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp)); Spacer(Modifier.height(4.dp)); Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(20.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) } } }
+            }
+            Spacer(Modifier.height(8.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f)); Spacer(Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
+                val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }
+                Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
+                Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
+    val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
+    val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.imageUrl) }
+            Column(modifier = Modifier.weight(1f)) { AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp)); val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) }
+            SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun AutoResizingText(text: String, style: TextStyle, modifier: Modifier = Modifier, maxLines: Int = 1) {
+    var fs by remember { mutableStateOf(style.fontSize) }
+    var rd by remember { mutableStateOf(false) }
+    Text(text = text, style = style.copy(fontSize = fs), modifier = modifier.drawWithContent { if (rd) drawContent() }, maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip, onTextLayout = { if (it.hasVisualOverflow && fs > 8.sp) { fs *= 0.95f } else { rd = true } })
 }
 
 fun formatCurrency(v: Double, d: Int = 2): String {
     val df = DecimalFormat("$#,##0.00")
-    if (d != 2) {
-        df.minimumFractionDigits = 0
-        df.maximumFractionDigits = d
-    }
+    if (d != 2) { df.minimumFractionDigits = 0; df.maximumFractionDigits = d }
     return df.format(v)
 }
 fun formatAmount(v: Double): String = DecimalFormat("#,###.########").format(v)
