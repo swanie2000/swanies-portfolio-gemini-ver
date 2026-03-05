@@ -86,7 +86,8 @@ class AssetRepository @Inject constructor(
                         dataMap[asset.coinId]?.let { fresh ->
                             asset.copy(
                                 currentPrice = fresh.currentPrice ?: asset.currentPrice,
-                                sparklineData = fresh.sparklineIn7d?.price ?: asset.sparklineData
+                                sparklineData = fresh.sparklineIn7d?.price ?: asset.sparklineData,
+                                priceChange24h = fresh.priceChangePercentage24h ?: asset.priceChange24h
                             )
                         } ?: asset
                     }
@@ -107,7 +108,8 @@ class AssetRepository @Inject constructor(
                         assetDao.upsertAll(owned.map {
                             it.copy(
                                 currentPrice = data.current,
-                                sparklineData = data.sparkline
+                                sparklineData = data.sparkline,
+                                priceChange24h = data.changePercent
                             )
                         })
                     }

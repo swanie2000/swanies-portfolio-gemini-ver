@@ -1,90 +1,49 @@
-📄 BROWSER_CONTEXT_NARRATIVE.md
+📄 BROWSER_CONTEXT_NARRATIVE.md (Updated)
 
 1. Project Overview
 
    App Name: Swanie's Portfolio
 
-   Purpose: Professional-grade Crypto & Precious Metals tracking with a high-end, user-curated visual theme.
-
-   Current Branch: main (Dual-Path Data Logic & Market Watch Locked)
-
-   Tech Stack: Kotlin, Jetpack Compose, Hilt, Room, Retrofit, Coroutines (Async/AwaitAll), DataStore.
+   Current Branch: main (Dual-Path Logic & 1:1 State Parity Locked)
 
 2. Architectural Status
 
-   Status: DUAL-PATH DATA & MARKET WATCH ENABLED
+   Status: UNIFIED SINGLE-SOURCE ARCHITECTURE
 
-        The Yahoo Single-Source: Abandoned unreliable CoinGecko/Kinesis mappings for metals. Yahoo Finance is now the sole source of truth for Gold (GC=F), Silver (SI=F), Platinum (PL=F), and Palladium (PA=F).
+        Single Source of Truth: Room Database is now the primary state for all screens.
 
-        Dual-Path Fetching:
+        Yahoo Integration: Unified YahooFinanceResponse handles price, 24h change, and hourly sparklines (interval=1h&range=7d).
 
-            Holdings Path: The main screen ONLY updates metals that explicitly exist in the Room database. No more "Zombie Assets" auto-populating after deletion.
-
-            Market Watch Path: A dedicated screen that fetches all 4 metals independently of the database. This allows market observation without forcing items into the personal portfolio.
-
-        Background "Burst" Logic: Decoupled data fetching from the splash screen. MainViewModel now sets isDataReady = true immediately, allowing theme colors to "burst" onto the screen instantly while AssetRepository loads data in the background via parallel coroutines.
+        The "Ghost Row" Solution: Market Watch now observes the database for 1:1 parity with Holdings, only performing "Ghost Fetches" for metals the user does not yet own.
 
 3. Feature Map & UI Status
 
 🟢 Completed & Locked
 
-    Market Watch UI: High-fidelity cards showing Live Price, 24H % Change, and Day High/Low ranges.
+    1:1 Price Parity: Sync disparity between Market Watch and Holdings is resolved.
 
-    7-Day Sparklines: Successfully integrated 1-hour interval data (interval=1h&range=7d) from Yahoo into the SparklineChart component for all metals.
+    Persistent Trends: 24h percentage changes (priceChange24h) are now saved to the database for all asset types.
 
-    Parallel Refresh: refreshAssets() now uses async/awaitAll to fetch Yahoo and CoinGecko data simultaneously, eliminating UI hangs during refreshes.
+    Visual Ownership: Market Watch now features an "OWNED" badge for items existing in the user's portfolio.
 
-    Unified Model: Consolidated all Yahoo metadata into a single YahooFinanceResponse.kt to prevent "Unresolved Reference" errors.
+🔴 Bug Tracker (Upcoming)
 
-🔴 Bug Tracker (Current Focus)
-
-    Sync Disparity: Identifying why "Market Watch" prices may occasionally lead "Holdings" prices during rapid refreshes.
-
-    Asset Picker Verification: Ensuring the search logic still maps CoinGecko IDs correctly to the new Repository structure.
-
-    Sparkline Overflow: Monitoring hourly data points to ensure they scale correctly within the SparklineChart box.
+    Refresh Button Polish: Verify the main screen icon correctly triggers the parallel background refresh.
 
 4. Key Logic Snippets (The Build-Savers)
    Kotlin
 
-// 1. DUAL-PATH REFRESH LOGIC (AssetRepository)
-// Only updates metals that the user actually owns
-metalTickers.map { (symbol, _) ->
-async {
-val data = fetchMarketPrice(symbol)
-if (data.current > 0.0) {
-val owned = allLocalAssets.filter { it.baseSymbol == symbol }
-if (owned.isNotEmpty()) {
-assetDao.upsertAll(owned.map { it.copy(currentPrice = data.current, sparklineData = data.sparkline) })
-}
-}
-}
-}.awaitAll()
+// 1. UNIFIED REFRESH (AssetRepository)
+// Now persists 24h change for parity across all screens
+assetDao.upsertAll(owned.map { it.copy(
+currentPrice = data.current,
+priceChange24h = data.changePercent, // Persistence locked
+sparklineData = data.sparkline
+)})
 
-// 2. SEARCH LOGIC PRESERVATION
-// Verifies that CoinGecko search still returns clean AssetEntities for the Picker
-suspend fun searchCoins(query: String): List<AssetEntity> = try {
-val result = coinGeckoApiService.search(query)
-result.coins.map { coin ->
-AssetEntity(coinId = coin.id, symbol = coin.symbol ?: "", name = coin.name ?: "",
-imageUrl = coin.large ?: "", category = AssetCategory.CRYPTO, baseSymbol = coin.symbol ?: "")
-}
-} catch (e: Exception) { emptyList() }
-
-// 3. IMMEDIATE UI UNLOCK (MainViewModel)
-init {
-_isDataReady.value = true // Unlocks splash screen instantly
-viewModelScope.launch { repository.refreshAssets() } // Loads in background
-}
+// 2. GHOST ROW PARITY (MetalsAuditScreen)
+// Prioritizes DB state; falls back to live fetch if not owned
+val currentPrice = ownedAsset?.currentPrice ?: ghostData?.current ?: 0.0
+val changePct = ownedAsset?.priceChange24h ?: ghostData?.changePercent ?: 0.0
 
 🛡️ Narrative Synchronized
-The app has moved past the "Audit" over-engineering. By separating market observation from portfolio holdings, we have eliminated "Ghost Assets" and restored high-speed UI transitions. Yahoo Finance provides high-fidelity, hourly sparklines for metals, while CoinGecko remains the search and price engine for Crypto.
-🏁 Clear Path to Fix Current Bugs
-
-    Search Logic Verification: We need to confirm that AssetPickerScreen is calling viewModel.searchCoins(query) and that the UI correctly handles the cryptoResults flow. We must ensure the agent didn't "simplify" the search so much that it stopped hitting the network.
-
-    State Sync Check: If "Market Watch" shows a different price than "Holdings," it’s because Market Watch fetches its own MarketPriceData object rather than observing the database. We should pivot Market Watch to observe the database while keeping the unowned metals as "Ghost Rows" to ensure 1:1 price matching.
-
-    Refresh Button Polish: Ensure the refresh icon on the main screen triggers viewModel.refreshAssets(), which now handles both the parallel Yahoo and CoinGecko calls.
-
-Would you like me to generate the specific prompt for the Studio Agent to fix the "Search Logic" first? I can have him verify that the network calls are actually firing when you type in the picker.
