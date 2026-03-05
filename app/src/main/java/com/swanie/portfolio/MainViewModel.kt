@@ -15,10 +15,10 @@ class MainViewModel @Inject constructor(
     private val themePreferences: ThemePreferences
 ) : ViewModel() {
 
-    private val _isThemeReady = MutableStateFlow(false)
-    val isThemeReady: StateFlow<Boolean> = _isThemeReady.asStateFlow()
+    private val _isDataReady = MutableStateFlow(false)
+    val isDataReady: StateFlow<Boolean> = _isDataReady.asStateFlow()
 
-    // Preferences observed as StateFlows for UI synchronization
+    // Preferences observed as StateFlows
     val siteBackgroundColor = themePreferences.siteBackgroundColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#000416")
     val siteTextColor = themePreferences.siteTextColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#FFFFFF")
     val cardBackgroundColor = themePreferences.cardBackgroundColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#121212")
@@ -28,12 +28,17 @@ class MainViewModel @Inject constructor(
     val isDarkMode = themePreferences.isDarkMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
-    // Bridge for Settings Screen toggle
-    fun setConfirmDelete(enabled: Boolean) = viewModelScope.launch {
-        themePreferences.saveConfirmDelete(enabled)
+    init {
+        // BURST: Unlock the UI immediately so the color animations show
+        _isDataReady.value = true
+
+        // REFRESH: Fetch data in the background
+        viewModelScope.launch {
+            repository.refreshAssets()
+        }
     }
 
-    init {
-        _isThemeReady.value = true
+    fun setConfirmDelete(enabled: Boolean) = viewModelScope.launch {
+        themePreferences.saveConfirmDelete(enabled)
     }
 }

@@ -1,135 +1,143 @@
 package com.swanie.portfolio.data.repository
 
 import android.util.Log
-import com.swanie.portfolio.data.MetalsProvider
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.network.CoinGeckoApiService
+import com.swanie.portfolio.data.network.YahooFinanceApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
+import com.swanie.portfolio.data.network.YahooFinanceResponse
+import com.swanie.portfolio.data.network.Meta
+import com.swanie.portfolio.data.network.ChartResult
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Simplified Market Data Model for UI consumption.
+ */
+data class MarketPriceData(
+    val current: Double,
+    val high: Double,
+    val low: Double,
+    val changePercent: Double,
+    val sparkline: List<Double>
+)
+
 @Singleton
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
-    private val coinGeckoApiService: CoinGeckoApiService
+    private val coinGeckoApiService: CoinGeckoApiService,
+    private val yahooApiService: YahooFinanceApiService
 ) {
-
     val allAssets = assetDao.getAllAssets()
 
-    suspend fun refreshAssets() {
+    // Single source of truth for metal symbols mapping to Yahoo tickers
+    private val metalTickers = mapOf(
+        "XAU" to "GC=F",
+        "XAG" to "SI=F",
+        "XPT" to "PL=F",
+        "XPD" to "PA=F"
+    )
+
+    /**
+     * Fetches current market data for a given metal symbol (XAU, XAG, etc.) from Yahoo Finance.
+     */
+    suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
+        return try {
+            val ticker = metalTickers[symbol] ?: return MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+            val response: YahooFinanceResponse = yahooApiService.getTickerData(ticker)
+            val result: ChartResult? = response.chart.result?.firstOrNull()
+            val meta: Meta? = result?.meta
+
+            // Extract closing prices for sparkline (filter nulls for stability)
+            val closePrices: List<Double> = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
+
+            MarketPriceData(
+                current = meta?.regularMarketPrice ?: 0.0,
+                high = meta?.regularMarketDayHigh ?: 0.0,
+                low = meta?.regularMarketDayLow ?: 0.0,
+                changePercent = meta?.regularMarketChangePercent ?: 0.0,
+                sparkline = closePrices
+            )
+        } catch (e: Exception) {
+            Log.e("AssetRepository", "Fetch failed for $symbol: ${e.message}")
+            MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+        }
+    }
+
+    /**
+     * Synchronizes all holdings with live market data.
+     */
+    suspend fun refreshAssets() = coroutineScope {
         val allLocalAssets = allAssets.first()
-        if (allLocalAssets.isEmpty()) return
 
+        // 1. Refresh Crypto Holdings via CoinGecko
         val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
-        val metalAssets = allLocalAssets.filter { it.category == AssetCategory.METAL }
+        if (cryptoAssets.isNotEmpty()) {
+            launch {
+                try {
+                    val ids = cryptoAssets.joinToString(",") { it.coinId }
+                    val marketData = coinGeckoApiService.getCoinMarkets(ids = ids)
+                    val dataMap = marketData.associateBy { it.id }
+                    val updatedCrypto = cryptoAssets.map { asset ->
+                        dataMap[asset.coinId]?.let { fresh ->
+                            asset.copy(
+                                currentPrice = fresh.currentPrice ?: asset.currentPrice,
+                                sparklineData = fresh.sparklineIn7d?.price ?: asset.sparklineData
+                            )
+                        } ?: asset
+                    }
+                    assetDao.upsertAll(updatedCrypto)
+                } catch (e: Exception) { 
+                    Log.e("AssetRepository", "Crypto refresh failed: ${e.message}") 
+                }
+            }
+        }
 
-        val cryptoIds = cryptoAssets.map { it.coinId }
-
-        val updatedAssets = mutableListOf<AssetEntity>()
-
-        if (cryptoIds.isNotEmpty()) {
-            try {
-                val marketData: List<CoinMarketResponse> = coinGeckoApiService.getCoinMarkets(ids = cryptoIds.joinToString(","))
-                val marketDataMap = marketData.associateBy { it.id }
-
-                cryptoAssets.forEach { currentAsset ->
-                    val marketInfo = marketDataMap[currentAsset.coinId]
-                    if (marketInfo != null) {
-                        updatedAssets.add(currentAsset.copy(
-                            currentPrice = marketInfo.currentPrice ?: currentAsset.currentPrice,
-                            priceChange24h = marketInfo.priceChange24h ?: currentAsset.priceChange24h,
-                            marketCapRank = marketInfo.marketCapRank ?: currentAsset.marketCapRank,
-                            sparklineData = marketInfo.sparklineIn7d?.price ?: currentAsset.sparklineData,
-                            lastUpdated = System.currentTimeMillis()
-                        ))
-                    } else {
-                        updatedAssets.add(currentAsset)
+        // 2. Refresh Metal Holdings via Yahoo Finance (Parallel)
+        metalTickers.map { (symbol, _) ->
+            async {
+                val data = fetchMarketPrice(symbol)
+                if (data.current > 0.0) {
+                    val owned = allLocalAssets.filter { it.baseSymbol == symbol }
+                    if (owned.isNotEmpty()) {
+                        assetDao.upsertAll(owned.map {
+                            it.copy(
+                                currentPrice = data.current,
+                                sparklineData = data.sparkline
+                            )
+                        })
                     }
                 }
-            } catch (e: Exception) {
-                Log.e("AssetRepository", "Crypto refresh failed", e)
-                updatedAssets.addAll(cryptoAssets)
             }
-        }
-
-        metalAssets.forEach { currentMetal ->
-            if (currentMetal.isCustom) {
-                val spotPrice = MetalsProvider.preciousMetals.find { it.symbol == currentMetal.baseSymbol }?.currentPrice ?: 0.0
-                val pricePerUnit = (spotPrice + currentMetal.premium)
-                updatedAssets.add(currentMetal.copy(
-                    currentPrice = pricePerUnit,
-                    lastUpdated = System.currentTimeMillis()
-                ))
-            } else {
-                val providerData = MetalsProvider.preciousMetals.find { it.coinId == currentMetal.coinId }
-                if (providerData != null) {
-                    updatedAssets.add(currentMetal.copy(
-                        currentPrice = providerData.currentPrice,
-                        lastUpdated = System.currentTimeMillis()
-                    ))
-                } else {
-                    updatedAssets.add(currentMetal)
-                }
-            }
-        }
-
-        if (updatedAssets.isNotEmpty()) {
-            assetDao.upsertAll(updatedAssets)
-        }
+        }.awaitAll()
     }
 
-    suspend fun searchCoins(query: String): List<AssetEntity> {
-        if (query.length < 2) return emptyList()
-        return try {
-            val searchResult = coinGeckoApiService.search(query)
-            searchResult.coins.map { coin ->
-                AssetEntity(
-                    coinId = coin.id,
-                    symbol = coin.symbol,
-                    name = coin.name,
-                    imageUrl = coin.large,
-                    amountHeld = 0.0,
-                    currentPrice = 0.0,
-                    change24h = 0.0,
-                    displayOrder = 0,
-                    lastUpdated = 0L,
-                    sparklineData = emptyList(),
-                    marketCapRank = 0,
-                    priceChange24h = 0.0,
-                    category = AssetCategory.CRYPTO
-                )
-            }
-        } catch (e: Exception) {
-            Log.e("AssetRepository", "Failed to search coins", e)
-            emptyList()
-        }
-    }
-
-    suspend fun saveAsset(asset: AssetEntity) {
-        val existingAsset = assetDao.getAssetById(asset.coinId)
-        if (existingAsset != null) {
-            val updatedAsset = existingAsset.copy(
-                amountHeld = existingAsset.amountHeld + asset.amountHeld,
-                lastUpdated = System.currentTimeMillis()
+    /**
+     * Search for crypto assets via CoinGecko.
+     */
+    suspend fun searchCoins(query: String): List<AssetEntity> = try {
+        val result = coinGeckoApiService.search(query)
+        result.coins.map { coin ->
+            AssetEntity(
+                coinId = coin.id, symbol = coin.symbol ?: "", name = coin.name ?: "",
+                imageUrl = coin.large ?: "", category = AssetCategory.CRYPTO,
+                baseSymbol = coin.symbol ?: ""
             )
-            assetDao.upsertAsset(updatedAsset)
-        } else {
-            assetDao.upsertAsset(asset.copy(lastUpdated = System.currentTimeMillis()))
         }
-    }
+    } catch (e: Exception) { emptyList() }
 
-    suspend fun deleteAsset(asset: AssetEntity) {
-        assetDao.deleteAsset(asset.coinId)
-    }
+    /**
+     * Get live price for a specific crypto asset before adding to holdings.
+     */
+    suspend fun fetchLivePriceForAsset(coinId: String): CoinMarketResponse? =
+        try { coinGeckoApiService.getCoinMarkets(ids = coinId).firstOrNull() } catch (e: Exception) { null }
 
-    suspend fun updateAssetOrder(assets: List<AssetEntity>) {
-        assetDao.updateAssetOrder(assets)
-    }
-
-    suspend fun updateAssetEntity(asset: AssetEntity) {
-        assetDao.updateAssetEntity(asset)
-    }
+    suspend fun saveAsset(asset: AssetEntity) = assetDao.upsertAsset(asset.copy(lastUpdated = System.currentTimeMillis()))
+    suspend fun deleteAsset(asset: AssetEntity) = assetDao.deleteAsset(asset.coinId)
+    suspend fun updateAssetOrder(assets: List<AssetEntity>) = assetDao.updateAssetOrder(assets)
+    suspend fun updateAssetEntity(asset: AssetEntity) = assetDao.updateAssetEntity(asset)
 }

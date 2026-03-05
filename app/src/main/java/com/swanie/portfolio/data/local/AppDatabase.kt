@@ -6,11 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-// Bumping to version 8 to lock in schema changes for Weight and Premium
-@Database(entities = [AssetEntity::class], version = 8, exportSchema = false)
+@Database(entities = [AssetEntity::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-
     abstract fun assetDao(): AssetDao
 
     companion object {
@@ -22,9 +20,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "asset_database"
+                    "swanie_portfolio_db"
                 )
-                    .fallbackToDestructiveMigration() // Ensures version 8 triggers a clean schema
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance

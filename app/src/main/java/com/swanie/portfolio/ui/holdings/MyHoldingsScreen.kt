@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
@@ -46,6 +47,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun MyHoldingsScreen(
@@ -94,16 +97,15 @@ fun MyHoldingsScreen(
                 2 -> holdings.filter { it.category == AssetCategory.METAL }
                 else -> holdings
             }
-            val total = filtered.sumOf {
+            val total = filtered.sumOf { asset ->
                 val multiplier = when {
-                    it.name.contains("KILO", ignoreCase = true) -> 32.1507
-                    it.name.contains("GRAM", ignoreCase = true) -> 0.0321507
-                    it.name.contains("DWT", ignoreCase = true) -> 0.0514426
+                    asset.name.contains("KILO", ignoreCase = true) -> 32.1507
+                    asset.name.contains("GRAM", ignoreCase = true) -> 0.0321507
                     else -> 1.0
                 }
-                it.currentPrice * multiplier * it.weight * it.amountHeld
+                (asset.currentPrice * multiplier * asset.weight * asset.amountHeld) + asset.premium
             }
-            formatCurrency(total, 2)
+            NumberFormat.getCurrencyInstance(Locale.US).format(total)
         }
     }
 
@@ -136,11 +138,9 @@ fun MyHoldingsScreen(
     }
 
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val filtered = if (selectedTab == 0) localHoldings else localHoldings.filter { it.category == if(selectedTab == 1) AssetCategory.CRYPTO else AssetCategory.METAL }
         val newList = localHoldings.toMutableList()
-        val fromIdx = newList.indexOfFirst { it.coinId == filtered[from.index].coinId }
-        val toIdx = newList.indexOfFirst { it.coinId == filtered[to.index].coinId }
-        if (fromIdx != -1 && toIdx != -1) { newList.add(toIdx, newList.removeAt(fromIdx)); localHoldings = newList }
+        newList.add(to.index, newList.removeAt(from.index))
+        localHoldings = newList
     }
 
     val view = LocalView.current
@@ -185,11 +185,20 @@ fun MyHoldingsScreen(
 
             Spacer(modifier = Modifier.height((-85).dp))
 
-            TabRow(selectedTabIndex = selectedTab, modifier = Modifier.height(44.dp).padding(horizontal = 20.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
-                tabs.forEachIndexed { index, title ->
-                    val isSelected = selectedTab == index
-                    Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
-                        Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 6.dp))
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+                TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(48.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
+                    tabs.forEachIndexed { index, title ->
+                        val isSelected = selectedTab == index
+                        Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
+                            Text(text = title, fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 8.dp))
+                        }
+                    }
+                }
+
+                // NEW: AUDIT INFO BUTTON (Visible only on Metal Tab)
+                AnimatedVisibility(visible = selectedTab == 2) {
+                    IconButton(onClick = { navController.navigate(Routes.METALS_AUDIT) }) {
+                        Icon(Icons.Default.Shield, contentDescription = "Audit Info", tint = Color.Yellow)
                     }
                 }
             }
@@ -205,13 +214,9 @@ fun MyHoldingsScreen(
                             onDragStopped = {
                                 isDraggingActive.value = false
                                 if (isOverTrash.value) {
-                                    if (confirmDeleteSetting) {
-                                        assetPendingDeletion = asset
-                                    } else {
-                                        viewModel.deleteAsset(asset)
-                                    }
+                                    if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset)
                                 } else {
-                                    scope.launch { isDraggingActive.value = false; isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                    scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
                                 }
                             }
                         )
@@ -219,21 +224,34 @@ fun MyHoldingsScreen(
                         if (isCompactViewEnabled && !isExpanded) {
                             CompactAssetCard(asset, isDragging, cardBg, cardText, { expandedAssetId = asset.coinId; showEditButtonId = null }, dragModifier)
                         } else {
-                            FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, { if (isCompactViewEnabled) { if (expandedAssetId == asset.coinId) { if (isEditButtonVisible) { expandedAssetId = null; showEditButtonId = null } else { showEditButtonId = asset.coinId } } else { expandedAssetId = asset.coinId; showEditButtonId = null } } else { showEditButtonId = if (isEditButtonVisible) null else asset.coinId } }, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                            FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, {
+                                if (isEditButtonVisible) { showEditButtonId = null } else { showEditButtonId = asset.coinId }
+                                expandedAssetId = if (isExpanded) null else asset.coinId
+                            }, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
                         }
                     }
                 }
             }
 
-            Surface(modifier = Modifier.fillMaxWidth().height(40.dp).background(bgColor)) {
+            Surface(modifier = Modifier.fillMaxWidth().height(56.dp).background(bgColor)) {
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
                     val icons = listOf(Icons.Default.Home to Routes.HOME, Icons.AutoMirrored.Filled.FormatListBulleted to Routes.HOLDINGS, Icons.Default.PieChart to Routes.ANALYTICS, Icons.Default.Settings to Routes.SETTINGS)
-                    icons.forEach { (icon, route) -> IconButton(onClick = { navController.navigate(route) }) { Icon(icon, null, tint = if(currentRoute == route) textColor else textColor.copy(0.3f)) } }
+                    icons.forEach { (icon, route) ->
+                        IconButton(onClick = { navController.navigate(route) }) {
+                            Icon(icon, null, tint = if(currentRoute == route) textColor else textColor.copy(0.3f))
+                        }
+                    }
                 }
             }
             Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(bgColor))
+        }
+
+        AnimatedVisibility(visible = isDraggingActive.value, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height) }) {
+            Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
+            }
         }
 
         if (assetBeingEdited != null) {
@@ -241,26 +259,13 @@ fun MyHoldingsScreen(
             if (asset.category == AssetCategory.METAL) {
                 MetalSelectionFunnel(
                     initialMetal = if(asset.baseSymbol == "CUSTOM") asset.symbol else (asset.name.split("\n").getOrNull(0) ?: "Silver"),
-                    initialForm = asset.name,
-                    initialWeight = asset.weight,
-                    initialQty = asset.amountHeld.toString(),
-                    initialPrem = asset.premium.toString(),
-                    initialManualPrice = if(asset.baseSymbol == "CUSTOM") asset.currentPrice.toString() else "0.0",
+                    initialForm = asset.name, initialWeight = asset.weight, initialQty = asset.amountHeld.toString(),
+                    initialPrem = asset.premium.toString(), initialManualPrice = if(asset.baseSymbol == "CUSTOM") asset.currentPrice.toString() else "0.0",
                     onDismiss = { assetBeingEdited = null },
                     onConfirmed = { fMetal, fForm, fWeight, isKilo, fQty, fPrem, iconUri, isTrueCust, manualPrice ->
                         scope.launch {
                             val finalName = if(isTrueCust) fForm else "${fMetal.uppercase()}\n${if (isKilo) "KILO" else fForm.uppercase()}"
-                            val price = if(isTrueCust) (manualPrice.toDoubleOrNull() ?: 0.0) else asset.currentPrice
-
-                            viewModel.updateAsset(asset.copy(
-                                symbol = if(isTrueCust) fMetal.uppercase() else asset.symbol,
-                                name = finalName,
-                                amountHeld = fQty.toDoubleOrNull() ?: asset.amountHeld,
-                                weight = fWeight,
-                                currentPrice = price,
-                                imageUrl = iconUri ?: if(isTrueCust) "SWAN_DEFAULT" else asset.imageUrl,
-                                baseSymbol = if(isTrueCust) "CUSTOM" else asset.baseSymbol
-                            ), finalName, fQty.toDoubleOrNull() ?: asset.amountHeld, fWeight, asset.decimalPreference)
+                            viewModel.updateAsset(asset, finalName, fQty.toDoubleOrNull() ?: asset.amountHeld, fWeight, asset.decimalPreference)
                             assetBeingEdited = null; expandedAssetId = null; showEditButtonId = null
                         }
                     }
@@ -272,31 +277,8 @@ fun MyHoldingsScreen(
             }
         }
 
-        AnimatedVisibility(visible = isDraggingActive.value, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 100.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height) }) {
-            Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp)) }
-        }
-
         if (assetPendingDeletion != null) {
-            AlertDialog(
-                onDismissRequest = { assetPendingDeletion = null },
-                containerColor = cardBg,
-                titleContentColor = cardText,
-                textContentColor = cardText.copy(alpha = 0.7f),
-                title = { Text("Are you sure?", fontWeight = FontWeight.Black) },
-                text = { Text("Remove ${assetPendingDeletion?.name?.replace("\n", " ")}?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val assetToDelete = assetPendingDeletion
-                        if (assetToDelete != null) { viewModel.deleteAsset(assetToDelete) }
-                        assetPendingDeletion = null
-                    }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Black) }
-                },
-                dismissButton = {
-                    TextButton(onClick = { assetPendingDeletion = null }) {
-                        Text("CANCEL", color = cardText.copy(alpha = 0.5f))
-                    }
-                }
-            )
+            AlertDialog(onDismissRequest = { assetPendingDeletion = null }, containerColor = cardBg, titleContentColor = cardText, textContentColor = cardText.copy(alpha = 0.7f), title = { Text("Are you sure?", fontWeight = FontWeight.Black) }, text = { Text("Remove ${assetPendingDeletion?.name?.replace("\n", " ")}?") }, confirmButton = { TextButton(onClick = { assetPendingDeletion?.let { viewModel.deleteAsset(it) }; assetPendingDeletion = null }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Black) } }, dismissButton = { TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = cardText.copy(alpha = 0.5f)) } })
         }
     }
 }

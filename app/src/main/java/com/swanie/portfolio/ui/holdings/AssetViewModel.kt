@@ -1,163 +1,105 @@
 package com.swanie.portfolio.ui.holdings
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.swanie.portfolio.data.MetalsProvider
-import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.network.CoinMarketResponse
 import com.swanie.portfolio.data.repository.AssetRepository
+import com.swanie.portfolio.data.repository.MarketPriceData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-enum class SortOrder {
-    VALUE, NAME, CATEGORY, MANUAL
-}
-
+/**
+ * Shared ViewModel for handling asset holdings and market data fetching.
+ */
 @HiltViewModel
-class AssetViewModel @Inject constructor(private val repository: AssetRepository) : ViewModel() {
+class AssetViewModel @Inject constructor(
+    private val repository: AssetRepository
+) : ViewModel() {
 
-    private val _sortOrder = MutableStateFlow(SortOrder.VALUE)
-    val sortOrder: StateFlow<SortOrder> = _sortOrder.asStateFlow()
-
-    // --- REFACTORED HOLDINGS FLOW: Calculation now respects Weight ---
-    val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
-        .combine(_sortOrder) { assets, order ->
-            when (order) {
-                SortOrder.VALUE -> assets.sortedByDescending { asset ->
-                    if (asset.isCustom || asset.category == AssetCategory.METAL) {
-                        asset.currentPrice * (asset.weight * asset.amountHeld)
-                    } else {
-                        asset.currentPrice * asset.amountHeld
-                    }
-                }
-                SortOrder.NAME -> assets.sortedBy { it.name }
-                SortOrder.CATEGORY -> assets.sortedBy { it.category.name }
-                SortOrder.MANUAL -> assets.sortedBy { it.displayOrder }
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    // Observed holdings from the local Room database.
+    val holdings = repository.allAssets
 
     private val _searchResults = MutableStateFlow<List<AssetEntity>>(emptyList())
-    val searchResults: StateFlow<List<AssetEntity>> = _searchResults.asStateFlow()
+    val searchResults = _searchResults.asStateFlow()
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-
-    private val _isRefreshEnabled = MutableStateFlow(true)
-    val isRefreshEnabled: StateFlow<Boolean> = _isRefreshEnabled.asStateFlow()
-
-    private var searchJob: Job? = null
-
-    init {
-        refreshAssets()
+    /**
+     * Search for crypto assets via Repository.
+     */
+    fun searchCoins(query: String) {
+        viewModelScope.launch {
+            if (query.length >= 2) {
+                _searchResults.value = repository.searchCoins(query)
+            } else {
+                _searchResults.value = emptyList()
+            }
+        }
     }
 
-    fun setSortOrder(order: SortOrder) {
-        _sortOrder.value = order
+    /**
+     * Independent fetch for a specific metal's market data (used by Market Watch).
+     */
+    suspend fun fetchMarketPriceData(symbol: String): MarketPriceData {
+        return repository.fetchMarketPrice(symbol)
     }
 
+    /**
+     * Get live price for a specific crypto asset before addition.
+     */
+    suspend fun fetchLivePrice(coinId: String): CoinMarketResponse? {
+        return repository.fetchLivePriceForAsset(coinId)
+    }
+
+    /**
+     * Synchronize all holdings with live market data.
+     */
     fun refreshAssets() {
         viewModelScope.launch {
-            if (!_isRefreshEnabled.value) return@launch
-            _isRefreshing.value = true
-            _isRefreshEnabled.value = false
-            try {
-                repository.refreshAssets()
-            } catch (e: Exception) {
-                Log.e("AssetViewModel", "Refresh failed", e)
-            } finally {
-                _isRefreshing.value = false
-                delay(30000)
-                _isRefreshEnabled.value = true
-            }
+            repository.refreshAssets()
         }
     }
 
-    fun searchCoins(query: String) {
-        searchJob?.cancel()
-        val cleanQuery = query.trim()
-
-        if (cleanQuery.length < 2) {
-            _searchResults.value = emptyList()
-            return
-        }
-
-        searchJob = viewModelScope.launch {
-            delay(300)
-
-            val metalResults = MetalsProvider.searchMetals(cleanQuery)
-            _searchResults.value = metalResults
-
-            try {
-                val cryptoResults = repository.searchCoins(cleanQuery)
-                _searchResults.value = (metalResults + cryptoResults).distinctBy { it.coinId }
-            } catch (e: Exception) {
-                Log.e("AssetViewModel", "Search error", e)
-                _searchResults.value = metalResults
-            }
-        }
-    }
-
-    fun saveNewAsset(asset: AssetEntity, amount: Double, onSaveComplete: () -> Unit) {
+    /**
+     * Save a new asset to the local database.
+     */
+    fun saveNewAsset(asset: AssetEntity, amount: Double, onComplete: () -> Unit) {
         viewModelScope.launch {
-            val holdingToSave = asset.copy(
-                amountHeld = amount,
-                category = asset.category,
-                currentPrice = asset.currentPrice,
-                lastUpdated = System.currentTimeMillis()
-            )
-            repository.saveAsset(holdingToSave)
-            onSaveComplete()
+            repository.saveAsset(asset.copy(amountHeld = amount))
+            onComplete()
         }
     }
 
+    /**
+     * Delete an asset from the local database.
+     */
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
-            try {
-                repository.deleteAsset(asset)
-            } catch (e: Exception) {
-                Log.e("AssetViewModel", "Delete failed for ${asset.name}", e)
-            }
+            repository.deleteAsset(asset)
         }
     }
 
+    /**
+     * Update the display order of assets in the database.
+     */
     fun updateAssetOrder(assets: List<AssetEntity>) {
         viewModelScope.launch {
             repository.updateAssetOrder(assets)
         }
     }
 
-    // --- REFACTORED: Now handles New Weight from the UI ---
-    fun updateAsset(
-        asset: AssetEntity,
-        newName: String,
-        newAmount: Double,
-        newWeight: Double, // Added parameter
-        newDecimalPreference: Int
-    ) {
+    /**
+     * Update an existing asset's properties.
+     */
+    fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, decimals: Int) {
         viewModelScope.launch {
-            val updatedAsset = asset.copy(
+            repository.updateAssetEntity(asset.copy(
                 name = newName,
                 amountHeld = newAmount,
-                weight = newWeight, // Now saving weight
-                decimalPreference = newDecimalPreference,
-                lastUpdated = System.currentTimeMillis()
-            )
-            repository.updateAssetEntity(updatedAsset)
+                weight = newWeight,
+                decimalPreference = decimals
+            ))
         }
     }
 }

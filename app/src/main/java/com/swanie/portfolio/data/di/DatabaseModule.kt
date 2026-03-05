@@ -1,12 +1,11 @@
 package com.swanie.portfolio.data.di
 
 import android.content.Context
-import androidx.room.Room
-import com.swanie.portfolio.data.ThemePreferences
-import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.data.ThemePreferences // ADDED IMPORT
 import com.swanie.portfolio.data.local.AssetDao
+import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.network.CoinGeckoApiService
-import com.swanie.portfolio.data.network.RetrofitClient
+import com.swanie.portfolio.data.network.YahooFinanceApiService
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.Module
 import dagger.Provides
@@ -22,13 +21,7 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "portfolio_db"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
+        return AppDatabase.getDatabase(context)
     }
 
     @Provides
@@ -36,6 +29,7 @@ object DatabaseModule {
         return database.assetDao()
     }
 
+    // NEW: Tells Hilt how to create ThemePreferences using the App Context
     @Provides
     @Singleton
     fun provideThemePreferences(@ApplicationContext context: Context): ThemePreferences {
@@ -44,16 +38,11 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideCoinGeckoApiService(): CoinGeckoApiService {
-        return RetrofitClient.instance
-    }
-
-    @Provides
-    @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,
-        apiService: CoinGeckoApiService
+        coinGeckoApiService: CoinGeckoApiService,
+        yahooFinanceApiService: YahooFinanceApiService
     ): AssetRepository {
-        return AssetRepository(assetDao, apiService)
+        return AssetRepository(assetDao, coinGeckoApiService, yahooFinanceApiService)
     }
 }

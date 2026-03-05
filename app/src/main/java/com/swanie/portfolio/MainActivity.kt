@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +25,11 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        splashScreen.setKeepOnScreenCondition { !viewModel.isThemeReady.value }
+        // FIX: Changed from isThemeReady to isDataReady.
+        // The splash screen will now hang until the Yahoo/CoinGecko audit finishes.
+        splashScreen.setKeepOnScreenCondition {
+            !viewModel.isDataReady.value
+        }
 
         enableEdgeToEdge()
 
@@ -33,6 +38,7 @@ class MainActivity : ComponentActivity() {
             val useGradient by viewModel.useGradient.collectAsStateWithLifecycle()
             val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
 
+            // Handle Status Bar / Nav Bar icons based on dark mode
             LaunchedEffect(isDarkMode) {
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
                 insetsController.isAppearanceLightStatusBars = !isDarkMode

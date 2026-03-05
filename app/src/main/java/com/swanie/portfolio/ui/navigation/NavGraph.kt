@@ -20,6 +20,7 @@ import com.swanie.portfolio.ui.holdings.AnalyticsScreen
 import com.swanie.portfolio.ui.holdings.AssetPickerScreen
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
+import com.swanie.portfolio.ui.metals.MetalsAuditScreen // FIXED: Import the new screen
 import com.swanie.portfolio.ui.settings.SettingsScreen
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
@@ -69,25 +70,28 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 AnalyticsScreen(navController = navController)
             }
 
+            // THE TRUTH DASHBOARD
+            composable(Routes.METALS_AUDIT) {
+                MetalsAuditScreen(navController = navController)
+            }
+
             composable(Routes.ASSET_PICKER) {
                 AssetPickerScreen(
                     navController = navController,
                     onAssetSelected = { asset ->
                         if (asset.category == AssetCategory.METAL) {
-                            // FIX: Using your actual ViewModel method name 'saveNewAsset'
+                            // Metals are saved directly because the Funnel already collected all data
                             assetViewModel.saveNewAsset(asset, asset.amountHeld) {
                                 navController.popBackStack()
                             }
                         } else {
-                            // For Crypto, navigate to the standard amount entry screen
+                            // Crypto still goes to the Amount Entry screen
                             val encodedUrl = URLEncoder.encode(asset.imageUrl, "UTF-8")
                             navController.navigate("amount_entry/${asset.coinId}/${asset.symbol}/${asset.name}/$encodedUrl/${asset.category.name}/${asset.currentPrice}")
                         }
                     }
                 )
             }
-
-            // Routes.MANUAL_ASSET_ENTRY removed as it's now handled by the Picker funnel
 
             composable(
                 route = Routes.AMOUNT_ENTRY,
