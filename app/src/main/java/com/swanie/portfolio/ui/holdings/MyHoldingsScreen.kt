@@ -14,8 +14,6 @@ import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -231,6 +229,36 @@ fun MyHoldingsScreen(
                     ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
+
+                        // IMPROVED TOGGLE LOGIC: Avoids "dead tap" in Full Mode
+                        val handleExpandToggle = {
+                            if (isCompactViewEnabled) {
+                                // Three-step for Compact Mode: Expand -> Show Edit -> Collapse
+                                when {
+                                    expandedAssetId != asset.coinId -> {
+                                        expandedAssetId = asset.coinId
+                                        showEditButtonId = null
+                                    }
+                                    showEditButtonId != asset.coinId -> {
+                                        showEditButtonId = asset.coinId
+                                    }
+                                    else -> {
+                                        expandedAssetId = null
+                                        showEditButtonId = null
+                                    }
+                                }
+                            } else {
+                                // Full Mode: Straight to Edit Button toggle (since card is already full size)
+                                if (showEditButtonId != asset.coinId) {
+                                    showEditButtonId = asset.coinId
+                                    expandedAssetId = asset.coinId // Sync for state consistency
+                                } else {
+                                    showEditButtonId = null
+                                    expandedAssetId = null
+                                }
+                            }
+                        }
+
                         val dragModifier = Modifier.longPressDraggableHandle(
                             onDragStarted = { isDraggingActive.value = true },
                             onDragStopped = {
@@ -239,23 +267,20 @@ fun MyHoldingsScreen(
                                     if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset)
                                 } else {
                                     // FIXED: Robust save logic with extended suppression of DB sync
-                                    scope.launch {
+                                    scope.launch { 
                                         isSavingOrder.value = true
                                         viewModel.updateAssetOrder(localHoldings)
                                         delay(800) // Give the DB and LazyColumn time to settle
-                                        isSavingOrder.value = false
+                                        isSavingOrder.value = false 
                                     }
                                 }
                             }
                         )
 
                         if (isCompactViewEnabled && !isExpanded) {
-                            CompactAssetCard(asset, isDragging, cardBg, cardText, { expandedAssetId = asset.coinId; showEditButtonId = null }, dragModifier)
+                            CompactAssetCard(asset, isDragging, cardBg, cardText, handleExpandToggle, dragModifier)
                         } else {
-                            FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, {
-                                if (isEditButtonVisible) { showEditButtonId = null } else { showEditButtonId = asset.coinId }
-                                expandedAssetId = if (isExpanded) null else asset.coinId
-                            }, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                            FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
                         }
                     }
                 }
