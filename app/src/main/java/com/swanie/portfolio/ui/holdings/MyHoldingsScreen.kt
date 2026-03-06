@@ -14,6 +14,8 @@ import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -90,6 +92,17 @@ fun MyHoldingsScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
+    // Filtered list used for display and reordering logic
+    val filteredHoldings by remember(localHoldings, selectedTab) {
+        derivedStateOf {
+            when (selectedTab) {
+                1 -> localHoldings.filter { it.category == AssetCategory.CRYPTO }
+                2 -> localHoldings.filter { it.category == AssetCategory.METAL }
+                else -> localHoldings
+            }
+        }
+    }
+
     val totalValueFormatted by remember(holdings, selectedTab) {
         derivedStateOf {
             val filtered = when (selectedTab) {
@@ -115,6 +128,7 @@ fun MyHoldingsScreen(
     val scanOffset = remember { Animatable(-1f) }
 
     LaunchedEffect(holdings) {
+        // Only sync from DB if we are NOT in the middle of a drag or a save operation
         if (!isDraggingActive.value && !isSavingOrder.value && assetBeingEdited == null) {
             localHoldings = holdings
         }
@@ -137,10 +151,20 @@ fun MyHoldingsScreen(
         }
     }
 
+    // FIXED: Corrected reorderable logic to handle filtered list mapping
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        val currentFiltered = filteredHoldings
+        val itemFrom = currentFiltered[from.index]
+        val itemTo = currentFiltered[to.index]
+
         val newList = localHoldings.toMutableList()
-        newList.add(to.index, newList.removeAt(from.index))
-        localHoldings = newList
+        val indexFrom = newList.indexOfFirst { it.coinId == itemFrom.coinId }
+        val indexTo = newList.indexOfFirst { it.coinId == itemTo.coinId }
+
+        if (indexFrom != -1 && indexTo != -1) {
+            newList.add(indexTo, newList.removeAt(indexFrom))
+            localHoldings = newList
+        }
     }
 
     val view = LocalView.current
@@ -195,7 +219,6 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                // NEW: AUDIT INFO BUTTON (Visible only on Metal Tab)
                 AnimatedVisibility(visible = selectedTab == 2) {
                     IconButton(onClick = { navController.navigate(Routes.METALS_AUDIT) }) {
                         Icon(Icons.Default.Shield, contentDescription = "Audit Info", tint = Color.Yellow)
@@ -204,8 +227,7 @@ fun MyHoldingsScreen(
             }
 
             LazyColumn(state = lazyListState, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val filtered = if (selectedTab == 0) localHoldings else localHoldings.filter { it.category == if(selectedTab == 1) AssetCategory.CRYPTO else AssetCategory.METAL }
-                items(items = filtered, key = { it.coinId }) { asset ->
+                items(items = filteredHoldings, key = { it.coinId }) { asset ->
                     ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
@@ -216,7 +238,13 @@ fun MyHoldingsScreen(
                                 if (isOverTrash.value) {
                                     if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset)
                                 } else {
-                                    scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(500); isSavingOrder.value = false }
+                                    // FIXED: Robust save logic with extended suppression of DB sync
+                                    scope.launch {
+                                        isSavingOrder.value = true
+                                        viewModel.updateAssetOrder(localHoldings)
+                                        delay(800) // Give the DB and LazyColumn time to settle
+                                        isSavingOrder.value = false
+                                    }
                                 }
                             }
                         )
