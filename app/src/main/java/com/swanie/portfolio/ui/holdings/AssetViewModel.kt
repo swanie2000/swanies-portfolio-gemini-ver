@@ -22,6 +22,9 @@ class AssetViewModel @Inject constructor(
     // Observed holdings from the local Room database.
     val holdings = repository.allAssets
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     private val _searchResults = MutableStateFlow<List<AssetEntity>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
@@ -54,10 +57,18 @@ class AssetViewModel @Inject constructor(
 
     /**
      * Synchronize all holdings with live market data.
+     * Includes an API Safety Lock to prevent redundant concurrent fetches.
      */
     fun refreshAssets() {
+        if (_isRefreshing.value) return
+        
         viewModelScope.launch {
-            repository.refreshAssets()
+            _isRefreshing.value = true
+            try {
+                repository.refreshAssets()
+            } finally {
+                _isRefreshing.value = false
+            }
         }
     }
 

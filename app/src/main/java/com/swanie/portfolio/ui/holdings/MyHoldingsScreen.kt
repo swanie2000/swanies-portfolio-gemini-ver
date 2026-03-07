@@ -90,6 +90,12 @@ fun MyHoldingsScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
+    // Dynamic Refresh State from ViewModel
+    val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    var refreshProgress by remember { mutableFloatStateOf(0f) }
+    var showScanFlash by remember { mutableStateOf(false) }
+    val scanOffset = remember { Animatable(-1f) }
+
     // Filtered list used for display and reordering logic
     val filteredHoldings by remember(localHoldings, selectedTab) {
         derivedStateOf {
@@ -120,32 +126,41 @@ fun MyHoldingsScreen(
         }
     }
 
-    var isRefreshing by remember { mutableStateOf(false) }
-    var refreshProgress by remember { mutableFloatStateOf(0f) }
-    var showScanFlash by remember { mutableStateOf(false) }
-    val scanOffset = remember { Animatable(-1f) }
-
     LaunchedEffect(holdings) {
-        // Only sync from DB if we are NOT in the middle of a drag or a save operation
         if (!isDraggingActive.value && !isSavingOrder.value && assetBeingEdited == null) {
             localHoldings = holdings
         }
     }
 
-    LaunchedEffect(isRefreshing) {
-        if (isRefreshing) {
+    // New Smart Refresh Logic
+    LaunchedEffect(isViewModelRefreshing) {
+        if (isViewModelRefreshing) {
             showScanFlash = true
             scanOffset.snapTo(-1f)
             scope.launch {
-                scanOffset.animateTo(2f, tween(1000, easing = LinearOutSlowInEasing))
+                // Loop scan while refreshing
+                while(isViewModelRefreshing) {
+                    scanOffset.animateTo(2f, tween(1200, easing = LinearOutSlowInEasing))
+                    scanOffset.snapTo(-1f)
+                }
                 showScanFlash = false
             }
-            val startTime = System.currentTimeMillis()
-            while (isRefreshing && (System.currentTimeMillis() - startTime) < 30000L) {
-                refreshProgress = (System.currentTimeMillis() - startTime).toFloat() / 30000L
-                delay(100)
+            
+            // Progress Bar: Indeterminate "Working" State
+            scope.launch {
+                var progress = 0.1f
+                while(isViewModelRefreshing) {
+                    refreshProgress = progress
+                    delay(100)
+                    progress = if (progress < 0.9f) progress + 0.05f else 0.85f
+                }
+                // Fetch Finished: Snap to Full
+                refreshProgress = 1.0f
+                delay(500)
+                refreshProgress = 0f
             }
-            refreshProgress = 1f; delay(500); isRefreshing = false; refreshProgress = 0f
+        } else {
+            showScanFlash = false
         }
     }
 
@@ -188,13 +203,13 @@ fun MyHoldingsScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(bgColor).statusBarsPadding()) {
-                IconButton(onClick = { if (!isRefreshing) isRefreshing = true; viewModel.refreshAssets() }, modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
-                    Icon(Icons.Default.Refresh, null, tint = if(isRefreshing) textColor.copy(0.2f) else textColor)
+                IconButton(onClick = { viewModel.refreshAssets() }, modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
+                    Icon(Icons.Default.Refresh, null, tint = if(isViewModelRefreshing) textColor.copy(0.2f) else textColor)
                 }
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
                     Box(modifier = Modifier.height(12.dp).offset(y = (-40).dp)) {
-                        if (isRefreshing) {
+                        if (refreshProgress > 0f) {
                             LinearProgressIndicator(progress = { refreshProgress }, modifier = Modifier.width(140.dp).height(6.dp).clip(CircleShape), color = textColor.copy(0.7f), trackColor = textColor.copy(0.05f))
                         }
                     }
@@ -233,7 +248,6 @@ fun MyHoldingsScreen(
                         // IMPROVED TOGGLE LOGIC: Avoids "dead tap" in Full Mode
                         val handleExpandToggle = {
                             if (isCompactViewEnabled) {
-                                // Three-step for Compact Mode: Expand -> Show Edit -> Collapse
                                 when {
                                     expandedAssetId != asset.coinId -> {
                                         expandedAssetId = asset.coinId
@@ -248,10 +262,9 @@ fun MyHoldingsScreen(
                                     }
                                 }
                             } else {
-                                // Full Mode: Straight to Edit Button toggle (since card is already full size)
                                 if (showEditButtonId != asset.coinId) {
                                     showEditButtonId = asset.coinId
-                                    expandedAssetId = asset.coinId // Sync for state consistency
+                                    expandedAssetId = asset.coinId 
                                 } else {
                                     showEditButtonId = null
                                     expandedAssetId = null
@@ -266,11 +279,10 @@ fun MyHoldingsScreen(
                                 if (isOverTrash.value) {
                                     if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset)
                                 } else {
-                                    // FIXED: Robust save logic with extended suppression of DB sync
                                     scope.launch { 
                                         isSavingOrder.value = true
                                         viewModel.updateAssetOrder(localHoldings)
-                                        delay(800) // Give the DB and LazyColumn time to settle
+                                        delay(800)
                                         isSavingOrder.value = false 
                                     }
                                 }
