@@ -173,72 +173,79 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-📄 BROWSER_CONTEXT_NARRATIVE.md (Updated)
-
+📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-07)
 1. Project Overview
 
-   App Name: Swanie's Portfolio
+   App Name: Swanie’s Portfolio
 
-   Current Branch: main (Dual-Path Logic & 1:1 State Parity Locked)
+   Current Branch: main (UI Structural Integrity & Canvas Direct-Draw Locked)
 
 2. Architectural Status
 
-   Status: UNIFIED SINGLE-SOURCE ARCHITECTURE
+   Status: REINFORCED GRID-LOCKED ARCHITECTURE
 
-        Single Source of Truth: Room Database is now the primary state for all screens.
+   UI Stability: Cards are hard-locked at 195.dp to prevent vertical clipping and overlap across all device aspect ratios.
 
-        Yahoo Integration: Unified YahooFinanceResponse handles price, 24h change, and hourly sparklines (interval=1h&range=7d).
+   The "Canvas Direct-Draw" Breakthrough: Bypassed external component coordinate bugs by implementing a manual Path rendering system inside a local Canvas. This ensures 100% sparkline visibility regardless of state timing.
 
-        The "Ghost Row" Solution: Market Watch now observes the database for 1:1 parity with Holdings, only performing "Ghost Fetches" for metals the user does not yet own.
+   Data Parity: Market Watch now independently fetches 7-day historical data (1h intervals) for all four metals, ensuring a "Live Watch" experience even for unowned assets.
 
 3. Feature Map & UI Status
 
-🟢 Completed & Locked
+🟢 Completed & Locked (Today's Wins)
 
-    1:1 Price Parity: Sync disparity between Market Watch and Holdings is resolved.
+    Information Density Optimization: Reduced Title (16.sp) and Price (18.sp) sizes to allow room for "Day High/Low" and "Holding" badge growth.
 
-    Persistent Trends: 24h percentage changes (priceChange24h) are now saved to the database for all asset types.
+    Visual Sub-Title Anchor: Currency suffixes (XAU, XPD, etc.) are tucked directly under titles to maximize vertical clearance.
 
-    Visual Ownership: Market Watch now features an "OWNED" badge for items existing in the user's portfolio.
+    The "Holding" Badge: Stylized as     "Holding" in bright yellow, providing instant portfolio recognition.
+
+    Haptic Reordering: Long-press drag-and-drop is fully persistent and includes "pick-up" vibration feedback.
+
+    Day High/Low Footers: Stacked labels ("DAY" over "HIGH/LOW") with unified brightness and wide horizontal spacing.
 
 🔴 Bug Tracker (Upcoming)
 
-    Refresh Button Polish: Verify the main screen icon correctly triggers the parallel background refresh.
+    Haptic Parity: Port the onDragStarted haptic vibration logic to the main HoldingsScreen.kt.
+
+    Sparkline Optimization: Verify that the manual Canvas drawing correctly handles color shifts (Green/Red) based on changePct.
 
 4. Key Logic Snippets (The Build-Savers)
    Kotlin
 
-// 1. UNIFIED REFRESH (AssetRepository)
-// Now persists 24h change for parity across all screens
-assetDao.upsertAll(owned.map { it.copy(
-currentPrice = data.current,
-priceChange24h = data.changePercent, // Persistence locked
-sparklineData = data.sparkline
-)})
+// 1. DIRECT-DRAW SPARKLINE (MetalsAuditScreen)
+// Bypasses coordinate bugs by calculating path locally within a 70dp box
+Canvas(modifier = Modifier.fillMaxSize()) {
+val path = Path().apply {
+liveSparkline.forEachIndexed { index, value ->
+val x = index * (size.width / (liveSparkline.size - 1))
+val y = size.height - ((value - minVal) / range * size.height).toFloat()
+if (index == 0) moveTo(x, y) else lineTo(x, y)
+}
+}
+drawPath(path = path, color = lineColor, style = Stroke(width = 2.dp.toPx()))
+}
 
-// 2. GHOST ROW PARITY (MetalsAuditScreen)
-// Prioritizes DB state; falls back to live fetch if not owned
-val currentPrice = ownedAsset?.currentPrice ?: ghostData?.current ?: 0.0
-val changePct = ownedAsset?.priceChange24h ?: ghostData?.changePercent ?: 0.0
+// 2. DECIMAL GHOST EXORCISM
+// Prevents floating dots by forcing a string fallback during load
+val lowStr = if (currentPrice <= 0.0 || low <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(low)
 
-🛡️ Narrative Synchronized
+🛡️ Narrative Synchronized and Pushed.
+
+Would you like me to ... start on the Haptic Feedback update for your HoldingsScreen.kt now?
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Thu 03/05/2026 15:54:27.99
+Generated: Sat 03/07/2026 20:34:46.35
 
 Branch:
 main
 Commit:
-17938de018f99fa4f7819d2503c9616c7d1e1e5a
+94a66290550f5f5ee7d556bcc6a73d02ce94ff21
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/data/network/CoinMarketResponse.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
- M app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
- M docs/BROWSER_CONTEXT_MASTER.md
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
