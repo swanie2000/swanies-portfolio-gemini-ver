@@ -31,6 +31,9 @@ class ThemeViewModel @Inject constructor(
     private val _useGradient = MutableStateFlow(false)
     val useGradient: StateFlow<Boolean> = _useGradient.asStateFlow()
 
+    private val _metalsDisplayOrder = MutableStateFlow("XAU,XAG,XPT,XPD")
+    val metalsDisplayOrder: StateFlow<String> = _metalsDisplayOrder.asStateFlow()
+
     init {
         viewModelScope.launch {
             themePreferences.cardBackgroundColor.collect { _cardBackgroundColor.value = it }
@@ -46,6 +49,9 @@ class ThemeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             themePreferences.useGradient.collect { _useGradient.value = it }
+        }
+        viewModelScope.launch {
+            themePreferences.metalsDisplayOrder.collect { _metalsDisplayOrder.value = it }
         }
     }
 
@@ -72,5 +78,10 @@ class ThemeViewModel @Inject constructor(
     fun saveUseGradient(useGradient: Boolean) {
         _useGradient.value = useGradient
         viewModelScope.launch { themePreferences.saveUseGradient(useGradient) }
+    }
+
+    fun saveMetalsDisplayOrder(order: String) {
+        _metalsDisplayOrder.value = order
+        viewModelScope.launch { themePreferences.saveMetalsDisplayOrder(order) }
     }
 }

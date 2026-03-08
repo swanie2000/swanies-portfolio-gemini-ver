@@ -1,46 +1,59 @@
 package com.swanie.portfolio.ui.metals
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.repository.MarketPriceData
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.SparklineChart
+import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.text.NumberFormat
 import java.util.*
 
-/**
- * Market Watch Screen (Rebuilt for Precious Metals).
- * Synchronized with the Room database to ensure 1:1 price parity with Holdings.
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetalsAuditScreen(navController: NavController) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
-    // Observe Database Holdings for 1:1 Parity
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
-    
-    // Observe Theme Preferences
+
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
     val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
@@ -51,125 +64,165 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardBg = Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" }))
     val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifBlank { "#FFFFFF" }))
 
-    // Local state for "Ghost" assets (metals not currently owned)
-    val ghostMarketData = remember { mutableStateMapOf<String, MarketPriceData>() }
-    val metals = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
+    var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
 
-    // Fetch live market data only for metals NOT in holdings
-    LaunchedEffect(holdings) {
-        metals.forEach { (_, sym) ->
-            val isOwned = holdings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
-            if (!isOwned) {
-                scope.launch {
-                    ghostMarketData[sym] = viewModel.fetchMarketPriceData(sym)
+    LaunchedEffect(Unit) {
+        val savedOrder = viewModel.getMetalDisplayOrder()
+        if (savedOrder != null) {
+            val defaultList = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
+            metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
+        }
+    }
+
+    val ghostMarketData = remember { mutableStateMapOf<String, MarketPriceData>() }
+
+    LaunchedEffect(holdings, metalsOrder) {
+        metalsOrder.forEach { (_, sym) ->
+            scope.launch {
+                val data = viewModel.fetchMarketPriceData(sym)
+                if (data.current > 0.0) {
+                    ghostMarketData[sym] = data
                 }
             }
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Market Watch", fontWeight = FontWeight.Black, color = textColor) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = bgColor)
-            )
-        },
-        containerColor = bgColor
-    ) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding).padding(horizontal = 16.dp, vertical = 8.dp)) {
-            items(metals) { (name, sym) ->
-                // Priority 1: Use Database Asset (Holdings) for exact parity
-                val ownedAsset = holdings.find { it.baseSymbol == sym && it.category == AssetCategory.METAL }
-                
-                // Priority 2: Use "Ghost" fetch if not owned
-                val ghostData = ghostMarketData[sym]
-                
-                val currentPrice = ownedAsset?.currentPrice ?: ghostData?.current ?: 0.0
-                val changePct = ownedAsset?.priceChange24h ?: ghostData?.changePercent ?: 0.0
-                val sparkline = ownedAsset?.sparklineData ?: ghostData?.sparkline ?: emptyList()
-                val high = ghostData?.high ?: 0.0
-                val low = ghostData?.low ?: 0.0
+    val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        metalsOrder = metalsOrder.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = cardBg),
-                    border = CardDefaults.outlinedCardBorder(enabled = true).copy(brush = SolidColor(cardText.copy(alpha = 0.1f)))
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text(name.uppercase(), fontWeight = FontWeight.ExtraBold, color = cardText, fontSize = 16.sp)
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(sym, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = cardText.copy(alpha = 0.4f))
-                                    if (ownedAsset != null) {
-                                        Spacer(Modifier.width(6.dp))
-                                        Surface(
-                                            color = Color.Yellow.copy(alpha = 0.1f),
-                                            shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
-                                        ) {
-                                            Text(
-                                                "OWNED", 
-                                                fontSize = 8.sp, 
-                                                fontWeight = FontWeight.Black, 
-                                                color = Color.Yellow,
-                                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                                            )
+    Box(modifier = Modifier.fillMaxSize().background(bgColor)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(top = 4.dp)) {
+                IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.TopStart).padding(start = 8.dp)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = textColor)
+                }
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(70.dp), contentScale = ContentScale.Fit)
+                    Text(text = "METALS MARKET WATCH", color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center, modifier = Modifier.offset(y = (-6).dp))
+                }
+            }
+
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                items(metalsOrder, key = { it.second }) { item ->
+                    val (name, sym) = item
+                    ReorderableItem(reorderableLazyListState, key = sym) { isDragging ->
+                        val ownedAsset = holdings.find { it.baseSymbol == sym && it.category == AssetCategory.METAL }
+                        val ghostData = ghostMarketData[sym]
+
+                        val currentPrice = if (ownedAsset?.currentPrice != null && ownedAsset.currentPrice > 0.0) ownedAsset.currentPrice else ghostData?.current ?: 0.0
+                        val changePct = if (ownedAsset?.priceChange24h != null) ownedAsset.priceChange24h else ghostData?.changePercent ?: 0.0
+                        val sparkline = if (ownedAsset?.sparklineData != null && ownedAsset.sparklineData.isNotEmpty()) ownedAsset.sparklineData else ghostData?.sparkline ?: emptyList()
+                        val high = ghostData?.high ?: 0.0
+                        val low = ghostData?.low ?: 0.0
+
+                        val scale by animateFloatAsState(if (isDragging) 1.1f else 1f, label = "scale")
+                        val elevation by animateDpAsState(if (isDragging) 15.dp else 2.dp, label = "elevation")
+
+                        val dragModifier = Modifier.longPressDraggableHandle(
+                            onDragStarted = { haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
+                            onDragStopped = { viewModel.saveMetalDisplayOrder(metalsOrder.map { it.second }) }
+                        )
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(195.dp)
+                                .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx() }
+                                .zIndex(if (isDragging) 1f else 0f)
+                                .then(dragModifier),
+                            colors = CardDefaults.cardColors(containerColor = cardBg),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = elevation)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp).fillMaxSize(),
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                // --- HEADER: Name and Symbol (Holding Badge with leading spaces/quotes) ---
+                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(name.uppercase(), fontWeight = FontWeight.Black, color = cardText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            // Greyed Symbol tucked close to name
+                                            Text(sym, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cardText.copy(alpha = 0.4f))
+                                            if (ownedAsset != null) {
+                                                // Yellow Badge with 4 spaces and quotes
+                                                Text("    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
+                                            }
+                                        }
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        if (currentPrice > 0.0) {
+                                            Text(NumberFormat.getCurrencyInstance(Locale.US).format(currentPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                            Text("${if(changePct >= 0) "+" else ""}${String.format("%.2f", changePct)}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F))
+                                        } else {
+                                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.5.dp, color = Color.Yellow)
                                         }
                                     }
                                 }
-                            }
 
-                            // SPARKLINE CHART
-                            if (sparkline.isNotEmpty()) {
-                                Box(Modifier.width(90.dp).height(35.dp).padding(horizontal = 10.dp)) {
-                                    SparklineChart(
-                                        sparklineData = sparkline,
-                                        changeColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-                                    )
+                                // --- SPARKLINE AREA ---
+                                Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
+                                    if (sparkline.size > 10) {
+                                        SparklineChart(sparklineData = sparkline, changeColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F))
+                                    } else {
+                                        HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp), thickness = 4.dp, color = Color.Yellow)
+                                    }
                                 }
-                            }
 
-                            Column(horizontalAlignment = Alignment.End) {
-                                if (currentPrice > 0.0) {
-                                    Text(
-                                        NumberFormat.getCurrencyInstance(Locale.US).format(currentPrice), 
-                                        fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp
-                                    )
-                                    Text(
-                                        text = "${if(changePct >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePct)}%",
-                                        fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
-                                        color = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-                                    )
-                                } else {
-                                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.Yellow)
-                                }
-                            }
-                        }
+                                // --- FOOTER ---
+                                Row(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 7.sp)
+                                            Text("LOW", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 8.sp)
+                                        }
+                                        Spacer(Modifier.width(8.dp))
+                                        val lowStr = if (currentPrice <= 0.0 || low <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(low)
+                                        Text(lowStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                                    }
 
-                        // HIGH/LOW RANGES
-                        if (high > 0.0) {
-                            Spacer(Modifier.height(14.dp))
-                            HorizontalDivider(color = cardText.copy(alpha = 0.05f))
-                            Spacer(Modifier.height(10.dp))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Column {
-                                    Text("DAY LOW", fontSize = 9.sp, fontWeight = FontWeight.Black, color = cardText.copy(alpha = 0.3f))
-                                    Text(NumberFormat.getCurrencyInstance(Locale.US).format(low), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD32F2F))
-                                }
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text("DAY HIGH", fontSize = 9.sp, fontWeight = FontWeight.Black, color = cardText.copy(alpha = 0.3f))
-                                    Text(NumberFormat.getCurrencyInstance(Locale.US).format(high), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF00C853))
+                                    Spacer(Modifier.weight(1f))
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 7.sp)
+                                            Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 8.sp)
+                                        }
+                                        Spacer(Modifier.width(8.dp))
+                                        val highStr = if (currentPrice <= 0.0 || high <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(high)
+                                        Text(highStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
+            Surface(modifier = Modifier.fillMaxWidth().height(64.dp), color = bgColor) {
+                Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentRoute = navBackStackEntry?.destination?.route
+                    val icons = listOf(Icons.Default.Home to Routes.HOME, Icons.AutoMirrored.Filled.FormatListBulleted to Routes.HOLDINGS, Icons.Default.PieChart to Routes.ANALYTICS, Icons.Default.Settings to Routes.SETTINGS)
+                    icons.forEach { (icon, route) ->
+                        IconButton(onClick = { navController.navigate(route) }, modifier = Modifier.size(48.dp)) {
+                            Icon(icon, null, modifier = Modifier.size(28.dp), tint = if(currentRoute == route) textColor else textColor.copy(0.3f))
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(bgColor))
         }
     }
 }

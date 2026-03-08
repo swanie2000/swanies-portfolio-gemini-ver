@@ -21,6 +21,7 @@ class ThemePreferences(context: Context) {
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
+        val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
     }
 
     // Flows
@@ -32,6 +33,7 @@ class ThemePreferences(context: Context) {
     val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false }
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_DARK_MODE] ?: true }
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
+    val metalsDisplayOrder: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.METALS_DISPLAY_ORDER] ?: "XAU,XAG,XPT,XPD" }
 
     // Save Functions
     suspend fun saveSiteBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = color } }
@@ -42,4 +44,5 @@ class ThemePreferences(context: Context) {
     suspend fun saveIsCompactViewEnabled(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled } }
     suspend fun saveIsDarkMode(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_DARK_MODE] = enabled } }
     suspend fun saveConfirmDelete(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.CONFIRM_DELETE] = enabled } }
+    suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
 }
