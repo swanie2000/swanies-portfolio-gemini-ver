@@ -37,19 +37,15 @@ import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.repository.MarketPriceData
 import com.swanie.portfolio.ui.holdings.AssetViewModel
-import com.swanie.portfolio.ui.holdings.SparklineChart
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.text.NumberFormat
 import java.util.*
 
-/**
- * Metals Market Watch - Final Production Edition.
- * Live sparklines, optimized spacing, and "Holding" badge logic.
- */
 @Composable
 fun MetalsAuditScreen(navController: NavController) {
     val viewModel: AssetViewModel = hiltViewModel()
@@ -70,6 +66,14 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifBlank { "#FFFFFF" }))
 
     var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
+
+    val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
+
+    // NEW: Force scroll to top on page entry with a small delay to ensure layout is ready
+    LaunchedEffect(Unit) {
+        delay(100) // Small delay to prevent scroll fighting with initial layout pass
+        lazyListState.scrollToItem(0)
+    }
 
     LaunchedEffect(Unit) {
         val savedOrder = viewModel.getMetalDisplayOrder()
@@ -92,7 +96,6 @@ fun MetalsAuditScreen(navController: NavController) {
         }
     }
 
-    val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         metalsOrder = metalsOrder.toMutableList().apply {
             add(to.index, removeAt(from.index))
@@ -153,7 +156,6 @@ fun MetalsAuditScreen(navController: NavController) {
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp).fillMaxSize(),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // --- HEADER ---
                                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(name.uppercase(), fontWeight = FontWeight.Black, color = cardText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -174,7 +176,6 @@ fun MetalsAuditScreen(navController: NavController) {
                                     }
                                 }
 
-                                // --- SPARKLINE AREA (Clean Manual Draw) ---
                                 Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
                                     if (liveSparkline.isNotEmpty()) {
                                         val lineColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
@@ -199,7 +200,6 @@ fun MetalsAuditScreen(navController: NavController) {
                                     }
                                 }
 
-                                // --- FOOTER ---
                                 Row(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {

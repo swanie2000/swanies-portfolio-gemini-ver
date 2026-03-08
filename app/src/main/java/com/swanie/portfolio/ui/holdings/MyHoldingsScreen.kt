@@ -20,10 +20,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +61,7 @@ fun MyHoldingsScreen(
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
@@ -77,7 +80,16 @@ fun MyHoldingsScreen(
     val cardText = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
     val isDarkTheme = ColorUtils.calculateLuminance(bgColor.toArgb()) < 0.5
 
+    // UI States
     val lazyListState = rememberLazyListState()
+    var selectedTab by remember { mutableIntStateOf(0) } // Moved up to fix compile error
+    val tabs = listOf("ALL", "CRYPTO", "METAL")
+
+    // AUTO-TOP LOGIC: Snaps to top on tab change or entry
+    LaunchedEffect(selectedTab) {
+        lazyListState.scrollToItem(0)
+    }
+
     val isDraggingActive = remember { mutableStateOf(false) }
     val isSavingOrder = remember { mutableStateOf(false) }
     val isOverTrash = remember { mutableStateOf(false) }
@@ -87,16 +99,12 @@ fun MyHoldingsScreen(
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var showEditButtonId by remember { mutableStateOf<String?>(null) }
     var assetPendingDeletion by remember { mutableStateOf<AssetEntity?>(null) }
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("ALL", "CRYPTO", "METAL")
 
-    // Dynamic Refresh State from ViewModel
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     var refreshProgress by remember { mutableFloatStateOf(0f) }
     var showScanFlash by remember { mutableStateOf(false) }
     val scanOffset = remember { Animatable(-1f) }
 
-    // Filtered list used for display and reordering logic
     val filteredHoldings by remember(localHoldings, selectedTab) {
         derivedStateOf {
             when (selectedTab) {
@@ -132,21 +140,18 @@ fun MyHoldingsScreen(
         }
     }
 
-    // New Smart Refresh Logic
     LaunchedEffect(isViewModelRefreshing) {
         if (isViewModelRefreshing) {
             showScanFlash = true
             scanOffset.snapTo(-1f)
             scope.launch {
-                // Loop scan while refreshing
                 while(isViewModelRefreshing) {
                     scanOffset.animateTo(2f, tween(1200, easing = LinearOutSlowInEasing))
                     scanOffset.snapTo(-1f)
                 }
                 showScanFlash = false
             }
-            
-            // Progress Bar: Indeterminate "Working" State
+
             scope.launch {
                 var progress = 0.1f
                 while(isViewModelRefreshing) {
@@ -154,7 +159,6 @@ fun MyHoldingsScreen(
                     delay(100)
                     progress = if (progress < 0.9f) progress + 0.05f else 0.85f
                 }
-                // Fetch Finished: Snap to Full
                 refreshProgress = 1.0f
                 delay(500)
                 refreshProgress = 0f
@@ -164,7 +168,6 @@ fun MyHoldingsScreen(
         }
     }
 
-    // FIXED: Corrected reorderable logic to handle filtered list mapping
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         val currentFiltered = filteredHoldings
         val itemFrom = currentFiltered[from.index]
@@ -245,7 +248,6 @@ fun MyHoldingsScreen(
                         val isExpanded = expandedAssetId == asset.coinId
                         val isEditButtonVisible = showEditButtonId == asset.coinId
 
-                        // IMPROVED TOGGLE LOGIC: Avoids "dead tap" in Full Mode
                         val handleExpandToggle = {
                             if (isCompactViewEnabled) {
                                 when {
@@ -264,7 +266,7 @@ fun MyHoldingsScreen(
                             } else {
                                 if (showEditButtonId != asset.coinId) {
                                     showEditButtonId = asset.coinId
-                                    expandedAssetId = asset.coinId 
+                                    expandedAssetId = asset.coinId
                                 } else {
                                     showEditButtonId = null
                                     expandedAssetId = null
@@ -272,18 +274,22 @@ fun MyHoldingsScreen(
                             }
                         }
 
+                        // Pick-up vibration
                         val dragModifier = Modifier.longPressDraggableHandle(
-                            onDragStarted = { isDraggingActive.value = true },
+                            onDragStarted = {
+                                isDraggingActive.value = true
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
                             onDragStopped = {
                                 isDraggingActive.value = false
                                 if (isOverTrash.value) {
                                     if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset)
                                 } else {
-                                    scope.launch { 
+                                    scope.launch {
                                         isSavingOrder.value = true
                                         viewModel.updateAssetOrder(localHoldings)
                                         delay(800)
-                                        isSavingOrder.value = false 
+                                        isSavingOrder.value = false
                                     }
                                 }
                             }
