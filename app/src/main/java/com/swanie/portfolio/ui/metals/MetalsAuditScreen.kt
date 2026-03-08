@@ -1,8 +1,7 @@
 package com.swanie.portfolio.ui.metals
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,13 +9,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
@@ -45,6 +46,10 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 import java.text.NumberFormat
 import java.util.*
 
+/**
+ * Metals Market Watch - Final Production Edition.
+ * Live sparklines, optimized spacing, and "Holding" badge logic.
+ */
 @Composable
 fun MetalsAuditScreen(navController: NavController) {
     val viewModel: AssetViewModel = hiltViewModel()
@@ -74,14 +79,14 @@ fun MetalsAuditScreen(navController: NavController) {
         }
     }
 
-    val ghostMarketData = remember { mutableStateMapOf<String, MarketPriceData>() }
+    val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
 
-    LaunchedEffect(holdings, metalsOrder) {
+    LaunchedEffect(metalsOrder) {
         metalsOrder.forEach { (_, sym) ->
             scope.launch {
                 val data = viewModel.fetchMarketPriceData(sym)
                 if (data.current > 0.0) {
-                    ghostMarketData[sym] = data
+                    marketDataMap[sym] = data
                 }
             }
         }
@@ -116,14 +121,14 @@ fun MetalsAuditScreen(navController: NavController) {
                 items(metalsOrder, key = { it.second }) { item ->
                     val (name, sym) = item
                     ReorderableItem(reorderableLazyListState, key = sym) { isDragging ->
-                        val ownedAsset = holdings.find { it.baseSymbol == sym && it.category == AssetCategory.METAL }
-                        val ghostData = ghostMarketData[sym]
+                        val isOwned = holdings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
+                        val marketData = marketDataMap[sym]
 
-                        val currentPrice = if (ownedAsset?.currentPrice != null && ownedAsset.currentPrice > 0.0) ownedAsset.currentPrice else ghostData?.current ?: 0.0
-                        val changePct = if (ownedAsset?.priceChange24h != null) ownedAsset.priceChange24h else ghostData?.changePercent ?: 0.0
-                        val sparkline = if (ownedAsset?.sparklineData != null && ownedAsset.sparklineData.isNotEmpty()) ownedAsset.sparklineData else ghostData?.sparkline ?: emptyList()
-                        val high = ghostData?.high ?: 0.0
-                        val low = ghostData?.low ?: 0.0
+                        val currentPrice = marketData?.current ?: 0.0
+                        val changePct = marketData?.changePercent ?: 0.0
+                        val liveSparkline = marketData?.sparkline ?: emptyList()
+                        val high = marketData?.high ?: 0.0
+                        val low = marketData?.low ?: 0.0
 
                         val scale by animateFloatAsState(if (isDragging) 1.1f else 1f, label = "scale")
                         val elevation by animateDpAsState(if (isDragging) 15.dp else 2.dp, label = "elevation")
@@ -148,15 +153,13 @@ fun MetalsAuditScreen(navController: NavController) {
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp).fillMaxSize(),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // --- HEADER: Name and Symbol (Holding Badge with leading spaces/quotes) ---
+                                // --- HEADER ---
                                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(name.uppercase(), fontWeight = FontWeight.Black, color = cardText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            // Greyed Symbol tucked close to name
                                             Text(sym, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cardText.copy(alpha = 0.4f))
-                                            if (ownedAsset != null) {
-                                                // Yellow Badge with 4 spaces and quotes
+                                            if (isOwned) {
                                                 Text("    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
                                             }
                                         }
@@ -171,12 +174,28 @@ fun MetalsAuditScreen(navController: NavController) {
                                     }
                                 }
 
-                                // --- SPARKLINE AREA ---
+                                // --- SPARKLINE AREA (Clean Manual Draw) ---
                                 Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
-                                    if (sparkline.size > 10) {
-                                        SparklineChart(sparklineData = sparkline, changeColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F))
-                                    } else {
-                                        HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp), thickness = 4.dp, color = Color.Yellow)
+                                    if (liveSparkline.isNotEmpty()) {
+                                        val lineColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+                                        Canvas(modifier = Modifier.fillMaxSize()) {
+                                            val width = size.width
+                                            val height = size.height
+                                            val maxVal = liveSparkline.maxOrNull() ?: 1.0
+                                            val minVal = liveSparkline.minOrNull() ?: 0.0
+                                            val range = (maxVal - minVal).coerceAtLeast(1.0)
+
+                                            val path = Path().apply {
+                                                liveSparkline.forEachIndexed { index, value ->
+                                                    val x = index * (width / (liveSparkline.size - 1))
+                                                    val y = height - ((value - minVal) / range * height).toFloat()
+                                                    if (index == 0) moveTo(x, y) else lineTo(x, y)
+                                                }
+                                            }
+                                            drawPath(path = path, color = lineColor, style = Stroke(width = 2.dp.toPx()))
+                                        }
+                                    } else if (currentPrice > 0.0) {
+                                        CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 3.dp, color = Color.White.copy(0.2f))
                                     }
                                 }
 
@@ -214,7 +233,7 @@ fun MetalsAuditScreen(navController: NavController) {
                 Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
-                    val icons = listOf(Icons.Default.Home to Routes.HOME, Icons.AutoMirrored.Filled.FormatListBulleted to Routes.HOLDINGS, Icons.Default.PieChart to Routes.ANALYTICS, Icons.Default.Settings to Routes.SETTINGS)
+                    val icons = listOf(Icons.Default.Home to Routes.HOME, Icons.Default.FormatListBulleted to Routes.HOLDINGS, Icons.Default.PieChart to Routes.ANALYTICS, Icons.Default.Settings to Routes.SETTINGS)
                     icons.forEach { (icon, route) ->
                         IconButton(onClick = { navController.navigate(route) }, modifier = Modifier.size(48.dp)) {
                             Icon(icon, null, modifier = Modifier.size(28.dp), tint = if(currentRoute == route) textColor else textColor.copy(0.3f))
