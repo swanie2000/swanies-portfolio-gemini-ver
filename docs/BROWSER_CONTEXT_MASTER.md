@@ -173,78 +173,74 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-07)
+📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-09)
+
 1. Project Overview
 
    App Name: Swanie’s Portfolio
 
-   Current Branch: main (UI Structural Integrity & Canvas Direct-Draw Locked)
+   Current Branch: main (Metals Stability Recovered | UI State Debugging)
 
 2. Architectural Status
 
    Status: REINFORCED GRID-LOCKED ARCHITECTURE
 
-   UI Stability: Cards are hard-locked at 195.dp to prevent vertical clipping and overlap across all device aspect ratios.
+   The Metals "Safe Harbor": Successfully reverted to a stable state where the Metals Market Watch independently fetches and renders live Yahoo Finance data. The logic is now "Hands-Off" to prevent regression.
 
-   The "Canvas Direct-Draw" Breakthrough: Bypassed external component coordinate bugs by implementing a manual Path rendering system inside a local Canvas. This ensures 100% sparkline visibility regardless of state timing.
-
-   Data Parity: Market Watch now independently fetches 7-day historical data (1h intervals) for all four metals, ensuring a "Live Watch" experience even for unowned assets.
+   The State Synchronization Challenge: Currently investigating a "Deaf UI" issue where the database updates successfully (verified by navigation), but the Holdings screen remains frozen until a manual interaction (like tapping an edit field) forces a re-composition.
 
 3. Feature Map & UI Status
 
-🟢 Completed & Locked (Today's Wins)
+🟢 Completed & Locked (Today’s Wins)
 
-    Information Density Optimization: Reduced Title (16.sp) and Price (18.sp) sizes to allow room for "Day High/Low" and "Holding" badge growth.
+    Metals Logic Recovery: Yahoo Finance API integration is restored and stable.
 
-    Visual Sub-Title Anchor: Currency suffixes (XAU, XPD, etc.) are tucked directly under titles to maximize vertical clearance.
+    Manual Re-composition Proof: Confirmed that the data is correctly stored in Room; the issue is isolated to the UI "Bridge" failing to trigger a redraw on the second asset addition.
 
-    The "Holding" Badge: Stylized as     "Holding" in bright yellow, providing instant portfolio recognition.
+    NavGraph Scoping: Initial work on unified AssetViewModel scoping to ensure the Picker and List share a single source of truth.
 
-    Haptic Reordering: Long-press drag-and-drop is fully persistent and includes "pick-up" vibration feedback.
+🔴 Bug Tracker (Current Priority)
 
-    Day High/Low Footers: Stacked labels ("DAY" over "HIGH/LOW") with unified brightness and wide horizontal spacing.
+    Reactive Flow Lock: Solve the "Second Asset" bug where new prices only appear after navigating to Analytics/Settings and back, or after interacting with a card.
 
-🔴 Bug Tracker (Upcoming)
+    UI "Wake-Up" Call: Implement a robust trigger to force the Holdings screen to redraw immediately upon landing or database emission.
 
-    Haptic Parity: Port the onDragStarted haptic vibration logic to the main HoldingsScreen.kt.
+📝 The Drawing Board (Post-Sync Phase)
 
-    Sparkline Optimization: Verify that the manual Canvas drawing correctly handles color shifts (Green/Red) based on changePct.
+    Pull-to-Refresh: Implement a standard "Swipe Down" manual refresh for the main Holdings list.
+
+    The Leaky Bucket Sync: Develop a "leaky bucket" synchronization strategy to handle high-frequency price updates without overwhelming the UI thread.
+
+    Expanded Search Engines: Integrate additional API endpoints to locate and track niche or "hard-to-find" crypto assets not currently indexed by the primary provider.
 
 4. Key Logic Snippets (The Build-Savers)
    Kotlin
 
-// 1. DIRECT-DRAW SPARKLINE (MetalsAuditScreen)
-// Bypasses coordinate bugs by calculating path locally within a 70dp box
-Canvas(modifier = Modifier.fillMaxSize()) {
-val path = Path().apply {
-liveSparkline.forEachIndexed { index, value ->
-val x = index * (size.width / (liveSparkline.size - 1))
-val y = size.height - ((value - minVal) / range * size.height).toFloat()
-if (index == 0) moveTo(x, y) else lineTo(x, y)
-}
-}
-drawPath(path = path, color = lineColor, style = Stroke(width = 2.dp.toPx()))
+// UI REACTIVITY BRIDGE (Pending Final Stabilization)
+// Unconditional update intended to bypass "frozen" local states
+LaunchedEffect(holdings) {
+Log.d("SWAN_DEBUG", "UI Received ${holdings.size} assets. Forcing Redraw.")
+localHoldings = holdings.toList()
 }
 
-// 2. DECIMAL GHOST EXORCISM
-// Prevents floating dots by forcing a string fallback during load
-val lowStr = if (currentPrice <= 0.0 || low <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(low)
-
-🛡️ Narrative Synchronized and Pushed.
-
-Would you like me to ... start on the Haptic Feedback update for your HoldingsScreen.kt now?
+// METALS API RECOVERY
+// Direct-assignment logic that restored the Market Watch functionality
+val result = viewModel.fetchMarketPriceData(sym)
+if (result.current > 0.0) {
+marketDataMap[sym] = result
+}
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 03/07/2026 20:34:46.35
+Generated: Mon 03/09/2026 15:50:09.64
 
 Branch:
 main
 Commit:
-94a66290550f5f5ee7d556bcc6a73d02ce94ff21
+699d2f5b611a4ceb79bec0daceb861947ffb85f6
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
