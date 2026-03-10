@@ -15,15 +15,9 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/**
- * Simplified Market Data Model for UI consumption.
- */
 data class MarketPriceData(
-    val current: Double,
-    val high: Double,
-    val low: Double,
-    val changePercent: Double,
-    val sparkline: List<Double>
+    val current: Double, val high: Double, val low: Double,
+    val changePercent: Double, val sparkline: List<Double>
 )
 
 @Singleton
@@ -31,30 +25,21 @@ class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService,
     private val yahooApiService: YahooFinanceApiService,
-    private val syncCoordinator: DataSyncCoordinator // NEW: The Tower arrives
+    private val syncCoordinator: DataSyncCoordinator
 ) {
     val allAssets = assetDao.getAllAssets()
 
-    // Single source of truth for metal symbols mapping to Yahoo tickers
     private val metalTickers = mapOf(
-        "XAU" to "GC=F",
-        "XAG" to "SI=F",
-        "XPT" to "PL=F",
-        "XPD" to "PA=F"
+        "XAU" to "GC=F", "XAG" to "SI=F", "XPT" to "PL=F", "XPD" to "PA=F"
     )
 
-    /**
-     * Fetches current market data for a given metal symbol (XAU, XAG, etc.) from Yahoo Finance.
-     */
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
         return try {
             val ticker = metalTickers[symbol] ?: return MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
             val response: YahooFinanceResponse = yahooApiService.getTickerData(ticker)
-            val result: ChartResult? = response.chart.result?.firstOrNull()
-            val meta: Meta? = result?.meta
-
-            // Extract closing prices for sparkline (filter nulls for stability)
-            val closePrices: List<Double> = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
+            val result = response.chart.result?.firstOrNull()
+            val meta = result?.meta
+            val closePrices = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
 
             MarketPriceData(
                 current = meta?.regularMarketPrice ?: 0.0,
@@ -69,12 +54,8 @@ class AssetRepository @Inject constructor(
         }
     }
 
-    /**
-     * Synchronizes all holdings with live market data, governed by the SyncCoordinator.
-     */
-    suspend fun refreshAssets() = coroutineScope {
-        // Check with the Tower before proceeding
-        if (!syncCoordinator.canRefresh()) {
+    suspend fun refreshAssets(force: Boolean = false) = coroutineScope {
+        if (!syncCoordinator.canRefresh(force)) {
             Log.d("SWAN_SYNC", "Repository: Refresh blocked by Rate Limiter.")
             return@coroutineScope
         }
@@ -85,7 +66,6 @@ class AssetRepository @Inject constructor(
         try {
             val allLocalAssets = allAssets.first()
 
-            // 1. Refresh Crypto Holdings via CoinGecko
             val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
             if (cryptoAssets.isNotEmpty()) {
                 try {
@@ -108,7 +88,6 @@ class AssetRepository @Inject constructor(
                 }
             }
 
-            // 2. Refresh Metal Holdings via Yahoo Finance (Parallel)
             metalTickers.map { (symbol, _) ->
                 async {
                     val data = fetchMarketPrice(symbol)
@@ -123,23 +102,17 @@ class AssetRepository @Inject constructor(
                                 )
                             })
                         }
-                    } else {
-                        success = false
-                    }
+                    } else { success = false }
                 }
             }.awaitAll()
 
         } catch (e: Exception) {
-            Log.e("AssetRepository", "Global refresh failed: ${e.message}")
             success = false
         } finally {
             syncCoordinator.endSync(success)
         }
     }
 
-    /**
-     * Search for crypto assets via CoinGecko.
-     */
     suspend fun searchCoins(query: String): List<AssetEntity> = try {
         val result = coinGeckoApiService.search(query)
         result.coins.map { coin ->
@@ -151,9 +124,6 @@ class AssetRepository @Inject constructor(
         }
     } catch (e: Exception) { emptyList() }
 
-    /**
-     * Get live price for a specific crypto asset before adding to holdings.
-     */
     suspend fun fetchLivePriceForAsset(coinId: String): CoinMarketResponse? =
         try { coinGeckoApiService.getCoinMarkets(ids = coinId).firstOrNull() } catch (e: Exception) { null }
 

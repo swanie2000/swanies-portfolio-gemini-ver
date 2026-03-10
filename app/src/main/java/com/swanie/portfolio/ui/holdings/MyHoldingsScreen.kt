@@ -206,8 +206,15 @@ fun MyHoldingsScreen(
 
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(bgColor).statusBarsPadding()) {
-                IconButton(onClick = { viewModel.refreshAssets() }, modifier = Modifier.align(Alignment.TopStart).padding(16.dp)) {
-                    Icon(Icons.Default.Refresh, null, tint = if(isViewModelRefreshing) textColor.copy(0.2f) else textColor)
+                IconButton(
+                    onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() },
+                    modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = if(isViewModelRefreshing) textColor.copy(0.2f) else textColor
+                    )
                 }
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))

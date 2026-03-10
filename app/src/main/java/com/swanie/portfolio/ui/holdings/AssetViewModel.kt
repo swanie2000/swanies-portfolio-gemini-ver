@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.CoinMarketResponse
-import com.swanie.portfolio.data.repository.AssetRepository
-import com.swanie.portfolio.data.repository.MarketPriceData
+import com.swanie.portfolio.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,72 +17,54 @@ import javax.inject.Inject
 @HiltViewModel
 class AssetViewModel @Inject constructor(
     private val repository: AssetRepository,
+    private val syncCoordinator: DataSyncCoordinator,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
-
     val holdings = repository.allAssets
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
+    val isRefreshing = syncCoordinator.syncStatus
+        .map { it is SyncStatus.Syncing }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _searchResults = MutableStateFlow<List<AssetEntity>>(emptyList())
     val searchResults = _searchResults.asStateFlow()
 
     fun searchCoins(query: String) {
         viewModelScope.launch {
-            if (query.length >= 2) {
-                _searchResults.value = repository.searchCoins(query)
-            } else {
-                _searchResults.value = emptyList()
-            }
+            if (query.length >= 2) _searchResults.value = repository.searchCoins(query)
+            else _searchResults.value = emptyList()
         }
     }
 
-    suspend fun fetchMarketPriceData(symbol: String): MarketPriceData {
-        return repository.fetchMarketPrice(symbol)
-    }
-
-    suspend fun fetchLivePrice(coinId: String): CoinMarketResponse? {
-        return repository.fetchLivePriceForAsset(coinId)
-    }
+    suspend fun fetchMarketPriceData(symbol: String): MarketPriceData = repository.fetchMarketPrice(symbol)
+    suspend fun fetchLivePrice(coinId: String): CoinMarketResponse? = repository.fetchLivePriceForAsset(coinId)
 
     fun refreshAssets() {
-        if (_isRefreshing.value) return
-
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            try {
-                repository.refreshAssets()
-            } finally {
-                _isRefreshing.value = false
-            }
-        }
+        viewModelScope.launch { repository.refreshAssets() }
     }
 
     fun saveNewAsset(asset: AssetEntity, amount: Double, onComplete: () -> Unit) {
         viewModelScope.launch {
             repository.saveAsset(asset.copy(amountHeld = amount))
+            delay(500) 
+            repository.refreshAssets(force = true) 
             onComplete()
         }
     }
 
     fun deleteAsset(asset: AssetEntity) {
-        viewModelScope.launch {
-            repository.deleteAsset(asset)
-        }
+        viewModelScope.launch { repository.deleteAsset(asset) }
     }
 
     fun updateAssetOrder(assets: List<AssetEntity>) {
-        viewModelScope.launch {
-            repository.updateAssetOrder(assets)
-        }
+        viewModelScope.launch { repository.updateAssetOrder(assets) }
     }
 
     fun saveMetalDisplayOrder(symbols: List<String>) {
         sharedPrefs.edit().putString("metals_order", symbols.joinToString(",")).apply()
-
         viewModelScope.launch {
             val currentHoldings = holdings.first()
             val metalsInDb = currentHoldings.filter { it.category == AssetCategory.METAL }
@@ -90,24 +72,15 @@ class AssetViewModel @Inject constructor(
                 val newIndex = symbols.indexOf(asset.baseSymbol)
                 if (newIndex != -1) asset.copy(displayOrder = newIndex) else asset
             }
-            if (updatedList.isNotEmpty()) {
-                repository.updateAssetOrder(updatedList)
-            }
+            if (updatedList.isNotEmpty()) repository.updateAssetOrder(updatedList)
         }
     }
 
-    fun getMetalDisplayOrder(): List<String>? {
-        return sharedPrefs.getString("metals_order", null)?.split(",")
-    }
+    fun getMetalDisplayOrder(): List<String>? = sharedPrefs.getString("metals_order", null)?.split(",")
 
     fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, decimals: Int) {
         viewModelScope.launch {
-            repository.updateAssetEntity(asset.copy(
-                name = newName,
-                amountHeld = newAmount,
-                weight = newWeight,
-                decimalPreference = decimals
-            ))
+            repository.updateAssetEntity(asset.copy(name = newName, amountHeld = newAmount, weight = newWeight, decimalPreference = decimals))
         }
     }
 }
