@@ -173,74 +173,48 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-09)
+📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-10)
 
 1. Project Overview
-
    App Name: Swanie’s Portfolio
-
-   Current Branch: main (Metals Stability Recovered | UI State Debugging)
+   Current Branch: main (Command & Control Phase 1 | Tower & Vault Integrated)
 
 2. Architectural Status
+   Status: COMMAND & CONTROL (CENTRALIZED GOVERNANCE)
 
-   Status: REINFORCED GRID-LOCKED ARCHITECTURE
+   The "Tower" (DataSyncCoordinator): A specialized singleton that manages the "Leaky Bucket" (30s Rate Limiter). 
 
-   The Metals "Safe Harbor": Successfully reverted to a stable state where the Metals Market Watch independently fetches and renders live Yahoo Finance data. The logic is now "Hands-Off" to prevent regression.
+   The "Vault" (AssetRepository): Now refactored to delegate timing authority to the Tower. It handles the "Forced Nudge" protocol for critical user actions.
 
-   The State Synchronization Challenge: Currently investigating a "Deaf UI" issue where the database updates successfully (verified by navigation), but the Holdings screen remains frozen until a manual interaction (like tapping an edit field) forces a re-composition.
+   The "Bridge" (AssetViewModel): Stabilized via distinctUntilChanged() to prevent UI loops.
 
 3. Feature Map & UI Status
 
 🟢 Completed & Locked (Today’s Wins)
-
-    Metals Logic Recovery: Yahoo Finance API integration is restored and stable.
-
-    Manual Re-composition Proof: Confirmed that the data is correctly stored in Room; the issue is isolated to the UI "Bridge" failing to trigger a redraw on the second asset addition.
-
-    NavGraph Scoping: Initial work on unified AssetViewModel scoping to ensure the Picker and List share a single source of truth.
+    - DataSyncCoordinator Implementation (30s Rate Limiting).
+    - Refined Force-Sync Protocol for asset addition.
+    - Loop Stabilization in AssetViewModel.
 
 🔴 Bug Tracker (Current Priority)
+    - 500ms Handoff verification for new asset data population.
+5. Engineering Protocols (The "Safe Harbor" Rules)
 
-    Reactive Flow Lock: Solve the "Second Asset" bug where new prices only appear after navigating to Analytics/Settings and back, or after interacting with a card.
-
-    UI "Wake-Up" Call: Implement a robust trigger to force the Holdings screen to redraw immediately upon landing or database emission.
-
-📝 The Drawing Board (Post-Sync Phase)
-
-    Pull-to-Refresh: Implement a standard "Swipe Down" manual refresh for the main Holdings list.
-
-    The Leaky Bucket Sync: Develop a "leaky bucket" synchronization strategy to handle high-frequency price updates without overwhelming the UI thread.
-
-    Expanded Search Engines: Integrate additional API endpoints to locate and track niche or "hard-to-find" crypto assets not currently indexed by the primary provider.
-
-4. Key Logic Snippets (The Build-Savers)
-   Kotlin
-
-// UI REACTIVITY BRIDGE (Pending Final Stabilization)
-// Unconditional update intended to bypass "frozen" local states
-LaunchedEffect(holdings) {
-Log.d("SWAN_DEBUG", "UI Received ${holdings.size} assets. Forcing Redraw.")
-localHoldings = holdings.toList()
-}
-
-// METALS API RECOVERY
-// Direct-assignment logic that restored the Market Watch functionality
-val result = viewModel.fetchMarketPriceData(sym)
-if (result.current > 0.0) {
-marketDataMap[sym] = result
-}
+- Zero-Tolerance for Spaghetti: No UI component is permitted to trigger a network call directly. All requests must pass through the AssetViewModel to the DataSyncCoordinator.
+- The 30-Second Rule: The SYNC_THRESHOLD is a hard limit. Bypassing this via the `force` flag is reserved EXCLUSIVELY for manual user "Save" or "Add" actions.
+- Room-First Handoff: Always ensure a minimum 500ms delay between a Database Write and a Network Refresh to prevent "Race Conditions" where the API is called before the Database has the new ID ready.
+- Full File Authority: AI agents must provide full file outputs for any changes to the Tower, Vault, or Bridge to maintain structural integrity.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 03/09/2026 15:50:09.64
+Generated: Tue 03/10/2026 12:21:50.06
 
 Branch:
 main
 Commit:
-699d2f5b611a4ceb79bec0daceb861947ffb85f6
+d4b10cdd10410ef6dabbbc4bd1ff5e001c122ccf
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -275,6 +249,7 @@ app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceResponse.kt
 app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
+app/src/main/java/com/swanie/portfolio/data/repository/DataSyncCoordinator.kt
 app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt

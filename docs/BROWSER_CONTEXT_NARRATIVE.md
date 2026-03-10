@@ -22,3 +22,9 @@
 
 🔴 Bug Tracker (Current Priority)
     - 500ms Handoff verification for new asset data population.
+5. Engineering Protocols (The "Safe Harbor" Rules)
+
+- Zero-Tolerance for Spaghetti: No UI component is permitted to trigger a network call directly. All requests must pass through the AssetViewModel to the DataSyncCoordinator.
+- The 30-Second Rule: The SYNC_THRESHOLD is a hard limit. Bypassing this via the `force` flag is reserved EXCLUSIVELY for manual user "Save" or "Add" actions.
+- Room-First Handoff: Always ensure a minimum 500ms delay between a Database Write and a Network Refresh to prevent "Race Conditions" where the API is called before the Database has the new ID ready.
+- Full File Authority: AI agents must provide full file outputs for any changes to the Tower, Vault, or Bridge to maintain structural integrity.
