@@ -30,7 +30,8 @@ data class MarketPriceData(
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService,
-    private val yahooApiService: YahooFinanceApiService
+    private val yahooApiService: YahooFinanceApiService,
+    private val syncCoordinator: DataSyncCoordinator // NEW: The Tower arrives
 ) {
     val allAssets = assetDao.getAllAssets()
 
@@ -69,15 +70,24 @@ class AssetRepository @Inject constructor(
     }
 
     /**
-     * Synchronizes all holdings with live market data.
+     * Synchronizes all holdings with live market data, governed by the SyncCoordinator.
      */
     suspend fun refreshAssets() = coroutineScope {
-        val allLocalAssets = allAssets.first()
+        // Check with the Tower before proceeding
+        if (!syncCoordinator.canRefresh()) {
+            Log.d("SWAN_SYNC", "Repository: Refresh blocked by Rate Limiter.")
+            return@coroutineScope
+        }
 
-        // 1. Refresh Crypto Holdings via CoinGecko
-        val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
-        if (cryptoAssets.isNotEmpty()) {
-            launch {
+        syncCoordinator.startSync()
+        var success = true
+
+        try {
+            val allLocalAssets = allAssets.first()
+
+            // 1. Refresh Crypto Holdings via CoinGecko
+            val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
+            if (cryptoAssets.isNotEmpty()) {
                 try {
                     val ids = cryptoAssets.joinToString(",") { it.coinId }
                     val marketData = coinGeckoApiService.getCoinMarkets(ids = ids)
@@ -92,30 +102,39 @@ class AssetRepository @Inject constructor(
                         } ?: asset
                     }
                     assetDao.upsertAll(updatedCrypto)
-                } catch (e: Exception) { 
-                    Log.e("AssetRepository", "Crypto refresh failed: ${e.message}") 
+                } catch (e: Exception) {
+                    Log.e("AssetRepository", "Crypto refresh failed: ${e.message}")
+                    success = false
                 }
             }
-        }
 
-        // 2. Refresh Metal Holdings via Yahoo Finance (Parallel)
-        metalTickers.map { (symbol, _) ->
-            async {
-                val data = fetchMarketPrice(symbol)
-                if (data.current > 0.0) {
-                    val owned = allLocalAssets.filter { it.baseSymbol == symbol }
-                    if (owned.isNotEmpty()) {
-                        assetDao.upsertAll(owned.map {
-                            it.copy(
-                                currentPrice = data.current,
-                                sparklineData = data.sparkline,
-                                priceChange24h = data.changePercent
-                            )
-                        })
+            // 2. Refresh Metal Holdings via Yahoo Finance (Parallel)
+            metalTickers.map { (symbol, _) ->
+                async {
+                    val data = fetchMarketPrice(symbol)
+                    if (data.current > 0.0) {
+                        val owned = allLocalAssets.filter { it.baseSymbol == symbol }
+                        if (owned.isNotEmpty()) {
+                            assetDao.upsertAll(owned.map {
+                                it.copy(
+                                    currentPrice = data.current,
+                                    sparklineData = data.sparkline,
+                                    priceChange24h = data.changePercent
+                                )
+                            })
+                        }
+                    } else {
+                        success = false
                     }
                 }
-            }
-        }.awaitAll()
+            }.awaitAll()
+
+        } catch (e: Exception) {
+            Log.e("AssetRepository", "Global refresh failed: ${e.message}")
+            success = false
+        } finally {
+            syncCoordinator.endSync(success)
+        }
     }
 
     /**
