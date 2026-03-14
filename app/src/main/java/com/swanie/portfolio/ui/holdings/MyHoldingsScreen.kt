@@ -43,6 +43,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.components.*
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
@@ -82,7 +83,7 @@ fun MyHoldingsScreen(
 
     // UI States
     val lazyListState = rememberLazyListState()
-    var selectedTab by remember { mutableIntStateOf(0) } // Moved up to fix compile error
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
     // AUTO-TOP LOGIC: Snaps to top on tab change or entry
@@ -281,7 +282,6 @@ fun MyHoldingsScreen(
                             }
                         }
 
-                        // Pick-up vibration
                         val dragModifier = Modifier.longPressDraggableHandle(
                             onDragStarted = {
                                 isDraggingActive.value = true
