@@ -65,6 +65,13 @@ class AssetViewModel @Inject constructor(
     }
 
     /**
+     * Strictly handles the Market Watch "Big 4" cache.
+     */
+    fun refreshMarketWatch() {
+        viewModelScope.launch { repository.refreshMarketWatch() }
+    }
+
+    /**
      * Optimized asset addition: Performs a surgical fetch for the new asset 
      * instead of a global refresh to prevent the "triple-flicker" and ensure 
      * the asset lands with real data.
@@ -74,7 +81,7 @@ class AssetViewModel @Inject constructor(
             Log.d("API_TRACE", "VM: saveAsset triggered for ${asset.symbol}")
             val newAsset = asset.copy(amountHeld = amount)
             
-            // 1. Initial save (with price if search result had it, or 0.0)
+            // 1. Initial save
             repository.saveAsset(newAsset)
             
             // 2. Surgical fetch for THIS specific asset to ensure real price data

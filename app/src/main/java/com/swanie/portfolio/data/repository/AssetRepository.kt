@@ -23,11 +23,27 @@ class AssetRepository @Inject constructor(
     val allAssets = assetDao.getAllAssets()
 
     /**
+     * Strictly handles the "Big 4" (XAU, XAG, XPT, XPD).
+     * Used only for the Market Watch screen cache.
+     */
+    suspend fun refreshMarketWatch() {
+        Log.d("API_TRACE", "REPOSITORY: refreshMarketWatch triggered")
+        try {
+            val metals = listOf("XAU", "XAG", "XPT", "XPD")
+            metals.forEach { symbol ->
+                Log.d("API_TRACE", "MARKET_WATCH: Fetching $symbol")
+                fetchMarketPrice(symbol) 
+            }
+        } catch (e: Exception) {
+            Log.e("AssetRepository", "refreshMarketWatch failed: ${e.message}")
+        }
+    }
+
+    /**
      * Bridge function to fetch individual metal prices.
      * Restored to maintain Signature Integrity for the ViewModel and Audit Screen.
      */
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
-        Log.d("API_TRACE", "REPOSITORY: fetchMarketPrice triggered for $symbol")
         return try {
             val provider = searchRegistry.getMetalProvider() as? MetalSearchProvider
             if (provider != null) {
@@ -41,6 +57,9 @@ class AssetRepository @Inject constructor(
         }
     }
 
+    /**
+     * Dynamic refresh logic: Loops through actual symbols in the database.
+     */
     suspend fun refreshAssets(force: Boolean = false) = coroutineScope {
         Log.d("API_TRACE", "REPOSITORY: refreshAssets triggered")
         if (!syncCoordinator.canRefresh(force)) {
@@ -53,56 +72,63 @@ class AssetRepository @Inject constructor(
 
         try {
             val allLocalAssets = allAssets.first()
-
-            // 1. Refresh Crypto
-            val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
-            if (cryptoAssets.isNotEmpty()) {
-                try {
-                    val ids = cryptoAssets.joinToString(",") { it.coinId }
-                    val provider = searchRegistry.getDefaultProvider()
-                    val freshData = provider.getPrices(ids)
-                    
-                    val dataMap = freshData.associateBy { it.coinId }
-                    val updatedCrypto = cryptoAssets.map { asset ->
-                        dataMap[asset.coinId]?.let { fresh ->
-                            asset.copy(
-                                currentPrice = fresh.currentPrice,
-                                sparklineData = fresh.sparklineData,
-                                priceChange24h = fresh.priceChange24h
-                            )
-                        } ?: asset
+            if (allLocalAssets.isNotEmpty()) {
+                // 1. Refresh Crypto
+                val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
+                if (cryptoAssets.isNotEmpty()) {
+                    try {
+                        val ids = cryptoAssets.joinToString(",") { it.coinId }
+                        val provider = searchRegistry.getDefaultProvider()
+                        
+                        cryptoAssets.forEach { Log.d("API_TRACE", "SYNC_HOLDING: Fetching ${it.symbol}") }
+                        
+                        val freshData = provider.getPrices(ids)
+                        val dataMap = freshData.associateBy { it.coinId }
+                        val updatedCrypto = cryptoAssets.map { asset ->
+                            dataMap[asset.coinId]?.let { fresh ->
+                                asset.copy(
+                                    currentPrice = fresh.currentPrice,
+                                    sparklineData = fresh.sparklineData,
+                                    priceChange24h = fresh.priceChange24h
+                                )
+                            } ?: asset
+                        }
+                        assetDao.upsertAll(updatedCrypto)
+                    } catch (e: Exception) {
+                        Log.e("AssetRepository", "Crypto refresh failed: ${e.message}")
+                        success = false
                     }
-                    assetDao.upsertAll(updatedCrypto)
-                } catch (e: Exception) {
-                    Log.e("AssetRepository", "Crypto refresh failed: ${e.message}")
-                    success = false
                 }
-            }
 
-            // 2. Refresh Metals
-            try {
-                val metalProvider = searchRegistry.getMetalProvider()
-                val freshMetals = metalProvider.getPrices("")
-                val metalDataMap = freshMetals.associateBy { it.baseSymbol }
-                
+                // 2. Refresh Metals
                 val metalAssets = allLocalAssets.filter { it.category == AssetCategory.METAL }
                 if (metalAssets.isNotEmpty()) {
-                    val updatedMetals = metalAssets.map { asset ->
-                        metalDataMap[asset.baseSymbol]?.let { fresh ->
-                            asset.copy(
-                                currentPrice = fresh.currentPrice,
-                                sparklineData = fresh.sparklineData,
-                                priceChange24h = fresh.priceChange24h
-                            )
-                        } ?: asset
+                    try {
+                        val metalProvider = searchRegistry.getMetalProvider()
+                        
+                        metalAssets.forEach { Log.d("API_TRACE", "SYNC_HOLDING: Fetching ${it.symbol}") }
+                        
+                        val freshMetals = metalProvider.getPrices("")
+                        val metalDataMap = freshMetals.associateBy { it.baseSymbol }
+                        
+                        val updatedMetals = metalAssets.map { asset ->
+                            metalDataMap[asset.baseSymbol]?.let { fresh ->
+                                asset.copy(
+                                    currentPrice = fresh.currentPrice,
+                                    sparklineData = fresh.sparklineData,
+                                    priceChange24h = fresh.priceChange24h
+                                )
+                            } ?: asset
+                        }
+                        assetDao.upsertAll(updatedMetals)
+                    } catch (e: Exception) {
+                        Log.e("AssetRepository", "Metals refresh failed: ${e.message}")
+                        success = false
                     }
-                    assetDao.upsertAll(updatedMetals)
                 }
-            } catch (e: Exception) {
-                Log.e("AssetRepository", "Metals refresh failed: ${e.message}")
-                success = false
+            } else {
+                Log.d("API_TRACE", "REPOSITORY: No holdings to sync.")
             }
-
         } catch (e: Exception) {
             success = false
         } finally {

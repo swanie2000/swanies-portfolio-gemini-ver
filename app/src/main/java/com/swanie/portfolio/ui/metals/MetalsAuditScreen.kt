@@ -64,7 +64,7 @@ fun MetalsAuditScreen(navController: NavController) {
 
     val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 
-    // ONE-TIME-FETCH: Restricted to Unit key. Triggers only on screen entry.
+    // ONE-TIME-FETCH: Now decoupled and calling refreshMarketWatch()
     LaunchedEffect(Unit) {
         // 1. Restore saved order
         val savedOrder = viewModel.getMetalDisplayOrder()
@@ -73,7 +73,10 @@ fun MetalsAuditScreen(navController: NavController) {
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
 
-        // 2. Perform single network fetch for all metals in order
+        // 2. Perform decoupled refresh for the "Big 4"
+        viewModel.refreshMarketWatch()
+
+        // 3. Populate UI map from the result of individual fetches
         metalsOrder.forEach { (_, sym) ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
@@ -83,7 +86,7 @@ fun MetalsAuditScreen(navController: NavController) {
             }
         }
 
-        // 3. Scroll to top
+        // 4. Scroll to top
         delay(100)
         lazyListState.scrollToItem(0)
     }
