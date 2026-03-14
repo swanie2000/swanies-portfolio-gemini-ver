@@ -60,33 +60,32 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifBlank { "#FFFFFF" }))
 
     var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
+    val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
 
     val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 
+    // ONE-TIME-FETCH: Restricted to Unit key. Triggers only on screen entry.
     LaunchedEffect(Unit) {
-        delay(100)
-        lazyListState.scrollToItem(0)
-    }
-
-    LaunchedEffect(Unit) {
+        // 1. Restore saved order
         val savedOrder = viewModel.getMetalDisplayOrder()
         if (savedOrder != null) {
             val defaultList = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
-    }
 
-    val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
-
-    LaunchedEffect(metalsOrder) {
+        // 2. Perform single network fetch for all metals in order
         metalsOrder.forEach { (_, sym) ->
-            scope.launch {
+            launch {
                 val data = viewModel.fetchMarketPriceData(sym)
                 if (data.current > 0.0) {
                     marketDataMap[sym] = data
                 }
             }
         }
+
+        // 3. Scroll to top
+        delay(100)
+        lazyListState.scrollToItem(0)
     }
 
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
