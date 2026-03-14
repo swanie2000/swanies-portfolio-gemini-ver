@@ -6,7 +6,6 @@ import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.network.CoinGeckoApiService
-import com.swanie.portfolio.data.network.YahooFinanceApiService
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.data.repository.DataSyncCoordinator
 import dagger.Module
@@ -42,14 +41,12 @@ object DatabaseModule {
     fun provideAssetRepository(
         assetDao: AssetDao,
         coinGeckoApiService: CoinGeckoApiService,
-        yahooFinanceApiService: YahooFinanceApiService,
         syncCoordinator: DataSyncCoordinator,
         searchEngineRegistry: SearchEngineRegistry
     ): AssetRepository {
         return AssetRepository(
             assetDao,
             coinGeckoApiService,
-            yahooFinanceApiService,
             syncCoordinator,
             searchEngineRegistry
         )

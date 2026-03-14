@@ -6,16 +6,15 @@ import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.network.CoinGeckoApiService
-import com.swanie.portfolio.data.network.YahooFinanceApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
-import com.swanie.portfolio.data.network.YahooFinanceResponse
-import com.swanie.portfolio.data.network.Meta
-import com.swanie.portfolio.data.network.ChartResult
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Data model for metal market details, required by AssetViewModel and MetalsAuditScreen.
+ */
 data class MarketPriceData(
     val current: Double, val high: Double, val low: Double,
     val changePercent: Double, val sparkline: List<Double>
@@ -25,33 +24,36 @@ data class MarketPriceData(
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService,
-    private val yahooApiService: YahooFinanceApiService,
     private val syncCoordinator: DataSyncCoordinator,
     private val searchEngineRegistry: SearchEngineRegistry
 ) {
     val allAssets = assetDao.getAllAssets()
 
-    private val metalTickers = mapOf(
-        "XAU" to "GC=F", "XAG" to "SI=F", "XPT" to "PL=F", "XPD" to "PA=F"
-    )
-
+    /**
+     * Bridge function to fetch individual metal prices.
+     * Restored to maintain Signature Integrity for the ViewModel and Audit Screen.
+     */
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
         return try {
-            val ticker = metalTickers[symbol] ?: return MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
-            val response: YahooFinanceResponse = yahooApiService.getTickerData(ticker)
-            val result = response.chart.result?.firstOrNull()
-            val meta = result?.meta
-            val closePrices = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
-
-            MarketPriceData(
-                current = meta?.regularMarketPrice ?: 0.0,
-                high = meta?.regularMarketDayHigh ?: 0.0,
-                low = meta?.regularMarketDayLow ?: 0.0,
-                changePercent = meta?.regularMarketChangePercent ?: 0.0,
-                sparkline = closePrices
-            )
+            val provider = searchEngineRegistry.getMetalProvider()
+            // We use the provider's logic to fetch all prices and find the one we need.
+            // This maintains the "Firewall" while satisfying the UI's specific request.
+            val freshMetals = provider.getPrices("") 
+            val match = freshMetals.find { it.baseSymbol == symbol }
+            
+            if (match != null) {
+                MarketPriceData(
+                    current = match.currentPrice,
+                    high = 0.0, // Provider doesn't currently expose high/low, keeping as 0.0 for now
+                    low = 0.0,
+                    changePercent = match.priceChange24h,
+                    sparkline = match.sparklineData
+                )
+            } else {
+                MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+            }
         } catch (e: Exception) {
-            Log.e("AssetRepository", "Fetch failed for $symbol: ${e.message}")
+            Log.e("AssetRepository", "fetchMarketPrice failed for $symbol: ${e.message}")
             MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
         }
     }
@@ -68,6 +70,7 @@ class AssetRepository @Inject constructor(
         try {
             val allLocalAssets = allAssets.first()
 
+            // 1. Refresh Crypto
             val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
             if (cryptoAssets.isNotEmpty()) {
                 try {
@@ -92,23 +95,29 @@ class AssetRepository @Inject constructor(
                 }
             }
 
-            metalTickers.map { (symbol, _) ->
-                async {
-                    val data = fetchMarketPrice(symbol)
-                    if (data.current > 0.0) {
-                        val owned = allLocalAssets.filter { it.baseSymbol == symbol }
-                        if (owned.isNotEmpty()) {
-                            assetDao.upsertAll(owned.map {
-                                it.copy(
-                                    currentPrice = data.current,
-                                    sparklineData = data.sparkline,
-                                    priceChange24h = data.changePercent
-                                )
-                            })
-                        }
-                    } else { success = false }
+            // 2. Refresh Metals
+            try {
+                val metalProvider = searchEngineRegistry.getMetalProvider()
+                val freshMetals = metalProvider.getPrices("")
+                val metalDataMap = freshMetals.associateBy { it.baseSymbol }
+                
+                val metalAssets = allLocalAssets.filter { it.category == AssetCategory.METAL }
+                if (metalAssets.isNotEmpty()) {
+                    val updatedMetals = metalAssets.map { asset ->
+                        metalDataMap[asset.baseSymbol]?.let { fresh ->
+                            asset.copy(
+                                currentPrice = fresh.currentPrice,
+                                sparklineData = fresh.sparklineData,
+                                priceChange24h = fresh.priceChange24h
+                            )
+                        } ?: asset
+                    }
+                    assetDao.upsertAll(updatedMetals)
                 }
-            }.awaitAll()
+            } catch (e: Exception) {
+                Log.e("AssetRepository", "Metals refresh failed: ${e.message}")
+                success = false
+            }
 
         } catch (e: Exception) {
             success = false
