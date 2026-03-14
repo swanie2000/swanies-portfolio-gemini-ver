@@ -1,6 +1,9 @@
 package com.swanie.portfolio.ui.holdings
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,12 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp // FIXED: Added missing import
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.settings.ThemeViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun AmountEntryScreen(
@@ -36,14 +41,12 @@ fun AmountEntryScreen(
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
-    // Inject Theme State
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
 
-    // Safely parse hex colors
-    val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex)) }
-    val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex)) }
+    val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" })) }
+    val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
 
@@ -51,6 +54,9 @@ fun AmountEntryScreen(
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // UX Polish: Saving State
+    var isSaving by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -63,6 +69,8 @@ fun AmountEntryScreen(
             return
         }
 
+        isSaving = true
+        
         val asset = AssetEntity(
             coinId = coinId,
             symbol = symbol,
@@ -79,8 +87,13 @@ fun AmountEntryScreen(
             sparklineData = emptyList()
         )
 
-        viewModel.saveAsset(asset)
-        onSave()
+        viewModel.saveAsset(asset) {
+            // After successful save and priority fetch is triggered
+            // Hold the user for 1.5s as mandated
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                onSave()
+            }, 1500)
+        }
     }
 
     if (showExitDialog) {
@@ -103,116 +116,150 @@ fun AmountEntryScreen(
     }
 
     BackHandler {
-        showExitDialog = true
+        if (!isSaving) showExitDialog = true
     }
 
-    Scaffold(containerColor = bgColor) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = { showExitDialog = true }, modifier = Modifier.align(Alignment.CenterStart)) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = textColor
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            if (imageUrl.isNotEmpty()) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = "$name Icon",
-                    modifier = Modifier.size(120.dp)
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .background(
-                            color = textColor.copy(alpha = 0.1f),
-                            shape = MaterialTheme.shapes.medium
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = symbol.take(1),
-                        style = MaterialTheme.typography.displayMedium,
-                        color = textColor
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = name,
-                style = MaterialTheme.typography.displaySmall,
-                color = textColor
-            )
-
-            Spacer(Modifier.height(32.dp))
-
-            OutlinedTextField(
-                value = amountText,
-                onValueChange = {
-                    amountText = it
-                    errorMessage = null
-                },
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(containerColor = bgColor) { padding ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text("Enter Amount for $symbol", color = textColor.copy(alpha = 0.6f)) },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = { executeSave() }
-                ),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    cursorColor = textColor,
-                    focusedBorderColor = textColor,
-                    unfocusedBorderColor = textColor.copy(alpha = 0.5f),
-                    focusedLabelColor = textColor.copy(alpha = 0.7f),
-                    unfocusedLabelColor = textColor.copy(alpha = 0.7f),
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                )
-            )
-            errorMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            Button(
-                onClick = { executeSave() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Yellow,
-                    contentColor = Color.Black
-                ),
-                enabled = amountText.isNotBlank()
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Save Asset", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    IconButton(
+                        onClick = { if (!isSaving) showExitDialog = true }, 
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = textColor
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(32.dp))
+
+                if (imageUrl.isNotEmpty()) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "$name Icon",
+                        modifier = Modifier.size(120.dp)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .background(
+                                color = textColor.copy(alpha = 0.1f),
+                                shape = MaterialTheme.shapes.medium
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = symbol.take(1),
+                            style = MaterialTheme.typography.displayMedium,
+                            color = textColor
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = textColor
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                OutlinedTextField(
+                    value = amountText,
+                    onValueChange = {
+                        if (!isSaving) {
+                            amountText = it
+                            errorMessage = null
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text("Enter Amount for $symbol", color = textColor.copy(alpha = 0.6f)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { executeSave() }
+                    ),
+                    singleLine = true,
+                    enabled = !isSaving,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        cursorColor = textColor,
+                        focusedBorderColor = textColor,
+                        unfocusedBorderColor = textColor.copy(alpha = 0.5f),
+                        focusedLabelColor = textColor.copy(alpha = 0.7f),
+                        unfocusedLabelColor = textColor.copy(alpha = 0.7f),
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
+                    )
+                )
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Button(
+                    onClick = { executeSave() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Yellow,
+                        contentColor = Color.Black
+                    ),
+                    enabled = amountText.isNotBlank() && !isSaving
+                ) {
+                    Text("Save Asset", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+            }
+        }
+
+        // UX POLISH: Centered Overlay for Saving state
+        AnimatedVisibility(
+            visible = isSaving,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.zIndex(10f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.8f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color.Yellow)
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = "Adding $name to Portfolio...",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }

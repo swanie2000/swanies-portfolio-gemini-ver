@@ -86,7 +86,13 @@ fun MyHoldingsScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
-    // AUTO-TOP LOGIC: Snaps to top on tab change or entry
+    // UNIFIED ONE-TIME-FETCH PROTOCOL: Triggered on screen entry.
+    LaunchedEffect(Unit) {
+        viewModel.refreshAssets()
+        lazyListState.scrollToItem(0)
+    }
+
+    // AUTO-TOP LOGIC: Snaps to top on tab change
     LaunchedEffect(selectedTab) {
         lazyListState.scrollToItem(0)
     }

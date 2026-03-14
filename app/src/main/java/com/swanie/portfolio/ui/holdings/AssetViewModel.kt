@@ -1,6 +1,7 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.api.SearchEngineRegistry
@@ -63,11 +64,23 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch { repository.refreshAssets() }
     }
 
+    /**
+     * Optimized asset addition: Performs a surgical fetch for the new asset 
+     * instead of a global refresh to prevent the "triple-flicker" and ensure 
+     * the asset lands with real data.
+     */
     fun saveNewAsset(asset: AssetEntity, amount: Double, onComplete: () -> Unit) {
         viewModelScope.launch {
-            repository.saveAsset(asset.copy(amountHeld = amount))
-            delay(500) 
-            repository.refreshAssets(force = true) 
+            Log.d("API_TRACE", "VM: saveAsset triggered for ${asset.symbol}")
+            val newAsset = asset.copy(amountHeld = amount)
+            
+            // 1. Initial save (with price if search result had it, or 0.0)
+            repository.saveAsset(newAsset)
+            
+            // 2. Surgical fetch for THIS specific asset to ensure real price data
+            repository.refreshSingleAsset(newAsset)
+            
+            // 3. UI Callback
             onComplete()
         }
     }

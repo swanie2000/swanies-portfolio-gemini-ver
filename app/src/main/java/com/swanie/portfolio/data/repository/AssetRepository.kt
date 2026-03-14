@@ -18,7 +18,7 @@ class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService,
     private val syncCoordinator: DataSyncCoordinator,
-    private val searchEngineRegistry: SearchEngineRegistry
+    private val searchRegistry: SearchEngineRegistry
 ) {
     val allAssets = assetDao.getAllAssets()
 
@@ -29,7 +29,7 @@ class AssetRepository @Inject constructor(
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
         Log.d("API_TRACE", "REPOSITORY: fetchMarketPrice triggered for $symbol")
         return try {
-            val provider = searchEngineRegistry.getMetalProvider() as? MetalSearchProvider
+            val provider = searchRegistry.getMetalProvider() as? MetalSearchProvider
             if (provider != null) {
                 provider.fetchMarketData(symbol)
             } else {
@@ -59,7 +59,7 @@ class AssetRepository @Inject constructor(
             if (cryptoAssets.isNotEmpty()) {
                 try {
                     val ids = cryptoAssets.joinToString(",") { it.coinId }
-                    val provider = searchEngineRegistry.getDefaultProvider()
+                    val provider = searchRegistry.getDefaultProvider()
                     val freshData = provider.getPrices(ids)
                     
                     val dataMap = freshData.associateBy { it.coinId }
@@ -81,7 +81,7 @@ class AssetRepository @Inject constructor(
 
             // 2. Refresh Metals
             try {
-                val metalProvider = searchEngineRegistry.getMetalProvider()
+                val metalProvider = searchRegistry.getMetalProvider()
                 val freshMetals = metalProvider.getPrices("")
                 val metalDataMap = freshMetals.associateBy { it.baseSymbol }
                 
@@ -107,6 +107,41 @@ class AssetRepository @Inject constructor(
             success = false
         } finally {
             syncCoordinator.endSync(success)
+        }
+    }
+
+    /**
+     * Performs a surgical refresh for a single asset.
+     * Used for new additions to ensure they land with real data.
+     */
+    suspend fun refreshSingleAsset(asset: AssetEntity) {
+        Log.d("API_TRACE", "REPOSITORY: Fetching initial price for NEW asset: ${asset.symbol}")
+        try {
+            if (asset.category == AssetCategory.CRYPTO) {
+                val fresh = fetchLivePriceForAsset(asset.coinId)
+                if (fresh != null) {
+                    val updated = asset.copy(
+                        currentPrice = fresh.currentPrice ?: 0.0,
+                        priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
+                        sparklineData = fresh.sparklineIn7d?.price ?: emptyList()
+                    )
+                    assetDao.upsertAsset(updated)
+                }
+            } else if (asset.category == AssetCategory.METAL) {
+                val metalProvider = searchRegistry.getMetalProvider()
+                val freshMetals = metalProvider.getPrices("")
+                val match = freshMetals.find { it.baseSymbol == asset.baseSymbol }
+                if (match != null) {
+                    val updated = asset.copy(
+                        currentPrice = match.currentPrice,
+                        priceChange24h = match.priceChange24h,
+                        sparklineData = match.sparklineData
+                    )
+                    assetDao.upsertAsset(updated)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AssetRepository", "refreshSingleAsset failed for ${asset.symbol}: ${e.message}")
         }
     }
 
