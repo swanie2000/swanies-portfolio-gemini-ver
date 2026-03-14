@@ -1,6 +1,7 @@
 package com.swanie.portfolio.data.repository
 
 import android.util.Log
+import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
@@ -25,7 +26,8 @@ class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val coinGeckoApiService: CoinGeckoApiService,
     private val yahooApiService: YahooFinanceApiService,
-    private val syncCoordinator: DataSyncCoordinator
+    private val syncCoordinator: DataSyncCoordinator,
+    private val searchEngineRegistry: SearchEngineRegistry
 ) {
     val allAssets = assetDao.getAllAssets()
 
@@ -70,14 +72,16 @@ class AssetRepository @Inject constructor(
             if (cryptoAssets.isNotEmpty()) {
                 try {
                     val ids = cryptoAssets.joinToString(",") { it.coinId }
-                    val marketData = coinGeckoApiService.getCoinMarkets(ids = ids)
-                    val dataMap = marketData.associateBy { it.id }
+                    val provider = searchEngineRegistry.getDefaultProvider()
+                    val freshData = provider.getPrices(ids)
+                    
+                    val dataMap = freshData.associateBy { it.coinId }
                     val updatedCrypto = cryptoAssets.map { asset ->
                         dataMap[asset.coinId]?.let { fresh ->
                             asset.copy(
-                                currentPrice = fresh.currentPrice ?: asset.currentPrice,
-                                sparklineData = fresh.sparklineIn7d?.price ?: asset.sparklineData,
-                                priceChange24h = fresh.priceChangePercentage24h ?: asset.priceChange24h
+                                currentPrice = fresh.currentPrice,
+                                sparklineData = fresh.sparklineData,
+                                priceChange24h = fresh.priceChange24h
                             )
                         } ?: asset
                     }

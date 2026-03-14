@@ -1,7 +1,8 @@
 package com.swanie.portfolio.data.di
 
 import android.content.Context
-import com.swanie.portfolio.data.ThemePreferences // ADDED IMPORT
+import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.network.CoinGeckoApiService
@@ -30,7 +31,6 @@ object DatabaseModule {
         return database.assetDao()
     }
 
-    // NEW: Tells Hilt how to create ThemePreferences using the App Context
     @Provides
     @Singleton
     fun provideThemePreferences(@ApplicationContext context: Context): ThemePreferences {
@@ -43,13 +43,15 @@ object DatabaseModule {
         assetDao: AssetDao,
         coinGeckoApiService: CoinGeckoApiService,
         yahooFinanceApiService: YahooFinanceApiService,
-        syncCoordinator: DataSyncCoordinator
+        syncCoordinator: DataSyncCoordinator,
+        searchEngineRegistry: SearchEngineRegistry
     ): AssetRepository {
         return AssetRepository(
             assetDao,
             coinGeckoApiService,
             yahooFinanceApiService,
-            syncCoordinator
+            syncCoordinator,
+            searchEngineRegistry
         )
     }
 }

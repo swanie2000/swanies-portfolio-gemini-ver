@@ -24,9 +24,10 @@ data class SearchSymbol(
 }
 
 /**
- * Interface for pluggable search engines (CoinGecko, Yahoo, MEXC, etc.)
+ * Interface for pluggable search and price providers.
  */
 interface SearchProvider {
     val name: String
     suspend fun search(query: String): List<SearchSymbol>
+    suspend fun getPrices(ids: String): List<AssetEntity>
 }
