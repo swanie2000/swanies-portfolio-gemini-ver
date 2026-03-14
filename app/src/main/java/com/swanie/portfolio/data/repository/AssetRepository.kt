@@ -113,17 +113,6 @@ class AssetRepository @Inject constructor(
         }
     }
 
-    suspend fun searchCoins(query: String): List<AssetEntity> = try {
-        val result = coinGeckoApiService.search(query)
-        result.coins.map { coin ->
-            AssetEntity(
-                coinId = coin.id, symbol = coin.symbol ?: "", name = coin.name ?: "",
-                imageUrl = coin.large ?: "", category = AssetCategory.CRYPTO,
-                baseSymbol = coin.symbol ?: ""
-            )
-        }
-    } catch (e: Exception) { emptyList() }
-
     suspend fun fetchLivePriceForAsset(coinId: String): CoinMarketResponse? =
         try { coinGeckoApiService.getCoinMarkets(ids = coinId).firstOrNull() } catch (e: Exception) { null }
 

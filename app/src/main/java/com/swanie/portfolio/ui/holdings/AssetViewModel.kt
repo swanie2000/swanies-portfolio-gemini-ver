@@ -3,6 +3,7 @@ package com.swanie.portfolio.ui.holdings
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.CoinMarketResponse
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class AssetViewModel @Inject constructor(
     private val repository: AssetRepository,
     private val syncCoordinator: DataSyncCoordinator,
+    private val searchRegistry: SearchEngineRegistry,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -29,14 +31,29 @@ class AssetViewModel @Inject constructor(
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    private val _searchResults = MutableStateFlow<List<AssetEntity>>(emptyList())
-    val searchResults = _searchResults.asStateFlow()
-
-    fun searchCoins(query: String) {
-        viewModelScope.launch {
-            if (query.length >= 2) _searchResults.value = repository.searchCoins(query)
-            else _searchResults.value = emptyList()
+    private val _searchQuery = MutableStateFlow("")
+    
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val searchResults: StateFlow<List<AssetEntity>> = _searchQuery
+        .debounce(300)
+        .flatMapLatest { query ->
+            if (query.length < 2) {
+                flowOf(emptyList())
+            } else {
+                flow {
+                    val results = searchRegistry.getDefaultProvider().search(query)
+                    emit(results.map { it.toAssetEntity() })
+                }
+            }
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /**
+     * UI Entry point for searching.
+     * Restored to maintain Signature Integrity.
+     */
+    fun searchCoins(query: String) {
+        _searchQuery.value = query
     }
 
     suspend fun fetchMarketPriceData(symbol: String): MarketPriceData = repository.fetchMarketPrice(symbol)
