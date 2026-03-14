@@ -43,6 +43,7 @@ class MetalSearchProvider @Inject constructor(
         val results = mutableListOf<AssetEntity>()
         for ((symbol, ticker) in metalTickers) {
             try {
+                Log.d("API_TRACE", "API_HIT: MetalSearchProvider -> Calling Yahoo for $symbol")
                 // Safety Delay to mitigate Rate Limits
                 delay(500)
                 val response = yahooApiService.getTickerData(ticker)
@@ -61,7 +62,10 @@ class MetalSearchProvider @Inject constructor(
                             currentPrice = meta.regularMarketPrice,
                             priceChange24h = meta.regularMarketChangePercent ?: 0.0,
                             sparklineData = closePrices,
-                            baseSymbol = symbol
+                            baseSymbol = symbol,
+                            officialSpotPrice = meta.regularMarketPrice,
+                            // Note: High/Low are currently not stored in AssetEntity, 
+                            // they are fetched on-demand for the Audit Screen.
                         )
                     )
                 }
@@ -70,5 +74,30 @@ class MetalSearchProvider @Inject constructor(
             }
         }
         return results
+    }
+
+    /**
+     * Internal helper to fetch full market data including high/low.
+     */
+    suspend fun fetchMarketData(symbol: String): com.swanie.portfolio.data.repository.MarketPriceData {
+        val ticker = metalTickers[symbol] ?: return com.swanie.portfolio.data.repository.MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+        return try {
+            Log.d("API_TRACE", "API_HIT: MetalSearchProvider -> Calling Yahoo for $symbol (Full Data)")
+            val response = yahooApiService.getTickerData(ticker)
+            val result = response.chart.result?.firstOrNull()
+            val meta = result?.meta
+            val closePrices = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
+
+            com.swanie.portfolio.data.repository.MarketPriceData(
+                current = meta?.regularMarketPrice ?: 0.0,
+                dayHigh = meta?.regularMarketDayHigh ?: 0.0,
+                dayLow = meta?.regularMarketDayLow ?: 0.0,
+                changePercent = meta?.regularMarketChangePercent ?: 0.0,
+                sparkline = closePrices
+            )
+        } catch (e: Exception) {
+            Log.e("MetalSearchProvider", "fetchMarketData failed for $symbol: ${e.message}")
+            com.swanie.portfolio.data.repository.MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+        }
     }
 }

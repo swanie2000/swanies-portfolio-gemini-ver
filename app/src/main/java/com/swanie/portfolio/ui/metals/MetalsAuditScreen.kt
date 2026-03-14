@@ -6,7 +6,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -14,10 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
@@ -25,7 +21,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -36,6 +31,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.repository.MarketPriceData
+import com.swanie.portfolio.ui.components.MetalMarketCard
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -43,8 +39,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.text.NumberFormat
-import java.util.*
 
 @Composable
 fun MetalsAuditScreen(navController: NavController) {
@@ -69,9 +63,8 @@ fun MetalsAuditScreen(navController: NavController) {
 
     val lazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 
-    // NEW: Force scroll to top on page entry with a small delay to ensure layout is ready
     LaunchedEffect(Unit) {
-        delay(100) // Small delay to prevent scroll fighting with initial layout pass
+        delay(100)
         lazyListState.scrollToItem(0)
     }
 
@@ -127,12 +120,6 @@ fun MetalsAuditScreen(navController: NavController) {
                         val isOwned = holdings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
                         val marketData = marketDataMap[sym]
 
-                        val currentPrice = marketData?.current ?: 0.0
-                        val changePct = marketData?.changePercent ?: 0.0
-                        val liveSparkline = marketData?.sparkline ?: emptyList()
-                        val high = marketData?.high ?: 0.0
-                        val low = marketData?.low ?: 0.0
-
                         val scale by animateFloatAsState(if (isDragging) 1.1f else 1f, label = "scale")
                         val elevation by animateDpAsState(if (isDragging) 15.dp else 2.dp, label = "elevation")
 
@@ -141,90 +128,26 @@ fun MetalsAuditScreen(navController: NavController) {
                             onDragStopped = { viewModel.saveMetalDisplayOrder(metalsOrder.map { it.second }) }
                         )
 
-                        Card(
+                        MetalMarketCard(
+                            name = name,
+                            symbol = sym,
+                            currentPrice = marketData?.current ?: 0.0,
+                            changePercent = marketData?.changePercent ?: 0.0,
+                            dayHigh = marketData?.dayHigh ?: 0.0,
+                            dayLow = marketData?.dayLow ?: 0.0,
+                            sparkline = marketData?.sparkline ?: emptyList(),
+                            isOwned = isOwned,
+                            cardBg = cardBg,
+                            cardText = cardText,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(195.dp)
-                                .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx() }
+                                .graphicsLayer { 
+                                    scaleX = scale
+                                    scaleY = scale
+                                    shadowElevation = elevation.toPx() 
+                                }
                                 .zIndex(if (isDragging) 1f else 0f)
-                                .then(dragModifier),
-                            colors = CardDefaults.cardColors(containerColor = cardBg),
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = elevation)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp).fillMaxSize(),
-                                verticalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(name.uppercase(), fontWeight = FontWeight.Black, color = cardText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(sym, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cardText.copy(alpha = 0.4f))
-                                            if (isOwned) {
-                                                Text("    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
-                                            }
-                                        }
-                                    }
-                                    Column(horizontalAlignment = Alignment.End) {
-                                        if (currentPrice > 0.0) {
-                                            Text(NumberFormat.getCurrencyInstance(Locale.US).format(currentPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                            Text("${if(changePct >= 0) "+" else ""}${String.format("%.2f", changePct)}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F))
-                                        } else {
-                                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.5.dp, color = Color.Yellow)
-                                        }
-                                    }
-                                }
-
-                                Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
-                                    if (liveSparkline.isNotEmpty()) {
-                                        val lineColor = if (changePct >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-                                        Canvas(modifier = Modifier.fillMaxSize()) {
-                                            val width = size.width
-                                            val height = size.height
-                                            val maxVal = liveSparkline.maxOrNull() ?: 1.0
-                                            val minVal = liveSparkline.minOrNull() ?: 0.0
-                                            val range = (maxVal - minVal).coerceAtLeast(1.0)
-
-                                            val path = Path().apply {
-                                                liveSparkline.forEachIndexed { index, value ->
-                                                    val x = index * (width / (liveSparkline.size - 1))
-                                                    val y = height - ((value - minVal) / range * height).toFloat()
-                                                    if (index == 0) moveTo(x, y) else lineTo(x, y)
-                                                }
-                                            }
-                                            drawPath(path = path, color = lineColor, style = Stroke(width = 2.dp.toPx()))
-                                        }
-                                    } else if (currentPrice > 0.0) {
-                                        CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 3.dp, color = Color.White.copy(0.2f))
-                                    }
-                                }
-
-                                Row(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 7.sp)
-                                            Text("LOW", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 8.sp)
-                                        }
-                                        Spacer(Modifier.width(8.dp))
-                                        val lowStr = if (currentPrice <= 0.0 || low <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(low)
-                                        Text(lowStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
-                                    }
-
-                                    Spacer(Modifier.weight(1f))
-
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 7.sp)
-                                            Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 8.sp)
-                                        }
-                                        Spacer(Modifier.width(8.dp))
-                                        val highStr = if (currentPrice <= 0.0 || high <= 0.0) "$ --.--" else NumberFormat.getCurrencyInstance(Locale.US).format(high)
-                                        Text(highStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
-                                    }
-                                }
-                            }
-                        }
+                                .then(dragModifier)
+                        )
                     }
                 }
             }

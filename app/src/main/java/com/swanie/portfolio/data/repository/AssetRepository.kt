@@ -2,6 +2,7 @@ package com.swanie.portfolio.data.repository
 
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
+import com.swanie.portfolio.data.api.impl.MetalSearchProvider
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
@@ -11,14 +12,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
-
-/**
- * Data model for metal market details, required by AssetViewModel and MetalsAuditScreen.
- */
-data class MarketPriceData(
-    val current: Double, val high: Double, val low: Double,
-    val changePercent: Double, val sparkline: List<Double>
-)
 
 @Singleton
 class AssetRepository @Inject constructor(
@@ -34,21 +27,11 @@ class AssetRepository @Inject constructor(
      * Restored to maintain Signature Integrity for the ViewModel and Audit Screen.
      */
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
+        Log.d("API_TRACE", "REPOSITORY: fetchMarketPrice triggered for $symbol")
         return try {
-            val provider = searchEngineRegistry.getMetalProvider()
-            // We use the provider's logic to fetch all prices and find the one we need.
-            // This maintains the "Firewall" while satisfying the UI's specific request.
-            val freshMetals = provider.getPrices("") 
-            val match = freshMetals.find { it.baseSymbol == symbol }
-            
-            if (match != null) {
-                MarketPriceData(
-                    current = match.currentPrice,
-                    high = 0.0, // Provider doesn't currently expose high/low, keeping as 0.0 for now
-                    low = 0.0,
-                    changePercent = match.priceChange24h,
-                    sparkline = match.sparklineData
-                )
+            val provider = searchEngineRegistry.getMetalProvider() as? MetalSearchProvider
+            if (provider != null) {
+                provider.fetchMarketData(symbol)
             } else {
                 MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
             }
@@ -59,6 +42,7 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun refreshAssets(force: Boolean = false) = coroutineScope {
+        Log.d("API_TRACE", "REPOSITORY: refreshAssets triggered")
         if (!syncCoordinator.canRefresh(force)) {
             Log.d("SWAN_SYNC", "Repository: Refresh blocked by Rate Limiter.")
             return@coroutineScope

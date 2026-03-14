@@ -161,3 +161,138 @@ fun CompactAssetCard(
         }
     }
 }
+
+@Composable
+fun MetalMarketCard(
+    name: String,
+    symbol: String,
+    currentPrice: Double,
+    changePercent: Double,
+    dayHigh: Double,
+    dayLow: Double,
+    sparkline: List<Double>,
+    isOwned: Boolean,
+    cardBg: Color,
+    cardText: Color,
+    modifier: Modifier = Modifier
+) {
+    val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(195.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Row 1: Identity & Price
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = name.uppercase(),
+                        fontWeight = FontWeight.Black,
+                        color = cardText,
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = symbol,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = cardText.copy(alpha = 0.4f)
+                        )
+                        if (isOwned) {
+                            Text(
+                                text = "    \"Holding\"",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.Yellow
+                            )
+                        }
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    if (currentPrice > 0.0) {
+                        Text(
+                            text = formatCurrency(currentPrice),
+                            fontWeight = FontWeight.Black,
+                            color = cardText,
+                            fontSize = 18.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = trendColor
+                        )
+                    } else {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.5.dp,
+                            color = Color.Yellow
+                        )
+                    }
+                }
+            }
+
+            // Row 2: Full-width Sparkline
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (sparkline.isNotEmpty()) {
+                    SparklineChart(sparkline, trendColor, Modifier.fillMaxSize())
+                } else if (currentPrice > 0.0) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 3.dp,
+                        color = cardText.copy(0.2f)
+                    )
+                }
+            }
+
+            // Row 3: Day High / Low
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 7.sp)
+                        Text("LOW", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 8.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    val lowStr = if (dayLow <= 0.0) "$ --.--" else formatCurrency(dayLow)
+                    Text(lowStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                }
+
+                Spacer(Modifier.weight(1f))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 7.sp)
+                        Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 8.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    val highStr = if (dayHigh <= 0.0) "$ --.--" else formatCurrency(dayHigh)
+                    Text(highStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                }
+            }
+        }
+    }
+}
