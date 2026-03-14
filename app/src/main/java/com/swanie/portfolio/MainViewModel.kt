@@ -29,13 +29,10 @@ class MainViewModel @Inject constructor(
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     init {
-        // BURST: Unlock the UI immediately so the color animations show
+        // DATA SILENCE: The MainViewModel is strictly for UI state and preferences.
+        // It is forbidden from initiating global network refreshes.
+        // Data sync is now localized to specific Screen Lifecycles.
         _isDataReady.value = true
-
-        // REFRESH: Fetch data in the background
-        viewModelScope.launch {
-            repository.refreshAssets()
-        }
     }
 
     fun setConfirmDelete(enabled: Boolean) = viewModelScope.launch {
