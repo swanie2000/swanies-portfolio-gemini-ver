@@ -26,5 +26,8 @@ data class AssetEntity(
     val baseSymbol: String = "",
     val decimalPreference: Int = 8,
     val officialSpotPrice: Double = 0.0,
-    val officialSpotTimestamp: Long = 0L
+    val officialSpotTimestamp: Long = 0L,
+    // THE DATA CHAIN OF CUSTODY: Mandatory fields for mapping integrity
+    val apiId: String = "",
+    val iconUrl: String? = null
 )

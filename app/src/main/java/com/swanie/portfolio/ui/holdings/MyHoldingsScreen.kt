@@ -86,9 +86,9 @@ fun MyHoldingsScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
-    // UNIFIED ONE-TIME-FETCH PROTOCOL: Triggered on screen entry.
+    // GHOST HUNTER: Removed viewModel.refreshAssets() from LaunchedEffect(Unit).
+    // The database is now a Passive Source. Network calls are strictly manual or surgical.
     LaunchedEffect(Unit) {
-        viewModel.refreshAssets()
         lazyListState.scrollToItem(0)
     }
 

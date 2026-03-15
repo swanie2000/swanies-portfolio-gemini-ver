@@ -14,12 +14,14 @@ data class SearchSymbol(
     val category: AssetCategory
 ) {
     fun toAssetEntity(): AssetEntity = AssetEntity(
-        coinId = id,
+        coinId = id, // Primary Key remains the unique ID from provider
         symbol = symbol,
         name = name,
         imageUrl = imageUrl,
         category = category,
-        baseSymbol = symbol
+        baseSymbol = symbol,
+        apiId = id,     // THE DATA CHAIN OF CUSTODY: Explicit API ID
+        iconUrl = imageUrl // THE DATA CHAIN OF CUSTODY: Explicit Icon URL
     )
 }
 

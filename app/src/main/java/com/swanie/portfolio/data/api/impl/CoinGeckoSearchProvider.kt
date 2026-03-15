@@ -1,5 +1,6 @@
 package com.swanie.portfolio.data.api.impl
 
+import android.util.Log
 import com.swanie.portfolio.data.api.SearchProvider
 import com.swanie.portfolio.data.api.SearchSymbol
 import com.swanie.portfolio.data.local.AssetCategory
@@ -13,7 +14,22 @@ class CoinGeckoSearchProvider @Inject constructor(
 ) : SearchProvider {
     override val name: String = "CoinGecko"
 
+    private var lastGlobalHit = 0L
+
+    private val tickerToIdMap = mapOf(
+        "SHIB" to "shiba-inu",
+        "FLOKI" to "floki",
+        "FLR" to "flare",
+        "XRP" to "ripple",
+        "USDT" to "tether",
+        "DOT" to "polkadot",
+        "BTC" to "bitcoin",
+        "ETH" to "ethereum",
+        "LTC" to "litecoin"
+    )
+
     override suspend fun search(query: String): List<SearchSymbol> {
+        Log.d("SEARCH_TRACE", "Searching for: $query")
         return try {
             val result = coinGeckoApiService.search(query)
             result.coins.map { coin ->
@@ -31,24 +47,42 @@ class CoinGeckoSearchProvider @Inject constructor(
     }
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastGlobalHit < 5000) {
+            Log.w("API_TRACE", "STRAITJACKET: API hit rejected. Less than 5s since last call.")
+            return emptyList()
+        }
+        lastGlobalHit = currentTime
+
         return try {
-            // Safety Delay to mitigate 429 Rate Limits
             delay(500)
-            val marketData = coinGeckoApiService.getCoinMarkets(ids = ids)
-            marketData.map { fresh ->
-                AssetEntity(
-                    coinId = fresh.id,
-                    symbol = fresh.symbol,
-                    name = fresh.name,
-                    imageUrl = fresh.image ?: "",
-                    category = AssetCategory.CRYPTO,
-                    currentPrice = fresh.currentPrice ?: 0.0,
-                    priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
-                    sparklineData = fresh.sparklineIn7d?.price ?: emptyList(),
-                    baseSymbol = fresh.symbol
-                )
+            val response = coinGeckoApiService.getCoinMarkets(ids = ids)
+            val url = response.raw().request.url.toString()
+            val code = response.code()
+            Log.d("ADD_TRACE", "STEP 4: API_HIT: ID=$ids, URL=$url, CODE=$code")
+
+            if (response.isSuccessful) {
+                val marketData = response.body() ?: emptyList()
+                marketData.map { fresh ->
+                    AssetEntity(
+                        coinId = fresh.id,
+                        symbol = fresh.symbol,
+                        name = fresh.name,
+                        imageUrl = fresh.image ?: "",
+                        category = AssetCategory.CRYPTO,
+                        currentPrice = fresh.currentPrice ?: 0.0,
+                        priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
+                        sparklineData = fresh.sparklineIn7d?.price ?: emptyList(),
+                        baseSymbol = fresh.symbol,
+                        apiId = fresh.id,
+                        iconUrl = fresh.image
+                    )
+                }
+            } else {
+                emptyList()
             }
         } catch (e: Exception) {
+            Log.e("ADD_TRACE", "STEP 4: API_ERROR: ${e.message}")
             emptyList()
         }
     }

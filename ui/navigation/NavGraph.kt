@@ -77,21 +77,12 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 AssetPickerScreen(
                     navController = navController,
                     onAssetSelected = { asset ->
-                        if (asset.category == AssetCategory.METAL) {
-                            // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Metal)
-                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
-                            // FIX: Replaced commented-out saveNewAsset with performSurgicalAdd
-                            assetViewModel.performSurgicalAdd(asset) {
-                                navController.popBackStack()
-                            }
-                        } else {
-                            val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl, "UTF-8")
-                            
-                            // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Crypto)
-                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
-                            
-                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.currentPrice}")
-                        }
+                        // LOCKDOWN: Strict isolation. Navigate only.
+                        val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl.ifBlank { "NONE" }, "UTF-8")
+                        
+                        Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
+                        
+                        navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.currentPrice}")
                     }
                 )
             }
@@ -109,7 +100,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
                 val apiId = backStackEntry.arguments?.getString("apiId") ?: ""
                 val iconUrl = backStackEntry.arguments?.getString("iconUrl") ?: ""
-                val decodedThumb = URLDecoder.decode(iconUrl, "UTF-8")
+                val decodedThumb = if (iconUrl == "NONE") "" else URLDecoder.decode(iconUrl, "UTF-8")
 
                 val categoryString = backStackEntry.arguments?.getString("category") ?: "CRYPTO"
                 val category = AssetCategory.valueOf(categoryString)

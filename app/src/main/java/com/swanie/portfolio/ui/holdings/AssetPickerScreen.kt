@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.holdings
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,7 +26,6 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.settings.ThemeViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +35,6 @@ fun AssetPickerScreen(
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
-    val scope = rememberCoroutineScope()
 
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
@@ -46,10 +45,10 @@ fun AssetPickerScreen(
     val cryptoResults by viewModel.searchResults.collectAsState()
 
     val metalList = listOf(
-        AssetEntity(coinId = "gold-spot", symbol = "XAU", name = "Gold", category = AssetCategory.METAL, baseSymbol = "XAU"),
-        AssetEntity(coinId = "silver-spot", symbol = "XAG", name = "Silver", category = AssetCategory.METAL, baseSymbol = "XAG"),
-        AssetEntity(coinId = "platinum-spot", symbol = "XPT", name = "Platinum", category = AssetCategory.METAL, baseSymbol = "XPT"),
-        AssetEntity(coinId = "palladium-spot", symbol = "XPD", name = "Palladium", category = AssetCategory.METAL, baseSymbol = "XPD")
+        AssetEntity(coinId = "gold-spot", symbol = "XAU", name = "Gold", category = AssetCategory.METAL, baseSymbol = "XAU", apiId = "gold-spot"),
+        AssetEntity(coinId = "silver-spot", symbol = "XAG", name = "Silver", category = AssetCategory.METAL, baseSymbol = "XAG", apiId = "silver-spot"),
+        AssetEntity(coinId = "platinum-spot", symbol = "XPT", name = "Platinum", category = AssetCategory.METAL, baseSymbol = "XPT", apiId = "platinum-spot"),
+        AssetEntity(coinId = "palladium-spot", symbol = "XPD", name = "Palladium", category = AssetCategory.METAL, baseSymbol = "XPD", apiId = "palladium-spot")
     )
 
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -115,18 +114,9 @@ fun AssetPickerScreen(
 
                 items(currentList) { asset ->
                     AssetPickerItem(asset, textColor) {
-                        scope.launch {
-                            if (asset.category == AssetCategory.CRYPTO) {
-                                val liveData = viewModel.fetchLivePrice(asset.coinId)
-                                onAssetSelected(asset.copy(
-                                    currentPrice = liveData?.currentPrice ?: 0.0,
-                                    sparklineData = liveData?.sparklineIn7d?.price ?: emptyList()
-                                ))
-                            } else {
-                                // Metals will refresh from Yahoo when added
-                                onAssetSelected(asset)
-                            }
-                        }
+                        // CLEAN SLATE: Instant navigation, no logic calls
+                        Log.d("ADD_TRACE", "STEP 1: USER_SELECTED: ID=${asset.apiId}")
+                        onAssetSelected(asset)
                     }
                 }
             }

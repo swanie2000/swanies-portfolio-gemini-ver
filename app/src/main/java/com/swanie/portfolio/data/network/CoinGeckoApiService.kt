@@ -1,6 +1,7 @@
 package com.swanie.portfolio.data.network
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -38,5 +39,5 @@ interface CoinGeckoApiService {
         @Query("ids") ids: String,
         @Query("sparkline") sparkline: Boolean = true,
         @Query("price_change_percentage") priceChange: String = "24h"
-    ): List<CoinMarketResponse>
+    ): Response<List<CoinMarketResponse>>
 }

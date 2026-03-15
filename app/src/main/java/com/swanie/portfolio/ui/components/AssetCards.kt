@@ -113,7 +113,8 @@ fun FullAssetCard(
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    MetalIcon(asset.name, imageUrl = asset.imageUrl)
+                    // THE DATA CHAIN OF CUSTODY: Pulling iconUrl directly from database
+                    MetalIcon(asset.name, imageUrl = asset.iconUrl ?: asset.imageUrl)
                     if (asset.baseSymbol != "CUSTOM") {
                         Spacer(Modifier.height(6.dp))
                         Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
@@ -155,7 +156,8 @@ fun CompactAssetCard(
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
         Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.imageUrl) }
+            // THE DATA CHAIN OF CUSTODY: Pulling iconUrl directly from database
+            Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.iconUrl ?: asset.imageUrl) }
             Column(modifier = Modifier.weight(1f)) { AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp)); val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) }
             SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp))
         }

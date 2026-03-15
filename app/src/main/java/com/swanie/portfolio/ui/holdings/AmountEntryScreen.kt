@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.holdings
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
@@ -49,14 +52,45 @@ fun AmountEntryScreen(
     val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
+    val loadingProgress by viewModel.loadingProgress.collectAsStateWithLifecycle()
+    val loadingStatus by viewModel.loadingStatus.collectAsStateWithLifecycle()
 
     var amountText by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     
-    // UX Polish: Saving State
     var isSaving by remember { mutableStateOf(false) }
+
+    // MARKET INSIGHT CYCLER
+    val insightList = listOf(
+        "Securing your position...",
+        "Connecting to the global blockchain...",
+        "Verifying real-time market valuations...",
+        "Almost there... final checks in progress."
+    )
+    var currentInsightIndex by remember { mutableIntStateOf(0) }
+    
+    LaunchedEffect(isSaving) {
+        if (isSaving) {
+            while (true) {
+                delay(2500)
+                currentInsightIndex = (currentInsightIndex + 1) % insightList.size
+            }
+        }
+    }
+
+    // PULSING ANIMATION
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -80,19 +114,13 @@ fun AmountEntryScreen(
             category = category,
             imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            change24h = 0.0,
-            displayOrder = 0,
-            priceChange24h = 0.0,
-            marketCapRank = 0,
-            sparklineData = emptyList()
+            apiId = coinId,
+            iconUrl = imageUrl,
+            baseSymbol = symbol
         )
 
-        viewModel.saveAsset(asset) {
-            // After successful save and priority fetch is triggered
-            // Hold the user for 1.5s as mandated
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                onSave()
-            }, 1500)
+        viewModel.performSurgicalAdd(asset) {
+            onSave()
         }
     }
 
@@ -237,7 +265,7 @@ fun AmountEntryScreen(
             }
         }
 
-        // UX POLISH: Centered Overlay for Saving state
+        // INTELLIGENT PROGRESS UI: Active & Engaging
         AnimatedVisibility(
             visible = isSaving,
             enter = fadeIn(),
@@ -247,17 +275,47 @@ fun AmountEntryScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.8f)),
+                    .background(Color.Black.copy(alpha = 0.88f)),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = Color.Yellow)
-                    Spacer(Modifier.height(16.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(32.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            progress = { loadingProgress },
+                            modifier = Modifier
+                                .size(110.dp)
+                                .scale(pulseScale),
+                            color = Color.Yellow,
+                            strokeWidth = 8.dp,
+                            trackColor = Color.White.copy(alpha = 0.1f)
+                        )
+                        Text(
+                            text = "${(loadingProgress * 100).toInt()}%",
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 22.sp
+                        )
+                    }
+                    
+                    Spacer(Modifier.height(32.dp))
+                    
+                    // DYNAMIC STATUS / INSIGHT TEXT
+                    val displayStatus = if (loadingStatus.contains("retry", true)) {
+                        loadingStatus
+                    } else {
+                        insightList[currentInsightIndex]
+                    }
+
                     Text(
-                        text = "Adding $name to Portfolio...",
+                        text = displayStatus,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 17.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        lineHeight = 22.sp
                     )
                 }
             }

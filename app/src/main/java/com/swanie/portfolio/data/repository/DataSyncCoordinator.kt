@@ -10,19 +10,29 @@ import javax.inject.Singleton
 class DataSyncCoordinator @Inject constructor() {
     private val TAG = "SWAN_SYNC"
     private val SYNC_THRESHOLD = 30_000L 
+    private val STARTUP_FORGIVE_THRESHOLD = 60_000L // 60s block for 429 forgiveness
+    private val appStartTime = System.currentTimeMillis()
     private var lastSyncTimestamp = 0L
 
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
     val syncStatus = _syncStatus.asStateFlow()
 
     fun canRefresh(force: Boolean = false): Boolean {
+        val currentTime = System.currentTimeMillis()
+        
+        // 60-second Startup Lock
+        if (currentTime - appStartTime < STARTUP_FORGIVE_THRESHOLD) {
+            val wait = (STARTUP_FORGIVE_THRESHOLD - (currentTime - appStartTime)) / 1000
+            Log.w(TAG, "COOLDOWN: 429 Forgiveness active. Remaining: $wait s")
+            return false
+        }
+
         if (force) {
             Log.d(TAG, "Rate Limiter: BYPASS (Forced Sync).")
             return true
         }
-        val currentTime = System.currentTimeMillis()
-        val timeSinceLastSync = currentTime - lastSyncTimestamp
         
+        val timeSinceLastSync = currentTime - lastSyncTimestamp
         return if (timeSinceLastSync >= SYNC_THRESHOLD) {
             Log.d(TAG, "Rate Limiter: GREEN. Ready for sync.")
             true

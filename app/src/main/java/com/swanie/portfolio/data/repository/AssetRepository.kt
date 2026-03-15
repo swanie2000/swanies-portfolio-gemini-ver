@@ -31,7 +31,7 @@ class AssetRepository @Inject constructor(
         try {
             val metals = listOf("XAU", "XAG", "XPT", "XPD")
             metals.forEach { symbol ->
-                Log.d("API_TRACE", "MARKET_WATCH: Fetching $symbol")
+                Log.d("ADD_TRACE", "MARKET_WATCH: Fetching $symbol")
                 fetchMarketPrice(symbol) 
             }
         } catch (e: Exception) {
@@ -41,7 +41,6 @@ class AssetRepository @Inject constructor(
 
     /**
      * Bridge function to fetch individual metal prices.
-     * Restored to maintain Signature Integrity for the ViewModel and Audit Screen.
      */
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
         return try {
@@ -62,26 +61,34 @@ class AssetRepository @Inject constructor(
      */
     suspend fun refreshAssets(force: Boolean = false) = coroutineScope {
         Log.d("API_TRACE", "REPOSITORY: refreshAssets triggered")
-        if (!syncCoordinator.canRefresh(force)) {
+        
+        val allLocalAssets = assetDao.getAllAssetsOnce()
+        
+        val hasHoles = allLocalAssets.any { it.currentPrice <= 0.0 && it.category == AssetCategory.CRYPTO }
+        val shouldBypass = force || hasHoles
+
+        if (!syncCoordinator.canRefresh(shouldBypass)) {
             Log.d("SWAN_SYNC", "Repository: Refresh blocked by Rate Limiter.")
             return@coroutineScope
+        }
+        
+        if (hasHoles) {
+            Log.w("API_TRACE", "REPOSITORY: Assets with NO PRICE detected. Bypassing rate limiter.")
         }
 
         syncCoordinator.startSync()
         var success = true
 
         try {
-            val allLocalAssets = allAssets.first()
+            Log.d("API_TRACE", "REPOSITORY: Found ${allLocalAssets.size} assets in DB for sync.")
+            
             if (allLocalAssets.isNotEmpty()) {
                 // 1. Refresh Crypto
                 val cryptoAssets = allLocalAssets.filter { it.category == AssetCategory.CRYPTO }
                 if (cryptoAssets.isNotEmpty()) {
                     try {
-                        val ids = cryptoAssets.joinToString(",") { it.coinId }
+                        val ids = cryptoAssets.joinToString(",") { it.apiId.ifBlank { it.coinId } }
                         val provider = searchRegistry.getDefaultProvider()
-                        
-                        cryptoAssets.forEach { Log.d("API_TRACE", "SYNC_HOLDING: Fetching ${it.symbol}") }
-                        
                         val freshData = provider.getPrices(ids)
                         val dataMap = freshData.associateBy { it.coinId }
                         val updatedCrypto = cryptoAssets.map { asset ->
@@ -105,9 +112,6 @@ class AssetRepository @Inject constructor(
                 if (metalAssets.isNotEmpty()) {
                     try {
                         val metalProvider = searchRegistry.getMetalProvider()
-                        
-                        metalAssets.forEach { Log.d("API_TRACE", "SYNC_HOLDING: Fetching ${it.symbol}") }
-                        
                         val freshMetals = metalProvider.getPrices("")
                         val metalDataMap = freshMetals.associateBy { it.baseSymbol }
                         
@@ -126,8 +130,6 @@ class AssetRepository @Inject constructor(
                         success = false
                     }
                 }
-            } else {
-                Log.d("API_TRACE", "REPOSITORY: No holdings to sync.")
             }
         } catch (e: Exception) {
             success = false
@@ -137,44 +139,90 @@ class AssetRepository @Inject constructor(
     }
 
     /**
-     * Performs a surgical refresh for a single asset.
-     * Used for new additions to ensure they land with real data.
+     * THE SURGICAL ROUTINE (ISOLATION PROTOCOL)
+     *
+     * This function is the exclusive network path for adding new assets.
+     * It ensures a 1:1 ratio between user action and API hits by fetching 
+     * only the specific asset being added. It includes localized 429 
+     * retry logic to prevent global sync failures during high traffic.
+     * 
+     * This routine guarantees that additions do not trigger global refreshes,
+     * maintaining strict data isolation.
      */
-    suspend fun refreshSingleAsset(asset: AssetEntity) {
-        Log.d("API_TRACE", "REPOSITORY: Fetching initial price for NEW asset: ${asset.symbol}")
-        try {
-            if (asset.category == AssetCategory.CRYPTO) {
-                val fresh = fetchLivePriceForAsset(asset.coinId)
-                if (fresh != null) {
-                    val updated = asset.copy(
-                        currentPrice = fresh.currentPrice ?: 0.0,
-                        priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
-                        sparklineData = fresh.sparklineIn7d?.price ?: emptyList()
-                    )
-                    assetDao.upsertAsset(updated)
-                }
-            } else if (asset.category == AssetCategory.METAL) {
-                val metalProvider = searchRegistry.getMetalProvider()
-                val freshMetals = metalProvider.getPrices("")
-                val match = freshMetals.find { it.baseSymbol == asset.baseSymbol }
-                if (match != null) {
-                    val updated = asset.copy(
-                        currentPrice = match.currentPrice,
-                        priceChange24h = match.priceChange24h,
-                        sparklineData = match.sparklineData
-                    )
-                    assetDao.upsertAsset(updated)
-                }
+    suspend fun executeSurgicalAdd(
+        asset: AssetEntity,
+        onStatusUpdate: (Float, String) -> Unit
+    ) {
+        val apiId = asset.apiId.ifBlank { asset.coinId }
+        
+        // Step A: Initial Save (Price 0.0)
+        Log.d("ADD_TRACE", "STEP 3: DB_SAVE_INITIAL: ID=$apiId")
+        onStatusUpdate(0.2f, "Securing asset in local vault...")
+        assetDao.upsertAsset(asset.copy(currentPrice = 0.0, lastUpdated = System.currentTimeMillis()))
+        
+        // Step B & C: Network Fetch with 429 Handling
+        Log.d("ADD_TRACE", "STEP 4: API_HIT triggered by Surgical Routine")
+        onStatusUpdate(0.4f, "Fetching real-time market data...")
+        
+        var freshData: CoinMarketResponse? = null
+        var attempts = 0
+        while (attempts < 2) {
+            val response = coinGeckoApiService.getCoinMarkets(ids = apiId)
+            if (response.isSuccessful) {
+                freshData = response.body()?.firstOrNull()
+                break
+            } else if (response.code() == 429) {
+                Log.w("ADD_TRACE", "429 Hit. Retrying in 3s...")
+                onStatusUpdate(0.5f, "Market data busy... retrying in 3 seconds...")
+                delay(3000)
+                attempts++
+            } else {
+                break
             }
-        } catch (e: Exception) {
-            Log.e("AssetRepository", "refreshSingleAsset failed for ${asset.symbol}: ${e.message}")
+        }
+        
+        // Step D: Final Update
+        if (freshData != null) {
+            val price = freshData.currentPrice ?: 0.0
+            Log.d("ADD_TRACE", "STEP 5: DB_PRICE_UPDATE: ID=$apiId, Price=$price")
+            onStatusUpdate(0.9f, "Success! Finalizing portfolio...")
+            
+            val updated = asset.copy(
+                currentPrice = price,
+                priceChange24h = freshData.priceChangePercentage24h ?: 0.0,
+                sparklineData = freshData.sparklineIn7d?.price ?: emptyList()
+            )
+            assetDao.upsertAsset(updated)
+        } else {
+            Log.e("ADD_TRACE", "STEP 5: DB_PRICE_UPDATE FAILED: No data returned for $apiId")
+            onStatusUpdate(1.0f, "Landing with last known data...")
         }
     }
 
-    suspend fun fetchLivePriceForAsset(coinId: String): CoinMarketResponse? =
-        try { coinGeckoApiService.getCoinMarkets(ids = coinId).firstOrNull() } catch (e: Exception) { null }
+    suspend fun fetchLivePriceForAsset(
+        coinId: String,
+        onRetry: (String) -> Unit = {}
+    ): CoinMarketResponse? {
+        var attempt = 0
+        while (attempt < 3) {
+            try {
+                val response = coinGeckoApiService.getCoinMarkets(ids = coinId)
+                if (response.isSuccessful) {
+                    return response.body()?.firstOrNull()
+                } else if (response.code() == 429) {
+                    onRetry("Market busy. Retrying in 3s...")
+                    delay(3000)
+                    attempt++
+                } else {
+                    return null
+                }
+            } catch (e: Exception) {
+                return null
+            }
+        }
+        return null
+    }
 
-    suspend fun saveAsset(asset: AssetEntity) = assetDao.upsertAsset(asset.copy(lastUpdated = System.currentTimeMillis()))
     suspend fun deleteAsset(asset: AssetEntity) = assetDao.deleteAsset(asset.coinId)
     suspend fun updateAssetOrder(assets: List<AssetEntity>) = assetDao.updateAssetOrder(assets)
     suspend fun updateAssetEntity(asset: AssetEntity) = assetDao.updateAssetEntity(asset)

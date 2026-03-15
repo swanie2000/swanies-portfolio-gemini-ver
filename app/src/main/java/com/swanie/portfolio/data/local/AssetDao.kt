@@ -20,6 +20,9 @@ interface AssetDao {
     @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
     fun getAllAssets(): Flow<List<AssetEntity>>
 
+    @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
+    suspend fun getAllAssetsOnce(): List<AssetEntity>
+
     @Query("SELECT * FROM assets WHERE coinId = :coinId")
     suspend fun getAssetById(coinId: String): AssetEntity?
 

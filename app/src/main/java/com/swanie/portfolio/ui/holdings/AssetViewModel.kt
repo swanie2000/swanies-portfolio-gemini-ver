@@ -11,21 +11,33 @@ import com.swanie.portfolio.data.network.CoinMarketResponse
 import com.swanie.portfolio.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class AssetViewModel @Inject constructor(
     private val repository: AssetRepository,
     private val syncCoordinator: DataSyncCoordinator,
     private val searchRegistry: SearchEngineRegistry,
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
-    val holdings = repository.allAssets
+
+    // FLIGHT RECORDER: Reactive Observation of the Database
+    val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
+        .onEach { list ->
+            Log.d("API_TRACE", "VM: UI observing ${list.size} assets from DB")
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     val isRefreshing = syncCoordinator.syncStatus
         .map { it is SyncStatus.Syncing }
@@ -72,22 +84,12 @@ class AssetViewModel @Inject constructor(
     }
 
     /**
-     * Optimized asset addition: Performs a surgical fetch for the new asset 
-     * instead of a global refresh to prevent the "triple-flicker" and ensure 
-     * the asset lands with real data.
+     * NEW SURGICAL ENTRY POINT: Used for direct additions (e.g. Metals)
      */
-    fun saveNewAsset(asset: AssetEntity, amount: Double, onComplete: () -> Unit) {
+    fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
         viewModelScope.launch {
-            Log.d("API_TRACE", "VM: saveAsset triggered for ${asset.symbol}")
-            val newAsset = asset.copy(amountHeld = amount)
-            
-            // 1. Initial save
-            repository.saveAsset(newAsset)
-            
-            // 2. Surgical fetch for THIS specific asset to ensure real price data
-            repository.refreshSingleAsset(newAsset)
-            
-            // 3. UI Callback
+            Log.d("ADD_TRACE", "VM: performSurgicalAdd (Direct) triggered for ${asset.symbol}")
+            repository.executeSurgicalAdd(asset) { _, _ -> }
             onComplete()
         }
     }
@@ -103,7 +105,7 @@ class AssetViewModel @Inject constructor(
     fun saveMetalDisplayOrder(symbols: List<String>) {
         sharedPrefs.edit().putString("metals_order", symbols.joinToString(",")).apply()
         viewModelScope.launch {
-            val currentHoldings = holdings.first()
+            val currentHoldings = holdings.value
             val metalsInDb = currentHoldings.filter { it.category == AssetCategory.METAL }
             val updatedList = metalsInDb.map { asset ->
                 val newIndex = symbols.indexOf(asset.baseSymbol)
