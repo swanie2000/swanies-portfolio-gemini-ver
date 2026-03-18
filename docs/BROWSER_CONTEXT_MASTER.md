@@ -173,61 +173,82 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-Updated Project Narrative: March 18, 2026
-✅ Current Working State (The "Surgical" Fortress)
+I. The Updated Project Narrative: March 18, 2026
+✅ The "Surgical" Fortress (Current Stable State)
 
-    The Reset Mandate Achieved: The "429 Death Loop" is officially extinct. The network is silent except for intentional, manual triggers.
+    The Reset Mandate: The "429 Death Loop" is extinct. All network activity is manual or protected by a 30s cooldown.
 
-    Surgical Isolation Protocol: AssetRepository.kt uses executeSurgicalAdd to bypass global refreshes. New assets land with 100% data accuracy without alerting rate-limit sensors.
+    Multi-Source Sparklines: MexcSearchProvider and CryptoCompareSearchProvider are fully wired. They successfully pull 168+ data points into the dashboard.
 
-    The Search Straitjacket: Logic features a 700ms debounce and a 2-character floor, preventing "search-as-you-type" spam while remaining responsive to user intent.
+    Persistence of Order: Reordering is locked. AssetDao uses ORDER BY displayOrder ASC, and manual drags are persisted to the DB immediately.
 
-    The Search Gatekeeper: A mandatory Provider Selection UI is active. Users must choose a source (CoinGecko, Yahoo, etc.) before the search box enables, adding a human-driven delay that protects API quotas.
+    MEXC 400 Fallback: A "New Listing" safety net is active. If MEXC returns a 400 error (not enough history), the app automatically retries with a 48h limit instead of 168h.
 
-    Metals Shield (30s Cooldown): A strict cooldown is applied to the MarketWatch fetch. Navigating the metals screen no longer "attacks" Yahoo Finance servers.
+    The Black Box Ledger: Every asset addition is permanently logged in a TransactionEntity, creating a historical "birth certificate" for every coin.
 
-    The "Black Box" Transaction Log: A permanent ledger (TransactionEntity) tracks every asset addition. This provides a "birth certificate" for every asset, recording the initial price and source for total transparency.
+    The Search Gatekeeper: 700ms debounce and mandatory provider selection protect API quotas from user spam.
 
-    The Multi-Source Journey: The "Add Asset" routine features a randomized 6-9 second animation with dynamic, provider-specific milestones (e.g., "Checking MEXC order book..."). It concludes with a success checkmark and confirmation that the transaction was logged to the Black Box.
+⚠️ Current Blockers (The "Ghost" Audit)
 
-🛠️ Next Objectives (The "Premium & Precision" Era)
+    The Visibility Gap: Source labels (COINGECKO, MEXC, etc.) are invisible in the UI, and UI_TRACE logs are missing from Logcat.
 
-    Provider Expansion: Plug in the specific API logic for MEXC and CryptoCompare to utilize the newly minted SearchProvider interface.
+    The Theory: The agent is editing a duplicate or "Ghost" version of AssetCards.kt that the MyHoldingsScreen is not actually importing.
 
-    The "Black Box" UI: Create a dedicated History screen or bottom-sheet to allow users to view their transaction ledger and "First Purchase" data.
+II. The "Master Rebuild" Instruction
 
-    Portfolio Screen Overhaul: Transition to a premium "Command Center" look:
+Copy and paste this entire block to the agent when the rate limit resets:
 
-        Glassmorphism: Suble blurs and semi-transparent cards.
+    Subject: Master Rebuild & Ghost File Resolution
 
-        Collapsible Buckets: Grouping assets by category (Metals, Main-Cap, Alt-Gems).
+    We are syncing the codebase to the "Gold Master" state. We have verified data and persistence, but we have a Dead Code issue in the UI. Execute the following:
 
-        Live Pulse: Visual indicators showing the "freshness" of the last price sync.
+    1. The Import Audit (CRITICAL):
+    Open MyHoldingsScreen.kt. Identify the exact file path for the FullAssetCard and CompactAssetCard imports. You must edit the file at that specific path. If there are duplicates in ui.components and ui.theme, delete the one NOT being imported.
 
-    Source-Aware Global Sync: Ensure the background refresh routine respects the priceSource tag on every asset, only hitting the appropriate API for that specific item.
+    2. The Universal Source Badge:
+    In the active AssetCards.kt, force every card to show its priceSource.
 
-🧪 Status of the "Add Asset" Audit
+        Style: A subtle "Pill" badge (10sp, Bold, 60% alpha).
 
-    PASS: New assets land with full price and source metadata.
+        Logic: No if statements. Every card (including CoinGecko) must display its source.
 
-    PASS: Database v5 migration is stable and correctly maps Asset/Transaction relationships.
+        Visibility: Use a high-contrast color (Primary) and a zIndex(1f) to ensure it isn't hidden behind the sparkline.
 
-    PASS: Adding an asset triggers ZERO recursive sync loops.
+        Log: Add Log.d("UI_TRACE", "DRAWING: ${asset.symbol} from ${asset.priceSource}") inside the card's root.
 
-    PASS: UI feedback (The Journey) effectively hides technical speed to prevent user spamming.
+    3. MEXC Reliability:
+    Ensure MexcSearchProvider.kt contains the try-catch fallback: If an HTTP 400 occurs, retry the fetch with limit=48.
+
+    4. Reordering Persistence:
+    Ensure AssetDao.kt remains locked to ORDER BY displayOrder ASC and the LazyColumn key is { it.coinId }.
+
+    5. Build Safety:
+    Ensure no dangling function references like Modifier.scale. All modifiers must be properly invoked (e.g., .scale(1f)).
+
+    Goal: Build the app. I must see 'COINGECKO', 'MEXC', or 'CRYPTOCOMPARE' on every card, and the UI_TRACE must appear in Logcat.
+
+III. Technical Verification Ledger
+Requirement	Implementation Detail
+API Safety	700ms Search Debounce
+Data Integrity	Converters.kt (String to List)
+History Logic	histohour (CryptoCompare) & kline (MEXC)
+DB Sorting	displayOrder Column (v5 Migration)
+UI Model	Asset data class must include priceSource: String
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Wed 03/18/2026 12:14:52.41
+Generated: Wed 03/18/2026 15:42:33.78
 
 Branch:
 main
 Commit:
-bfa273ac57909644bbc4f7f59acc3e0f668e25ad
+86be372e080213886accdfc8b9103cd0d1c610ea
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
+ M app/src/main/java/com/swanie/portfolio/ui/components/AssetCards.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -252,7 +273,9 @@ app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/data/api/SearchEngineRegistry.kt
 app/src/main/java/com/swanie/portfolio/data/api/SearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
 app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
@@ -263,6 +286,8 @@ app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinMarketResponse.kt
+app/src/main/java/com/swanie/portfolio/data/network/CryptoCompareApiService.kt
+app/src/main/java/com/swanie/portfolio/data/network/MexcApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceResponse.kt

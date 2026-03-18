@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetEntity
@@ -110,18 +111,27 @@ fun FullAssetCard(
 ) {
     Log.d("UI_TRACE", "CARD_RENDER: Drawing full card for ${asset.symbol} with source: ${asset.priceSource}")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
+    val scaleVal by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
     
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }
+            .graphicsLayer { scaleX = scaleVal; scaleY = scaleVal; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }
             .clickable(enabled = !isEditing) { onExpandToggle() },
         colors = CardDefaults.cardColors(containerColor = cardBg),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
     ) {
+        // FORCE CODE PATH: Top-level diagnostic text
+        Text(
+            text = "TEST: " + asset.priceSource.uppercase(),
+            color = Color.Red,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(8.dp)
+        )
+
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -151,14 +161,6 @@ fun FullAssetCard(
                 Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { 
                     Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); 
                     AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
-                    // THE INVISIBILITY FIX: Force Display Source Label
-                    Text(
-                        text = asset.priceSource.uppercase(), 
-                        color = MaterialTheme.colorScheme.primary, 
-                        fontSize = 10.sp, 
-                        fontWeight = FontWeight.Black, 
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
                 }
                 Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
             }
@@ -176,32 +178,33 @@ fun CompactAssetCard(
     modifier: Modifier = Modifier
 ) {
     Log.d("UI_TRACE", "CARD_RENDER: Drawing compact card for ${asset.symbol} with source: ${asset.priceSource}")
-    val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    val scaleVal by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }
+            .graphicsLayer { scaleX = scaleVal; scaleY = scaleVal; clip = true; shape = RoundedCornerShape(12.dp) }
             .clickable { onExpandToggle() },
         colors = CardDefaults.cardColors(containerColor = cardBg),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
     ) {
+        // FORCE CODE PATH: Top-level diagnostic text
+        Text(
+            text = "TEST: " + asset.priceSource.uppercase(),
+            color = Color.Red,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+        )
+
         Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             // THE DATA CHAIN OF CUSTODY: Pulling iconUrl directly from database
             Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.iconUrl ?: asset.imageUrl) }
             Column(modifier = Modifier.weight(1f)) { 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
-                    // THE INVISIBILITY FIX: Force Display Source Label
-                    Text(
-                        text = " • ${asset.priceSource.uppercase()}", 
-                        color = MaterialTheme.colorScheme.primary, 
-                        fontSize = 10.sp, 
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
                 }
                 val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
                 AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
