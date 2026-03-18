@@ -28,7 +28,6 @@ class AssetViewModel @Inject constructor(
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
 
-    // FLIGHT RECORDER: Reactive Observation of the Database
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .onEach { list ->
             Log.d("API_TRACE", "VM: UI observing ${list.size} assets from DB")
@@ -45,26 +44,36 @@ class AssetViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _searchQuery = MutableStateFlow("")
-    
+
+    private val _isSearchBusy = MutableStateFlow(false)
+    val isSearchBusy: StateFlow<Boolean> = _isSearchBusy.asStateFlow()
+
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val searchResults: StateFlow<List<AssetEntity>> = _searchQuery
-        .debounce(300)
+        .debounce(700)
+        .distinctUntilChanged()
         .flatMapLatest { query ->
-            if (query.length < 2) {
+            val cleanQuery = query.trim()
+            if (cleanQuery.length < 2) { // Floor restored to 2 characters
+                _isSearchBusy.value = false
                 flowOf(emptyList())
             } else {
                 flow {
-                    val results = searchRegistry.getDefaultProvider().search(query)
-                    emit(results.map { it.toAssetEntity() })
+                    _isSearchBusy.value = true
+                    try {
+                        val results = searchRegistry.getDefaultProvider().search(cleanQuery)
+                        emit(results.map { it.toAssetEntity() })
+                    } catch (e: Exception) {
+                        Log.e("SEARCH_TRACE", "Search failed for $cleanQuery: ${e.message}")
+                        emit(emptyList())
+                    } finally {
+                        _isSearchBusy.value = false
+                    }
                 }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    /**
-     * UI Entry point for searching.
-     * Restored to maintain Signature Integrity.
-     */
     fun searchCoins(query: String) {
         _searchQuery.value = query
     }
@@ -76,16 +85,10 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch { repository.refreshAssets() }
     }
 
-    /**
-     * Strictly handles the Market Watch "Big 4" cache.
-     */
     fun refreshMarketWatch() {
         viewModelScope.launch { repository.refreshMarketWatch() }
     }
 
-    /**
-     * NEW SURGICAL ENTRY POINT: Used for direct additions (e.g. Metals)
-     */
     fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
         viewModelScope.launch {
             Log.d("ADD_TRACE", "VM: performSurgicalAdd (Direct) triggered for ${asset.symbol}")
@@ -119,7 +122,12 @@ class AssetViewModel @Inject constructor(
 
     fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, decimals: Int) {
         viewModelScope.launch {
-            repository.updateAssetEntity(asset.copy(name = newName, amountHeld = newAmount, weight = newWeight, decimalPreference = decimals))
+            repository.updateAssetEntity(asset.copy(
+                name = newName,
+                amountHeld = newAmount,
+                weight = newWeight,
+                decimalPreference = decimals
+            ))
         }
     }
 }

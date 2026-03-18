@@ -1,20 +1,21 @@
 package com.swanie.portfolio.ui.holdings
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -52,41 +54,59 @@ fun AmountEntryScreen(
     val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
-    val loadingProgress by viewModel.loadingProgress.collectAsStateWithLifecycle()
-    val loadingStatus by viewModel.loadingStatus.collectAsStateWithLifecycle()
+
+    var visualProgress by remember { mutableFloatStateOf(0f) }
+    var visualStatus by remember { mutableStateOf("Initializing...") }
+    var isSaving by remember { mutableStateOf(false) }
+    var isActualWorkDone by remember { mutableStateOf(false) }
+    var showCheckmark by remember { mutableStateOf(false) }
 
     var amountText by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
-    var isSaving by remember { mutableStateOf(false) }
 
-    // MARKET INSIGHT CYCLER
-    val insightList = listOf(
-        "Securing your position...",
-        "Connecting to the global blockchain...",
-        "Verifying real-time market valuations...",
-        "Almost there... final checks in progress."
-    )
-    var currentInsightIndex by remember { mutableIntStateOf(0) }
-    
+    val milestones = remember(name, symbol) {
+        listOf(
+            0.15f to "Securing $name in local vault...",
+            0.35f to "Connecting to CoinGecko servers...",
+            0.55f to "Fetching live $symbol spot price...",
+            0.75f to "Downloading 24h market metrics...",
+            0.90f to "Synchronizing portfolio DB...",
+            1.00f to "Asset secured successfully!"
+        )
+    }
+
     LaunchedEffect(isSaving) {
         if (isSaving) {
-            while (true) {
-                delay(2500)
-                currentInsightIndex = (currentInsightIndex + 1) % insightList.size
+            milestones.forEach { milestone ->
+                val (target, text) = milestone
+                visualStatus = text
+
+                // SLOWED DOWN: Randomize duration between 800ms and 1500ms per step
+                val stepDuration = (800L..1500L).random()
+                val startProgress = visualProgress
+                val totalSteps = 20
+
+                for (i in 1..totalSteps) {
+                    delay(stepDuration / totalSteps)
+                    visualProgress = startProgress + (target - startProgress) * (i.toFloat() / totalSteps)
+                }
             }
+
+            showCheckmark = true
+            while (!isActualWorkDone) { delay(100) }
+            delay(1200) // Extra soak time for the Checkmark
+            onSave()
         }
     }
 
-    // PULSING ANIMATION
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.08f,
+        targetValue = 1.06f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing),
+            animation = tween(1100, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "scale"
@@ -102,26 +122,15 @@ fun AmountEntryScreen(
             errorMessage = "Please enter a valid amount."
             return
         }
-
         isSaving = true
-        
         val asset = AssetEntity(
-            coinId = coinId,
-            symbol = symbol,
-            name = name,
-            amountHeld = amountValue,
-            currentPrice = currentPrice,
-            category = category,
-            imageUrl = imageUrl,
+            coinId = coinId, symbol = symbol, name = name,
+            amountHeld = amountValue, currentPrice = currentPrice,
+            category = category, imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            apiId = coinId,
-            iconUrl = imageUrl,
-            baseSymbol = symbol
+            apiId = coinId, iconUrl = imageUrl, baseSymbol = symbol
         )
-
-        viewModel.performSurgicalAdd(asset) {
-            onSave()
-        }
+        viewModel.performSurgicalAdd(asset) { isActualWorkDone = true }
     }
 
     if (showExitDialog) {
@@ -143,121 +152,54 @@ fun AmountEntryScreen(
         )
     }
 
-    BackHandler {
-        if (!isSaving) showExitDialog = true
-    }
+    BackHandler { if (!isSaving) showExitDialog = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(containerColor = bgColor) { padding ->
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     IconButton(
-                        onClick = { if (!isSaving) showExitDialog = true }, 
+                        onClick = { if (!isSaving) showExitDialog = true },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = textColor
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
                     }
                 }
-
                 Spacer(Modifier.height(32.dp))
-
-                if (imageUrl.isNotEmpty()) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "$name Icon",
-                        modifier = Modifier.size(120.dp)
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(120.dp)
-                            .background(
-                                color = textColor.copy(alpha = 0.1f),
-                                shape = MaterialTheme.shapes.medium
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = symbol.take(1),
-                            style = MaterialTheme.typography.displayMedium,
-                            color = textColor
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = textColor
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "$name Icon",
+                    modifier = Modifier.size(120.dp).clip(CircleShape)
                 )
-
+                Spacer(Modifier.height(16.dp))
+                Text(text = name, style = MaterialTheme.typography.displaySmall, color = textColor)
                 Spacer(Modifier.height(32.dp))
-
                 OutlinedTextField(
                     value = amountText,
-                    onValueChange = {
-                        if (!isSaving) {
-                            amountText = it
-                            errorMessage = null
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    onValueChange = { if (!isSaving) { amountText = it; errorMessage = null } },
+                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                     label = { Text("Enter Amount for $symbol", color = textColor.copy(alpha = 0.6f)) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { executeSave() }
-                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { executeSave() }),
                     singleLine = true,
                     enabled = !isSaving,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = textColor,
-                        unfocusedTextColor = textColor,
-                        cursorColor = textColor,
-                        focusedBorderColor = textColor,
-                        unfocusedBorderColor = textColor.copy(alpha = 0.5f),
-                        focusedLabelColor = textColor.copy(alpha = 0.7f),
-                        unfocusedLabelColor = textColor.copy(alpha = 0.7f),
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent
+                        focusedTextColor = textColor, unfocusedTextColor = textColor,
+                        cursorColor = textColor, focusedBorderColor = textColor,
+                        unfocusedBorderColor = textColor.copy(alpha = 0.5f)
                     )
                 )
                 errorMessage?.let {
-                    Text(
-                        text = it,
-                        color = Color.Red,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
                 }
-
                 Spacer(Modifier.weight(1f))
-
                 Button(
                     onClick = { executeSave() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Yellow,
-                        contentColor = Color.Black
-                    ),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                     enabled = amountText.isNotBlank() && !isSaving
                 ) {
                     Text("Save Asset", fontWeight = FontWeight.Bold, fontSize = 18.sp)
@@ -265,7 +207,6 @@ fun AmountEntryScreen(
             }
         }
 
-        // INTELLIGENT PROGRESS UI: Active & Engaging
         AnimatedVisibility(
             visible = isSaving,
             enter = fadeIn(),
@@ -273,52 +214,58 @@ fun AmountEntryScreen(
             modifier = Modifier.zIndex(10f)
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.88f)),
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.94f)),
                 contentAlignment = Alignment.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(32.dp)
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(90.dp).scale(if (showCheckmark) 1f else pulseScale)
+                    )
+                    Spacer(Modifier.height(40.dp))
                     Box(contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            progress = { loadingProgress },
-                            modifier = Modifier
-                                .size(110.dp)
-                                .scale(pulseScale),
-                            color = Color.Yellow,
-                            strokeWidth = 8.dp,
-                            trackColor = Color.White.copy(alpha = 0.1f)
-                        )
-                        Text(
-                            text = "${(loadingProgress * 100).toInt()}%",
-                            color = Color.White,
-                            fontWeight = FontWeight.Black,
-                            fontSize = 22.sp
-                        )
+                        if (showCheckmark) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Success",
+                                tint = Color.Green,
+                                modifier = Modifier.size(140.dp).animateEnterExit(
+                                    enter = scaleIn(tween(500, easing = OvershootInterpolator().toEasing()))
+                                )
+                            )
+                        } else {
+                            CircularProgressIndicator(
+                                progress = { visualProgress },
+                                modifier = Modifier.size(140.dp),
+                                color = Color.Yellow,
+                                strokeWidth = 10.dp,
+                                trackColor = Color.White.copy(alpha = 0.1f)
+                            )
+                        }
+                        if (!showCheckmark) {
+                            Text(
+                                text = "${(visualProgress * 100).toInt()}%",
+                                color = Color.White,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 28.sp
+                            )
+                        }
                     }
-                    
-                    Spacer(Modifier.height(32.dp))
-                    
-                    // DYNAMIC STATUS / INSIGHT TEXT
-                    val displayStatus = if (loadingStatus.contains("retry", true)) {
-                        loadingStatus
-                    } else {
-                        insightList[currentInsightIndex]
-                    }
-
+                    Spacer(Modifier.height(40.dp))
                     Text(
-                        text = displayStatus,
-                        color = Color.White,
+                        text = visualStatus,
+                        color = if (showCheckmark) Color.Green else Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        lineHeight = 22.sp
+                        fontSize = 19.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 40.dp)
                     )
                 }
             }
         }
     }
 }
+
+fun android.view.animation.Interpolator.toEasing() = Easing { x -> getInterpolation(x) }
+class OvershootInterpolator : android.view.animation.OvershootInterpolator()
