@@ -17,10 +17,10 @@ interface AssetDao {
     @Upsert
     suspend fun upsertAll(assets: List<AssetEntity>)
 
-    @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
     fun getAllAssets(): Flow<List<AssetEntity>>
 
-    @Query("SELECT * FROM assets ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
     suspend fun getAllAssetsOnce(): List<AssetEntity>
 
     @Query("SELECT * FROM assets WHERE coinId = :coinId")
