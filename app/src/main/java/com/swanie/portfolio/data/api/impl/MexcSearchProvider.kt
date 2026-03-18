@@ -69,15 +69,26 @@ class MexcSearchProvider @Inject constructor(
      * Ensures the symbol is mapped to the full pair (e.g., ATLA becomes ATLAUSDT).
      */
     suspend fun fetchSparkline(symbol: String): List<Double> {
+        Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching sparkline for $symbol...")
+        val fullPair = if (symbol.endsWith("USDT")) symbol else "${symbol}USDT"
+        Log.d("ADD_TRACE", "MEXC_URL: Fetching K-Lines for $fullPair")
+
         return try {
-            // FIX: Ensure symbol has USDT suffix for K-line API
-            val fullPair = if (symbol.endsWith("USDT")) symbol else "${symbol}USDT"
-            
-            val klines = mexcApiService.getKlines(fullPair, "1h", 168)
-            // MEXC K-line structure: [Time, Open, High, Low, Close, Volume, ...]
-            // Index 4 is the Close price.
+            // Primary attempt: 1h interval for 7-day granularity
+            var klines = mexcApiService.getKlines(fullPair, "1h", 168)
+            Log.d("ADD_TRACE", "MEXC_PAYLOAD (1h): Received ${klines.size} points. First price sample: ${klines.firstOrNull()?.getOrNull(4)}")
+
+            // Fallback: Try 4h interval if 1h is empty (newer/low liquidity listings)
+            if (klines.isEmpty()) {
+                Log.w("ADD_TRACE", "MEXC_FALLBACK: 1h payload empty. Retrying with 4h interval...")
+                klines = mexcApiService.getKlines(fullPair, "4h", 42) // 42 * 4h = 168h (7 days)
+                Log.d("ADD_TRACE", "MEXC_PAYLOAD (4h): Received ${klines.size} points. First price sample: ${klines.firstOrNull()?.getOrNull(4)}")
+            }
+
+            // Index 4 is the Close price in MEXC K-line response
             val sparkline = klines.mapNotNull { it.getOrNull(4)?.toString()?.toDoubleOrNull() }
-            Log.d("ADD_TRACE", "MEXC_BRIDGE: Sparkline data retrieved (${sparkline.size} points) for $fullPair")
+            Log.d("ADD_TRACE", "PROVIDER_RESULT: Received ${sparkline.size} points for $symbol.")
+            Log.d("ADD_TRACE", "MEXC_BRIDGE: Final sparkline mapped (${sparkline.size} points) for $fullPair")
             sparkline
         } catch (e: Exception) {
             Log.e("ADD_TRACE", "MEXC Sparkline Error for $symbol: ${e.message}")

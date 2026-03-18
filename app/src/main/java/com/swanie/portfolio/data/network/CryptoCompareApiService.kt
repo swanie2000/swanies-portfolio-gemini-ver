@@ -26,6 +26,18 @@ data class CryptoComparePriceData(
     @SerializedName("IMAGEURL") val imageUrl: String?
 )
 
+data class CryptoCompareHistoryResponse(
+    @SerializedName("Data") val data: CryptoCompareHistoryData
+)
+
+data class CryptoCompareHistoryData(
+    @SerializedName("Data") val data: List<CryptoCompareHistoryPoint>
+)
+
+data class CryptoCompareHistoryPoint(
+    @SerializedName("close") val close: Double
+)
+
 interface CryptoCompareApiService {
     @GET("data/all/coinlist")
     suspend fun getAllCoins(): CryptoCompareSearchResponse
@@ -35,4 +47,11 @@ interface CryptoCompareApiService {
         @Query("fsyms") fsyms: String,
         @Query("tsyms") tsyms: String = "USD"
     ): Response<CryptoComparePriceResponse>
+
+    @GET("data/v2/histohour")
+    suspend fun getHistoryHour(
+        @Query("fsym") fsym: String,
+        @Query("tsym") tsym: String = "USD",
+        @Query("limit") limit: Int = 168
+    ): Response<CryptoCompareHistoryResponse>
 }

@@ -41,6 +41,7 @@ class CryptoCompareSearchProvider @Inject constructor(
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
         return try {
+            Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching price for $ids...")
             val response = cryptoCompareApiService.getPriceFull(fsyms = ids)
             if (response.isSuccessful) {
                 val rawData = response.body()?.raw ?: emptyMap()
@@ -54,7 +55,7 @@ class CryptoCompareSearchProvider @Inject constructor(
                         category = AssetCategory.CRYPTO,
                         currentPrice = usdData?.price ?: 0.0,
                         priceChange24h = usdData?.changePct24h ?: 0.0,
-                        sparklineData = emptyList(),
+                        sparklineData = emptyList(), // Sparkline fetched separately in surgical/sync
                         baseSymbol = symbol,
                         apiId = symbol,
                         iconUrl = if (usdData?.imageUrl != null) "https://www.cryptocompare.com${usdData.imageUrl}" else "",
@@ -66,6 +67,28 @@ class CryptoCompareSearchProvider @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("ADD_TRACE", "CryptoCompare Price Error: ${e.message}")
+            emptyList()
+        }
+    }
+
+    /**
+     * Implementation of sparkline fetch for CryptoCompare.
+     */
+    suspend fun fetchSparkline(symbol: String): List<Double> {
+        Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching sparkline for $symbol...")
+        return try {
+            val response = cryptoCompareApiService.getHistoryHour(fsym = symbol)
+            if (response.isSuccessful) {
+                val historyData = response.body()?.data?.data ?: emptyList()
+                val sparkline = historyData.map { it.close }
+                Log.d("ADD_TRACE", "PROVIDER_RESULT: Received ${sparkline.size} points for $symbol.")
+                sparkline
+            } else {
+                Log.e("ADD_TRACE", "CryptoCompare History Error for $symbol: ${response.code()}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("ADD_TRACE", "CryptoCompare Sparkline Error for $symbol: ${e.message}")
             emptyList()
         }
     }

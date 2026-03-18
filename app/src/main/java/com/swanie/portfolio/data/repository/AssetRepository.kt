@@ -4,6 +4,7 @@ import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
 import com.swanie.portfolio.data.api.impl.MexcSearchProvider
+import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
@@ -113,23 +114,37 @@ class AssetRepository @Inject constructor(
                         val updatedAssets = assets.map { asset ->
                             val key = if (asset.category == AssetCategory.METAL) asset.baseSymbol else asset.coinId
                             dataMap[key]?.let { fresh ->
-                                // GLOBAL_SYNC: Patching missing MEXC sparkline
-                                val updatedSparkline = if (source == "MEXC" && (asset.sparklineData.isEmpty()) && provider is MexcSearchProvider) {
-                                    val points = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                    Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
-                                    if (points.isNotEmpty()) points else asset.sparklineData
-                                } else if (fresh.sparklineData.isNotEmpty()) {
-                                    fresh.sparklineData
+                                // GLOBAL_SYNC: Patching missing sparkline for non-CoinGecko sources
+                                val updatedSparkline = if (asset.sparklineData.isEmpty()) {
+                                    when (source) {
+                                        "MEXC" -> {
+                                            if (provider is MexcSearchProvider) {
+                                                val points = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
+                                                Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
+                                                if (points.isNotEmpty()) points else asset.sparklineData
+                                            } else asset.sparklineData
+                                        }
+                                        "CryptoCompare" -> {
+                                            if (provider is CryptoCompareSearchProvider) {
+                                                val points = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
+                                                Log.d("ADD_TRACE", "DEEP_TRACE: CryptoCompare Sparkline results for ${asset.symbol}: ${points.size} points.")
+                                                if (points.isNotEmpty()) points else asset.sparklineData
+                                            } else asset.sparklineData
+                                        }
+                                        else -> if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else asset.sparklineData
+                                    }
                                 } else {
-                                    asset.sparklineData
+                                    if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else asset.sparklineData
                                 }
 
-                                asset.copy(
+                                val finalAsset = asset.copy(
                                     currentPrice = fresh.currentPrice,
                                     sparklineData = updatedSparkline,
                                     priceChange24h = fresh.priceChange24h,
                                     lastUpdated = System.currentTimeMillis()
                                 )
+                                Log.d("ADD_TRACE", "REPO_PRE_SAVE: Symbol ${finalAsset.symbol} (Global Sync) is about to be saved. Sparkline size: ${finalAsset.sparklineData.size}")
+                                finalAsset
                             } ?: asset
                         }
                         assetDao.upsertAll(updatedAssets)
@@ -178,13 +193,23 @@ class AssetRepository @Inject constructor(
             if (freshData != null) {
                 onStatusUpdate(0.6f, "Retrieving market trends...")
                 
-                // MEXC BRIDGE: Fetch Sparkline if provider is MEXC
-                val finalSparkline = if (source == "MEXC" && provider is MexcSearchProvider) {
-                    val points = provider.fetchSparkline(apiId)
-                    Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
-                    points
-                } else {
-                    freshData.sparklineData
+                // MULTI-SOURCE BRIDGE: Fetch Sparkline
+                val finalSparkline = when (source) {
+                    "MEXC" -> {
+                        if (provider is MexcSearchProvider) {
+                            val points = provider.fetchSparkline(apiId)
+                            Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
+                            points
+                        } else emptyList()
+                    }
+                    "CryptoCompare" -> {
+                        if (provider is CryptoCompareSearchProvider) {
+                            val points = provider.fetchSparkline(apiId)
+                            Log.d("ADD_TRACE", "DEEP_TRACE: CryptoCompare Sparkline results for ${asset.symbol}: ${points.size} points.")
+                            points
+                        } else emptyList()
+                    }
+                    else -> freshData.sparklineData
                 }
 
                 Log.d("ADD_TRACE", "STEP 5: DB_PRICE_UPDATE: ID=$apiId, Price=${freshData.currentPrice}")
@@ -196,6 +221,7 @@ class AssetRepository @Inject constructor(
                     sparklineData = finalSparkline,
                     lastUpdated = System.currentTimeMillis()
                 )
+                Log.d("ADD_TRACE", "REPO_PRE_SAVE: Symbol ${updated.symbol} (Surgical) is about to be saved. Sparkline size: ${updated.sparklineData.size}")
                 assetDao.upsertAsset(updated)
 
                 // Step E: Black Box Logging
