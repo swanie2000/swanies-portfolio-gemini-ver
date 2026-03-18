@@ -80,35 +80,37 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                         if (asset.category == AssetCategory.METAL) {
                             // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Metal)
                             Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
-                            // FIX: Replaced commented-out saveNewAsset with performSurgicalAdd
                             assetViewModel.performSurgicalAdd(asset) {
                                 navController.popBackStack()
                             }
                         } else {
                             val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl, "UTF-8")
+                            val encodedSource = URLEncoder.encode(asset.priceSource, "UTF-8")
                             
                             // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Crypto)
-                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
+                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}, SOURCE=${asset.priceSource}")
                             
-                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.currentPrice}")
+                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.currentPrice}/$encodedSource")
                         }
                     }
                 )
             }
 
             composable(
-                route = "amount_entry/{symbol}/{apiId}/{iconUrl}/{category}/{price}",
+                route = "amount_entry/{symbol}/{apiId}/{iconUrl}/{category}/{price}/{priceSource}",
                 arguments = listOf(
                     navArgument("symbol") { type = NavType.StringType },
                     navArgument("apiId") { type = NavType.StringType },
                     navArgument("iconUrl") { type = NavType.StringType },
                     navArgument("category") { type = NavType.StringType },
-                    navArgument("price") { type = NavType.StringType }
+                    navArgument("price") { type = NavType.StringType },
+                    navArgument("priceSource") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
                 val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
                 val apiId = backStackEntry.arguments?.getString("apiId") ?: ""
                 val iconUrl = backStackEntry.arguments?.getString("iconUrl") ?: ""
+                val priceSource = backStackEntry.arguments?.getString("priceSource") ?: "CoinGecko"
                 val decodedThumb = URLDecoder.decode(iconUrl, "UTF-8")
 
                 val categoryString = backStackEntry.arguments?.getString("category") ?: "CRYPTO"
@@ -122,6 +124,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     imageUrl = decodedThumb,
                     category = category,
                     currentPrice = price,
+                    priceSource = priceSource,
                     onSave = {
                         navController.navigate(Routes.HOLDINGS) {
                             popUpTo(Routes.HOLDINGS) { inclusive = true }

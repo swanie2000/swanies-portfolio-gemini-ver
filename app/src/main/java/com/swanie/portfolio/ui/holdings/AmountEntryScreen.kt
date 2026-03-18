@@ -43,6 +43,7 @@ fun AmountEntryScreen(
     imageUrl: String,
     category: AssetCategory,
     currentPrice: Double,
+    priceSource: String,
     onSave: () -> Unit,
     onCancel: () -> Unit
 ) {
@@ -66,11 +67,15 @@ fun AmountEntryScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val milestones = remember(name, symbol) {
+    val milestones = remember(name, symbol, priceSource) {
         listOf(
             0.15f to "Securing $name in local vault...",
-            0.35f to "Connecting to CoinGecko servers...",
-            0.55f to "Fetching live $symbol spot price...",
+            0.35f to "Connecting to $priceSource servers...",
+            0.55f to when(priceSource) {
+                "MEXC" -> "Checking MEXC order book for $symbol price..."
+                "YahooFinance" -> "Fetching Yahoo Finance market data for $symbol..."
+                else -> "Fetching live $symbol spot price from $priceSource..."
+            },
             0.75f to "Downloading 24h market metrics...",
             0.90f to "Synchronizing portfolio DB...",
             1.00f to "Asset secured successfully!"
@@ -128,7 +133,8 @@ fun AmountEntryScreen(
             amountHeld = amountValue, currentPrice = currentPrice,
             category = category, imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            apiId = coinId, iconUrl = imageUrl, baseSymbol = symbol
+            apiId = coinId, iconUrl = imageUrl, baseSymbol = symbol,
+            priceSource = priceSource
         )
         viewModel.performSurgicalAdd(asset) { isActualWorkDone = true }
     }
@@ -261,6 +267,15 @@ fun AmountEntryScreen(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 40.dp)
                     )
+                    
+                    if (showCheckmark) {
+                        Text(
+                            text = "Initial transaction logged to Black Box.",
+                            color = Color.White.copy(alpha = 0.6f),
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
                 }
             }
         }

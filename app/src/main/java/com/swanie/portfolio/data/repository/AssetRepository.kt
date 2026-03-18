@@ -3,9 +3,7 @@ package com.swanie.portfolio.data.repository
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
-import com.swanie.portfolio.data.local.AssetDao
-import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
 import kotlinx.coroutines.*
@@ -16,6 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
+    private val transactionDao: TransactionDao,
     private val coinGeckoApiService: CoinGeckoApiService,
     private val syncCoordinator: DataSyncCoordinator,
     private val searchRegistry: SearchEngineRegistry
@@ -175,6 +174,19 @@ class AssetRepository @Inject constructor(
                     lastUpdated = System.currentTimeMillis()
                 )
                 assetDao.upsertAsset(updated)
+
+                // Step E: Black Box Logging
+                Log.d("ADD_TRACE", "BLACK_BOX: Initial transaction logged for ${asset.symbol} at price ${freshData.currentPrice}")
+                transactionDao.insertTransaction(
+                    TransactionEntity(
+                        assetId = asset.coinId,
+                        type = "INITIAL_ADD",
+                        amount = asset.amountHeld,
+                        priceAtTime = freshData.currentPrice,
+                        timestamp = System.currentTimeMillis(),
+                        source = source
+                    )
+                )
             } else {
                 Log.e("ADD_TRACE", "STEP 5: DB_PRICE_UPDATE FAILED: No data returned for $apiId from $source")
                 onStatusUpdate(1.0f, "Landing with last known data...")

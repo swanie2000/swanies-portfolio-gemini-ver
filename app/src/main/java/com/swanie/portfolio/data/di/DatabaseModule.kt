@@ -5,6 +5,7 @@ import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.data.local.TransactionDao
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.data.repository.DataSyncCoordinator
@@ -31,6 +32,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideTransactionDao(database: AppDatabase): TransactionDao {
+        return database.transactionDao()
+    }
+
+    @Provides
     @Singleton
     fun provideThemePreferences(@ApplicationContext context: Context): ThemePreferences {
         return ThemePreferences(context)
@@ -40,12 +46,14 @@ object DatabaseModule {
     @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,
+        transactionDao: TransactionDao,
         coinGeckoApiService: CoinGeckoApiService,
         syncCoordinator: DataSyncCoordinator,
         searchEngineRegistry: SearchEngineRegistry
     ): AssetRepository {
         return AssetRepository(
             assetDao,
+            transactionDao,
             coinGeckoApiService,
             syncCoordinator,
             searchEngineRegistry
