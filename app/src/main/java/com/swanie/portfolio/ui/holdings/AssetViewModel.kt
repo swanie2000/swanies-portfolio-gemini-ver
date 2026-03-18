@@ -43,6 +43,13 @@ class AssetViewModel @Inject constructor(
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val remainingCooldown: StateFlow<Int> = flow {
+        while(true) {
+            emit(syncCoordinator.getRemainingCooldown())
+            delay(1000)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     private val _searchQuery = MutableStateFlow("")
     private val _selectedProvider = MutableStateFlow<String?>(null)
     val selectedProvider: StateFlow<String?> = _selectedProvider.asStateFlow()

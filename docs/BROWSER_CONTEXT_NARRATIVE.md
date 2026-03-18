@@ -3,26 +3,40 @@ Updated Project Narrative: March 18, 2026
 
     The Reset Mandate Achieved: The "429 Death Loop" is officially extinct. The network is silent except for intentional, manual triggers.
 
-    Surgical Isolation Protocol: AssetRepository.kt now uses executeSurgicalAdd. This routine bypasses global refreshes, hitting the API for one ID only, ensuring new assets land with 100% data accuracy without alerting rate-limit sensors.
+    Surgical Isolation Protocol: AssetRepository.kt uses executeSurgicalAdd to bypass global refreshes. New assets land with 100% data accuracy without alerting rate-limit sensors.
 
-    The Search Straitjacket: Search logic now features a 700ms debounce and a 2-character floor, preventing "search-as-you-type" spam while remaining responsive to user intent.
+    The Search Straitjacket: Logic features a 700ms debounce and a 2-character floor, preventing "search-as-you-type" spam while remaining responsive to user intent.
 
-    The Confirmation Journey: The "Add Asset" screen has been transformed from a technical blip into a premium UX experience. It features a randomized 6-9 second animation with a pulsing icon, real-time status milestones, and an animated Success Checkmark to pace the user and protect the API.
+    The Search Gatekeeper: A mandatory Provider Selection UI is active. Users must choose a source (CoinGecko, Yahoo, etc.) before the search box enables, adding a human-driven delay that protects API quotas.
 
-🛠️ Next Objectives (The "Multi-Server" Expansion)
+    Metals Shield (30s Cooldown): A strict cooldown is applied to the MarketWatch fetch. Navigating the metals screen no longer "attacks" Yahoo Finance servers.
 
-    The Search Gatekeeper: Implement a Required Provider Selection dropdown (CoinGecko, MEXC, Yahoo Finance). This adds a "user-driven delay" and allows access to "hard-to-find" assets across different ecosystems.
+    The "Black Box" Transaction Log: A permanent ledger (TransactionEntity) tracks every asset addition. This provides a "birth certificate" for every asset, recording the initial price and source for total transparency.
 
-    Metals Shield (30s Cooldown): Apply a strict cooldown to the MarketWatch fetch. Rapidly entering and exiting the metals screen will no longer "attack" the Yahoo Finance servers.
+    The Multi-Source Journey: The "Add Asset" routine features a randomized 6-9 second animation with dynamic, provider-specific milestones (e.g., "Checking MEXC order book..."). It concludes with a success checkmark and confirmation that the transaction was logged to the Black Box.
 
-    The "Black Box" Transaction Log: Introduce a TransactionEntity database table to track every add, edit, and price sync, providing the user with a historical "receipt" of their portfolio's growth.
+🛠️ Next Objectives (The "Premium & Precision" Era)
 
-    Multi-Server Journey UI: Update the AmountEntryScreen to dynamically display the server currently being accessed (e.g., "Verifying listing on MEXC...").
+    Provider Expansion: Plug in the specific API logic for MEXC and CryptoCompare to utilize the newly minted SearchProvider interface.
+
+    The "Black Box" UI: Create a dedicated History screen or bottom-sheet to allow users to view their transaction ledger and "First Purchase" data.
+
+    Portfolio Screen Overhaul: Transition to a premium "Command Center" look:
+
+        Glassmorphism: Suble blurs and semi-transparent cards.
+
+        Collapsible Buckets: Grouping assets by category (Metals, Main-Cap, Alt-Gems).
+
+        Live Pulse: Visual indicators showing the "freshness" of the last price sync.
+
+    Source-Aware Global Sync: Ensure the background refresh routine respects the priceSource tag on every asset, only hitting the appropriate API for that specific item.
 
 🧪 Status of the "Add Asset" Audit
 
-    PASS: New assets land with full price and 24h data.
+    PASS: New assets land with full price and source metadata.
+
+    PASS: Database v5 migration is stable and correctly maps Asset/Transaction relationships.
 
     PASS: Adding an asset triggers ZERO recursive sync loops.
 
-    PASS: UI remains fluid and responsive during the background database write.
+    PASS: UI feedback (The Journey) effectively hides technical speed to prevent user spamming.

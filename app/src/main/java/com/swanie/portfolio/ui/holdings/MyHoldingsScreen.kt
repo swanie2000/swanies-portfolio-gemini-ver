@@ -9,6 +9,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.*
@@ -85,6 +86,9 @@ fun MyHoldingsScreen(
     val lazyListState = rememberLazyListState()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
+
+    // Timer Logic
+    val remainingCooldown by viewModel.remainingCooldown.collectAsStateWithLifecycle()
 
     // GHOST HUNTER: Removed viewModel.refreshAssets() from LaunchedEffect(Unit).
     // The database is now a Passive Source. Network calls are strictly manual or surgical.
@@ -214,14 +218,23 @@ fun MyHoldingsScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(bgColor).statusBarsPadding()) {
                 IconButton(
-                    onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() },
+                    onClick = { if (!isViewModelRefreshing && remainingCooldown <= 0) viewModel.refreshAssets() },
                     modifier = Modifier.align(Alignment.TopStart).padding(16.dp)
                 ) {
-                    Icon(
-                        Icons.Default.Refresh,
-                        contentDescription = "Refresh",
-                        tint = if(isViewModelRefreshing) textColor.copy(0.2f) else textColor
-                    )
+                    if (remainingCooldown > 0 && !isViewModelRefreshing) {
+                        Text(
+                            text = "${remainingCooldown}s",
+                            color = textColor.copy(alpha = 0.5f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Refresh",
+                            tint = if(isViewModelRefreshing || remainingCooldown > 0) textColor.copy(0.2f) else textColor
+                        )
+                    }
                 }
                 Column(modifier = Modifier.align(Alignment.TopCenter), horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))

@@ -109,7 +109,16 @@ fun FullAssetCard(
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }.clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+    
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }
+            .clickable(enabled = !isEditing) { onExpandToggle() },
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+    ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
@@ -154,7 +163,16 @@ fun CompactAssetCard(
 ) {
     val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+    
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }
+            .clickable { onExpandToggle() },
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+    ) {
         Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             // THE DATA CHAIN OF CUSTODY: Pulling iconUrl directly from database
             Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.iconUrl ?: asset.imageUrl) }
@@ -179,6 +197,7 @@ fun MetalMarketCard(
     modifier: Modifier = Modifier
 ) {
     val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    
     Card(
         modifier = modifier
             .fillMaxWidth()

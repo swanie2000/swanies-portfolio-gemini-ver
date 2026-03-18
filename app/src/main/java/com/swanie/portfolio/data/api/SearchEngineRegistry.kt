@@ -2,19 +2,25 @@ package com.swanie.portfolio.data.api
 
 import com.swanie.portfolio.data.api.impl.CoinGeckoSearchProvider
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
+import com.swanie.portfolio.data.api.impl.MexcSearchProvider
+import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SearchEngineRegistry @Inject constructor(
     coinGeckoProvider: CoinGeckoSearchProvider,
-    metalProvider: MetalSearchProvider
+    metalProvider: MetalSearchProvider,
+    mexcProvider: MexcSearchProvider,
+    cryptoCompareProvider: CryptoCompareSearchProvider
 ) {
     private val providers = mutableMapOf<String, SearchProvider>()
 
     init {
         providers[coinGeckoProvider.name] = coinGeckoProvider
         providers[metalProvider.name] = metalProvider
+        providers[mexcProvider.name] = mexcProvider
+        providers[cryptoCompareProvider.name] = cryptoCompareProvider
     }
 
     fun getProvider(name: String): SearchProvider? = providers[name]

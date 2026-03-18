@@ -3,6 +3,7 @@ package com.swanie.portfolio.data.repository
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
+import com.swanie.portfolio.data.api.impl.MexcSearchProvider
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
@@ -112,9 +113,20 @@ class AssetRepository @Inject constructor(
                         val updatedAssets = assets.map { asset ->
                             val key = if (asset.category == AssetCategory.METAL) asset.baseSymbol else asset.coinId
                             dataMap[key]?.let { fresh ->
+                                // GLOBAL_SYNC: Patching missing MEXC sparkline
+                                val updatedSparkline = if (source == "MEXC" && (asset.sparklineData.isEmpty()) && provider is MexcSearchProvider) {
+                                    val points = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
+                                    Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
+                                    if (points.isNotEmpty()) points else asset.sparklineData
+                                } else if (fresh.sparklineData.isNotEmpty()) {
+                                    fresh.sparklineData
+                                } else {
+                                    asset.sparklineData
+                                }
+
                                 asset.copy(
                                     currentPrice = fresh.currentPrice,
-                                    sparklineData = fresh.sparklineData,
+                                    sparklineData = updatedSparkline,
                                     priceChange24h = fresh.priceChange24h,
                                     lastUpdated = System.currentTimeMillis()
                                 )
@@ -164,13 +176,24 @@ class AssetRepository @Inject constructor(
 
             // Step D: Final Update
             if (freshData != null) {
+                onStatusUpdate(0.6f, "Retrieving market trends...")
+                
+                // MEXC BRIDGE: Fetch Sparkline if provider is MEXC
+                val finalSparkline = if (source == "MEXC" && provider is MexcSearchProvider) {
+                    val points = provider.fetchSparkline(apiId)
+                    Log.d("ADD_TRACE", "DEEP_TRACE: MEXC Sparkline results for ${asset.symbol}: ${points.size} points.")
+                    points
+                } else {
+                    freshData.sparklineData
+                }
+
                 Log.d("ADD_TRACE", "STEP 5: DB_PRICE_UPDATE: ID=$apiId, Price=${freshData.currentPrice}")
                 onStatusUpdate(0.9f, "Success! Finalizing portfolio...")
                 
                 val updated = asset.copy(
                     currentPrice = freshData.currentPrice,
                     priceChange24h = freshData.priceChange24h,
-                    sparklineData = freshData.sparklineData,
+                    sparklineData = finalSparkline,
                     lastUpdated = System.currentTimeMillis()
                 )
                 assetDao.upsertAsset(updated)
