@@ -42,17 +42,12 @@ fun AssetPickerScreen(
     val textColor = Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" }))
 
     var searchQuery by remember { mutableStateOf("") }
-    val cryptoResults by viewModel.searchResults.collectAsState()
+    val searchResults by viewModel.searchResults.collectAsState()
+    val isSearchBusy by viewModel.isSearchBusy.collectAsState()
+    val selectedProvider by viewModel.selectedProvider.collectAsState()
+    val providers = viewModel.getAvailableProviders()
 
-    val metalList = listOf(
-        AssetEntity(coinId = "gold-spot", symbol = "XAU", name = "Gold", category = AssetCategory.METAL, baseSymbol = "XAU", apiId = "gold-spot"),
-        AssetEntity(coinId = "silver-spot", symbol = "XAG", name = "Silver", category = AssetCategory.METAL, baseSymbol = "XAG", apiId = "silver-spot"),
-        AssetEntity(coinId = "platinum-spot", symbol = "XPT", name = "Platinum", category = AssetCategory.METAL, baseSymbol = "XPT", apiId = "platinum-spot"),
-        AssetEntity(coinId = "palladium-spot", symbol = "XPD", name = "Palladium", category = AssetCategory.METAL, baseSymbol = "XPD", apiId = "palladium-spot")
-    )
-
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CRYPTO", "METALS")
+    var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -69,53 +64,87 @@ fun AssetPickerScreen(
         containerColor = bgColor
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            
+            // THE GATEKEEPER: Provider Selection
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                OutlinedTextField(
+                    value = selectedProvider ?: "Select Price Provider...",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Search Source", color = textColor.copy(alpha = 0.7f)) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        focusedBorderColor = Color.Yellow,
+                        unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                        focusedLabelColor = Color.Yellow,
+                        unfocusedLabelColor = textColor.copy(alpha = 0.5f)
+                    ),
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(bgColor.copy(alpha = 0.95f))
+                ) {
+                    providers.forEach { provider ->
+                        DropdownMenuItem(
+                            text = { Text(provider, color = textColor) },
+                            onClick = {
+                                viewModel.selectProvider(provider)
+                                expanded = false
+                                searchQuery = "" // Reset query when switching
+                            }
+                        )
+                    }
+                }
+            }
+
+            // THE SEARCH BOX: Enabled only after provider selection
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
                     searchQuery = it
-                    if (selectedTab == 0) viewModel.searchCoins(it)
+                    viewModel.searchCoins(it)
                 },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                placeholder = { Text("Search assets...", color = textColor.copy(alpha = 0.5f)) },
-                leadingIcon = { Icon(Icons.Default.Search, null, tint = textColor) },
+                enabled = selectedProvider != null,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholder = { 
+                    Text(
+                        if (selectedProvider == null) "Select provider first..." else "Search assets...", 
+                        color = textColor.copy(alpha = 0.5f)
+                    ) 
+                },
+                leadingIcon = { Icon(Icons.Default.Search, null, tint = if (selectedProvider != null) textColor else textColor.copy(alpha = 0.3f)) },
+                trailingIcon = {
+                    if (isSearchBusy) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
+                    }
+                },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Yellow,
                     unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                    disabledBorderColor = textColor.copy(alpha = 0.1f),
                     focusedTextColor = textColor,
-                    unfocusedTextColor = textColor
+                    unfocusedTextColor = textColor,
+                    disabledTextColor = textColor.copy(alpha = 0.3f)
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
 
-            TabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = Color.Transparent,
-                contentColor = Color.Yellow,
-                divider = {}
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = { Text(title, fontWeight = FontWeight.Bold, color = if(selectedTab == index) Color.Yellow else textColor.copy(alpha = 0.4f)) }
-                    )
-                }
-            }
+            Spacer(Modifier.height(8.dp))
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                val currentList = if (selectedTab == 0) {
-                    cryptoResults
-                } else {
-                    metalList.filter {
-                        it.name.contains(searchQuery, ignoreCase = true) ||
-                                it.symbol.contains(searchQuery, ignoreCase = true)
-                    }
-                }
-
-                items(currentList) { asset ->
+                items(searchResults) { asset ->
                     AssetPickerItem(asset, textColor) {
-                        // CLEAN SLATE: Instant navigation, no logic calls
-                        Log.d("ADD_TRACE", "STEP 1: USER_SELECTED: ID=${asset.apiId}")
+                        Log.d("ADD_TRACE", "STEP 1: USER_SELECTED: ID=${asset.apiId} SOURCE=${asset.priceSource}")
                         onAssetSelected(asset)
                     }
                 }
@@ -138,7 +167,16 @@ fun AssetPickerItem(asset: AssetEntity, textColor: Color, onClick: () -> Unit) {
         Spacer(Modifier.width(16.dp))
         Column {
             Text(asset.name, fontWeight = FontWeight.Bold, color = textColor)
-            Text(asset.symbol.uppercase(), fontSize = 12.sp, color = textColor.copy(alpha = 0.5f))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(asset.symbol.uppercase(), fontSize = 12.sp, color = textColor.copy(alpha = 0.5f))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = asset.priceSource, 
+                    fontSize = 10.sp, 
+                    color = Color.Yellow.copy(alpha = 0.7f),
+                    modifier = Modifier.background(Color.Yellow.copy(alpha = 0.1f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp)
+                )
+            }
         }
     }
 }

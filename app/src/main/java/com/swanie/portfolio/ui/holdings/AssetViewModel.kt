@@ -44,27 +44,41 @@ class AssetViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _searchQuery = MutableStateFlow("")
+    private val _selectedProvider = MutableStateFlow<String?>(null)
+    val selectedProvider: StateFlow<String?> = _selectedProvider.asStateFlow()
 
     private val _isSearchBusy = MutableStateFlow(false)
     val isSearchBusy: StateFlow<Boolean> = _isSearchBusy.asStateFlow()
 
+    fun getAvailableProviders(): List<String> = searchRegistry.getAvailableProviders()
+
+    fun selectProvider(name: String) {
+        _selectedProvider.value = name
+        // Clear results when provider changes
+        _searchQuery.value = ""
+    }
+
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val searchResults: StateFlow<List<AssetEntity>> = _searchQuery
+    val searchResults: StateFlow<List<AssetEntity>> = combine(_searchQuery, _selectedProvider) { query, provider ->
+        query to provider
+    }
         .debounce(700)
         .distinctUntilChanged()
-        .flatMapLatest { query ->
+        .flatMapLatest { (query, provider) ->
             val cleanQuery = query.trim()
-            if (cleanQuery.length < 2) { // Floor restored to 2 characters
+            if (cleanQuery.length < 2 || provider == null) {
                 _isSearchBusy.value = false
                 flowOf(emptyList())
             } else {
                 flow {
                     _isSearchBusy.value = true
                     try {
-                        val results = searchRegistry.getDefaultProvider().search(cleanQuery)
+                        Log.d("ADD_TRACE", "SEARCH: Querying '$cleanQuery' via provider '$provider'")
+                        val searchProvider = searchRegistry.getProvider(provider) ?: searchRegistry.getDefaultProvider()
+                        val results = searchProvider.search(cleanQuery)
                         emit(results.map { it.toAssetEntity() })
                     } catch (e: Exception) {
-                        Log.e("SEARCH_TRACE", "Search failed for $cleanQuery: ${e.message}")
+                        Log.e("SEARCH_TRACE", "Search failed for $cleanQuery on $provider: ${e.message}")
                         emit(emptyList())
                     } finally {
                         _isSearchBusy.value = false

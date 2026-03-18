@@ -2,7 +2,7 @@ package com.swanie.portfolio.data.api.impl
 
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchProvider
-import com.swanie.portfolio.data.api.SearchSymbol
+import com.swanie.portfolio.data.api.SearchResult
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.CoinGeckoApiService
@@ -16,29 +16,18 @@ class CoinGeckoSearchProvider @Inject constructor(
 
     private var lastGlobalHit = 0L
 
-    private val tickerToIdMap = mapOf(
-        "SHIB" to "shiba-inu",
-        "FLOKI" to "floki",
-        "FLR" to "flare",
-        "XRP" to "ripple",
-        "USDT" to "tether",
-        "DOT" to "polkadot",
-        "BTC" to "bitcoin",
-        "ETH" to "ethereum",
-        "LTC" to "litecoin"
-    )
-
-    override suspend fun search(query: String): List<SearchSymbol> {
-        Log.d("SEARCH_TRACE", "Searching for: $query")
+    override suspend fun search(query: String): List<SearchResult> {
+        Log.d("SEARCH_TRACE", "Searching for: $query via $name")
         return try {
             val result = coinGeckoApiService.search(query)
             result.coins.map { coin ->
-                SearchSymbol(
+                SearchResult(
                     id = coin.id,
                     symbol = coin.symbol,
                     name = coin.name,
                     imageUrl = coin.large,
-                    category = AssetCategory.CRYPTO
+                    category = AssetCategory.CRYPTO,
+                    priceSource = name
                 )
             }
         } catch (e: Exception) {
@@ -75,7 +64,8 @@ class CoinGeckoSearchProvider @Inject constructor(
                         sparklineData = fresh.sparklineIn7d?.price ?: emptyList(),
                         baseSymbol = fresh.symbol,
                         apiId = fresh.id,
-                        iconUrl = fresh.image
+                        iconUrl = fresh.image,
+                        priceSource = name
                     )
                 }
             } else {

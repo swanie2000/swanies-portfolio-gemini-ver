@@ -173,62 +173,46 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-13)
-Markdown
+Updated Project Narrative: March 18, 2026
+✅ Current Working State (The "Surgical" Fortress)
 
-# 📄 BROWSER_CONTEXT_NARRATIVE.md (Updated 2026-03-13)
+    The Reset Mandate Achieved: The "429 Death Loop" is officially extinct. The network is silent except for intentional, manual triggers.
 
-## 1. Project Overview
-- **App Name:** Swanie’s Portfolio
-- **Current Branch:** `main` (Restored to **Command & Control Phase 1** | Hash: `df88dbb`)
-- **Status:** **STABLE RETREAT.** All experimental "Clean Slate" code has been discarded. Project is building and UI is fully functional.
+    Surgical Isolation Protocol: AssetRepository.kt now uses executeSurgicalAdd. This routine bypasses global refreshes, hitting the API for one ID only, ensuring new assets land with 100% data accuracy without alerting rate-limit sensors.
 
-## 2. Architectural Status
-- **The Tower (DataSyncCoordinator):** Manages the 30s Rate Limiter.
-- **The Vault (AssetRepository):** Handles the database and delegates timing to the Tower.
-- **The Bridge (AssetViewModel):** Standardizes UI data flow.
-- **UI Components:** `FullAssetCard` and `CompactAssetCard` are strictly defined. **DO NOT RENAME PARAMETERS** (e.g., `isDragging` and `onExpandToggle` are hard requirements).
+    The Search Straitjacket: Search logic now features a 700ms debounce and a 2-character floor, preventing "search-as-you-type" spam while remaining responsive to user intent.
 
-## 3. Failed Protocols & Post-Mortem (The "March 13th Experiment")
-> **⚠️ CRITICAL WARNING TO FUTURE AI AGENTS:**
-> We attempted a "Sequential Sync" refactor that resulted in a total UI failure.
-> - **Failed Idea:** Moving all saving/fetching logic into a single "Fire-and-Forget" sequential block.
-> - **The Result:** Massive "Unresolved Reference" errors. The UI parameter signatures (Card components) were accidentally altered, breaking the `MyHoldingsScreen` compilation.
-> - **The Lesson:** **NEVER** attempt a "Clean Slate" rebuild of the Repository or ViewModel without first locking the existing UI function signatures. The UI and the Data Engine are tightly coupled via specific parameter names.
+    The Confirmation Journey: The "Add Asset" screen has been transformed from a technical blip into a premium UX experience. It features a randomized 6-9 second animation with a pulsing icon, real-time status milestones, and an animated Success Checkmark to pace the user and protect the API.
 
-## 4. The Path Forward (The "Almost Working" Blueprint)
-The goal remains to solve the 429 Rate Limit and "No Data" bug on new asset adds.
-- **The Sequence:** `Database Write` -> `500ms Delay` -> `API Price Fetch` -> `Database Update`.
-- **The Implementation:** This must be performed "surgically" inside the existing `AssetViewModel` or `Repository` functions **without** changing the function names or parameter types that `MyHoldingsScreen.kt` relies on.
+🛠️ Next Objectives (The "Multi-Server" Expansion)
 
-## 5. Feature Map & UI Status
-- 🟢 **Metals Market Watch:** Functional with direct-draw sparklines. **(PROTECT THIS CODE)**.
-- 🟢 **Holdings Dashboard:** Visuals restored. Drag-to-delete and Reordering are active.
-- 🟡 **Rate Limiter:** Active, but requires refinement for the initial fetch of a brand-new asset.
+    The Search Gatekeeper: Implement a Required Provider Selection dropdown (CoinGecko, MEXC, Yahoo Finance). This adds a "user-driven delay" and allows access to "hard-to-find" assets across different ecosystems.
 
-## 6. Engineering Protocols ("Safe Harbor" Rules)
-- **Signature Integrity:** AI must verify `FullAssetCard` and `CompactAssetCard` definitions before suggesting any `LazyColumn` changes.
-- **Full File Authority:** AI must provide the **complete file output** for any changes. No partial snippets.
-- **The 500ms Buffer:** Observe a mandatory delay between a Room write and a network refresh.
+    Metals Shield (30s Cooldown): Apply a strict cooldown to the MarketWatch fetch. Rapidly entering and exiting the metals screen will no longer "attack" the Yahoo Finance servers.
 
-## 7. Modularization Roadmap (The "Firewall" Strategy)
-**Strategy:** Break the code apart to prevent one error from destroying the entire UI.
-- **Phase 1 (UI Isolation):** Extract `FullAssetCard` and `CompactAssetCard` into `ui/components/AssetCards.kt`.
-- **Phase 2 (Logic Extraction):** Move CoinGecko and Yahoo API logic into dedicated service files (e.g., `data/api/MetalPriceService.kt`).
-- **Phase 3 (Screen Isolation):** Ensure `AmountEntryScreen` and `MetalsAuditScreen` remain standalone with their own ViewModels.
-- **Protocol:** Push to GitHub after **EVERY** successful file separation.
+    The "Black Box" Transaction Log: Introduce a TransactionEntity database table to track every add, edit, and price sync, providing the user with a historical "receipt" of their portfolio's growth.
+
+    Multi-Server Journey UI: Update the AmountEntryScreen to dynamically display the server currently being accessed (e.g., "Verifying listing on MEXC...").
+
+🧪 Status of the "Add Asset" Audit
+
+    PASS: New assets land with full price and 24h data.
+
+    PASS: Adding an asset triggers ZERO recursive sync loops.
+
+    PASS: UI remains fluid and responsive during the background database write.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 03/13/2026 15:49:44.00
+Generated: Wed 03/18/2026 10:57:04.74
 
 Branch:
 main
 Commit:
-9194ebba5ab1a1b4e0b40d65015dfc9563426237
+18333ec35598b1853ec12dc5a76cf982391901cf
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -251,6 +235,10 @@ app/src/main/java/com/swanie/portfolio/MainActivity.kt
 app/src/main/java/com/swanie/portfolio/MainViewModel.kt
 app/src/main/java/com/swanie/portfolio/PortfolioApplication.kt
 app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
+app/src/main/java/com/swanie/portfolio/data/api/SearchEngineRegistry.kt
+app/src/main/java/com/swanie/portfolio/data/api/SearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
 app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
@@ -264,8 +252,10 @@ app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceResponse.kt
 app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
 app/src/main/java/com/swanie/portfolio/data/repository/DataSyncCoordinator.kt
+app/src/main/java/com/swanie/portfolio/data/repository/MarketPriceData.kt
 app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
+app/src/main/java/com/swanie/portfolio/ui/components/AssetCards.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
 app/src/main/java/com/swanie/portfolio/ui/components/CustomToast.kt
 app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt

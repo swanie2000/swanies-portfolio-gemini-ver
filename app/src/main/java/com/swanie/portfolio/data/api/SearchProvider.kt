@@ -6,12 +6,13 @@ import com.swanie.portfolio.data.local.AssetEntity
 /**
  * Common data model for search results to decouple UI/ViewModel from API-specific models.
  */
-data class SearchSymbol(
+data class SearchResult(
     val id: String,
     val symbol: String,
     val name: String,
     val imageUrl: String,
-    val category: AssetCategory
+    val category: AssetCategory,
+    val priceSource: String
 ) {
     fun toAssetEntity(): AssetEntity = AssetEntity(
         coinId = id, // Primary Key remains the unique ID from provider
@@ -21,7 +22,8 @@ data class SearchSymbol(
         category = category,
         baseSymbol = symbol,
         apiId = id,     // THE DATA CHAIN OF CUSTODY: Explicit API ID
-        iconUrl = imageUrl // THE DATA CHAIN OF CUSTODY: Explicit Icon URL
+        iconUrl = imageUrl, // THE DATA CHAIN OF CUSTODY: Explicit Icon URL
+        priceSource = priceSource
     )
 }
 
@@ -30,6 +32,6 @@ data class SearchSymbol(
  */
 interface SearchProvider {
     val name: String
-    suspend fun search(query: String): List<SearchSymbol>
+    suspend fun search(query: String): List<SearchResult>
     suspend fun getPrices(ids: String): List<AssetEntity>
 }

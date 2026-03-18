@@ -1,30 +1,28 @@
-Updated Project Narrative: March 14, 2026
-✅ Current Working State (Safe Harbor)
+Updated Project Narrative: March 18, 2026
+✅ Current Working State (The "Surgical" Fortress)
 
-    UI Firewall: AssetCards.kt is the centralized "factory" for all card types (Full, Compact, and Metal Market). This isolates design from logic.
+    The Reset Mandate Achieved: The "429 Death Loop" is officially extinct. The network is silent except for intentional, manual triggers.
 
-    API Silence: The "Machine Gun" loop is dead. The Metals screen now uses a One-Time-Fetch protocol (LaunchedEffect(Unit)), ensuring it only hits the API once upon entry.
+    Surgical Isolation Protocol: AssetRepository.kt now uses executeSurgicalAdd. This routine bypasses global refreshes, hitting the API for one ID only, ensuring new assets land with 100% data accuracy without alerting rate-limit sensors.
 
-    Data Accuracy: Yahoo Finance Day High and Day Low mapping is fully functional and visible on the UI.
+    The Search Straitjacket: Search logic now features a 700ms debounce and a 2-character floor, preventing "search-as-you-type" spam while remaining responsive to user intent.
 
-    Performance: The app is snappy with zero recomposition lag during drag-and-drop or scrolling.
+    The Confirmation Journey: The "Add Asset" screen has been transformed from a technical blip into a premium UX experience. It features a randomized 6-9 second animation with a pulsing icon, real-time status milestones, and an animated Success Checkmark to pace the user and protect the API.
 
-🛠️ Next Objectives (The "Zero-Ghost" Audit)
+🛠️ Next Objectives (The "Multi-Server" Expansion)
 
-    Add Asset Validation: Test the "Add Asset" screen to ensure new assets land with full price data. We need to verify that adding a new item doesn't trigger a recursive sync loop.
+    The Search Gatekeeper: Implement a Required Provider Selection dropdown (CoinGecko, MEXC, Yahoo Finance). This adds a "user-driven delay" and allows access to "hard-to-find" assets across different ecosystems.
 
-    Leaky Bucket Implementation: Now that the "Bad Actors" are gone, transition the repository to a Leaky Bucket model to allow for respectable burst hits (like adding 3 assets in a row) while maintaining long-term API safety.
+    Metals Shield (30s Cooldown): Apply a strict cooldown to the MarketWatch fetch. Rapidly entering and exiting the metals screen will no longer "attack" the Yahoo Finance servers.
 
-    UI Feedback: Add the 10-second "Refresh" button lockout and gray-out effect to manage user expectations.
+    The "Black Box" Transaction Log: Introduce a TransactionEntity database table to track every add, edit, and price sync, providing the user with a historical "receipt" of their portfolio's growth.
 
-🧪 Testing the "Add Asset" Screen
+    Multi-Server Journey UI: Update the AmountEntryScreen to dynamically display the server currently being accessed (e.g., "Verifying listing on MEXC...").
 
-This is a critical test. When you add a new asset, the app usually has to:
+🧪 Status of the "Add Asset" Audit
 
-    Save the new item to the Database.
+    PASS: New assets land with full price and 24h data.
 
-    Fetch the initial price for that specific item.
+    PASS: Adding an asset triggers ZERO recursive sync loops.
 
-    Update the UI.
-
-The Danger Zone: If the "Add" logic triggers a refreshAll(), it might kick off the loop we just killed.
+    PASS: UI remains fluid and responsive during the background database write.

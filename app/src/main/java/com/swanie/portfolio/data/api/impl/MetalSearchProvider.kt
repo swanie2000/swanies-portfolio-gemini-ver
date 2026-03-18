@@ -2,7 +2,7 @@ package com.swanie.portfolio.data.api.impl
 
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchProvider
-import com.swanie.portfolio.data.api.SearchSymbol
+import com.swanie.portfolio.data.api.SearchResult
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.YahooFinanceApiService
@@ -18,12 +18,12 @@ class MetalSearchProvider @Inject constructor(
         "XAU" to "GC=F", "XAG" to "SI=F", "XPT" to "PL=F", "XPD" to "PA=F"
     )
 
-    override suspend fun search(query: String): List<SearchSymbol> {
+    override suspend fun search(query: String): List<SearchResult> {
         // Simple filter-based search for metals based on tickers
         return metalTickers.keys
             .filter { it.contains(query, ignoreCase = true) }
             .map { symbol ->
-                SearchSymbol(
+                SearchResult(
                     id = symbol,
                     symbol = symbol,
                     name = when(symbol) {
@@ -34,7 +34,8 @@ class MetalSearchProvider @Inject constructor(
                         else -> symbol
                     },
                     imageUrl = "",
-                    category = AssetCategory.METAL
+                    category = AssetCategory.METAL,
+                    priceSource = name
                 )
             }
     }
@@ -64,6 +65,7 @@ class MetalSearchProvider @Inject constructor(
                             sparklineData = closePrices,
                             baseSymbol = symbol,
                             officialSpotPrice = meta.regularMarketPrice,
+                            priceSource = name
                             // Note: High/Low are currently not stored in AssetEntity, 
                             // they are fetched on-demand for the Audit Screen.
                         )
