@@ -1,6 +1,7 @@
 package com.swanie.portfolio.ui.holdings
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -18,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
@@ -76,6 +79,19 @@ fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Mo
         val path = Path().apply { moveTo(points[0].x, points[0].y); for (i in 1 until points.size) lineTo(points[i].x, points[i].y) }
         drawPath(path, changeColor, style = Stroke(2.dp.toPx()))
     }
+}
+
+@Composable
+fun WatermarkBadge(source: String, color: Color, modifier: Modifier = Modifier) {
+    Text(
+        text = source.uppercase(),
+        color = color.copy(alpha = 0.3f), // ADAPTIVE COLOR
+        fontSize = 8.sp,
+        fontWeight = FontWeight.Black,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -208,36 +224,64 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }.clickable(enabled = !isEditing) { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    MetalIcon(asset.name, imageUrl = asset.imageUrl)
-                    if (asset.baseSymbol != "CUSTOM") {
-                        Spacer(Modifier.height(6.dp))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
-                    } else {
-                        Text(asset.symbol, color = cardText, fontWeight = FontWeight.Black, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+    
+    Box(modifier = modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }
+                .clickable(enabled = !isEditing) { onExpandToggle() },
+            colors = CardDefaults.cardColors(containerColor = cardBg),
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        MetalIcon(asset.name, imageUrl = asset.imageUrl)
+                        if (asset.baseSymbol != "CUSTOM") {
+                            Spacer(Modifier.height(6.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
+                        } else {
+                            Text(asset.symbol, color = cardText, fontWeight = FontWeight.Black, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+                        }
+                    }
+                    Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold);
+                        Text(formatAmount(asset.amountHeld), color = cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp);
+                        Box(modifier = Modifier.height(55.dp), contentAlignment = Alignment.Center) {
+                            val forced = if (asset.name.contains(" ") && !asset.name.contains("\n")) asset.name.replaceFirst(" ", "\n") else asset.name;
+                            Text(text = forced.uppercase(), color = cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 13.sp, maxLines = 3)
+                        }
+                    }
+                    Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) { 
+                        if (showEditButton && !isEditing) {
+                            IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) } 
+                        } else { 
+                            SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp).padding(top = 12.dp)); 
+                            Spacer(Modifier.height(4.dp)); 
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(20.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) } 
+                        } 
                     }
                 }
-                Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold);
-                    Text(formatAmount(asset.amountHeld), color = cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp);
-                    Box(modifier = Modifier.height(55.dp), contentAlignment = Alignment.Center) {
-                        val forced = if (asset.name.contains(" ") && !asset.name.contains("\n")) asset.name.replaceFirst(" ", "\n") else asset.name;
-                        Text(text = forced.uppercase(), color = cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 13.sp, maxLines = 3)
+                Spacer(Modifier.height(8.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f)); Spacer(Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
+                    val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }
+                    Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { 
+                        Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); 
+                        AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
                     }
+                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
                 }
-                Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) { if (showEditButton && !isEditing) IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) } else { SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp)); Spacer(Modifier.height(4.dp)); Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(20.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) } } }
-            }
-            Spacer(Modifier.height(8.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f)); Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
-                val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }
-                Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
-                Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
             }
         }
+        // ADAPTIVE TRUE TOP WATERMARK
+        WatermarkBadge(
+            source = asset.priceSource, 
+            color = cardText, 
+            modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
+        )
     }
 }
 
@@ -245,11 +289,107 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
 fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
     val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    Card(modifier = modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.imageUrl) }
-            Column(modifier = Modifier.weight(1f)) { AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp)); val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) }
-            SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp))
+    
+    Box(modifier = modifier.fillMaxWidth()) {
+        Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+            Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.imageUrl) }
+                Column(modifier = Modifier.weight(1f)) { 
+                    AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
+                    val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
+                    AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
+                }
+                SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
+            }
+        }
+        // ADAPTIVE TRUE TOP WATERMARK (Compact)
+        WatermarkBadge(
+            source = asset.priceSource, 
+            color = cardText,
+            modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
+        )
+    }
+}
+
+@Composable
+fun MetalMarketCard(
+    name: String,
+    symbol: String,
+    currentPrice: Double,
+    changePercent: Double,
+    dayHigh: Double,
+    dayLow: Double,
+    sparkline: List<Double>,
+    isOwned: Boolean,
+    cardBg: Color,
+    cardText: Color,
+    modifier: Modifier = Modifier
+) {
+    val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
+    
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(195.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 12.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = name.uppercase(), fontWeight = FontWeight.Black, color = cardText, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = symbol, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = cardText.copy(alpha = 0.4f))
+                        if (isOwned) {
+                            Text(text = "    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
+                        }
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    if (currentPrice > 0.0) {
+                        Text(text = formatCurrency(currentPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = trendColor)
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.5.dp, color = Color.Yellow)
+                    }
+                }
+            }
+
+            Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
+                if (sparkline.isNotEmpty()) {
+                    SparklineChart(sparkline, trendColor, Modifier.fillMaxSize())
+                } else if (currentPrice > 0.0) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = cardText.copy(0.2f))
+                }
+            }
+
+            Row(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 7.sp)
+                        Text("LOW", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 8.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    val lowStr = if (dayLow <= 0.0) "$ --.--" else formatCurrency(dayLow)
+                    Text(lowStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                }
+                Spacer(Modifier.weight(1f))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("DAY", fontSize = 7.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 7.sp)
+                        Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 8.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    val highStr = if (dayHigh <= 0.0) "$ --.--" else formatCurrency(dayHigh)
+                    Text(highStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
+                }
+            }
         }
     }
 }

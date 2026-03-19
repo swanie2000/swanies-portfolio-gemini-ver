@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.holdings
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -107,37 +109,80 @@ fun AssetPickerScreen(
                 }
             }
 
-            // THE SEARCH BOX: Enabled only after provider selection
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = {
-                    searchQuery = it
-                    viewModel.searchCoins(it)
-                },
-                enabled = selectedProvider != null,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { 
-                    Text(
-                        if (selectedProvider == null) "Select provider first..." else "Search assets...", 
-                        color = textColor.copy(alpha = 0.5f)
-                    ) 
-                },
-                leadingIcon = { Icon(Icons.Default.Search, null, tint = if (selectedProvider != null) textColor else textColor.copy(alpha = 0.3f)) },
-                trailingIcon = {
-                    if (isSearchBusy) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
+            if (selectedProvider == "YahooFinance") {
+                // YAHOO FINANCE SHORTCUT: Quick Metals Buttons
+                Text(
+                    text = "SELECT METAL TYPE",
+                    color = textColor.copy(alpha = 0.5f),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val metals = listOf("XAU" to "GOLD", "XAG" to "SILVER", "XPT" to "PLATINUM", "XPD" to "PALLADIUM")
+                    metals.forEach { (ticker, label) ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(0.05f))
+                                .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
+                                .clickable {
+                                    val asset = AssetEntity(
+                                        coinId = ticker,
+                                        symbol = ticker,
+                                        name = label,
+                                        imageUrl = "",
+                                        category = AssetCategory.METAL,
+                                        priceSource = "YahooFinance",
+                                        baseSymbol = ticker,
+                                        apiId = ticker
+                                    )
+                                    onAssetSelected(asset)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = label, color = Color.Yellow, fontSize = 9.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                        }
                     }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Yellow,
-                    unfocusedBorderColor = textColor.copy(alpha = 0.2f),
-                    disabledBorderColor = textColor.copy(alpha = 0.1f),
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    disabledTextColor = textColor.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
+                }
+            } else {
+                // STANDARD SEARCH BOX
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = {
+                        searchQuery = it
+                        viewModel.searchCoins(it)
+                    },
+                    enabled = selectedProvider != null,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    placeholder = { 
+                        Text(
+                            if (selectedProvider == null) "Select provider first..." else "Search assets...", 
+                            color = textColor.copy(alpha = 0.5f)
+                        ) 
+                    },
+                    leadingIcon = { Icon(Icons.Default.Search, null, tint = if (selectedProvider != null) textColor else textColor.copy(alpha = 0.3f)) },
+                    trailingIcon = {
+                        if (isSearchBusy) {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Yellow,
+                        unfocusedBorderColor = textColor.copy(alpha = 0.2f),
+                        disabledBorderColor = textColor.copy(alpha = 0.1f),
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
+                        disabledTextColor = textColor.copy(alpha = 0.3f)
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+            }
 
             Spacer(Modifier.height(8.dp))
 

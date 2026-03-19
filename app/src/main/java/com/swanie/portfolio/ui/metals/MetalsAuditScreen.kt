@@ -31,8 +31,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.repository.MarketPriceData
-import com.swanie.portfolio.ui.components.MetalMarketCard
 import com.swanie.portfolio.ui.holdings.AssetViewModel
+import com.swanie.portfolio.ui.holdings.MetalMarketCard // RESTORED IMPORT
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay

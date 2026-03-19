@@ -175,6 +175,11 @@ class AssetRepository @Inject constructor(
         val apiId = asset.apiId.ifBlank { asset.coinId }
         val source = asset.priceSource.ifBlank { "CoinGecko" }
         
+        // MEXC_TRACE: Log surgical add start
+        if (source == "MEXC") {
+            Log.d("MEXC_TRACE", "Surgical Add triggered for ${asset.symbol}")
+        }
+
         // Step A: Initial Save (Price 0.0)
         Log.d("ADD_TRACE", "STEP 3: DB_SAVE_INITIAL: ID=$apiId, SOURCE=$source")
         onStatusUpdate(0.2f, "Securing asset in local vault...")

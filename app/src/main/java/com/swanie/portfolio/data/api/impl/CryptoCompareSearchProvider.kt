@@ -55,7 +55,7 @@ class CryptoCompareSearchProvider @Inject constructor(
                         category = AssetCategory.CRYPTO,
                         currentPrice = usdData?.price ?: 0.0,
                         priceChange24h = usdData?.changePct24h ?: 0.0,
-                        sparklineData = emptyList(), // Sparkline fetched separately in surgical/sync
+                        sparklineData = emptyList(), 
                         baseSymbol = symbol,
                         apiId = symbol,
                         iconUrl = if (usdData?.imageUrl != null) "https://www.cryptocompare.com${usdData.imageUrl}" else "",
@@ -72,23 +72,33 @@ class CryptoCompareSearchProvider @Inject constructor(
     }
 
     /**
-     * Implementation of sparkline fetch for CryptoCompare.
+     * Implementation of sparkline fetch for CryptoCompare with specialized field validation.
      */
     suspend fun fetchSparkline(symbol: String): List<Double> {
-        Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching sparkline for $symbol...")
+        Log.d("CRYPTO_TRACE", "Attempting fetch for $symbol")
         return try {
-            val response = cryptoCompareApiService.getHistoryHour(fsym = symbol)
+            val response = cryptoCompareApiService.getHistoryHour(fsym = symbol, tsym = "USD", limit = 168)
+            
             if (response.isSuccessful) {
-                val historyData = response.body()?.data?.data ?: emptyList()
+                val body = response.body()
+                // DEEP VALIDATION: Checking the nested Data structure
+                Log.d("CRYPTO_TRACE", "Checking Data field: ${body?.data != null} | Checking nested Data list: ${body?.data?.data != null}")
+                
+                val historyData = body?.data?.data ?: emptyList()
                 val sparkline = historyData.map { it.close }
-                Log.d("ADD_TRACE", "PROVIDER_RESULT: Received ${sparkline.size} points for $symbol.")
+                
+                if (sparkline.isNotEmpty()) {
+                    Log.d("CRYPTO_TRACE", "SUCCESS: Received ${sparkline.size} points for $symbol.")
+                } else {
+                    Log.w("CRYPTO_TRACE", "EMPTY_RESULT: No history data found for $symbol")
+                }
                 sparkline
             } else {
-                Log.e("ADD_TRACE", "CryptoCompare History Error for $symbol: ${response.code()}")
+                Log.e("CRYPTO_TRACE", "HTTP_ERROR: ${response.code()} for $symbol")
                 emptyList()
             }
         } catch (e: Exception) {
-            Log.e("ADD_TRACE", "CryptoCompare Sparkline Error for $symbol: ${e.message}")
+            Log.e("CRYPTO_TRACE", "EXCEPTION for $symbol: ${e.message}")
             emptyList()
         }
     }

@@ -1,61 +1,27 @@
-I. The Updated Project Narrative: March 18, 2026
-✅ The "Surgical" Fortress (Current Stable State)
+PROJECT STATUS: SWANIE'S PORTFOLIO - "SURGICAL FORTRESS" (GOLD MASTER V1)
+LAST UPDATED: 2026-03-18
+CURRENT WINDOW: 2.5-hour "Ghost Hunt" & Data Strike (COMPLETED)
 
-    The Reset Mandate: The "429 Death Loop" is extinct. All network activity is manual or protected by a 30s cooldown.
+--- SESSION WINS & MILESTONES ---
 
-    Multi-Source Sparklines: MexcSearchProvider and CryptoCompareSearchProvider are fully wired. They successfully pull 168+ data points into the dashboard.
+1. THE GHOST BUSTED: Successfully identified and deleted the redundant 'AssetCards.kt' in 'ui.components' that was hijacking the UI. All cards are now correctly sourced from 'ui.holdings'.
+2. THE ADAPTIVE WATERMARK: Implemented a professional, top-aligned source label. It dynamically samples the card's text color at 30% alpha and is offset to the absolute top edge of the card.
+3. MEXC PIPELINE RESTORED: Fixed the HTTP 400 error by standardizing on uppercase symbols and the '60m' interval. RAY and GHT are now officially pulling 168-point sparklines.
+4. METALS ONE-TAP UI: Replaced the clunky Yahoo Finance search with 4 premium "Shortcut Buttons" (GOLD, SILVER, PLATINUM, PALLADIUM). Tapping a button triggers an instant "Surgical Add."
+5. CRYPTOCOMPARE VALIDATION: Verified the 'Data.Data' JSON structure. Major assets (BTC) are graphing perfectly. Identified 'MEC' as a provider history gap (0 points returned by server).
 
-    Persistence of Order: Reordering is locked. AssetDao uses ORDER BY displayOrder ASC, and manual drags are persisted to the DB immediately.
+--- CURRENT ARCHITECTURE ---
 
-    MEXC 400 Fallback: A "New Listing" safety net is active. If MEXC returns a 400 error (not enough history), the app automatically retries with a 48h limit instead of 168h.
+- UI SOURCE: 'app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt'
+- REPOSITORY: 'AssetRepository.kt' (Manages the 'Surgical Add' and DB synchronization)
+- PROVIDERS: MexcSearchProvider (60m interval), CryptoCompareSearchProvider (v2/histohour), Yahoo (Metal Tickers)
+- DB CONVERTERS: Corrected to handle List<Double> for sparkline persistence.
 
-    The Black Box Ledger: Every asset addition is permanently logged in a TransactionEntity, creating a historical "birth certificate" for every coin.
+--- THE ROAD AHEAD (NEXT SESSION) ---
 
-    The Search Gatekeeper: 700ms debounce and mandatory provider selection protect API quotas from user spam.
+1. THE GREAT FALLBACK: Implement logic to automatically try an alternative provider (e.g., CoinGecko) if the primary provider returns 0 points or a "No History" error.
+2. EMPTY STATE RECOGNITION: Add a "No History Available" subtle text overlay for coins like MEC so the user knows the flat line is a data gap, not a bug.
+3. ANALYTICS SYNC: Now that prices are accurate and sparklines are live, begin the audit of the "Total Portfolio Value" calculation to ensure it reflects real-time MEXC/Yahoo/CG data.
+4. PORTFOLIO REBUILD: Safely re-import the remaining assets from the master list using the now-stable "Surgical Add" flow.
 
-⚠️ Current Blockers (The "Ghost" Audit)
-
-    The Visibility Gap: Source labels (COINGECKO, MEXC, etc.) are invisible in the UI, and UI_TRACE logs are missing from Logcat.
-
-    The Theory: The agent is editing a duplicate or "Ghost" version of AssetCards.kt that the MyHoldingsScreen is not actually importing.
-
-II. The "Master Rebuild" Instruction
-
-Copy and paste this entire block to the agent when the rate limit resets:
-
-    Subject: Master Rebuild & Ghost File Resolution
-
-    We are syncing the codebase to the "Gold Master" state. We have verified data and persistence, but we have a Dead Code issue in the UI. Execute the following:
-
-    1. The Import Audit (CRITICAL):
-    Open MyHoldingsScreen.kt. Identify the exact file path for the FullAssetCard and CompactAssetCard imports. You must edit the file at that specific path. If there are duplicates in ui.components and ui.theme, delete the one NOT being imported.
-
-    2. The Universal Source Badge:
-    In the active AssetCards.kt, force every card to show its priceSource.
-
-        Style: A subtle "Pill" badge (10sp, Bold, 60% alpha).
-
-        Logic: No if statements. Every card (including CoinGecko) must display its source.
-
-        Visibility: Use a high-contrast color (Primary) and a zIndex(1f) to ensure it isn't hidden behind the sparkline.
-
-        Log: Add Log.d("UI_TRACE", "DRAWING: ${asset.symbol} from ${asset.priceSource}") inside the card's root.
-
-    3. MEXC Reliability:
-    Ensure MexcSearchProvider.kt contains the try-catch fallback: If an HTTP 400 occurs, retry the fetch with limit=48.
-
-    4. Reordering Persistence:
-    Ensure AssetDao.kt remains locked to ORDER BY displayOrder ASC and the LazyColumn key is { it.coinId }.
-
-    5. Build Safety:
-    Ensure no dangling function references like Modifier.scale. All modifiers must be properly invoked (e.g., .scale(1f)).
-
-    Goal: Build the app. I must see 'COINGECKO', 'MEXC', or 'CRYPTOCOMPARE' on every card, and the UI_TRACE must appear in Logcat.
-
-III. Technical Verification Ledger
-Requirement	Implementation Detail
-API Safety	700ms Search Debounce
-Data Integrity	Converters.kt (String to List)
-History Logic	histohour (CryptoCompare) & kline (MEXC)
-DB Sorting	displayOrder Column (v5 Migration)
-UI Model	Asset data class must include priceSource: String
+--- END OF FILE ---
