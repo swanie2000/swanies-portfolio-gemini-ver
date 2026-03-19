@@ -173,31 +173,33 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: SWANIE'S PORTFOLIO - "SURGICAL FORTRESS" (GOLD MASTER V1)
-LAST UPDATED: 2026-03-18
-CURRENT WINDOW: 2.5-hour "Ghost Hunt" & Data Strike (COMPLETED)
+SwaniesPortfolio_Narrative_2026-03-19.txt
+Plaintext
+
+PROJECT STATUS: SWANIE'S PORTFOLIO - "SURGICAL FORTRESS" (GOLD MASTER V2)
+LAST UPDATED: 2026-03-19
+SESSION: 2-hour "Exchange Professional" Migration (COMPLETED)
 
 --- SESSION WINS & MILESTONES ---
 
-1. THE GHOST BUSTED: Successfully identified and deleted the redundant 'AssetCards.kt' in 'ui.components' that was hijacking the UI. All cards are now correctly sourced from 'ui.holdings'.
-2. THE ADAPTIVE WATERMARK: Implemented a professional, top-aligned source label. It dynamically samples the card's text color at 30% alpha and is offset to the absolute top edge of the card.
-3. MEXC PIPELINE RESTORED: Fixed the HTTP 400 error by standardizing on uppercase symbols and the '60m' interval. RAY and GHT are now officially pulling 168-point sparklines.
-4. METALS ONE-TAP UI: Replaced the clunky Yahoo Finance search with 4 premium "Shortcut Buttons" (GOLD, SILVER, PLATINUM, PALLADIUM). Tapping a button triggers an instant "Surgical Add."
-5. CRYPTOCOMPARE VALIDATION: Verified the 'Data.Data' JSON structure. Major assets (BTC) are graphing perfectly. Identified 'MEC' as a provider history gap (0 points returned by server).
+1. PROVIDER PIVOT: Retired MEXC and Binance (HTTP 451 geoblocked). Successfully migrated architecture to Coinbase (US-Stable) and KuCoin (Altcoin-Stable) for 100% legal and stable connectivity.
+2. COINBASE MASTER LIST: Tapped into the Exchange API to fetch 467 assets. Implemented local master-list filtering for instant, lag-free searching and bypass of the 0-result bug.
+3. SPARKLINE OHLC FIX: Calibrated candlestick index mapping (KuCoin Index 2, Coinbase Index 4). All crypto assets now draw accurate 168-hour hourly graphs with left-to-right chronological reversal.
+4. IDENTITY RESTORED: Resolved the 'UNKNOWN' asset label bug. Assets are now correctly mapped to their base symbols (e.g., 'RAY') and display professional logos via native and GitHub-hosted CDNs.
+5. BUILD & LOCKDOWN: Cleared Dagger/Hilt MissingBinding errors and implemented 'toDoubleOrNull' safety shields. Pushed 634 insertions to GitHub (Commit 7b50e99). The Fortress is now exchange-grade.
 
 --- CURRENT ARCHITECTURE ---
 
-- UI SOURCE: 'app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt'
-- REPOSITORY: 'AssetRepository.kt' (Manages the 'Surgical Add' and DB synchronization)
-- PROVIDERS: MexcSearchProvider (60m interval), CryptoCompareSearchProvider (v2/histohour), Yahoo (Metal Tickers)
-- DB CONVERTERS: Corrected to handle List<Double> for sparkline persistence.
+- REPOSITORY: 'AssetRepository.kt' (Handles surgical migration and routes sparklines to the new Exchange-Direct providers).
+- PROVIDERS: CoinbaseSearchProvider (Exchange API), KuCoinSearchProvider (Hyphenated Symbol Logic), Yahoo Finance (Metals Shortcut UI).
+- UI: 'HoldingsUIComponents.kt' (Unified source for all cards with adaptive watermarks and high-resolution logo support).
 
---- THE ROAD AHEAD (NEXT SESSION) ---
+--- THE ROAD AHEAD ---
 
-1. THE GREAT FALLBACK: Implement logic to automatically try an alternative provider (e.g., CoinGecko) if the primary provider returns 0 points or a "No History" error.
-2. EMPTY STATE RECOGNITION: Add a "No History Available" subtle text overlay for coins like MEC so the user knows the flat line is a data gap, not a bug.
-3. ANALYTICS SYNC: Now that prices are accurate and sparklines are live, begin the audit of the "Total Portfolio Value" calculation to ensure it reflects real-time MEXC/Yahoo/CG data.
-4. PORTFOLIO REBUILD: Safely re-import the remaining assets from the master list using the now-stable "Surgical Add" flow.
+1. THE COINGECKO FALLBACK (PLAN C): Integrate CoinGecko as the global safety net for obscure assets not listed on major exchanges and as a secondary high-resolution icon source.
+2. THE GREAT FALLBACK: Implement logic to automatically attempt a secondary provider fetch if the primary exchange returns a 0-point sparkline or a pricing error.
+3. ANALYTICS AUDIT: Now that exchange prices are precision-accurate, perform a full audit of the "Total Portfolio Value" math to ensure it matches real-time exchange data.
+4. BULK RE-IMPORT: Safely re-populate the portfolio using the now-stable Coinbase and KuCoin "Surgical Add" pipelines.
 
 --- END OF FILE ---
 ### END_NARRATIVE
@@ -206,20 +208,13 @@ CURRENT WINDOW: 2.5-hour "Ghost Hunt" & Data Strike (COMPLETED)
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Wed 03/18/2026 20:43:02.95
+Generated: Thu 03/19/2026 15:39:50.63
 
 Branch:
 main
 Commit:
-b1b4da9c0dd76c4227ea9416a55d7f64b4820889
+7b50e99a5d555944c685bf597d2d9d2bbfb55415
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
-D  app/src/main/java/com/swanie/portfolio/ui/components/AssetCards.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt
- M app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -243,8 +238,11 @@ app/src/main/java/com/swanie/portfolio/PortfolioApplication.kt
 app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/data/api/SearchEngineRegistry.kt
 app/src/main/java/com/swanie/portfolio/data/api/SearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/BinanceSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/CoinbaseSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/KuCoinSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
@@ -255,9 +253,12 @@ app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/Converters.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
+app/src/main/java/com/swanie/portfolio/data/network/BinanceApiService.kt
+app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinMarketResponse.kt
 app/src/main/java/com/swanie/portfolio/data/network/CryptoCompareApiService.kt
+app/src/main/java/com/swanie/portfolio/data/network/KuCoinApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/MexcApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceApiService.kt
