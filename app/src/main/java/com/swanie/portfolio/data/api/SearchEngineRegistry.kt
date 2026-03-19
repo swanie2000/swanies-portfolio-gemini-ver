@@ -2,7 +2,8 @@ package com.swanie.portfolio.data.api
 
 import com.swanie.portfolio.data.api.impl.CoinGeckoSearchProvider
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
-import com.swanie.portfolio.data.api.impl.MexcSearchProvider
+import com.swanie.portfolio.data.api.impl.KuCoinSearchProvider
+import com.swanie.portfolio.data.api.impl.CoinbaseSearchProvider
 import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -11,7 +12,8 @@ import javax.inject.Singleton
 class SearchEngineRegistry @Inject constructor(
     coinGeckoProvider: CoinGeckoSearchProvider,
     metalProvider: MetalSearchProvider,
-    mexcProvider: MexcSearchProvider,
+    kuCoinProvider: KuCoinSearchProvider,
+    coinbaseProvider: CoinbaseSearchProvider,
     cryptoCompareProvider: CryptoCompareSearchProvider
 ) {
     private val providers = mutableMapOf<String, SearchProvider>()
@@ -19,7 +21,8 @@ class SearchEngineRegistry @Inject constructor(
     init {
         providers[coinGeckoProvider.name] = coinGeckoProvider
         providers[metalProvider.name] = metalProvider
-        providers[mexcProvider.name] = mexcProvider
+        providers[kuCoinProvider.name] = kuCoinProvider
+        providers[coinbaseProvider.name] = coinbaseProvider
         providers[cryptoCompareProvider.name] = cryptoCompareProvider
     }
 

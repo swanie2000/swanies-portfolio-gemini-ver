@@ -2,7 +2,8 @@ package com.swanie.portfolio.di
 
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.YahooFinanceApiService
-import com.swanie.portfolio.data.network.MexcApiService
+import com.swanie.portfolio.data.network.KuCoinApiService
+import com.swanie.portfolio.data.network.CoinbaseApiService
 import com.swanie.portfolio.data.network.CryptoCompareApiService
 import dagger.Module
 import dagger.Provides
@@ -35,9 +36,17 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("MEXC")
-    fun provideMexcRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.mexc.com/")
+    @Named("KuCoin")
+    fun provideKuCoinRetrofit(): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.kucoin.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    @Provides
+    @Singleton
+    @Named("Coinbase")
+    fun provideCoinbaseRetrofit(): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.coinbase.com/v2/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -63,9 +72,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMexcApiService(
-        @Named("MEXC") retrofit: Retrofit
-    ): MexcApiService = retrofit.create(MexcApiService::class.java)
+    fun provideKuCoinApiService(
+        @Named("KuCoin") retrofit: Retrofit
+    ): KuCoinApiService = retrofit.create(KuCoinApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCoinbaseApiService(
+        @Named("Coinbase") retrofit: Retrofit
+    ): CoinbaseApiService = retrofit.create(CoinbaseApiService::class.java)
 
     @Provides
     @Singleton

@@ -23,11 +23,13 @@ class MexcSearchProvider @Inject constructor(
                 .filter { it.quoteAsset == "USDT" && (it.baseAsset.contains(query, ignoreCase = true) || it.symbol.contains(query, ignoreCase = true)) }
                 .take(20)
                 .map { symbol ->
+                    val iconUrl = "https://www.mexc.com/coin/icon/${symbol.baseAsset.lowercase()}.png"
+                    Log.d("ICON_TRACE", "Generated Icon URL for ${symbol.baseAsset}: $iconUrl")
                     SearchResult(
                         id = symbol.symbol,
                         symbol = symbol.baseAsset,
                         name = "${symbol.baseAsset} (MEXC)",
-                        imageUrl = "", // MEXC API doesn't provide icons in exchangeInfo
+                        imageUrl = iconUrl,
                         category = AssetCategory.CRYPTO,
                         priceSource = name
                     )
@@ -146,18 +148,22 @@ class MexcSearchProvider @Inject constructor(
     }
 
     private fun createAssetEntity(ticker: com.swanie.portfolio.data.network.MexcTicker24h): AssetEntity {
+        val symbolOnly = ticker.symbol.replace("USDT", "")
+        val iconUrl = "https://www.mexc.com/coin/icon/${symbolOnly.lowercase()}.png"
+        Log.d("ICON_TRACE", "Generated Entity Icon URL for $symbolOnly: $iconUrl")
+
         return AssetEntity(
             coinId = ticker.symbol,
-            symbol = ticker.symbol.replace("USDT", ""),
-            name = ticker.symbol.replace("USDT", ""),
-            imageUrl = "",
+            symbol = symbolOnly,
+            name = symbolOnly,
+            imageUrl = iconUrl,
             category = AssetCategory.CRYPTO,
             currentPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0,
             priceChange24h = ticker.priceChangePercent.replace("%", "").toDoubleOrNull() ?: 0.0,
             sparklineData = emptyList(),
-            baseSymbol = ticker.symbol.replace("USDT", ""),
+            baseSymbol = symbolOnly,
             apiId = ticker.symbol,
-            iconUrl = "",
+            iconUrl = iconUrl,
             priceSource = name
         )
     }
