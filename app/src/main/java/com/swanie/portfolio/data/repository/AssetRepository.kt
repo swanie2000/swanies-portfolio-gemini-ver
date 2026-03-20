@@ -6,6 +6,7 @@ import com.swanie.portfolio.data.api.impl.MetalSearchProvider
 import com.swanie.portfolio.data.api.impl.KuCoinSearchProvider
 import com.swanie.portfolio.data.api.impl.CoinbaseSearchProvider
 import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
+import com.swanie.portfolio.data.api.impl.CoinGeckoSearchProvider
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.network.CoinMarketResponse
@@ -86,31 +87,41 @@ class AssetRepository @Inject constructor(
                         val ids = if (assets.any { it.category == AssetCategory.METAL }) "" 
                                  else assets.joinToString(",") { it.apiId.ifBlank { it.coinId } }
                         
-                        val freshData = provider.getPrices(ids)
+                        var freshData = try {
+                            provider.getPrices(ids)
+                        } catch (e: Exception) {
+                            Log.w("AssetRepository", "Primary provider $source failed. Falling back to CoinGecko.")
+                            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
+                            cgProvider?.getPrices(ids) ?: emptyList()
+                        }
+
+                        // If primary returned empty, also try fallback
+                        if (freshData.isEmpty() && source != "CoinGecko" && source != "YahooFinance") {
+                            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
+                            freshData = cgProvider?.getPrices(ids) ?: emptyList()
+                        }
+
                         val dataMap = freshData.associateBy { if (it.category == AssetCategory.METAL) it.baseSymbol else it.coinId }
                         
                         val updatedAssets = assets.map { asset ->
                             val key = if (asset.category == AssetCategory.METAL) asset.baseSymbol else asset.coinId
                             dataMap[key]?.let { fresh ->
                                 // BRIDGE: Fetch Sparkline if missing
-                                val updatedSparkline = if (asset.sparklineData.isEmpty()) {
+                                var updatedSparkline = if (asset.sparklineData.isEmpty() || asset.sparklineData.size < 10) {
                                     when (source) {
                                         "KuCoin" -> {
                                             if (provider is KuCoinSearchProvider) {
-                                                provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                            } else asset.sparklineData
+                                                val spark = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
+                                                if (spark.isEmpty()) fetchFallbackSparkline(asset.coinId) else spark
+                                            } else fetchFallbackSparkline(asset.coinId)
                                         }
                                         "Coinbase" -> {
                                             if (provider is CoinbaseSearchProvider) {
-                                                provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                            } else asset.sparklineData
+                                                val spark = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
+                                                if (spark.isEmpty()) fetchFallbackSparkline(asset.coinId) else spark
+                                            } else fetchFallbackSparkline(asset.coinId)
                                         }
-                                        "CryptoCompare" -> {
-                                            if (provider is CryptoCompareSearchProvider) {
-                                                provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                            } else asset.sparklineData
-                                        }
-                                        else -> if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else asset.sparklineData
+                                        else -> if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else fetchFallbackSparkline(asset.coinId)
                                     }
                                 } else {
                                     if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else asset.sparklineData
@@ -138,6 +149,21 @@ class AssetRepository @Inject constructor(
         }
     }
 
+    private suspend fun fetchFallbackSparkline(coinId: String): List<Double> {
+        return try {
+            Log.d("AssetRepository", "Fetching fallback sparkline from CoinGecko for $coinId")
+            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
+            val response = coinGeckoApiService.getCoinMarkets(ids = coinId, sparkline = true)
+            if (response.isSuccessful) {
+                response.body()?.firstOrNull()?.sparklineIn7d?.price ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
     suspend fun executeSurgicalAdd(
         asset: AssetEntity,
         onStatusUpdate: (Float, String) -> Unit
@@ -152,7 +178,18 @@ class AssetRepository @Inject constructor(
         
         try {
             val provider = searchRegistry.getProvider(source) ?: searchRegistry.getDefaultProvider()
-            val freshList = provider.getPrices(apiId)
+            var freshList = try {
+                provider.getPrices(apiId)
+            } catch (e: Exception) {
+                emptyList()
+            }
+
+            // Fallback for surgical add
+            if (freshList.isEmpty() && source != "CoinGecko") {
+                val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
+                freshList = cgProvider?.getPrices(apiId) ?: emptyList()
+            }
+
             val freshData = freshList.firstOrNull()
 
             if (freshData != null) {
@@ -162,20 +199,17 @@ class AssetRepository @Inject constructor(
                 val finalSparkline = when (source) {
                     "KuCoin" -> {
                         if (provider is KuCoinSearchProvider) {
-                            provider.fetchSparkline(apiId)
-                        } else emptyList()
+                            val s = provider.fetchSparkline(apiId)
+                            if (s.isEmpty()) fetchFallbackSparkline(asset.coinId) else s
+                        } else fetchFallbackSparkline(asset.coinId)
                     }
                     "Coinbase" -> {
                         if (provider is CoinbaseSearchProvider) {
-                            provider.fetchSparkline(apiId)
-                        } else emptyList()
+                            val s = provider.fetchSparkline(apiId)
+                            if (s.isEmpty()) fetchFallbackSparkline(asset.coinId) else s
+                        } else fetchFallbackSparkline(asset.coinId)
                     }
-                    "CryptoCompare" -> {
-                        if (provider is CryptoCompareSearchProvider) {
-                            provider.fetchSparkline(apiId)
-                        } else emptyList()
-                    }
-                    else -> freshData.sparklineData
+                    else -> if (freshData.sparklineData.isNotEmpty()) freshData.sparklineData else fetchFallbackSparkline(asset.coinId)
                 }
 
                 onStatusUpdate(0.9f, "Success! Finalizing portfolio...")

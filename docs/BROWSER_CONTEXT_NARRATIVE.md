@@ -1,6 +1,3 @@
-SwaniesPortfolio_Narrative_2026-03-19.txt
-Plaintext
-
 PROJECT STATUS: SWANIE'S PORTFOLIO - "SURGICAL FORTRESS" (GOLD MASTER V2)
 LAST UPDATED: 2026-03-19
 SESSION: 2-hour "Exchange Professional" Migration (COMPLETED)
@@ -19,11 +16,12 @@ SESSION: 2-hour "Exchange Professional" Migration (COMPLETED)
 - PROVIDERS: CoinbaseSearchProvider (Exchange API), KuCoinSearchProvider (Hyphenated Symbol Logic), Yahoo Finance (Metals Shortcut UI).
 - UI: 'HoldingsUIComponents.kt' (Unified source for all cards with adaptive watermarks and high-resolution logo support).
 
---- THE ROAD AHEAD ---
+--- THE ROAD AHEAD (V3: CONNECTIVITY & CONVENIENCE) ---
 
-1. THE COINGECKO FALLBACK (PLAN C): Integrate CoinGecko as the global safety net for obscure assets not listed on major exchanges and as a secondary high-resolution icon source.
-2. THE GREAT FALLBACK: Implement logic to automatically attempt a secondary provider fetch if the primary exchange returns a 0-point sparkline or a pricing error.
-3. ANALYTICS AUDIT: Now that exchange prices are precision-accurate, perform a full audit of the "Total Portfolio Value" math to ensure it matches real-time exchange data.
-4. BULK RE-IMPORT: Safely re-populate the portfolio using the now-stable Coinbase and KuCoin "Surgical Add" pipelines.
+1. INSTANT VIEW TOGGLE: Add a "Compact/Full" toggle button directly to the Main Holdings header. Connect it to AssetViewModel/UserPreferences to eliminate navigation to the Settings menu.
+2. THE COINGECKO SAFETY NET (PLAN C): Implement "Fall-through" repository logic. If a primary exchange (Coinbase/KuCoin) fails or lacks history, automatically trigger a CoinGecko backup fetch.
+3. GLANCE WIDGET PROTOTYPE: Design and implement a modern Jetpack Glance home-screen widget to display Top 3 Holdings, Total Portfolio Value, and simplified sparkline "pulse" views.
+4. ICON RECOVERY & SCRAPER: Utilize the CoinGecko Safety Net to scrape high-resolution icons for any obscure assets missing logos in the primary exchange-direct providers.
+5. ANALYTICS AUDIT: Perform a full audit of the "Total Portfolio Value" math against the now-stable real-time exchange data to ensure 100% precision in gains/loss tracking.
 
 --- END OF FILE ---

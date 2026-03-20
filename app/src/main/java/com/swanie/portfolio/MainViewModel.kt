@@ -38,4 +38,8 @@ class MainViewModel @Inject constructor(
     fun setConfirmDelete(enabled: Boolean) = viewModelScope.launch {
         themePreferences.saveConfirmDelete(enabled)
     }
+
+    fun toggleCompactView() = viewModelScope.launch {
+        themePreferences.saveIsCompactViewEnabled(!isCompactViewEnabled.value)
+    }
 }
