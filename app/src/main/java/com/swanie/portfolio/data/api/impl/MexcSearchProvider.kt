@@ -158,7 +158,7 @@ class MexcSearchProvider @Inject constructor(
             name = symbolOnly,
             imageUrl = iconUrl,
             category = AssetCategory.CRYPTO,
-            currentPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0,
+            officialSpotPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0, // ALIGNED V6
             priceChange24h = ticker.priceChangePercent.replace("%", "").toDoubleOrNull() ?: 0.0,
             sparklineData = emptyList(),
             baseSymbol = symbolOnly,

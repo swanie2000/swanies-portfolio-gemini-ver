@@ -2,269 +2,133 @@ package com.swanie.portfolio.data.repository
 
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
-import com.swanie.portfolio.data.api.impl.MetalSearchProvider
-import com.swanie.portfolio.data.api.impl.KuCoinSearchProvider
-import com.swanie.portfolio.data.api.impl.CoinbaseSearchProvider
-import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
-import com.swanie.portfolio.data.api.impl.CoinGeckoSearchProvider
-import com.swanie.portfolio.data.local.*
-import com.swanie.portfolio.data.network.CoinGeckoApiService
-import com.swanie.portfolio.data.network.CoinMarketResponse
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import com.swanie.portfolio.data.local.AssetDao
+import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetCategory
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
-    private val transactionDao: TransactionDao,
-    private val coinGeckoApiService: CoinGeckoApiService,
-    private val syncCoordinator: DataSyncCoordinator,
-    private val searchRegistry: SearchEngineRegistry
+    private val searchRegistry: SearchEngineRegistry,
+    private val syncCoordinator: DataSyncCoordinator
 ) {
     val allAssets = assetDao.getAllAssets()
 
-    private var lastMetalsRefreshTime = 0L
-    private val METALS_REFRESH_THRESHOLD = 30_000L // 30 Seconds
-
-    suspend fun refreshMarketWatch() {
-        val currentTime = System.currentTimeMillis()
-        val timeSinceLastRefresh = currentTime - lastMetalsRefreshTime
+    suspend fun refreshAssets(force: Boolean = false) {
+        if (!syncCoordinator.canRefresh(force)) return
         
-        if (timeSinceLastRefresh < METALS_REFRESH_THRESHOLD) {
-            val remaining = (METALS_REFRESH_THRESHOLD - timeSinceLastRefresh) / 1000
-            Log.d("ADD_TRACE", "METALS_SHIELD: Refresh blocked. Cooldown active (Remaining: ${remaining}s)")
-            return
-        }
-
+        var isSuccess = false
         try {
-            val metals = listOf("XAU", "XAG", "XPT", "XPD")
-            metals.forEach { symbol ->
-                fetchMarketPrice(symbol) 
+            syncCoordinator.startSync()
+            val assets = assetDao.getAllAssetsOnce()
+            if (assets.isEmpty()) {
+                isSuccess = true
+                return
             }
-            lastMetalsRefreshTime = System.currentTimeMillis()
+
+            assets.groupBy { it.priceSource }.forEach { (sourceName, providerAssets) ->
+                val provider = searchRegistry.getProvider(sourceName) ?: return@forEach
+                
+                val idString = if (sourceName.equals("CoinGecko", ignoreCase = true)) {
+                    providerAssets.joinToString(",") { it.apiId }
+                } else {
+                    providerAssets.joinToString(",") { it.symbol }
+                }
+
+                val updatedList = provider.getPrices(idString)
+
+                providerAssets.forEach { existing ->
+                    updatedList.find { it.symbol.equals(existing.symbol, ignoreCase = true) }?.let { update ->
+                        assetDao.upsertAsset(existing.copy(
+                            officialSpotPrice = update.officialSpotPrice,
+                            priceChange24h = update.priceChange24h,
+                            sparklineData = if (update.sparklineData.isNotEmpty()) update.sparklineData else existing.sparklineData,
+                            imageUrl = if (existing.imageUrl.isEmpty()) update.imageUrl else existing.imageUrl,
+                            lastUpdated = System.currentTimeMillis()
+                        ))
+                    }
+                }
+            }
+            isSuccess = true
         } catch (e: Exception) {
-            Log.e("AssetRepository", "refreshMarketWatch failed: ${e.message}")
+            Log.e("REPO_REFRESH", "Error: ${e.message}")
+            isSuccess = false
+        } finally {
+            syncCoordinator.endSync(isSuccess)
+        }
+    }
+
+    /**
+     * SURGICAL: Live data fetch for a single asset.
+     * Used by AmountEntryViewModel to ensure assets land with data.
+     */
+    suspend fun fetchLiveAssetData(asset: AssetEntity): AssetEntity {
+        return try {
+            val provider = searchRegistry.getProvider(asset.priceSource) ?: return asset
+            
+            // Dispatch correctly: CoinGecko needs ID, others need Symbol
+            val idString = if (asset.priceSource.equals("CoinGecko", true)) asset.apiId else asset.symbol
+            
+            val updates = provider.getPrices(idString)
+            val liveMatch = updates.find { it.symbol.equals(asset.symbol, true) }
+            
+            if (liveMatch != null) {
+                asset.copy(
+                    officialSpotPrice = liveMatch.officialSpotPrice,
+                    priceChange24h = liveMatch.priceChange24h,
+                    sparklineData = liveMatch.sparklineData,
+                    lastUpdated = System.currentTimeMillis()
+                )
+            } else {
+                asset
+            }
+        } catch (e: Exception) {
+            Log.e("REPO_LIVE_FETCH", "Failed: ${e.message}")
+            asset
+        }
+    }
+
+    suspend fun addAsset(asset: AssetEntity) {
+        assetDao.upsertAsset(asset)
+    }
+
+    suspend fun deleteAsset(asset: AssetEntity) {
+        assetDao.deleteAssetById(asset.coinId)
+    }
+
+    suspend fun updateAssetOrder(assets: List<AssetEntity>) {
+        assetDao.updateAssetOrder(assets)
+    }
+
+    suspend fun updateAssetEntity(asset: AssetEntity) {
+        assetDao.updateAssetEntity(asset)
+    }
+
+    suspend fun toggleWidgetVisibility(id: String, isVisible: Boolean) {
+        assetDao.updateWidgetVisibility(id, isVisible)
+    }
+
+    suspend fun executeSurgicalAdd(asset: AssetEntity, callback: (Boolean, String) -> Unit) {
+        try {
+            assetDao.upsertAsset(asset)
+            callback(true, "Asset added successfully")
+        } catch (e: Exception) {
+            callback(false, e.message ?: "Unknown error")
         }
     }
 
     suspend fun fetchMarketPrice(symbol: String): MarketPriceData {
-        return try {
-            val provider = searchRegistry.getMetalProvider() as? MetalSearchProvider
-            if (provider != null) {
-                provider.fetchMarketData(symbol)
-            } else {
-                MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
-            }
-        } catch (e: Exception) {
-            Log.e("AssetRepository", "fetchMarketPrice failed for $symbol: ${e.message}")
-            MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList())
+        val provider = searchRegistry.getProvider("YahooFinance")
+        return if (provider is com.swanie.portfolio.data.api.impl.MetalSearchProvider) {
+            provider.fetchMarketData(symbol)
+        } else {
+            MarketPriceData()
         }
     }
 
-    suspend fun refreshAssets(force: Boolean = false) = coroutineScope {
-        val allLocalAssets = assetDao.getAllAssetsOnce()
-        val hasHoles = allLocalAssets.any { it.currentPrice <= 0.0 && it.category == AssetCategory.CRYPTO }
-        val shouldBypass = force || hasHoles
-
-        if (!syncCoordinator.canRefresh(shouldBypass)) {
-            Log.d("SWAN_SYNC", "Repository: Refresh blocked by Rate Limiter.")
-            return@coroutineScope
-        }
-        
-        syncCoordinator.startSync()
-        var success = true
-
-        try {
-            if (allLocalAssets.isNotEmpty()) {
-                val groupedBySource = allLocalAssets.groupBy { it.priceSource }
-                
-                groupedBySource.forEach { (source, assets) ->
-                    val provider = searchRegistry.getProvider(source) ?: searchRegistry.getDefaultProvider()
-                    
-                    try {
-                        val ids = if (assets.any { it.category == AssetCategory.METAL }) "" 
-                                 else assets.joinToString(",") { it.apiId.ifBlank { it.coinId } }
-                        
-                        var freshData = try {
-                            provider.getPrices(ids)
-                        } catch (e: Exception) {
-                            Log.w("AssetRepository", "Primary provider $source failed. Falling back to CoinGecko.")
-                            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
-                            cgProvider?.getPrices(ids) ?: emptyList()
-                        }
-
-                        // If primary returned empty, also try fallback
-                        if (freshData.isEmpty() && source != "CoinGecko" && source != "YahooFinance") {
-                            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
-                            freshData = cgProvider?.getPrices(ids) ?: emptyList()
-                        }
-
-                        val dataMap = freshData.associateBy { if (it.category == AssetCategory.METAL) it.baseSymbol else it.coinId }
-                        
-                        val updatedAssets = assets.map { asset ->
-                            val key = if (asset.category == AssetCategory.METAL) asset.baseSymbol else asset.coinId
-                            dataMap[key]?.let { fresh ->
-                                // BRIDGE: Fetch Sparkline if missing
-                                var updatedSparkline = if (asset.sparklineData.isEmpty() || asset.sparklineData.size < 10) {
-                                    when (source) {
-                                        "KuCoin" -> {
-                                            if (provider is KuCoinSearchProvider) {
-                                                val spark = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                                if (spark.isEmpty()) fetchFallbackSparkline(asset.coinId) else spark
-                                            } else fetchFallbackSparkline(asset.coinId)
-                                        }
-                                        "Coinbase" -> {
-                                            if (provider is CoinbaseSearchProvider) {
-                                                val spark = provider.fetchSparkline(asset.apiId.ifBlank { asset.coinId })
-                                                if (spark.isEmpty()) fetchFallbackSparkline(asset.coinId) else spark
-                                            } else fetchFallbackSparkline(asset.coinId)
-                                        }
-                                        else -> if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else fetchFallbackSparkline(asset.coinId)
-                                    }
-                                } else {
-                                    if (fresh.sparklineData.isNotEmpty()) fresh.sparklineData else asset.sparklineData
-                                }
-
-                                asset.copy(
-                                    currentPrice = fresh.currentPrice,
-                                    sparklineData = updatedSparkline,
-                                    priceChange24h = fresh.priceChange24h,
-                                    lastUpdated = System.currentTimeMillis()
-                                )
-                            } ?: asset
-                        }
-                        assetDao.upsertAll(updatedAssets)
-                    } catch (e: Exception) {
-                        Log.e("AssetRepository", "Refresh failed for source $source: ${e.message}")
-                        success = false
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            success = false
-        } finally {
-            syncCoordinator.endSync(success)
-        }
+    suspend fun refreshMarketWatch() {
+        refreshAssets(force = true)
     }
-
-    private suspend fun fetchFallbackSparkline(coinId: String): List<Double> {
-        return try {
-            Log.d("AssetRepository", "Fetching fallback sparkline from CoinGecko for $coinId")
-            val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
-            val response = coinGeckoApiService.getCoinMarkets(ids = coinId, sparkline = true)
-            if (response.isSuccessful) {
-                response.body()?.firstOrNull()?.sparklineIn7d?.price ?: emptyList()
-            } else {
-                emptyList()
-            }
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
-    suspend fun executeSurgicalAdd(
-        asset: AssetEntity,
-        onStatusUpdate: (Float, String) -> Unit
-    ) {
-        val apiId = asset.apiId.ifBlank { asset.coinId }
-        val source = asset.priceSource.ifBlank { "CoinGecko" }
-        
-        onStatusUpdate(0.2f, "Securing asset in local vault...")
-        assetDao.upsertAsset(asset.copy(currentPrice = 0.0, lastUpdated = System.currentTimeMillis()))
-        
-        onStatusUpdate(0.4f, "Verifying listing on $source...")
-        
-        try {
-            val provider = searchRegistry.getProvider(source) ?: searchRegistry.getDefaultProvider()
-            var freshList = try {
-                provider.getPrices(apiId)
-            } catch (e: Exception) {
-                emptyList()
-            }
-
-            // Fallback for surgical add
-            if (freshList.isEmpty() && source != "CoinGecko") {
-                val cgProvider = searchRegistry.getProvider("CoinGecko") as? CoinGeckoSearchProvider
-                freshList = cgProvider?.getPrices(apiId) ?: emptyList()
-            }
-
-            val freshData = freshList.firstOrNull()
-
-            if (freshData != null) {
-                onStatusUpdate(0.6f, "Retrieving market trends...")
-                
-                // MULTI-SOURCE BRIDGE: Fetch Sparkline
-                val finalSparkline = when (source) {
-                    "KuCoin" -> {
-                        if (provider is KuCoinSearchProvider) {
-                            val s = provider.fetchSparkline(apiId)
-                            if (s.isEmpty()) fetchFallbackSparkline(asset.coinId) else s
-                        } else fetchFallbackSparkline(asset.coinId)
-                    }
-                    "Coinbase" -> {
-                        if (provider is CoinbaseSearchProvider) {
-                            val s = provider.fetchSparkline(apiId)
-                            if (s.isEmpty()) fetchFallbackSparkline(asset.coinId) else s
-                        } else fetchFallbackSparkline(asset.coinId)
-                    }
-                    else -> if (freshData.sparklineData.isNotEmpty()) freshData.sparklineData else fetchFallbackSparkline(asset.coinId)
-                }
-
-                onStatusUpdate(0.9f, "Success! Finalizing portfolio...")
-                
-                val updated = asset.copy(
-                    currentPrice = freshData.currentPrice,
-                    priceChange24h = freshData.priceChange24h,
-                    sparklineData = finalSparkline,
-                    lastUpdated = System.currentTimeMillis()
-                )
-                assetDao.upsertAsset(updated)
-
-                transactionDao.insertTransaction(
-                    TransactionEntity(
-                        assetId = asset.coinId,
-                        type = "INITIAL_ADD",
-                        amount = asset.amountHeld,
-                        priceAtTime = freshData.currentPrice,
-                        timestamp = System.currentTimeMillis(),
-                        source = source
-                    )
-                )
-            } else {
-                onStatusUpdate(1.0f, "Landing with last known data...")
-            }
-        } catch (e: Exception) {
-            onStatusUpdate(1.0f, "Error fetching data from $source")
-        }
-    }
-
-    suspend fun fetchLivePriceForAsset(
-        coinId: String,
-        onRetry: (String) -> Unit = {}
-    ): CoinMarketResponse? {
-        var attempt = 0
-        while (attempt < 3) {
-            try {
-                val response = coinGeckoApiService.getCoinMarkets(ids = coinId)
-                if (response.isSuccessful) {
-                    return response.body()?.firstOrNull()
-                } else if (response.code() == 429) {
-                    onRetry("Market busy. Retrying in 3s...")
-                    delay(3000)
-                    attempt++
-                } else {
-                    return null
-                }
-            } catch (e: Exception) {
-                return null
-            }
-        }
-        return null
-    }
-
-    suspend fun deleteAsset(asset: AssetEntity) = assetDao.deleteAsset(asset.coinId)
-    suspend fun updateAssetOrder(assets: List<AssetEntity>) = assetDao.updateAssetOrder(assets)
-    suspend fun updateAssetEntity(asset: AssetEntity) = assetDao.updateAssetEntity(asset)
 }

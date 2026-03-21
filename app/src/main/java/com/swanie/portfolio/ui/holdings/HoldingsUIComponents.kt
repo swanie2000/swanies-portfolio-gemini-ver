@@ -270,9 +270,9 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }
                     Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { 
                         Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); 
-                        AutoResizingText(text = formatCurrency(asset.currentPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                        AutoResizingText(text = formatCurrency(asset.officialSpotPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
                     }
-                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
+                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
                 }
             }
         }
@@ -297,7 +297,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
                 Column(modifier = Modifier.weight(1f)) { 
                     AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
-                    AutoResizingText(formatCurrency(asset.currentPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
+                    AutoResizingText(formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
                 }
                 SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
             }
@@ -315,7 +315,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
 fun MetalMarketCard(
     name: String,
     symbol: String,
-    currentPrice: Double,
+    officialSpotPrice: Double,
     changePercent: Double,
     dayHigh: Double,
     dayLow: Double,
@@ -352,8 +352,8 @@ fun MetalMarketCard(
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    if (currentPrice > 0.0) {
-                        Text(text = formatCurrency(currentPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (officialSpotPrice > 0.0) {
+                        Text(text = formatCurrency(officialSpotPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = trendColor)
                     } else {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.5.dp, color = Color.Yellow)
@@ -364,7 +364,7 @@ fun MetalMarketCard(
             Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
                 if (sparkline.isNotEmpty()) {
                     SparklineChart(sparkline, trendColor, Modifier.fillMaxSize())
-                } else if (currentPrice > 0.0) {
+                } else if (officialSpotPrice > 0.0) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = cardText.copy(0.2f))
                 }
             }

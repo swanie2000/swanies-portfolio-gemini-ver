@@ -3,32 +3,30 @@ package com.swanie.portfolio.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class AssetCategory { CRYPTO, METAL }
-
 @Entity(tableName = "assets")
 data class AssetEntity(
-    @PrimaryKey val coinId: String = "",
-    val symbol: String = "",
-    val name: String = "",
-    val amountHeld: Double = 0.0,
-    val currentPrice: Double = 0.0,
-    val change24h: Double = 0.0,
-    val displayOrder: Int = 0,
-    val lastUpdated: Long = 0L,
+    @PrimaryKey val coinId: String,
+    val symbol: String,
+    val name: String,
     val imageUrl: String = "",
-    val category: AssetCategory = AssetCategory.CRYPTO,
-    val sparklineData: List<Double> = emptyList(),
-    val marketCapRank: Int = 0,
+    val category: AssetCategory,
+    val officialSpotPrice: Double = 0.0, // ALIGNED V6
     val priceChange24h: Double = 0.0,
-    val weight: Double = 1.0,
-    val premium: Double = 0.0,
-    val isCustom: Boolean = false,
+    val sparklineData: List<Double> = emptyList(),
     val baseSymbol: String = "",
-    val decimalPreference: Int = 8,
-    val officialSpotPrice: Double = 0.0,
-    val officialSpotTimestamp: Long = 0L,
-    // THE DATA CHAIN OF CUSTODY: Mandatory fields for mapping integrity
     val apiId: String = "",
     val iconUrl: String? = null,
-    val priceSource: String = ""
+    val priceSource: String = "CoinGecko",
+    val weight: Double = 1.0,
+    val amountHeld: Double = 0.0,
+    val premium: Double = 0.0,
+    val decimalPreference: Int = 2,
+    val displayOrder: Int = 0, // ALIGNED V6
+    val lastUpdated: Long = System.currentTimeMillis(),
+    val isFavorite: Boolean = false,
+    val showOnWidget: Boolean = false
 )
+
+enum class AssetCategory {
+    CRYPTO, METAL
+}

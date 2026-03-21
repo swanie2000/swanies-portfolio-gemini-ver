@@ -121,7 +121,7 @@ class BinanceSearchProvider @Inject constructor(
             name = baseSymbol,
             imageUrl = iconUrl,
             category = AssetCategory.CRYPTO,
-            currentPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0,
+            officialSpotPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0, // ALIGNED V6
             priceChange24h = ticker.priceChangePercent.toDoubleOrNull() ?: 0.0,
             sparklineData = emptyList(),
             baseSymbol = baseSymbol,

@@ -40,7 +40,6 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
@@ -127,7 +126,7 @@ fun MyHoldingsScreen(
                     asset.name.contains("GRAM", ignoreCase = true) -> 0.0321507
                     else -> 1.0
                 }
-                (asset.currentPrice * multiplier * asset.weight * asset.amountHeld) + asset.premium
+                (asset.officialSpotPrice * multiplier * asset.weight * asset.amountHeld) + asset.premium
             }
             NumberFormat.getCurrencyInstance(Locale.US).format(total)
         }
@@ -194,9 +193,7 @@ fun MyHoldingsScreen(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // TIGHTENED HERO HEADER (SURGICAL COMPRESSION)
             Box(modifier = Modifier.fillMaxWidth().background(bgColor).statusBarsPadding()) {
-                // Header Content (Swan + Buttons)
                 Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
                     Image(
                         painter = painterResource(id = R.drawable.swanie_foreground),
@@ -225,14 +222,13 @@ fun MyHoldingsScreen(
                             Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor)
                         }
 
-                        Spacer(modifier = Modifier.width(16.dp)) // Tighter button spacing
+                        Spacer(modifier = Modifier.width(16.dp))
 
                         IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
                             Icon(Icons.Default.Add, null, tint = Color.Black)
                         }
                     }
 
-                    // Progress Indicator (Surgically moved under the Swan)
                     if (refreshProgress > 0f) {
                         Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 2.dp), contentAlignment = Alignment.Center) {
                             LinearProgressIndicator(
@@ -246,7 +242,6 @@ fun MyHoldingsScreen(
                 }
             }
 
-            // High-Impact Data Stack (Compressed Spacing)
             Text(
                 text = "MY HOLDINGS",
                 color = textColor,
@@ -264,9 +259,8 @@ fun MyHoldingsScreen(
                 modifier = Modifier.fillMaxWidth().clickable { navController.navigate(Routes.ANALYTICS) }
             )
 
-            Spacer(modifier = Modifier.height(12.dp)) // Smaller gap before Tabs
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // TAB ROW
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
                 TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(40.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
                     tabs.forEachIndexed { index, title ->
@@ -283,7 +277,6 @@ fun MyHoldingsScreen(
                 }
             }
 
-            // List Transition
             AnimatedContent(
                 targetState = isCompactViewEnabled,
                 transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(400)) },
@@ -333,14 +326,10 @@ fun MyHoldingsScreen(
             BottomNavigationBar(navController = navController)
         }
 
-        // Drag Trash Bin
         AnimatedVisibility(visible = isDraggingActive.value, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height) }) {
             Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
             }
         }
-
-        if (assetBeingEdited != null) { /* Funnel logic... */ }
-        if (assetPendingDeletion != null) { /* Delete dialog... */ }
     }
 }

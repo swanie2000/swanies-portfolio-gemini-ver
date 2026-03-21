@@ -78,19 +78,17 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     navController = navController,
                     onAssetSelected = { asset ->
                         if (asset.category == AssetCategory.METAL) {
-                            // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Metal)
                             Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
                             assetViewModel.performSurgicalAdd(asset) {
                                 navController.popBackStack()
                             }
                         } else {
-                            val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl, "UTF-8")
+                            val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl ?: "", "UTF-8")
                             val encodedSource = URLEncoder.encode(asset.priceSource, "UTF-8")
                             
-                            // THE SEQUENCE TRACER: STEP 2 - Nav Hand-off (Crypto)
                             Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}, SOURCE=${asset.priceSource}")
                             
-                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.currentPrice}/$encodedSource")
+                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.officialSpotPrice}/$encodedSource")
                         }
                     }
                 )
@@ -123,7 +121,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     name = symbol,
                     imageUrl = decodedThumb,
                     category = category,
-                    currentPrice = price,
+                    officialSpotPrice = price, // ALIGNED V6
                     priceSource = priceSource,
                     onSave = {
                         navController.navigate(Routes.HOLDINGS) {

@@ -42,7 +42,7 @@ fun AmountEntryScreen(
     name: String,
     imageUrl: String,
     category: AssetCategory,
-    currentPrice: Double,
+    officialSpotPrice: Double, // ALIGNED V6
     priceSource: String,
     onSave: () -> Unit,
     onCancel: () -> Unit
@@ -130,7 +130,7 @@ fun AmountEntryScreen(
         isSaving = true
         val asset = AssetEntity(
             coinId = coinId, symbol = symbol, name = name,
-            amountHeld = amountValue, currentPrice = currentPrice,
+            amountHeld = amountValue, officialSpotPrice = officialSpotPrice, // ALIGNED V6
             category = category, imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
             apiId = coinId, iconUrl = imageUrl, baseSymbol = symbol,

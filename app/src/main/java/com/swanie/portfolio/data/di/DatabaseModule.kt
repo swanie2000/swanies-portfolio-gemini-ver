@@ -1,14 +1,12 @@
 package com.swanie.portfolio.data.di
 
 import android.content.Context
-import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.api.SearchEngineRegistry
-import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AppDatabase
+import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.TransactionDao
-import com.swanie.portfolio.data.network.CoinGeckoApiService
 import com.swanie.portfolio.data.repository.AssetRepository
-import com.swanie.portfolio.data.repository.DataSyncCoordinator
+import com.swanie.portfolio.data.repository.DataSyncCoordinator // Ensure this is imported
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,25 +36,12 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideThemePreferences(@ApplicationContext context: Context): ThemePreferences {
-        return ThemePreferences(context)
-    }
-
-    @Provides
-    @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,
-        transactionDao: TransactionDao,
-        coinGeckoApiService: CoinGeckoApiService,
-        syncCoordinator: DataSyncCoordinator,
-        searchEngineRegistry: SearchEngineRegistry
+        searchRegistry: SearchEngineRegistry,
+        syncCoordinator: DataSyncCoordinator // SURGICAL: Hilt now provides the coordinator here
     ): AssetRepository {
-        return AssetRepository(
-            assetDao,
-            transactionDao,
-            coinGeckoApiService,
-            syncCoordinator,
-            searchEngineRegistry
-        )
+        // SURGICAL: Pass the coordinator into the constructor
+        return AssetRepository(assetDao, searchRegistry, syncCoordinator)
     }
 }

@@ -4,12 +4,18 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "theme_settings")
 
-class ThemePreferences(context: Context) {
+@Singleton
+class ThemePreferences @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val appContext = context.applicationContext
 
     private object PreferencesKeys {
@@ -22,9 +28,10 @@ class ThemePreferences(context: Context) {
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
         val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
+        val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
     }
 
-    // Flows
+    // High-Resolution Theme Flows
     val siteBackgroundColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.SITE_BACKGROUND_COLOR] ?: "#000416" }
     val siteTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.SITE_TEXT_COLOR] ?: "#FFFFFF" }
     val cardBackgroundColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.CARD_BACKGROUND_COLOR] ?: "#121212" }
@@ -34,8 +41,9 @@ class ThemePreferences(context: Context) {
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_DARK_MODE] ?: true }
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
     val metalsDisplayOrder: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.METALS_DISPLAY_ORDER] ?: "XAU,XAG,XPT,XPD" }
+    val themeMode: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.THEME_MODE_KEY] ?: "SYSTEM" }
 
-    // Save Functions
+    // Persistence Functions
     suspend fun saveSiteBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = color } }
     suspend fun saveSiteTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_TEXT_COLOR] = color } }
     suspend fun saveCardBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.CARD_BACKGROUND_COLOR] = color } }
@@ -45,4 +53,5 @@ class ThemePreferences(context: Context) {
     suspend fun saveIsDarkMode(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_DARK_MODE] = enabled } }
     suspend fun saveConfirmDelete(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.CONFIRM_DELETE] = enabled } }
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
+    suspend fun saveThemeMode(mode: String) { appContext.dataStore.edit { it[PreferencesKeys.THEME_MODE_KEY] = mode } }
 }

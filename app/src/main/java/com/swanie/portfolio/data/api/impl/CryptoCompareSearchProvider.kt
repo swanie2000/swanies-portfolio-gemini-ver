@@ -40,65 +40,71 @@ class CryptoCompareSearchProvider @Inject constructor(
     }
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
-        return try {
+        val results = mutableListOf<AssetEntity>()
+        try {
             Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching price for $ids...")
             val response = cryptoCompareApiService.getPriceFull(fsyms = ids)
             if (response.isSuccessful) {
                 val rawData = response.body()?.raw ?: emptyMap()
-                rawData.map { (symbol, priceMap) ->
+                for ((symbol, priceMap) in rawData) {
                     val usdData = priceMap["USD"]
-                    AssetEntity(
+                    
+                    // SPARKLINE RESTORATION: Fetch history for each symbol
+                    // Use a 24-hour window for the sparkline
+                    val sparkline = try {
+                        fetchSparkline(symbol)
+                    } catch (e: Exception) {
+                        Log.e("CRYPTO_TRACE", "Sparkline failed for $symbol: ${e.message}")
+                        emptyList()
+                    }
+
+                    results.add(AssetEntity(
                         coinId = symbol,
                         symbol = symbol,
                         name = symbol,
                         imageUrl = if (usdData?.imageUrl != null) "https://www.cryptocompare.com${usdData.imageUrl}" else "",
                         category = AssetCategory.CRYPTO,
-                        currentPrice = usdData?.price ?: 0.0,
+                        officialSpotPrice = usdData?.price ?: 0.0,
                         priceChange24h = usdData?.changePct24h ?: 0.0,
-                        sparklineData = emptyList(), 
+                        sparklineData = sparkline, 
                         baseSymbol = symbol,
                         apiId = symbol,
                         iconUrl = if (usdData?.imageUrl != null) "https://www.cryptocompare.com${usdData.imageUrl}" else "",
-                        priceSource = name
-                    )
+                        priceSource = name,
+                        lastUpdated = System.currentTimeMillis()
+                    ))
                 }
             } else {
-                emptyList()
+                Log.e("ADD_TRACE", "CryptoCompare Price Error: ${response.code()}")
             }
         } catch (e: Exception) {
-            Log.e("ADD_TRACE", "CryptoCompare Price Error: ${e.message}")
-            emptyList()
+            Log.e("ADD_TRACE", "CryptoCompare Price Exception: ${e.message}")
         }
+        return results
     }
 
     /**
      * Implementation of sparkline fetch for CryptoCompare with specialized field validation.
      */
     suspend fun fetchSparkline(symbol: String): List<Double> {
-        Log.d("CRYPTO_TRACE", "Attempting fetch for $symbol")
+        // Ensure symbol is uppercase for the history endpoint
+        val cleanSymbol = symbol.uppercase()
+        Log.d("CRYPTO_TRACE", "Attempting fetch for $cleanSymbol")
         return try {
-            val response = cryptoCompareApiService.getHistoryHour(fsym = symbol, tsym = "USD", limit = 168)
+            val response = cryptoCompareApiService.getHistoryHour(fsym = cleanSymbol, tsym = "USD", limit = 24)
             
             if (response.isSuccessful) {
                 val body = response.body()
-                // DEEP VALIDATION: Checking the nested Data structure
-                Log.d("CRYPTO_TRACE", "Checking Data field: ${body?.data != null} | Checking nested Data list: ${body?.data?.data != null}")
-                
                 val historyData = body?.data?.data ?: emptyList()
                 val sparkline = historyData.map { it.close }
-                
-                if (sparkline.isNotEmpty()) {
-                    Log.d("CRYPTO_TRACE", "SUCCESS: Received ${sparkline.size} points for $symbol.")
-                } else {
-                    Log.w("CRYPTO_TRACE", "EMPTY_RESULT: No history data found for $symbol")
-                }
+                Log.d("CRYPTO_TRACE", "Successfully fetched ${sparkline.size} points for $cleanSymbol")
                 sparkline
             } else {
-                Log.e("CRYPTO_TRACE", "HTTP_ERROR: ${response.code()} for $symbol")
+                Log.e("CRYPTO_TRACE", "HTTP_ERROR: ${response.code()} for $cleanSymbol")
                 emptyList()
             }
         } catch (e: Exception) {
-            Log.e("CRYPTO_TRACE", "EXCEPTION for $symbol: ${e.message}")
+            Log.e("CRYPTO_TRACE", "EXCEPTION for $cleanSymbol: ${e.message}")
             emptyList()
         }
     }

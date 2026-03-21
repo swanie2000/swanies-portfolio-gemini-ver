@@ -11,107 +11,90 @@ import javax.inject.Singleton
 
 @Singleton
 class CoinbaseSearchProvider @Inject constructor(
-    private val coinbaseApiService: CoinbaseApiService
+    private val coinbaseApi: CoinbaseApiService
 ) : SearchProvider {
     override val name: String = "Coinbase"
 
-    // THE MASTER LIST CACHE
-    private var cachedCurrencies: Map<String, String>? = null
-
-    private suspend fun getCurrencyNames(): Map<String, String> {
-        if (cachedCurrencies != null) return cachedCurrencies!!
-        
-        return try {
-            Log.d("DIAGNOSTIC", "Coinbase: Fetching master list from Exchange API...")
-            val response = coinbaseApiService.getExchangeCurrencies()
-            val map = response.associate { it.id to it.name }
-            Log.d("DIAGNOSTIC", "Coinbase: Master list loaded with ${map.size} assets.")
-            cachedCurrencies = map
-            map
-        } catch (e: Exception) {
-            Log.e("DIAGNOSTIC", "Coinbase: Failed to fetch master list: ${e.message}")
-            emptyMap()
-        }
-    }
+    private var masterListCache: List<SearchResult> = emptyList()
 
     override suspend fun search(query: String): List<SearchResult> {
-        Log.d("SEARCH_TRACE", "SEARCH: Querying [$query] via provider [$name]")
         return try {
-            val names = getCurrencyNames()
-            val filtered = names.filter { entry -> 
-                entry.key.contains(query, ignoreCase = true) || entry.value.contains(query, ignoreCase = true) 
-            }
-                .toList()
-                .take(20)
-                .map { (id, fullName) ->
-                    val iconUrl = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${id.lowercase()}.png"
+            if (masterListCache.isEmpty()) {
+                val currencies = coinbaseApi.getExchangeCurrencies()
+                masterListCache = currencies.map { crypto ->
+                    val base = crypto.id.uppercase()
+                    // ICON FIX: Standardizing on a more reliable community source for icons
+                    val iconUrl = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${base.lowercase()}.png"
                     SearchResult(
-                        id = id,
-                        symbol = id,
-                        name = "$fullName (Coinbase)",
+                        id = "CB_$base",
+                        symbol = base,
+                        name = crypto.name,
                         imageUrl = iconUrl,
                         category = AssetCategory.CRYPTO,
                         priceSource = name
                     )
                 }
-            
-            Log.d("DIAGNOSTIC", "Coinbase: SUCCESS found ${filtered.size} assets for query [$query]")
-            filtered
+            }
+            masterListCache.filter {
+                it.symbol.contains(query, ignoreCase = true) ||
+                        it.name.contains(query, ignoreCase = true)
+            }.take(15)
         } catch (e: Exception) {
-            Log.e("DIAGNOSTIC", "Coinbase Search Error: ${e.message}")
+            Log.e("COINBASE_SEARCH", "Search failed: ${e.message}")
             emptyList()
         }
     }
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
-        val symbolList = ids.split(",")
-        return symbolList.mapNotNull { id ->
+        val results = mutableListOf<AssetEntity>()
+        val symbols = ids.split(",")
+
+        for (symbol in symbols) {
+            if (symbol.isBlank()) continue
+            val cleanSymbol = symbol.trim().uppercase()
             try {
-                val pair = "${id}-USD"
-                Log.d("DIAGNOSTIC", "Coinbase Calling: prices/$pair/spot")
-                val response = coinbaseApiService.getSpotPrice(pair)
-                val price = response.data.amount.toDoubleOrNull() ?: 0.0
+                // 1. Fetch current Spot Price
+                val pair = "$cleanSymbol-USD"
+                val priceResponse = try {
+                    coinbaseApi.getSpotPrice(pair)
+                } catch (e: Exception) {
+                    Log.e("COINBASE_PRICE", "Spot price failed for $pair: ${e.message}")
+                    null
+                }
                 
-                val iconUrl = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${id.lowercase()}.png"
+                val currentPrice = priceResponse?.data?.amount?.toDoubleOrNull() ?: 0.0
+
+                // 2. SPARKLINE RESTORATION
+                val candles = try {
+                    coinbaseApi.getExchangeCandles(pair)
+                } catch (e: Exception) {
+                    Log.e("COINBASE_PRICE", "Candles failed for $pair: ${e.message}")
+                    emptyList()
+                }
+
+                val sparkline = candles.take(24).mapNotNull { it.getOrNull(4) }.reversed()
                 
-                AssetEntity(
-                    coinId = id,
-                    symbol = id,
-                    name = id,
-                    imageUrl = iconUrl,
-                    category = AssetCategory.CRYPTO,
-                    currentPrice = price,
-                    priceChange24h = 0.0,
-                    sparklineData = emptyList(), // Filled by fetchSparkline if needed in repo
-                    baseSymbol = id,
-                    apiId = id,
-                    iconUrl = iconUrl,
-                    priceSource = name
+                // ICON FIX: Standardizing on a more reliable community source
+                val iconUrl = "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${cleanSymbol.lowercase()}.png"
+
+                results.add(
+                    AssetEntity(
+                        coinId = "CB_$cleanSymbol",
+                        symbol = cleanSymbol,
+                        name = cleanSymbol,
+                        imageUrl = iconUrl,
+                        category = AssetCategory.CRYPTO,
+                        officialSpotPrice = currentPrice,
+                        sparklineData = sparkline,
+                        priceSource = name,
+                        lastUpdated = System.currentTimeMillis(),
+                        apiId = "CB_$cleanSymbol"
+                    )
                 )
             } catch (e: Exception) {
-                Log.e("DIAGNOSTIC", "Coinbase Price Error for $id: ${e.message}")
-                null
+                Log.e("COINBASE_PRICE", "Overall failure for $symbol: ${e.message}")
             }
         }
-    }
-
-    /**
-     * Coinbase Sparkline fetcher (Exchange API)
-     * Data: [time, low, high, open, close, volume]
-     * Close Price is index 4.
-     */
-    suspend fun fetchSparkline(symbol: String): List<Double> {
-        val pair = if (symbol.contains("-")) symbol else "${symbol}-USD"
-        Log.d("DIAGNOSTIC", "Coinbase Calling: candles for $pair")
-        return try {
-            val response = coinbaseApiService.getCandles(pair)
-            // Coinbase returns points in reverse chronological order
-            val points = response.take(168).mapNotNull { it.getOrNull(4) }.reversed()
-            Log.d("DIAGNOSTIC", "Coinbase Sparkline Points: ${points.size}")
-            points
-        } catch (e: Exception) {
-            Log.e("DIAGNOSTIC", "Coinbase Sparkline Error for $symbol: ${e.message}")
-            emptyList()
-        }
+        return results
     }
 }

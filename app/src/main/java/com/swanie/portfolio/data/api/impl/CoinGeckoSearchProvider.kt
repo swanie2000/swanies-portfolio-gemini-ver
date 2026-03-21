@@ -37,19 +37,18 @@ class CoinGeckoSearchProvider @Inject constructor(
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastGlobalHit < 5000) {
-            Log.w("API_TRACE", "STRAITJACKET: API hit rejected. Less than 5s since last call.")
+        // Rate limit protection for CoinGecko Public API
+        if (currentTime - lastGlobalHit < 10000) {
+            Log.w("API_TRACE", "COINGECKO: Rate limit cooldown active.")
             return emptyList()
         }
         lastGlobalHit = currentTime
 
         return try {
             delay(500)
+            // ids here is expected to be a comma-separated list of apiIds (e.g. "bitcoin,ethereum")
             val response = coinGeckoApiService.getCoinMarkets(ids = ids)
-            val url = response.raw().request.url.toString()
-            val code = response.code()
-            Log.d("ADD_TRACE", "STEP 4: API_HIT: ID=$ids, URL=$url, CODE=$code")
-
+            
             if (response.isSuccessful) {
                 val marketData = response.body() ?: emptyList()
                 marketData.map { fresh ->
@@ -59,20 +58,22 @@ class CoinGeckoSearchProvider @Inject constructor(
                         name = fresh.name,
                         imageUrl = fresh.image ?: "",
                         category = AssetCategory.CRYPTO,
-                        currentPrice = fresh.currentPrice ?: 0.0,
+                        officialSpotPrice = fresh.currentPrice ?: 0.0,
                         priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
                         sparklineData = fresh.sparklineIn7d?.price ?: emptyList(),
                         baseSymbol = fresh.symbol,
                         apiId = fresh.id,
                         iconUrl = fresh.image,
-                        priceSource = name
+                        priceSource = name,
+                        lastUpdated = System.currentTimeMillis()
                     )
                 }
             } else {
+                Log.e("API_TRACE", "COINGECKO ERROR: ${response.code()}")
                 emptyList()
             }
         } catch (e: Exception) {
-            Log.e("ADD_TRACE", "STEP 4: API_ERROR: ${e.message}")
+            Log.e("API_TRACE", "COINGECKO EXCEPTION: ${e.message}")
             emptyList()
         }
     }

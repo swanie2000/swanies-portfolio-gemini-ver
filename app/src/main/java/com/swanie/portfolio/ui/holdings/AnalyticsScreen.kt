@@ -61,13 +61,15 @@ fun AnalyticsScreen(navController: NavController) {
         Color(0xFF2979FF), Color(0xFFEEFF41), Color(0xFFB2FF59)
     )
 
-    val totalValue = holdings.sumOf { it.currentPrice * (it.weight * it.amountHeld) }
+    // ALIGNED V6: officialSpotPrice
+    val totalValue = holdings.sumOf { it.officialSpotPrice * (it.weight * it.amountHeld) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     var selectedAssetId by remember { mutableStateOf<String?>(null) }
 
     val assetSegments = holdings.mapIndexed { index, asset ->
-        val assetValue = asset.currentPrice * (asset.weight * asset.amountHeld)
+        // ALIGNED V6: officialSpotPrice
+        val assetValue = asset.officialSpotPrice * (asset.weight * asset.amountHeld)
         AssetSegment(
             asset = asset,
             value = assetValue,

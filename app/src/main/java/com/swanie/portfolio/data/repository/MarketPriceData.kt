@@ -1,9 +1,9 @@
 package com.swanie.portfolio.data.repository
 
 data class MarketPriceData(
-    val current: Double,
-    val dayHigh: Double,
-    val dayLow: Double,
-    val changePercent: Double,
-    val sparkline: List<Double>
+    val officialSpotPrice: Double = 0.0,
+    val dayHigh: Double = 0.0,
+    val dayLow: Double = 0.0,
+    val changePercent: Double = 0.0,
+    val sparkline: List<Double> = emptyList()
 )

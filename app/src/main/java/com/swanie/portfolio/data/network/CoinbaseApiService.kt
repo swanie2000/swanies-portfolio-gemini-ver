@@ -1,48 +1,34 @@
 package com.swanie.portfolio.data.network
 
-import com.google.gson.annotations.SerializedName
 import retrofit2.http.GET
 import retrofit2.http.Path
-import retrofit2.http.Query
-
-data class CoinbasePriceResponse(
-    val data: CoinbasePriceData
-)
-
-data class CoinbasePriceData(
-    val base: String,
-    val currency: String,
-    val amount: String
-)
-
-data class CoinbaseCurrencyResponse(
-    val data: List<CoinbaseCurrency>
-)
-
-data class CoinbaseCurrency(
-    val id: String,
-    val name: String,
-    val min_size: String
-)
 
 interface CoinbaseApiService {
-    @GET("prices/{symbol}/spot")
-    suspend fun getSpotPrice(@Path("symbol") symbol: String): CoinbasePriceResponse
 
-    // MASTER LIST: Using the Exchange API's public currencies list for full crypto coverage
+    // 1. Gets the master list of all tradeable crypto assets
     @GET("https://api.exchange.coinbase.com/currencies")
     suspend fun getExchangeCurrencies(): List<CoinbaseExchangeCurrency>
 
-    // CANDLES: Using the Exchange API for sparkline data
-    @GET("https://api.exchange.coinbase.com/products/{symbol}/candles")
-    suspend fun getCandles(
-        @Path("symbol") symbol: String,
-        @Query("granularity") granularity: Int = 3600
-    ): List<List<Double>>
+    // 2. Gets real-time spot price (e.g., BTC-USD)
+    @GET("https://api.coinbase.com/v2/prices/{pair}/spot")
+    suspend fun getSpotPrice(@Path("pair") pair: String): CoinbasePriceResponse
+
+    /**
+     * SURGICAL: Restores Sparklines.
+     * Fetches historical price points (Candles) for the last 24 hours.
+     * Granularity 3600 = 1 hour intervals.
+     */
+    @GET("https://api.exchange.coinbase.com/products/{pair}/candles?granularity=3600")
+    suspend fun getExchangeCandles(@Path("pair") pair: String): List<List<Double>>
 }
 
+// --- DATA MODELS ---
+
 data class CoinbaseExchangeCurrency(
-    val id: String,
-    val name: String,
+    val id: String,         // e.g., "BTC"
+    val name: String,       // e.g., "Bitcoin"
     val status: String
 )
+
+data class CoinbasePriceResponse(val data: CoinbasePriceData)
+data class CoinbasePriceData(val amount: String, val currency: String)

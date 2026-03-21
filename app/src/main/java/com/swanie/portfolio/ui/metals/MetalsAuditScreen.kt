@@ -33,7 +33,7 @@ import com.swanie.portfolio.data.repository.MarketPriceData
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalMarketCard
 import com.swanie.portfolio.ui.settings.ThemeViewModel
-import com.swanie.portfolio.ui.components.BottomNavigationBar // Ensure this exists in your components folder
+import com.swanie.portfolio.ui.components.BottomNavigationBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
@@ -71,7 +71,7 @@ fun MetalsAuditScreen(navController: NavController) {
         metalsOrder.forEach { (_, sym) ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
-                if (data.current > 0.0) marketDataMap[sym] = data
+                if (data.officialSpotPrice > 0.0) marketDataMap[sym] = data
             }
         }
         delay(100)
@@ -85,14 +85,12 @@ fun MetalsAuditScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize().background(bgColor)) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            // --- ANALYTICS STANDARD HERO HEADER ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(bgColor)
                     .statusBarsPadding()
             ) {
-                // Center Logo
                 Image(
                     painter = painterResource(id = R.drawable.swanie_foreground),
                     contentDescription = null,
@@ -101,7 +99,6 @@ fun MetalsAuditScreen(navController: NavController) {
                         .align(Alignment.Center)
                 )
 
-                // Back Button (Action Row)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -115,7 +112,6 @@ fun MetalsAuditScreen(navController: NavController) {
                 }
             }
 
-            // High-Impact Title
             Text(
                 text = "METALS MARKET WATCH",
                 color = textColor,
@@ -127,7 +123,6 @@ fun MetalsAuditScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Market Cards List
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -145,7 +140,7 @@ fun MetalsAuditScreen(navController: NavController) {
                         MetalMarketCard(
                             name = name,
                             symbol = sym,
-                            currentPrice = marketData?.current ?: 0.0,
+                            officialSpotPrice = marketData?.officialSpotPrice ?: 0.0,
                             changePercent = marketData?.changePercent ?: 0.0,
                             dayHigh = marketData?.dayHigh ?: 0.0,
                             dayLow = marketData?.dayLow ?: 0.0,
@@ -171,7 +166,6 @@ fun MetalsAuditScreen(navController: NavController) {
                 }
             }
 
-            // Unified Bottom Navigation
             BottomNavigationBar(navController = navController)
         }
     }
