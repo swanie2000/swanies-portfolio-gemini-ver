@@ -52,7 +52,6 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
     val cardTextHex by themeViewModel.cardTextColor.collectAsState()
 
-    val bgColor = Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" }))
     val textColor = Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" }))
     val cardBg = Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" }))
     val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifHexBlank("#FFFFFF")))
@@ -68,10 +67,8 @@ fun MetalsAuditScreen(navController: NavController) {
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
         
-        // SAFETY STRIKE: Respect global cooldown for Metals Watch.
         viewModel.refreshMarketWatch()
         
-        // DATA POPULATION: Fetching individual points for UI state if bulk failed or is pending.
         metalsOrder.forEach { (_, sym) ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
@@ -86,13 +83,14 @@ fun MetalsAuditScreen(navController: NavController) {
         metalsOrder = metalsOrder.toMutableList().apply { add(to.index, removeAt(from.index)) }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(bgColor)) {
+    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
+    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
         Column(modifier = Modifier.fillMaxSize()) {
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(bgColor)
+                    .background(Color.Transparent)
                     .statusBarsPadding()
             ) {
                 Image(

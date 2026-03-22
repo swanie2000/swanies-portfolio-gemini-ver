@@ -189,8 +189,10 @@ Key Wins Today:
 - Schema Lockdown: Migrated from V5 through V6 to a stable V7. All fields (officialSpotPrice, displayOrder, apiId) are synchronized.
 - Data Pipeline Restoration: All 4 search engines (CoinGecko, Coinbase, KuCoin, CryptoCompare) now return live Price, Sparklines, and Icons on the first add.
 - Metadata Healing (The Safety Net): Restored background CoinGecko search. Assets added from Coinbase/KuCoin are now automatically "healed" with premium CoinGecko icons and standardized IDs.
+- Dynamic Gradient Restoration: Re-implemented the background gradient system with a user-controlled intensity slider and global transparency across all screens.
+- Launch Transition: Engineered a smooth fade-in sequence from the splash color (#000416) to the dynamic vault gradient, eliminating launch flickers.
 - UX Optimization:
-    - Asset Picker: Unified, theme-adaptive search bar with integrated provider selection.
+    - Asset Picker: Unified, theme-adaptive search bar with integrated provider selection and "Precious Metals" rebranding.
     - Keyboard Retreat: Keyboard automatically slides away when search results are scrolled.
     - Branded Visuals: High-vertical, full-color Hero Swan branding on the search screen.
 - API Safety:
@@ -206,40 +208,43 @@ Branding	Full-color Swan integrated into UI layers.
 Safety Net	CoinGecko background healing active for all search results.
 Interaction	Full Edit/Delete funnels restored for both Crypto and Metals.
 
-THE REVISED PHASE 2 BATTLE PLAN: "THE BITMAP COURIER"
+THE REVISED PHASE 2 BATTLE PLAN: "THE COLOR PULSE WIDGET"
 
-Now that the data foundation is rock-solid, we are ready to re-invade the Home Screen.
+The data foundation is now rock-solid. We are ready to re-invade the Home Screen with a focus on trend visualization.
 
 Objective:
 "The Color Pulse Engine" — A home screen widget that renders live trend colors (Green/Red) using a Bitmap Courier system to bypass Jetpack Glance’s hardware limitations.
 
 The Three-Pronged Strike:
-1. The Bitmap Courier: Create a WidgetIconManager to handle the "Fax Machine" constraint of Jetpack Glance.
-2. The Data Provider: Connect the V7 database to the Glance StateDefinition.
-3. The Pulse UI: Build the widget using the already-stable officialSpotPrice and priceChange24h fields.
+1. The UI Bridge: Add the "Show on Home Screen" toggle to the Asset Detail screens to designate widget assets.
+2. The Bitmap Courier: Create the WidgetIconManager to handle high-performance trend color rendering.
+3. The Glance Implementation: Rebuild the widget on the stabilized V7 foundation, connecting the database to the Glance StateDefinition.
+
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 03/21/2026 17:24:18.93
+Generated: Sat 03/21/2026 19:16:58.48
 
 Branch:
 main
 Commit:
-77d94b225ce9e909ab15d13c6d1cc93f0c8e3ebb
+336cb15e258cd3c1a6e89c1cbb077aeb82f6fe98
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/DataSyncCoordinator.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
+ M app/src/main/java/com/swanie/portfolio/MainActivity.kt
+ M app/src/main/java/com/swanie/portfolio/MainViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
  M app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
+ M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------

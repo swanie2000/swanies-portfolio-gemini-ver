@@ -6,7 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -15,8 +15,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.ui.Typography
 
-val LocalBackgroundBrush = staticCompositionLocalOf<Brush> {
-    error("No background brush provided")
+// CHANGE: Switched to compositionLocalOf for reactive updates when gradient toggles
+val LocalBackgroundBrush = compositionLocalOf<Brush> {
+    SolidColor(Color(0xFF000416))
 }
 
 internal fun Color.toHsv(): FloatArray {
@@ -25,41 +26,20 @@ internal fun Color.toHsv(): FloatArray {
     return hsv
 }
 
-fun generateColorSchemeFromHex(seedColor: Color): Pair<ColorScheme, ColorScheme> {
-    val lightScheme = lightColorScheme(
-        primary = seedColor,
-        background = Color.Transparent, // Decoupled from theme
-        surface = Color.Transparent,    // Decoupled from theme
-        onBackground = Color(0xFF1A1A1A), // Dark text for light backgrounds
-        onSurface = Color(0xFF1A1A1A)
-    )
-
-    val darkScheme = darkColorScheme(
-        primary = seedColor,
-        background = Color.Transparent, // Decoupled from theme
-        surface = Color.Transparent,    // Decoupled from theme
-        onBackground = Color.White,         // Light text for dark backgrounds
-        onSurface = Color.White
-    )
-
-    return Pair(lightScheme, darkScheme)
-}
-
 @Composable
 fun SwaniesPortfolioTheme(
     seedColorHex: String = "#000416",
     isGradientEnabled: Boolean = false,
+    gradientAmount: Float = 0.5f,
     content: @Composable () -> Unit
 ) {
     val seedColor = try {
         Color(seedColorHex.toColorInt())
-    } catch (e: IllegalArgumentException) {
-        Color(0xFF000416) // Fallback to Swanie Navy
+    } catch (e: Exception) {
+        Color(0xFF000416)
     }
 
-    val (_, darkScheme) = generateColorSchemeFromHex(seedColor)
-
-    val colorScheme = darkScheme
+    val colorScheme = darkColorScheme(primary = seedColor)
 
     val backgroundBrush = if (isGradientEnabled) {
         val hsv = seedColor.toHsv()
@@ -69,20 +49,18 @@ fun SwaniesPortfolioTheme(
 
         val topColor = Color.hsv(
             hue,
-            (saturation * 0.8f).coerceIn(0f, 1f),
-            (value * 1.40f).coerceIn(0f, 1f)
+            (saturation * (1f - (gradientAmount * 0.4f))).coerceIn(0f, 1f),
+            (value * (1f + (gradientAmount * 0.8f))).coerceIn(0f, 1f)
         )
 
         val bottomColor = Color.hsv(
             hue,
-            (saturation * 1.1f).coerceIn(0f, 1f),
-            (value * 0.60f).coerceIn(0f, 1f)
+            (saturation * (1f + (gradientAmount * 0.2f))).coerceIn(0f, 1f),
+            (value * (1f - (gradientAmount * 0.6f))).coerceIn(0f, 1f)
         )
 
-        Brush.linearGradient(
-            colors = listOf(topColor, bottomColor),
-            start = Offset.Zero,
-            end = Offset.Infinite
+        Brush.verticalGradient(
+            colors = listOf(topColor, bottomColor)
         )
     } else {
         SolidColor(seedColor)

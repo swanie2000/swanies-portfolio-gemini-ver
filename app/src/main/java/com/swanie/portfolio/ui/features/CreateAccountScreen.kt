@@ -40,16 +40,14 @@ fun CreateAccountScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var agreedToTerms by remember { mutableStateOf(false) }
 
-    val bgColor by viewModel.siteBackgroundColor.collectAsState()
-    val textColor by viewModel.siteTextColor.collectAsState()
+    val siteTextColor by viewModel.siteTextColor.collectAsState()
+    val primaryTextColor = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
-    val primaryTextColor = Color(textColor.toColorInt())
-    val backgroundColor = Color(bgColor.toColorInt())
-
+    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(Color.Transparent)
     ) {
         Column(
             modifier = Modifier
@@ -161,7 +159,7 @@ fun CreateAccountScreen(
                             onCheckedChange = { agreedToTerms = it },
                             colors = CheckboxDefaults.colors(
                                 checkedColor = primaryTextColor,
-                                checkmarkColor = backgroundColor,
+                                checkmarkColor = Color.Transparent,
                                 uncheckedColor = primaryTextColor
                             )
                         )
@@ -180,7 +178,7 @@ fun CreateAccountScreen(
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = primaryTextColor,
-                            contentColor = backgroundColor
+                            contentColor = Color.Black
                         )
                     ) {
                         Text(

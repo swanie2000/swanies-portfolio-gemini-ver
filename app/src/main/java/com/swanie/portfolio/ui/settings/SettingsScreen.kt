@@ -32,16 +32,20 @@ fun SettingsScreen(
 ) {
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
+    
+    // GRADIENT STATE
+    val useGradient by mainViewModel.useGradient.collectAsState()
+    val gradientAmount by mainViewModel.gradientAmount.collectAsState()
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
-    val safeBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
+    // GRADIENT SYMMETRY: Set containerColor to Transparent to allow NavGraph gradient to show
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController) },
-        containerColor = safeBg
+        containerColor = Color.Transparent
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -54,6 +58,10 @@ fun SettingsScreen(
             }
 
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                
+                // --- VISUAL SETTINGS ---
+                Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                
                 SettingsToggleItem(
                     title = "Use Compact Cards",
                     subtitle = "Shrink asset cards to show more on screen",
@@ -62,7 +70,6 @@ fun SettingsScreen(
                     themeColor = safeText
                 )
 
-                // NEW: DELETE CONFIRMATION TOGGLE
                 SettingsToggleItem(
                     title = "Confirm Deletion",
                     subtitle = "Show 'Are you sure?' before removing an asset",
@@ -70,6 +77,35 @@ fun SettingsScreen(
                     onCheckedChange = { mainViewModel.setConfirmDelete(it) },
                     themeColor = safeText
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // --- THEME & GRADIENT ---
+                Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                
+                SettingsToggleItem(
+                    title = "Background Gradient",
+                    subtitle = "Enable dynamic color shifting for the vault",
+                    checked = useGradient,
+                    onCheckedChange = { mainViewModel.setUseGradient(it) },
+                    themeColor = safeText
+                )
+
+                if (useGradient) {
+                    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
+                        Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Slider(
+                            value = gradientAmount,
+                            onValueChange = { mainViewModel.setGradientAmount(it) },
+                            valueRange = 0f..1f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color.Yellow,
+                                activeTrackColor = Color.Yellow,
+                                inactiveTrackColor = safeText.copy(alpha = 0.2f)
+                            )
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 

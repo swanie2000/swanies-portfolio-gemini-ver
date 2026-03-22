@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -98,19 +99,40 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            // Unified 4-Icon Navigation
             BottomNavigationBar(navController = navController)
         },
-        containerColor = Color(0xFF000416) // Splash handoff color
+        containerColor = Color.Transparent // GRADIENT SYMMETRY
     ) { innerPadding ->
-        // innerPadding is respected to keep content from sliding behind the nav bar
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+
+            // 🛠️ SPLASH TRANSITION LAYER: Prevents flicker during launch
+            val transitionAlpha by animateFloatAsState(
+                targetValue = if (animationStarted) 0f else 1f,
+                animationSpec = tween(1000),
+                label = "SplashFade"
+            )
+            Box(Modifier.fillMaxSize().alpha(transitionAlpha).background(Color(0xFF000416)))
 
             // ANIMATED RADIAL REVEAL
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val centerPoint = Offset(size.width / 2f, size.height / 2f)
                 val maxDim = size.width.coerceAtLeast(size.height)
-                drawCircle(color = userThemeBgColor, radius = maxDim * radiusPercent, center = centerPoint)
+                
+                // CRASH FIX: Ending radius must be > 0
+                if (radiusPercent > 0.01f) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                userThemeBgColor.copy(alpha = 0.35f),
+                                Color.Transparent
+                            ),
+                            center = centerPoint,
+                            radius = maxDim * radiusPercent
+                        ),
+                        radius = maxDim * radiusPercent,
+                        center = centerPoint
+                    )
+                }
             }
 
             // THE SWAN LOGO
@@ -133,7 +155,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 }
             }
 
-            // AUTH TRAY (Login, Create, and RESTORED Forgot Password)
+            // AUTH TRAY
             AnimatedVisibility(
                 visible = animateText,
                 enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
@@ -170,7 +192,6 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
             TextButton(onClick = onCreateAccountClick) {
                 Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
-            // RESTORED LINK
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(onClick = { /* Handle Forgot Password logic here */ }) {
                 Text("Forgot Password?", color = trayTextColor.copy(alpha = 0.5f), fontSize = 13.sp)

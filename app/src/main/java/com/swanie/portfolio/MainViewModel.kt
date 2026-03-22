@@ -24,14 +24,12 @@ class MainViewModel @Inject constructor(
     val cardBackgroundColor = themePreferences.cardBackgroundColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#121212")
     val cardTextColor = themePreferences.cardTextColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#FFFFFF")
     val useGradient = themePreferences.useGradient.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val gradientAmount = themePreferences.gradientAmount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.5f)
     val isCompactViewEnabled = themePreferences.isCompactViewEnabled.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val isDarkMode = themePreferences.isDarkMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     init {
-        // DATA SILENCE: The MainViewModel is strictly for UI state and preferences.
-        // It is forbidden from initiating global network refreshes.
-        // Data sync is now localized to specific Screen Lifecycles.
         _isDataReady.value = true
     }
 
@@ -41,5 +39,13 @@ class MainViewModel @Inject constructor(
 
     fun toggleCompactView() = viewModelScope.launch {
         themePreferences.saveIsCompactViewEnabled(!isCompactViewEnabled.value)
+    }
+
+    fun setUseGradient(enabled: Boolean) = viewModelScope.launch {
+        themePreferences.saveUseGradient(enabled)
+    }
+
+    fun setGradientAmount(amount: Float) = viewModelScope.launch {
+        themePreferences.saveGradientAmount(amount)
     }
 }

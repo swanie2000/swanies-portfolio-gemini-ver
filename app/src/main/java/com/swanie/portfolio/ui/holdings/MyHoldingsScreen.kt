@@ -179,7 +179,8 @@ fun MyHoldingsScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkTheme
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(bgColor).pointerInput(Unit) {
+    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
+    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent).pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
@@ -193,7 +194,7 @@ fun MyHoldingsScreen(
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth().background(bgColor).statusBarsPadding()) {
+            Box(modifier = Modifier.fillMaxWidth().background(Color.Transparent).statusBarsPadding()) {
                 Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
                     Image(
                         painter = painterResource(id = R.drawable.swanie_foreground),

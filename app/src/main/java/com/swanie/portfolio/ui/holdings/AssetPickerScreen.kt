@@ -64,27 +64,25 @@ fun AssetPickerScreen(
     val isSearchBusy by viewModel.isSearchBusy.collectAsState()
     val selectedProvider by viewModel.selectedProvider.collectAsState()
     
-    // Sort providers so "YahooFinance" (Precious Metals) is at the bottom
     val providers = remember(viewModel) {
         viewModel.getAvailableProviders().sortedBy { it == "YahooFinance" }
     }
 
     var menuExpanded by remember { mutableStateOf(false) }
 
-    // KEYBOARD RETREAT: Clear focus when user starts scrolling the results
     LaunchedEffect(listState.isScrollInProgress) {
         if (listState.isScrollInProgress) {
             focusManager.clearFocus()
         }
     }
 
-    // AUTO-KEYBOARD: Request focus on launch and set default to CoinGecko
     LaunchedEffect(Unit) {
         if (selectedProvider == null) viewModel.selectProvider("CoinGecko")
         delay(300)
         focusRequester.requestFocus()
     }
 
+    // GRADIENT SYMMETRY: Set containerColor to Transparent to allow NavGraph gradient to show
     Scaffold(
         topBar = {
             TopAppBar(
@@ -94,14 +92,13 @@ fun AssetPickerScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = textColor)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = bgColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         },
-        containerColor = bgColor
+        containerColor = Color.Transparent
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             
-            // --- THEMED FIXED HEIGHT SEARCH BOX ---
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).height(64.dp)) {
                 OutlinedTextField(
                     value = searchQuery,
@@ -116,7 +113,6 @@ fun AssetPickerScreen(
                         }
                     },
                     trailingIcon = {
-                        // THE PROVIDER BADGE: Rebranded for User Experience
                         Box(modifier = Modifier.padding(end = 8.dp)) {
                             Surface(
                                 onClick = { menuExpanded = true },
@@ -169,10 +165,7 @@ fun AssetPickerScreen(
                 )
             }
 
-            // MAIN CONTENT AREA
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                
-                // Content Layer: Metals Row + Results List
                 Column(modifier = Modifier.fillMaxSize()) {
                     if (selectedProvider == "YahooFinance") {
                         Row(
@@ -214,7 +207,6 @@ fun AssetPickerScreen(
                     }
                 }
 
-                // Swan Branding Layer: Positioned exactly 30dp below the search bar
                 if (searchResults.isEmpty() && !isSearchBusy) {
                     Box(
                         modifier = Modifier.fillMaxSize(),

@@ -24,6 +24,7 @@ class ThemePreferences @Inject constructor(
         val CARD_BACKGROUND_COLOR = stringPreferencesKey("card_background_color")
         val CARD_TEXT_COLOR = stringPreferencesKey("card_text_color")
         val USE_GRADIENT = booleanPreferencesKey("use_gradient")
+        val GRADIENT_AMOUNT = floatPreferencesKey("gradient_amount") // NEW: Control the strength of the gradient
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
@@ -37,6 +38,7 @@ class ThemePreferences @Inject constructor(
     val cardBackgroundColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.CARD_BACKGROUND_COLOR] ?: "#121212" }
     val cardTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.CARD_TEXT_COLOR] ?: "#FFFFFF" }
     val useGradient: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.USE_GRADIENT] ?: false }
+    val gradientAmount: Flow<Float> = appContext.dataStore.data.map { it[PreferencesKeys.GRADIENT_AMOUNT] ?: 0.5f }
     val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false }
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_DARK_MODE] ?: true }
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
@@ -49,6 +51,7 @@ class ThemePreferences @Inject constructor(
     suspend fun saveCardBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.CARD_BACKGROUND_COLOR] = color } }
     suspend fun saveCardTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.CARD_TEXT_COLOR] = color } }
     suspend fun saveUseGradient(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.USE_GRADIENT] = enabled } }
+    suspend fun saveGradientAmount(amount: Float) { appContext.dataStore.edit { it[PreferencesKeys.GRADIENT_AMOUNT] = amount } }
     suspend fun saveIsCompactViewEnabled(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled } }
     suspend fun saveIsDarkMode(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_DARK_MODE] = enabled } }
     suspend fun saveConfirmDelete(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.CONFIRM_DELETE] = enabled } }

@@ -49,10 +49,8 @@ fun AnalyticsScreen(navController: NavController) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
-    val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
-    val safeBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
     val neonPalette = listOf(
@@ -61,14 +59,12 @@ fun AnalyticsScreen(navController: NavController) {
         Color(0xFF2979FF), Color(0xFFEEFF41), Color(0xFFB2FF59)
     )
 
-    // ALIGNED V6: officialSpotPrice
     val totalValue = holdings.sumOf { it.officialSpotPrice * (it.weight * it.amountHeld) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     var selectedAssetId by remember { mutableStateOf<String?>(null) }
 
     val assetSegments = holdings.mapIndexed { index, asset ->
-        // ALIGNED V6: officialSpotPrice
         val assetValue = asset.officialSpotPrice * (asset.weight * asset.amountHeld)
         AssetSegment(
             asset = asset,
@@ -81,11 +77,15 @@ fun AnalyticsScreen(navController: NavController) {
     val focusedSegment = assetSegments.find { it.asset.coinId == selectedAssetId }
     val pagerState = rememberPagerState(pageCount = { 3 })
 
-    Column(modifier = Modifier.fillMaxSize().background(safeBg)) {
+    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navController = navController) },
+        containerColor = Color.Transparent
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
             Box(modifier = Modifier.fillMaxWidth().statusBarsPadding(), contentAlignment = Alignment.Center) {
@@ -203,8 +203,6 @@ fun AnalyticsScreen(navController: NavController) {
             }
             Spacer(Modifier.height(40.dp))
         }
-
-        BottomNavigationBar(navController = navController)
     }
 }
 
@@ -314,7 +312,6 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
-            // ICON BOX (Cleaned up, no ring)
             Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                 if (segment.asset.category == AssetCategory.METAL) {
                     MetalIcon(segment.asset.name, size = 30)
@@ -329,7 +326,6 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
 
             Spacer(Modifier.width(14.dp))
 
-            // NAME + PILL BAR STACK
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
                     text = displayTitle,
@@ -340,7 +336,6 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(Modifier.height(4.dp))
-                // THE PILL BAR
                 Box(
                     modifier = Modifier
                         .width(40.dp)

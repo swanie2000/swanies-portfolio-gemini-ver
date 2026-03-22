@@ -31,6 +31,9 @@ class ThemeViewModel @Inject constructor(
     private val _useGradient = MutableStateFlow(false)
     val useGradient: StateFlow<Boolean> = _useGradient.asStateFlow()
 
+    private val _gradientAmount = MutableStateFlow(0.5f)
+    val gradientAmount: StateFlow<Float> = _gradientAmount.asStateFlow()
+
     private val _metalsDisplayOrder = MutableStateFlow("XAU,XAG,XPT,XPD")
     val metalsDisplayOrder: StateFlow<String> = _metalsDisplayOrder.asStateFlow()
 
@@ -49,6 +52,9 @@ class ThemeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             themePreferences.useGradient.collect { _useGradient.value = it }
+        }
+        viewModelScope.launch {
+            themePreferences.gradientAmount.collect { _gradientAmount.value = it }
         }
         viewModelScope.launch {
             themePreferences.metalsDisplayOrder.collect { _metalsDisplayOrder.value = it }
@@ -78,6 +84,11 @@ class ThemeViewModel @Inject constructor(
     fun saveUseGradient(useGradient: Boolean) {
         _useGradient.value = useGradient
         viewModelScope.launch { themePreferences.saveUseGradient(useGradient) }
+    }
+
+    fun saveGradientAmount(amount: Float) {
+        _gradientAmount.value = amount
+        viewModelScope.launch { themePreferences.saveGradientAmount(amount) }
     }
 
     fun saveMetalsDisplayOrder(order: String) {
