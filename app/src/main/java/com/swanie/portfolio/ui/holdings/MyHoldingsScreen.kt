@@ -331,5 +331,61 @@ fun MyHoldingsScreen(
                 Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
             }
         }
+
+        // 🛠️ RESTORED: Asset Editing Logic
+        assetBeingEdited?.let { asset ->
+            if (asset.category == AssetCategory.CRYPTO) {
+                CryptoEditFunnel(
+                    asset = asset,
+                    onDismiss = { assetBeingEdited = null },
+                    onSave = { newName, newAmount, newDecimals ->
+                        viewModel.updateAsset(asset, newName, newAmount, asset.weight, newDecimals)
+                        assetBeingEdited = null
+                    }
+                )
+            } else {
+                MetalSelectionFunnel(
+                    initialMetal = asset.symbol,
+                    initialForm = asset.name,
+                    initialWeight = asset.weight,
+                    initialQty = asset.amountHeld.toString(),
+                    initialPrem = asset.premium.toString(),
+                    initialManualPrice = asset.officialSpotPrice.toString(),
+                    onDismiss = { assetBeingEdited = null },
+                    onConfirmed = { type, desc, weight, isKilo, qty, prem, icon, isManual, manualPrice ->
+                        val finalWeight = if (isKilo) 32.1507 else weight
+                        viewModel.updateAssetEntity(asset.copy(
+                            symbol = type,
+                            name = desc,
+                            weight = finalWeight,
+                            amountHeld = qty.toDoubleOrNull() ?: 0.0,
+                            premium = prem.toDoubleOrNull() ?: 0.0,
+                            imageUrl = icon ?: asset.imageUrl,
+                            officialSpotPrice = if(isManual) (manualPrice.toDoubleOrNull() ?: 0.0) else asset.officialSpotPrice
+                        ))
+                        assetBeingEdited = null
+                    }
+                )
+            }
+        }
+
+        // 🗑️ RESTORED: Delete Confirmation Logic
+        assetPendingDeletion?.let { asset ->
+            AlertDialog(
+                onDismissRequest = { assetPendingDeletion = null },
+                containerColor = Color(0xFF1A1A1A),
+                title = { Text("PURGE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
+                text = { Text("This will permanently remove ${asset.name} from your vault. Proceed?", color = Color.White.copy(0.7f)) },
+                confirmButton = {
+                    TextButton(onClick = { 
+                        viewModel.deleteAsset(asset)
+                        assetPendingDeletion = null
+                    }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Black) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = Color.White) }
+                }
+            )
+        }
     }
 }

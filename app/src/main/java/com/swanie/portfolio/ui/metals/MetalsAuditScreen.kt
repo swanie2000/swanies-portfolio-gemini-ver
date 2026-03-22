@@ -55,7 +55,7 @@ fun MetalsAuditScreen(navController: NavController) {
     val bgColor = Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" }))
     val textColor = Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" }))
     val cardBg = Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" }))
-    val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifBlank { "#FFFFFF" }))
+    val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifHexBlank("#FFFFFF")))
 
     var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
     val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
@@ -67,7 +67,11 @@ fun MetalsAuditScreen(navController: NavController) {
             val defaultList = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
+        
+        // SAFETY STRIKE: Respect global cooldown for Metals Watch.
         viewModel.refreshMarketWatch()
+        
+        // DATA POPULATION: Fetching individual points for UI state if bulk failed or is pending.
         metalsOrder.forEach { (_, sym) ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
@@ -170,3 +174,5 @@ fun MetalsAuditScreen(navController: NavController) {
         }
     }
 }
+
+private fun String.ifHexBlank(default: String): String = if (this.isBlank() || !this.startsWith("#")) default else this

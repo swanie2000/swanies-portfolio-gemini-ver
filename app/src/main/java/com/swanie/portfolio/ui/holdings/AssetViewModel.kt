@@ -91,6 +91,11 @@ class AssetViewModel @Inject constructor(
 
     suspend fun fetchMarketPriceData(symbol: String): MarketPriceData = repository.fetchMarketPrice(symbol)
 
+    /**
+     * METADATA HEALING BRIDGE: Standardizes icons and IDs via CoinGecko
+     */
+    suspend fun healMetadata(asset: AssetEntity): AssetEntity = repository.healMetadata(asset)
+
     fun refreshAssets() {
         viewModelScope.launch { repository.refreshAssets() }
     }
@@ -131,7 +136,6 @@ class AssetViewModel @Inject constructor(
             val currentHoldings = holdings.value
             val updatedList = currentHoldings.filter { it.category == AssetCategory.METAL }.map { asset ->
                 val newIndex = symbols.indexOf(asset.baseSymbol)
-                // ALIGNED V6: sortOrder -> displayOrder
                 if (newIndex != -1) asset.copy(displayOrder = newIndex) else asset
             }
             if (updatedList.isNotEmpty()) repository.updateAssetOrder(updatedList)
@@ -139,6 +143,15 @@ class AssetViewModel @Inject constructor(
     }
 
     fun getMetalDisplayOrder(): List<String>? = sharedPrefs.getString("metals_order", null)?.split(",")
+
+    /**
+     * SURGICAL: Expose direct entity update for complex metal/crypto edits.
+     */
+    fun updateAssetEntity(asset: AssetEntity) {
+        viewModelScope.launch {
+            repository.updateAssetEntity(asset)
+        }
+    }
 
     fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, decimals: Int) {
         viewModelScope.launch {

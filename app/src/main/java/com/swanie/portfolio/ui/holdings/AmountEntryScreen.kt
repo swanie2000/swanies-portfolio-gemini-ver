@@ -38,6 +38,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun AmountEntryScreen(
     coinId: String,
+    apiId: String, // Aligned V6: Separate fetch ID
     symbol: String,
     name: String,
     imageUrl: String,
@@ -88,7 +89,6 @@ fun AmountEntryScreen(
                 val (target, text) = milestone
                 visualStatus = text
 
-                // SLOWED DOWN: Randomize duration between 800ms and 1500ms per step
                 val stepDuration = (800L..1500L).random()
                 val startProgress = visualProgress
                 val totalSteps = 20
@@ -101,7 +101,7 @@ fun AmountEntryScreen(
 
             showCheckmark = true
             while (!isActualWorkDone) { delay(100) }
-            delay(1200) // Extra soak time for the Checkmark
+            delay(1200)
             onSave()
         }
     }
@@ -128,12 +128,20 @@ fun AmountEntryScreen(
             return
         }
         isSaving = true
+        
+        // UNIQUE SOURCE RESTORATION: Use coinId as PK, apiId for data chain
         val asset = AssetEntity(
-            coinId = coinId, symbol = symbol, name = name,
-            amountHeld = amountValue, officialSpotPrice = officialSpotPrice, // ALIGNED V6
-            category = category, imageUrl = imageUrl,
+            coinId = coinId, 
+            symbol = symbol, 
+            name = name,
+            amountHeld = amountValue, 
+            officialSpotPrice = officialSpotPrice,
+            category = category, 
+            imageUrl = imageUrl,
             lastUpdated = System.currentTimeMillis(),
-            apiId = coinId, iconUrl = imageUrl, baseSymbol = symbol,
+            apiId = apiId, 
+            iconUrl = imageUrl, 
+            baseSymbol = symbol,
             priceSource = priceSource
         )
         viewModel.performSurgicalAdd(asset) { isActualWorkDone = true }

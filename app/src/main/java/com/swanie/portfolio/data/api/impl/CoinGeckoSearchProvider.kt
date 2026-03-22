@@ -22,7 +22,7 @@ class CoinGeckoSearchProvider @Inject constructor(
             val result = coinGeckoApiService.search(query)
             result.coins.map { coin ->
                 SearchResult(
-                    id = coin.id,
+                    id = "CG_${coin.id}", // UNIQUE PREFIX
                     symbol = coin.symbol,
                     name = coin.name,
                     imageUrl = coin.large,
@@ -37,23 +37,23 @@ class CoinGeckoSearchProvider @Inject constructor(
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
         val currentTime = System.currentTimeMillis()
-        // Rate limit protection for CoinGecko Public API
         if (currentTime - lastGlobalHit < 10000) {
-            Log.w("API_TRACE", "COINGECKO: Rate limit cooldown active.")
+            Log.w("API_TRACE", "COINGECKO: Rate limit cooldown.")
             return emptyList()
         }
         lastGlobalHit = currentTime
 
         return try {
             delay(500)
-            // ids here is expected to be a comma-separated list of apiIds (e.g. "bitcoin,ethereum")
-            val response = coinGeckoApiService.getCoinMarkets(ids = ids)
+            // Strip CG_ prefix for the API call
+            val cleanIds = ids.split(",").joinToString(",") { it.replace("CG_", "") }
+            val response = coinGeckoApiService.getCoinMarkets(ids = cleanIds)
             
             if (response.isSuccessful) {
                 val marketData = response.body() ?: emptyList()
                 marketData.map { fresh ->
                     AssetEntity(
-                        coinId = fresh.id,
+                        coinId = "CG_${fresh.id}", // UNIQUE PK
                         symbol = fresh.symbol,
                         name = fresh.name,
                         imageUrl = fresh.image ?: "",
@@ -62,18 +62,16 @@ class CoinGeckoSearchProvider @Inject constructor(
                         priceChange24h = fresh.priceChangePercentage24h ?: 0.0,
                         sparklineData = fresh.sparklineIn7d?.price ?: emptyList(),
                         baseSymbol = fresh.symbol,
-                        apiId = fresh.id,
+                        apiId = fresh.id, // Raw ID for fetch logic
                         iconUrl = fresh.image,
                         priceSource = name,
                         lastUpdated = System.currentTimeMillis()
                     )
                 }
             } else {
-                Log.e("API_TRACE", "COINGECKO ERROR: ${response.code()}")
                 emptyList()
             }
         } catch (e: Exception) {
-            Log.e("API_TRACE", "COINGECKO EXCEPTION: ${e.message}")
             emptyList()
         }
     }

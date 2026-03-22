@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -26,12 +27,14 @@ import com.swanie.portfolio.ui.settings.SettingsScreen
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
+import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.net.URLEncoder
 
 @Composable
 fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
     val assetViewModel: AssetViewModel = hiltViewModel()
+    val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
         NavHost(
@@ -77,26 +80,33 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 AssetPickerScreen(
                     navController = navController,
                     onAssetSelected = { asset ->
-                        if (asset.category == AssetCategory.METAL) {
-                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}")
-                            assetViewModel.performSurgicalAdd(asset) {
-                                navController.popBackStack()
+                        scope.launch {
+                            // METADATA HEALING: Heal via CoinGecko but keep the unique provider coinId
+                            val healedAsset = assetViewModel.healMetadata(asset)
+                            
+                            if (healedAsset.category == AssetCategory.METAL) {
+                                Log.d("ADD_TRACE", "STEP 2: NAV_PASSING (METAL): ID=${healedAsset.coinId}")
+                                assetViewModel.performSurgicalAdd(healedAsset) {
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "", "UTF-8")
+                                val encodedSource = URLEncoder.encode(healedAsset.priceSource, "UTF-8")
+                                
+                                Log.d("ADD_TRACE", "STEP 2: NAV_PASSING (CRYPTO): coinId=${healedAsset.coinId}, apiId=${healedAsset.apiId}")
+                                
+                                // RESTORED UNIQUENESS: Passing both coinId AND apiId
+                                navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource")
                             }
-                        } else {
-                            val encodedThumb = URLEncoder.encode(asset.iconUrl ?: asset.imageUrl ?: "", "UTF-8")
-                            val encodedSource = URLEncoder.encode(asset.priceSource, "UTF-8")
-                            
-                            Log.d("ADD_TRACE", "STEP 2: NAV_PASSING: ID=${asset.apiId}, SOURCE=${asset.priceSource}")
-                            
-                            navController.navigate("amount_entry/${asset.symbol}/${asset.apiId}/$encodedThumb/${asset.category.name}/${asset.officialSpotPrice}/$encodedSource")
                         }
                     }
                 )
             }
 
             composable(
-                route = "amount_entry/{symbol}/{apiId}/{iconUrl}/{category}/{price}/{priceSource}",
+                route = "amount_entry/{coinId}/{symbol}/{apiId}/{iconUrl}/{category}/{price}/{priceSource}",
                 arguments = listOf(
+                    navArgument("coinId") { type = NavType.StringType },
                     navArgument("symbol") { type = NavType.StringType },
                     navArgument("apiId") { type = NavType.StringType },
                     navArgument("iconUrl") { type = NavType.StringType },
@@ -105,6 +115,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     navArgument("priceSource") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
+                val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
                 val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
                 val apiId = backStackEntry.arguments?.getString("apiId") ?: ""
                 val iconUrl = backStackEntry.arguments?.getString("iconUrl") ?: ""
@@ -116,12 +127,13 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 val price = backStackEntry.arguments?.getString("price")?.toDoubleOrNull() ?: 0.0
 
                 AmountEntryScreen(
-                    coinId = apiId,
+                    coinId = coinId,
+                    apiId = apiId, // Aligned with unique PK vs fetch ID
                     symbol = symbol,
                     name = symbol,
                     imageUrl = decodedThumb,
                     category = category,
-                    officialSpotPrice = price, // ALIGNED V6
+                    officialSpotPrice = price,
                     priceSource = priceSource,
                     onSave = {
                         navController.navigate(Routes.HOLDINGS) {

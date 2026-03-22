@@ -173,78 +173,73 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE FORTRESS RESTORED
+PROJECT STATUS: THE FORTRESS STABILIZED (V7)
 
-Current Version: 3.1 (Stable)
+Current Version: 3.2 (Recovery Milestone)
 
-Build Status: 🟢 SUCCESS
+Build Status: 🟢 SUCCESS (Verified on Device)
 
-Database Schema: V5 (Legacy Symmetry)
-1. The Post-Mortem: Why V3.2 "Broke"
+Database Schema: V7 (Locked & Aligned)
 
-The previous attempt failed because of a "Symmetry Fracture." We tried to upgrade the engine (Database V6) while the tires were still spinning on V5 logic (ViewModel/Providers).
-Component	Status during Crash	Current Restored State
-Database	V6 (Partial Migration)	V5 (Gold Master)
-Glance Widget	Mismatched Handshakes	Deleted (Clean Slate)
-Naming	sortOrder / showOnWidget	displayOrder / officialSpotPrice
-Hilt	Dependency Loops	Purged & Realigned
+1. The Great Recovery: Hard-V6 to V7 Milestone
+
+We have successfully navigated the "Symmetry Fracture" that broke previous versions. The app is now fully functional on a brand-new V7 schema that correctly separates Primary Keys from API Fetch IDs.
+
+Key Wins Today:
+- Schema Lockdown: Migrated from V5 through V6 to a stable V7. All fields (officialSpotPrice, displayOrder, apiId) are synchronized.
+- Data Pipeline Restoration: All 4 search engines (CoinGecko, Coinbase, KuCoin, CryptoCompare) now return live Price, Sparklines, and Icons on the first add.
+- Metadata Healing (The Safety Net): Restored background CoinGecko search. Assets added from Coinbase/KuCoin are now automatically "healed" with premium CoinGecko icons and standardized IDs.
+- UX Optimization:
+    - Asset Picker: Unified, theme-adaptive search bar with integrated provider selection.
+    - Keyboard Retreat: Keyboard automatically slides away when search results are scrolled.
+    - Branded Visuals: High-vertical, full-color Hero Swan branding on the search screen.
+- API Safety:
+    - Removed redundant startup locks while strengthening actual rate-limiting.
+    - Metals Market Watch now uses batch updates (1 hit instead of 8) and respects a global 30s cooldown.
+
 2. The Current "Fortress" Specs
 
-The app is currently in a "High-Density Stable" state. It’s fast, it’s clean, and the connectivity to KuCoin and Coinbase is solid.
+Component	Status
+Database	V7 (Ironclad Uniqueness via CG_/CB_/KC_/CC_ prefixes)
+Networking	Retrofit handles multi-domain requests (Candles + Spot Price).
+Branding	Full-color Swan integrated into UI layers.
+Safety Net	CoinGecko background healing active for all search results.
+Interaction	Full Edit/Delete funnels restored for both Crypto and Metals.
 
-    Networking: Retrofit instances are correctly named and injected.
+THE REVISED PHASE 2 BATTLE PLAN: "THE BITMAP COURIER"
 
-    Branding: The 100dp "Hero Swan" logo is persistent and centers the UI.
+Now that the data foundation is rock-solid, we are ready to re-invade the Home Screen.
 
-    Persistence: DataStore successfully remembers your "Compact/Full" view preferences.
+Objective:
+"The Color Pulse Engine" — A home screen widget that renders live trend colors (Green/Red) using a Bitmap Courier system to bypass Jetpack Glance’s hardware limitations.
 
-    Providers: CoinGecko acts as the "Safety Net" while KuCoin/Coinbase handle the heavy lifting.
-
-THE REVISED V3.2 BATTLE PLAN: "SYMMETRY-FIRST"
-
-We aren't giving up on the widget; we’re just changing how we invade. Instead of a multi-file "scatter-gun" update, we will move in a single, synchronized strike.
-The Phase 2 Objective
-
-    "The Color Pulse Engine" — A home screen widget that renders live trend colors (Green/Red) using a Bitmap Courier system to bypass Glance’s hardware limitations.
-
-The Three-Pronged Strike
-
-    The Bitmap Courier: Create a WidgetIconManager to handle the "Fax Machine" constraint of Jetpack Glance.
-
-    The UI Bridge: Add the "Show on Home Screen" toggle to the Asset Detail screen before we touch the database.
-
-    The Schema Lockdown: Perform the V5 ➔ V6 migration only when the Repository and ViewModel are already "standing by" to receive the new data fields.
+The Three-Pronged Strike:
+1. The Bitmap Courier: Create a WidgetIconManager to handle the "Fax Machine" constraint of Jetpack Glance.
+2. The Data Provider: Connect the V7 database to the Glance StateDefinition.
+3. The Pulse UI: Build the widget using the already-stable officialSpotPrice and priceChange24h fields.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 03/21/2026 11:19:17.31
+Generated: Sat 03/21/2026 17:24:18.93
 
 Branch:
 main
 Commit:
-c11e9fc9a553c92c65dbda294fd4fee68386bf90
+77d94b225ce9e909ab15d13c6d1cc93f0c8e3ebb
 Working tree status (git status --porcelain):
- M .idea/misc.xml
- M app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/CoinbaseSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/KuCoinSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
- M app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
- M app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
- M app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
- M app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
- M app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
- M app/src/main/java/com/swanie/portfolio/data/network/KuCoinApiService.kt
+ M app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
+ M app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider.kt
  M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/MarketPriceData.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/data/repository/DataSyncCoordinator.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
-D  app/src/main/java/com/swanie/portfolio/ui/widget/PortfolioWidget.kt
- M docs/BROWSER_CONTEXT_MASTER.md
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------

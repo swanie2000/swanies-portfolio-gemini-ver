@@ -25,7 +25,7 @@ class CryptoCompareSearchProvider @Inject constructor(
                 .take(20)
                 .map { coin ->
                     SearchResult(
-                        id = coin.symbol,
+                        id = "CC_${coin.symbol}", // UNIQUE PREFIX
                         symbol = coin.symbol,
                         name = coin.fullName,
                         imageUrl = "https://www.cryptocompare.com${coin.imageUrl ?: ""}",
@@ -43,23 +43,22 @@ class CryptoCompareSearchProvider @Inject constructor(
         val results = mutableListOf<AssetEntity>()
         try {
             Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching price for $ids...")
-            val response = cryptoCompareApiService.getPriceFull(fsyms = ids)
+            // Strip CC_ prefix for the API call
+            val cleanIds = ids.split(",").joinToString(",") { it.replace("CC_", "") }
+            val response = cryptoCompareApiService.getPriceFull(fsyms = cleanIds)
             if (response.isSuccessful) {
                 val rawData = response.body()?.raw ?: emptyMap()
                 for ((symbol, priceMap) in rawData) {
                     val usdData = priceMap["USD"]
                     
-                    // SPARKLINE RESTORATION: Fetch history for each symbol
-                    // Use a 24-hour window for the sparkline
                     val sparkline = try {
                         fetchSparkline(symbol)
                     } catch (e: Exception) {
-                        Log.e("CRYPTO_TRACE", "Sparkline failed for $symbol: ${e.message}")
                         emptyList()
                     }
 
                     results.add(AssetEntity(
-                        coinId = symbol,
+                        coinId = "CC_$symbol", // UNIQUE PK
                         symbol = symbol,
                         name = symbol,
                         imageUrl = if (usdData?.imageUrl != null) "https://www.cryptocompare.com${usdData.imageUrl}" else "",
@@ -74,8 +73,6 @@ class CryptoCompareSearchProvider @Inject constructor(
                         lastUpdated = System.currentTimeMillis()
                     ))
                 }
-            } else {
-                Log.e("ADD_TRACE", "CryptoCompare Price Error: ${response.code()}")
             }
         } catch (e: Exception) {
             Log.e("ADD_TRACE", "CryptoCompare Price Exception: ${e.message}")
@@ -83,29 +80,16 @@ class CryptoCompareSearchProvider @Inject constructor(
         return results
     }
 
-    /**
-     * Implementation of sparkline fetch for CryptoCompare with specialized field validation.
-     */
     suspend fun fetchSparkline(symbol: String): List<Double> {
-        // Ensure symbol is uppercase for the history endpoint
         val cleanSymbol = symbol.uppercase()
-        Log.d("CRYPTO_TRACE", "Attempting fetch for $cleanSymbol")
-        return try {
+        try {
             val response = cryptoCompareApiService.getHistoryHour(fsym = cleanSymbol, tsym = "USD", limit = 24)
-            
             if (response.isSuccessful) {
-                val body = response.body()
-                val historyData = body?.data?.data ?: emptyList()
-                val sparkline = historyData.map { it.close }
-                Log.d("CRYPTO_TRACE", "Successfully fetched ${sparkline.size} points for $cleanSymbol")
-                sparkline
-            } else {
-                Log.e("CRYPTO_TRACE", "HTTP_ERROR: ${response.code()} for $cleanSymbol")
-                emptyList()
+                return response.body()?.data?.data?.map { it.close } ?: emptyList()
             }
         } catch (e: Exception) {
-            Log.e("CRYPTO_TRACE", "EXCEPTION for $cleanSymbol: ${e.message}")
-            emptyList()
+            Log.e("CRYPTO_TRACE", "Sparkline failed: ${e.message}")
         }
+        return emptyList()
     }
 }

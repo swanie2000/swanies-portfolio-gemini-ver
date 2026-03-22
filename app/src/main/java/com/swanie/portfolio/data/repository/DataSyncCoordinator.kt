@@ -10,20 +10,18 @@ import javax.inject.Singleton
 class DataSyncCoordinator @Inject constructor() {
     private val TAG = "SWAN_SYNC"
     private val SYNC_THRESHOLD = 30_000L 
-    private val STARTUP_FORGIVE_THRESHOLD = 30_000L // Reduced to 30s to match sync threshold
-    private val appStartTime = System.currentTimeMillis()
     private var lastSyncTimestamp = 0L
 
     private val _syncStatus = MutableStateFlow<SyncStatus>(SyncStatus.Idle)
     val syncStatus = _syncStatus.asStateFlow()
 
+    /**
+     * Calculates remaining seconds for the rate-limiter.
+     * The startup lock has been removed to improve responsiveness,
+     * but the 30s cooldown between successful hits remains ironclad.
+     */
     fun getRemainingCooldown(): Int {
         val currentTime = System.currentTimeMillis()
-        
-        // Startup Lock check (Now 30s)
-        val startupWait = (STARTUP_FORGIVE_THRESHOLD - (currentTime - appStartTime)) / 1000
-        if (startupWait > 0) return startupWait.toInt()
-
         val timeSinceLastSync = currentTime - lastSyncTimestamp
         val syncWait = (SYNC_THRESHOLD - timeSinceLastSync) / 1000
         return if (syncWait > 0) syncWait.toInt() else 0
@@ -34,7 +32,6 @@ class DataSyncCoordinator @Inject constructor() {
             Log.d(TAG, "Rate Limiter: BYPASS (Forced Sync).")
             return true
         }
-        
         return getRemainingCooldown() <= 0
     }
 
