@@ -24,7 +24,9 @@ data class AssetEntity(
     val displayOrder: Int = 0, // ALIGNED V6
     val lastUpdated: Long = System.currentTimeMillis(),
     val isFavorite: Boolean = false,
-    val showOnWidget: Boolean = false
+    val showOnWidget: Boolean = false,
+    val portfolioId: String = "MAIN",
+    val widgetOrder: Int = 0
 )
 
 enum class AssetCategory {

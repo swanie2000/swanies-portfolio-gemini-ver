@@ -5,14 +5,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AssetDao {
-    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
-    fun getAllAssets(): Flow<List<AssetEntity>>
+    // 🛡️ V7 Compatibility Property: Points to the 'MAIN' portfolio by default
+    @Query("SELECT * FROM assets WHERE portfolioId = 'MAIN' ORDER BY displayOrder ASC")
+    fun getAllAssetsFlow(): Flow<List<AssetEntity>>
 
-    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
-    suspend fun getAllAssetsOnce(): List<AssetEntity>
+    // 🚀 V8 Multi-Portfolio Function
+    @Query("SELECT * FROM assets WHERE portfolioId = :pId ORDER BY displayOrder ASC")
+    fun getAssetsByPortfolio(pId: String): Flow<List<AssetEntity>>
 
-    @Query("SELECT * FROM assets WHERE showOnWidget = 1 ORDER BY displayOrder ASC")
-    suspend fun getWidgetAssets(): List<AssetEntity>
+    @Query("SELECT * FROM assets WHERE portfolioId = :pId ORDER BY displayOrder ASC")
+    suspend fun getAllAssetsOnce(pId: String = "MAIN"): List<AssetEntity>
+
+    @Query("SELECT * FROM assets WHERE showOnWidget = 1 AND portfolioId = :pId ORDER BY widgetOrder ASC")
+    suspend fun getWidgetAssets(pId: String = "MAIN"): List<AssetEntity>
 
     @Upsert
     suspend fun upsertAsset(asset: AssetEntity)
@@ -38,4 +43,7 @@ interface AssetDao {
 
     @Query("UPDATE assets SET displayOrder = :order WHERE coinId = :id")
     suspend fun updateAssetDisplayOrder(id: String, order: Int)
+
+    @Query("UPDATE assets SET widgetOrder = :order WHERE coinId = :id")
+    suspend fun updateWidgetOrder(id: String, order: Int)
 }

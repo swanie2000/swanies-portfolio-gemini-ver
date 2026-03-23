@@ -27,6 +27,7 @@ class AssetViewModel @Inject constructor(
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
 
+    // 🛡️ RECONNECTED: This now points to repository.allAssets (The V7 Bridge)
     val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
         .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -36,7 +37,7 @@ class AssetViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val remainingCooldown: StateFlow<Int> = flow {
-        while(true) {
+        while (true) {
             emit(syncCoordinator.getRemainingCooldown())
             delay(1000)
         }
@@ -57,43 +58,44 @@ class AssetViewModel @Inject constructor(
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    val searchResults: StateFlow<List<AssetEntity>> = combine(_searchQuery, _selectedProvider) { query, provider ->
-        query to provider
-    }
-        .debounce(700)
-        .distinctUntilChanged()
-        .flatMapLatest { (query, provider) ->
-            val cleanQuery = query.trim()
-            if (cleanQuery.length < 2 || provider == null) {
-                _isSearchBusy.value = false
-                flowOf(emptyList())
-            } else {
-                flow {
-                    _isSearchBusy.value = true
-                    try {
-                        val searchProvider = searchRegistry.getProvider(provider) ?: searchRegistry.getDefaultProvider()
-                        val results = searchProvider.search(cleanQuery)
-                        emit(results.map { it.toAssetEntity() })
-                    } catch (e: Exception) {
-                        Log.e("SEARCH_ERROR", "Search failed: ${e.message}")
-                        emit(emptyList())
-                    } finally {
-                        _isSearchBusy.value = false
+    val searchResults: StateFlow<List<AssetEntity>> =
+        combine(_searchQuery, _selectedProvider) { query, provider ->
+            query to provider
+        }
+            .debounce(700)
+            .distinctUntilChanged()
+            .flatMapLatest { (query, provider) ->
+                val cleanQuery = query.trim()
+                if (cleanQuery.length < 2 || provider == null) {
+                    _isSearchBusy.value = false
+                    flowOf(emptyList())
+                } else {
+                    flow {
+                        _isSearchBusy.value = true
+                        try {
+                            val searchProvider = searchRegistry.getProvider(provider)
+                                ?: searchRegistry.getDefaultProvider()
+                            val results = searchProvider.search(cleanQuery)
+                            // 🚀 V8 Identity: Ensure search results land with 'MAIN' portfolio default
+                            emit(results.map { it.toAssetEntity().copy(portfolioId = "MAIN") })
+                        } catch (e: Exception) {
+                            Log.e("SEARCH_ERROR", "Search failed: ${e.message}")
+                            emit(emptyList())
+                        } finally {
+                            _isSearchBusy.value = false
+                        }
                     }
                 }
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun searchCoins(query: String) {
         _searchQuery.value = query
     }
 
-    suspend fun fetchMarketPriceData(symbol: String): MarketPriceData = repository.fetchMarketPrice(symbol)
+    suspend fun fetchMarketPriceData(symbol: String): MarketPriceData =
+        repository.fetchMarketPrice(symbol)
 
-    /**
-     * METADATA HEALING BRIDGE: Standardizes icons and IDs via CoinGecko
-     */
     suspend fun healMetadata(asset: AssetEntity): AssetEntity = repository.healMetadata(asset)
 
     fun refreshAssets() {
@@ -104,18 +106,18 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch { repository.refreshMarketWatch() }
     }
 
-    /**
-     * SURGICAL: Core DB insertion logic
-     */
     fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
         viewModelScope.launch {
-            repository.executeSurgicalAdd(asset) { _, _ -> }
+            // 🚀 V8 Identity: Explicitly tag as 'MAIN' during surgical add if missing
+            val taggedAsset = if (asset.portfolioId.isEmpty()) asset.copy(portfolioId = "MAIN") else asset
+            repository.executeSurgicalAdd(taggedAsset) { _, _ -> }
             onComplete()
         }
     }
 
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
+            // 🛡️ RECONNECTED: This now calls the overloaded repository.deleteAsset(asset)
             repository.deleteAsset(asset)
         }
     }
@@ -134,19 +136,18 @@ class AssetViewModel @Inject constructor(
         sharedPrefs.edit().putString("metals_order", symbols.joinToString(",")).apply()
         viewModelScope.launch {
             val currentHoldings = holdings.value
-            val updatedList = currentHoldings.filter { it.category == AssetCategory.METAL }.map { asset ->
-                val newIndex = symbols.indexOf(asset.baseSymbol)
-                if (newIndex != -1) asset.copy(displayOrder = newIndex) else asset
-            }
+            val updatedList =
+                currentHoldings.filter { it.category == AssetCategory.METAL }.map { asset ->
+                    val newIndex = symbols.indexOf(asset.baseSymbol)
+                    if (newIndex != -1) asset.copy(displayOrder = newIndex) else asset
+                }
             if (updatedList.isNotEmpty()) repository.updateAssetOrder(updatedList)
         }
     }
 
-    fun getMetalDisplayOrder(): List<String>? = sharedPrefs.getString("metals_order", null)?.split(",")
+    fun getMetalDisplayOrder(): List<String>? =
+        sharedPrefs.getString("metals_order", null)?.split(",")
 
-    /**
-     * SURGICAL: Expose direct entity update for complex metal/crypto edits.
-     */
     fun updateAssetEntity(asset: AssetEntity) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset)
