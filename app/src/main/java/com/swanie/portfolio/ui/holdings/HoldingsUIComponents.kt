@@ -5,8 +5,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +24,9 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
@@ -47,22 +48,74 @@ import java.text.DecimalFormat
 import java.util.Locale
 
 @Composable
-fun MetalIcon(name: String, size: Int = 44, imageUrl: String = "") {
+fun MetalIcon(name: String, weight: Double, size: Int = 44, imageUrl: String = "", category: AssetCategory = AssetCategory.METAL) {
+    var isError by remember { mutableStateOf(false) }
+
     if (imageUrl == "SWAN_DEFAULT") {
         Box(modifier = Modifier.size((size * 1.2).dp).clip(CircleShape).background(Color.White.copy(0.1f)), contentAlignment = Alignment.Center) {
             Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
         }
     } else if (imageUrl.startsWith("content://") || imageUrl.startsWith("file://")) {
         AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(size.dp).clip(CircleShape).border(1.dp, Color.White.copy(0.2f), CircleShape))
-    } else if (imageUrl.isNotEmpty()) {
-        AsyncImage(model = imageUrl, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.size(size.dp).clip(RoundedCornerShape(8.dp)))
+    } else if (imageUrl.isNotEmpty() && !isError) {
+        AsyncImage(
+            model = imageUrl, 
+            contentDescription = null, 
+            contentScale = ContentScale.Fit, 
+            modifier = Modifier.size(size.dp).clip(CircleShape),
+            onError = { isError = true }
+        )
     } else {
-        val metalColors = if (name.contains("Gold", true)) listOf(Color(0xFFFFD700), Color(0xFFB8860B))
-        else if (name.contains("Silver", true)) listOf(Color(0xFFE0E0E0), Color(0xFF757575))
-        else listOf(Color(0xFFCED4DA), Color(0xFF495057))
-        val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true) || name.contains("GRAM", true)
-        Box(modifier = Modifier.size(size.dp).clip(if (isBar) RoundedCornerShape(4.dp) else CircleShape).background(Brush.radialGradient(metalColors, center = Offset.Zero)).border(1.dp, Color.White.copy(0.2f), if (isBar) RoundedCornerShape(4.dp) else CircleShape), contentAlignment = Alignment.Center) {
-            Icon(imageVector = if (isBar) Icons.Default.ViewAgenda else Icons.Default.Toll, contentDescription = null, tint = Color.Black.copy(0.2f), modifier = Modifier.size((size * 0.6).dp))
+        // --- DYNAMIC FORGED ICONS ---
+        if (category == AssetCategory.CRYPTO) {
+            val firstLetter = name.take(1).uppercase()
+            Box(modifier = Modifier.size(size.dp).clip(CircleShape).background(Color.Yellow.copy(0.2f)).border(1.dp, Color.Yellow.copy(0.4f), CircleShape), contentAlignment = Alignment.Center) {
+                Text(text = firstLetter, color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = (size * 0.5).sp)
+            }
+        } else {
+            val isGold = name.contains("Gold", true) || name.contains("XAU", true)
+            val isSilver = name.contains("Silver", true) || name.contains("XAG", true)
+            val isPlat = name.contains("Plat", true) || name.contains("XPT", true)
+            
+            val metalColors = when {
+                isGold -> listOf(Color(0xFFFFD700), Color(0xFFFDB931), Color(0xFFB8860B))
+                isSilver -> listOf(Color(0xFFE0E0E0), Color(0xFFAAAAAA), Color(0xFF757575))
+                isPlat -> listOf(Color(0xFFE5E4E2), Color(0xFFB4B1B0), Color(0xFF888581))
+                else -> listOf(Color(0xFFCED4DA), Color(0xFFADB5BD), Color(0xFF495057))
+            }
+
+            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true)
+            
+            Box(modifier = Modifier.size(size.dp), contentAlignment = Alignment.Center) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    if (isBar) {
+                        val barWidth = size.dp.toPx()
+                        val barHeight = size.dp.toPx() * 0.7f
+                        drawRoundRect(
+                            brush = Brush.linearGradient(colors = metalColors, start = Offset.Zero, end = Offset(barWidth, barHeight)),
+                            size = Size(barWidth, barHeight),
+                            cornerRadius = CornerRadius(4.dp.toPx()),
+                            topLeft = Offset(0f, (barWidth - barHeight) / 2)
+                        )
+                        drawRoundRect(
+                            color = Color.White.copy(alpha = 0.3f),
+                            size = Size(barWidth, barHeight),
+                            cornerRadius = CornerRadius(4.dp.toPx()),
+                            topLeft = Offset(0f, (barWidth - barHeight) / 2),
+                            style = Stroke(width = 1.dp.toPx())
+                        )
+                    } else {
+                        drawCircle(brush = Brush.radialGradient(colors = metalColors, center = center, radius = size.dp.toPx() / 2))
+                        drawCircle(color = Color.White.copy(alpha = 0.2f), radius = (size.dp.toPx() / 2) - 2.dp.toPx(), style = Stroke(width = 1.5.dp.toPx()))
+                    }
+                }
+                val weightStr = when {
+                    weight >= 32.0 -> "1k"
+                    weight >= 1.0 -> weight.toInt().toString()
+                    else -> weight.toString().replace("0.", ".")
+                }
+                Text(text = weightStr, color = Color.Black.copy(alpha = 0.7f), fontSize = (size * 0.35).sp, fontWeight = FontWeight.Black)
+            }
         }
     }
 }
@@ -85,7 +138,7 @@ fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Mo
 fun WatermarkBadge(source: String, color: Color, modifier: Modifier = Modifier) {
     Text(
         text = source.uppercase(),
-        color = color.copy(alpha = 0.3f), // ADAPTIVE COLOR
+        color = color.copy(alpha = 0.3f),
         fontSize = 8.sp,
         fontWeight = FontWeight.Black,
         maxLines = 1,
@@ -132,14 +185,21 @@ fun MetalSelectionFunnel(
     onDismiss: () -> Unit, onConfirmed: (String, String, Double, Boolean, String, String, String?, Boolean, String) -> Unit
 ) {
     var step by remember { mutableIntStateOf(1) }
-    var selectedMetal by remember { mutableStateOf("") }
-    var l1 by remember { mutableStateOf("") }
+    val startMetal = when {
+        initialMetal.contains("XAU", true) -> "Gold"
+        initialMetal.contains("XAG", true) -> "Silver"
+        initialMetal.contains("XPT", true) -> "Platinum"
+        initialMetal.contains("XPD", true) -> "Palladium"
+        else -> initialMetal
+    }
+    var selectedMetal by remember { mutableStateOf(startMetal) }
+    var l1 by remember { mutableStateOf(initialForm) }
     var l2 by remember { mutableStateOf("") }
     var selectedWeight by remember { mutableDoubleStateOf(initialWeight) }
-    var isKiloSelected by remember { mutableStateOf(false) }
-    var qtyInput by remember { mutableStateOf("") }
-    var premInput by remember { mutableStateOf("") }
-    var manualPriceInput by remember { mutableStateOf("") }
+    var isKiloSelected by remember { mutableStateOf(initialWeight >= 32.0) }
+    var qtyInput by remember { mutableStateOf(initialQty) }
+    var premInput by remember { mutableStateOf(initialPrem) }
+    var manualPriceInput by remember { mutableStateOf(initialManualPrice) }
     var customIconUri by remember { mutableStateOf<String?>(null) }
     var isTrueManualFlag by remember { mutableStateOf(false) }
 
@@ -238,7 +298,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        MetalIcon(asset.name, imageUrl = asset.imageUrl)
+                        MetalIcon(name = asset.symbol, weight = asset.weight, imageUrl = asset.imageUrl, category = asset.category)
                         if (asset.baseSymbol != "CUSTOM") {
                             Spacer(Modifier.height(6.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
@@ -293,9 +353,14 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
     Box(modifier = modifier.fillMaxWidth()) {
         Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(asset.name, size = 32, imageUrl = asset.imageUrl) }
-                Column(modifier = Modifier.weight(1f)) { 
-                    AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
+                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, size = 32, imageUrl = asset.imageUrl, category = asset.category) }
+                Column(modifier = Modifier.weight(1f)) {
+                    if (asset.category == AssetCategory.METAL) {
+                        val inlineLabel = "${asset.symbol} - ${asset.name}"
+                        AutoResizingText(inlineLabel.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp))
+                    } else {
+                        AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
+                    }
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
                     AutoResizingText(formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
                 }

@@ -82,7 +82,6 @@ fun AssetPickerScreen(
         focusRequester.requestFocus()
     }
 
-    // GRADIENT SYMMETRY: Set containerColor to Transparent to allow NavGraph gradient to show
     Scaffold(
         topBar = {
             TopAppBar(
@@ -176,10 +175,16 @@ fun AssetPickerScreen(
                             metals.forEach { (ticker, label) ->
                                 Surface(
                                     onClick = {
+                                        // 🛠️ DATA INTEGRITY FIX: Use technical tickers (XAG/XAU) for background fetching
+                                        // Use label for name, ticker for internal mapping logic.
                                         onAssetSelected(AssetEntity(
-                                            coinId = ticker, symbol = ticker, name = label,
-                                            category = AssetCategory.METAL, priceSource = "YahooFinance",
-                                            baseSymbol = ticker, apiId = ticker
+                                            coinId = ticker, 
+                                            symbol = ticker, // технический ticker
+                                            name = label, // User friendly name
+                                            category = AssetCategory.METAL, 
+                                            priceSource = "YahooFinance",
+                                            baseSymbol = ticker, 
+                                            apiId = ticker
                                         ))
                                     },
                                     color = cardBg.copy(alpha = 0.5f),

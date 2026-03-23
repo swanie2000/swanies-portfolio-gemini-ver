@@ -23,28 +23,42 @@ class MetalSearchProvider @Inject constructor(
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
         val results = mutableListOf<AssetEntity>()
-        for ((symbol, ticker) in metalTickers) {
+        val requestedSymbols = ids.split(",")
+        
+        for (symbol in requestedSymbols) {
+            if (symbol.isBlank()) continue
+            val cleanSymbol = symbol.trim().uppercase()
+            val ticker = metalTickers[cleanSymbol] ?: continue
             try {
-                delay(500)
+                delay(300)
                 val response = yahooApiService.getTickerData(ticker)
                 val result = response.chart.result?.firstOrNull()
                 val meta = result?.meta
                 val closePrices = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
 
                 if (meta?.regularMarketPrice != null) {
+                    // 🛠️ DERIVED TREND CALCULATION:
+                    // If regularMarketChangePercent is null, calculate it from chartPreviousClose
+                    val current = meta.regularMarketPrice
+                    val previous = meta.chartPreviousClose ?: current
+                    val derivedChange = if (previous != 0.0) ((current - previous) / previous) * 100.0 else 0.0
+                    val finalChange = meta.regularMarketChangePercent ?: derivedChange
+
                     results.add(AssetEntity(
-                        coinId = symbol, 
-                        symbol = symbol, 
-                        name = symbol, 
+                        coinId = cleanSymbol, 
+                        symbol = cleanSymbol, 
+                        name = cleanSymbol, 
                         category = AssetCategory.METAL, 
-                        officialSpotPrice = meta.regularMarketPrice, // ALIGNED V6
-                        priceChange24h = meta.regularMarketChangePercent ?: 0.0, 
+                        officialSpotPrice = current,
+                        priceChange24h = finalChange,
                         sparklineData = closePrices, 
-                        baseSymbol = symbol, 
-                        priceSource = name
+                        baseSymbol = cleanSymbol, 
+                        apiId = cleanSymbol,
+                        priceSource = name,
+                        lastUpdated = System.currentTimeMillis()
                     ))
                 }
-            } catch (e: Exception) { Log.e("MetalSearchProvider", "Failed: ${e.message}") }
+            } catch (e: Exception) { Log.e("MetalSearchProvider", "Failed for $symbol: ${e.message}") }
         }
         return results
     }
@@ -57,11 +71,16 @@ class MetalSearchProvider @Inject constructor(
             val meta = result?.meta
             val closePrices = result?.indicators?.quote?.firstOrNull()?.close?.filterNotNull() ?: emptyList()
 
+            val current = meta?.regularMarketPrice ?: 0.0
+            val previous = meta?.chartPreviousClose ?: current
+            val derivedChange = if (previous != 0.0) ((current - previous) / previous) * 100.0 else 0.0
+            val finalChange = meta?.regularMarketChangePercent ?: derivedChange
+
             MarketPriceData(
-                officialSpotPrice = meta?.regularMarketPrice ?: 0.0, // ALIGNED V6
+                officialSpotPrice = current,
                 dayHigh = meta?.regularMarketDayHigh ?: 0.0,
                 dayLow = meta?.regularMarketDayLow ?: 0.0,
-                changePercent = meta?.regularMarketChangePercent ?: 0.0,
+                changePercent = finalChange,
                 sparkline = closePrices
             )
         } catch (e: Exception) { MarketPriceData(0.0, 0.0, 0.0, 0.0, emptyList()) }

@@ -1,6 +1,8 @@
 package com.swanie.portfolio.ui.navigation
 
 import android.util.Log
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +42,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) },
+            popEnterTransition = { fadeIn(animationSpec = tween(400)) },
+            popExitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
             composable(Routes.HOME) {
                 HomeScreen(navController, mainViewModel)
@@ -84,20 +90,13 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                             // METADATA HEALING: Heal via CoinGecko but keep the unique provider coinId
                             val healedAsset = assetViewModel.healMetadata(asset)
                             
-                            if (healedAsset.category == AssetCategory.METAL) {
-                                Log.d("ADD_TRACE", "STEP 2: NAV_PASSING (METAL): ID=${healedAsset.coinId}")
-                                assetViewModel.performSurgicalAdd(healedAsset) {
-                                    navController.popBackStack()
-                                }
-                            } else {
-                                val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "", "UTF-8")
-                                val encodedSource = URLEncoder.encode(healedAsset.priceSource, "UTF-8")
-                                
-                                Log.d("ADD_TRACE", "STEP 2: NAV_PASSING (CRYPTO): coinId=${healedAsset.coinId}, apiId=${healedAsset.apiId}")
-                                
-                                // RESTORED UNIQUENESS: Passing both coinId AND apiId
-                                navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource")
-                            }
+                            // SYMMETRY FIX: All assets (Crypto AND Metal) now navigate to the entry screen
+                            val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "NONE", "UTF-8")
+                            val encodedSource = URLEncoder.encode(healedAsset.priceSource, "UTF-8")
+                            
+                            Log.d("ADD_TRACE", "NAV_PASSING: category=${healedAsset.category}, coinId=${healedAsset.coinId}")
+                            
+                            navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource")
                         }
                     }
                 )
@@ -118,9 +117,9 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
                 val symbol = backStackEntry.arguments?.getString("symbol") ?: ""
                 val apiId = backStackEntry.arguments?.getString("apiId") ?: ""
-                val iconUrl = backStackEntry.arguments?.getString("iconUrl") ?: ""
+                val iconUrl = backStackEntry.arguments?.getString("iconUrl") ?: "NONE"
                 val priceSource = backStackEntry.arguments?.getString("priceSource") ?: "CoinGecko"
-                val decodedThumb = URLDecoder.decode(iconUrl, "UTF-8")
+                val decodedThumb = if (iconUrl == "NONE") "" else URLDecoder.decode(iconUrl, "UTF-8")
 
                 val categoryString = backStackEntry.arguments?.getString("category") ?: "CRYPTO"
                 val category = AssetCategory.valueOf(categoryString)
@@ -128,7 +127,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
                 AmountEntryScreen(
                     coinId = coinId,
-                    apiId = apiId, // Aligned with unique PK vs fetch ID
+                    apiId = apiId,
                     symbol = symbol,
                     name = symbol,
                     imageUrl = decodedThumb,

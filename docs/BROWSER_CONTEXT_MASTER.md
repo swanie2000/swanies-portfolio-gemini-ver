@@ -173,52 +173,46 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE FORTRESS STABILIZED (V7)
+PROJECT STATUS: THE FORTRESS ARMORED (V7)
 
-Current Version: 3.2 (Recovery Milestone)
+Current Version: 3.3 (Visual & Data Symmetry Milestone)
 
 Build Status: 🟢 SUCCESS (Verified on Device)
 
-Database Schema: V7 (Locked & Aligned)
+Database Schema: V7 (Ironclad Uniqueness)
 
-1. The Great Recovery: Hard-V6 to V7 Milestone
+1. The Visual & Data Lockdown: V7 Evolution
 
-We have successfully navigated the "Symmetry Fracture" that broke previous versions. The app is now fully functional on a brand-new V7 schema that correctly separates Primary Keys from API Fetch IDs.
+We have successfully moved beyond basic recovery into high-fidelity optimization. The "Fortress" now features a logically distinct data layer and a premium custom visual engine for precious metals.
 
 Key Wins Today:
-- Schema Lockdown: Migrated from V5 through V6 to a stable V7. All fields (officialSpotPrice, displayOrder, apiId) are synchronized.
-- Data Pipeline Restoration: All 4 search engines (CoinGecko, Coinbase, KuCoin, CryptoCompare) now return live Price, Sparklines, and Icons on the first add.
-- Metadata Healing (The Safety Net): Restored background CoinGecko search. Assets added from Coinbase/KuCoin are now automatically "healed" with premium CoinGecko icons and standardized IDs.
-- Dynamic Gradient Restoration: Re-implemented the background gradient system with a user-controlled intensity slider and global transparency across all screens.
-- Launch Transition: Engineered a smooth fade-in sequence from the splash color (#000416) to the dynamic vault gradient, eliminating launch flickers.
-- UX Optimization:
-    - Asset Picker: Unified, theme-adaptive search bar with integrated provider selection and "Precious Metals" rebranding.
-    - Keyboard Retreat: Keyboard automatically slides away when search results are scrolled.
-    - Branded Visuals: High-vertical, full-color Hero Swan branding on the search screen.
-- API Safety:
-    - Removed redundant startup locks while strengthening actual rate-limiting.
-    - Metals Market Watch now uses batch updates (1 hit instead of 8) and respects a global 30s cooldown.
+- Ironclad Uniqueness: Implemented timestamped Primary Keys (coinId_timestamp). The vault now supports unlimited distinct holdings of the same asset (e.g., 100oz Bars, 1oz Coins, and Rounds) without overwriting.
+- Dynamic Metal Forging: Created a dynamic Canvas rendering engine for metal icons. The app now "mints" 3D-shaded bars and coins with centered numerical weight labels (100, 10, 1, 1k) directly on the graphic.
+- Instant Data Landing: Engineered a "Pre-Flight Fetch" in the entry funnel. All assets (Crypto & Metal) now land on the holdings screen with live Prices, Sparklines, and 24h Trend data already populated.
+- Trend Logic Hardening: Implemented a mathematical fallback for Metal trend data. If the API returns null, the app manually calculates the 24h percentage from the previous close.
+- Navigation Refinement: Standardized a premium 400ms cross-fade across all screens while eliminating launch crashes and fixing background transparency for global gradient visibility.
+- Search Cleanliness: Successfully tested, then purged, the WEEX engine after finding "ATLA" on the more reliable CryptoCompare source, keeping the build lean.
 
 2. The Current "Fortress" Specs
 
 Component	Status
-Database	V7 (Ironclad Uniqueness via CG_/CB_/KC_/CC_ prefixes)
-Networking	Retrofit handles multi-domain requests (Candles + Spot Price).
-Branding	Full-color Swan integrated into UI layers.
-Safety Net	CoinGecko background healing active for all search results.
-Interaction	Full Edit/Delete funnels restored for both Crypto and Metals.
+Database	V7 (Multi-holding support via unique timestamped PKs)
+Data Engine	Pre-flight enrichment ensures no "0.0" data landings.
+Branding	Full-color Hero Swan with high-vertical keyboard clearance.
+Visuals	Dynamic Canvas-rendered metal icons + Dynamic Gradients.
+Safety Net	Global 30s cooldowns + technical ticker mapping (XAU/XAG).
 
 THE REVISED PHASE 2 BATTLE PLAN: "THE COLOR PULSE WIDGET"
 
-The data foundation is now rock-solid. We are ready to re-invade the Home Screen with a focus on trend visualization.
+With the data chain and visual engine now perfect, we move to the final frontier: the Home Screen.
 
 Objective:
 "The Color Pulse Engine" — A home screen widget that renders live trend colors (Green/Red) using a Bitmap Courier system to bypass Jetpack Glance’s hardware limitations.
 
 The Three-Pronged Strike:
-1. The UI Bridge: Add the "Show on Home Screen" toggle to the Asset Detail screens to designate widget assets.
+1. The UI Bridge: Add the "Show on Home Screen" toggle to the asset interaction layer to designate widget assets.
 2. The Bitmap Courier: Create the WidgetIconManager to handle high-performance trend color rendering.
-3. The Glance Implementation: Rebuild the widget on the stabilized V7 foundation, connecting the database to the Glance StateDefinition.
+3. The Pulse Implementation: Build the Jetpack Glance widget, connecting the V7 database to the Glance StateDefinition.
 
 ### END_NARRATIVE
 
@@ -226,25 +220,24 @@ The Three-Pronged Strike:
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 03/21/2026 19:16:58.48
+Generated: Sun 03/22/2026 19:51:37.24
 
 Branch:
 main
 Commit:
-336cb15e258cd3c1a6e89c1cbb077aeb82f6fe98
+149a0625797aef83295823f62c232e47bdd0e670
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/MainActivity.kt
- M app/src/main/java/com/swanie/portfolio/MainViewModel.kt
- M app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+ M app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
+ M app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
+AM app/src/main/java/com/swanie/portfolio/data/api/impl/WeexSearchProvider.kt
+ M app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
+AM app/src/main/java/com/swanie/portfolio/data/network/WeexApiService.kt
+ M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
  M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
- M app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt
+ M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -275,6 +268,7 @@ app/src/main/java/com/swanie/portfolio/data/api/impl/CryptoCompareSearchProvider
 app/src/main/java/com/swanie/portfolio/data/api/impl/KuCoinSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/WeexSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
 app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
@@ -291,6 +285,7 @@ app/src/main/java/com/swanie/portfolio/data/network/CryptoCompareApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/KuCoinApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/MexcApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
+app/src/main/java/com/swanie/portfolio/data/network/WeexApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/YahooFinanceResponse.kt
 app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt

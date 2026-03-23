@@ -6,165 +6,105 @@ import com.swanie.portfolio.data.api.SearchResult
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.network.MexcApiService
-import retrofit2.HttpException
+import com.swanie.portfolio.data.network.MexcTicker24h
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class MexcSearchProvider @Inject constructor(
-    private val mexcApiService: MexcApiService
+    private val api: MexcApiService
 ) : SearchProvider {
     override val name: String = "MEXC"
 
-    override suspend fun search(query: String): List<SearchResult> {
-        Log.d("SEARCH_TRACE", "SEARCH: Querying [$query] via provider [$name]")
-        return try {
-            val info = mexcApiService.getExchangeInfo()
-            // Filter for spot USDT pairs and match query
-            info.symbols
-                .filter { it.quoteAsset == "USDT" && (it.baseAsset.contains(query, ignoreCase = true) || it.symbol.contains(query, ignoreCase = true)) }
-                .take(20)
-                .map { symbol ->
-                    val iconUrl = "https://www.mexc.com/coin/icon/${symbol.baseAsset.lowercase()}.png"
-                    Log.d("ICON_TRACE", "Generated Icon URL for ${symbol.baseAsset}: $iconUrl")
-                    SearchResult(
-                        id = symbol.symbol,
-                        symbol = symbol.baseAsset,
-                        name = "${symbol.baseAsset} (MEXC)",
-                        imageUrl = iconUrl,
-                        category = AssetCategory.CRYPTO,
-                        priceSource = name
-                    )
-                }
-        } catch (e: Exception) {
-            Log.e("SEARCH_TRACE", "MEXC Search Error: ${e.message}")
-            emptyList()
-        }
+    private var lastGlobalHit = 0L
+
+    override suspend fun search(query: String): List<SearchResult> = try {
+        val info = api.getExchangeInfo()
+        info.symbols
+            .filter { it.quoteAsset == "USDT" && (it.baseAsset.contains(query, true) || it.symbol.contains(query, true)) }
+            .take(15)
+            .map {
+                val symbol = it.baseAsset.uppercase()
+                // WORLD MIRROR ICON: Using a multi-stage fallback strategy
+                // Primary: CoinCap (Global), Secondary: Github (Reliable)
+                val iconUrl = "https://assets.coincap.io/assets/icons/${it.baseAsset.lowercase()}@2x.png"
+                SearchResult(
+                    id = "MX_${it.symbol}",
+                    symbol = symbol,
+                    name = "$symbol (MEXC)",
+                    imageUrl = iconUrl,
+                    category = AssetCategory.CRYPTO,
+                    priceSource = name
+                )
+            }
+    } catch (e: Exception) {
+        Log.e("MEXC_SEARCH", "Search failed: ${e.message}")
+        emptyList()
     }
 
     override suspend fun getPrices(ids: String): List<AssetEntity> {
-        return try {
-            val symbols = ids.split(",")
-            if (symbols.size == 1) {
-                val response = mexcApiService.getTicker24h(symbols[0])
+        val currentTime = System.currentTimeMillis()
+        val pairs = ids.split(",")
+        val isBulk = pairs.size > 1
+        
+        if (isBulk && currentTime - lastGlobalHit < 10000) return emptyList()
+        if (isBulk) lastGlobalHit = currentTime
+
+        val results = mutableListOf<AssetEntity>()
+
+        for (pair in pairs) {
+            if (pair.isBlank()) continue
+            val cleanTicker = pair.trim().replace("MX_", "") 
+            try {
+                // WORLD ADDRESS FIX: MEXC sometimes requires specific headers for regional bypass
+                // Handled by OkHttpClient in NetworkModule
+                val response = api.getTicker24h(cleanTicker)
                 if (response.isSuccessful) {
-                    val ticker = response.body()
-                    if (ticker != null) {
-                        listOf(createAssetEntity(ticker))
-                    } else emptyList()
-                } else emptyList()
-            } else {
-                // Bulk refresh logic
-                val response = mexcApiService.getTickers24h()
-                if (response.isSuccessful) {
-                    val allTickers = response.body() ?: emptyList()
-                    val symbolSet = symbols.toSet()
-                    allTickers.filter { symbolSet.contains(it.symbol) }
-                        .map { createAssetEntity(it) }
-                } else emptyList()
+                    response.body()?.let { ticker ->
+                        val spark = fetchSparkline(ticker.symbol)
+                        results.add(createAssetEntity(ticker, spark))
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("MEXC_PRICE", "Failed for $cleanTicker: ${e.message}")
             }
-        } catch (e: Exception) {
-            Log.e("ADD_TRACE", "MEXC Price Error: ${e.message}")
-            emptyList()
         }
+        return results
     }
 
-    /**
-     * Fetches K-line data from MEXC and maps it to a sparkline list.
-     * Ensures the symbol is mapped to the full pair (e.g., ATLA becomes ATLAUSDT).
-     * Includes diagnostic logging, interval fallback, and 400 error retry.
-     */
     suspend fun fetchSparkline(symbol: String): List<Double> {
-        Log.d("MEXC_TRACE", "Network fetch started for $symbol")
-        // SANITIZATION: Ensure uppercase and full pair name
-        val fullPair = (if (symbol.endsWith("USDT")) symbol else "${symbol}USDT").uppercase()
-        
-        Log.d("ADD_TRACE", "PROVIDER_FETCH: Fetching sparkline for $symbol...")
-        Log.d("ADD_TRACE", "MEXC_URL: Fetching K-Lines for $fullPair")
-
         return try {
-            val points = fetchKlinesWithFallback(fullPair, 168)
-            Log.d("MEXC_DEBUG", "Points received for $symbol: ${points.size}")
-            points
+            // ROBUST SPARKLINE: Use 4h candles as fallback for restricted regions
+            val klines = api.getKlines(symbol, "1h", 24)
+            if (klines.isEmpty()) {
+                val fallback = api.getKlines(symbol, "4h", 6)
+                fallback.mapNotNull { it.getOrNull(4)?.toString()?.toDoubleOrNull() }
+            } else {
+                klines.mapNotNull { it.getOrNull(4)?.toString()?.toDoubleOrNull() }
+            }
         } catch (e: Exception) {
-            Log.e("ADD_TRACE", "MEXC Sparkline Error for $symbol: ${e.message}")
+            Log.e("MEXC_SPARK", "Failed for $symbol: ${e.message}")
             emptyList()
         }
     }
 
-    private suspend fun fetchKlinesWithFallback(pair: String, limit: Int): List<Double> {
-        // SOME MEXC VERSIONS PREFER '60m' OVER '1h'
-        val interval = "60m" 
+    private fun createAssetEntity(ticker: MexcTicker24h, spark: List<Double>): AssetEntity {
+        val baseSymbol = ticker.symbol.replace("USDT", "")
+        val iconUrl = "https://assets.coincap.io/assets/icons/${baseSymbol.lowercase()}@2x.png"
         
-        return try {
-            // LOG FINAL URL (Conceptual, as Retrofit handles the final construction)
-            Log.d("MEXC_TRACE", "CALLING_API: pair=$pair, interval=$interval, limit=$limit")
-            
-            val klines = mexcApiService.getKlines(pair, interval, limit)
-            
-            // MEXC_TRACE: Detailed log of the response
-            Log.d("MEXC_TRACE", "RAW_RESPONSE: Received ${klines.size} points for $pair")
-            if (klines.isNotEmpty()) {
-                Log.d("MEXC_TRACE", "SAMPLE_POINT: ${klines.first()}")
-            }
-
-            if (klines.isEmpty() && limit == 168) {
-                Log.w("ADD_TRACE", "MEXC_FALLBACK: 1h payload empty. Retrying with 4h interval...")
-                val klines4h = mexcApiService.getKlines(pair, "4h", 42)
-                return klines4h.mapIndexedNotNull { i, list -> 
-                    try {
-                        list.getOrNull(4)?.toString()?.toDoubleOrNull()
-                    } catch (e: Exception) {
-                        Log.e("MEXC_TRACE", "Failed to parse point at index $i for $pair (4h)")
-                        null
-                    }
-                }
-            }
-            
-            // MEXC K-line format: [Time, Open, High, Low, Close, Volume, ...]
-            // Index 4 is the Closing price.
-            klines.mapIndexedNotNull { i, list ->
-                try {
-                    val price = list.getOrNull(4)?.toString()?.toDoubleOrNull()
-                    if (price == null) {
-                        Log.e("MEXC_TRACE", "Failed to parse point at index $i (Value is null or not a double)")
-                    }
-                    price
-                } catch (e: Exception) {
-                    Log.e("MEXC_TRACE", "Failed to parse point at index $i")
-                    null
-                }
-            }
-        } catch (e: HttpException) {
-            Log.d("MEXC_TRACE", "RAW_RESPONSE: Error Code ${e.code()} | Body: ${e.response()?.errorBody()?.string()}")
-            if (e.code() == 400 && limit > 48) {
-                Log.w("ADD_TRACE", "MEXC_RETRY: 400 Error for $pair. Falling back to 48h limit.")
-                return fetchKlinesWithFallback(pair, 48)
-            }
-            Log.e("ADD_TRACE", "MEXC HTTP Error: ${e.code()} - ${e.message()}")
-            emptyList()
-        } catch (e: Exception) {
-            Log.e("ADD_TRACE", "MEXC Fetch Error: ${e.message}")
-            emptyList()
-        }
-    }
-
-    private fun createAssetEntity(ticker: com.swanie.portfolio.data.network.MexcTicker24h): AssetEntity {
-        val symbolOnly = ticker.symbol.replace("USDT", "")
-        val iconUrl = "https://www.mexc.com/coin/icon/${symbolOnly.lowercase()}.png"
-        Log.d("ICON_TRACE", "Generated Entity Icon URL for $symbolOnly: $iconUrl")
-
         return AssetEntity(
-            coinId = ticker.symbol,
-            symbol = symbolOnly,
-            name = symbolOnly,
+            coinId = "MX_${ticker.symbol}",
+            symbol = baseSymbol,
+            name = baseSymbol,
             imageUrl = iconUrl,
             category = AssetCategory.CRYPTO,
-            officialSpotPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0, // ALIGNED V6
+            officialSpotPrice = ticker.lastPrice.toDoubleOrNull() ?: 0.0,
             priceChange24h = ticker.priceChangePercent.replace("%", "").toDoubleOrNull() ?: 0.0,
-            sparklineData = emptyList(),
-            baseSymbol = symbolOnly,
+            sparklineData = spark,
+            baseSymbol = baseSymbol,
             apiId = ticker.symbol,
-            iconUrl = iconUrl,
-            priceSource = name
+            priceSource = name,
+            lastUpdated = System.currentTimeMillis()
         )
     }
 }

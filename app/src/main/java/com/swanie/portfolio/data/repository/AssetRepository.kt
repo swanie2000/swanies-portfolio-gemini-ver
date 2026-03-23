@@ -31,18 +31,19 @@ class AssetRepository @Inject constructor(
             assets.groupBy { it.priceSource }.forEach { (sourceName, providerAssets) ->
                 val provider = searchRegistry.getProvider(sourceName) ?: return@forEach
                 
-                // COINGECKO FIX: Needs apiId (e.g. 'bitcoin') instead of symbol ('btc')
-                val idString = if (sourceName.equals("CoinGecko", ignoreCase = true)) {
-                    providerAssets.joinToString(",") { it.apiId }
-                } else {
-                    providerAssets.joinToString(",") { it.symbol }
-                }
+                // DATA DISPATCHER: Use apiId for all engines to ensureTechnical Ticker accuracy
+                val idString = providerAssets.joinToString(",") { it.apiId }
 
+                Log.d("SWAN_DEBUG", "REPO: Refreshing $sourceName with IDs: $idString")
                 val updatedList = provider.getPrices(idString)
+                Log.d("SWAN_DEBUG", "REPO: Received ${updatedList.size} updates from $sourceName")
 
                 providerAssets.forEach { existing ->
-                    // Match by symbol (case insensitive)
-                    updatedList.find { it.symbol.equals(existing.symbol, ignoreCase = true) }?.let { update ->
+                    // Match by apiId or Symbol for maximum resilience
+                    updatedList.find { 
+                        it.apiId.equals(existing.apiId, true) || it.symbol.equals(existing.symbol, true) 
+                    }?.let { update ->
+                        Log.d("SWAN_DEBUG", "REPO: Applying update for ${existing.symbol}: Price=${update.officialSpotPrice}")
                         assetDao.upsertAsset(existing.copy(
                             officialSpotPrice = update.officialSpotPrice,
                             priceChange24h = update.priceChange24h,
@@ -50,7 +51,7 @@ class AssetRepository @Inject constructor(
                             imageUrl = if (existing.imageUrl.isEmpty() || existing.imageUrl.contains("coincap")) update.imageUrl else existing.imageUrl,
                             lastUpdated = System.currentTimeMillis()
                         ))
-                    }
+                    } ?: Log.w("SWAN_DEBUG", "REPO: No match found in update list for ${existing.symbol}")
                 }
             }
             isSuccess = true
@@ -62,9 +63,6 @@ class AssetRepository @Inject constructor(
         }
     }
 
-    /**
-     * METADATA HEALING: Background CoinGecko Search.
-     */
     suspend fun healMetadata(asset: AssetEntity): AssetEntity {
         if (asset.priceSource == "CoinGecko" || asset.category == AssetCategory.METAL) return asset
         
@@ -84,20 +82,33 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun fetchLiveAssetData(asset: AssetEntity): AssetEntity {
+        Log.d("SWAN_DEBUG", "REPO: Pre-flight fetch for ${asset.symbol} (ID: ${asset.apiId})")
         return try {
             val provider = searchRegistry.getProvider(asset.priceSource) ?: return asset
-            val idString = if (asset.priceSource.equals("CoinGecko", true)) asset.apiId else asset.symbol
+            
+            // Dispatch technical ID
+            val idString = asset.apiId
+            
+            Log.d("SWAN_DEBUG", "REPO: Calling provider.getPrices with technical ID: $idString")
             val updates = provider.getPrices(idString)
-            val liveMatch = updates.find { it.symbol.equals(asset.symbol, true) }
+            
+            // Match against technical ID
+            val liveMatch = updates.find { 
+                it.apiId.equals(asset.apiId, true) || it.symbol.equals(asset.symbol, true) 
+            }
             
             if (liveMatch != null) {
+                Log.d("SWAN_DEBUG", "REPO: Live match found! New Price: ${liveMatch.officialSpotPrice}")
                 asset.copy(
                     officialSpotPrice = liveMatch.officialSpotPrice,
                     priceChange24h = liveMatch.priceChange24h,
                     sparklineData = liveMatch.sparklineData,
                     lastUpdated = System.currentTimeMillis()
                 )
-            } else asset
+            } else {
+                Log.w("SWAN_DEBUG", "REPO: Failed to find live match for ${asset.symbol}")
+                asset
+            }
         } catch (e: Exception) { asset }
     }
 
@@ -109,6 +120,7 @@ class AssetRepository @Inject constructor(
 
     suspend fun executeSurgicalAdd(asset: AssetEntity, callback: (Boolean, String) -> Unit) {
         try {
+            Log.d("SWAN_DEBUG", "REPO: DB Write for ${asset.coinId}")
             assetDao.upsertAsset(asset)
             callback(true, "Asset added successfully")
         } catch (e: Exception) {
@@ -123,10 +135,6 @@ class AssetRepository @Inject constructor(
         } else MarketPriceData()
     }
 
-    /**
-     * THROTTLED REFRESH: Respects the global 30s cooldown.
-     * Prevents spamming metals providers on screen entry.
-     */
     suspend fun refreshMarketWatch() {
         refreshAssets(force = false)
     }

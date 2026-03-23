@@ -314,7 +314,7 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
         Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                 if (segment.asset.category == AssetCategory.METAL) {
-                    MetalIcon(segment.asset.name, size = 30)
+                    MetalIcon(name = segment.asset.name, weight = segment.asset.weight, size = 30, category = segment.asset.category)
                 } else {
                     AsyncImage(
                         model = segment.asset.imageUrl,

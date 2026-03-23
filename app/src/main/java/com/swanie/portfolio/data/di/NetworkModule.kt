@@ -20,7 +20,7 @@ object NetworkModule {
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()
-                .header("User-Agent", "SwaniesPortfolio/1.0") // REQUIRED for Coinbase/KuCoin
+                .header("User-Agent", "SwaniesPortfolio/1.0")
                 .header("Accept", "application/json")
                 .build()
             chain.proceed(request)
