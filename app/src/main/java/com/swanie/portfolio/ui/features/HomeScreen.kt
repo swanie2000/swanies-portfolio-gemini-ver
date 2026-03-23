@@ -57,6 +57,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkleOnS by remember { mutableStateOf(false) }
     var showSparkleOnSwanHead by remember { mutableStateOf(false) }
+    var isExiting by remember { mutableStateOf(false) }
 
     val radiusPercent by animateFloatAsState(
         targetValue = if (animationStarted) 1.5f else 0f,
@@ -135,35 +136,43 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 }
             }
 
-            // THE SWAN LOGO
-            Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
-                Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
-                    drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
-                })
-                Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
-                if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
-            }
+            // THE SWAN LOGO (Hidden on Exit to prevent ghosting)
+            if (!isExiting) {
+                Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
+                    Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
+                        drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
+                    })
+                    Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
+                    if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
+                }
 
-            // BRAND TEXT
-            AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier.graphicsLayer(clip = false)) {
-                        Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
-                        if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
+                // BRAND TEXT
+                AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(modifier = Modifier.graphicsLayer(clip = false)) {
+                            Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
+                            if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
+                        }
+                        Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
                     }
-                    Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
                 }
             }
 
             // AUTH TRAY
             AnimatedVisibility(
-                visible = animateText,
+                visible = animateText && !isExiting,
                 enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
                 modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp)
             ) {
                 AuthTray(
-                    onLoginClick = { navController.navigate(Routes.HOLDINGS) },
-                    onCreateAccountClick = { navController.navigate(Routes.CREATE_ACCOUNT) },
+                    onLoginClick = { 
+                        isExiting = true
+                        navController.navigate(Routes.HOLDINGS) 
+                    },
+                    onCreateAccountClick = { 
+                        isExiting = true
+                        navController.navigate(Routes.CREATE_ACCOUNT) 
+                    },
                     trayTextColor = userThemeTextColor
                 )
             }

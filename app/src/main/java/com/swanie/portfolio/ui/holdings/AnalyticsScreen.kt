@@ -52,6 +52,7 @@ fun AnalyticsScreen(navController: NavController) {
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+    var isExiting by remember { mutableStateOf(false) }
 
     val neonPalette = listOf(
         Color(0xFF00E5FF), Color(0xFFFFD600), Color(0xFFFF4081),
@@ -79,129 +80,131 @@ fun AnalyticsScreen(navController: NavController) {
 
     // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
+        bottomBar = { BottomNavigationBar(navController = navController, onNavigate = { isExiting = true }) },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Box(modifier = Modifier.fillMaxWidth().statusBarsPadding(), contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(R.drawable.swanie_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp)
-                )
-            }
-
-            Text(
-                text = "PORTFOLIO INTELLIGENCE",
-                color = safeText,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-            )
-
-            Surface(
+        if (!isExiting) {
+            Column(
                 modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 8.dp)
-                    .fillMaxWidth()
-                    .height(440.dp),
-                color = Color(0xFF060606),
-                shape = RoundedCornerShape(28.dp),
-                border = BorderStroke(1.dp, Color.White.copy(0.12f))
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(
-                        Modifier.height(40.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.Bottom
-                    ) {
-                        repeat(3) { iteration ->
-                            val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(0.2f)
-                            Box(modifier = Modifier.padding(4.dp).clip(CircleShape).background(color).size(6.dp))
-                        }
-                    }
+                Box(modifier = Modifier.fillMaxWidth().statusBarsPadding(), contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(R.drawable.swanie_foreground),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp)
+                    )
+                }
 
-                    Box(modifier = Modifier.weight(1f)) {
-                        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                                when (page) {
-                                    0 -> PopOutPieChart(assetSegments, selectedAssetId) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
-                                    1 -> InteractiveDonutChart(assetSegments, selectedAssetId, safeText) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
-                                    2 -> InteractiveBarChart(assetSegments, selectedAssetId) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
+                Text(
+                    text = "PORTFOLIO INTELLIGENCE",
+                    color = safeText,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                        .height(440.dp),
+                    color = Color(0xFF060606),
+                    shape = RoundedCornerShape(28.dp),
+                    border = BorderStroke(1.dp, Color.White.copy(0.12f))
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            Modifier.height(40.dp).fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            repeat(3) { iteration ->
+                                val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(0.2f)
+                                Box(modifier = Modifier.padding(4.dp).clip(CircleShape).background(color).size(6.dp))
+                            }
+                        }
+
+                        Box(modifier = Modifier.weight(1f)) {
+                            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                    when (page) {
+                                        0 -> PopOutPieChart(assetSegments, selectedAssetId) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
+                                        1 -> InteractiveDonutChart(assetSegments, selectedAssetId, safeText) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
+                                        2 -> InteractiveBarChart(assetSegments, selectedAssetId) { id -> selectedAssetId = if(selectedAssetId == id) null else id }
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.White.copy(0.04f))
-                            .height(110.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Crossfade(targetState = focusedSegment, label = "footerFade") { segment ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                if (segment != null) {
-                                    Text(
-                                        text = segment.asset.name.replace("\n", " ").uppercase(),
-                                        color = segment.color,
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.Black,
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = currencyFormatter.format(segment.value),
-                                        color = Color.White,
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Black,
-                                        textAlign = TextAlign.Center
-                                    )
-                                    Text(
-                                        text = "${String.format("%.1f", segment.ratio * 100)}% OF TOTAL",
-                                        color = segment.color.copy(alpha = 0.8f),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Center
-                                    )
-                                } else {
-                                    Text(text = "TOTAL PORTFOLIO VALUE", color = Color.White.copy(0.4f), fontSize = 10.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                                    Text(text = currencyFormatter.format(totalValue), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
-                                    Text(text = " ", fontSize = 12.sp)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White.copy(0.04f))
+                                .height(110.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Crossfade(targetState = focusedSegment, label = "footerFade") { segment ->
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    if (segment != null) {
+                                        Text(
+                                            text = segment.asset.name.replace("\n", " ").uppercase(),
+                                            color = segment.color,
+                                            fontSize = 10.sp,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = currencyFormatter.format(segment.value),
+                                            color = Color.White,
+                                            fontSize = 24.sp,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Text(
+                                            text = "${String.format("%.1f", segment.ratio * 100)}% OF TOTAL",
+                                            color = segment.color.copy(alpha = 0.8f),
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    } else {
+                                        Text(text = "TOTAL PORTFOLIO VALUE", color = Color.White.copy(0.4f), fontSize = 10.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                        Text(text = currencyFormatter.format(totalValue), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                                        Text(text = " ", fontSize = 12.sp)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            Text(
-                text = "HOLDINGS KEY",
-                color = safeText.copy(0.5f),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp)
-            )
+                Text(
+                    text = "HOLDINGS KEY",
+                    color = safeText.copy(0.5f),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp)
+                )
 
-            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                assetSegments.forEach { segment ->
-                    val isSelected = selectedAssetId == segment.asset.coinId
-                    AssetLegendRow(segment, safeText, isSelected) { selectedAssetId = if(isSelected) null else segment.asset.coinId }
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = safeText.copy(0.05f))
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    assetSegments.forEach { segment ->
+                        val isSelected = selectedAssetId == segment.asset.coinId
+                        AssetLegendRow(segment, safeText, isSelected) { selectedAssetId = if(isSelected) null else segment.asset.coinId }
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = safeText.copy(0.05f))
+                    }
                 }
+                Spacer(Modifier.height(40.dp))
             }
-            Spacer(Modifier.height(40.dp))
         }
     }
 }

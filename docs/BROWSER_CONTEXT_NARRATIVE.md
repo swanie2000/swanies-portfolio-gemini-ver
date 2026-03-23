@@ -1,6 +1,6 @@
 # PROJECT STATUS: THE FORTRESS ARMORED (V8)
 
-**Current Version:** 4.0 (Global Infrastructure & Multi-Portfolio Milestone)
+**Current Version:** 4.1 (UX Hardening & Visual Lockdown)
 **Build Status:** 🟢 SUCCESS (V8 Symmetry Verified on Device)
 **Database Schema:** V8 (The Global Foundation)
 
@@ -11,12 +11,12 @@ We have successfully evolved from a single-user vault into a global-ready financ
 
 ### Key Wins Today:
 * **The V8 Five-Table Vault:** Expanded the schema from 2 to 5 tables. The "Fortress" now supports **Portfolios** (multi-container logic), **UserConfig** (global localization), and **SystemLogs** (the "Black Box" diagnostic engine).
-* **Symmetry Recovery:** Manually re-engineered the `AssetDao`, `AssetRepository`, and `AssetViewModel` to bridge the gap between V7 legacy calls and V8 multi-portfolio requirements.
-* **Ghost-Cache Purge:** Successfully bypassed Android’s internal database caching by forcing a migration to `swanie_portfolio_v8_final`, ensuring a clean slate for the new entities.
-* **Global Readiness:** Initialized the `UserConfig` table with USD/English defaults, preparing the infrastructure for Currency and Language localization.
-* **Black Box Diagnostics:** Implemented the `SystemLogEntity`, providing a persistent record of app health and background sync events for professional-grade troubleshooting.
-* **Persistence Lockdown:** Verified via App Inspection that all existing assets were correctly "tagged" to the "MAIN" portfolio, preserving the user’s history through the upgrade.
-* **Visual Symmetry:** Maintained the timestamped Primary Key logic (coinId_timestamp), ensuring unlimited distinct holdings (e.g., specific bars/coins) remain unique and trackable.
+* **Ghost-Cache Purge:** Successfully bypassed Android’s internal database caching by forcing a migration to `swanie_portfolio_v8_final`.
+* **Global Readiness:** Initialized the `UserConfig` table with USD/English defaults.
+* **Black Box Diagnostics:** Implemented the `SystemLogEntity`, providing a persistent record of app health and background sync events.
+* **Persistence Lockdown:** Verified via App Inspection that all existing assets were correctly "tagged" to the "MAIN" portfolio.
+* **Visual Symmetry:** Maintained the timestamped Primary Key logic (coinId_timestamp), ensuring unlimited distinct holdings remain unique.
+* **UX HARDENING (The Ghost Purge):** Eliminated persistent numeric keyboards and "ghosting" UI artifacts across all screens. By implementing a synchronized `isExiting` state pattern and improving the opaque "Fortress" saving animation, the navigation is now surgically clean.
 
 ---
 
@@ -26,7 +26,7 @@ We have successfully evolved from a single-user vault into a global-ready financ
 | :--- | :--- |
 | **Database** | V8 (5-Table Multi-Portfolio & Config Support) |
 | **Data Engine** | V7 Timestamped PKs + V8 Portfolio Filtering |
-| **Localization** | Infrastructure ready for EUR, GBP, CAD, and Language switching |
+| **UX Quality** | High-Performance navigation with state-based "Ghost" prevention |
 | **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
 | **Safety Net** | Manual "Symmetry Bridge" prevents UI crashes on V8 data |
 | **Metal Icons** | Dynamic Canvas-rendered bars/coins with weight labeling |

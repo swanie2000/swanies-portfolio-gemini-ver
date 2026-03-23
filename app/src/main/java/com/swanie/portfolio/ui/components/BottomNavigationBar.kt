@@ -21,7 +21,10 @@ import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(
+    navController: NavController,
+    onNavigate: () -> Unit = {}
+) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
@@ -46,16 +49,36 @@ fun BottomNavigationBar(navController: NavController) {
                 val currentRoute = navBackStackEntry?.destination?.route
                 val baseTextColor = Color(textColorInt)
 
-                IconButton(onClick = { if (currentRoute != Routes.HOME) navController.navigate(Routes.HOME) }) {
+                IconButton(onClick = { 
+                    if (currentRoute != Routes.HOME) {
+                        onNavigate()
+                        navController.navigate(Routes.HOME) 
+                    }
+                }) {
                     Icon(Icons.Default.Home, null, tint = if(currentRoute == Routes.HOME) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { if (currentRoute != Routes.HOLDINGS) navController.navigate(Routes.HOLDINGS) }) {
+                IconButton(onClick = { 
+                    if (currentRoute != Routes.HOLDINGS) {
+                        onNavigate()
+                        navController.navigate(Routes.HOLDINGS) 
+                    }
+                }) {
                     Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(currentRoute == Routes.HOLDINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { if (currentRoute != Routes.ANALYTICS) navController.navigate(Routes.ANALYTICS) }) {
+                IconButton(onClick = { 
+                    if (currentRoute != Routes.ANALYTICS) {
+                        onNavigate()
+                        navController.navigate(Routes.ANALYTICS) 
+                    }
+                }) {
                     Icon(Icons.Default.PieChart, null, tint = if(currentRoute == Routes.ANALYTICS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { if (currentRoute != Routes.SETTINGS) navController.navigate(Routes.SETTINGS) }) {
+                IconButton(onClick = { 
+                    if (currentRoute != Routes.SETTINGS) {
+                        onNavigate()
+                        navController.navigate(Routes.SETTINGS) 
+                    }
+                }) {
                     Icon(Icons.Default.Settings, null, tint = if(currentRoute == Routes.SETTINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
             }

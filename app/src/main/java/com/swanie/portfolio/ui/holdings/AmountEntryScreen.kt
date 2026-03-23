@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,6 +57,7 @@ fun AmountEntryScreen(
     val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var visualProgress by remember { mutableFloatStateOf(0f) }
     var visualStatus by remember { mutableStateOf("Initializing...") }
@@ -83,6 +85,9 @@ fun AmountEntryScreen(
 
     LaunchedEffect(isSaving) {
         if (isSaving) {
+            // RETRACT KEYBOARD IMMEDIATELY BEFORE ANIMATION
+            keyboardController?.hide()
+            
             milestones.forEach { milestone ->
                 val (target, text) = milestone
                 visualStatus = text
@@ -170,7 +175,8 @@ fun AmountEntryScreen(
 
     Scaffold(containerColor = Color.Transparent) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            if (category == AssetCategory.CRYPTO) {
+            // REMOVE GHOST: Only show content if NOT saving
+            if (category == AssetCategory.CRYPTO && !isSaving) {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -209,7 +215,8 @@ fun AmountEntryScreen(
             }
 
             AnimatedVisibility(visible = isSaving, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.zIndex(10f)) {
-                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.94f)), contentAlignment = Alignment.Center) {
+                // REMOVE GHOST: Use fully opaque black background
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         AsyncImage(model = imageUrl, contentDescription = null, modifier = Modifier.size(90.dp).scale(if (showCheckmark) 1f else pulseScale))
                         Spacer(Modifier.height(40.dp))

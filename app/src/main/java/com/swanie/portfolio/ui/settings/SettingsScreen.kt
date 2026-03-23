@@ -7,9 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,81 +39,87 @@ fun SettingsScreen(
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+    var isExiting by remember { mutableStateOf(false) }
 
     // GRADIENT SYMMETRY: Set containerColor to Transparent to allow NavGraph gradient to show
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) },
+        bottomBar = { BottomNavigationBar(navController = navController, onNavigate = { isExiting = true }) },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Box(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
-                Text(text = "SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
-            }
-
-            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                
-                // --- VISUAL SETTINGS ---
-                Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                
-                SettingsToggleItem(
-                    title = "Use Compact Cards",
-                    subtitle = "Shrink asset cards to show more on screen",
-                    checked = isCompactMode,
-                    onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
-                    themeColor = safeText
-                )
-
-                SettingsToggleItem(
-                    title = "Confirm Deletion",
-                    subtitle = "Show 'Are you sure?' before removing an asset",
-                    checked = confirmDelete,
-                    onCheckedChange = { mainViewModel.setConfirmDelete(it) },
-                    themeColor = safeText
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // --- THEME & GRADIENT ---
-                Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                
-                SettingsToggleItem(
-                    title = "Background Gradient",
-                    subtitle = "Enable dynamic color shifting for the vault",
-                    checked = useGradient,
-                    onCheckedChange = { mainViewModel.setUseGradient(it) },
-                    themeColor = safeText
-                )
-
-                if (useGradient) {
-                    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
-                        Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                        Slider(
-                            value = gradientAmount,
-                            onValueChange = { mainViewModel.setGradientAmount(it) },
-                            valueRange = 0f..1f,
-                            colors = SliderDefaults.colors(
-                                thumbColor = Color.Yellow,
-                                activeTrackColor = Color.Yellow,
-                                inactiveTrackColor = safeText.copy(alpha = 0.2f)
-                            )
-                        )
-                    }
+        if (!isExiting) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Box(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
+                    Text(text = "SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                    
+                    // --- VISUAL SETTINGS ---
+                    Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    
+                    SettingsToggleItem(
+                        title = "Use Compact Cards",
+                        subtitle = "Shrink asset cards to show more on screen",
+                        checked = isCompactMode,
+                        onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
+                        themeColor = safeText
+                    )
 
-                Button(
-                    onClick = { navController.navigate(Routes.THEME_STUDIO) },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                    SettingsToggleItem(
+                        title = "Confirm Deletion",
+                        subtitle = "Show 'Are you sure?' before removing an asset",
+                        checked = confirmDelete,
+                        onCheckedChange = { mainViewModel.setConfirmDelete(it) },
+                        themeColor = safeText
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // --- THEME & GRADIENT ---
+                    Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    
+                    SettingsToggleItem(
+                        title = "Background Gradient",
+                        subtitle = "Enable dynamic color shifting for the vault",
+                        checked = useGradient,
+                        onCheckedChange = { mainViewModel.setUseGradient(it) },
+                        themeColor = safeText
+                    )
+
+                    if (useGradient) {
+                        Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
+                            Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Slider(
+                                value = gradientAmount,
+                                onValueChange = { mainViewModel.setGradientAmount(it) },
+                                valueRange = 0f..1f,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = Color.Yellow,
+                                    activeTrackColor = Color.Yellow,
+                                    inactiveTrackColor = safeText.copy(alpha = 0.2f)
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { 
+                            isExiting = true
+                            navController.navigate(Routes.THEME_STUDIO) 
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }

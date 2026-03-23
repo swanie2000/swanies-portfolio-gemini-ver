@@ -103,6 +103,8 @@ fun MyHoldingsScreen(
     var showScanFlash by remember { mutableStateOf(false) }
     val scanOffset = remember { Animatable(-1f) }
 
+    var isExiting by remember { mutableStateOf(false) }
+
     val filteredHoldings by remember(localHoldings, selectedTab) {
         derivedStateOf {
             when (selectedTab) {
@@ -189,145 +191,147 @@ fun MyHoldingsScreen(
             }
         }
     }) {
-        if (showScanFlash) {
+        if (showScanFlash && !isExiting) {
             Box(modifier = Modifier.fillMaxSize().zIndex(999f).background(Brush.verticalGradient(0f to Color.Transparent, 0.45f to Color.White.copy(0.15f), 0.5f to Color.White.copy(0.35f), 0.55f to Color.White.copy(0.15f), 1f to Color.Transparent, startY = scanOffset.value * 2000f, endY = (scanOffset.value * 2000f) + 600f)))
         }
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth().background(Color.Transparent).statusBarsPadding()) {
-                Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.swanie_foreground),
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp).align(Alignment.Center)
-                    )
+        if (!isExiting) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.fillMaxWidth().background(Color.Transparent).statusBarsPadding()) {
+                    Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.swanie_foreground),
+                            contentDescription = null,
+                            modifier = Modifier.size(100.dp).align(Alignment.Center)
+                        )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = { if (!isViewModelRefreshing && remainingCooldown <= 0) viewModel.refreshAssets() },
-                            modifier = Modifier.size(48.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (remainingCooldown > 0 && !isViewModelRefreshing) {
-                                Text("${remainingCooldown}s", color = textColor.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            } else {
-                                Icon(Icons.Default.Refresh, null, tint = if(isViewModelRefreshing || remainingCooldown > 0) textColor.copy(0.2f) else textColor)
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        IconButton(onClick = { mainViewModel.toggleCompactView() }, modifier = Modifier.size(44.dp)) {
-                            Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor)
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        IconButton(onClick = { navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
-                            Icon(Icons.Default.Add, null, tint = Color.Black)
-                        }
-                    }
-
-                    if (refreshProgress > 0f) {
-                        Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 2.dp), contentAlignment = Alignment.Center) {
-                            LinearProgressIndicator(
-                                progress = { refreshProgress },
-                                modifier = Modifier.width(100.dp).height(4.dp).clip(CircleShape),
-                                color = textColor.copy(0.7f),
-                                trackColor = textColor.copy(0.05f)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Text(
-                text = "MY HOLDINGS",
-                color = textColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 0.dp)
-            )
-            Text(
-                text = totalValueFormatted,
-                color = textColor.copy(alpha = 0.7f),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().clickable { navController.navigate(Routes.ANALYTICS) }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-                TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(40.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
-                    tabs.forEachIndexed { index, title ->
-                        val isSelected = selectedTab == index
-                        Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
-                            Text(text = title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 4.dp))
-                        }
-                    }
-                }
-                AnimatedVisibility(visible = selectedTab == 2) {
-                    IconButton(onClick = { navController.navigate(Routes.METALS_AUDIT) }, modifier = Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Shield, null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
-                    }
-                }
-            }
-
-            AnimatedContent(
-                targetState = isCompactViewEnabled,
-                transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(400)) },
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                label = "ViewToggle"
-            ) { targetIsCompact ->
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(items = filteredHoldings, key = { it.coinId }) { asset ->
-                        ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
-                            val isExpanded = expandedAssetId == asset.coinId
-                            val isEditButtonVisible = showEditButtonId == asset.coinId
-                            val handleExpandToggle = {
-                                if (targetIsCompact) {
-                                    if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; showEditButtonId = null }
-                                    else if (showEditButtonId != asset.coinId) { showEditButtonId = asset.coinId }
-                                    else { expandedAssetId = null; showEditButtonId = null }
+                            IconButton(
+                                onClick = { if (!isViewModelRefreshing && remainingCooldown <= 0) viewModel.refreshAssets() },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                if (remainingCooldown > 0 && !isViewModelRefreshing) {
+                                    Text("${remainingCooldown}s", color = textColor.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 } else {
-                                    if (showEditButtonId != asset.coinId) { showEditButtonId = asset.coinId; expandedAssetId = asset.coinId }
-                                    else { showEditButtonId = null; expandedAssetId = null }
+                                    Icon(Icons.Default.Refresh, null, tint = if(isViewModelRefreshing || remainingCooldown > 0) textColor.copy(0.2f) else textColor)
                                 }
                             }
 
-                            val dragModifier = Modifier.longPressDraggableHandle(
-                                onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                onDragStopped = {
-                                    isDraggingActive.value = false
-                                    if (isOverTrash.value) { if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset) }
-                                    else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(800); isSavingOrder.value = false } }
-                                }
-                            )
+                            Spacer(modifier = Modifier.weight(1f))
 
-                            if (targetIsCompact && !isExpanded) {
-                                CompactAssetCard(asset, isDragging, cardBg, cardText, handleExpandToggle, dragModifier)
-                            } else {
-                                FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                            IconButton(onClick = { mainViewModel.toggleCompactView() }, modifier = Modifier.size(44.dp)) {
+                                Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor)
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
+                                Icon(Icons.Default.Add, null, tint = Color.Black)
+                            }
+                        }
+
+                        if (refreshProgress > 0f) {
+                            Box(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 2.dp), contentAlignment = Alignment.Center) {
+                                LinearProgressIndicator(
+                                    progress = { refreshProgress },
+                                    modifier = Modifier.width(100.dp).height(4.dp).clip(CircleShape),
+                                    color = textColor.copy(0.7f),
+                                    trackColor = textColor.copy(0.05f)
+                                )
                             }
                         }
                     }
                 }
-            }
 
-            BottomNavigationBar(navController = navController)
+                Text(
+                    text = "MY HOLDINGS",
+                    color = textColor,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 0.dp)
+                )
+                Text(
+                    text = totalValueFormatted,
+                    color = textColor.copy(alpha = 0.7f),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().clickable { isExiting = true; navController.navigate(Routes.ANALYTICS) }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
+                    TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(40.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
+                        tabs.forEachIndexed { index, title ->
+                            val isSelected = selectedTab == index
+                            Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
+                                Text(text = title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 4.dp))
+                            }
+                        }
+                    }
+                    AnimatedVisibility(visible = selectedTab == 2) {
+                        IconButton(onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) }, modifier = Modifier.size(32.dp)) {
+                            Icon(Icons.Default.Shield, null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
+                        }
+                    }
+                }
+
+                AnimatedContent(
+                    targetState = isCompactViewEnabled,
+                    transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(400)) },
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    label = "ViewToggle"
+                ) { targetIsCompact ->
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(items = filteredHoldings, key = { it.coinId }) { asset ->
+                            ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
+                                val isExpanded = expandedAssetId == asset.coinId
+                                val isEditButtonVisible = showEditButtonId == asset.coinId
+                                val handleExpandToggle = {
+                                    if (targetIsCompact) {
+                                        if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; showEditButtonId = null }
+                                        else if (showEditButtonId != asset.coinId) { showEditButtonId = asset.coinId }
+                                        else { expandedAssetId = null; showEditButtonId = null }
+                                    } else {
+                                        if (showEditButtonId != asset.coinId) { showEditButtonId = asset.coinId; expandedAssetId = asset.coinId }
+                                        else { showEditButtonId = null; expandedAssetId = null }
+                                    }
+                                }
+
+                                val dragModifier = Modifier.longPressDraggableHandle(
+                                    onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
+                                    onDragStopped = {
+                                        isDraggingActive.value = false
+                                        if (isOverTrash.value) { if (confirmDeleteSetting) assetPendingDeletion = asset else viewModel.deleteAsset(asset) }
+                                        else { scope.launch { isSavingOrder.value = true; viewModel.updateAssetOrder(localHoldings); delay(800); isSavingOrder.value = false } }
+                                    }
+                                )
+
+                                if (targetIsCompact && !isExpanded) {
+                                    CompactAssetCard(asset, isDragging, cardBg, cardText, handleExpandToggle, dragModifier)
+                                } else {
+                                    FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                BottomNavigationBar(navController = navController, onNavigate = { isExiting = true })
+            }
         }
 
-        AnimatedVisibility(visible = isDraggingActive.value, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height) }) {
+        AnimatedVisibility(visible = isDraggingActive.value && !isExiting, modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).onGloballyPositioned { coords -> val pos = coords.positionInRoot(); trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height) }) {
             Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
             }
