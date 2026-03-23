@@ -1,22 +1,28 @@
-# PROJECT STATUS: THE FORTRESS ARMORED (V8)
+# PROJECT STATUS: THE PULSE HORIZON (V4.2)
 
-**Current Version:** 4.1 (UX Hardening & Visual Lockdown)
+**Current Version:** 4.2 (Widget Studio & UX Lockdown Milestone)
 **Build Status:** 🟢 SUCCESS (V8 Symmetry Verified on Device)
 **Database Schema:** V8 (The Global Foundation)
 
 ---
 
-## 1. The V8 Grand Expansion: Global & Multi-User Evolution
-We have successfully evolved from a single-user vault into a global-ready financial engine. Despite a significant AI "Symmetry Fracture" during the V8 migration, the system was manually recovered and hardened, ensuring no data loss and 100% architectural integrity.
+## 1. THE PULSE REVOLUTION: The Home Screen Interface
+We have successfully extended the "Fortress" beyond the app itself, establishing a high-performance, interactive presence on the Android Home Screen. This milestone marks the completion of the visual "Pulse" engine.
 
-### Key Wins Today:
-* **The V8 Five-Table Vault:** Expanded the schema from 2 to 5 tables. The "Fortress" now supports **Portfolios** (multi-container logic), **UserConfig** (global localization), and **SystemLogs** (the "Black Box" diagnostic engine).
-* **Ghost-Cache Purge:** Successfully bypassed Android’s internal database caching by forcing a migration to `swanie_portfolio_v8_final`.
-* **Global Readiness:** Initialized the `UserConfig` table with USD/English defaults.
-* **Black Box Diagnostics:** Implemented the `SystemLogEntity`, providing a persistent record of app health and background sync events.
-* **Persistence Lockdown:** Verified via App Inspection that all existing assets were correctly "tagged" to the "MAIN" portfolio.
-* **Visual Symmetry:** Maintained the timestamped Primary Key logic (coinId_timestamp), ensuring unlimited distinct holdings remain unique.
-* **UX HARDENING (The Ghost Purge):** Eliminated persistent numeric keyboards and "ghosting" UI artifacts across all screens. By implementing a synchronized `isExiting` state pattern and improving the opaque "Fortress" saving animation, the navigation is now surgically clean.
+### Key Wins (Widget Studio):
+* **Jetpack Glance Foundation:** Implemented a modern, coroutine-powered widget engine using Jetpack Glance.
+* **V8 Multi-Portfolio Integration:** The widget is surgically bound to the "MAIN" portfolio, correctly handling the V8 database schema (`swanie_portfolio_v8_final`) and multi-container logic.
+* **The Weighted Trend Engine:** Developed a professional-grade calculation that weights 24h price changes against the total value of each holding: `Sum(Value_i * ChangePercent_i) / TotalValue`.
+* **The Color Pulse:** Implemented dynamic trend indicators (#00C853 Green / #FF1744 Red) that tint the entire widget's status bar based on aggregate portfolio health.
+* **Functional Interactivity:** * **Deep-Linking:** Tapping the widget launches `MainActivity` directly via `actionStartActivity`.
+    * **Manual Refresh:** Integrated a `RefreshAction` (via `ActionCallback`) directly into the widget to force a price update.
+    * **Cross-Process DI:** Successfully utilized a Hilt `@EntryPoint` to provide the `AssetRepository` to the Glance process, ensuring architectural integrity.
+    * **Sync Feedback:** Added a "Last Sync" timestamp derived from the `max(lastUpdated)` across assets to ensure data truth.
+
+### Key Wins (UX Hardening):
+* **The Ghost Purge:** Eliminated persistent numeric keyboards and navigation "ghosting" artifacts by implementing a synchronized `isExiting` state pattern across all screens.
+* **Composition Lockdown:** Updated all main navigation components (BottomBar, MyHoldings, Settings, Analytics) to physically remove elements from the UI tree during transitions, preventing visual overlap.
+* **Symmetry Bridge:** Manually hardened the Repository layer to handle the transition from V7 single-stream data to V8 filtered portfolio streams without UI-layer crashes.
 
 ---
 
@@ -26,21 +32,21 @@ We have successfully evolved from a single-user vault into a global-ready financ
 | :--- | :--- |
 | **Database** | V8 (5-Table Multi-Portfolio & Config Support) |
 | **Data Engine** | V7 Timestamped PKs + V8 Portfolio Filtering |
+| **Interface** | Interactive Home Screen Pulse Widget (Glance 1.1.0) |
 | **UX Quality** | High-Performance navigation with state-based "Ghost" prevention |
 | **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
-| **Safety Net** | Manual "Symmetry Bridge" prevents UI crashes on V8 data |
-| **Metal Icons** | Dynamic Canvas-rendered bars/coins with weight labeling |
+| **Safety Net** | Manual "Symmetry Bridge" in Repository layer |
 
 ---
 
-## 3. THE REVISED PHASE 3 BATTLE PLAN: "THE WIDGET STUDIO"
+## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
 
-With the V8 foundation now rock-solid and the data chain capable of handling multiple portfolios, we move to the final visual frontier: the Samsung Home Screen.
+With the visual presence established, we move to broaden the app's international capabilities and refine the V8 multi-portfolio experience.
 
 **Objective:**
-"The Pulse Widget" — A high-performance Home Screen Glance widget that provides an instant 1:1 view of the "MAIN" portfolio's total value and top movers.
+"Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.
 
 ### The Three-Pronged Strike:
-1.  **The Glance Foundation:** Implement `GlanceAppWidget` and `GlanceAppWidgetReceiver` using modern Jetpack Glance to establish the "Pulse" on the home screen.
-2.  **The Live Pulse Engine:** Connect the Widget to the `AssetRepository.allAssets` flow, ensuring the home screen updates in real-time as prices shift.
-3.  **The Visual Sync:** Extend the Canvas-rendered metal icons and dynamic trend colors (Green/Red) to the widget layout for total brand symmetry.
+1.  **The Multi-Vault Switcher:** Implement the UI to allow users to create and switch between different "Vaults" (Portfolios) using the V8 `PortfolioEntity`.
+2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency, with automated FX conversion logic.
+3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French) as defined in the V8 infrastructure.
