@@ -173,71 +173,65 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE FORTRESS ARMORED (V7)
+# PROJECT STATUS: THE FORTRESS ARMORED (V8)
 
-Current Version: 3.3 (Visual & Data Symmetry Milestone)
+**Current Version:** 4.0 (Global Infrastructure & Multi-Portfolio Milestone)
+**Build Status:** 🟢 SUCCESS (V8 Symmetry Verified on Device)
+**Database Schema:** V8 (The Global Foundation)
 
-Build Status: 🟢 SUCCESS (Verified on Device)
+---
 
-Database Schema: V7 (Ironclad Uniqueness)
+## 1. The V8 Grand Expansion: Global & Multi-User Evolution
+We have successfully evolved from a single-user vault into a global-ready financial engine. Despite a significant AI "Symmetry Fracture" during the V8 migration, the system was manually recovered and hardened, ensuring no data loss and 100% architectural integrity.
 
-1. The Visual & Data Lockdown: V7 Evolution
+### Key Wins Today:
+* **The V8 Five-Table Vault:** Expanded the schema from 2 to 5 tables. The "Fortress" now supports **Portfolios** (multi-container logic), **UserConfig** (global localization), and **SystemLogs** (the "Black Box" diagnostic engine).
+* **Symmetry Recovery:** Manually re-engineered the `AssetDao`, `AssetRepository`, and `AssetViewModel` to bridge the gap between V7 legacy calls and V8 multi-portfolio requirements.
+* **Ghost-Cache Purge:** Successfully bypassed Android’s internal database caching by forcing a migration to `swanie_portfolio_v8_final`, ensuring a clean slate for the new entities.
+* **Global Readiness:** Initialized the `UserConfig` table with USD/English defaults, preparing the infrastructure for Currency and Language localization.
+* **Black Box Diagnostics:** Implemented the `SystemLogEntity`, providing a persistent record of app health and background sync events for professional-grade troubleshooting.
+* **Persistence Lockdown:** Verified via App Inspection that all existing assets were correctly "tagged" to the "MAIN" portfolio, preserving the user’s history through the upgrade.
+* **Visual Symmetry:** Maintained the timestamped Primary Key logic (coinId_timestamp), ensuring unlimited distinct holdings (e.g., specific bars/coins) remain unique and trackable.
 
-We have successfully moved beyond basic recovery into high-fidelity optimization. The "Fortress" now features a logically distinct data layer and a premium custom visual engine for precious metals.
+---
 
-Key Wins Today:
-- Ironclad Uniqueness: Implemented timestamped Primary Keys (coinId_timestamp). The vault now supports unlimited distinct holdings of the same asset (e.g., 100oz Bars, 1oz Coins, and Rounds) without overwriting.
-- Dynamic Metal Forging: Created a dynamic Canvas rendering engine for metal icons. The app now "mints" 3D-shaded bars and coins with centered numerical weight labels (100, 10, 1, 1k) directly on the graphic.
-- Instant Data Landing: Engineered a "Pre-Flight Fetch" in the entry funnel. All assets (Crypto & Metal) now land on the holdings screen with live Prices, Sparklines, and 24h Trend data already populated.
-- Trend Logic Hardening: Implemented a mathematical fallback for Metal trend data. If the API returns null, the app manually calculates the 24h percentage from the previous close.
-- Navigation Refinement: Standardized a premium 400ms cross-fade across all screens while eliminating launch crashes and fixing background transparency for global gradient visibility.
-- Search Cleanliness: Successfully tested, then purged, the WEEX engine after finding "ATLA" on the more reliable CryptoCompare source, keeping the build lean.
+## 2. The Current "Fortress" Specs
 
-2. The Current "Fortress" Specs
+| Component | Status |
+| :--- | :--- |
+| **Database** | V8 (5-Table Multi-Portfolio & Config Support) |
+| **Data Engine** | V7 Timestamped PKs + V8 Portfolio Filtering |
+| **Localization** | Infrastructure ready for EUR, GBP, CAD, and Language switching |
+| **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
+| **Safety Net** | Manual "Symmetry Bridge" prevents UI crashes on V8 data |
+| **Metal Icons** | Dynamic Canvas-rendered bars/coins with weight labeling |
 
-Component	Status
-Database	V7 (Multi-holding support via unique timestamped PKs)
-Data Engine	Pre-flight enrichment ensures no "0.0" data landings.
-Branding	Full-color Hero Swan with high-vertical keyboard clearance.
-Visuals	Dynamic Canvas-rendered metal icons + Dynamic Gradients.
-Safety Net	Global 30s cooldowns + technical ticker mapping (XAU/XAG).
+---
 
-THE REVISED PHASE 2 BATTLE PLAN: "THE COLOR PULSE WIDGET"
+## 3. THE REVISED PHASE 3 BATTLE PLAN: "THE WIDGET STUDIO"
 
-With the data chain and visual engine now perfect, we move to the final frontier: the Home Screen.
+With the V8 foundation now rock-solid and the data chain capable of handling multiple portfolios, we move to the final visual frontier: the Samsung Home Screen.
 
-Objective:
-"The Color Pulse Engine" — A home screen widget that renders live trend colors (Green/Red) using a Bitmap Courier system to bypass Jetpack Glance’s hardware limitations.
+**Objective:**
+"The Pulse Widget" — A high-performance Home Screen Glance widget that provides an instant 1:1 view of the "MAIN" portfolio's total value and top movers.
 
-The Three-Pronged Strike:
-1. The UI Bridge: Add the "Show on Home Screen" toggle to the asset interaction layer to designate widget assets.
-2. The Bitmap Courier: Create the WidgetIconManager to handle high-performance trend color rendering.
-3. The Pulse Implementation: Build the Jetpack Glance widget, connecting the V7 database to the Glance StateDefinition.
-
+### The Three-Pronged Strike:
+1.  **The Glance Foundation:** Implement `GlanceAppWidget` and `GlanceAppWidgetReceiver` using modern Jetpack Glance to establish the "Pulse" on the home screen.
+2.  **The Live Pulse Engine:** Connect the Widget to the `AssetRepository.allAssets` flow, ensuring the home screen updates in real-time as prices shift.
+3.  **The Visual Sync:** Extend the Canvas-rendered metal icons and dynamic trend colors (Green/Red) to the widget layout for total brand symmetry.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 03/22/2026 19:51:37.24
+Generated: Mon 03/23/2026 12:08:21.23
 
 Branch:
 main
 Commit:
-149a0625797aef83295823f62c232e47bdd0e670
+1bab5dd24f92ac3b8a6577adaa50113efdf870db
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
-AM app/src/main/java/com/swanie/portfolio/data/api/impl/WeexSearchProvider.kt
- M app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
-AM app/src/main/java/com/swanie/portfolio/data/network/WeexApiService.kt
- M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -275,8 +269,11 @@ app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/Converters.kt
+app/src/main/java/com/swanie/portfolio/data/local/PortfolioEntity.kt
+app/src/main/java/com/swanie/portfolio/data/local/SystemLogEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
+app/src/main/java/com/swanie/portfolio/data/local/UserConfigEntity.kt
 app/src/main/java/com/swanie/portfolio/data/network/BinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
