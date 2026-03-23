@@ -28,8 +28,9 @@
             </intent-filter>
         </activity>
 
+        <!-- SYMMETRY FIX: Pointing to the correct Glance Receiver package -->
         <receiver
-            android:name=".ui.widget.PortfolioWidgetReceiver"
+            android:name=".widget.PortfolioWidgetReceiver"
             android:exported="true"
             android:label="Swanie Portfolio Pulse">
             <intent-filter>
