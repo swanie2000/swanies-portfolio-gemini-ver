@@ -173,31 +173,27 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-# PROJECT STATUS: THE PULSE HORIZON (V4.2)
+# PROJECT STATUS: THE STEALTH PULSE (V5.1)
 
-**Current Version:** 4.2 (Widget Studio & UX Lockdown Milestone)
-**Build Status:** 🟢 SUCCESS (V8 Symmetry Verified on Device)
-**Database Schema:** V8 (The Global Foundation)
+**Current Version:** 5.1 (Widget Studio & Self-Healing V9 Milestone)
+**Build Status:** 🟢 SUCCESS (V9 Schema & Stealth Logic Verified)
+**Database Schema:** V9 (The Privacy & Config Layer)
 
 ---
 
-## 1. THE PULSE REVOLUTION: The Home Screen Interface
-We have successfully extended the "Fortress" beyond the app itself, establishing a high-performance, interactive presence on the Android Home Screen. This milestone marks the completion of the visual "Pulse" engine.
+## 1. THE STEALTH REVOLUTION: Secure Home Screen Interface
+We have successfully transformed the Home Screen Widget into a secure "Stealth Vault." This version prioritizes user privacy by default, ensuring that sensitive financial totals are only visible when explicitly authorized.
 
 ### Key Wins (Widget Studio):
-* **Jetpack Glance Foundation:** Implemented a modern, coroutine-powered widget engine using Jetpack Glance.
-* **V8 Multi-Portfolio Integration:** The widget is surgically bound to the "MAIN" portfolio, correctly handling the V8 database schema (`swanie_portfolio_v8_final`) and multi-container logic.
-* **The Weighted Trend Engine:** Developed a professional-grade calculation that weights 24h price changes against the total value of each holding: `Sum(Value_i * ChangePercent_i) / TotalValue`.
-* **The Color Pulse:** Implemented dynamic trend indicators (#00C853 Green / #FF1744 Red) that tint the entire widget's status bar based on aggregate portfolio health.
-* **Functional Interactivity:** * **Deep-Linking:** Tapping the widget launches `MainActivity` directly via `actionStartActivity`.
-    * **Manual Refresh:** Integrated a `RefreshAction` (via `ActionCallback`) directly into the widget to force a price update.
-    * **Cross-Process DI:** Successfully utilized a Hilt `@EntryPoint` to provide the `AssetRepository` to the Glance process, ensuring architectural integrity.
-    * **Sync Feedback:** Added a "Last Sync" timestamp derived from the `max(lastUpdated)` across assets to ensure data truth.
+* **Stealth Privacy Masking:** Total portfolio value now defaults to `••••••••`. Visibility is toggled via the new **Widget Studio UI**, which persists the `showWidgetTotal` flag in the V9 database.
+* **Top-3 Asset Dashboard:** The widget now renders a live, curated list of the user's top 3 selected holdings (e.g., GOLD, BTC, SILVER) with individual price and 24h trend data.
+* **Self-Healing Initialization:** Resolved the `java.lang.IllegalStateException` by making the `UserConfigDao` null-safe. Implemented an `onEach` side-effect in the `SettingsViewModel` that auto-inserts a default configuration if the table is empty.
+* **Functional Background Sync:** The "Refresh" icon is now hardwired to the `AssetRepository`, triggering a `force = true` API fetch that updates the database and widget timestamp in real-time.
+* **Widget Studio UI:** Created a dedicated management screen (`WidgetSettingsScreen.kt`) allowing users to pick their top assets and manage privacy settings without leaving the app.
 
-### Key Wins (UX Hardening):
-* **The Ghost Purge:** Eliminated persistent numeric keyboards and navigation "ghosting" artifacts by implementing a synchronized `isExiting` state pattern across all screens.
-* **Composition Lockdown:** Updated all main navigation components (BottomBar, MyHoldings, Settings, Analytics) to physically remove elements from the UI tree during transitions, preventing visual overlap.
-* **Symmetry Bridge:** Manually hardened the Repository layer to handle the transition from V7 single-stream data to V8 filtered portfolio streams without UI-layer crashes.
+### Key Wins (Architecture):
+* **V9 Database Migration:** Successfully evolved the `UserConfigEntity` to support privacy flags and comma-separated asset selections.
+* **Hilt Process Bridging:** Verified the `@EntryPoint` pattern allows the Glance widget to safely access the V9 Repository and DAO layers across process boundaries.
 
 ---
 
@@ -205,38 +201,37 @@ We have successfully extended the "Fortress" beyond the app itself, establishing
 
 | Component | Status |
 | :--- | :--- |
-| **Database** | V8 (5-Table Multi-Portfolio & Config Support) |
-| **Data Engine** | V7 Timestamped PKs + V8 Portfolio Filtering |
-| **Interface** | Interactive Home Screen Pulse Widget (Glance 1.1.0) |
-| **UX Quality** | High-Performance navigation with state-based "Ghost" prevention |
-| **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
-| **Safety Net** | Manual "Symmetry Bridge" in Repository layer |
+| **Database** | V9 (5-Table + Self-Healing Config Persistence) |
+| **Privacy** | "Stealth Mode" active by default (Masked Totals) |
+| **Interface** | Interactive Dashboard (Top 3 Assets + Real Sync) |
+| **Stability** | Null-safe DAO retrieval with Auto-Initialization |
+| **UX Quality** | "Ghost Purge" finalized; clean transitions to Widget Studio |
 
 ---
 
 ## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
 
-With the visual presence established, we move to broaden the app's international capabilities and refine the V8 multi-portfolio experience.
+With the Home Screen secure, we move to broaden the app's international capabilities and refine the multi-vault experience.
 
 **Objective:**
 "Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.
 
 ### The Three-Pronged Strike:
-1.  **The Multi-Vault Switcher:** Implement the UI to allow users to create and switch between different "Vaults" (Portfolios) using the V8 `PortfolioEntity`.
-2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency, with automated FX conversion logic.
-3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French) as defined in the V8 infrastructure.
+1.  **The Multi-Vault Switcher:** Build the UI to allow users to create and switch between different "Vaults" (Portfolios) using the `PortfolioEntity`.
+2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency ($, €, £), with automated FX conversion logic in the Repository.
+3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French).
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 03/23/2026 14:51:48.40
+Generated: Mon 03/23/2026 15:44:18.97
 
 Branch:
 main
 Commit:
-357c84d685f1e43466eaf083723f7cb525c20a51
+0e08e9328b4f3e1b945847d6e20230c174905953
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -279,6 +274,7 @@ app/src/main/java/com/swanie/portfolio/data/local/PortfolioEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/SystemLogEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
+app/src/main/java/com/swanie/portfolio/data/local/UserConfigDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/UserConfigEntity.kt
 app/src/main/java/com/swanie/portfolio/data/network/BinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
@@ -316,6 +312,7 @@ app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModelFactory.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/ThemeStudioScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/WidgetSettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Color.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt

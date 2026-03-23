@@ -1,25 +1,24 @@
-# PROJECT STATUS: THE PULSE MASTER (V5.0)
+# PROJECT STATUS: THE STEALTH PULSE (V5.1)
 
-**Current Version:** 5.0 (Widget Studio Controller & V9 Migration Milestone)
-**Build Status:** 🟢 SUCCESS (V9 Schema Verified & Compiled)
-**Database Schema:** V9 (The Privacy Layer)
+**Current Version:** 5.1 (Widget Studio & Self-Healing V9 Milestone)
+**Build Status:** 🟢 SUCCESS (V9 Schema & Stealth Logic Verified)
+**Database Schema:** V9 (The Privacy & Config Layer)
 
 ---
 
-## 1. THE V9 EVOLUTION: Privacy & Personalization
-We have successfully evolved the "Fortress" database to Version 9, introducing a dedicated configuration layer for user-specific UI preferences and home screen security.
+## 1. THE STEALTH REVOLUTION: Secure Home Screen Interface
+We have successfully transformed the Home Screen Widget into a secure "Stealth Vault." This version prioritizes user privacy by default, ensuring that sensitive financial totals are only visible when explicitly authorized.
 
-### Key Wins (Widget Studio Controller):
-* **V9 Database Migration:** Surgically migrated the database from V8 to V9, adding `showWidgetTotal` and `selectedWidgetAssets` to the `UserConfigEntity`.
-* **Privacy Lockdown:** Implemented a "Privacy Mask" on the home screen widget. The total portfolio value now defaults to `••••••••` unless the user explicitly enables visibility in the new Widget Studio.
-* **Top-3 Asset Selection:** Enabled a specialized "Widget Studio" selection interface. Users can now pick their "Top 3" most important assets to drive the widget's Pulse calculation.
-* **Master Branding Sync:** Re-aligned all widget branding to **"Swanie's Portfolio Pulse"** across the UI and Manifest for consistent brand identity.
-* **The Widget Studio UI:** Created a high-polish `WidgetSettingsScreen.kt` that bridges the `UserConfigDao` to the Compose UI, allowing for real-time configuration of the home screen experience.
-* **Hilt Factory Alignment:** Updated the `SettingsViewModelFactory` to support the new `UserConfigDao`, ensuring clean dependency injection throughout the settings branch.
+### Key Wins (Widget Studio):
+* **Stealth Privacy Masking:** Total portfolio value now defaults to `••••••••`. Visibility is toggled via the new **Widget Studio UI**, which persists the `showWidgetTotal` flag in the V9 database.
+* **Top-3 Asset Dashboard:** The widget now renders a live, curated list of the user's top 3 selected holdings (e.g., GOLD, BTC, SILVER) with individual price and 24h trend data.
+* **Self-Healing Initialization:** Resolved the `java.lang.IllegalStateException` by making the `UserConfigDao` null-safe. Implemented an `onEach` side-effect in the `SettingsViewModel` that auto-inserts a default configuration if the table is empty.
+* **Functional Background Sync:** The "Refresh" icon is now hardwired to the `AssetRepository`, triggering a `force = true` API fetch that updates the database and widget timestamp in real-time.
+* **Widget Studio UI:** Created a dedicated management screen (`WidgetSettingsScreen.kt`) allowing users to pick their top assets and manage privacy settings without leaving the app.
 
-### Key Wins (Legacy Hardening):
-* **The Ghost Purge:** Maintained the `isExiting` state-based navigation fix, ensuring 100% clean transitions between the new Widget Studio and the main Settings menu.
-* **Symmetry Bridge V9:** Verified that the `AssetRepository` and `PortfolioWidget` correctly interpret the new V9 privacy flags without impacting legacy "MAIN" portfolio data.
+### Key Wins (Architecture):
+* **V9 Database Migration:** Successfully evolved the `UserConfigEntity` to support privacy flags and comma-separated asset selections.
+* **Hilt Process Bridging:** Verified the `@EntryPoint` pattern allows the Glance widget to safely access the V9 Repository and DAO layers across process boundaries.
 
 ---
 
@@ -27,23 +26,22 @@ We have successfully evolved the "Fortress" database to Version 9, introducing a
 
 | Component | Status |
 | :--- | :--- |
-| **Database** | V9 (5-Table + Configuration & Privacy Support) |
-| **Data Engine** | V7 Timestamped PKs + V9 Widget Filtering |
-| **Interface** | Secure Home Screen Pulse Widget (Privacy Enabled) |
-| **UX Quality** | Widget Studio Controller with state-based "Ghost" prevention |
-| **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
-| **Safety Net** | Room V8->V9 Migration script verified |
+| **Database** | V9 (5-Table + Self-Healing Config Persistence) |
+| **Privacy** | "Stealth Mode" active by default (Masked Totals) |
+| **Interface** | Interactive Dashboard (Top 3 Assets + Real Sync) |
+| **Stability** | Null-safe DAO retrieval with Auto-Initialization |
+| **UX Quality** | "Ghost Purge" finalized; clean transitions to Widget Studio |
 
 ---
 
-## 3. THE REVISED BATTLE PLAN: "GLOBAL VISTA"
+## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
 
-With the widget privacy and control now in the user's hands, we return to the expansion of the "Fortress" into international markets.
+With the Home Screen secure, we move to broaden the app's international capabilities and refine the multi-vault experience.
 
 **Objective:**
 "Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.
 
 ### The Three-Pronged Strike:
-1.  **The Multi-Vault Switcher:** Implement the UI to allow users to create and switch between different "Vaults" (Portfolios) using the V8 `PortfolioEntity`.
-2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency, with automated FX conversion logic.
-3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French) as defined in the V8 infrastructure.
+1.  **The Multi-Vault Switcher:** Build the UI to allow users to create and switch between different "Vaults" (Portfolios) using the `PortfolioEntity`.
+2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency ($, €, £), with automated FX conversion logic in the Repository.
+3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French).
