@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserConfigDao {
     @Query("SELECT * FROM user_config WHERE id = 1")
-    fun getUserConfig(): Flow<UserConfigEntity>
+    fun getUserConfig(): Flow<UserConfigEntity?>
 
     @Query("SELECT * FROM user_config WHERE id = 1")
     suspend fun getUserConfigOnce(): UserConfigEntity?

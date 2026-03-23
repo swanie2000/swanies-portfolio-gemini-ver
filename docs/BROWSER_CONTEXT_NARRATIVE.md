@@ -1,28 +1,25 @@
-# PROJECT STATUS: THE PULSE HORIZON (V4.2)
+# PROJECT STATUS: THE PULSE MASTER (V5.0)
 
-**Current Version:** 4.2 (Widget Studio & UX Lockdown Milestone)
-**Build Status:** 🟢 SUCCESS (V8 Symmetry Verified on Device)
-**Database Schema:** V8 (The Global Foundation)
+**Current Version:** 5.0 (Widget Studio Controller & V9 Migration Milestone)
+**Build Status:** 🟢 SUCCESS (V9 Schema Verified & Compiled)
+**Database Schema:** V9 (The Privacy Layer)
 
 ---
 
-## 1. THE PULSE REVOLUTION: The Home Screen Interface
-We have successfully extended the "Fortress" beyond the app itself, establishing a high-performance, interactive presence on the Android Home Screen. This milestone marks the completion of the visual "Pulse" engine.
+## 1. THE V9 EVOLUTION: Privacy & Personalization
+We have successfully evolved the "Fortress" database to Version 9, introducing a dedicated configuration layer for user-specific UI preferences and home screen security.
 
-### Key Wins (Widget Studio):
-* **Jetpack Glance Foundation:** Implemented a modern, coroutine-powered widget engine using Jetpack Glance.
-* **V8 Multi-Portfolio Integration:** The widget is surgically bound to the "MAIN" portfolio, correctly handling the V8 database schema (`swanie_portfolio_v8_final`) and multi-container logic.
-* **The Weighted Trend Engine:** Developed a professional-grade calculation that weights 24h price changes against the total value of each holding: `Sum(Value_i * ChangePercent_i) / TotalValue`.
-* **The Color Pulse:** Implemented dynamic trend indicators (#00C853 Green / #FF1744 Red) that tint the entire widget's status bar based on aggregate portfolio health.
-* **Functional Interactivity:** * **Deep-Linking:** Tapping the widget launches `MainActivity` directly via `actionStartActivity`.
-    * **Manual Refresh:** Integrated a `RefreshAction` (via `ActionCallback`) directly into the widget to force a price update.
-    * **Cross-Process DI:** Successfully utilized a Hilt `@EntryPoint` to provide the `AssetRepository` to the Glance process, ensuring architectural integrity.
-    * **Sync Feedback:** Added a "Last Sync" timestamp derived from the `max(lastUpdated)` across assets to ensure data truth.
+### Key Wins (Widget Studio Controller):
+* **V9 Database Migration:** Surgically migrated the database from V8 to V9, adding `showWidgetTotal` and `selectedWidgetAssets` to the `UserConfigEntity`.
+* **Privacy Lockdown:** Implemented a "Privacy Mask" on the home screen widget. The total portfolio value now defaults to `••••••••` unless the user explicitly enables visibility in the new Widget Studio.
+* **Top-3 Asset Selection:** Enabled a specialized "Widget Studio" selection interface. Users can now pick their "Top 3" most important assets to drive the widget's Pulse calculation.
+* **Master Branding Sync:** Re-aligned all widget branding to **"Swanie's Portfolio Pulse"** across the UI and Manifest for consistent brand identity.
+* **The Widget Studio UI:** Created a high-polish `WidgetSettingsScreen.kt` that bridges the `UserConfigDao` to the Compose UI, allowing for real-time configuration of the home screen experience.
+* **Hilt Factory Alignment:** Updated the `SettingsViewModelFactory` to support the new `UserConfigDao`, ensuring clean dependency injection throughout the settings branch.
 
-### Key Wins (UX Hardening):
-* **The Ghost Purge:** Eliminated persistent numeric keyboards and navigation "ghosting" artifacts by implementing a synchronized `isExiting` state pattern across all screens.
-* **Composition Lockdown:** Updated all main navigation components (BottomBar, MyHoldings, Settings, Analytics) to physically remove elements from the UI tree during transitions, preventing visual overlap.
-* **Symmetry Bridge:** Manually hardened the Repository layer to handle the transition from V7 single-stream data to V8 filtered portfolio streams without UI-layer crashes.
+### Key Wins (Legacy Hardening):
+* **The Ghost Purge:** Maintained the `isExiting` state-based navigation fix, ensuring 100% clean transitions between the new Widget Studio and the main Settings menu.
+* **Symmetry Bridge V9:** Verified that the `AssetRepository` and `PortfolioWidget` correctly interpret the new V9 privacy flags without impacting legacy "MAIN" portfolio data.
 
 ---
 
@@ -30,18 +27,18 @@ We have successfully extended the "Fortress" beyond the app itself, establishing
 
 | Component | Status |
 | :--- | :--- |
-| **Database** | V8 (5-Table Multi-Portfolio & Config Support) |
-| **Data Engine** | V7 Timestamped PKs + V8 Portfolio Filtering |
-| **Interface** | Interactive Home Screen Pulse Widget (Glance 1.1.0) |
-| **UX Quality** | High-Performance navigation with state-based "Ghost" prevention |
+| **Database** | V9 (5-Table + Configuration & Privacy Support) |
+| **Data Engine** | V7 Timestamped PKs + V9 Widget Filtering |
+| **Interface** | Secure Home Screen Pulse Widget (Privacy Enabled) |
+| **UX Quality** | Widget Studio Controller with state-based "Ghost" prevention |
 | **Diagnostics** | Persistent System Logging enabled via SystemLogEntity |
-| **Safety Net** | Manual "Symmetry Bridge" in Repository layer |
+| **Safety Net** | Room V8->V9 Migration script verified |
 
 ---
 
-## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
+## 3. THE REVISED BATTLE PLAN: "GLOBAL VISTA"
 
-With the visual presence established, we move to broaden the app's international capabilities and refine the V8 multi-portfolio experience.
+With the widget privacy and control now in the user's hands, we return to the expansion of the "Fortress" into international markets.
 
 **Objective:**
 "Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.

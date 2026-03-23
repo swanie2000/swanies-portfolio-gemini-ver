@@ -8,6 +8,7 @@ import com.swanie.portfolio.data.local.UserConfigEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +29,13 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
+        .onEach { config ->
+            if (config == null) {
+                viewModelScope.launch {
+                    userConfigDao.insertConfig(UserConfigEntity(id = 1))
+                }
+            }
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun saveIsDarkMode(isDark: Boolean) {

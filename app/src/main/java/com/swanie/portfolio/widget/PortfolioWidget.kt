@@ -19,6 +19,7 @@ import androidx.glance.layout.*
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 import com.swanie.portfolio.MainActivity
+import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.hilt.EntryPoint
@@ -53,13 +54,18 @@ class PortfolioWidget : GlanceAppWidget() {
         val assets = repository.getAssetsForPortfolio("MAIN").first()
         
         val selectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
-        val filteredAssets = if (selectedIds.isEmpty()) assets else assets.filter { selectedIds.contains(it.coinId) }
+        val filteredAssets = if (selectedIds.isEmpty()) {
+            assets.take(3)
+        } else {
+            assets.filter { selectedIds.contains(it.coinId) }.take(3)
+        }
 
         var totalValue = 0.0
         var totalChangeWeighted = 0.0
         var lastSyncTimestamp = 0L
 
-        filteredAssets.forEach { asset ->
+        // Calculate based on ALL assets in portfolio for accurate "Pulse"
+        assets.forEach { asset ->
             val multiplier = when {
                 asset.name.contains("KILO", ignoreCase = true) -> 32.1507
                 asset.name.contains("GRAM", ignoreCase = true) -> 0.0321507
@@ -70,15 +76,13 @@ class PortfolioWidget : GlanceAppWidget() {
             
             totalValue += assetTotalValue
             totalChangeWeighted += (assetBaseValue * asset.priceChange24h)
-            if (asset.lastUpdated > lastSyncTimestamp) {
-                lastSyncTimestamp = asset.lastUpdated
-            }
         }
 
+        // Pull timestamp from the actual filtered list for "Top 3" accuracy
+        filteredAssets.forEach { if (it.lastUpdated > lastSyncTimestamp) lastSyncTimestamp = it.lastUpdated }
+
         val aggregateChangePercent = if (totalValue > 0) totalChangeWeighted / totalValue else 0.0
-        
-        // PRIVACY LOCK: Check userConfig for permission to show total
-        val displayValue = if (userConfig?.showWidgetTotal == true) {
+        val displayTotalValue = if (userConfig?.showWidgetTotal == true) {
             NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
         } else {
             "••••••••"
@@ -96,12 +100,19 @@ class PortfolioWidget : GlanceAppWidget() {
         }
 
         provideContent {
-            WidgetContent(displayValue, formattedPercent, trendColor, syncTime, intent)
+            WidgetContent(displayTotalValue, formattedPercent, trendColor, syncTime, filteredAssets, intent)
         }
     }
 
     @Composable
-    private fun WidgetContent(totalValue: String, percentChange: String, trendColor: Color, syncTime: String, intent: Intent) {
+    private fun WidgetContent(
+        totalValue: String, 
+        percentChange: String, 
+        trendColor: Color, 
+        syncTime: String, 
+        topAssets: List<AssetEntity>,
+        intent: Intent
+    ) {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
@@ -117,7 +128,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     text = "SWANIE'S PORTFOLIO PULSE",
                     style = TextStyle(
                         color = ColorProvider(Color.White.copy(alpha = 0.4f)),
-                        fontSize = 8.sp, // Slightly smaller for longer name
+                        fontSize = 8.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -131,34 +142,44 @@ class PortfolioWidget : GlanceAppWidget() {
                 )
             }
 
-            // MIDDLE: VALUE & TREND
-            Column(
-                modifier = GlanceModifier
-                    .defaultWeight()
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Vertical.CenterVertically,
-                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+            // CENTER: PORTFOLIO PULSE
+            Row(
+                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
-                Text(
-                    text = totalValue,
-                    style = TextStyle(
-                        color = ColorProvider(Color.Yellow),
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
+                Column(modifier = GlanceModifier.defaultWeight()) {
+                    Text(
+                        text = totalValue,
+                        style = TextStyle(
+                            color = ColorProvider(Color.Yellow),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
-                )
-                Spacer(modifier = GlanceModifier.height(2.dp))
-                Text(
-                    text = percentChange,
-                    style = TextStyle(
-                        color = ColorProvider(trendColor),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
+                    Text(
+                        text = "AGGREGATE TREND: $percentChange",
+                        style = TextStyle(
+                            color = ColorProvider(trendColor),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     )
-                )
+                }
+            }
+
+            Spacer(modifier = GlanceModifier.height(8.dp))
+
+            // ASSET LIST: TOP 3 SELECTED
+            Column(
+                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 16.dp)
+            ) {
+                topAssets.forEach { asset ->
+                    AssetRow(asset)
+                }
             }
             
+            Spacer(modifier = GlanceModifier.defaultWeight())
+
             // BOTTOM: TIMESTAMP & PULSE BAR
             Row(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
@@ -168,7 +189,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     text = "Last Sync: $syncTime",
                     style = TextStyle(
                         color = ColorProvider(Color.White.copy(alpha = 0.3f)),
-                        fontSize = 9.sp
+                        fontSize = 8.sp
                     )
                 )
             }
@@ -179,6 +200,31 @@ class PortfolioWidget : GlanceAppWidget() {
                     .height(4.dp)
                     .background(ColorProvider(trendColor))
             ) {}
+        }
+    }
+
+    @Composable
+    private fun AssetRow(asset: AssetEntity) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth().padding(vertical = 2.dp),
+            verticalAlignment = Alignment.Vertical.CenterVertically
+        ) {
+            Text(
+                text = asset.symbol.uppercase(),
+                style = TextStyle(color = ColorProvider(Color.White), fontSize = 10.sp, fontWeight = FontWeight.Bold),
+                modifier = GlanceModifier.width(40.dp)
+            )
+            Spacer(modifier = GlanceModifier.defaultWeight())
+            Text(
+                text = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice),
+                style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.8f)), fontSize = 10.sp)
+            )
+            Spacer(modifier = GlanceModifier.width(8.dp))
+            val color = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
+            Text(
+                text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
+                style = TextStyle(color = ColorProvider(color), fontSize = 10.sp, fontWeight = FontWeight.Medium)
+            )
         }
     }
 }
@@ -195,8 +241,10 @@ class RefreshAction : ActionCallback {
         )
         val repository = entryPoint.assetRepository()
         
+        // REAL SYNC: Trigger force-refresh
         repository.refreshAssets(force = true, portfolioId = "MAIN")
         
+        // REFRESH UI
         PortfolioWidget().updateAll(context)
     }
 }
