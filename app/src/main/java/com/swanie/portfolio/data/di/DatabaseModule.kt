@@ -5,8 +5,9 @@ import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.TransactionDao
+import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.repository.AssetRepository
-import com.swanie.portfolio.data.repository.DataSyncCoordinator // Ensure this is imported
+import com.swanie.portfolio.data.repository.DataSyncCoordinator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,13 +36,17 @@ object DatabaseModule {
     }
 
     @Provides
+    fun provideUserConfigDao(database: AppDatabase): UserConfigDao {
+        return database.userConfigDao()
+    }
+
+    @Provides
     @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,
         searchRegistry: SearchEngineRegistry,
-        syncCoordinator: DataSyncCoordinator // SURGICAL: Hilt now provides the coordinator here
+        syncCoordinator: DataSyncCoordinator
     ): AssetRepository {
-        // SURGICAL: Pass the coordinator into the constructor
         return AssetRepository(assetDao, searchRegistry, syncCoordinator)
     }
 }

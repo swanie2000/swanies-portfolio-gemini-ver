@@ -9,5 +9,7 @@ data class UserConfigEntity(
     val preferredCurrency: String = "USD",
     val languageCode: String = "en",
     val isBiometricActive: Boolean = false,
-    val subscriptionLevel: String = "FREE"
+    val subscriptionLevel: String = "FREE",
+    val showWidgetTotal: Boolean = false,
+    val selectedWidgetAssets: String = "" // Comma-separated asset IDs
 )

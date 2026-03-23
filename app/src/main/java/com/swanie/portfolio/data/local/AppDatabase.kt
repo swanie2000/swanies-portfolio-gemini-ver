@@ -12,35 +12,35 @@ import androidx.sqlite.db.SupportSQLiteDatabase
     entities = [
         AssetEntity::class,
         TransactionEntity::class,
-        PortfolioEntity::class,    // 🛡️ FIXED: Registered
-        UserConfigEntity::class,   // 🛡️ FIXED: Registered
-        SystemLogEntity::class     // 🛡️ FIXED: Registered
+        PortfolioEntity::class,
+        UserConfigEntity::class,
+        SystemLogEntity::class
     ],
-    version = 8,
+    version = 9, // Incremented version for UserConfig update
     exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun assetDao(): AssetDao
     abstract fun transactionDao(): TransactionDao
-    // 🛡️ Added missing DAOs if you've created them; if not, you'll need them soon
-    // abstract fun portfolioDao(): PortfolioDao
+    abstract fun userConfigDao(): UserConfigDao
 
     companion object {
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Add new columns to user_config
+                db.execSQL("ALTER TABLE user_config ADD COLUMN showWidgetTotal INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE user_config ADD COLUMN selectedWidgetAssets TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
         private val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // 1. Update Assets
                 db.execSQL("ALTER TABLE assets ADD COLUMN portfolioId TEXT NOT NULL DEFAULT 'MAIN'")
                 db.execSQL("ALTER TABLE assets ADD COLUMN widgetOrder INTEGER NOT NULL DEFAULT 0")
-
-                // 2. Create Portfolios
                 db.execSQL("CREATE TABLE IF NOT EXISTS portfolios (id TEXT NOT NULL, name TEXT NOT NULL, colorHex TEXT NOT NULL, isDefault INTEGER NOT NULL, PRIMARY KEY(id))")
-
-                // 3. Create User Config & Initialize
                 db.execSQL("CREATE TABLE IF NOT EXISTS user_config (id INTEGER NOT NULL, preferredCurrency TEXT NOT NULL, languageCode TEXT NOT NULL, isBiometricActive INTEGER NOT NULL, subscriptionLevel TEXT NOT NULL, PRIMARY KEY(id))")
                 db.execSQL("INSERT OR IGNORE INTO user_config (id, preferredCurrency, languageCode, isBiometricActive, subscriptionLevel) VALUES (1, 'USD', 'en', 0, 'FREE')")
-
-                // 4. Create System Logs
                 db.execSQL("CREATE TABLE IF NOT EXISTS system_logs (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, timestamp INTEGER NOT NULL, level TEXT NOT NULL, tag TEXT NOT NULL, message TEXT NOT NULL)")
             }
         }
@@ -53,9 +53,9 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "swanie_portfolio_v8_final" // 🚀 FORCED NAME CHANGE to kill the ghost cache
+                    "swanie_portfolio_v8_final"
                 )
-                    .addMigrations(MIGRATION_7_8)
+                    .addMigrations(MIGRATION_7_8, MIGRATION_8_9)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

@@ -19,6 +19,7 @@ import androidx.glance.layout.*
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 import com.swanie.portfolio.MainActivity
+import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -36,6 +37,7 @@ class PortfolioWidget : GlanceAppWidget() {
     @InstallIn(SingletonComponent::class)
     interface PortfolioWidgetEntryPoint {
         fun assetRepository(): AssetRepository
+        fun userConfigDao(): UserConfigDao
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -45,15 +47,19 @@ class PortfolioWidget : GlanceAppWidget() {
             PortfolioWidgetEntryPoint::class.java
         )
         val repository = entryPoint.assetRepository()
+        val userConfigDao = entryPoint.userConfigDao()
 
-        // V8 INTEGRATION: Fetch "MAIN" portfolio assets
+        val userConfig = userConfigDao.getUserConfig().first()
         val assets = repository.getAssetsForPortfolio("MAIN").first()
         
+        val selectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+        val filteredAssets = if (selectedIds.isEmpty()) assets else assets.filter { selectedIds.contains(it.coinId) }
+
         var totalValue = 0.0
         var totalChangeWeighted = 0.0
         var lastSyncTimestamp = 0L
 
-        assets.forEach { asset ->
+        filteredAssets.forEach { asset ->
             val multiplier = when {
                 asset.name.contains("KILO", ignoreCase = true) -> 32.1507
                 asset.name.contains("GRAM", ignoreCase = true) -> 0.0321507
@@ -70,9 +76,15 @@ class PortfolioWidget : GlanceAppWidget() {
         }
 
         val aggregateChangePercent = if (totalValue > 0) totalChangeWeighted / totalValue else 0.0
-        val formattedValue = NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
-        val formattedPercent = "${if (aggregateChangePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", aggregateChangePercent)}%"
         
+        // PRIVACY LOCK: Check userConfig for permission to show total
+        val displayValue = if (userConfig?.showWidgetTotal == true) {
+            NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
+        } else {
+            "••••••••"
+        }
+        
+        val formattedPercent = "${if (aggregateChangePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", aggregateChangePercent)}%"
         val trendColor = if (aggregateChangePercent >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
         
         val syncTime = if (lastSyncTimestamp > 0) {
@@ -84,7 +96,7 @@ class PortfolioWidget : GlanceAppWidget() {
         }
 
         provideContent {
-            WidgetContent(formattedValue, formattedPercent, trendColor, syncTime, intent)
+            WidgetContent(displayValue, formattedPercent, trendColor, syncTime, intent)
         }
     }
 
@@ -102,10 +114,10 @@ class PortfolioWidget : GlanceAppWidget() {
                 verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
                 Text(
-                    text = "SWANIE PULSE",
+                    text = "SWANIE'S PORTFOLIO PULSE",
                     style = TextStyle(
                         color = ColorProvider(Color.White.copy(alpha = 0.4f)),
-                        fontSize = 10.sp,
+                        fontSize = 8.sp, // Slightly smaller for longer name
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -183,10 +195,8 @@ class RefreshAction : ActionCallback {
         )
         val repository = entryPoint.assetRepository()
         
-        // Trigger a manual force-refresh of the MAIN portfolio
         repository.refreshAssets(force = true, portfolioId = "MAIN")
         
-        // Update the widget UI
         PortfolioWidget().updateAll(context)
     }
 }

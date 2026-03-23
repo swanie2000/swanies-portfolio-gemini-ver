@@ -109,6 +109,8 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
+                    Text("STUDIOS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
                     Button(
                         onClick = { 
                             isExiting = true
@@ -119,6 +121,20 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { 
+                            isExiting = true
+                            navController.navigate(Routes.WIDGET_SETTINGS) 
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("OPEN WIDGET STUDIO", color = safeText, fontWeight = FontWeight.Bold)
                     }
                 }
             }

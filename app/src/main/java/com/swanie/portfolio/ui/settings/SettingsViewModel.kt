@@ -3,6 +3,8 @@ package com.swanie.portfolio.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.local.UserConfigDao
+import com.swanie.portfolio.data.local.UserConfigEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val themePreferences: ThemePreferences
+    private val themePreferences: ThemePreferences,
+    private val userConfigDao: UserConfigDao
 ) : ViewModel() {
 
     val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
@@ -23,6 +26,9 @@ class SettingsViewModel @Inject constructor(
 
     val confirmDelete: StateFlow<Boolean> = themePreferences.confirmDelete
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun saveIsDarkMode(isDark: Boolean) {
         viewModelScope.launch {
@@ -39,6 +45,18 @@ class SettingsViewModel @Inject constructor(
     fun saveConfirmDelete(enabled: Boolean) {
         viewModelScope.launch {
             themePreferences.saveConfirmDelete(enabled)
+        }
+    }
+
+    fun updateShowWidgetTotal(show: Boolean) {
+        viewModelScope.launch {
+            userConfigDao.updateShowWidgetTotal(show)
+        }
+    }
+
+    fun updateSelectedWidgetAssets(assets: String) {
+        viewModelScope.launch {
+            userConfigDao.updateSelectedWidgetAssets(assets)
         }
     }
 

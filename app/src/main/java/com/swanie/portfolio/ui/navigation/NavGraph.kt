@@ -28,6 +28,7 @@ import com.swanie.portfolio.ui.metals.MetalsAuditScreen
 import com.swanie.portfolio.ui.settings.SettingsScreen
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
+import com.swanie.portfolio.ui.settings.WidgetSettingsScreen
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -67,6 +68,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 ThemeStudioScreen(navController)
             }
 
+            composable(Routes.WIDGET_SETTINGS) {
+                WidgetSettingsScreen(navController)
+            }
+
             composable(Routes.HOLDINGS) {
                 MyHoldingsScreen(
                     mainViewModel = mainViewModel,
@@ -87,15 +92,9 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     navController = navController,
                     onAssetSelected = { asset ->
                         scope.launch {
-                            // METADATA HEALING: Heal via CoinGecko but keep the unique provider coinId
                             val healedAsset = assetViewModel.healMetadata(asset)
-                            
-                            // SYMMETRY FIX: All assets (Crypto AND Metal) now navigate to the entry screen
                             val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "NONE", "UTF-8")
                             val encodedSource = URLEncoder.encode(healedAsset.priceSource, "UTF-8")
-                            
-                            Log.d("ADD_TRACE", "NAV_PASSING: category=${healedAsset.category}, coinId=${healedAsset.coinId}")
-                            
                             navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource")
                         }
                     }
