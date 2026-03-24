@@ -1,51 +1,47 @@
-🛡️ THE UPDATED MASTER NARRATIVE: THE RESILIENT PULSE (V6.2.1)
-Markdown
+PROJECT STATUS: THE PROTECTED PULSE (V6.4)
 
-# PROJECT STATUS: THE RESILIENT PULSE (V6.2.1)
+Current Version: 6.4 (Studio Symmetry & Safety Milestone)
 
-**Current Version:** 6.2.1 (V11 Database & Command Studio Milestone)
-**Build Status:** 🟢 SUCCESS (V11 Schema Verified & Stable)
-**Database Schema:** V11 (Added Widget 4-Color Logic & Order Persistence)
+Build Status: 🟢 SUCCESS (V11 Schema & Dialog Logic Verified)
 
----
+Database Schema: V11 (Added Widget 4-Color & Order Persistence)
+1. THE V6.4 REVOLUTION: Symmetry & Safety
 
-## 1. THE V6 REVOLUTION: Tiered Widget Command & Control
-We have successfully evolved the widget configuration from a single settings page into a professional, multi-tiered management suite. This version separates functional data management from visual aesthetic styling, mirroring the app's high-end internal architecture.
+The widget configuration has evolved into a professional, multi-tiered management suite. By mirroring the internal app’s high-end architecture, we have achieved a unified "Swanie Studio" experience that is both elite in design and foolproof in function.
+Key Wins (Widget Manager & Studio):
 
-### Key Wins (Widget Manager & Studio):
-* **The Structural Split:** Created a dedicated "Widget Manager" for functional logic (Privacy & Assets) and a "Widget Studio" sub-page for aesthetic styling (Colors & Themes).
-* **4-Tier Color Studio:** Implemented a functional clone of the internal Theme Studio, providing granular control over Widget Background, Background Text, Card Color, and Card Text Color.
-* **10-Asset Dynamic Ranking:** Expanded capacity from 3 to 10 assets. Implemented a "Yellow Circle Indexing" UI (32dp bubbles) that allows users to define the exact display sequence on the home screen.
-* **Compact Card UI:** Replaced the standard text list with themed "Compact Cards" featuring 12dp rounded corners, providing a premium "V8 Armored" look.
-* **Zero-Mask Stealth Mode:** Optimized privacy logic. When "Privacy Mode" is enabled, the widget hides all sensitive data and re-centers the branding header for a clean, professional minimalist aesthetic.
+    Functional Command Chain: Established a logical flow: App Settings → Widget Manager (Data/Privacy) → Widget Studio (Aesthetics).
 
-### Key Wins (Architecture & Stability):
-* **V11 Database Migration:** Successfully recovered from a "Death Loop" crash by implementing `MIGRATION_10_11`, adding the missing text color columns to the `user_config` table.
-* **Zero-Latency Sync:** Hardwired the `SettingsViewModel` to trigger `PortfolioWidget().updateAll(context)` on every Studio change, ensuring real-time home screen updates.
-* **Symmetry Alignment:** Ensured all Studio components (HSV pickers, color tiles) are identical to the internal app, creating a unified brand experience.
+    Logo-Centric Branding: Standardized the 120dp Swan header across both Studios; removed redundant text titles for a premium, minimalist brand identity.
 
----
+    4-Tier Color Symmetry: Achieved 1:1 parity with the main Theme Studio, granting granular control over Widget Background, Background Text, Card Color, and Card Text Color.
 
-## 2. The Current "Fortress" Specs
+    10-Asset "Power Bubbles": Implemented high-visibility 32dp yellow indexing circles with 18sp bold numbering for intuitive priority ranking.
 
-| Component | Status |
-| :--- | :--- |
-| **Database** | V11 (5-Table + 4-Color & Order Persistence) |
-| **Privacy** | "Zero-Mask" Stealth (No placeholders, centered branding) |
-| **Interface** | 10-Asset Compact Card Dashboard (User-Defined Order) |
-| **Stability** | V11 Schema verified; Logic-to-Glance bridge confirmed |
-| **UX Quality** | Tiered "Command Chain" (Manager -> Studio) |
+    Micro-Typography Polish: Refined selection buttons to a 12sp/13sp two-line centered format, providing professional "breathing room" and eliminating text clipping.
 
----
+Key Wins (Architecture & Safety):
 
-## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
+    Safety Confirmation Dialogs: Implemented AlertDialog protection for "Default Color" resets across both Studios, preventing accidental loss of custom HEX selections (e.g., #000416).
 
-With the home screen dashboard and customization suite now elite, we return to the core expansion of the V11 engine into international markets.
+    V11 Database Migration: Neutralized the "Death Loop" crash by implementing MIGRATION_10_11, adding necessary columns for full widget text-color customization.
 
-**Objective:**
-"Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.
+    Zero-Mask Stealth Mode: Optimized privacy logic; when toggled, the widget re-centers the branding header and hides sensitive data for a sleek, minimalist aesthetic.
 
-### The Three-Pronged Strike:
-1.  **The Multi-Vault Switcher:** Build the UI to allow users to create and switch between different "Vaults" (Portfolios) using the `PortfolioEntity`.
-2.  **The Currency Engine:** Connect the `UserConfigEntity` to the UI to allow users to switch their base currency ($, €, £), with automated FX conversion logic in the Repository.
-3.  **The Localization Layer:** Prepare the app for multi-language support (English/Spanish/German/French).
+2. The Current "Fortress" Specs
+   Component	Status
+   Database	V11 (5-Table + 4-Color & Priority Order Persistence)
+   Branding	Unified 120dp Swan Header (No redundant text titles)
+   UX Safety	Reset Confirmation Dialogs (Data Loss Protection)
+   Interface	10-Asset Compact Card Dashboard (12dp corners)
+   Stability	V11 Schema verified; Logic-to-Glance bridge stable
+3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
+
+Objective: "Global Vista" — Implementing localized currency support and multi-portfolio switching to transform the app into a global wealth management tool.
+The Three-Pronged Strike:
+
+    The Multi-Vault Switcher: Build the UI to allow users to create, name, and switch between different "Vaults" (Portfolios) using the PortfolioEntity.
+
+    The Currency Engine: Connect the UserConfigEntity to the UI to allow users to switch base currencies ($, €, £), backed by automated FX conversion logic.
+
+    The Localization Layer: Prepare the app for a global audience with multi-language support (English/Spanish/German/French).
