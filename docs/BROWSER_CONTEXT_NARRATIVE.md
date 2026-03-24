@@ -1,47 +1,52 @@
-PROJECT STATUS: THE PROTECTED PULSE (V6.4)
+PROJECT STATUS: THE PROTECTED PULSE (V6.5)
 
-Current Version: 6.4 (Studio Symmetry & Safety Milestone)
+Current Version: 6.5 (Clean-Slate Architecture & V6.4 Polish)
 
-Build Status: 🟢 SUCCESS (V11 Schema & Dialog Logic Verified)
+Build Status: 🟢 SUCCESS
 
-Database Schema: V11 (Added Widget 4-Color & Order Persistence)
-1. THE V6.4 REVOLUTION: Symmetry & Safety
+Database Schema: V11 (Transitioning to V12 Multi-Vault)
+🛑 MANDATORY DEVELOPER RULE: THE "CLEAN SLATE" PROTOCOL
 
-The widget configuration has evolved into a professional, multi-tiered management suite. By mirroring the internal app’s high-end architecture, we have achieved a unified "Swanie Studio" experience that is both elite in design and foolproof in function.
-Key Wins (Widget Manager & Studio):
+    CRITICAL INSTRUCTION (DO NOT DELETE): To prevent IllegalStateException crashes during heavy development, the AppDatabase MUST utilize .fallbackToDestructiveMigration(). The user HAS EXPLICITLY STATED they do not need to preserve test data. All future agents must prioritize schema flexibility over data persistence until the app reaches "Production" status.
 
-    Functional Command Chain: Established a logical flow: App Settings → Widget Manager (Data/Privacy) → Widget Studio (Aesthetics).
+1. THE V6.5 EVOLUTION: Aesthetic Lab & Safety
 
-    Logo-Centric Branding: Standardized the 120dp Swan header across both Studios; removed redundant text titles for a premium, minimalist brand identity.
+We have reached the "Design Gold Master" for the customization suite. The app now features a high-fidelity, symmetrical interface protected by safety protocols.
+Key Wins (Branding & UX):
 
-    4-Tier Color Symmetry: Achieved 1:1 parity with the main Theme Studio, granting granular control over Widget Background, Background Text, Card Color, and Card Text Color.
+    Logo-Centric Symmetry: Standardized the 120dp Swan header across both Studios; removed redundant text titles for a premium brand identity.
 
-    10-Asset "Power Bubbles": Implemented high-visibility 32dp yellow indexing circles with 18sp bold numbering for intuitive priority ranking.
+    Safety Confirmation Dialogs: Implemented AlertDialog protection for "Default Color" resets, preventing accidental loss of custom HEX selections.
 
-    Micro-Typography Polish: Refined selection buttons to a 12sp/13sp two-line centered format, providing professional "breathing room" and eliminating text clipping.
+    Micro-Typography Polish: Standardized all selection buttons to a 12sp/13sp two-line centered format with 54dp/48dp tiered heights for professional "breathing room."
 
-Key Wins (Architecture & Safety):
+    The "Midnight Obsidian" Palette: Established the new default theme standard:
 
-    Safety Confirmation Dialogs: Implemented AlertDialog protection for "Default Color" resets across both Studios, preventing accidental loss of custom HEX selections (e.g., #000416).
+        Background: #000416 | Text: #FFFFFF
 
-    V11 Database Migration: Neutralized the "Death Loop" crash by implementing MIGRATION_10_11, adding necessary columns for full widget text-color customization.
+        Card BG: #363636 | Card Text: #C3C3C3
 
-    Zero-Mask Stealth Mode: Optimized privacy logic; when toggled, the widget re-centers the branding header and hides sensitive data for a sleek, minimalist aesthetic.
+Key Wins (Architecture):
 
-2. The Current "Fortress" Specs
-   Component	Status
-   Database	V11 (5-Table + 4-Color & Priority Order Persistence)
-   Branding	Unified 120dp Swan Header (No redundant text titles)
-   UX Safety	Reset Confirmation Dialogs (Data Loss Protection)
-   Interface	10-Asset Compact Card Dashboard (12dp corners)
-   Stability	V11 Schema verified; Logic-to-Glance bridge stable
-3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
+    V11 Database Stability: Successfully moved the Home Screen Widget to a 4-color persisted system with 10-asset custom ordering.
 
-Objective: "Global Vista" — Implementing localized currency support and multi-portfolio switching to transform the app into a global wealth management tool.
+    10-Asset "Power Bubbles": Implemented high-visibility 32dp yellow indexing circles for intuitive priority ranking on the Home Screen.
+
+2. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
+
+Objective: Transform the app into a global wealth management tool via Multi-Vault architecture and Currency Localization.
 The Three-Pronged Strike:
 
-    The Multi-Vault Switcher: Build the UI to allow users to create, name, and switch between different "Vaults" (Portfolios) using the PortfolioEntity.
+    The Multi-Vault Switcher: Implement the VaultEntity and a global VaultManager to allow users to switch between isolated portfolios (e.g., Personal vs. Business).
 
-    The Currency Engine: Connect the UserConfigEntity to the UI to allow users to switch base currencies ($, €, £), backed by automated FX conversion logic.
+    The Currency Engine: Connect the UserConfigEntity to the UI to allow global switching of base currencies ($, €, £) with automated FX conversion.
 
-    The Localization Layer: Prepare the app for a global audience with multi-language support (English/Spanish/German/French).
+    The Localization Layer: Prepare for internationalization (English/Spanish/German/French).
+
+3. The Current "Fortress" Specs
+   Component	Status
+   Database	V11 (Moving to V12 with Destructive Migration active)
+   Branding	Unified 120dp Swan Header
+   UX Safety	Reset Confirmation Dialogs Active
+   Interface	10-Asset Compact Card Dashboard (12dp corners)
+   Stability	CLEAN-SLATE PROTOCOL ACTIVE (No more migration crashes)
