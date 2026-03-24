@@ -109,7 +109,8 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text("MANAGERS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    // --- APP COLORS ---
+                    Text("ADJUST APP COLORS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
                         onClick = { 
@@ -123,7 +124,10 @@ fun SettingsScreen(
                         Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // --- WIDGET SECTION ---
+                    Text("BUILD HOME SCREEN WIDGETS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
                         onClick = { 
@@ -134,7 +138,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("OPEN WIDGET STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
                 }
             }

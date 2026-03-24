@@ -74,6 +74,7 @@ fun ThemeStudioScreen(
 
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     // Pulse & Glow Animations
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -151,6 +152,32 @@ fun ThemeStudioScreen(
         } catch (e: Exception) {}
     }
 
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Reset to Default?", fontWeight = FontWeight.Bold, color = Color.White) },
+            text = { Text("This will override your custom HEX selection.", color = Color.White.copy(0.7f)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.saveCardBackgroundColor("#000416")
+                    viewModel.saveCardTextColor("#FFFFFF")
+                    viewModel.saveSiteBackgroundColor("#000416")
+                    viewModel.saveSiteTextColor("#FFFFFF")
+                    hasUnsavedChanges = false
+                    hexInput = "000416"
+                    val hsv = FloatArray(3)
+                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#000416"), hsv)
+                    hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
+                    showResetDialog = false
+                }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) { Text("CANCEL", color = Color.White) }
+            },
+            containerColor = Color(0xFF1C1C1E)
+        )
+    }
+
     Scaffold(containerColor = Color(0xFF1C1C1E)) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp, vertical = 4.dp),
@@ -174,17 +201,7 @@ fun ThemeStudioScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy((-2).dp),
-                        modifier = Modifier.clickable {
-                            viewModel.saveCardBackgroundColor("#000416")
-                            viewModel.saveCardTextColor("#FFFFFF")
-                            viewModel.saveSiteBackgroundColor("#000416")
-                            viewModel.saveSiteTextColor("#FFFFFF")
-                            hasUnsavedChanges = false
-                            hexInput = "000416"
-                            val hsv = FloatArray(3)
-                            android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#000416"), hsv)
-                            hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
-                        }
+                        modifier = Modifier.clickable { showResetDialog = true }
                     ) {
                         Text("DEFAULT", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
                         Text("COLOR", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)

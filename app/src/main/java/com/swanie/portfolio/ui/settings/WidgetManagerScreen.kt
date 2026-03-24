@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -254,7 +255,12 @@ fun WidgetStudioScreen(
     val widgetCardTextColor = userConfig?.widgetCardTextColor ?: "#FFFFFF"
 
     var activeTarget by remember { mutableIntStateOf(0) }
-    val targets = listOf("Widget Background", "Widget BG Text", "Widget Cards", "Widget Card Text")
+    val targets = listOf(
+        "WIDGET\nBACKGROUND",
+        "WIDGET\nBG TEXT",
+        "WIDGET\nCARDS",
+        "WIDGET\nCARD TEXT"
+    )
 
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
@@ -265,6 +271,7 @@ fun WidgetStudioScreen(
 
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
@@ -342,30 +349,66 @@ fun WidgetStudioScreen(
         } catch (e: Exception) {}
     }
 
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Reset to Default?", fontWeight = FontWeight.Bold, color = Color.White) },
+            text = { Text("This will override your custom HEX selection.", color = Color.White.copy(0.7f)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.updateWidgetBgColor("#000000")
+                    viewModel.updateWidgetBgTextColor("#FFFFFF")
+                    viewModel.updateWidgetCardColor("#1A1C1E")
+                    viewModel.updateWidgetCardTextColor("#FFFFFF")
+                    hasUnsavedChanges = false
+                    hexInput = "000000"
+                    val hsv = FloatArray(3)
+                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#000000"), hsv)
+                    hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
+                    showResetDialog = false
+                }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) { Text("CANCEL", color = Color.White) }
+            },
+            containerColor = Color(0xFF1C1C1E)
+        )
+    }
+
     Scaffold(containerColor = Color(0xFF1C1C1E)) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // --- HEADER ---
             Box(modifier = Modifier.fillMaxWidth().height(110.dp), contentAlignment = Alignment.Center) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White, modifier = Modifier.size(28.dp).clickable { navController.popBackStack() })
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp).clickable { navController.popBackStack() }
+                    )
+
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.clickable {
-                            viewModel.updateWidgetBgColor("#000000")
-                            viewModel.updateWidgetBgTextColor("#FFFFFF")
-                            viewModel.updateWidgetCardColor("#1A1C1E")
-                            viewModel.updateWidgetCardTextColor("#FFFFFF")
-                            hasUnsavedChanges = false
-                        }
+                        verticalArrangement = Arrangement.spacedBy((-2).dp),
+                        modifier = Modifier.clickable { showResetDialog = true }
                     ) {
-                        Text("DEFAULT", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Text("COLOR", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("DEFAULT", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
+                        Text("COLOR", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
                     }
                 }
-                Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(120.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.swanie_foreground),
+                    contentDescription = null,
+                    modifier = Modifier.size(120.dp)
+                )
             }
 
             AnimatedVisibility(visible = showError) {
@@ -407,35 +450,70 @@ fun WidgetStudioScreen(
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // LEFT COLUMN TOP: Widget Background
                     StudioTargetItem(targets[0], widgetBgColor, widgetBgTextColor, activeTarget == 0, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 0 }
-                    StudioTargetItem(targets[1], widgetBgColor, widgetBgTextColor, activeTarget == 1, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 1 }
+                    // RIGHT COLUMN TOP: Widget Cards
+                    StudioTargetItem(targets[2], widgetCardColor, widgetCardTextColor, activeTarget == 2, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 2 }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StudioTargetItem(targets[2], widgetCardColor, widgetCardTextColor, activeTarget == 2, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 2 }
+                    // LEFT COLUMN BOTTOM: Widget BG Text
+                    StudioTargetItem(targets[1], widgetBgColor, widgetBgTextColor, activeTarget == 1, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 1 }
+                    // RIGHT COLUMN BOTTOM: Widget Card Text
                     StudioTargetItem(targets[3], widgetCardColor, widgetCardTextColor, activeTarget == 3, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 3 }
                 }
             }
 
             Button(
                 onClick = { applyColor() },
-                modifier = Modifier.fillMaxWidth().height(50.dp).scale(pulseScale),
+                modifier = Modifier.fillMaxWidth().height(48.dp).scale(pulseScale),
                 colors = ButtonDefaults.buttonColors(containerColor = if (isFlashing) Color.White else Color.Yellow),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("APPLY TO ${targets[activeTarget].uppercase()}", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                Text(
+                    text = targets[activeTarget].replace("\n", " ").uppercase(),
+                    color = Color.Black,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
             }
         }
     }
 }
 
 @Composable
-private fun StudioTargetItem(label: String, bg: String, txt: String, isSelected: Boolean, hasChanges: Boolean, alpha: Float, modifier: Modifier, onClick: () -> Unit) {
+private fun StudioTargetItem(
+    label: String,
+    bg: String,
+    txt: String,
+    isSelected: Boolean,
+    hasChanges: Boolean,
+    alpha: Float,
+    modifier: Modifier,
+    onClick: () -> Unit
+) {
+    val borderThickness = if (isSelected && hasChanges) 4.dp else if (isSelected) 2.dp else 1.dp
     val borderColor = if (isSelected && hasChanges) Color.White.copy(alpha = alpha) else if (isSelected) Color.White else Color.Gray
+
     Box(
-        modifier = modifier.height(50.dp).background(Color(bg.toColorInt()), RoundedCornerShape(8.dp)).border(if (isSelected) 2.dp else 1.dp, borderColor, RoundedCornerShape(8.dp)).clickable { onClick() },
+        modifier = modifier
+            .height(54.dp)
+            .background(Color(bg.toColorInt()), RoundedCornerShape(8.dp))
+            .border(borderThickness, borderColor, RoundedCornerShape(8.dp))
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(label, color = Color(txt.toColorInt()), fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(
+            text = label,
+            color = Color(txt.toColorInt()),
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 14.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
