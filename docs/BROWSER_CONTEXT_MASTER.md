@@ -173,27 +173,31 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-# PROJECT STATUS: THE STEALTH PULSE (V5.1)
+🛡️ THE UPDATED MASTER NARRATIVE: THE RESILIENT PULSE (V6.2.1)
+Markdown
 
-**Current Version:** 5.1 (Widget Studio & Self-Healing V9 Milestone)
-**Build Status:** 🟢 SUCCESS (V9 Schema & Stealth Logic Verified)
-**Database Schema:** V9 (The Privacy & Config Layer)
+# PROJECT STATUS: THE RESILIENT PULSE (V6.2.1)
+
+**Current Version:** 6.2.1 (V11 Database & Command Studio Milestone)
+**Build Status:** 🟢 SUCCESS (V11 Schema Verified & Stable)
+**Database Schema:** V11 (Added Widget 4-Color Logic & Order Persistence)
 
 ---
 
-## 1. THE STEALTH REVOLUTION: Secure Home Screen Interface
-We have successfully transformed the Home Screen Widget into a secure "Stealth Vault." This version prioritizes user privacy by default, ensuring that sensitive financial totals are only visible when explicitly authorized.
+## 1. THE V6 REVOLUTION: Tiered Widget Command & Control
+We have successfully evolved the widget configuration from a single settings page into a professional, multi-tiered management suite. This version separates functional data management from visual aesthetic styling, mirroring the app's high-end internal architecture.
 
-### Key Wins (Widget Studio):
-* **Stealth Privacy Masking:** Total portfolio value now defaults to `••••••••`. Visibility is toggled via the new **Widget Studio UI**, which persists the `showWidgetTotal` flag in the V9 database.
-* **Top-3 Asset Dashboard:** The widget now renders a live, curated list of the user's top 3 selected holdings (e.g., GOLD, BTC, SILVER) with individual price and 24h trend data.
-* **Self-Healing Initialization:** Resolved the `java.lang.IllegalStateException` by making the `UserConfigDao` null-safe. Implemented an `onEach` side-effect in the `SettingsViewModel` that auto-inserts a default configuration if the table is empty.
-* **Functional Background Sync:** The "Refresh" icon is now hardwired to the `AssetRepository`, triggering a `force = true` API fetch that updates the database and widget timestamp in real-time.
-* **Widget Studio UI:** Created a dedicated management screen (`WidgetSettingsScreen.kt`) allowing users to pick their top assets and manage privacy settings without leaving the app.
+### Key Wins (Widget Manager & Studio):
+* **The Structural Split:** Created a dedicated "Widget Manager" for functional logic (Privacy & Assets) and a "Widget Studio" sub-page for aesthetic styling (Colors & Themes).
+* **4-Tier Color Studio:** Implemented a functional clone of the internal Theme Studio, providing granular control over Widget Background, Background Text, Card Color, and Card Text Color.
+* **10-Asset Dynamic Ranking:** Expanded capacity from 3 to 10 assets. Implemented a "Yellow Circle Indexing" UI (32dp bubbles) that allows users to define the exact display sequence on the home screen.
+* **Compact Card UI:** Replaced the standard text list with themed "Compact Cards" featuring 12dp rounded corners, providing a premium "V8 Armored" look.
+* **Zero-Mask Stealth Mode:** Optimized privacy logic. When "Privacy Mode" is enabled, the widget hides all sensitive data and re-centers the branding header for a clean, professional minimalist aesthetic.
 
-### Key Wins (Architecture):
-* **V9 Database Migration:** Successfully evolved the `UserConfigEntity` to support privacy flags and comma-separated asset selections.
-* **Hilt Process Bridging:** Verified the `@EntryPoint` pattern allows the Glance widget to safely access the V9 Repository and DAO layers across process boundaries.
+### Key Wins (Architecture & Stability):
+* **V11 Database Migration:** Successfully recovered from a "Death Loop" crash by implementing `MIGRATION_10_11`, adding the missing text color columns to the `user_config` table.
+* **Zero-Latency Sync:** Hardwired the `SettingsViewModel` to trigger `PortfolioWidget().updateAll(context)` on every Studio change, ensuring real-time home screen updates.
+* **Symmetry Alignment:** Ensured all Studio components (HSV pickers, color tiles) are identical to the internal app, creating a unified brand experience.
 
 ---
 
@@ -201,17 +205,17 @@ We have successfully transformed the Home Screen Widget into a secure "Stealth V
 
 | Component | Status |
 | :--- | :--- |
-| **Database** | V9 (5-Table + Self-Healing Config Persistence) |
-| **Privacy** | "Stealth Mode" active by default (Masked Totals) |
-| **Interface** | Interactive Dashboard (Top 3 Assets + Real Sync) |
-| **Stability** | Null-safe DAO retrieval with Auto-Initialization |
-| **UX Quality** | "Ghost Purge" finalized; clean transitions to Widget Studio |
+| **Database** | V11 (5-Table + 4-Color & Order Persistence) |
+| **Privacy** | "Zero-Mask" Stealth (No placeholders, centered branding) |
+| **Interface** | 10-Asset Compact Card Dashboard (User-Defined Order) |
+| **Stability** | V11 Schema verified; Logic-to-Glance bridge confirmed |
+| **UX Quality** | Tiered "Command Chain" (Manager -> Studio) |
 
 ---
 
 ## 3. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
 
-With the Home Screen secure, we move to broaden the app's international capabilities and refine the multi-vault experience.
+With the home screen dashboard and customization suite now elite, we return to the core expansion of the V11 engine into international markets.
 
 **Objective:**
 "Global Vista" — Implementing localized currency support (EUR, GBP, CAD) and enabling the ability to switch between multiple portfolios directly from the UI.
@@ -226,12 +230,12 @@ With the Home Screen secure, we move to broaden the app's international capabili
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 03/23/2026 15:44:18.97
+Generated: Tue 03/24/2026 12:13:23.56
 
 Branch:
 main
 Commit:
-0e08e9328b4f3e1b945847d6e20230c174905953
+4ce4d6cc0f5abc5c0bb74096a31f98907d2fb2e6
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
@@ -312,6 +316,7 @@ app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModelFactory.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/ThemeStudioScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/ThemeViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/WidgetManagerScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/WidgetSettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Color.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
