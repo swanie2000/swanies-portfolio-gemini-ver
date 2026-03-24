@@ -134,7 +134,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("OPEN WIDGET STUDIO", color = safeText, fontWeight = FontWeight.Bold)
                     }
                 }
             }

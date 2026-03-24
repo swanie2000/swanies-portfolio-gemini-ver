@@ -33,6 +33,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.glance.appwidget.cornerRadius
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -59,7 +60,7 @@ class PortfolioWidget : GlanceAppWidget() {
         
         val selectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
         
-        // Expansion to 10 & Manual Ordering
+        // Dynamic List & Exact Selection Order
         val filteredAssets = if (selectedIds.isEmpty()) {
             assets.take(10)
         } else {
@@ -70,7 +71,6 @@ class PortfolioWidget : GlanceAppWidget() {
         var totalChangeWeighted = 0.0
         var lastSyncTimestamp = 0L
 
-        // Calculate based on ALL assets in portfolio for accurate "Pulse"
         assets.forEach { asset ->
             val multiplier = when {
                 asset.name.contains("KILO", ignoreCase = true) -> 32.1507
@@ -88,11 +88,10 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val aggregateChangePercent = if (totalValue > 0) totalChangeWeighted / totalValue else 0.0
         
-        // Zero-Mask Privacy logic
         val showTotal = userConfig?.showWidgetTotal == true
         val displayTotalValue = if (showTotal) {
             NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
-        } else "" // Display nothing if stealth is ON
+        } else "" // Zero-Mask Stealth
         
         val formattedPercent = "${if (aggregateChangePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", aggregateChangePercent)}%"
         val trendColor = if (aggregateChangePercent >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
@@ -146,7 +145,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 .background(bgColor)
                 .clickable(actionStartActivity(intent))
         ) {
-            // TOP ROW: BRANDING & REFRESH
+            // TOP ROW: REFRESH ONLY IF STEALTH IS ON (Centering Title)
             Row(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically
@@ -171,18 +170,18 @@ class PortfolioWidget : GlanceAppWidget() {
                 )
             }
 
-            // CENTER: PORTFOLIO PULSE / STEALTH BRANDING
-            Row(
+            // HEADER: TOTAL OR CENTERED STEALTH TITLE
+            Box(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.Vertical.CenterVertically
+                contentAlignment = if (showTotal) Alignment.CenterStart else Alignment.Center
             ) {
-                Column(modifier = GlanceModifier.defaultWeight()) {
-                    if (showTotal) {
+                if (showTotal) {
+                    Column {
                         Text(
                             text = totalValue,
                             style = TextStyle(
                                 color = ColorProvider(Color.Yellow),
-                                fontSize = 20.sp,
+                                fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
@@ -194,36 +193,34 @@ class PortfolioWidget : GlanceAppWidget() {
                                 fontWeight = FontWeight.Medium
                             )
                         )
-                    } else {
-                        // Stealth mode: Center the branding title to occupy the area
-                        Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "SWANIE'S PORTFOLIO PULSE",
-                                style = TextStyle(
-                                    color = ColorProvider(Color.White.copy(alpha = 0.6f)),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
                     }
+                } else {
+                    Text(
+                        text = "SWANIE'S PORTFOLIO PULSE",
+                        style = TextStyle(
+                            color = ColorProvider(Color.White),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                 }
             }
 
             Spacer(modifier = GlanceModifier.height(8.dp))
 
-            // ASSET LIST: UP TO 10 ASSETS IN COMPACT CARDS
+            // ASSET LIST: COMPACT CARDS WITH 12DP CORNERS
             val maxVisible = if (size.height > 200.dp) 10 else 5
             Column(
-                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 8.dp)
+                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp)
             ) {
                 assets.take(maxVisible).forEach { asset ->
                     Box(
                         modifier = GlanceModifier
                             .fillMaxWidth()
-                            .padding(vertical = 2.dp)
+                            .padding(vertical = 3.dp)
+                            .cornerRadius(12.dp)
                             .background(cardColor)
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         AssetRow(asset)
                     }
@@ -232,13 +229,13 @@ class PortfolioWidget : GlanceAppWidget() {
             
             Spacer(modifier = GlanceModifier.defaultWeight())
 
-            // BOTTOM: TIMESTAMP & PULSE BAR
+            // BOTTOM BAR
             Row(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
                 Text(
-                    text = "Last Sync: $syncTime",
+                    text = "Sync: $syncTime",
                     style = TextStyle(
                         color = ColorProvider(Color.White.copy(alpha = 0.3f)),
                         fontSize = 8.sp
@@ -249,7 +246,7 @@ class PortfolioWidget : GlanceAppWidget() {
             Box(
                 modifier = GlanceModifier
                     .fillMaxWidth()
-                    .height(4.dp)
+                    .height(3.dp)
                     .background(ColorProvider(trendColor))
             ) {}
         }
@@ -263,19 +260,19 @@ class PortfolioWidget : GlanceAppWidget() {
         ) {
             Text(
                 text = asset.symbol.uppercase(),
-                style = TextStyle(color = ColorProvider(Color.White), fontSize = 10.sp, fontWeight = FontWeight.Bold),
-                modifier = GlanceModifier.width(40.dp)
+                style = TextStyle(color = ColorProvider(Color.White), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                modifier = GlanceModifier.width(45.dp)
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
             Text(
                 text = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice),
-                style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.8f)), fontSize = 10.sp)
+                style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.9f)), fontSize = 11.sp)
             )
-            Spacer(modifier = GlanceModifier.width(8.dp))
+            Spacer(modifier = GlanceModifier.width(10.dp))
             val color = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
             Text(
                 text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
-                style = TextStyle(color = ColorProvider(color), fontSize = 10.sp, fontWeight = FontWeight.Medium)
+                style = TextStyle(color = ColorProvider(color), fontSize = 11.sp, fontWeight = FontWeight.Medium)
             )
         }
     }
