@@ -1,11 +1,15 @@
 package com.swanie.portfolio.ui.settings
 
+import android.content.Context
+import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.UserConfigEntity
+import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -15,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val themePreferences: ThemePreferences,
     private val userConfigDao: UserConfigDao
 ) : ViewModel() {
@@ -59,13 +64,33 @@ class SettingsViewModel @Inject constructor(
     fun updateShowWidgetTotal(show: Boolean) {
         viewModelScope.launch {
             userConfigDao.updateShowWidgetTotal(show)
+            updateWidget()
         }
     }
 
     fun updateSelectedWidgetAssets(assets: String) {
         viewModelScope.launch {
             userConfigDao.updateSelectedWidgetAssets(assets)
+            updateWidget()
         }
+    }
+
+    fun updateWidgetBgColor(color: String) {
+        viewModelScope.launch {
+            userConfigDao.updateWidgetBgColor(color)
+            updateWidget()
+        }
+    }
+
+    fun updateWidgetCardColor(color: String) {
+        viewModelScope.launch {
+            userConfigDao.updateWidgetCardColor(color)
+            updateWidget()
+        }
+    }
+
+    private suspend fun updateWidget() {
+        PortfolioWidget().updateAll(context)
     }
 
     fun saveDefaultTheme() {

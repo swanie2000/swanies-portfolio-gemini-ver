@@ -16,7 +16,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         UserConfigEntity::class,
         SystemLogEntity::class
     ],
-    version = 9, // Incremented version for UserConfig update
+    version = 10, // Incremented version for Widget Manager colors
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -26,9 +26,16 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userConfigDao(): UserConfigDao
 
     companion object {
-        private val MIGRATION_8_9 = object : Migration(8, 9) {
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Add new columns to user_config
+                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetBgColor TEXT NOT NULL DEFAULT '#000000'")
+                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetCardColor TEXT NOT NULL DEFAULT '#1A1C1E'")
+            }
+        }
+
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE user_config ADD COLUMN showWidgetTotal INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE user_config ADD COLUMN selectedWidgetAssets TEXT NOT NULL DEFAULT ''")
             }
@@ -55,7 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "swanie_portfolio_v8_final"
                 )
-                    .addMigrations(MIGRATION_7_8, MIGRATION_8_9)
+                    .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                     .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance

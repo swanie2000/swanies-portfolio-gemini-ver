@@ -109,7 +109,7 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text("STUDIOS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text("MANAGERS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
                         onClick = { 
@@ -128,13 +128,13 @@ fun SettingsScreen(
                     Button(
                         onClick = { 
                             isExiting = true
-                            navController.navigate(Routes.WIDGET_SETTINGS) 
+                            navController.navigate(Routes.WIDGET_MANAGER) 
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("OPEN WIDGET STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
                 }
             }

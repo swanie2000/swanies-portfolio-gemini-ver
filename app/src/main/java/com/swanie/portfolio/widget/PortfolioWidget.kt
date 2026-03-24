@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.*
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
@@ -34,6 +36,8 @@ import java.util.Locale
 
 class PortfolioWidget : GlanceAppWidget() {
 
+    override val sizeMode = SizeMode.Exact
+
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface PortfolioWidgetEntryPoint {
@@ -54,10 +58,12 @@ class PortfolioWidget : GlanceAppWidget() {
         val assets = repository.getAssetsForPortfolio("MAIN").first()
         
         val selectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+        
+        // Expansion to 10 & Manual Ordering
         val filteredAssets = if (selectedIds.isEmpty()) {
-            assets.take(3)
+            assets.take(10)
         } else {
-            assets.filter { selectedIds.contains(it.coinId) }.take(3)
+            selectedIds.mapNotNull { id -> assets.find { it.coinId == id } }.take(10)
         }
 
         var totalValue = 0.0
@@ -78,15 +84,15 @@ class PortfolioWidget : GlanceAppWidget() {
             totalChangeWeighted += (assetBaseValue * asset.priceChange24h)
         }
 
-        // Pull timestamp from the actual filtered list for "Top 3" accuracy
         filteredAssets.forEach { if (it.lastUpdated > lastSyncTimestamp) lastSyncTimestamp = it.lastUpdated }
 
         val aggregateChangePercent = if (totalValue > 0) totalChangeWeighted / totalValue else 0.0
-        val displayTotalValue = if (userConfig?.showWidgetTotal == true) {
+        
+        // Zero-Mask Privacy logic
+        val showTotal = userConfig?.showWidgetTotal == true
+        val displayTotalValue = if (showTotal) {
             NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
-        } else {
-            "••••••••"
-        }
+        } else "" // Display nothing if stealth is ON
         
         val formattedPercent = "${if (aggregateChangePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", aggregateChangePercent)}%"
         val trendColor = if (aggregateChangePercent >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
@@ -99,8 +105,25 @@ class PortfolioWidget : GlanceAppWidget() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
+        val bgColorStr = userConfig?.widgetBgColor ?: "#000000"
+        val cardColorStr = userConfig?.widgetCardColor ?: "#1A1C1E"
+        val widgetBgColor = try { Color(android.graphics.Color.parseColor(bgColorStr)) } catch (e: Exception) { Color.Black }
+        val widgetCardColor = try { Color(android.graphics.Color.parseColor(cardColorStr)) } catch (e: Exception) { Color(0xFF1A1C1E) }
+
         provideContent {
-            WidgetContent(displayTotalValue, formattedPercent, trendColor, syncTime, filteredAssets, intent)
+            val size = LocalSize.current
+            WidgetContent(
+                displayTotalValue, 
+                formattedPercent, 
+                trendColor, 
+                syncTime, 
+                filteredAssets, 
+                intent, 
+                showTotal,
+                size,
+                widgetBgColor,
+                widgetCardColor
+            )
         }
     }
 
@@ -110,13 +133,17 @@ class PortfolioWidget : GlanceAppWidget() {
         percentChange: String, 
         trendColor: Color, 
         syncTime: String, 
-        topAssets: List<AssetEntity>,
-        intent: Intent
+        assets: List<AssetEntity>,
+        intent: Intent,
+        showTotal: Boolean,
+        size: DpSize,
+        bgColor: Color,
+        cardColor: Color
     ) {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(ImageProvider(com.swanie.portfolio.R.drawable.widget_background))
+                .background(bgColor)
                 .clickable(actionStartActivity(intent))
         ) {
             // TOP ROW: BRANDING & REFRESH
@@ -124,14 +151,16 @@ class PortfolioWidget : GlanceAppWidget() {
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
-                Text(
-                    text = "SWANIE'S PORTFOLIO PULSE",
-                    style = TextStyle(
-                        color = ColorProvider(Color.White.copy(alpha = 0.4f)),
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold
+                if (showTotal) {
+                    Text(
+                        text = "SWANIE'S PORTFOLIO PULSE",
+                        style = TextStyle(
+                            color = ColorProvider(Color.White.copy(alpha = 0.4f)),
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
-                )
+                }
                 Spacer(modifier = GlanceModifier.defaultWeight())
                 Image(
                     provider = ImageProvider(android.R.drawable.ic_popup_sync),
@@ -142,39 +171,62 @@ class PortfolioWidget : GlanceAppWidget() {
                 )
             }
 
-            // CENTER: PORTFOLIO PULSE
+            // CENTER: PORTFOLIO PULSE / STEALTH BRANDING
             Row(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically
             ) {
                 Column(modifier = GlanceModifier.defaultWeight()) {
-                    Text(
-                        text = totalValue,
-                        style = TextStyle(
-                            color = ColorProvider(Color.Yellow),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                    if (showTotal) {
+                        Text(
+                            text = totalValue,
+                            style = TextStyle(
+                                color = ColorProvider(Color.Yellow),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
-                    )
-                    Text(
-                        text = "AGGREGATE TREND: $percentChange",
-                        style = TextStyle(
-                            color = ColorProvider(trendColor),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium
+                        Text(
+                            text = "AGGREGATE TREND: $percentChange",
+                            style = TextStyle(
+                                color = ColorProvider(trendColor),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium
+                            )
                         )
-                    )
+                    } else {
+                        // Stealth mode: Center the branding title to occupy the area
+                        Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "SWANIE'S PORTFOLIO PULSE",
+                                style = TextStyle(
+                                    color = ColorProvider(Color.White.copy(alpha = 0.6f)),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = GlanceModifier.height(8.dp))
 
-            // ASSET LIST: TOP 3 SELECTED
+            // ASSET LIST: UP TO 10 ASSETS IN COMPACT CARDS
+            val maxVisible = if (size.height > 200.dp) 10 else 5
             Column(
-                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 8.dp)
             ) {
-                topAssets.forEach { asset ->
-                    AssetRow(asset)
+                assets.take(maxVisible).forEach { asset ->
+                    Box(
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp)
+                            .background(cardColor)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        AssetRow(asset)
+                    }
                 }
             }
             
@@ -206,7 +258,7 @@ class PortfolioWidget : GlanceAppWidget() {
     @Composable
     private fun AssetRow(asset: AssetEntity) {
         Row(
-            modifier = GlanceModifier.fillMaxWidth().padding(vertical = 2.dp),
+            modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
@@ -241,10 +293,7 @@ class RefreshAction : ActionCallback {
         )
         val repository = entryPoint.assetRepository()
         
-        // REAL SYNC: Trigger force-refresh
         repository.refreshAssets(force = true, portfolioId = "MAIN")
-        
-        // REFRESH UI
         PortfolioWidget().updateAll(context)
     }
 }

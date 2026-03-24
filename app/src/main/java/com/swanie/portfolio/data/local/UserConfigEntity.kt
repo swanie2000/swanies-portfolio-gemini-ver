@@ -11,5 +11,7 @@ data class UserConfigEntity(
     val isBiometricActive: Boolean = false,
     val subscriptionLevel: String = "FREE",
     val showWidgetTotal: Boolean = false,
-    val selectedWidgetAssets: String = "" // Comma-separated asset IDs
+    val selectedWidgetAssets: String = "", // Comma-separated asset IDs
+    val widgetBgColor: String = "#000000",
+    val widgetCardColor: String = "#1A1C1E"
 )
