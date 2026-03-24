@@ -104,10 +104,11 @@ class PortfolioWidget : GlanceAppWidget() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-        val bgColorStr = userConfig?.widgetBgColor ?: "#000000"
-        val cardColorStr = userConfig?.widgetCardColor ?: "#1A1C1E"
-        val widgetBgColor = try { Color(android.graphics.Color.parseColor(bgColorStr)) } catch (e: Exception) { Color.Black }
-        val widgetCardColor = try { Color(android.graphics.Color.parseColor(cardColorStr)) } catch (e: Exception) { Color(0xFF1A1C1E) }
+        // 4-Tier Color System
+        val bgColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetBgColor ?: "#000000")) } catch (e: Exception) { Color.Black }
+        val bgTextColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetBgTextColor ?: "#FFFFFF")) } catch (e: Exception) { Color.White }
+        val cardColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardColor ?: "#1A1C1E")) } catch (e: Exception) { Color(0xFF1A1C1E) }
+        val cardTextColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardTextColor ?: "#FFFFFF")) } catch (e: Exception) { Color.White }
 
         provideContent {
             val size = LocalSize.current
@@ -120,8 +121,10 @@ class PortfolioWidget : GlanceAppWidget() {
                 intent, 
                 showTotal,
                 size,
-                widgetBgColor,
-                widgetCardColor
+                bgColor,
+                bgTextColor,
+                cardColor,
+                cardTextColor
             )
         }
     }
@@ -137,7 +140,9 @@ class PortfolioWidget : GlanceAppWidget() {
         showTotal: Boolean,
         size: DpSize,
         bgColor: Color,
-        cardColor: Color
+        bgTextColor: Color,
+        cardColor: Color,
+        cardTextColor: Color
     ) {
         Column(
             modifier = GlanceModifier
@@ -145,7 +150,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 .background(bgColor)
                 .clickable(actionStartActivity(intent))
         ) {
-            // TOP ROW: REFRESH ONLY IF STEALTH IS ON (Centering Title)
+            // TOP ROW: BRANDING
             Row(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.Vertical.CenterVertically
@@ -154,7 +159,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     Text(
                         text = "SWANIE'S PORTFOLIO PULSE",
                         style = TextStyle(
-                            color = ColorProvider(Color.White.copy(alpha = 0.4f)),
+                            color = ColorProvider(bgTextColor.copy(alpha = 0.4f)),
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -180,7 +185,7 @@ class PortfolioWidget : GlanceAppWidget() {
                         Text(
                             text = totalValue,
                             style = TextStyle(
-                                color = ColorProvider(Color.Yellow),
+                                color = ColorProvider(bgTextColor),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -198,7 +203,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     Text(
                         text = "SWANIE'S PORTFOLIO PULSE",
                         style = TextStyle(
-                            color = ColorProvider(Color.White),
+                            color = ColorProvider(bgTextColor),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -208,7 +213,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
             Spacer(modifier = GlanceModifier.height(8.dp))
 
-            // ASSET LIST: COMPACT CARDS WITH 12DP CORNERS
+            // ASSET LIST
             val maxVisible = if (size.height > 200.dp) 10 else 5
             Column(
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp)
@@ -222,7 +227,7 @@ class PortfolioWidget : GlanceAppWidget() {
                             .background(cardColor)
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
-                        AssetRow(asset)
+                        AssetRow(asset, cardTextColor)
                     }
                 }
             }
@@ -237,7 +242,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 Text(
                     text = "Sync: $syncTime",
                     style = TextStyle(
-                        color = ColorProvider(Color.White.copy(alpha = 0.3f)),
+                        color = ColorProvider(bgTextColor.copy(alpha = 0.3f)),
                         fontSize = 8.sp
                     )
                 )
@@ -253,26 +258,26 @@ class PortfolioWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun AssetRow(asset: AssetEntity) {
+    private fun AssetRow(asset: AssetEntity, textColor: Color) {
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Text(
                 text = asset.symbol.uppercase(),
-                style = TextStyle(color = ColorProvider(Color.White), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
                 modifier = GlanceModifier.width(45.dp)
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
             Text(
                 text = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice),
-                style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.9f)), fontSize = 11.sp)
+                style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.9f)), fontSize = 11.sp)
             )
             Spacer(modifier = GlanceModifier.width(10.dp))
-            val color = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
+            val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
             Text(
                 text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
-                style = TextStyle(color = ColorProvider(color), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                style = TextStyle(color = ColorProvider(trendColor), fontSize = 11.sp, fontWeight = FontWeight.Medium)
             )
         }
     }

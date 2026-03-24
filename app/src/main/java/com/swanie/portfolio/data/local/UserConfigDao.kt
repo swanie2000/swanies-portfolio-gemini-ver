@@ -30,6 +30,12 @@ interface UserConfigDao {
     @Query("UPDATE user_config SET widgetBgColor = :color WHERE id = 1")
     suspend fun updateWidgetBgColor(color: String)
 
+    @Query("UPDATE user_config SET widgetBgTextColor = :color WHERE id = 1")
+    suspend fun updateWidgetBgTextColor(color: String)
+
     @Query("UPDATE user_config SET widgetCardColor = :color WHERE id = 1")
     suspend fun updateWidgetCardColor(color: String)
+
+    @Query("UPDATE user_config SET widgetCardTextColor = :color WHERE id = 1")
+    suspend fun updateWidgetCardTextColor(color: String)
 }

@@ -13,5 +13,7 @@ data class UserConfigEntity(
     val showWidgetTotal: Boolean = false,
     val selectedWidgetAssets: String = "", // Comma-separated asset IDs
     val widgetBgColor: String = "#000000",
-    val widgetCardColor: String = "#1A1C1E"
+    val widgetBgTextColor: String = "#FFFFFF",
+    val widgetCardColor: String = "#1A1C1E",
+    val widgetCardTextColor: String = "#FFFFFF"
 )

@@ -29,6 +29,7 @@ import com.swanie.portfolio.ui.settings.SettingsScreen
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeStudioScreen
 import com.swanie.portfolio.ui.settings.WidgetManagerScreen
+import com.swanie.portfolio.ui.settings.WidgetStudioScreen
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -70,6 +71,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
             composable(Routes.WIDGET_MANAGER) {
                 WidgetManagerScreen(navController)
+            }
+
+            composable(Routes.WIDGET_STUDIO) {
+                WidgetStudioScreen(navController)
             }
 
             composable(Routes.HOLDINGS) {

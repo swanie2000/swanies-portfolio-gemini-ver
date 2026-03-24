@@ -82,9 +82,23 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateWidgetBgTextColor(color: String) {
+        viewModelScope.launch {
+            userConfigDao.updateWidgetBgTextColor(color)
+            updateWidget()
+        }
+    }
+
     fun updateWidgetCardColor(color: String) {
         viewModelScope.launch {
             userConfigDao.updateWidgetCardColor(color)
+            updateWidget()
+        }
+    }
+
+    fun updateWidgetCardTextColor(color: String) {
+        viewModelScope.launch {
+            userConfigDao.updateWidgetCardTextColor(color)
             updateWidget()
         }
     }
