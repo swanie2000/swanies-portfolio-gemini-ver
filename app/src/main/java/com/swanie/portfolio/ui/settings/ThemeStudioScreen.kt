@@ -42,6 +42,7 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.theme.ThemeDefaults
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -75,6 +76,9 @@ fun ThemeStudioScreen(
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+
+    // Helper for ThemeDefaults color to Hex String
+    fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
 
     // Pulse & Glow Animations
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -159,14 +163,20 @@ fun ThemeStudioScreen(
             text = { Text("This will override your custom HEX selection.", color = Color.White.copy(0.7f)) },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.saveCardBackgroundColor("#000416")
-                    viewModel.saveCardTextColor("#FFFFFF")
-                    viewModel.saveSiteBackgroundColor("#000416")
-                    viewModel.saveSiteTextColor("#FFFFFF")
+                    val defAppBg = ThemeDefaults.APP_BG.toHexString()
+                    val defAppText = ThemeDefaults.APP_TEXT.toHexString()
+                    val defCardBg = ThemeDefaults.CARD_BG.toHexString()
+                    val defCardText = ThemeDefaults.CARD_TEXT.toHexString()
+
+                    viewModel.saveSiteBackgroundColor(defAppBg)
+                    viewModel.saveSiteTextColor(defAppText)
+                    viewModel.saveCardBackgroundColor(defCardBg)
+                    viewModel.saveCardTextColor(defCardText)
+
                     hasUnsavedChanges = false
-                    hexInput = "000416"
+                    hexInput = defAppBg.replace("#", "")
                     val hsv = FloatArray(3)
-                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#000416"), hsv)
+                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor(defAppBg), hsv)
                     hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
                     showResetDialog = false
                 }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }

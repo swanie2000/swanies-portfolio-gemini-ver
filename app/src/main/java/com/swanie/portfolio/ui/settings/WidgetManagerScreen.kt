@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.settings
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,6 +54,7 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.theme.ThemeDefaults
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -273,6 +275,9 @@ fun WidgetStudioScreen(
     var showError by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
 
+    // Helper for ThemeDefaults color to Hex String
+    fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
+
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -356,14 +361,20 @@ fun WidgetStudioScreen(
             text = { Text("This will override your custom HEX selection.", color = Color.White.copy(0.7f)) },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.updateWidgetBgColor("#000000")
-                    viewModel.updateWidgetBgTextColor("#FFFFFF")
-                    viewModel.updateWidgetCardColor("#1A1C1E")
-                    viewModel.updateWidgetCardTextColor("#FFFFFF")
+                    val defAppBg = ThemeDefaults.APP_BG.toHexString()
+                    val defAppText = ThemeDefaults.APP_TEXT.toHexString()
+                    val defCardBg = ThemeDefaults.CARD_BG.toHexString()
+                    val defCardText = ThemeDefaults.CARD_TEXT.toHexString()
+
+                    viewModel.updateWidgetBgColor(defAppBg)
+                    viewModel.updateWidgetBgTextColor(defAppText)
+                    viewModel.updateWidgetCardColor(defCardBg)
+                    viewModel.updateWidgetCardTextColor(defCardText)
+
                     hasUnsavedChanges = false
-                    hexInput = "000000"
+                    hexInput = defAppBg.replace("#", "")
                     val hsv = FloatArray(3)
-                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#000000"), hsv)
+                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor(defAppBg), hsv)
                     hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
                     showResetDialog = false
                 }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }

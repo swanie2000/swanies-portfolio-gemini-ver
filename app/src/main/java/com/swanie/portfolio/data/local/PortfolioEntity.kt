@@ -8,5 +8,6 @@ data class PortfolioEntity(
     @PrimaryKey val id: String,
     val name: String,
     val colorHex: String,
-    val isDefault: Boolean
+    val isDefault: Boolean,
+    val vaultId: Int = 1
 )

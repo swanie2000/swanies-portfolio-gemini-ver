@@ -10,7 +10,7 @@ data class AssetEntity(
     val name: String,
     val imageUrl: String = "",
     val category: AssetCategory,
-    val officialSpotPrice: Double = 0.0, // ALIGNED V6
+    val officialSpotPrice: Double = 0.0,
     val priceChange24h: Double = 0.0,
     val sparklineData: List<Double> = emptyList(),
     val baseSymbol: String = "",
@@ -21,12 +21,13 @@ data class AssetEntity(
     val amountHeld: Double = 0.0,
     val premium: Double = 0.0,
     val decimalPreference: Int = 2,
-    val displayOrder: Int = 0, // ALIGNED V6
+    val displayOrder: Int = 0,
     val lastUpdated: Long = System.currentTimeMillis(),
     val isFavorite: Boolean = false,
     val showOnWidget: Boolean = false,
     val portfolioId: String = "MAIN",
-    val widgetOrder: Int = 0
+    val widgetOrder: Int = 0,
+    val vaultId: Int = 1
 )
 
 enum class AssetCategory {

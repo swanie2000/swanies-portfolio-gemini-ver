@@ -7,6 +7,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(
     entities = [
@@ -14,9 +17,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         TransactionEntity::class,
         PortfolioEntity::class,
         UserConfigEntity::class,
-        SystemLogEntity::class
+        SystemLogEntity::class,
+        VaultEntity::class
     ],
-    version = 11, // Incremented version for Widget Text colors
+    version = 13, // Incremented to V13 for Global Vista (Multi-Vault)
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -26,39 +30,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userConfigDao(): UserConfigDao
 
     companion object {
-        private val MIGRATION_10_11 = object : Migration(10, 11) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetBgTextColor TEXT NOT NULL DEFAULT '#FFFFFF'")
-                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetCardTextColor TEXT NOT NULL DEFAULT '#FFFFFF'")
-            }
-        }
-
-        private val MIGRATION_9_10 = object : Migration(9, 10) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                // Add new columns to user_config
-                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetBgColor TEXT NOT NULL DEFAULT '#000000'")
-                db.execSQL("ALTER TABLE user_config ADD COLUMN widgetCardColor TEXT NOT NULL DEFAULT '#1A1C1E'")
-            }
-        }
-
-        private val MIGRATION_8_9 = object : Migration(8, 9) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE user_config ADD COLUMN showWidgetTotal INTEGER NOT NULL DEFAULT 0")
-                db.execSQL("ALTER TABLE user_config ADD COLUMN selectedWidgetAssets TEXT NOT NULL DEFAULT ''")
-            }
-        }
-
-        private val MIGRATION_7_8 = object : Migration(7, 8) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE assets ADD COLUMN portfolioId TEXT NOT NULL DEFAULT 'MAIN'")
-                db.execSQL("ALTER TABLE assets ADD COLUMN widgetOrder INTEGER NOT NULL DEFAULT 0")
-                db.execSQL("CREATE TABLE IF NOT EXISTS portfolios (id TEXT NOT NULL, name TEXT NOT NULL, colorHex TEXT NOT NULL, isDefault INTEGER NOT NULL, PRIMARY KEY(id))")
-                db.execSQL("CREATE TABLE IF NOT EXISTS user_config (id INTEGER NOT NULL, preferredCurrency TEXT NOT NULL, languageCode TEXT NOT NULL, isBiometricActive INTEGER NOT NULL, subscriptionLevel TEXT NOT NULL, PRIMARY KEY(id))")
-                db.execSQL("INSERT OR IGNORE INTO user_config (id, preferredCurrency, languageCode, isBiometricActive, subscriptionLevel) VALUES (1, 'USD', 'en', 0, 'FREE')")
-                db.execSQL("CREATE TABLE IF NOT EXISTS system_logs (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, timestamp INTEGER NOT NULL, level TEXT NOT NULL, tag TEXT NOT NULL, message TEXT NOT NULL)")
-            }
-        }
-
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -69,8 +40,17 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "swanie_portfolio_v8_final"
                 )
-                    .addMigrations(MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                     .fallbackToDestructiveMigration()
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            // Seed the default vault
+                            CoroutineScope(Dispatchers.IO).launch {
+                                // Direct SQL insert for the seed to avoid DAO circular dependency on creation
+                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416')")
+                            }
+                        }
+                    })
                     .build()
                 INSTANCE = instance
                 instance
