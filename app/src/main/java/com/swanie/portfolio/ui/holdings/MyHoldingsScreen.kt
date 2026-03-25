@@ -9,6 +9,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.automirrored.filled.ViewList
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
@@ -44,6 +47,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.components.*
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -105,6 +109,11 @@ fun MyHoldingsScreen(
 
     var isExiting by remember { mutableStateOf(false) }
 
+    // 🌐 GLOBAL VISTA: Vault Header State
+    val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
+    val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
+    var showVaultManager by remember { mutableStateOf(false) }
+
     val filteredHoldings by remember(localHoldings, selectedTab) {
         derivedStateOf {
             when (selectedTab) {
@@ -115,7 +124,7 @@ fun MyHoldingsScreen(
         }
     }
 
-    val totalValueFormatted by remember(holdings, selectedTab) {
+    val totalValueFormatted by remember(holdings, selectedTab, activeVault.baseCurrency) {
         derivedStateOf {
             val filtered = when (selectedTab) {
                 1 -> holdings.filter { it.category == AssetCategory.CRYPTO }
@@ -130,7 +139,7 @@ fun MyHoldingsScreen(
                 }
                 (asset.officialSpotPrice * multiplier * asset.weight * asset.amountHeld) + asset.premium
             }
-            NumberFormat.getCurrencyInstance(Locale.US).format(total)
+            formatCurrency(total, 2, activeVault.baseCurrency)
         }
     }
 
@@ -246,14 +255,23 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                Text(
-                    text = "MY HOLDINGS",
-                    color = textColor,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 0.dp)
-                )
+                // 🌐 GLOBAL VISTA: Dynamic Vault Header
+                Box(
+                    modifier = Modifier.fillMaxWidth().clickable { showVaultManager = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = activeVault.name.uppercase(),
+                            color = textColor,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Black,
+                            textAlign = TextAlign.Center
+                        )
+                        Icon(Icons.Default.ArrowDropDown, null, tint = textColor.copy(0.5f))
+                    }
+                }
+
                 Text(
                     text = totalValueFormatted,
                     color = textColor.copy(alpha = 0.7f),
@@ -318,9 +336,9 @@ fun MyHoldingsScreen(
                                 )
 
                                 if (targetIsCompact && !isExpanded) {
-                                    CompactAssetCard(asset, isDragging, cardBg, cardText, handleExpandToggle, dragModifier)
+                                    CompactAssetCard(asset, isDragging, cardBg, cardText, activeVault.baseCurrency, handleExpandToggle, dragModifier)
                                 } else {
-                                    FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                                    FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, activeVault.baseCurrency, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
                                 }
                             }
                         }
@@ -337,7 +355,7 @@ fun MyHoldingsScreen(
             }
         }
 
-        // 🛠️ RESTORED: Asset Editing Logic
+        // 🛠️ Asset Editing Logic
         assetBeingEdited?.let { asset ->
             if (asset.category == AssetCategory.CRYPTO) {
                 CryptoEditFunnel(
@@ -374,7 +392,7 @@ fun MyHoldingsScreen(
             }
         }
 
-        // 🗑️ RESTORED: Delete Confirmation Logic
+        // 🗑️ Delete Confirmation Logic
         assetPendingDeletion?.let { asset ->
             AlertDialog(
                 onDismissRequest = { assetPendingDeletion = null },
@@ -391,6 +409,129 @@ fun MyHoldingsScreen(
                     TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = Color.White) }
                 }
             )
+        }
+
+        // 🌐 GLOBAL VISTA: Vault Manager Modal
+        if (showVaultManager) {
+            VaultManagerDialog(
+                allVaults = allVaults,
+                activeVault = activeVault,
+                onDismiss = { showVaultManager = false },
+                onSelectVault = { mainViewModel.selectVault(it); showVaultManager = false },
+                onRenameVault = { id, name -> mainViewModel.updateVaultName(id, name) },
+                onUpdateCurrency = { id, code -> mainViewModel.updateVaultCurrency(id, code) },
+                onCreateVault = { mainViewModel.createNewVault(it) }
+            )
+        }
+    }
+}
+
+@Composable
+fun VaultManagerDialog(
+    allVaults: List<VaultEntity>,
+    activeVault: VaultEntity,
+    onDismiss: () -> Unit,
+    onSelectVault: (Int) -> Unit,
+    onRenameVault: (Int, String) -> Unit,
+    onUpdateCurrency: (Int, String) -> Unit,
+    onCreateVault: (String) -> Unit
+) {
+    var isCreating by remember { mutableStateOf(false) }
+    var newName by remember { mutableStateOf("") }
+    var editingId by remember { mutableIntStateOf(-1) }
+    var editName by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFF000416))
+                .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(24.dp))
+                .padding(24.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text("VAULT MANAGER", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.heightIn(max = 300.dp)) {
+                    items(allVaults) { vault ->
+                        val isSelected = vault.id == activeVault.id
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isSelected) Color.White.copy(0.1f) else Color.Transparent)
+                                .border(1.dp, if (isSelected) Color.White.copy(0.3f) else Color.White.copy(0.05f), RoundedCornerShape(12.dp))
+                                .clickable { onSelectVault(vault.id) }
+                                .padding(12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (editingId == vault.id) {
+                                    TextField(
+                                        value = editName,
+                                        onValueChange = { editName = it },
+                                        modifier = Modifier.weight(1f),
+                                        colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, focusedTextColor = Color.White, cursorColor = Color.Yellow)
+                                    )
+                                    IconButton(onClick = { onRenameVault(vault.id, editName); editingId = -1 }) {
+                                        Icon(Icons.Default.Check, null, tint = Color.Green)
+                                    }
+                                } else {
+                                    Text(vault.name, color = if (isSelected) Color.White else Color.White.copy(0.6f), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, modifier = Modifier.weight(1f))
+                                    IconButton(onClick = { editingId = vault.id; editName = vault.name }) {
+                                        Icon(Icons.Default.Edit, null, tint = Color.White.copy(0.4f), modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            }
+                            
+                            if (isSelected && editingId != vault.id) {
+                                Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf("USD", "EUR", "GBP").forEach { code ->
+                                        val isCurrent = vault.baseCurrency == code
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(CircleShape)
+                                                .background(if (isCurrent) Color.Yellow else Color.White.copy(0.05f))
+                                                .border(1.dp, if (isCurrent) Color.Transparent else Color.White.copy(0.1f), CircleShape)
+                                                .clickable { onUpdateCurrency(vault.id, code) }
+                                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                                        ) {
+                                            Text(text = code, color = if (isCurrent) Color.Black else Color.White, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (isCreating) {
+                    TextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        placeholder = { Text("Vault Name...", color = Color.Gray) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, focusedTextColor = Color.White, cursorColor = Color.Yellow)
+                    )
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        TextButton(onClick = { isCreating = false }) { Text("CANCEL", color = Color.White) }
+                        Button(onClick = { onCreateVault(newName); isCreating = false; newName = "" }, colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow)) {
+                            Text("CREATE", color = Color.Black, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = { isCreating = true },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(0.1f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Add, null, tint = Color.White)
+                        Spacer(Modifier.width(8.dp))
+                        Text("CREATE NEW VAULT", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }

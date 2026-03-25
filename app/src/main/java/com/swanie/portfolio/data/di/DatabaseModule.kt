@@ -2,10 +2,7 @@ package com.swanie.portfolio.data.di
 
 import android.content.Context
 import com.swanie.portfolio.data.api.SearchEngineRegistry
-import com.swanie.portfolio.data.local.AppDatabase
-import com.swanie.portfolio.data.local.AssetDao
-import com.swanie.portfolio.data.local.TransactionDao
-import com.swanie.portfolio.data.local.UserConfigDao
+import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.data.repository.DataSyncCoordinator
 import dagger.Module
@@ -38,6 +35,11 @@ object DatabaseModule {
     @Provides
     fun provideUserConfigDao(database: AppDatabase): UserConfigDao {
         return database.userConfigDao()
+    }
+
+    @Provides
+    fun provideVaultDao(database: AppDatabase): VaultDao {
+        return database.vaultDao()
     }
 
     @Provides

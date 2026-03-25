@@ -30,6 +30,7 @@ class ThemePreferences @Inject constructor(
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
         val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
+        val CURRENT_VAULT_ID = intPreferencesKey("current_vault_id")
     }
 
     // High-Resolution Theme Flows
@@ -44,6 +45,7 @@ class ThemePreferences @Inject constructor(
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
     val metalsDisplayOrder: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.METALS_DISPLAY_ORDER] ?: "XAU,XAG,XPT,XPD" }
     val themeMode: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.THEME_MODE_KEY] ?: "SYSTEM" }
+    val currentVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.CURRENT_VAULT_ID] ?: 1 }
 
     // Persistence Functions
     suspend fun saveSiteBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = color } }
@@ -57,4 +59,5 @@ class ThemePreferences @Inject constructor(
     suspend fun saveConfirmDelete(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.CONFIRM_DELETE] = enabled } }
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
     suspend fun saveThemeMode(mode: String) { appContext.dataStore.edit { it[PreferencesKeys.THEME_MODE_KEY] = mode } }
+    suspend fun saveCurrentVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.CURRENT_VAULT_ID] = id } }
 }

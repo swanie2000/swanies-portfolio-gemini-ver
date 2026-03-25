@@ -171,8 +171,15 @@ fun AutoResizingText(text: String, style: TextStyle, modifier: Modifier = Modifi
     Text(text = text, style = style.copy(fontSize = fs), modifier = modifier.drawWithContent { if (rd) drawContent() }, maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip, onTextLayout = { if (it.hasVisualOverflow && fs > 8.sp) { fs *= 0.95f } else { rd = true } })
 }
 
-fun formatCurrency(v: Double, d: Int = 2): String {
-    val df = DecimalFormat("$#,##0.00")
+fun getCurrencySymbol(code: String): String = when (code.uppercase()) {
+    "EUR" -> "€"
+    "GBP" -> "£"
+    else -> "$"
+}
+
+fun formatCurrency(v: Double, d: Int = 2, currencyCode: String = "USD"): String {
+    val symbol = getCurrencySymbol(currencyCode)
+    val df = DecimalFormat("$symbol#,##0.00")
     if (d != 2) { df.minimumFractionDigits = 0; df.maximumFractionDigits = d }
     return df.format(v)
 }
@@ -280,7 +287,7 @@ fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String,
 }
 
 @Composable
-fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
+fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
@@ -330,9 +337,9 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }
                     Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) { 
                         Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold); 
-                        AutoResizingText(text = formatCurrency(asset.officialSpotPrice, asset.decimalPreference), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                        AutoResizingText(text = formatCurrency(asset.officialSpotPrice, asset.decimalPreference, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
                     }
-                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
+                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) { Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black); AutoResizingText(text = formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 17.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth()) }
                 }
             }
         }
@@ -346,7 +353,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
 }
 
 @Composable
-fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
+fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
     val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     
@@ -362,7 +369,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
                         AutoResizingText(asset.symbol.uppercase(), TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 14.sp))
                     }
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
-                    AutoResizingText(formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
+                    AutoResizingText(formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2, baseCurrency), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
                 }
                 SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
             }
@@ -388,6 +395,7 @@ fun MetalMarketCard(
     isOwned: Boolean,
     cardBg: Color,
     cardText: Color,
+    baseCurrency: String = "USD",
     modifier: Modifier = Modifier
 ) {
     val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
@@ -418,7 +426,7 @@ fun MetalMarketCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     if (officialSpotPrice > 0.0) {
-                        Text(text = formatCurrency(officialSpotPrice), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(text = formatCurrency(officialSpotPrice, 2, baseCurrency), fontWeight = FontWeight.Black, color = cardText, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = trendColor)
                     } else {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.5.dp, color = Color.Yellow)
@@ -441,7 +449,7 @@ fun MetalMarketCard(
                         Text("LOW", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Red, lineHeight = 8.sp)
                     }
                     Spacer(Modifier.width(8.dp))
-                    val lowStr = if (dayLow <= 0.0) "$ --.--" else formatCurrency(dayLow)
+                    val lowStr = if (dayLow <= 0.0) "${getCurrencySymbol(baseCurrency)} --.--" else formatCurrency(dayLow, 2, baseCurrency)
                     Text(lowStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
                 }
                 Spacer(Modifier.weight(1f))
@@ -451,7 +459,7 @@ fun MetalMarketCard(
                         Text("HIGH", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Green, lineHeight = 8.sp)
                     }
                     Spacer(Modifier.width(8.dp))
-                    val highStr = if (dayHigh <= 0.0) "$ --.--" else formatCurrency(dayHigh)
+                    val highStr = if (dayHigh <= 0.0) "${getCurrencySymbol(baseCurrency)} --.--" else formatCurrency(dayHigh, 2, baseCurrency)
                     Text(highStr, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = cardText)
                 }
             }

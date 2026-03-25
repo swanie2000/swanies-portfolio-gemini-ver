@@ -4,32 +4,41 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AssetViewModel @Inject constructor(
     private val repository: AssetRepository,
     private val syncCoordinator: DataSyncCoordinator,
     private val searchRegistry: SearchEngineRegistry,
+    private val themePreferences: ThemePreferences,
+    private val assetDao: AssetDao,
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
 
-    // 🛡️ RECONNECTED: This now points to repository.allAssets (The V7 Bridge)
-    val holdings: StateFlow<List<AssetEntity>> = repository.allAssets
-        .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets") }
+    // 🌐 GLOBAL VISTA: Track Current Vault
+    val currentVaultId = themePreferences.currentVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+
+    // 🌐 GLOBAL VISTA: Filter holdings by currentVaultId
+    val holdings: StateFlow<List<AssetEntity>> = currentVaultId
+        .flatMapLatest { id -> assetDao.getAssetsByVault(id) }
+        .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val isRefreshing: StateFlow<Boolean> = syncCoordinator.syncStatus
@@ -57,7 +66,6 @@ class AssetViewModel @Inject constructor(
         _searchQuery.value = ""
     }
 
-    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val searchResults: StateFlow<List<AssetEntity>> =
         combine(_searchQuery, _selectedProvider) { query, provider ->
             query to provider
@@ -77,7 +85,7 @@ class AssetViewModel @Inject constructor(
                                 ?: searchRegistry.getDefaultProvider()
                             val results = searchProvider.search(cleanQuery)
                             // 🚀 V8 Identity: Ensure search results land with 'MAIN' portfolio default
-                            emit(results.map { it.toAssetEntity().copy(portfolioId = "MAIN") })
+                            emit(results.map { it.toAssetEntity().copy(portfolioId = "MAIN", vaultId = currentVaultId.value) })
                         } catch (e: Exception) {
                             Log.e("SEARCH_ERROR", "Search failed: ${e.message}")
                             emit(emptyList())
@@ -108,8 +116,7 @@ class AssetViewModel @Inject constructor(
 
     fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
         viewModelScope.launch {
-            // 🚀 V8 Identity: Explicitly tag as 'MAIN' during surgical add if missing
-            val taggedAsset = if (asset.portfolioId.isEmpty()) asset.copy(portfolioId = "MAIN") else asset
+            val taggedAsset = asset.copy(vaultId = currentVaultId.value)
             repository.executeSurgicalAdd(taggedAsset) { _, _ -> }
             onComplete()
         }
@@ -117,7 +124,6 @@ class AssetViewModel @Inject constructor(
 
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
-            // 🛡️ RECONNECTED: This now calls the overloaded repository.deleteAsset(asset)
             repository.deleteAsset(asset)
         }
     }
