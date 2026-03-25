@@ -44,14 +44,32 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import java.io.File
 import java.text.DecimalFormat
 import java.util.Locale
 
 @Composable
-fun MetalIcon(name: String, weight: Double, size: Int = 44, imageUrl: String = "", category: AssetCategory = AssetCategory.METAL) {
+fun MetalIcon(
+    name: String, 
+    weight: Double, 
+    size: Int = 44, 
+    imageUrl: String = "", 
+    localPath: String? = null,
+    category: AssetCategory = AssetCategory.METAL
+) {
     var isError by remember { mutableStateOf(false) }
 
-    if (imageUrl == "SWAN_DEFAULT") {
+    // 🌐 GLOBAL VISTA: Priority 1 - Local Icon Vault
+    val localFile = localPath?.let { File(it) }
+    if (localFile != null && localFile.exists() && !isError) {
+        AsyncImage(
+            model = localFile,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(size.dp).clip(CircleShape),
+            onError = { isError = true }
+        )
+    } else if (imageUrl == "SWAN_DEFAULT") {
         Box(modifier = Modifier.size((size * 1.2).dp).clip(CircleShape).background(Color.White.copy(0.1f)), contentAlignment = Alignment.Center) {
             Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
         }
@@ -121,16 +139,38 @@ fun MetalIcon(name: String, weight: Double, size: Int = 44, imageUrl: String = "
 }
 
 @Composable
-fun SparklineChart(sparklineData: List<Double>, changeColor: Color, modifier: Modifier = Modifier) {
-    if (sparklineData.size < 2) {
-        Canvas(modifier) { drawLine(color = Color.White.copy(alpha = 0.2f), start = Offset(0f, size.height / 2), end = Offset(size.width, size.height / 2), strokeWidth = 1.dp.toPx()) }
+fun SparklineChart(historyData: List<Double>, modifier: Modifier = Modifier) {
+    if (historyData.size < 2) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            Text("Gathering Data...", color = Color.Gray, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+            Canvas(Modifier.fillMaxSize()) {
+                drawLine(color = Color.White.copy(alpha = 0.1f), start = Offset(0f, size.height / 2), end = Offset(size.width, size.height / 2), strokeWidth = 1.dp.toPx())
+            }
+        }
         return
     }
-    val min = sparklineData.minOrNull() ?: 0.0; val max = sparklineData.maxOrNull() ?: 0.0; val range = if ((max - min) > 0) max - min else 1.0
+
+    // 🚀 GLOBAL VISTA: 168-POINT SMOOTH PATH ENGINE
+    val lastPrice = historyData.last()
+    val firstPrice = historyData.first()
+    val trendColor = if (lastPrice >= firstPrice) Color(0xFF00FF00) else Color(0xFFFF0000)
+
+    val min = historyData.minOrNull() ?: 0.0
+    val max = historyData.maxOrNull() ?: 1.0
+    val range = if ((max - min) > 0) max - min else 1.0
+
     Canvas(modifier) {
-        val points = sparklineData.mapIndexed { i, p -> Offset(i.toFloat() / (sparklineData.size - 1) * size.width, size.height - ((p - min) / range * size.height).toFloat()) }
-        val path = Path().apply { moveTo(points[0].x, points[0].y); for (i in 1 until points.size) lineTo(points[i].x, points[i].y) }
-        drawPath(path, changeColor, style = Stroke(2.dp.toPx()))
+        val points = historyData.mapIndexed { i, p -> 
+            Offset(
+                i.toFloat() / (historyData.size - 1) * size.width, 
+                size.height - (((p - min) / range) * (size.height - 8f) + 4f).toFloat()
+            ) 
+        }
+        val path = Path().apply { 
+            moveTo(points[0].x, points[0].y)
+            for (i in 1 until points.size) lineTo(points[i].x, points[i].y) 
+        }
+        drawPath(path, trendColor, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     }
 }
 
@@ -313,7 +353,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        MetalIcon(name = asset.symbol, weight = asset.weight, imageUrl = asset.imageUrl, category = asset.category)
+                        MetalIcon(name = asset.symbol, weight = asset.weight, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category)
                         if (asset.baseSymbol != "CUSTOM") {
                             Spacer(Modifier.height(6.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp); val unit = when { asset.name.contains("KILO", true) -> "KILO"; asset.name.contains("GRAM", true) -> "GRAM"; else -> "OZ" }; Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp) }
@@ -333,7 +373,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                         if (showEditButton && !isEditing) {
                             IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) } 
                         } else { 
-                            SparklineChart(asset.sparklineData, trendColor, Modifier.width(75.dp).height(32.dp).padding(top = 12.dp)); 
+                            SparklineChart(asset.sparklineData, Modifier.width(75.dp).height(32.dp).padding(top = 12.dp)); 
                             Spacer(Modifier.height(4.dp)); 
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(20.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) } 
                         } 
@@ -368,7 +408,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
     Box(modifier = modifier.fillMaxWidth()) {
         Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, size = 32, imageUrl = asset.imageUrl, category = asset.category) }
+                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, size = 32, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category) }
                 Column(modifier = Modifier.weight(1f)) {
                     if (asset.category == AssetCategory.METAL) {
                         val inlineLabel = "${asset.symbol} - ${asset.name}"
@@ -379,7 +419,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
                     val mult = when { asset.name.contains("KILO", true) -> 32.1507; asset.name.contains("GRAM", true) -> 0.03215; else -> 1.0 }; 
                     AutoResizingText(formatCurrency(asset.officialSpotPrice * mult * asset.weight * asset.amountHeld, 2, baseCurrency), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold)) 
                 }
-                SparklineChart(asset.sparklineData, trendColor, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
+                SparklineChart(asset.sparklineData, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
             }
         }
         // ADAPTIVE TRUE TOP WATERMARK (Compact)
@@ -444,7 +484,7 @@ fun MetalMarketCard(
 
             Box(modifier = Modifier.fillMaxWidth().height(70.dp), contentAlignment = Alignment.Center) {
                 if (sparkline.isNotEmpty()) {
-                    SparklineChart(sparkline, trendColor, Modifier.fillMaxSize())
+                    SparklineChart(sparkline, Modifier.fillMaxSize())
                 } else if (officialSpotPrice > 0.0) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp, color = cardText.copy(0.2f))
                 }

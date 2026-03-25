@@ -9,6 +9,7 @@ import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +28,7 @@ class AssetViewModel @Inject constructor(
     private val searchRegistry: SearchEngineRegistry,
     private val themePreferences: ThemePreferences,
     private val assetDao: AssetDao,
+    private val priceHistoryDao: PriceHistoryDao,
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -169,5 +171,10 @@ class AssetViewModel @Inject constructor(
                 decimalPreference = decimals
             ))
         }
+    }
+
+    fun getPriceHistory(assetId: String): Flow<List<Double>> = flow {
+        val history = priceHistoryDao.getRecentHistory(assetId).map { it.price }.reversed()
+        emit(history)
     }
 }
