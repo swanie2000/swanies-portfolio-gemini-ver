@@ -173,69 +173,69 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE PROTECTED PULSE (V6.7)
+PROJECT STATUS: THE PROTECTED PULSE (V6.7 - REPAIRED)
 
-Current Version: 6.7 (Total Data Ownership: Phase 3 Complete)
+Current Version: 6.7.1 (Obsidian 2.0: Widget & Schema Finalized)
 
-Build Status: 🟢 SUCCESS (V15 Relational Schema Verified)
+Build Status: 🟢 SUCCESS (V16 Relational Schema Verified)
 
-Database Schema: V15 (Local History & Icon Vault Active)
+Database Schema: V16 (LastSync Heartbeat & Price History Active)
 🛑 MANDATORY DEVELOPER RULE: THE "CLEAN SLATE" PROTOCOL
 
     CRITICAL INSTRUCTION (DO NOT DELETE): To prevent IllegalStateException crashes during heavy development, the AppDatabase MUST utilize .fallbackToDestructiveMigration(). The user DOES NOT need to preserve test data. All future agents must prioritize schema flexibility over data persistence until the app reaches "Production" status.
 
-1. THE V6.7 REVOLUTION: The Local Data Fortress
+1. THE V6.7 REVOLUTION: Obsidian 2.0 & Data Integrity
 
-In this version, we successfully eliminated "Internet Dependency" for the core UI. The app no longer "asks" the cloud how it should look; it owns its icons and historical trends locally.
+This version marks the stabilization of the "Local Data Fortress." We resolved the schema mismatch that caused the login crashes and standardized the high-fidelity widget layout.
 Key Wins (Architecture & Data):
 
-    V15 "Historical Brain": Introduced PriceHistoryEntity to store 168 points of hourly data (7-day trend) per asset. This enables instant, offline-ready visualizations.
+    V16 "Sync Heartbeat": Incremented the database to V16 to support the lastUpdated timestamp in UserConfigEntity. This allows the widget to show exactly when the last price refresh occurred.
 
-    The Icon Vault (IconManager): Implemented a surgical on-demand downloader. Icons are fetched once upon saving an asset and stored as local .png files in the app's internal directory.
+    The Nuclear Reset: Implemented a robust "Clear All Assets" logic in SettingsViewModel. It surgically wipes assets, resets the widget selection string to "", and zeros out the sync clock, killing the persistent "7, 8, 9, 10" indexing ghost.
 
-    Total Ownership Sync: Bridged the data gap between the Home Screen Widget and the Main Holdings Screen. Both now pull 100% of their icons and sparklines from local disk, enabling a flawless Airplane Mode experience.
+    Hilt Handshake Stabilization: Aligned all Dependency Injection (DI) constructors. All DAOs are now provided as @Singleton instances, resolving the "Login Crash" and ensuring a stable startup sequence.
 
-    FX Multiplier Engine: Implemented initial currency math ($/€/£). Switching a vault's base currency now dynamically recalculates both the Total Portfolio Value and individual asset prices using hardcoded multipliers.
+    Vault-Aware Widget: The widget now dynamically pulls the vaultName (e.g., "SWANIE 1") into the header based on the current active vault, making it a true multi-portfolio dashboard.
 
 Key Wins (Visual Fidelity & UX):
 
-    Continuous Path Sparklines: Replaced the "bar-graph" pulse with professional 168-point smooth path sparklines. These are rendered as memory-efficient Bitmaps, ensuring a high-end "CoinGecko" aesthetic on the home screen.
+    Wide-Pulse Sparklines: Expanded the widget sparklines to 120dp, providing double the visual resolution for 7-day trend analysis.
 
-    Widget Selection Logic: Fixed a persistent indexing bug where selection counters wouldn't reset after a wipe. The "Power Bubbles" now correctly reset to 1-10.
+    Improved Touch Targets: Increased the Widget Refresh Icon to 24dp and successfully wired it to the RefreshAction for on-demand updates.
 
-    Manual Save & Force Refresh: Added a "SAVE WIDGET SETTINGS" button to the manager. This provides a clear "Commit" action and triggers an immediate Glance.update() to refresh the Home Screen Pulse.
+    Footer Clean-up: Relocated the sync timestamp to the bottom-right in a clean 10sp font, removing dead vertical space and the redundant "Sync" label.
 
-    Symmetrical Header: Standardized the centered 120dp Swan Branding and total value metrics across all screens and widget layouts.
+    Full Name Support: Increased the horizontal weight for asset names, preventing truncation for symbols like "Bitcoin" or "Ethereum."
 
 2. THE CURRENT "FORTRESS" SPECS
    Component	Status
-   Database	V15 (Relational: Vaults → Assets → 168pt History)
-   Performance	Instant-On (Zero shimmer for cached holdings)
-   Icons	🟢 100% Local Cache (Main App & Widget)
-   Sparklines	🟢 Continuous Path Canvas (Green/Red color-coded)
-   Currency	🟢 Symbol & Value Recalculation ($/€/£)
-   Stability	CLEAN-SLATE PROTOCOL ACTIVE (Verified on V14/V15 jumps)
+   Database	V16 (Vaults → Assets → History → LastSync)
+   Performance	Instant-On (Zero-shimmer offline mode verified)
+   Icons	🟢 100% Local Cache (Internal PNG Storage)
+   Sparklines	🟢 120dp Continuous Path (Wide-Pulse View)
+   Widget UI	🟢 Obsidian 2.0 Standard (Vault-Specific Headers)
+   Stability	CLEAN-SLATE PROTOCOL ACTIVE (Verified V15 → V16)
 3. THE PATH FORWARD: "GLOBAL VISTA" PHASE 4
 
-Objective: Transition from mock/hardcoded data to live financial intelligence and expanded market reach.
+Objective: Transition from mock data to live financial intelligence.
 
     Live FX API Integration: Replace the hardcoded multipliers (0.92, 0.78) with a background service that fetches real-time exchange rates for USD, EUR, and GBP.
 
-    Metal Market Ownership: Apply the "Surgical Cache" logic to the Metal Watch screen. Ensure gold/silver prices and historical trends are stored in the V15 database for offline viewing.
+    Metal Market Ownership: Bring the Gold and Silver screens into the V16 database. Apply the "Surgical Cache" logic so precious metal trends are also available offline.
 
-    Search & Performance: Refine the "Add Asset" search flow to ensure the "Historical Seed" (fetching the first 168 points) is as fast and invisible to the user as possible.
+    Search & Performance: Refine the "Add Asset" search flow to ensure the "Historical Seed" (fetching the first 168 points) is fast and invisible to the user
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Wed 03/25/2026  9:52:29.97
+Generated: Wed 03/25/2026 12:33:45.61
 
 Branch:
 main
 Commit:
-d972fc18b003836af74b0ce8b21659f47dc7ecbf
+a4ab226196a981b4e163466cfe4f184f9b0411f8
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
