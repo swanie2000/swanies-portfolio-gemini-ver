@@ -173,68 +173,70 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE PROTECTED PULSE (V6.6)
+PROJECT STATUS: THE PROTECTED PULSE (V6.7)
 
-Current Version: 6.6 (Global Vista: Phase 1 & 2 Complete)
+Current Version: 6.7 (Total Data Ownership: Phase 3 Complete)
 
-Build Status: 🟢 SUCCESS (V13 Relational Schema Verified)
+Build Status: 🟢 SUCCESS (V15 Relational Schema Verified)
 
-Database Schema: V13 (Multi-Vault & Asset Linking Active)
+Database Schema: V15 (Local History & Icon Vault Active)
 🛑 MANDATORY DEVELOPER RULE: THE "CLEAN SLATE" PROTOCOL
 
     CRITICAL INSTRUCTION (DO NOT DELETE): To prevent IllegalStateException crashes during heavy development, the AppDatabase MUST utilize .fallbackToDestructiveMigration(). The user DOES NOT need to preserve test data. All future agents must prioritize schema flexibility over data persistence until the app reaches "Production" status.
 
-1. THE V6.6 REVOLUTION: Global Vista & Obsidian Standard
+1. THE V6.7 REVOLUTION: The Local Data Fortress
 
-This version marks the transition from a "List App" to a "Wealth Management System." We have successfully implemented the relational infrastructure required for a global, multi-portfolio experience.
+In this version, we successfully eliminated "Internet Dependency" for the core UI. The app no longer "asks" the cloud how it should look; it owns its icons and historical trends locally.
 Key Wins (Architecture & Data):
 
-    V13 Relational Database: Successfully jumped from V11 to V13 using the Clean-Slate Protocol. Introduced the VaultEntity and linked all AssetEntity and PortfolioEntity records via vaultId.
+    V15 "Historical Brain": Introduced PriceHistoryEntity to store 168 points of hourly data (7-day trend) per asset. This enables instant, offline-ready visualizations.
 
-    The Currency Engine (MVP): Integrated a dynamic currency symbol system ($, €, £) into the Vault Manager. Each vault now carries its own baseCurrency attribute.
+    The Icon Vault (IconManager): Implemented a surgical on-demand downloader. Icons are fetched once upon saving an asset and stored as local .png files in the app's internal directory.
 
-    Vault Manager CRUD: Implemented the ability to Create, Select, and Rename vaults (e.g., "Mom Portfolio," "NICA Portfolio") directly from the main header.
+    Total Ownership Sync: Bridged the data gap between the Home Screen Widget and the Main Holdings Screen. Both now pull 100% of their icons and sparklines from local disk, enabling a flawless Airplane Mode experience.
 
-    Obsidian "Fortress" Defaults: Hardcoded the #000416 palette into the UserConfigEntity and ThemeDefaults. The app now "wakes up" in the Midnight Obsidian theme on every fresh install/wipe.
+    FX Multiplier Engine: Implemented initial currency math ($/€/£). Switching a vault's base currency now dynamically recalculates both the Total Portfolio Value and individual asset prices using hardcoded multipliers.
 
-Key Wins (Widget & UX):
+Key Wins (Visual Fidelity & UX):
 
-    Centered Header Branding: Standardized the 120dp Swan Logo as the primary hero, with centered Total Value and Aggregate Trend metrics.
+    Continuous Path Sparklines: Replaced the "bar-graph" pulse with professional 168-point smooth path sparklines. These are rendered as memory-efficient Bitmaps, ensuring a high-end "CoinGecko" aesthetic on the home screen.
 
-    High-Definition Spacing: Implemented 8dp gutters between widget asset cards and 12dp corner radii to eliminate visual "blurring."
+    Widget Selection Logic: Fixed a persistent indexing bug where selection counters wouldn't reset after a wipe. The "Power Bubbles" now correctly reset to 1-10.
 
-    Dynamic Pulse (WIP): Replaced static indicators with a 12-point trend pulse (Green/Red color-coded) to provide actionable market intensity at a glance.
+    Manual Save & Force Refresh: Added a "SAVE WIDGET SETTINGS" button to the manager. This provides a clear "Commit" action and triggers an immediate Glance.update() to refresh the Home Screen Pulse.
+
+    Symmetrical Header: Standardized the centered 120dp Swan Branding and total value metrics across all screens and widget layouts.
 
 2. THE CURRENT "FORTRESS" SPECS
    Component	Status
-   Database	V13 (Multi-Vault Relational)
-   Branding	Unified 120dp Swan Header (App & Widget)
-   Theme	Midnight Obsidian (#000416 / #363636)
-   Widget	WIP: High-Fidelity Sparklines & Asset Icon URI Loading
-   Stability	CLEAN-SLATE PROTOCOL ACTIVE (Verified on V12/V13 jumps)
-3. THE PATH FORWARD: "GLOBAL VISTA" PHASE 3
+   Database	V15 (Relational: Vaults → Assets → 168pt History)
+   Performance	Instant-On (Zero shimmer for cached holdings)
+   Icons	🟢 100% Local Cache (Main App & Widget)
+   Sparklines	🟢 Continuous Path Canvas (Green/Red color-coded)
+   Currency	🟢 Symbol & Value Recalculation ($/€/£)
+   Stability	CLEAN-SLATE PROTOCOL ACTIVE (Verified on V14/V15 jumps)
+3. THE PATH FORWARD: "GLOBAL VISTA" PHASE 4
 
-Objective: Complete the high-fidelity visual polish and implement real-time financial math.
+Objective: Transition from mock/hardcoded data to live financial intelligence and expanded market reach.
 
-    The "Gecko" Sparkline: Finalize the transition from step-bars to a continuous Bitmap path for smooth 7-day trend lines in the widget.
+    Live FX API Integration: Replace the hardcoded multipliers (0.92, 0.78) with a background service that fetches real-time exchange rates for USD, EUR, and GBP.
 
-    Asset Icon Engine: Resolve Glance URI restrictions to display real crypto/stock logos instead of letter-based fallbacks.
+    Metal Market Ownership: Apply the "Surgical Cache" logic to the Metal Watch screen. Ensure gold/silver prices and historical trends are stored in the V15 database for offline viewing.
 
-    Live FX Logic: Implement the conversion math so changing a vault's currency (e.g., USD → EUR) recalculates the total value using live exchange rates.
+    Search & Performance: Refine the "Add Asset" search flow to ensure the "Historical Seed" (fetching the first 168 points) is as fast and invisible to the user as possible.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 03/24/2026 21:38:32.61
+Generated: Wed 03/25/2026  9:52:29.97
 
 Branch:
 main
 Commit:
-7a6c0b707b6277ae67fbdf844e0e3ba7034527ad
+d972fc18b003836af74b0ce8b21659f47dc7ecbf
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -272,7 +274,10 @@ app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/Converters.kt
+app/src/main/java/com/swanie/portfolio/data/local/IconManager.kt
 app/src/main/java/com/swanie/portfolio/data/local/PortfolioEntity.kt
+app/src/main/java/com/swanie/portfolio/data/local/PriceHistoryDao.kt
+app/src/main/java/com/swanie/portfolio/data/local/PriceHistoryEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/SystemLogEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
@@ -323,6 +328,7 @@ app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/ThemeDefaults.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidgetReceiver.kt
+app/src/main/java/com/swanie/portfolio/widget/SparklineDrawUtils.kt
 
 --------------------------------------------------
 RESOURCES INDEX (res paths)
