@@ -2,6 +2,7 @@ package com.swanie.portfolio.widget
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -15,7 +16,6 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
 import androidx.glance.layout.*
@@ -25,17 +25,20 @@ import com.swanie.portfolio.MainActivity
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.UserConfigDao
+import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
+import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.action.actionStartActivity
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -46,6 +49,7 @@ class PortfolioWidget : GlanceAppWidget() {
     interface PortfolioWidgetEntryPoint {
         fun assetRepository(): AssetRepository
         fun userConfigDao(): UserConfigDao
+        fun priceHistoryDao(): PriceHistoryDao
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -56,6 +60,7 @@ class PortfolioWidget : GlanceAppWidget() {
         )
         val repository = entryPoint.assetRepository()
         val userConfigDao = entryPoint.userConfigDao()
+        val priceHistoryDao = entryPoint.priceHistoryDao()
 
         val userConfig = userConfigDao.getUserConfig().first()
         val assets = repository.getAssetsForPortfolio("MAIN").first()
@@ -66,6 +71,11 @@ class PortfolioWidget : GlanceAppWidget() {
             assets.take(10)
         } else {
             selectedIds.mapNotNull { id -> assets.find { it.coinId == id } }.take(10)
+        }
+
+        // Fetch 168-point history for each visible asset
+        val assetHistoryMap = filteredAssets.associate { asset ->
+            asset.coinId to priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed()
         }
 
         var totalValue = 0.0
@@ -117,6 +127,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 trendColor, 
                 syncTime, 
                 filteredAssets, 
+                assetHistoryMap,
                 intent, 
                 showTotal,
                 size,
@@ -135,6 +146,7 @@ class PortfolioWidget : GlanceAppWidget() {
         trendColor: Color, 
         syncTime: String, 
         assets: List<AssetEntity>,
+        assetHistoryMap: Map<String, List<Double>>,
         intent: Intent,
         showTotal: Boolean,
         size: DpSize,
@@ -185,7 +197,8 @@ class PortfolioWidget : GlanceAppWidget() {
                         style = TextStyle(
                             color = ColorProvider(bgTextColor),
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
                         )
                     )
                     Text(
@@ -193,7 +206,8 @@ class PortfolioWidget : GlanceAppWidget() {
                         style = TextStyle(
                             color = ColorProvider(trendColor),
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
                         )
                     )
                 }
@@ -219,7 +233,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 modifier = GlanceModifier.fillMaxWidth().padding(horizontal = 12.dp)
             ) {
                 assets.take(maxVisible).forEachIndexed { index, asset ->
-                    AssetCard(asset, cardColor, cardTextColor)
+                    AssetCard(asset, assetHistoryMap[asset.coinId] ?: emptyList(), cardColor, cardTextColor)
                     if (index < assets.take(maxVisible).size - 1) {
                         Spacer(modifier = GlanceModifier.height(8.dp))
                     }
@@ -245,7 +259,7 @@ class PortfolioWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun AssetCard(asset: AssetEntity, cardColor: Color, textColor: Color) {
+    private fun AssetCard(asset: AssetEntity, history: List<Double>, cardColor: Color, textColor: Color) {
         Row(
             modifier = GlanceModifier
                 .fillMaxWidth()
@@ -254,16 +268,27 @@ class PortfolioWidget : GlanceAppWidget() {
                 .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
-            // ASSET ICON (High-End Fallback)
+            // ASSET ICON
             Box(
                 modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp).background(Color(0xFFC3C3C3).copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                val symbolLetter = asset.symbol.take(1).uppercase()
-                Text(
-                    text = symbolLetter,
-                    style = TextStyle(color = ColorProvider(Color.White), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                )
+                val localPath = asset.localIconPath
+                if (localPath != null && File(localPath).exists()) {
+                    val bitmap = BitmapFactory.decodeFile(localPath)
+                    if (bitmap != null) {
+                        Image(
+                            provider = ImageProvider(bitmap),
+                            contentDescription = asset.symbol,
+                            modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        LetterFallback(asset.symbol)
+                    }
+                } else {
+                    LetterFallback(asset.symbol)
+                }
             }
             
             Spacer(modifier = GlanceModifier.width(8.dp))
@@ -294,33 +319,32 @@ class PortfolioWidget : GlanceAppWidget() {
 
             Spacer(modifier = GlanceModifier.width(12.dp))
 
-            // CONTINUOUS SPARKLINE (High Fidelity Step-Path)
-            SmoothSparkline(asset.sparklineData, asset.priceChange24h >= 0)
+            // 🌐 GLOBAL VISTA: 168-POINT SMOOTH PATH SPARKLINE
+            if (history.size >= 2) {
+                val lastPrice = history.last()
+                val firstPrice = history.first()
+                val trendColor = if (lastPrice >= firstPrice) Color(0xFF00FF00) else Color(0xFFFF0000)
+                
+                val sparklineBitmap = SparklineDrawUtils.drawSparklineBitmap(history, trendColor)
+                Image(
+                    provider = ImageProvider(sparklineBitmap),
+                    contentDescription = "7d Trend",
+                    modifier = GlanceModifier.width(60.dp).height(30.dp),
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Spacer(modifier = GlanceModifier.width(60.dp).height(30.dp))
+            }
         }
     }
 
     @Composable
-    private fun SmoothSparkline(data: List<Double>, isPositive: Boolean) {
-        val trendColor = if (isPositive) Color(0xFF00FF00) else Color(0xFFFF0000)
-        val points = if (data.size >= 12) data.takeLast(12) else List(12) { 0.5 }
-        val min = points.minOrNull() ?: 0.0
-        val max = points.maxOrNull() ?: 1.0
-        val range = if (max - min > 0) max - min else 1.0
-
-        Row(
-            modifier = GlanceModifier.width(48.dp).height(18.dp),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            points.forEach { point ->
-                val normalizedHeight = (((point - min) / range) * 16).coerceAtLeast(2.0).dp
-                Box(
-                    modifier = GlanceModifier
-                        .width(4.dp)
-                        .height(normalizedHeight)
-                        .background(ColorProvider(trendColor))
-                ) {}
-            }
-        }
+    private fun LetterFallback(symbol: String) {
+        val symbolLetter = symbol.take(1).uppercase()
+        Text(
+            text = symbolLetter,
+            style = TextStyle(color = ColorProvider(Color.White), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        )
     }
 }
 

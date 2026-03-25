@@ -18,9 +18,10 @@ import kotlinx.coroutines.launch
         PortfolioEntity::class,
         UserConfigEntity::class,
         SystemLogEntity::class,
-        VaultEntity::class
+        VaultEntity::class,
+        PriceHistoryEntity::class // V15: 168-Point History
     ],
-    version = 13, // Incremented to V13 for Global Vista (Multi-Vault)
+    version = 15, // Incremented to V15 for Global Vista (Price History + Icons)
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -29,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun userConfigDao(): UserConfigDao
     abstract fun vaultDao(): VaultDao
+    abstract fun priceHistoryDao(): PriceHistoryDao
 
     companion object {
         @Volatile

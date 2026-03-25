@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -23,6 +24,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        // 🌐 GLOBAL VISTA: Initialize Icon Vault directory
+        val iconDir = File(filesDir, "icons")
+        if (!iconDir.exists()) {
+            iconDir.mkdirs()
+        }
 
         splashScreen.setKeepOnScreenCondition {
             viewModel.isDataReady.value == false

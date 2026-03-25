@@ -178,10 +178,18 @@ fun getCurrencySymbol(code: String): String = when (code.uppercase()) {
 }
 
 fun formatCurrency(v: Double, d: Int = 2, currencyCode: String = "USD"): String {
+    // 🌐 GLOBAL VISTA: Implementation of Phase 1 Hardcoded FX Multipliers
+    val multiplier = when (currencyCode.uppercase()) {
+        "EUR" -> 0.92
+        "GBP" -> 0.78
+        else -> 1.0
+    }
+    
+    val convertedValue = v * multiplier
     val symbol = getCurrencySymbol(currencyCode)
     val df = DecimalFormat("$symbol#,##0.00")
     if (d != 2) { df.minimumFractionDigits = 0; df.maximumFractionDigits = d }
-    return df.format(v)
+    return df.format(convertedValue)
 }
 
 fun formatAmount(v: Double): String = DecimalFormat("#,###.########").format(v)
@@ -227,7 +235,7 @@ fun MetalSelectionFunnel(
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         Text("LABEL UNDER ICON", color = Color.White.copy(0.5f), fontSize = 10.sp)
                         OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text("Enter Name...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 10 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
                     }
                     11 -> {
                         Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) { if (customIconUri != null) AsyncImage(model = customIconUri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) else Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f)) }

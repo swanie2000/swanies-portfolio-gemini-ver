@@ -43,6 +43,11 @@ object DatabaseModule {
     }
 
     @Provides
+    fun providePriceHistoryDao(database: AppDatabase): PriceHistoryDao {
+        return database.priceHistoryDao()
+    }
+
+    @Provides
     @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,

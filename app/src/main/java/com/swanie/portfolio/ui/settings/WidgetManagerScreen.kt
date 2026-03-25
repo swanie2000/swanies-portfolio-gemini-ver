@@ -30,6 +30,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -70,9 +71,12 @@ fun WidgetManagerScreen(
     val assets by assetViewModel.holdings.collectAsStateWithLifecycle(emptyList())
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    val selectedIds = remember(userConfig?.selectedWidgetAssets) {
-        userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+    // DRAFT STATE: Handle selection locally before saving
+    var draftSelectedIds by remember(userConfig?.selectedWidgetAssets) {
+        mutableStateOf(userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList())
     }
 
     Scaffold(
@@ -87,7 +91,32 @@ fun WidgetManagerScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
         },
-        containerColor = Color.Transparent
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = Color.Transparent,
+        floatingActionButton = {
+            // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration
+            Button(
+                onClick = {
+                    settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Settings Saved! Pulse Updated.",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(8.dp)
+            ) {
+                Text("SAVE WIDGET SETTINGS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -151,13 +180,13 @@ fun WidgetManagerScreen(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("(${selectedIds.size}/10)", color = if(selectedIds.size >= 10) Color.Red else safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("(${draftSelectedIds.size}/10)", color = if(draftSelectedIds.size >= 10) Color.Red else safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
             items(assets) { asset ->
-                val isSelected = selectedIds.contains(asset.coinId)
-                val orderIndex = if (isSelected) selectedIds.indexOf(asset.coinId) + 1 else null
+                val isSelected = draftSelectedIds.contains(asset.coinId)
+                val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
 
                 WidgetAssetSelectItem(
                     asset = asset,
@@ -165,17 +194,17 @@ fun WidgetManagerScreen(
                     orderIndex = orderIndex,
                     onToggle = {
                         val newList = if (isSelected) {
-                            selectedIds.filter { it != asset.coinId }
+                            draftSelectedIds.filter { it != asset.coinId }
                         } else {
-                            if (selectedIds.size < 10) selectedIds + asset.coinId else selectedIds
+                            if (draftSelectedIds.size < 10) draftSelectedIds + asset.coinId else draftSelectedIds
                         }
-                        settingsViewModel.updateSelectedWidgetAssets(newList.joinToString(","))
+                        draftSelectedIds = newList
                     },
                     themeColor = safeText
                 )
             }
 
-            item { Spacer(Modifier.height(40.dp)) }
+            item { Spacer(Modifier.height(80.dp)) } // Extra padding for FAB
         }
     }
 }

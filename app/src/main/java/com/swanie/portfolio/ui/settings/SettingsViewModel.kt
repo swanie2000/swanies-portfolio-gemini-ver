@@ -10,8 +10,10 @@ import com.swanie.portfolio.data.local.UserConfigEntity
 import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -23,6 +25,9 @@ class SettingsViewModel @Inject constructor(
     private val themePreferences: ThemePreferences,
     private val userConfigDao: UserConfigDao
 ) : ViewModel() {
+
+    private val _isSaving = MutableStateFlow(false)
+    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
 
     val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
@@ -65,6 +70,18 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userConfigDao.updateShowWidgetTotal(show)
             updateWidget()
+        }
+    }
+
+    // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration
+    fun saveWidgetConfiguration(selectedIds: List<String>, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            _isSaving.value = true
+            val idsString = selectedIds.joinToString(",")
+            userConfigDao.updateSelectedWidgetAssets(idsString)
+            updateWidget()
+            _isSaving.value = false
+            onComplete()
         }
     }
 

@@ -16,6 +16,7 @@ data class AssetEntity(
     val baseSymbol: String = "",
     val apiId: String = "",
     val iconUrl: String? = null,
+    val localIconPath: String? = null, // Global Vista: Phase 3 Icon Storage
     val priceSource: String = "CoinGecko",
     val weight: Double = 1.0,
     val amountHeld: Double = 0.0,
