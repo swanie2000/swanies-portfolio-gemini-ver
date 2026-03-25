@@ -2,7 +2,6 @@ package com.swanie.portfolio.ui.settings
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,7 +30,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -75,8 +74,12 @@ fun WidgetManagerScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // DRAFT STATE: Handle selection locally before saving
-    var draftSelectedIds by remember(userConfig?.selectedWidgetAssets) {
-        mutableStateOf(userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList())
+    // 🛡️ INDEX HARD-RESET: Ensure draft list is clean if assets are wiped or empty
+    var draftSelectedIds by remember(userConfig?.selectedWidgetAssets, assets.isEmpty()) {
+        mutableStateOf(
+            if (assets.isEmpty()) emptyList()
+            else userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+        )
     }
 
     Scaffold(
@@ -94,7 +97,6 @@ fun WidgetManagerScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent,
         floatingActionButton = {
-            // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration
             Button(
                 onClick = {
                     settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
@@ -125,6 +127,25 @@ fun WidgetManagerScreen(
                 .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            settingsViewModel.clearAllAssets()
+                            draftSelectedIds = emptyList()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("CLEAR ALL SELECTIONS", fontWeight = FontWeight.Black, fontSize = 12.sp)
+                    }
+                }
+            }
+
             item {
                 Text(
                     "PRIVACY MODE",

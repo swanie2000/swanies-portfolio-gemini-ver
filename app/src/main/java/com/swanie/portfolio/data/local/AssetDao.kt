@@ -32,6 +32,9 @@ interface AssetDao {
     @Query("DELETE FROM assets WHERE coinId = :id")
     suspend fun deleteAssetById(id: String)
 
+    @Query("DELETE FROM assets")
+    suspend fun deleteAll()
+
     @Update
     suspend fun updateAssetEntity(asset: AssetEntity)
 

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.UserConfigEntity
+import com.swanie.portfolio.data.local.AssetDao
+import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,7 +25,9 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val themePreferences: ThemePreferences,
-    private val userConfigDao: UserConfigDao
+    private val userConfigDao: UserConfigDao,
+    private val assetDao: AssetDao,
+    private val vaultDao: VaultDao
 ) : ViewModel() {
 
     private val _isSaving = MutableStateFlow(false)
@@ -82,6 +86,23 @@ class SettingsViewModel @Inject constructor(
             updateWidget()
             _isSaving.value = false
             onComplete()
+        }
+    }
+
+    // 🛡️ NUCLEAR RESET: Clear widget selection, all assets, and timestamp
+    fun clearAllAssets() {
+        viewModelScope.launch {
+            assetDao.deleteAll()
+            userConfigDao.updateSelectedWidgetAssets("")
+            userConfigDao.updateLastSync(0L)
+            updateWidget()
+        }
+    }
+
+    fun clearWidgetSelection() {
+        viewModelScope.launch {
+            userConfigDao.updateSelectedWidgetAssets("")
+            updateWidget()
         }
     }
 

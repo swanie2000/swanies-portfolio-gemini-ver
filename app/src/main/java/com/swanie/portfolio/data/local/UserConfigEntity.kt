@@ -15,5 +15,6 @@ data class UserConfigEntity(
     val widgetBgColor: String = "#000416",
     val widgetBgTextColor: String = "#FFFFFF",
     val widgetCardColor: String = "#363636",
-    val widgetCardTextColor: String = "#C3C3C3"
+    val widgetCardTextColor: String = "#C3C3C3",
+    val lastUpdated: Long = 0L // 🌐 GLOBAL VISTA: Widget Sync Timestamp
 )

@@ -23,26 +23,31 @@ object DatabaseModule {
     }
 
     @Provides
+    @Singleton
     fun provideAssetDao(database: AppDatabase): AssetDao {
         return database.assetDao()
     }
 
     @Provides
+    @Singleton
     fun provideTransactionDao(database: AppDatabase): TransactionDao {
         return database.transactionDao()
     }
 
     @Provides
+    @Singleton
     fun provideUserConfigDao(database: AppDatabase): UserConfigDao {
         return database.userConfigDao()
     }
 
     @Provides
+    @Singleton
     fun provideVaultDao(database: AppDatabase): VaultDao {
         return database.vaultDao()
     }
 
     @Provides
+    @Singleton
     fun providePriceHistoryDao(database: AppDatabase): PriceHistoryDao {
         return database.priceHistoryDao()
     }
@@ -51,9 +56,10 @@ object DatabaseModule {
     @Singleton
     fun provideAssetRepository(
         assetDao: AssetDao,
+        userConfigDao: UserConfigDao,
         searchRegistry: SearchEngineRegistry,
         syncCoordinator: DataSyncCoordinator
     ): AssetRepository {
-        return AssetRepository(assetDao, searchRegistry, syncCoordinator)
+        return AssetRepository(assetDao, userConfigDao, searchRegistry, syncCoordinator)
     }
 }

@@ -38,4 +38,7 @@ interface UserConfigDao {
 
     @Query("UPDATE user_config SET widgetCardTextColor = :color WHERE id = 1")
     suspend fun updateWidgetCardTextColor(color: String)
+
+    @Query("UPDATE user_config SET lastUpdated = :timestamp WHERE id = 1")
+    suspend fun updateLastSync(timestamp: Long)
 }

@@ -5,6 +5,7 @@ import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.UserConfigDao
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -12,11 +13,11 @@ import kotlinx.coroutines.flow.Flow
 @Singleton
 class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
+    private val userConfigDao: UserConfigDao,
     private val searchRegistry: SearchEngineRegistry,
     private val syncCoordinator: DataSyncCoordinator
 ) {
     // 🛡️ FIX: Restore the 'allAssets' property using the new DAO naming convention
-    // Points to the 'MAIN' portfolio by default to satisfy the ViewModel
     val allAssets: Flow<List<AssetEntity>> = assetDao.getAllAssetsFlow()
 
     // 🚀 V8 Multi-Portfolio access
@@ -59,6 +60,8 @@ class AssetRepository @Inject constructor(
                 }
             }
             isSuccess = true
+            // 🌐 GLOBAL VISTA: Save sync timestamp to UserConfig for Widget Header
+            userConfigDao.updateLastSync(System.currentTimeMillis())
         } catch (e: Exception) {
             Log.e("REPO_REFRESH", "Error: ${e.message}")
             isSuccess = false

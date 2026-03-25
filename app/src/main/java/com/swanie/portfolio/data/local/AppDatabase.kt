@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +18,9 @@ import kotlinx.coroutines.launch
         UserConfigEntity::class,
         SystemLogEntity::class,
         VaultEntity::class,
-        PriceHistoryEntity::class // V15: 168-Point History
+        PriceHistoryEntity::class
     ],
-    version = 15, // Incremented to V15 for Global Vista (Price History + Icons)
+    version = 16, // 🛡️ V16: Global Vista Schema Fix (UserConfig Timestamp)
     exportSchema = false
 )
 @TypeConverters(Converters::class)
