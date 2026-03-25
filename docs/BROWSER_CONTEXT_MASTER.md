@@ -173,71 +173,68 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-PROJECT STATUS: THE PROTECTED PULSE (V6.5)
+PROJECT STATUS: THE PROTECTED PULSE (V6.6)
 
-Current Version: 6.5 (Clean-Slate Architecture & V6.4 Polish)
+Current Version: 6.6 (Global Vista: Phase 1 & 2 Complete)
 
-Build Status: 🟢 SUCCESS
+Build Status: 🟢 SUCCESS (V13 Relational Schema Verified)
 
-Database Schema: V11 (Transitioning to V12 Multi-Vault)
+Database Schema: V13 (Multi-Vault & Asset Linking Active)
 🛑 MANDATORY DEVELOPER RULE: THE "CLEAN SLATE" PROTOCOL
 
-    CRITICAL INSTRUCTION (DO NOT DELETE): To prevent IllegalStateException crashes during heavy development, the AppDatabase MUST utilize .fallbackToDestructiveMigration(). The user HAS EXPLICITLY STATED they do not need to preserve test data. All future agents must prioritize schema flexibility over data persistence until the app reaches "Production" status.
+    CRITICAL INSTRUCTION (DO NOT DELETE): To prevent IllegalStateException crashes during heavy development, the AppDatabase MUST utilize .fallbackToDestructiveMigration(). The user DOES NOT need to preserve test data. All future agents must prioritize schema flexibility over data persistence until the app reaches "Production" status.
 
-1. THE V6.5 EVOLUTION: Aesthetic Lab & Safety
+1. THE V6.6 REVOLUTION: Global Vista & Obsidian Standard
 
-We have reached the "Design Gold Master" for the customization suite. The app now features a high-fidelity, symmetrical interface protected by safety protocols.
-Key Wins (Branding & UX):
+This version marks the transition from a "List App" to a "Wealth Management System." We have successfully implemented the relational infrastructure required for a global, multi-portfolio experience.
+Key Wins (Architecture & Data):
 
-    Logo-Centric Symmetry: Standardized the 120dp Swan header across both Studios; removed redundant text titles for a premium brand identity.
+    V13 Relational Database: Successfully jumped from V11 to V13 using the Clean-Slate Protocol. Introduced the VaultEntity and linked all AssetEntity and PortfolioEntity records via vaultId.
 
-    Safety Confirmation Dialogs: Implemented AlertDialog protection for "Default Color" resets, preventing accidental loss of custom HEX selections.
+    The Currency Engine (MVP): Integrated a dynamic currency symbol system ($, €, £) into the Vault Manager. Each vault now carries its own baseCurrency attribute.
 
-    Micro-Typography Polish: Standardized all selection buttons to a 12sp/13sp two-line centered format with 54dp/48dp tiered heights for professional "breathing room."
+    Vault Manager CRUD: Implemented the ability to Create, Select, and Rename vaults (e.g., "Mom Portfolio," "NICA Portfolio") directly from the main header.
 
-    The "Midnight Obsidian" Palette: Established the new default theme standard:
+    Obsidian "Fortress" Defaults: Hardcoded the #000416 palette into the UserConfigEntity and ThemeDefaults. The app now "wakes up" in the Midnight Obsidian theme on every fresh install/wipe.
 
-        Background: #000416 | Text: #FFFFFF
+Key Wins (Widget & UX):
 
-        Card BG: #363636 | Card Text: #C3C3C3
+    Centered Header Branding: Standardized the 120dp Swan Logo as the primary hero, with centered Total Value and Aggregate Trend metrics.
 
-Key Wins (Architecture):
+    High-Definition Spacing: Implemented 8dp gutters between widget asset cards and 12dp corner radii to eliminate visual "blurring."
 
-    V11 Database Stability: Successfully moved the Home Screen Widget to a 4-color persisted system with 10-asset custom ordering.
+    Dynamic Pulse (WIP): Replaced static indicators with a 12-point trend pulse (Green/Red color-coded) to provide actionable market intensity at a glance.
 
-    10-Asset "Power Bubbles": Implemented high-visibility 32dp yellow indexing circles for intuitive priority ranking on the Home Screen.
-
-2. THE NEXT BATTLE PLAN: "GLOBAL VISTA"
-
-Objective: Transform the app into a global wealth management tool via Multi-Vault architecture and Currency Localization.
-The Three-Pronged Strike:
-
-    The Multi-Vault Switcher: Implement the VaultEntity and a global VaultManager to allow users to switch between isolated portfolios (e.g., Personal vs. Business).
-
-    The Currency Engine: Connect the UserConfigEntity to the UI to allow global switching of base currencies ($, €, £) with automated FX conversion.
-
-    The Localization Layer: Prepare for internationalization (English/Spanish/German/French).
-
-3. The Current "Fortress" Specs
+2. THE CURRENT "FORTRESS" SPECS
    Component	Status
-   Database	V11 (Moving to V12 with Destructive Migration active)
-   Branding	Unified 120dp Swan Header
-   UX Safety	Reset Confirmation Dialogs Active
-   Interface	10-Asset Compact Card Dashboard (12dp corners)
-   Stability	CLEAN-SLATE PROTOCOL ACTIVE (No more migration crashes)
+   Database	V13 (Multi-Vault Relational)
+   Branding	Unified 120dp Swan Header (App & Widget)
+   Theme	Midnight Obsidian (#000416 / #363636)
+   Widget	WIP: High-Fidelity Sparklines & Asset Icon URI Loading
+   Stability	CLEAN-SLATE PROTOCOL ACTIVE (Verified on V12/V13 jumps)
+3. THE PATH FORWARD: "GLOBAL VISTA" PHASE 3
+
+Objective: Complete the high-fidelity visual polish and implement real-time financial math.
+
+    The "Gecko" Sparkline: Finalize the transition from step-bars to a continuous Bitmap path for smooth 7-day trend lines in the widget.
+
+    Asset Icon Engine: Resolve Glance URI restrictions to display real crypto/stock logos instead of letter-based fallbacks.
+
+    Live FX Logic: Implement the conversion math so changing a vault's currency (e.g., USD → EUR) recalculates the total value using live exchange rates.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 03/24/2026 15:43:53.01
+Generated: Tue 03/24/2026 21:38:32.61
 
 Branch:
 main
 Commit:
-074c7e55628299913b536e49fd8fc1606a8a41a7
+7a6c0b707b6277ae67fbdf844e0e3ba7034527ad
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -281,6 +278,8 @@ app/src/main/java/com/swanie/portfolio/data/local/TransactionDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/TransactionEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/UserConfigDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/UserConfigEntity.kt
+app/src/main/java/com/swanie/portfolio/data/local/VaultDao.kt
+app/src/main/java/com/swanie/portfolio/data/local/VaultEntity.kt
 app/src/main/java/com/swanie/portfolio/data/network/BinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
@@ -321,6 +320,7 @@ app/src/main/java/com/swanie/portfolio/ui/settings/WidgetManagerScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/WidgetSettingsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Color.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
+app/src/main/java/com/swanie/portfolio/ui/theme/ThemeDefaults.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidgetReceiver.kt
 
