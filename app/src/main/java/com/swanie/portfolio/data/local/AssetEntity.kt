@@ -7,7 +7,12 @@ import androidx.room.PrimaryKey
 data class AssetEntity(
     @PrimaryKey val coinId: String,
     val symbol: String,
-    val name: String,
+    val name: String, // Raw API name (e.g., "GOLD KILO BAR")
+
+    // 🛠️ PHASE 1: Data Sanitization Fields
+    val displayName: String = "", // Sanitized name (e.g., "Gold (1kg)")
+    val isMetal: Boolean = false, // Quick-access flag for Widget/UI logic
+
     val imageUrl: String = "",
     val category: AssetCategory,
     val officialSpotPrice: Double = 0.0,

@@ -109,7 +109,6 @@ fun MyHoldingsScreen(
 
     var isExiting by remember { mutableStateOf(false) }
 
-    // 🌐 GLOBAL VISTA: Vault Header State
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
     val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
     var showVaultManager by remember { mutableStateOf(false) }
@@ -132,12 +131,7 @@ fun MyHoldingsScreen(
                 else -> holdings
             }
             val total = filtered.sumOf { asset ->
-                val multiplier = when {
-                    asset.name.contains("KILO", ignoreCase = true) -> 32.1507
-                    asset.name.contains("GRAM", ignoreCase = true) -> 0.0321507
-                    else -> 1.0
-                }
-                (asset.officialSpotPrice * multiplier * asset.weight * asset.amountHeld) + asset.premium
+                (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
             }
             formatCurrency(total, 2, activeVault.baseCurrency)
         }
@@ -190,7 +184,6 @@ fun MyHoldingsScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkTheme
     }
 
-    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
     Box(modifier = Modifier.fillMaxSize().background(Color.Transparent).pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
@@ -255,7 +248,6 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                // 🌐 GLOBAL VISTA: Dynamic Vault Header
                 Box(
                     modifier = Modifier.fillMaxWidth().clickable { showVaultManager = true },
                     contentAlignment = Alignment.Center
@@ -355,7 +347,6 @@ fun MyHoldingsScreen(
             }
         }
 
-        // 🛠️ Asset Editing Logic
         assetBeingEdited?.let { asset ->
             if (asset.category == AssetCategory.CRYPTO) {
                 CryptoEditFunnel(
@@ -392,15 +383,14 @@ fun MyHoldingsScreen(
             }
         }
 
-        // 🗑️ Delete Confirmation Logic
         assetPendingDeletion?.let { asset ->
             AlertDialog(
                 onDismissRequest = { assetPendingDeletion = null },
                 containerColor = Color(0xFF1A1A1A),
                 title = { Text("PURGE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
-                text = { Text("This will permanently remove ${asset.name} from your vault. Proceed?", color = Color.White.copy(0.7f)) },
+                text = { Text("This will permanently remove ${asset.displayName.ifEmpty { asset.name }} from your vault. Proceed?", color = Color.White.copy(0.7f)) },
                 confirmButton = {
-                    TextButton(onClick = { 
+                    TextButton(onClick = {
                         viewModel.deleteAsset(asset)
                         assetPendingDeletion = null
                     }) { Text("DELETE", color = Color.Red, fontWeight = FontWeight.Black) }
@@ -411,16 +401,15 @@ fun MyHoldingsScreen(
             )
         }
 
-        // 🌐 GLOBAL VISTA: Vault Manager Modal
         if (showVaultManager) {
             VaultManagerDialog(
                 allVaults = allVaults,
                 activeVault = activeVault,
                 onDismiss = { showVaultManager = false },
-                onSelectVault = { mainViewModel.selectVault(it); showVaultManager = false },
-                onRenameVault = { id, name -> mainViewModel.updateVaultName(id, name) },
-                onUpdateCurrency = { id, code -> mainViewModel.updateVaultCurrency(id, code) },
-                onCreateVault = { mainViewModel.createNewVault(it) }
+                onSelectVault = { vaultId: Int -> mainViewModel.selectVault(vaultId); showVaultManager = false },
+                onRenameVault = { id: Int, name: String -> mainViewModel.updateVaultName(id, name) },
+                onUpdateCurrency = { id: Int, code: String -> mainViewModel.updateVaultCurrency(id, code) },
+                onCreateVault = { name: String -> mainViewModel.createNewVault(name) }
             )
         }
     }
@@ -483,7 +472,7 @@ fun VaultManagerDialog(
                                     }
                                 }
                             }
-                            
+
                             if (isSelected && editingId != vault.id) {
                                 Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     listOf("USD", "EUR", "GBP").forEach { code ->

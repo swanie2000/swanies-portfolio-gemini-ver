@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    version = 16, // 🛡️ V16: Global Vista Schema Fix (UserConfig Timestamp)
+    // 🛡️ V17: Phase 1 Metal Sanitization (displayName & isMetal)
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -42,6 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "swanie_portfolio_v8_final"
                 )
+                    // 🛡️ CLEAN-SLATE PROTOCOL: Automatically drops and rebuilds on version change
                     .fallbackToDestructiveMigration()
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
