@@ -89,7 +89,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    // 🛡️ NUCLEAR RESET: Clear widget selection, all assets, and timestamp
+    // 🛡️ NUCLEAR RESET: Deletes ALL assets, resets widget selections, and resets timestamp.
     fun clearAllAssets() {
         viewModelScope.launch {
             assetDao.deleteAll()
@@ -99,6 +99,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // 🛡️ SURGICAL RESET: ONLY clears widget selection string to fix "7-10" numbering issue.
     fun clearWidgetSelection() {
         viewModelScope.launch {
             userConfigDao.updateSelectedWidgetAssets("")

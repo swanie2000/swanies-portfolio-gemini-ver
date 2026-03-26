@@ -74,7 +74,6 @@ fun WidgetManagerScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // DRAFT STATE: Handle selection locally before saving
-    // 🛡️ INDEX HARD-RESET: Ensure draft list is clean if assets are wiped or empty
     var draftSelectedIds by remember(userConfig?.selectedWidgetAssets, assets.isEmpty()) {
         mutableStateOf(
             if (assets.isEmpty()) emptyList()
@@ -128,10 +127,12 @@ fun WidgetManagerScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
+                // 🛡️ SURGICAL RESET: ONLY clears widget selection string to fix "7-10" numbering issue.
+                // REMOVED: settingsViewModel.clearAllAssets() call to prevent accidental data loss.
                 TextButton(
                     onClick = {
                         scope.launch {
-                            settingsViewModel.clearAllAssets()
+                            settingsViewModel.clearWidgetSelection()
                             draftSelectedIds = emptyList()
                         }
                     },

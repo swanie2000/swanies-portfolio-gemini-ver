@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +22,7 @@ import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.navigation.Routes
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
@@ -40,8 +43,40 @@ fun SettingsScreen(
 
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
     var isExiting by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    // GRADIENT SYMMETRY: Set containerColor to Transparent to allow NavGraph gradient to show
+    // 🛡️ NUCLEAR SAFETY STATE
+    var showFactoryResetDialog by remember { mutableStateOf(false) }
+
+    if (showFactoryResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showFactoryResetDialog = false },
+            icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red) },
+            title = { Text("Delete All Data?", fontWeight = FontWeight.Bold) },
+            text = { Text("This will permanently remove all assets, vaults, and history. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            settingsViewModel.clearAllAssets()
+                            showFactoryResetDialog = false
+                        }
+                    }
+                ) {
+                    Text("CONFIRM", color = Color.Red, fontWeight = FontWeight.Black)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFactoryResetDialog = false }) {
+                    Text("CANCEL", color = safeText.copy(alpha = 0.6f))
+                }
+            },
+            containerColor = Color(0xFF1C1C1E),
+            textContentColor = Color.White,
+            titleContentColor = Color.White
+        )
+    }
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController = navController, onNavigate = { isExiting = true }) },
         containerColor = Color.Transparent
@@ -140,6 +175,23 @@ fun SettingsScreen(
                     ) {
                         Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
+
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    // 🛡️ DANGER ZONE: Nuclear Reset Section
+                    Text("DANGER ZONE", color = Color.Red.copy(0.7f), fontSize = 12.sp, fontWeight = FontWeight.Black, modifier = Modifier.padding(bottom = 8.dp))
+                    
+                    OutlinedButton(
+                        onClick = { showFactoryResetDialog = true },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.Red.copy(alpha = 0.3f))),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("FACTORY RESET (WIPE ALL DATA)", fontWeight = FontWeight.Black)
+                    }
+
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
         }
