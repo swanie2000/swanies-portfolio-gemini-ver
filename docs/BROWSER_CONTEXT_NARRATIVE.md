@@ -1,40 +1,48 @@
-🛡️ NARRATIVE UPDATE: THE STEALTH SYNC REVOLUTION (V7.0.2)
+🛡️ NARRATIVE: THE "GOLDEN BUILD" RESTORATION (V7.1.0)
 
-Current Version: 7.0.2 (The "Obsididan Stealth" Milestone)
+Current Version: 7.1.0 (The "Golden Build" Milestone)
 
-Build Status: 🟢 SUCCESS (All Hilt/Glance/WorkManager conflicts resolved)
-1. THE V7.0 REVOLUTION: Self-Healing & OS Intelligence
+Build Status: 🟢 ULTRA-STABLE (Survived Full Wipe & Reinstall Stress Test)
+1. THE V7.1 EVOLUTION: ARCHITECTURAL HARDENING
 
-This session marked the transition from "Fighting the OS" to "Mastering the OS." We solved the notorious AppWidget throttling issue that plagues most Android developers.
+This session was defined by the "Reinstall Paradox." We discovered that while the UI was beautiful, the "plumbing" was too aggressive for a fresh Android installation. We successfully rolled back to a verified stable state and identified the exact "Poison Pills" that cause widget death.
+🚀 Key Engineering Wins:
 
-Key Engineering Wins:
+    The "Golden Build" Recovery: Executed a successful git reset --hard to Commit 4e93f76. This restored the high-fidelity design while stripping out unstable experimental database calls.
 
-    The 180s "Stealth" Protocol: Implemented a mandatory 3-minute (180s) cooldown on widget updates. This ensures the app never gets blacklisted by Android’s Power Management, guaranteeing a 100% update success rate on the "First Click."
+    Cold-Start Resilience: Verified that the widget now survives a Full App Uninstall/Reinstall. It correctly handles the "Empty Database" state without crashing the Glance process.
 
-    Persistent Sync (WorkManager): Created WidgetSyncWorker.kt. If the OS blocks an immediate update, this "Safety Net" wakes up 60-180 seconds later to force the sync, making the pipe 100% reliable.
+    The 5-Asset Payload Cap: Hard-coded a 5-asset limit for the widget rows. This keeps the RemoteViews memory footprint well under the 2MB Android OS limit, preventing the "Can't show content" error.
 
-    Foreground Priority Injection: Upgraded the ACTION_APPWIDGET_UPDATE broadcast with FLAG_RECEIVER_FOREGROUND. This forces the intent to the front of the OS queue, bypassing background delivery delays.
+    Hilt-Glance De-Confliction: Fixed the EntryPointAccessors logic. Data is now fetched once per update cycle, preventing the "Circular Flow" hangs that were freezing the home screen.
 
-    Visual Proof (Timestamping): Added a "Last Updated" timestamp to the widget footer. The user no longer has to "guess" if the data is fresh—the widget proves it.
+💎 UX & Logic Refinements:
 
-UX & Logic Refinements:
+    Letter-Fallback Logic: If an asset icon (especially new Metals) hasn't been downloaded yet, the widget now gracefully displays a styled 1-letter circle instead of a broken image or a crash.
 
-    The "Honest" Button: The Save button now transforms into a "DELAY FOR NEXT UPDATE" standby mode with a live M:SS countdown.
+    Manual Sync Kickstart: Confirmed that the Widget Manager "Save & Sync" button successfully "wakes up" a fresh widget after a reinstall.
 
-    The "Rush" Penalty: Tapping a locked button triggers a specific educational popup: "Android limits home screen widgets to 3 minutes... Please wait."
-
-    Clean-Slate Logic: Removed the "Clear All Selections" button to prevent un-throttled database writes that could trip the OS abuse monitor.
-
-2. THE "FORTRESS" SPECS (V7.0.2)
+2. THE "FORTRESS" SPECS (V7.1.0)
    Component	Status	Tech Stack
-   Sync Engine	🟢 SELF-HEALING	WorkManager + Foreground Broadcasts
-   Cooldown	🟢 180s STEALTH	Integrated M:SS UI Heartbeat
-   Glance UI	🟢 V2.1	Timestamped Footer + 120dp Sparklines
-   Stability	🟢 PRO-GRADE	Resolved Hilt @Composable scoping errors
-3. THE PATH FORWARD: "GLOBAL VISTA" PHASE 4
+   Sync Engine	🟢 RESILIENT	WorkManager + DataStore Preferences
+   Cold Start	🟢 TESTED	Handles Empty DB / Fresh Reinstall
+   Glance UI	🟢 GOLDEN	5-Row Cap + High-Fidelity Cards
+   Memory Info	🟢 SAFE	< 2MB Payload (Optimized Bitmaps)
+3. THE PATH FORWARD: "PRECISION DATA" PHASE 5
+   🛠️ The "Safe" Metals Integration:
 
-   Live FX API Integration: Transition from the 180s "UI Sync" to the 180s "Data Fetch." Integrate real-time exchange rates.
+   Data-First, UI-Second: We will fix the Metals "KILO/GRAM" naming and price-calc logic in the Repository layer first.
 
-   The "Nuclear" Redo: Now that the Widget is stable, we can apply this same "Stealth Sync" logic to the Precious Metals and Crypto screens to ensure the whole app stays in lockstep.
+   Widget Firewall: We will not touch PortfolioWidget.kt until the new metal data is 100% stable in the main app list.
 
-   Search Optimization: Refine the Asset Search to ensure the "Historical Seed" (168 points) is fetched during that 3-minute "Delay" window.
+   Sparkline Sanitization: Implement a try-catch bitmap generator specifically for Metals to ensure the widget never "sees" a corrupt sparkline during a sync.
+
+🔄 Multi-Vault Support:
+
+    Prepare the widget to display the Vault Name in the header so the user knows exactly which portfolio they are looking at (e.g., "SWANIE: CRYPTO" vs "SWANIE: METALS").
+
+🏁 GitHub Synchronization:
+
+    Status: origin/main is now perfectly synced with the Golden Build.
+
+    Next Step: Perform a "Smoke Test" of the auto-refresh over the next 60 minutes.
