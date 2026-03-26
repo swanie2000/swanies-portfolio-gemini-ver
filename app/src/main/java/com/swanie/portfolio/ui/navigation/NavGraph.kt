@@ -1,6 +1,5 @@
 package com.swanie.portfolio.ui.navigation
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -19,17 +18,9 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
-import com.swanie.portfolio.ui.holdings.AmountEntryScreen
-import com.swanie.portfolio.ui.holdings.AnalyticsScreen
-import com.swanie.portfolio.ui.holdings.AssetPickerScreen
-import com.swanie.portfolio.ui.holdings.AssetViewModel
-import com.swanie.portfolio.ui.holdings.MyHoldingsScreen
+import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen
-import com.swanie.portfolio.ui.settings.SettingsScreen
-import com.swanie.portfolio.ui.settings.SettingsViewModel
-import com.swanie.portfolio.ui.settings.ThemeStudioScreen
-import com.swanie.portfolio.ui.settings.WidgetManagerScreen
-import com.swanie.portfolio.ui.settings.WidgetStudioScreen
+import com.swanie.portfolio.ui.settings.*
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -73,9 +64,8 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 WidgetManagerScreen(navController)
             }
 
-            composable(Routes.WIDGET_STUDIO) {
-                WidgetStudioScreen(navController)
-            }
+            // REMOVED: WIDGET_STUDIO route removed because it's now integrated
+            // directly into WidgetManagerScreen.kt to support Unified Draft logic.
 
             composable(Routes.HOLDINGS) {
                 MyHoldingsScreen(

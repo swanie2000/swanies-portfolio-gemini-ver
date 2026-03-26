@@ -41,8 +41,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import java.io.File
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionStartActivity
@@ -57,6 +55,12 @@ class PortfolioWidget : GlanceAppWidget() {
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
         val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
         val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
+
+        // --- V8.0.0 THEME CACHE KEYS ---
+        val WIDGET_BG_COLOR_KEY = stringPreferencesKey("widget_bg_color")
+        val WIDGET_BG_TEXT_COLOR_KEY = stringPreferencesKey("widget_bg_text_color")
+        val WIDGET_CARD_COLOR_KEY = stringPreferencesKey("widget_card_color")
+        val WIDGET_CARD_TEXT_COLOR_KEY = stringPreferencesKey("widget_card_text_color")
     }
 
     @EntryPoint
@@ -71,7 +75,6 @@ class PortfolioWidget : GlanceAppWidget() {
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        Log.d("SWANIE_TRACE", "5. provideGlance Waking Up for ID: $id")
         val appContext = context.applicationContext
         val entryPoint = EntryPointAccessors.fromApplication(appContext, PortfolioWidgetEntryPoint::class.java)
 
@@ -84,7 +87,6 @@ class PortfolioWidget : GlanceAppWidget() {
         val prefs = getAppWidgetState<Preferences>(context, id)
         val directIdsString = prefs[SELECTED_ASSETS_KEY]
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
-        Log.d("SWANIE_TRACE", "6. Read Direct Command: $directIdsString")
 
         val userConfig = userConfigDao.getUserConfig().first()
         val currentVaultId = themePrefs.currentVaultId.first()
@@ -129,12 +131,17 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val intent = Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
 
-        val bgColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetBgColor ?: "#000416")) } catch (e: Exception) { Color(0xFF000416) }
-        val bgTextColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetBgTextColor ?: "#FFFFFF")) } catch (e: Exception) { Color.White }
-        val cardColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardColor ?: "#363636")) } catch (e: Exception) { Color(0xFF363636) }
-        val cardTextColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardTextColor ?: "#C3C3C3")) } catch (e: Exception) { Color(0xFFC3C3C3) }
+        // --- ATOMIC THEME RESOLUTION (Prioritize Direct Command Cache) ---
+        val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: userConfig?.widgetBgColor ?: "#000416"
+        val rawBgTxt = prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: userConfig?.widgetBgTextColor ?: "#FFFFFF"
+        val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#363636"
+        val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#C3C3C3"
 
-        Log.d("SWANIE_TRACE", "7. Final Asset Count to Draw: ${filteredAssets.size}")
+        val bgColor = try { Color(android.graphics.Color.parseColor(rawBg)) } catch (e: Exception) { Color(0xFF000416) }
+        val bgTextColor = try { Color(android.graphics.Color.parseColor(rawBgTxt)) } catch (e: Exception) { Color.White }
+        val cardColor = try { Color(android.graphics.Color.parseColor(rawCrd)) } catch (e: Exception) { Color(0xFF363636) }
+        val cardTextColor = try { Color(android.graphics.Color.parseColor(rawCrdTxt)) } catch (e: Exception) { Color(0xFFC3C3C3) }
+
         provideContent {
             WidgetContent(
                 vaultName = vaultName,
@@ -212,8 +219,7 @@ fun WidgetContent(
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Spacer(modifier = GlanceModifier.defaultWeight())
-            // 🚀 WIDGET TIMESTAMP (V7.0.0)
-            Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 10.sp, color = ColorProvider(Color.Gray)))
+            Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 10.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.5f))))
         }
     }
 }

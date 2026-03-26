@@ -37,6 +37,19 @@ class ThemeViewModel @Inject constructor(
     private val _metalsDisplayOrder = MutableStateFlow("XAU,XAG,XPT,XPD")
     val metalsDisplayOrder: StateFlow<String> = _metalsDisplayOrder.asStateFlow()
 
+    // --- WIDGET SPECIFIC THEME PROPERTIES (Added for V8.0.0) ---
+    private val _widgetBgColor = MutableStateFlow("#1C1C1E")
+    val widgetBgColor: StateFlow<String> = _widgetBgColor.asStateFlow()
+
+    private val _widgetBgTextColor = MutableStateFlow("#FFFFFF")
+    val widgetBgTextColor: StateFlow<String> = _widgetBgTextColor.asStateFlow()
+
+    private val _widgetCardColor = MutableStateFlow("#2C2C2E")
+    val widgetCardColor: StateFlow<String> = _widgetCardColor.asStateFlow()
+
+    private val _widgetCardTextColor = MutableStateFlow("#FFFFFF")
+    val widgetCardTextColor: StateFlow<String> = _widgetCardTextColor.asStateFlow()
+
     init {
         viewModelScope.launch {
             themePreferences.cardBackgroundColor.collect { _cardBackgroundColor.value = it }
@@ -59,8 +72,22 @@ class ThemeViewModel @Inject constructor(
         viewModelScope.launch {
             themePreferences.metalsDisplayOrder.collect { _metalsDisplayOrder.value = it }
         }
+        // Collect widget-specific preferences
+        viewModelScope.launch {
+            themePreferences.widgetBgColor.collect { _widgetBgColor.value = it }
+        }
+        viewModelScope.launch {
+            themePreferences.widgetBgTextColor.collect { _widgetBgTextColor.value = it }
+        }
+        viewModelScope.launch {
+            themePreferences.widgetCardColor.collect { _widgetCardColor.value = it }
+        }
+        viewModelScope.launch {
+            themePreferences.widgetCardTextColor.collect { _widgetCardTextColor.value = it }
+        }
     }
 
+    // Existing save functions...
     fun saveCardBackgroundColor(hex: String) {
         _cardBackgroundColor.value = hex
         viewModelScope.launch { themePreferences.saveCardBackgroundColor(hex) }
@@ -94,5 +121,26 @@ class ThemeViewModel @Inject constructor(
     fun saveMetalsDisplayOrder(order: String) {
         _metalsDisplayOrder.value = order
         viewModelScope.launch { themePreferences.saveMetalsDisplayOrder(order) }
+    }
+
+    // --- WIDGET THEME UPDATE FUNCTIONS (Added for V8.0.0) ---
+    fun updateWidgetBgColor(hex: String) {
+        _widgetBgColor.value = hex
+        viewModelScope.launch { themePreferences.saveWidgetBgColor(hex) }
+    }
+
+    fun updateWidgetBgTextColor(hex: String) {
+        _widgetBgTextColor.value = hex
+        viewModelScope.launch { themePreferences.saveWidgetBgTextColor(hex) }
+    }
+
+    fun updateWidgetCardColor(hex: String) {
+        _widgetCardColor.value = hex
+        viewModelScope.launch { themePreferences.saveWidgetCardColor(hex) }
+    }
+
+    fun updateWidgetCardTextColor(hex: String) {
+        _widgetCardTextColor.value = hex
+        viewModelScope.launch { themePreferences.saveWidgetCardTextColor(hex) }
     }
 }

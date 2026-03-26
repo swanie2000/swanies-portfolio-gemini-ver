@@ -24,13 +24,19 @@ class ThemePreferences @Inject constructor(
         val CARD_BACKGROUND_COLOR = stringPreferencesKey("card_background_color")
         val CARD_TEXT_COLOR = stringPreferencesKey("card_text_color")
         val USE_GRADIENT = booleanPreferencesKey("use_gradient")
-        val GRADIENT_AMOUNT = floatPreferencesKey("gradient_amount") // NEW: Control the strength of the gradient
+        val GRADIENT_AMOUNT = floatPreferencesKey("gradient_amount")
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
         val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         val CURRENT_VAULT_ID = intPreferencesKey("current_vault_id")
+
+        // --- NEW WIDGET KEYS (V8.0.0) ---
+        val WIDGET_BG_COLOR = stringPreferencesKey("widget_bg_color")
+        val WIDGET_BG_TEXT_COLOR = stringPreferencesKey("widget_bg_text_color")
+        val WIDGET_CARD_COLOR = stringPreferencesKey("widget_card_color")
+        val WIDGET_CARD_TEXT_COLOR = stringPreferencesKey("widget_card_text_color")
     }
 
     // High-Resolution Theme Flows
@@ -47,6 +53,12 @@ class ThemePreferences @Inject constructor(
     val themeMode: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.THEME_MODE_KEY] ?: "SYSTEM" }
     val currentVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.CURRENT_VAULT_ID] ?: 1 }
 
+    // --- NEW WIDGET FLOWS (V8.0.0) ---
+    val widgetBgColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_BG_COLOR] ?: "#1C1C1E" }
+    val widgetBgTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] ?: "#FFFFFF" }
+    val widgetCardColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_CARD_COLOR] ?: "#2C2C2E" }
+    val widgetCardTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_CARD_TEXT_COLOR] ?: "#FFFFFF" }
+
     // Persistence Functions
     suspend fun saveSiteBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = color } }
     suspend fun saveSiteTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_TEXT_COLOR] = color } }
@@ -60,4 +72,10 @@ class ThemePreferences @Inject constructor(
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
     suspend fun saveThemeMode(mode: String) { appContext.dataStore.edit { it[PreferencesKeys.THEME_MODE_KEY] = mode } }
     suspend fun saveCurrentVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.CURRENT_VAULT_ID] = id } }
+
+    // --- NEW WIDGET SAVE FUNCTIONS (V8.0.0) ---
+    suspend fun saveWidgetBgColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_BG_COLOR] = color } }
+    suspend fun saveWidgetBgTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] = color } }
+    suspend fun saveWidgetCardColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_COLOR] = color } }
+    suspend fun saveWidgetCardTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_TEXT_COLOR] = color } }
 }
