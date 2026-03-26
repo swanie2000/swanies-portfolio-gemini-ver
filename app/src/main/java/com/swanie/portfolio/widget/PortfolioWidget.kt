@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.*
 import androidx.glance.action.ActionParameters
@@ -54,6 +55,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
     companion object {
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
+        val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
     }
 
     @EntryPoint
@@ -68,6 +70,7 @@ class PortfolioWidget : GlanceAppWidget() {
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        Log.d("SWANIE_TRACE", "5. provideGlance Waking Up for ID: $id")
         val appContext = context.applicationContext
         val entryPoint = EntryPointAccessors.fromApplication(appContext, PortfolioWidgetEntryPoint::class.java)
 
@@ -79,6 +82,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val prefs = getAppWidgetState<Preferences>(context, id)
         val directIdsString = prefs[SELECTED_ASSETS_KEY]
+        Log.d("SWANIE_TRACE", "6. Read Direct Command: $directIdsString")
 
         val userConfig = userConfigDao.getUserConfig().first()
         val currentVaultId = themePrefs.currentVaultId.first()
@@ -130,6 +134,7 @@ class PortfolioWidget : GlanceAppWidget() {
         val cardColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardColor ?: "#363636")) } catch (e: Exception) { Color(0xFF363636) }
         val cardTextColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetCardTextColor ?: "#C3C3C3")) } catch (e: Exception) { Color(0xFFC3C3C3) }
 
+        Log.d("SWANIE_TRACE", "7. Final Asset Count to Draw: ${filteredAssets.size}")
         provideContent {
             WidgetContent(
                 vaultName = vaultName,
@@ -190,7 +195,7 @@ fun WidgetContent(
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
                 Text(text = totalValue, style = TextStyle(color = ColorProvider(bgTextColor), fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center))
-                Text(text = "TREND: $percentChange", style = TextStyle(color = ColorProvider(trendColor), fontSize = 11.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center))
+                Text(text = "TREND: " + percentChange, style = TextStyle(color = ColorProvider(trendColor), fontSize = 11.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center))
             }
         }
         Spacer(modifier = GlanceModifier.height(8.dp))
@@ -207,7 +212,7 @@ fun WidgetContent(
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Spacer(modifier = GlanceModifier.defaultWeight())
-            Text(text = "Updated: $syncTime", style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), fontSize = 10.sp))
+            Text(text = "Updated: " + syncTime, style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), fontSize = 10.sp))
         }
     }
 }
