@@ -173,66 +173,70 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-🛡️ NARRATIVE: THE "GOLDEN BUILD" RESTORATION (V7.1.0)
+🛡️ NARRATIVE: THE "GOLDEN BUILD" EVOLUTION (V7.1.1)
 
-Current Version: 7.1.0 (The "Golden Build" Milestone)
+Current Version: 7.1.1 (The "Precision Metals" Milestone)
 
-Build Status: 🟢 ULTRA-STABLE (Survived Full Wipe & Reinstall Stress Test)
-1. THE V7.1 EVOLUTION: ARCHITECTURAL HARDENING
+Build Status: 🟢 ULTRA-STABLE (Phase 1 Data Sanitization Complete)
+1. THE V7.1.1 EVOLUTION: DATA & UI HARDENING
 
-This session was defined by the "Reinstall Paradox." We discovered that while the UI was beautiful, the "plumbing" was too aggressive for a fresh Android installation. We successfully rolled back to a verified stable state and identified the exact "Poison Pills" that cause widget death.
+This session successfully moved "The Brain" of the app from the UI layer into the Repository. We resolved the "SILVER - SILVER" duplicate naming paradox and standardized how metals are represented across the entire ecosystem.
+
 🚀 Key Engineering Wins:
 
-    The "Golden Build" Recovery: Executed a successful git reset --hard to Commit 4e93f76. This restored the high-fidelity design while stripping out unstable experimental database calls.
+    The "V6" Sanitization Engine: Implemented a context-aware cleanMetalName utility in AssetRepository. It prioritizes weight metadata (100.0, 10.0, 1.0) to reconstruct accurate labels, bypassing inconsistent API raw strings.
 
-    Cold-Start Resilience: Verified that the widget now survives a Full App Uninstall/Reinstall. It correctly handles the "Empty Database" state without crashing the Glance process.
+    DB V17 Clean-Slate: Successfully executed a destructive migration to add displayName and isMetal columns. This allows the app to store professional, sanitized names permanently while keeping raw API data for debugging.
 
-    The 5-Asset Payload Cap: Hard-coded a 5-asset limit for the widget rows. This keeps the RemoteViews memory footprint well under the 2MB Android OS limit, preventing the "Can't show content" error.
+    UI "Uppercase" Decoupling: Identified and removed hardcoded .uppercase() calls in HoldingsUIComponents.kt. The UI now respects the stylized casing (e.g., "100oz") provided by the Repository.
 
-    Hilt-Glance De-Confliction: Fixed the EntryPointAccessors logic. Data is now fetched once per update cycle, preventing the "Circular Flow" hangs that were freezing the home screen.
+    Formula Simplification: Removed manual multiplier logic (Kilo/Gram) from the UI components. The UI now trusts the asset.weight stored in the database, reducing calculation risks and code bloat.
 
 💎 UX & Logic Refinements:
 
-    Letter-Fallback Logic: If an asset icon (especially new Metals) hasn't been downloaded yet, the widget now gracefully displays a styled 1-letter circle instead of a broken image or a crash.
+    Stylized Casing: Standardized units to lowercase (oz, g) for a modern, high-fidelity look.
 
-    Manual Sync Kickstart: Confirmed that the Widget Manager "Save & Sync" button successfully "wakes up" a fresh widget after a reinstall.
+    Name Priority: Fixed the "XAG - SILVER" duplicate titles by strictly displaying the displayName field in both Compact and Full card views.
 
-2. THE "FORTRESS" SPECS (V7.1.0)
+2. THE "FORTRESS" SPECS (V7.1.1)
    Component	Status	Tech Stack
-   Sync Engine	🟢 RESILIENT	WorkManager + DataStore Preferences
-   Cold Start	🟢 TESTED	Handles Empty DB / Fresh Reinstall
-   Glance UI	🟢 GOLDEN	5-Row Cap + High-Fidelity Cards
-   Memory Info	🟢 SAFE	< 2MB Payload (Optimized Bitmaps)
-3. THE PATH FORWARD: "PRECISION DATA" PHASE 5
-   🛠️ The "Safe" Metals Integration:
+   Data Layer	🟢 SANITIZED	Repository-Driven displayName logic
+   Database	🟢 V17	Destructive Migration / Clean-Slate Verified
+   UI Rendering	🟢 PROFESSIONAL	Case-sensitive / Metadata-reliant weights
+   Memory Info	🟢 SAFE	< 2MB Payload (Current)
+3. THE PATH FORWARD: PHASE 2 "THE WIDGET FIREWALL"
 
-   Data-First, UI-Second: We will fix the Metals "KILO/GRAM" naming and price-calc logic in the Repository layer first.
+Now that the internal app data is perfectly sanitized, we move to protecting the Android Home Screen experience.
 
-   Widget Firewall: We will not touch PortfolioWidget.kt until the new metal data is 100% stable in the main app list.
+🛠️ Widget Hardening:
 
-   Sparkline Sanitization: Implement a try-catch bitmap generator specifically for Metals to ensure the widget never "sees" a corrupt sparkline during a sync.
+    Bitmap Downsampling: Update SparklineDrawUtils.kt to strictly scale generated bitmaps. This is a non-negotiable safety measure to ensure the widget never exceeds the 2MB RemoteViews limit as the portfolio grows.
 
-🔄 Multi-Vault Support:
+    Branded Empty State: Implement a "Soft-Fail" UI. If the database is wiped (V18+), the widget must show a branded Swan logo and a "Tap to Setup" prompt instead of a blank or crashing state.
 
-    Prepare the widget to display the Vault Name in the header so the user knows exactly which portfolio they are looking at (e.g., "SWANIE: CRYPTO" vs "SWANIE: METALS").
+    Vault Header Integration: Update the widget provider to pull the active Vault Name from ThemePreferences, allowing the user to distinguish between "Crypto" and "Metals" portfolios at a glance.
+
+🔄 Multi-Vault Synchronization:
+
+    Ensure that switching vaults in the main app triggers an immediate WidgetSyncWorker to update the home screen data accordingly.
 
 🏁 GitHub Synchronization:
 
-    Status: origin/main is now perfectly synced with the Golden Build.
+    Status: origin/main is synced at Commit 51ea738.
 
-    Next Step: Perform a "Smoke Test" of the auto-refresh over the next 60 minutes.
+    Next Step: Perform a "Cold Start" test after the next context dump to ensure V17 database stability holds.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Thu 03/26/2026 14:08:44.70
+Generated: Thu 03/26/2026 15:48:31.26
 
 Branch:
 main
 Commit:
-4e93f762a062c75919ca5a85daf699fe2071837f
+51ea73804452fe3391afbbd9a51c7e15cd88e27c
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
