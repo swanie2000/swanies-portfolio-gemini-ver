@@ -56,6 +56,7 @@ class PortfolioWidget : GlanceAppWidget() {
     companion object {
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
         val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
+        val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
     }
 
     @EntryPoint
@@ -82,6 +83,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val prefs = getAppWidgetState<Preferences>(context, id)
         val directIdsString = prefs[SELECTED_ASSETS_KEY]
+        val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
         Log.d("SWANIE_TRACE", "6. Read Direct Command: $directIdsString")
 
         val userConfig = userConfigDao.getUserConfig().first()
@@ -125,8 +127,6 @@ class PortfolioWidget : GlanceAppWidget() {
         val formattedPercent = "${if (aggregateChangePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", aggregateChangePercent)}%"
         val trendColor = if (aggregateChangePercent >= 0) Color(0xFF00C853) else Color(0xFFFF1744)
 
-        val lastSyncTimestamp = userConfig?.lastUpdated ?: 0L
-        val syncTime = if (lastSyncTimestamp > 0) SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(lastSyncTimestamp)) else "--:--"
         val intent = Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
 
         val bgColor = try { Color(android.graphics.Color.parseColor(userConfig?.widgetBgColor ?: "#000416")) } catch (e: Exception) { Color(0xFF000416) }
@@ -141,7 +141,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 totalValue = displayTotalValue,
                 percentChange = formattedPercent,
                 trendColor = trendColor,
-                syncTime = syncTime,
+                lastUpdated = lastUpdatedTime,
                 assets = filteredAssets,
                 assetHistoryMap = assetHistoryMap,
                 intent = intent,
@@ -161,7 +161,7 @@ fun WidgetContent(
     totalValue: String,
     percentChange: String,
     trendColor: Color,
-    syncTime: String,
+    lastUpdated: String,
     assets: List<AssetEntity>,
     assetHistoryMap: Map<String, List<Double>>,
     intent: Intent,
@@ -212,7 +212,8 @@ fun WidgetContent(
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
             Spacer(modifier = GlanceModifier.defaultWeight())
-            Text(text = "Updated: " + syncTime, style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), fontSize = 10.sp))
+            // 🚀 WIDGET TIMESTAMP (V7.0.0)
+            Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 10.sp, color = ColorProvider(Color.Gray)))
         }
     }
 }

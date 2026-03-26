@@ -69,6 +69,8 @@ import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,6 +95,46 @@ fun WidgetManagerScreen(
         )
     }
 
+    // Cooldown Logic States
+    var cooldownSeconds by remember { mutableIntStateOf(0) }
+    var showCooldownDialog by remember { mutableStateOf(false) }
+
+    // Heartbeat: Decrement the timer every second
+    LaunchedEffect(cooldownSeconds) {
+        if (cooldownSeconds > 0) {
+            delay(1000L)
+            cooldownSeconds -= 1
+        }
+    }
+
+    // Helper to format seconds into "M:SS" style
+    val timeDisplay = remember(cooldownSeconds) {
+        val mins = cooldownSeconds / 60
+        val secs = cooldownSeconds % 60
+        String.format("%d:%02d", mins, secs)
+    }
+
+    // Popup logic (Verbiage Locked)
+    if (showCooldownDialog) {
+        AlertDialog(
+            onDismissRequest = { showCooldownDialog = false },
+            title = { Text("COOLDOWN ACTIVE", fontWeight = FontWeight.Black, color = Color.White) },
+            text = {
+                Text(
+                    "Android limits home screen widgets to 3 minutes between updates. After the countdown, your newly edited widget will be available instantly. Please wait...",
+                    color = Color.White.copy(alpha = 0.7f)
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showCooldownDialog = false }) {
+                    Text("GOT IT", fontWeight = FontWeight.Black, color = Color.Yellow)
+                }
+            },
+            containerColor = Color(0xFF1C1C1E),
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -108,72 +150,90 @@ fun WidgetManagerScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color.Transparent,
         floatingActionButton = {
-            Button(
-                onClick = {
-                    Log.d("SWANIE_TRACE", "1. Save Button Clicked")
-                    val idsString = draftSelectedIds.joinToString(",")
-                    settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
-                        Log.d("SWANIE_TRACE", "2. ViewModel Save Callback Received")
-                        scope.launch {
-                            val manager = GlanceAppWidgetManager(context)
-                            val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
-                            Log.d("SWANIE_TRACE", "3. Found ${glanceIds.size} Glance IDs")
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(56.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.Transparent,
+                shadowElevation = 12.dp
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Button(
+                        onClick = {
+                            if (cooldownSeconds == 0) {
+                                val idsString = draftSelectedIds.joinToString(",")
+                                settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
+                                    scope.launch {
+                                        val manager = GlanceAppWidgetManager(context)
+                                        val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
+                                        val currentTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
 
-                            glanceIds.forEach { glanceId ->
-                                Log.d("SWANIE_TRACE", "4. Sending Direct Command to ID: $glanceId")
-                                updateAppWidgetState(context, glanceId) { prefs ->
-                                    prefs[PortfolioWidget.SELECTED_ASSETS_KEY] = idsString
-                                    prefs[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
-                                }
-                                PortfolioWidget().update(context, glanceId)
+                                        glanceIds.forEach { glanceId ->
+                                            updateAppWidgetState(context, glanceId) { prefs ->
+                                                prefs[PortfolioWidget.SELECTED_ASSETS_KEY] = idsString
+                                                prefs[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
+                                                prefs[PortfolioWidget.LAST_UPDATED_KEY] = currentTime
+                                            }
+                                            PortfolioWidget().update(context, glanceId)
 
-                                // 🛡️ SURGERY: Direct cast to satisfy compiler instead of buggy toAppWidgetId extension
-                                val rawId = (glanceId as? AppWidgetId)?.appWidgetId
-                                if (rawId != null) {
-                                    val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                                        component = ComponentName(context, PortfolioWidgetReceiver::class.java)
-                                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(rawId))
-                                        addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                            addFlags(Intent.FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS)
+                                            val rawId = (glanceId as? AppWidgetId)?.appWidgetId
+                                            if (rawId != null) {
+                                                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                                                    component = ComponentName(context, PortfolioWidgetReceiver::class.java)
+                                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(rawId))
+                                                    addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+                                                }
+                                                context.sendBroadcast(intent)
+                                            }
                                         }
+                                        cooldownSeconds = 180
+                                        Toast.makeText(context, "Widget Updated!", Toast.LENGTH_SHORT).show()
                                     }
-                                    context.sendBroadcast(intent)
                                 }
                             }
-
-                            Toast.makeText(context, "Widget Updated!", Toast.LENGTH_SHORT).show()
-                            snackbarHostState.showSnackbar("Settings Saved! Pulse Updated.", duration = SnackbarDuration.Short)
-                        }
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = cooldownSeconds == 0
+                    ) {
+                        Text(
+                            text = if (cooldownSeconds > 0) "NEXT UPDATE $timeDisplay" else "SAVE WIDGET SETTINGS",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 14.sp
+                        )
                     }
-                },
-                modifier = Modifier.fillMaxWidth(0.9f).height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
-                shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(8.dp)
-            ) {
-                Text("SAVE WIDGET SETTINGS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+
+                    if (cooldownSeconds > 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent)
+                                .clickable(
+                                    interactionSource = null,
+                                    indication = null
+                                ) { showCooldownDialog = true }
+                        )
+                    }
+                }
             }
         },
         floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(bottom = 120.dp)
         ) {
-            item {
-                TextButton(
-                    onClick = { scope.launch { settingsViewModel.clearWidgetSelection(); draftSelectedIds = emptyList() } },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("CLEAR ALL SELECTIONS", fontWeight = FontWeight.Black, fontSize = 12.sp)
-                    }
-                }
-            }
+            // Note: Red "Clear All Selections" button removed to prevent un-throttled database writes.
+
             item {
                 Text("PRIVACY MODE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
                 Row(
@@ -191,6 +251,7 @@ fun WidgetManagerScreen(
                     )
                 }
             }
+
             item {
                 Button(
                     onClick = { navController.navigate(Routes.WIDGET_STUDIO) },
@@ -204,6 +265,7 @@ fun WidgetManagerScreen(
                     }
                 }
             }
+
             items(assets) { asset ->
                 WidgetAssetSelectItem(
                     asset = asset,
@@ -216,7 +278,6 @@ fun WidgetManagerScreen(
                     themeColor = safeText
                 )
             }
-            item { Spacer(Modifier.height(80.dp)) }
         }
     }
 }
@@ -232,7 +293,6 @@ fun WidgetAssetSelectItem(asset: AssetEntity, isSelected: Boolean, orderIndex: I
     ) {
         Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
             if (asset.category == AssetCategory.METAL) {
-                // 🛡️ CAST FIX: Explicit .name for category String requirement
                 MetalIcon(asset.name, asset.weight, 32, asset.category.name)
             } else {
                 AsyncImage(model = asset.imageUrl, null, modifier = Modifier.size(32.dp).clip(CircleShape))
@@ -281,17 +341,21 @@ fun WidgetStudioScreen(navController: NavHostController, viewModel: SettingsView
         if (hexInput.length != 6) { errorMessage = "6 CHARACTERS REQUIRED"; showError = true; scope.launch { delay(2500); showError = false }; return }
         try {
             val finalHex = "#$hexInput"
-            when (activeTarget) { 0 -> viewModel.updateWidgetBgColor(finalHex); 1 -> viewModel.updateWidgetBgTextColor(finalHex); 2 -> viewModel.updateWidgetCardColor(finalHex); 3 -> viewModel.updateWidgetCardTextColor(finalHex) }
+            when (activeTarget) {
+                0 -> viewModel.updateWidgetBgColor(finalHex)
+                1 -> viewModel.updateWidgetBgTextColor(finalHex)
+                2 -> viewModel.updateWidgetCardColor(finalHex)
+                3 -> viewModel.updateWidgetCardTextColor(finalHex)
+            }
             isFlashing = true; hasUnsavedChanges = false; keyboardController?.hide(); focusManager.clearFocus(); scope.launch { delay(300); isFlashing = false }
         } catch (e: Exception) { errorMessage = "SAVE ERROR"; showError = true; scope.launch { delay(2500); showError = false } }
     }
 
     Scaffold(containerColor = Color(0xFF1C1C1E)) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(modifier = Modifier.fillMaxWidth().height(110.dp), contentAlignment = Alignment.Center) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White, modifier = Modifier.size(28.dp).clickable { navController.popBackStack() })
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White, modifier = Modifier.size(28.dp).clickable { navController.popBackStack() } )
                     Column(modifier = Modifier.clickable { showResetDialog = true }) {
                         Text("DEFAULT", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     }
