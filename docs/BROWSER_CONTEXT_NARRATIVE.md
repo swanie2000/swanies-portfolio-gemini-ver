@@ -1,51 +1,35 @@
-NARRATIVE: THE "PRECISION VAULT" UPGRADE (V7.2.0)
+🛡️ NARRATIVE: THE "VISUAL SYNC" STRIKE (V7.2.3)
 
-Current Version: 7.2.0 (The "Precision Vault" Edition)
+Current Version: 7.2.3 (The "Parity" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (DB V18 Schema Active)
+Build Status: 🔴 VISUAL MISMATCH (App V18 Stable / Widget Out-of-Sync)
 
-    Note: We have successfully moved beyond the "V17 Restoration" and implemented the V18 "Explicit Units" architecture. The app now has 100% unit persistence for metals, solving the legacy "Ounce Drift" bug.
+    Critical Observation: The main app is successfully displaying the V18 "Precision Vault" data (Rectangular bars, specific unit stamps). However, the Home Screen Widget is failing to render these specific V18 attributes, defaulting to generic "G" placeholders.
 
-1. THE V18 REVOLUTION: UNIT PERSISTENCE & SCHEMATIC HARDENING
+1. THE V7.2.3 MISSION: TOTAL PARITY
 
-This session transformed the data model to ensure that Grams, Kilos, and Ounces are never confused again. We moved from "Mathematical Guessing" to "Explicit Storage."
+We are currently aligning PortfolioWidget.kt to the V18 schematic. The goal is to move from the "Generic State" to the "Precision State" seen in the app.
 
-🚀 Key Engineering Wins:
+🚀 Engineering Blockers to Resolve:
 
-    Explicit Unit Architecture: Added `weightUnit` (String) to `AssetEntity`. The app now permanently stores "GRAM", "KILO", or "OZ" for every metal asset.
-    
-    High-Precision Stamping: Refactored `MetalIcon` logic. It now uses the `weightUnit` to stamp "1g", "1k", or "1/10" directly on the icon with perfect accuracy.
+    Icon Stamping Failure: The widget is still rendering a static circle with a "G". It needs to be updated to a Box layout that mimics the MetalIcon logic, checking the weightUnit to render "1k", "1g", etc.
 
-    Funnel Refactoring: The `MetalSelectionFunnel` was upgraded to a string-based unit return. This eliminates the "isKilo" boolean ambiguity and allows for future units (like Tonnes or Pounds) without breaking the UI.
+    Label Truncation: The widget is pulling asset.name (Gold) instead of asset.displayName (Gold (1kg)). This is causing the user to lose critical context on the home screen.
 
-    Surgical Compilation Fix: Resolved complex "Overload Resolution" and "Argument Mismatch" errors across `MyHoldingsScreen`, `AssetViewModel`, and `WidgetManagerScreen` caused by the schema shift.
+    Shape Consistency: The widget is not respecting the "Bar vs. Coin" distinction. Bars should be rendered as Rounded Rectangles, not circles.
 
-    Clean Slate Protocol: Executed a version 18 migration with `fallbackToDestructiveMigration()`. This wiped the test data and initialized the new schema with 100% integrity.
+💎 Current UX State:
 
-💎 UX & Logic Status:
+    App: 🟢 Precision Stamping (1/10oz, 1oz, 10oz, 100oz, 1k, 1g).
 
-    Visual Verification: Confirmed via screenshots that Icons correctly toggle between "Circular" (Coins) and "Rectangular" (Bars) based on weight thresholds and units.
-    
-    Label Stability: The `AssetRepository` now uses a "Unit-First" sanitization logic, ensuring that labels like "Gold (1kg)" are generated from facts, not float-point math guesses.
+    Widget: 🔴 Legacy Generic (G, G, G, G, G).
 
-2. THE "FORTRESS" SPECS (V7.2.0)
-   Component	Status	Tech Stack / Logic
-   Data Layer	🟢 STABLE	V18 Unit-Driven displayName logic
-   Database	🟢 V18	Explicit weightUnit field (GRAM, KILO, OZ)
-   Navigation	🟢 CLEAN	Single-function NavGraph; Routes synchronized
-   Build State	🟢 GREEN	Zero compilation errors; clean assembleDebug
-3. THE PATH FORWARD: "THE WIDGET FIREWALL" (PHASE 3)
+2. THE "FORTRESS" SPECS (V7.2.3)
+   Component	Status	Logic Requirement
+   Data Layer	🟢 STABLE	V18 Unit-Driven displayName
+   Database	🟢 V18	Explicit weightUnit (GRAM, KILO, OZ)
+   Widget UI	🔴 MISALIGNED	Needs AssetCardOriginal refactor
+   Sparklines	🟡 OPTIMIZING	Transitioning to RGB_565 memory safety
+3. THE PATH FORWARD: LOCKING THE SYNC
 
-With the metals database now logically sound, we return to the Home Screen and Widget performance.
-
-🛠️ Widget Hardening (Phase 3):
-
-    Sparkline Optimization: Update `SparklineDrawUtils.kt` to use `Bitmap.Config.RGB_565` to cut memory usage by 50%.
-
-    Unit-Aware Widget: Ensure the widget pulls from the new `weightUnit` field to display "1g" or "1k" in the compact widget cards.
-
-    Soft-Fail Branding: Implement the "Swan-Logo" empty state for the widget to handle new DB wipes gracefully.
-
-🔄 Git Hygiene Protocol:
-
-    V18 Baseline: This build is the new baseline. Commit and push immediately to lock in the "Precision Vault" logic.
+To fix the images you just showed me, I need to provide the Full File for PortfolioWidget.kt that specifically addresses the AssetCardOriginal layout. We must replace the generic ImageProvider with a Box/Text combo for the icon and switch the title to asset.displayName.
