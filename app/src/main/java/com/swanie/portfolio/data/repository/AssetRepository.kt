@@ -24,10 +24,10 @@ class AssetRepository @Inject constructor(
     fun getAssetsForPortfolio(portfolioId: String) = assetDao.getAssetsByPortfolio(portfolioId)
 
     /**
-     * Phase 1: Data Sanitization Utility (V8 - Ultimate Precision & Force)
-     * Hard-coded detection for Troy conversions to ensure UI labels are perfect.
+     * Phase 1: Data Sanitization Utility (V18 - Precision Force)
+     * Now leverages explicit weightUnit for perfect labels.
      */
-    private fun cleanMetalName(rawName: String, symbol: String, weight: Double): String {
+    private fun cleanMetalName(rawName: String, symbol: String, weight: Double, unit: String): String {
         val upperSymbol = symbol.uppercase(Locale.ROOT)
         val upperName = rawName.uppercase(Locale.ROOT)
 
@@ -39,20 +39,23 @@ class AssetRepository @Inject constructor(
             else -> symbol.replace("=F", "")
         }
 
-        // 🛠️ PRECISION WEIGHT MAPPING (Using epsilon comparison for doubles)
-        val unit = when {
-            abs(weight - 100.0) < 0.001 -> "(100oz)"
-            abs(weight - 10.0) < 0.001 -> "(10oz)"
-            abs(weight - 1.0) < 0.001 -> "(1oz)"
-            abs(weight - 0.1) < 0.001 -> "(1/10oz)"
-            // 1 Troy Kilo = 32.1507 oz
-            abs(weight - 32.1507) < 0.001 -> "(1kg)"
-            // 1 Gram = 0.0321507 oz
-            abs(weight - 0.0321507) < 0.0001 || upperName.contains("GRAM") -> "(1g)"
+        // 🛠️ V18: TRUST EXPLICIT UNIT FIRST
+        val unitLabel = when (unit.uppercase(Locale.ROOT)) {
+            "KILO" -> "(1kg)"
+            "GRAM" -> "(1g)"
+            "OZ" -> {
+                when {
+                    abs(weight - 100.0) < 0.001 -> "(100oz)"
+                    abs(weight - 10.0) < 0.001 -> "(10oz)"
+                    abs(weight - 1.0) < 0.001 -> "(1oz)"
+                    abs(weight - 0.1) < 0.001 -> "(1/10oz)"
+                    else -> ""
+                }
+            }
             else -> ""
         }
 
-        return if (unit.isEmpty()) metalType else "$metalType $unit"
+        return if (unitLabel.isEmpty()) metalType else "$metalType $unitLabel"
     }
 
     suspend fun refreshAssets(force: Boolean = false, portfolioId: String = "MAIN") {
@@ -78,9 +81,9 @@ class AssetRepository @Inject constructor(
                     }?.let { update ->
                         val isMetal = existing.category == AssetCategory.METAL
 
-                        // 🛠️ Always recalculate displayName on refresh to fix legacy "1oz" strings
+                        // 🛠️ V18: High-precision label refresh
                         val finalDisplayName = if (isMetal) {
-                            cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight)
+                            cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight, existing.weightUnit)
                         } else {
                             update.name.ifEmpty { existing.name }
                         }
@@ -109,9 +112,9 @@ class AssetRepository @Inject constructor(
 
     suspend fun upsertAsset(asset: AssetEntity) {
         val isMetal = asset.category == AssetCategory.METAL
-        // 🛠️ FORCE SANITIZATION ON EVERY UPSERT
+        // 🛠️ V18: FORCE SANITIZATION ON EVERY UPSERT
         val finalDisplayName = if (isMetal) {
-            cleanMetalName(asset.name, asset.symbol, asset.weight)
+            cleanMetalName(asset.name, asset.symbol, asset.weight, asset.weightUnit)
         } else {
             asset.name
         }

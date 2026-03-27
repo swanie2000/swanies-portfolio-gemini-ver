@@ -152,14 +152,14 @@ fun AmountEntryScreen(
             initialPrem = "",
             initialManualPrice = officialSpotPrice.toString(),
             onDismiss = onCancel,
-            onConfirmed = { type, desc, weight, isKilo, qty, prem, icon, isManual, manualPrice ->
-                val finalWeight = if (isKilo) 32.1507 else weight
+            onConfirmed = { type, desc, weight, unit, qty, prem, icon, isManual, manualPrice ->
                 metalEntityBuffer = AssetEntity(
                     coinId = coinId,
                     symbol = type,
                     name = desc,
                     category = AssetCategory.METAL,
-                    weight = finalWeight,
+                    weight = weight,
+                    weightUnit = unit, // 🛠️ V18: Explicit Unit Capture
                     amountHeld = qty.toDoubleOrNull() ?: 0.0,
                     premium = prem.toDoubleOrNull() ?: 0.0,
                     imageUrl = icon ?: "",

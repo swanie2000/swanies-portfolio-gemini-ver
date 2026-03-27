@@ -24,6 +24,7 @@ data class AssetEntity(
     val localIconPath: String? = null, // Global Vista: Phase 3 Icon Storage
     val priceSource: String = "CoinGecko",
     val weight: Double = 1.0,
+    val weightUnit: String = "OZ", // 🛠️ V18: Explicit Unit (GRAM, KILO, OZ)
     val amountHeld: Double = 0.0,
     val premium: Double = 0.0,
     val decimalPreference: Int = 2,

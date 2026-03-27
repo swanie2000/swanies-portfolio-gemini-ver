@@ -330,7 +330,7 @@ fun MyHoldingsScreen(
                                 if (targetIsCompact && !isExpanded) {
                                     CompactAssetCard(asset, isDragging, cardBg, cardText, activeVault.baseCurrency, handleExpandToggle, dragModifier)
                                 } else {
-                                    FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, activeVault.baseCurrency, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _ -> }, modifier = dragModifier)
+                                    FullAssetCard(asset, isExpanded, false, isDragging, isEditButtonVisible, cardBg, cardText, activeVault.baseCurrency, handleExpandToggle, { assetBeingEdited = asset }, { _, _, _, _, _ -> }, modifier = dragModifier)
                                 }
                             }
                         }
@@ -353,7 +353,7 @@ fun MyHoldingsScreen(
                     asset = asset,
                     onDismiss = { assetBeingEdited = null },
                     onSave = { newName, newAmount, newDecimals ->
-                        viewModel.updateAsset(asset, newName, newAmount, asset.weight, newDecimals)
+                        viewModel.updateAsset(asset, newName, newAmount, asset.weight, asset.weightUnit, newDecimals)
                         assetBeingEdited = null
                     }
                 )
@@ -366,12 +366,12 @@ fun MyHoldingsScreen(
                     initialPrem = asset.premium.toString(),
                     initialManualPrice = asset.officialSpotPrice.toString(),
                     onDismiss = { assetBeingEdited = null },
-                    onConfirmed = { type, desc, weight, isKilo, qty, prem, icon, isManual, manualPrice ->
-                        val finalWeight = if (isKilo) 32.1507 else weight
+                    onConfirmed = { type, desc, weight, unit, qty, prem, icon, isManual, manualPrice ->
                         viewModel.updateAssetEntity(asset.copy(
                             symbol = type,
                             name = desc,
-                            weight = finalWeight,
+                            weight = weight,
+                            weightUnit = unit, // 🛠️ V18: Standardized Persistence
                             amountHeld = qty.toDoubleOrNull() ?: 0.0,
                             premium = prem.toDoubleOrNull() ?: 0.0,
                             imageUrl = icon ?: asset.imageUrl,

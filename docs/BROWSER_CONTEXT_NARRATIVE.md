@@ -1,52 +1,51 @@
-🛡️ NARRATIVE: THE "GOLDEN BUILD" EVOLUTION (V7.1.1)
+NARRATIVE: THE "PRECISION VAULT" UPGRADE (V7.2.0)
 
-Current Version: 7.1.1 (The "Precision Metals" Milestone)
+Current Version: 7.2.0 (The "Precision Vault" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (Phase 1 Data Sanitization Complete)
-1. THE V7.1.1 EVOLUTION: DATA & UI HARDENING
+Build Status: 🟢 ULTRA-STABLE (DB V18 Schema Active)
 
-This session successfully moved "The Brain" of the app from the UI layer into the Repository. We resolved the "SILVER - SILVER" duplicate naming paradox and standardized how metals are represented across the entire ecosystem.
+    Note: We have successfully moved beyond the "V17 Restoration" and implemented the V18 "Explicit Units" architecture. The app now has 100% unit persistence for metals, solving the legacy "Ounce Drift" bug.
+
+1. THE V18 REVOLUTION: UNIT PERSISTENCE & SCHEMATIC HARDENING
+
+This session transformed the data model to ensure that Grams, Kilos, and Ounces are never confused again. We moved from "Mathematical Guessing" to "Explicit Storage."
 
 🚀 Key Engineering Wins:
 
-    The "V6" Sanitization Engine: Implemented a context-aware cleanMetalName utility in AssetRepository. It prioritizes weight metadata (100.0, 10.0, 1.0) to reconstruct accurate labels, bypassing inconsistent API raw strings.
+    Explicit Unit Architecture: Added `weightUnit` (String) to `AssetEntity`. The app now permanently stores "GRAM", "KILO", or "OZ" for every metal asset.
+    
+    High-Precision Stamping: Refactored `MetalIcon` logic. It now uses the `weightUnit` to stamp "1g", "1k", or "1/10" directly on the icon with perfect accuracy.
 
-    DB V17 Clean-Slate: Successfully executed a destructive migration to add displayName and isMetal columns. This allows the app to store professional, sanitized names permanently while keeping raw API data for debugging.
+    Funnel Refactoring: The `MetalSelectionFunnel` was upgraded to a string-based unit return. This eliminates the "isKilo" boolean ambiguity and allows for future units (like Tonnes or Pounds) without breaking the UI.
 
-    UI "Uppercase" Decoupling: Identified and removed hardcoded .uppercase() calls in HoldingsUIComponents.kt. The UI now respects the stylized casing (e.g., "100oz") provided by the Repository.
+    Surgical Compilation Fix: Resolved complex "Overload Resolution" and "Argument Mismatch" errors across `MyHoldingsScreen`, `AssetViewModel`, and `WidgetManagerScreen` caused by the schema shift.
 
-    Formula Simplification: Removed manual multiplier logic (Kilo/Gram) from the UI components. The UI now trusts the asset.weight stored in the database, reducing calculation risks and code bloat.
+    Clean Slate Protocol: Executed a version 18 migration with `fallbackToDestructiveMigration()`. This wiped the test data and initialized the new schema with 100% integrity.
 
-💎 UX & Logic Refinements:
+💎 UX & Logic Status:
 
-    Stylized Casing: Standardized units to lowercase (oz, g) for a modern, high-fidelity look.
+    Visual Verification: Confirmed via screenshots that Icons correctly toggle between "Circular" (Coins) and "Rectangular" (Bars) based on weight thresholds and units.
+    
+    Label Stability: The `AssetRepository` now uses a "Unit-First" sanitization logic, ensuring that labels like "Gold (1kg)" are generated from facts, not float-point math guesses.
 
-    Name Priority: Fixed the "XAG - SILVER" duplicate titles by strictly displaying the displayName field in both Compact and Full card views.
+2. THE "FORTRESS" SPECS (V7.2.0)
+   Component	Status	Tech Stack / Logic
+   Data Layer	🟢 STABLE	V18 Unit-Driven displayName logic
+   Database	🟢 V18	Explicit weightUnit field (GRAM, KILO, OZ)
+   Navigation	🟢 CLEAN	Single-function NavGraph; Routes synchronized
+   Build State	🟢 GREEN	Zero compilation errors; clean assembleDebug
+3. THE PATH FORWARD: "THE WIDGET FIREWALL" (PHASE 3)
 
-2. THE "FORTRESS" SPECS (V7.1.1)
-   Component	Status	Tech Stack
-   Data Layer	🟢 SANITIZED	Repository-Driven displayName logic
-   Database	🟢 V17	Destructive Migration / Clean-Slate Verified
-   UI Rendering	🟢 PROFESSIONAL	Case-sensitive / Metadata-reliant weights
-   Memory Info	🟢 SAFE	< 2MB Payload (Current)
-3. THE PATH FORWARD: PHASE 2 "THE WIDGET FIREWALL"
+With the metals database now logically sound, we return to the Home Screen and Widget performance.
 
-Now that the internal app data is perfectly sanitized, we move to protecting the Android Home Screen experience.
+🛠️ Widget Hardening (Phase 3):
 
-🛠️ Widget Hardening:
+    Sparkline Optimization: Update `SparklineDrawUtils.kt` to use `Bitmap.Config.RGB_565` to cut memory usage by 50%.
 
-    Bitmap Downsampling: Update SparklineDrawUtils.kt to strictly scale generated bitmaps. This is a non-negotiable safety measure to ensure the widget never exceeds the 2MB RemoteViews limit as the portfolio grows.
+    Unit-Aware Widget: Ensure the widget pulls from the new `weightUnit` field to display "1g" or "1k" in the compact widget cards.
 
-    Branded Empty State: Implement a "Soft-Fail" UI. If the database is wiped (V18+), the widget must show a branded Swan logo and a "Tap to Setup" prompt instead of a blank or crashing state.
+    Soft-Fail Branding: Implement the "Swan-Logo" empty state for the widget to handle new DB wipes gracefully.
 
-    Vault Header Integration: Update the widget provider to pull the active Vault Name from ThemePreferences, allowing the user to distinguish between "Crypto" and "Metals" portfolios at a glance.
+🔄 Git Hygiene Protocol:
 
-🔄 Multi-Vault Synchronization:
-
-    Ensure that switching vaults in the main app triggers an immediate WidgetSyncWorker to update the home screen data accordingly.
-
-🏁 GitHub Synchronization:
-
-    Status: origin/main is synced at Commit 51ea738.
-
-    Next Step: Perform a "Cold Start" test after the next context dump to ensure V17 database stability holds.
+    V18 Baseline: This build is the new baseline. Commit and push immediately to lock in the "Precision Vault" logic.

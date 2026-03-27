@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    // 🛡️ V17: Phase 1 Metal Sanitization (displayName & isMetal)
-    version = 17,
+    // 🛡️ V18: Explicit Metal Units (GRAM, KILO, OZ)
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

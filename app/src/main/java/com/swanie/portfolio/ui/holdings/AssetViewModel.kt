@@ -162,12 +162,14 @@ class AssetViewModel @Inject constructor(
         }
     }
 
-    fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, decimals: Int) {
+    // 🛠️ V18: Standardized update including unit
+    fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset.copy(
                 name = newName,
                 amountHeld = newAmount,
                 weight = newWeight,
+                weightUnit = weightUnit,
                 decimalPreference = decimals
             ))
         }

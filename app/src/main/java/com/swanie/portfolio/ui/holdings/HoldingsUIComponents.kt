@@ -49,6 +49,7 @@ import java.util.Locale
 fun MetalIcon(
     name: String,
     weight: Double,
+    unit: String = "OZ", // 🛠️ V18: Standardized Unit for stamping
     size: Int = 44,
     imageUrl: String = "",
     localPath: String? = null,
@@ -97,7 +98,7 @@ fun MetalIcon(
                 else -> listOf(Color(0xFFCED4DA), Color(0xFFADB5BD), Color(0xFF495057))
             }
 
-            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true) || weight >= 10.0
+            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || unit == "KILO" || weight >= 10.0
 
             Box(modifier = Modifier.size(size.dp), contentAlignment = Alignment.Center) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
@@ -123,14 +124,22 @@ fun MetalIcon(
                     }
                 }
 
-                val weightStr = when {
-                    weight > 0.03 && weight < 0.033 -> "1g"
-                    weight > 32.1 && weight < 32.2 -> "1k"
-                    weight == 100.0 -> "100"
-                    weight == 10.0 -> "10"
-                    weight >= 1.0 -> weight.toInt().toString()
-                    else -> weight.toString().replace("0.", ".")
+                // 🛠️ V18: High-Precision Stamping Logic
+                val weightStr = when (unit.uppercase()) {
+                    "GRAM" -> "1g"
+                    "KILO" -> "1k"
+                    "OZ" -> {
+                        when {
+                            weight == 0.1 -> "1/10"
+                            weight == 100.0 -> "100"
+                            weight == 10.0 -> "10"
+                            weight == 1.0 -> "1"
+                            else -> if (weight < 1.0) weight.toString().replace("0.", ".") else weight.toInt().toString()
+                        }
+                    }
+                    else -> weight.toString()
                 }
+
                 Text(
                     text = weightStr,
                     color = Color.Black.copy(alpha = 0.7f),
@@ -235,7 +244,7 @@ fun formatAmount(v: Double): String = DecimalFormat("#,###.########").format(v)
 @Composable
 fun MetalSelectionFunnel(
     initialMetal: String, initialForm: String, initialWeight: Double, initialQty: String, initialPrem: String, initialManualPrice: String,
-    onDismiss: () -> Unit, onConfirmed: (String, String, Double, Boolean, String, String, String?, Boolean, String) -> Unit
+    onDismiss: () -> Unit, onConfirmed: (String, String, Double, String, String, String, String?, Boolean, String) -> Unit
 ) {
     var step by remember { mutableIntStateOf(1) }
     val startMetal = when {
@@ -249,7 +258,7 @@ fun MetalSelectionFunnel(
     var l1 by remember { mutableStateOf(initialForm) }
     var l2 by remember { mutableStateOf("") }
     var selectedWeight by remember { mutableDoubleStateOf(initialWeight) }
-    var isKiloSelected by remember { mutableStateOf(initialWeight >= 32.0) }
+    var selectedUnit by remember { mutableStateOf("OZ") } // 🛠️ V18: Explicit Tracking
     var qtyInput by remember { mutableStateOf(initialQty) }
     var premInput by remember { mutableStateOf(initialPrem) }
     var manualPriceInput by remember { mutableStateOf(initialManualPrice) }
@@ -288,21 +297,21 @@ fun MetalSelectionFunnel(
                     13 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         Text("UNIT VALUE", color = Color.White.copy(0.5f), fontSize = 10.sp); OutlinedTextField(value = manualPriceInput, onValueChange = { manualPriceInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, false, qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, "OZ", qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
                     }
                     2 -> FunnelGrid(listOf("Bars", "Coins", "Rounds", "Custom"), l1) { l1 = it; step = 3 }
                     3 -> FunnelGrid(listOf("1/10 OZ", "1 OZ", "10 OZ", "100 OZ", "1 KILO", "1 GRAM", "Custom"), "") { label ->
                         val common = mapOf(
-                            "1/10 OZ" to (0.1 to false),
-                            "1 OZ" to (1.0 to false),
-                            "10 OZ" to (10.0 to false),
-                            "100 OZ" to (100.0 to false),
-                            "1 KILO" to (32.1507 to true),
-                            "1 GRAM" to (0.0321507 to false)
+                            "1/10 OZ" to (0.1 to "OZ"),
+                            "1 OZ" to (1.0 to "OZ"),
+                            "10 OZ" to (10.0 to "OZ"),
+                            "100 OZ" to (100.0 to "OZ"),
+                            "1 KILO" to (32.1507 to "KILO"),
+                            "1 GRAM" to (0.0321507 to "GRAM")
                         )
-                        val data = common[label] ?: (1.0 to false)
+                        val data = common[label] ?: (1.0 to "OZ")
                         selectedWeight = data.first
-                        isKiloSelected = data.second
+                        selectedUnit = data.second
                         step = 4
                     }
                     4 -> {
@@ -313,7 +322,7 @@ fun MetalSelectionFunnel(
                     else -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         OutlinedTextField(value = premInput, onValueChange = { premInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, isKiloSelected, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, selectedUnit, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
                     }
                 }
                 if (step > 1) { val prev = when(step) { 10 -> 1; 11 -> 10; 12 -> 11; 13 -> 4; else -> step - 1 }; TextButton(onClick = { step = prev }) { Text("BACK", color = Color.Gray) } }
@@ -342,7 +351,7 @@ fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String,
 }
 
 @Composable
-fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
+fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, String, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
@@ -359,17 +368,18 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        MetalIcon(name = asset.symbol, weight = asset.weight, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category)
+                        MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category)
                         if (asset.baseSymbol != "CUSTOM") {
                             Spacer(Modifier.height(6.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = asset.weight.toString(), color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp)
-                                val unit = when {
-                                    asset.displayName.contains("KILO", true) || asset.name.contains("KILO", true) -> "KILO"
-                                    asset.displayName.contains("GRAM", true) || asset.name.contains("GRAM", true) -> "GRAM"
-                                    else -> "OZ"
+                                // 🛠️ V18: High-Precision UI Labels
+                                val weightLabel = when (asset.weightUnit.uppercase()) {
+                                    "KILO" -> "1"
+                                    "GRAM" -> "1"
+                                    else -> formatAmount(asset.weight)
                                 }
-                                Text(text = unit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp)
+                                Text(text = weightLabel, color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp)
+                                Text(text = asset.weightUnit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp)
                             }
                         } else {
                             Text(asset.symbol, color = cardText, fontWeight = FontWeight.Black, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
@@ -423,7 +433,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
     Box(modifier = modifier.fillMaxWidth()) {
         Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, size = 32, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category) }
+                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, size = 32, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category) }
                 Column(modifier = Modifier.weight(1f)) {
                     val titleText = if (asset.category == AssetCategory.METAL) {
                         asset.displayName.ifEmpty { asset.name }

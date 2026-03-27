@@ -342,7 +342,7 @@ fun WidgetAssetSelectItem(asset: AssetEntity, isSelected: Boolean, orderIndex: I
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-            if (asset.category == AssetCategory.METAL) MetalIcon(asset.name, asset.weight, 20, asset.category.name)
+            if (asset.category == AssetCategory.METAL) MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, size = 20)
             else AsyncImage(model = asset.imageUrl, contentDescription = asset.name, modifier = Modifier.size(20.dp).clip(CircleShape), contentScale = ContentScale.Crop)
         }
         Spacer(Modifier.width(16.dp))
