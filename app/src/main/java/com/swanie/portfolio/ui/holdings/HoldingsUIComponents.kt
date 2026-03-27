@@ -97,7 +97,7 @@ fun MetalIcon(
                 else -> listOf(Color(0xFFCED4DA), Color(0xFFADB5BD), Color(0xFF495057))
             }
 
-            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true)
+            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || name.contains("KILO", true) || weight >= 10.0
 
             Box(modifier = Modifier.size(size.dp), contentAlignment = Alignment.Center) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
@@ -122,12 +122,21 @@ fun MetalIcon(
                         drawCircle(color = Color.White.copy(alpha = 0.2f), radius = (size.dp.toPx() / 2) - 2.dp.toPx(), style = Stroke(width = 1.5.dp.toPx()))
                     }
                 }
+
                 val weightStr = when {
-                    weight >= 32.0 -> "1k"
+                    weight > 0.03 && weight < 0.033 -> "1g"
+                    weight > 32.1 && weight < 32.2 -> "1k"
+                    weight == 100.0 -> "100"
+                    weight == 10.0 -> "10"
                     weight >= 1.0 -> weight.toInt().toString()
                     else -> weight.toString().replace("0.", ".")
                 }
-                Text(text = weightStr, color = Color.Black.copy(alpha = 0.7f), fontSize = (size * 0.35).sp, fontWeight = FontWeight.Black)
+                Text(
+                    text = weightStr,
+                    color = Color.Black.copy(alpha = 0.7f),
+                    fontSize = if (weightStr.length > 2) (size * 0.28).sp else (size * 0.35).sp,
+                    fontWeight = FontWeight.Black
+                )
             }
         }
     }
@@ -144,15 +153,12 @@ fun SparklineChart(historyData: List<Double>, modifier: Modifier = Modifier) {
         }
         return
     }
-
     val lastPrice = historyData.last()
     val firstPrice = historyData.first()
     val trendColor = if (lastPrice >= firstPrice) Color(0xFF00FF00) else Color(0xFFFF0000)
-
     val min = historyData.minOrNull() ?: 0.0
     val max = historyData.maxOrNull() ?: 1.0
     val range = if ((max - min) > 0) max - min else 1.0
-
     Canvas(modifier) {
         val points = historyData.mapIndexed { i, p ->
             Offset(
@@ -249,7 +255,6 @@ fun MetalSelectionFunnel(
     var manualPriceInput by remember { mutableStateOf(initialManualPrice) }
     var customIconUri by remember { mutableStateOf<String?>(null) }
     var isTrueManualFlag by remember { mutableStateOf(false) }
-
     val focus = remember { FocusRequester() }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> customIconUri = uri?.toString() }
 
@@ -287,8 +292,18 @@ fun MetalSelectionFunnel(
                     }
                     2 -> FunnelGrid(listOf("Bars", "Coins", "Rounds", "Custom"), l1) { l1 = it; step = 3 }
                     3 -> FunnelGrid(listOf("1/10 OZ", "1 OZ", "10 OZ", "100 OZ", "1 KILO", "1 GRAM", "Custom"), "") { label ->
-                        val common = mapOf("1/10 OZ" to (0.1 to false), "1 OZ" to (1.0 to false), "10 OZ" to (10.0 to false), "100 OZ" to (100.0 to false), "1 KILO" to (1.0 to true), "1 GRAM" to (1.0 to false))
-                        val data = common[label] ?: (1.0 to false); selectedWeight = data.first; isKiloSelected = data.second; step = 4
+                        val common = mapOf(
+                            "1/10 OZ" to (0.1 to false),
+                            "1 OZ" to (1.0 to false),
+                            "10 OZ" to (10.0 to false),
+                            "100 OZ" to (100.0 to false),
+                            "1 KILO" to (32.1507 to true),
+                            "1 GRAM" to (0.0321507 to false)
+                        )
+                        val data = common[label] ?: (1.0 to false)
+                        selectedWeight = data.first
+                        isKiloSelected = data.second
+                        step = 4
                     }
                     4 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
@@ -331,7 +346,6 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
-
     Box(modifier = modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
@@ -406,7 +420,6 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
 fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
     val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-
     Box(modifier = modifier.fillMaxWidth()) {
         Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -10,6 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import java.util.Locale
+import kotlin.math.abs
 
 @Singleton
 class AssetRepository @Inject constructor(
@@ -23,8 +24,8 @@ class AssetRepository @Inject constructor(
     fun getAssetsForPortfolio(portfolioId: String) = assetDao.getAssetsByPortfolio(portfolioId)
 
     /**
-     * Phase 1: Data Sanitization Utility (V6 - Force Lowercase)
-     * Prioritizes the 'weight' metadata to override any legacy "OZ" strings.
+     * Phase 1: Data Sanitization Utility (V8 - Ultimate Precision & Force)
+     * Hard-coded detection for Troy conversions to ensure UI labels are perfect.
      */
     private fun cleanMetalName(rawName: String, symbol: String, weight: Double): String {
         val upperSymbol = symbol.uppercase(Locale.ROOT)
@@ -38,14 +39,16 @@ class AssetRepository @Inject constructor(
             else -> symbol.replace("=F", "")
         }
 
-        // 🛠️ HARD-FORCE LOWERCASE "oz" based on stored weight
+        // 🛠️ PRECISION WEIGHT MAPPING (Using epsilon comparison for doubles)
         val unit = when {
-            weight == 100.0 -> "(100oz)"
-            weight == 10.0 -> "(10oz)"
-            weight == 1.0 -> "(1oz)"
-            weight == 0.1 -> "(1/10oz)"
-            (weight > 32.1 && weight < 32.2) -> "(1kg)"
-            upperName.contains("GRAM") -> "(100g)"
+            abs(weight - 100.0) < 0.001 -> "(100oz)"
+            abs(weight - 10.0) < 0.001 -> "(10oz)"
+            abs(weight - 1.0) < 0.001 -> "(1oz)"
+            abs(weight - 0.1) < 0.001 -> "(1/10oz)"
+            // 1 Troy Kilo = 32.1507 oz
+            abs(weight - 32.1507) < 0.001 -> "(1kg)"
+            // 1 Gram = 0.0321507 oz
+            abs(weight - 0.0321507) < 0.0001 || upperName.contains("GRAM") -> "(1g)"
             else -> ""
         }
 
@@ -75,7 +78,7 @@ class AssetRepository @Inject constructor(
                     }?.let { update ->
                         val isMetal = existing.category == AssetCategory.METAL
 
-                        // 🛠️ V6 Change: Pass 'existing.weight' to ensure we force the oz/kg label
+                        // 🛠️ Always recalculate displayName on refresh to fix legacy "1oz" strings
                         val finalDisplayName = if (isMetal) {
                             cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight)
                         } else {
@@ -106,6 +109,7 @@ class AssetRepository @Inject constructor(
 
     suspend fun upsertAsset(asset: AssetEntity) {
         val isMetal = asset.category == AssetCategory.METAL
+        // 🛠️ FORCE SANITIZATION ON EVERY UPSERT
         val finalDisplayName = if (isMetal) {
             cleanMetalName(asset.name, asset.symbol, asset.weight)
         } else {
