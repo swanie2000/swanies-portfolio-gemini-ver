@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,8 +31,7 @@ fun SettingsScreen(
 ) {
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
-    
-    // GRADIENT STATE
+
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
 
@@ -45,15 +42,24 @@ fun SettingsScreen(
     var isExiting by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // 🛡️ NUCLEAR SAFETY STATE
+    // 🛡️ FACTORY RESET STATE (2-Step Confirmation)
     var showFactoryResetDialog by remember { mutableStateOf(false) }
 
     if (showFactoryResetDialog) {
         AlertDialog(
             onDismissRequest = { showFactoryResetDialog = false },
-            icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red) },
-            title = { Text("Delete All Data?", fontWeight = FontWeight.Bold) },
-            text = { Text("This will permanently remove all assets, vaults, and history. This action cannot be undone.") },
+            title = {
+                Text(
+                    text = "Reset to Factory Defaults?",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            },
+            text = {
+                Text(
+                    text = "This will completely wipe the entire app, including all assets, custom themes, and vault history. This action cannot be undone."
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -63,7 +69,7 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("CONFIRM", color = Color.Red, fontWeight = FontWeight.Black)
+                    Text("RESET EVERYTHING", color = Color.Red, fontWeight = FontWeight.Black)
                 }
             },
             dismissButton = {
@@ -93,10 +99,10 @@ fun SettingsScreen(
                 }
 
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
-                    
+
                     // --- VISUAL SETTINGS ---
                     Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                    
+
                     SettingsToggleItem(
                         title = "Use Compact Cards",
                         subtitle = "Shrink asset cards to show more on screen",
@@ -107,7 +113,7 @@ fun SettingsScreen(
 
                     SettingsToggleItem(
                         title = "Confirm Deletion",
-                        subtitle = "Show 'Are you sure?' before removing an asset",
+                        subtitle = "Show confirmation before removing an asset",
                         checked = confirmDelete,
                         onCheckedChange = { mainViewModel.setConfirmDelete(it) },
                         themeColor = safeText
@@ -117,10 +123,10 @@ fun SettingsScreen(
 
                     // --- THEME & GRADIENT ---
                     Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                    
+
                     SettingsToggleItem(
                         title = "Background Gradient",
-                        subtitle = "Enable dynamic color shifting for the vault",
+                        subtitle = "Enable dynamic color shifting",
                         checked = useGradient,
                         onCheckedChange = { mainViewModel.setUseGradient(it) },
                         themeColor = safeText
@@ -144,13 +150,13 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- APP COLORS ---
-                    Text("ADJUST APP COLORS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    // --- NAVIGATION BUTTONS ---
+                    Text("MANAGEMENT", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
-                        onClick = { 
+                        onClick = {
                             isExiting = true
-                            navController.navigate(Routes.THEME_STUDIO) 
+                            navController.navigate(Routes.THEME_STUDIO)
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
@@ -159,15 +165,12 @@ fun SettingsScreen(
                         Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // --- WIDGET SECTION ---
-                    Text("BUILD HOME SCREEN WIDGETS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
-                        onClick = { 
+                        onClick = {
                             isExiting = true
-                            navController.navigate(Routes.WIDGET_MANAGER) 
+                            navController.navigate(Routes.WIDGET_MANAGER)
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
@@ -178,18 +181,24 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(48.dp))
 
-                    // 🛡️ DANGER ZONE: Nuclear Reset Section
-                    Text("DANGER ZONE", color = Color.Red.copy(0.7f), fontSize = 12.sp, fontWeight = FontWeight.Black, modifier = Modifier.padding(bottom = 8.dp))
-                    
-                    OutlinedButton(
+                    // --- SYSTEM ACTIONS (Replaced Danger Zone) ---
+                    Text("SYSTEM ACTIONS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    Button(
                         onClick = { showFactoryResetDialog = true },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.Red.copy(alpha = 0.3f))),
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.05f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("FACTORY RESET (WIPE ALL DATA)", fontWeight = FontWeight.Black)
+                        Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
                     }
+
+                    Text(
+                        text = "Wipe all assets, vaults, and settings to start fresh.",
+                        color = safeText.copy(alpha = 0.4f),
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 8.dp, start = 4.dp)
+                    )
 
                     Spacer(modifier = Modifier.height(40.dp))
                 }
@@ -200,11 +209,25 @@ fun SettingsScreen(
 
 @Composable
 fun SettingsToggleItem(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit, themeColor: Color) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp).clickable { onCheckedChange(!checked) }, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+            .clickable { onCheckedChange(!checked) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, color = themeColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Text(text = subtitle, color = themeColor.copy(alpha = 0.6f), fontSize = 14.sp)
         }
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange, colors = CheckboxDefaults.colors(checkedColor = themeColor, uncheckedColor = themeColor.copy(alpha = 0.3f), checkmarkColor = Color.Black))
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = themeColor,
+                uncheckedColor = themeColor.copy(alpha = 0.3f),
+                checkmarkColor = Color.Black
+            )
+        )
     }
 }

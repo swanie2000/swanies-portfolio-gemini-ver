@@ -246,7 +246,9 @@ fun formatAmount(v: Double): String = DecimalFormat("#,###.########").format(v)
 @Composable
 fun MetalSelectionFunnel(
     initialMetal: String, initialForm: String, initialWeight: Double, initialQty: String, initialPrem: String, initialManualPrice: String,
-    onDismiss: () -> Unit, onConfirmed: (String, String, Double, String, String, String, String?, Boolean, String) -> Unit
+    onDismiss: () -> Unit,
+    onConfirmed: (String, String, Double, String, String, String, String?, Boolean, String) -> Unit,
+    onNavigateToArchitect: (() -> Unit)? = null // 🛠️ V7.2.5: Integrated for Custom Asset building
 ) {
     var step by remember { mutableIntStateOf(1) }
     val startMetal = when {
@@ -276,14 +278,20 @@ fun MetalSelectionFunnel(
                 Spacer(Modifier.height(20.dp))
                 when (step) {
                     1 -> FunnelGrid(listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"), selectedMetal) {
-                        if (it == "Custom") { isTrueManualFlag = true; selectedMetal = ""; step = 10 }
+                        if (it == "Custom") {
+                            if (onNavigateToArchitect != null) {
+                                onNavigateToArchitect()
+                            } else {
+                                isTrueManualFlag = true; selectedMetal = ""; step = 10
+                            }
+                        }
                         else { isTrueManualFlag = false; selectedMetal = it; step = 2 }
                     }
                     10 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         Text("LABEL UNDER ICON", color = Color.White.copy(0.5f), fontSize = 10.sp)
                         OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text("Enter Name...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 101 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
                     }
                     11 -> {
                         Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) { if (customIconUri != null) AsyncImage(model = customIconUri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) else Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f)) }

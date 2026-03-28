@@ -47,7 +47,8 @@ fun AmountEntryScreen(
     officialSpotPrice: Double,
     priceSource: String,
     onSave: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onNavigateToArchitect: (String, Double, String) -> Unit // 🛠️ V7.2.5 Handshake
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
@@ -170,6 +171,9 @@ fun AmountEntryScreen(
                     baseSymbol = symbol
                 )
                 isSaving = true 
+            },
+            onNavigateToArchitect = {
+                onNavigateToArchitect(symbol, officialSpotPrice, priceSource)
             }
         )
     }

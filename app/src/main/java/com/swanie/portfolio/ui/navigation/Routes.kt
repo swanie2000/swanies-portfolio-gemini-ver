@@ -8,9 +8,9 @@ object Routes {
     const val SETTINGS = "settings"
     const val THEME_STUDIO = "theme_studio"
     const val WIDGET_MANAGER = "widget_manager"
-    // REMOVED: WIDGET_STUDIO - It is now part of WidgetManagerScreen
     const val ASSET_PICKER = "asset_picker"
     const val AMOUNT_ENTRY = "amount_entry/{coinId}/{symbol}/{name}/{imageUrl}/{category}/{price}"
     const val MANUAL_ASSET_ENTRY = "manual_asset_entry"
     const val METALS_AUDIT = "metals_audit"
+    const val ASSET_ARCHITECT = "asset_architect/{symbol}/{price}/{source}"
 }

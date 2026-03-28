@@ -16,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.AssetEntity // 🛠️ Required for type-safe lambda
+import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.holdings.*
@@ -29,6 +31,7 @@ import java.net.URLEncoder
 @Composable
 fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
     val assetViewModel: AssetViewModel = hiltViewModel()
+    val amountEntryViewModel: AmountEntryViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
@@ -63,9 +66,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             composable(Routes.WIDGET_MANAGER) {
                 WidgetManagerScreen(navController)
             }
-
-            // REMOVED: WIDGET_STUDIO route removed because it's now integrated
-            // directly into WidgetManagerScreen.kt to support Unified Draft logic.
 
             composable(Routes.HOLDINGS) {
                 MyHoldingsScreen(
@@ -131,6 +131,37 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     onSave = {
                         navController.navigate(Routes.HOLDINGS) {
                             popUpTo(Routes.HOLDINGS) { inclusive = true }
+                        }
+                    },
+                    onCancel = { navController.popBackStack() },
+                    onNavigateToArchitect = { sym: String, p: Double, src: String ->
+                        val encodedSrc = URLEncoder.encode(src, "UTF-8")
+                        navController.navigate("asset_architect/$sym/$p/$encodedSrc")
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.ASSET_ARCHITECT,
+                arguments = listOf(
+                    navArgument("symbol") { type = NavType.StringType },
+                    navArgument("price") { type = NavType.FloatType },
+                    navArgument("source") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val symbol = backStackEntry.arguments?.getString("symbol") ?: "GOLD"
+                val price = backStackEntry.arguments?.getFloat("price")?.toDouble() ?: 0.0
+                val source = URLDecoder.decode(backStackEntry.arguments?.getString("source") ?: "Manual", "UTF-8")
+
+                AssetArchitectScreen(
+                    initialSymbol = symbol,
+                    initialPrice = price,
+                    initialSource = source,
+                    onSave = { entity: AssetEntity ->
+                        amountEntryViewModel.performSurgicalAdd(entity) {
+                            navController.navigate(Routes.HOLDINGS) {
+                                popUpTo(Routes.HOLDINGS) { inclusive = true }
+                            }
                         }
                     },
                     onCancel = { navController.popBackStack() }
