@@ -42,7 +42,6 @@ fun SettingsScreen(
     var isExiting by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // 🛡️ FACTORY RESET STATE (2-Step Confirmation)
     var showFactoryResetDialog by remember { mutableStateOf(false) }
 
     if (showFactoryResetDialog) {
@@ -84,124 +83,140 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController, onNavigate = { isExiting = true }) },
+        bottomBar = {
+            if (!isExiting) {
+                BottomNavigationBar(navController = navController, onNavigate = { isExiting = true })
+            }
+        },
         containerColor = Color.Transparent
     ) { paddingValues ->
-        if (!isExiting) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Box(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
-                    Text(text = "SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
-                }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
+                Text(text = "SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
+            }
 
-                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
-                    // --- VISUAL SETTINGS ---
-                    Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                // --- VISUAL SETTINGS ---
+                Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    SettingsToggleItem(
-                        title = "Use Compact Cards",
-                        subtitle = "Shrink asset cards to show more on screen",
-                        checked = isCompactMode,
-                        onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
-                        themeColor = safeText
-                    )
+                SettingsToggleItem(
+                    title = "Use Compact Cards",
+                    subtitle = "Shrink asset cards to show more on screen",
+                    checked = isCompactMode,
+                    onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
+                    themeColor = safeText
+                )
 
-                    SettingsToggleItem(
-                        title = "Confirm Deletion",
-                        subtitle = "Show confirmation before removing an asset",
-                        checked = confirmDelete,
-                        onCheckedChange = { mainViewModel.setConfirmDelete(it) },
-                        themeColor = safeText
-                    )
+                SettingsToggleItem(
+                    title = "Confirm Deletion",
+                    subtitle = "Show confirmation before removing an asset",
+                    checked = confirmDelete,
+                    onCheckedChange = { mainViewModel.setConfirmDelete(it) },
+                    themeColor = safeText
+                )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    // --- THEME & GRADIENT ---
-                    Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                // --- THEME & GRADIENT ---
+                Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    SettingsToggleItem(
-                        title = "Background Gradient",
-                        subtitle = "Enable dynamic color shifting",
-                        checked = useGradient,
-                        onCheckedChange = { mainViewModel.setUseGradient(it) },
-                        themeColor = safeText
-                    )
+                SettingsToggleItem(
+                    title = "Background Gradient",
+                    subtitle = "Enable dynamic color shifting",
+                    checked = useGradient,
+                    onCheckedChange = { mainViewModel.setUseGradient(it) },
+                    themeColor = safeText
+                )
 
-                    if (useGradient) {
-                        Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
-                            Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-                            Slider(
-                                value = gradientAmount,
-                                onValueChange = { mainViewModel.setGradientAmount(it) },
-                                valueRange = 0f..1f,
-                                colors = SliderDefaults.colors(
-                                    thumbColor = Color.Yellow,
-                                    activeTrackColor = Color.Yellow,
-                                    inactiveTrackColor = safeText.copy(alpha = 0.2f)
-                                )
+                if (useGradient) {
+                    Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
+                        Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Slider(
+                            value = gradientAmount,
+                            onValueChange = { mainViewModel.setGradientAmount(it) },
+                            valueRange = 0f..1f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color.Yellow,
+                                activeTrackColor = Color.Yellow,
+                                inactiveTrackColor = safeText.copy(alpha = 0.2f)
                             )
-                        }
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // --- NAVIGATION BUTTONS ---
-                    Text("MANAGEMENT", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-
-                    Button(
-                        onClick = {
-                            isExiting = true
-                            navController.navigate(Routes.THEME_STUDIO)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            isExiting = true
-                            navController.navigate(Routes.WIDGET_MANAGER)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(48.dp))
-
-                    // --- SYSTEM ACTIONS (Replaced Danger Zone) ---
-                    Text("SYSTEM ACTIONS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-
-                    Button(
-                        onClick = { showFactoryResetDialog = true },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.05f)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
-                    }
-
-                    Text(
-                        text = "Wipe all assets, vaults, and settings to start fresh.",
-                        color = safeText.copy(alpha = 0.4f),
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 8.dp, start = 4.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(40.dp))
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // --- MANAGEMENT ---
+                Text("MANAGEMENT", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                Button(
+                    onClick = {
+                        isExiting = true
+                        navController.navigate(Routes.PORTFOLIO_MANAGER)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("MANAGE PORTFOLIOS", color = safeText, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = {
+                        isExiting = true
+                        navController.navigate(Routes.THEME_STUDIO)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = {
+                        isExiting = true
+                        navController.navigate(Routes.WIDGET_MANAGER)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(48.dp))
+
+                // --- SYSTEM ACTIONS ---
+                Text("SYSTEM ACTIONS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                Button(
+                    onClick = { showFactoryResetDialog = true },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.05f)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
+                }
+
+                Text(
+                    text = "Wipe all assets, vaults, and settings to start fresh.",
+                    color = safeText.copy(alpha = 0.4f),
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(top = 8.dp, start = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }

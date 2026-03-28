@@ -13,4 +13,5 @@ object Routes {
     const val MANUAL_ASSET_ENTRY = "manual_asset_entry"
     const val METALS_AUDIT = "metals_audit"
     const val ASSET_ARCHITECT = "asset_architect/{symbol}/{price}/{source}"
+    const val PORTFOLIO_MANAGER = "portfolio_manager" // 🛠️ New Route
 }

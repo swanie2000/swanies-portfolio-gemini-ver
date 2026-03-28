@@ -16,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
-import com.swanie.portfolio.data.local.AssetEntity // 🛠️ Required for type-safe lambda
+import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
@@ -65,6 +65,13 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
             composable(Routes.WIDGET_MANAGER) {
                 WidgetManagerScreen(navController)
+            }
+
+            composable(Routes.PORTFOLIO_MANAGER) {
+                PortfolioManagerScreen(
+                    navController = navController,
+                    mainViewModel = mainViewModel
+                )
             }
 
             composable(Routes.HOLDINGS) {
