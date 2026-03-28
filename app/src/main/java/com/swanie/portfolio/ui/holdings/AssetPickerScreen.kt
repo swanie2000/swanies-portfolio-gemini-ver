@@ -37,8 +37,8 @@ import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 
 /**
- * 🛠️ V7.2.6 MISSION: UI RESTORATION & METAL TRIGGER FIX
- * Restores the unified search UI while providing an instant funnel for Metals.
+ * 🛠️ V7.3.0 MISSION: PRECISION STAMP & THEME LOCK
+ * Final polish for the Vault Selector with theme-aware inputs and a bespoke custom build button.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,21 +101,20 @@ fun AssetPickerScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             
-            // --- UNIFIED INPUT & PROVIDER AREA ---
+            // --- UNIFIED INPUT AREA (One Window Strategy) ---
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
                 if (selectedProvider == "YahooFinance") {
-                    // 🚀 METAL MODE: Selector + Funnel replace the search bar
-                    Column {
-                        SourceSelectorSurface(
+                    // 🚀 METAL MODE: The selection area appears directly
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        UnifiedSourceHeader(
                             displayLabel = "PRECIOUS METALS",
-                            icon = Icons.Default.Shield,
+                            icon = Icons.Default.Security,
                             onClick = { menuExpanded = true },
                             bgColor = cardBg,
-                            textColor = cardText,
-                            modifier = Modifier.fillMaxWidth().height(56.dp)
+                            textColor = cardText
                         )
                         
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(24.dp))
                         
                         Text(
                             "SELECT METAL TYPE",
@@ -123,34 +122,74 @@ fun AssetPickerScreen(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Black,
                             letterSpacing = 2.sp,
-                            modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
                         
-                        FunnelGrid(
-                            options = listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"),
-                            selected = ""
-                        ) { choice ->
-                            if (choice == "Custom") {
-                                navController.navigate("asset_architect/CUSTOM/0.0/Manual")
-                            } else {
-                                val ticker = when (choice) {
-                                    "Gold" -> "XAU"
-                                    "Silver" -> "XAG"
-                                    "Platinum" -> "XPT"
-                                    "Palladium" -> "XPD"
-                                    else -> choice.uppercase()
+                        // 🛠️ 2x2 Grid for standard metals
+                        val metals = listOf("Gold", "Silver", "Platinum", "Palladium")
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            metals.chunked(2).forEach { rowItems ->
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    rowItems.forEach { choice ->
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(55.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(Color.White.copy(0.05f))
+                                                .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
+                                                .clickable {
+                                                    val ticker = when (choice) {
+                                                        "Gold" -> "XAU"
+                                                        "Silver" -> "XAG"
+                                                        "Platinum" -> "XPT"
+                                                        "Palladium" -> "XPD"
+                                                        else -> choice.uppercase()
+                                                    }
+                                                    onAssetSelected(AssetEntity(
+                                                        coinId = ticker,
+                                                        symbol = ticker,
+                                                        name = choice.uppercase(),
+                                                        category = AssetCategory.METAL,
+                                                        priceSource = "YahooFinance",
+                                                        baseSymbol = ticker,
+                                                        apiId = ticker,
+                                                        isMetal = true,
+                                                        physicalForm = "Coin"
+                                                    ))
+                                                },
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(text = choice.uppercase(), color = Color.White, fontWeight = FontWeight.Black, fontSize = 11.sp)
+                                        }
+                                    }
                                 }
-                                onAssetSelected(AssetEntity(
-                                    coinId = ticker,
-                                    symbol = ticker,
-                                    name = choice.uppercase(),
-                                    category = AssetCategory.METAL,
-                                    priceSource = "YahooFinance",
-                                    baseSymbol = ticker,
-                                    apiId = ticker,
-                                    isMetal = true,
-                                    physicalForm = "Coin"
-                                ))
+                            }
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        // 🚀 BESPOKE BUILD BUTTON: Styled to match but full width
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(0.05f))
+                                .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
+                                .clickable { navController.navigate("asset_architect/CUSTOM/0.0/Manual") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "BUILD A CUSTOM ASSET CARD", 
+                                    color = Color.White, 
+                                    fontWeight = FontWeight.Black, 
+                                    fontSize = 10.sp,
+                                    letterSpacing = 1.sp
+                                )
                             }
                         }
                     }
@@ -163,35 +202,44 @@ fun AssetPickerScreen(
                         placeholder = { Text("Search Crypto...", color = cardText.copy(alpha = 0.4f)) },
                         leadingIcon = {
                             if (isSearchBusy) {
-                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = textColor)
                             } else {
                                 Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
                             }
                         },
                         trailingIcon = {
-                            SourceSelectorSurface(
-                                displayLabel = selectedProvider ?: "SOURCE",
-                                icon = Icons.Default.Search,
-                                onClick = { menuExpanded = true },
-                                bgColor = Color.White.copy(alpha = 0.05f),
-                                textColor = cardText,
-                                modifier = Modifier.width(140.dp).padding(end = 8.dp).height(36.dp)
-                            )
+                            Box(modifier = Modifier.padding(end = 4.dp)) {
+                                Surface(
+                                    onClick = { menuExpanded = true },
+                                    color = Color.White.copy(alpha = 0.05f),
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.width(130.dp).height(32.dp),
+                                    border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f))
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(text = (selectedProvider ?: "SOURCE").uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
+                                        Icon(Icons.Default.ArrowDropDown, null, tint = cardText.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                                    }
+                                }
+                            }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = cardBg,
                             unfocusedContainerColor = cardBg,
-                            focusedBorderColor = Color.Yellow.copy(alpha = 0.5f),
-                            unfocusedBorderColor = cardText.copy(alpha = 0.1f),
-                            focusedTextColor = cardText,
-                            unfocusedTextColor = cardText
+                            focusedBorderColor = textColor.copy(alpha = 0.5f), // 🎨 THEME LOCKED
+                            unfocusedBorderColor = textColor.copy(alpha = 0.15f), // 🎨 THEME LOCKED
+                            focusedTextColor = textColor,
+                            unfocusedTextColor = textColor,
+                            cursorColor = textColor // 🎨 THEME LOCKED
                         ),
                         shape = RoundedCornerShape(16.dp),
                         singleLine = true
                     )
                 }
 
-                // Unified Dropdown Menu
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
@@ -211,7 +259,7 @@ fun AssetPickerScreen(
                 }
             }
 
-            // --- CONTENT AREA (Results or Branding) ---
+            // --- CONTENT AREA ---
             Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 if (selectedProvider != "YahooFinance") {
                     Column(modifier = Modifier.fillMaxSize()) {
@@ -229,11 +277,10 @@ fun AssetPickerScreen(
                     }
 
                     if (searchResults.isEmpty() && !isSearchBusy) {
-                        BrandedSwanBranding(alpha = 0.3f)
+                        BrandingLogo(alpha = 0.3f)
                     }
                 } else {
-                    // Metal Mode Background Branding
-                    BrandedSwanBranding(alpha = 0.1f)
+                    BrandingLogo(alpha = 0.1f)
                 }
             }
         }
@@ -241,53 +288,39 @@ fun AssetPickerScreen(
 }
 
 @Composable
-fun SourceSelectorSurface(
+fun UnifiedSourceHeader(
     displayLabel: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit,
     bgColor: Color,
-    textColor: Color,
-    modifier: Modifier = Modifier
+    textColor: Color
 ) {
     Surface(
         onClick = onClick,
         color = bgColor,
-        shape = RoundedCornerShape(8.dp),
-        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().height(56.dp),
         border = BorderStroke(1.dp, textColor.copy(alpha = 0.15f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = displayLabel.uppercase(),
-                color = textColor,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center
-            )
-            Icon(Icons.Default.ArrowDropDown, null, tint = textColor.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+            Icon(imageVector = icon, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(text = displayLabel.uppercase(), color = textColor, fontSize = 13.sp, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+            Icon(Icons.Default.ArrowDropDown, null, tint = textColor.copy(alpha = 0.5f))
         }
     }
 }
 
 @Composable
-fun BrandedSwanBranding(alpha: Float) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopCenter
-    ) {
+fun BrandingLogo(alpha: Float) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         Image(
             painter = painterResource(id = R.drawable.swanie_foreground),
             contentDescription = null,
-            modifier = Modifier
-                .padding(top = 60.dp)
-                .size(240.dp)
-                .alpha(alpha),
+            modifier = Modifier.padding(top = 60.dp).size(240.dp).alpha(alpha),
             contentScale = ContentScale.Fit
         )
     }
@@ -309,6 +342,6 @@ fun AssetPickerItem(asset: AssetEntity, textColor: Color, onClick: () -> Unit) {
             Text(asset.name, fontWeight = FontWeight.Bold, color = textColor, fontSize = 15.sp)
             Text(asset.symbol.uppercase(), fontSize = 11.sp, color = textColor.copy(alpha = 0.4f), fontWeight = FontWeight.Bold)
         }
-        Icon(Icons.Default.Add, null, tint = Color.Yellow.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
+        Icon(Icons.Default.Add, null, tint = textColor.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
     }
 }
