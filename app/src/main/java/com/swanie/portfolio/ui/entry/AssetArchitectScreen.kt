@@ -1,13 +1,10 @@
 package com.swanie.portfolio.ui.entry
 
-import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -15,11 +12,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,14 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.ui.holdings.FullAssetCard
 import com.swanie.portfolio.ui.holdings.FunnelGrid
-import kotlinx.coroutines.launch
+import com.swanie.portfolio.ui.holdings.MetalIcon
+import com.swanie.portfolio.ui.holdings.formatAmount
+import com.swanie.portfolio.ui.holdings.formatCurrency
+import java.util.Locale
 
 /**
- * 🛠️ V7.2.5 MISSION: ASSET ARCHITECT
- * Finalized WYSIWYG screen with Touch-to-Edit.
- * Logic is passed back to NavGraph for V19 database persistence.
+ * 🛠️ V7.2.6 MISSION: DIRECT-CARD EDITING
+ * A high-fidelity WYSIWYG screen where the card itself is the input form.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,12 +38,10 @@ fun AssetArchitectScreen(
     initialSymbol: String = "GOLD",
     initialPrice: Double = 0.0,
     initialSource: String = "Manual",
-    onSave: (AssetEntity) -> Unit, // 🛠️ Fixed: Now passes the entity back
+    onSave: (AssetEntity) -> Unit,
     onCancel: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-
-    // 🛡️ V19 ARCHITECT STATE (Reactive Draft)
+    // 🛡️ V19 ARCHITECT STATE
     var draftAsset by remember {
         mutableStateOf(
             AssetEntity(
@@ -63,42 +56,17 @@ fun AssetArchitectScreen(
                 weightUnit = "OZ",
                 physicalForm = "Coin",
                 isMetal = true,
-                amountHeld = 1.0
+                amountHeld = 1.0,
+                premium = 0.0
             )
         )
-    }
-
-    val scrollState = rememberLazyListState()
-    val nameFocusRequester = remember { FocusRequester() }
-    val weightFocusRequester = remember { FocusRequester() }
-    val quantityFocusRequester = remember { FocusRequester() }
-
-    // Smooth Scroll & Focus logic for Touch-to-Edit
-    val onCardPartTapped: (String) -> Unit = { part ->
-        scope.launch {
-            when (part) {
-                "ICON" -> scrollState.animateScrollToItem(3) // Scroll to Shape picker
-                "TITLE" -> {
-                    scrollState.animateScrollToItem(2) // Scroll to Name field
-                    nameFocusRequester.requestFocus()
-                }
-                "MASS" -> {
-                    scrollState.animateScrollToItem(4) // Scroll to Weight field
-                    weightFocusRequester.requestFocus()
-                }
-            }
-        }
     }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("ASSET ARCHITECT", style = TextStyle(fontWeight = FontWeight.Black, fontSize = 16.sp, letterSpacing = 2.sp)) },
-                navigationIcon = {
-                    IconButton(onClick = onCancel) {
-                        Icon(Icons.Default.Close, contentDescription = "Cancel", tint = Color.White)
-                    }
-                },
+                title = { Text("ASSET ARCHITECT", style = TextStyle(fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 2.sp)) },
+                navigationIcon = { IconButton(onClick = onCancel) { Icon(Icons.Default.Close, contentDescription = "Cancel", tint = Color.White) } },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFF000416), titleContentColor = Color.White)
             )
         },
@@ -108,166 +76,161 @@ fun AssetArchitectScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .imePadding()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🖼️ THE INTERACTIVE PREVIEW (TOUCH-TO-EDIT)
-            Box(
+            Spacer(Modifier.height(20.dp))
+
+            // 🖼️ THE DIRECT-EDIT CARD
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(Color.White.copy(0.05f), RoundedCornerShape(16.dp))
-                    .padding(8.dp)
+                    .padding(horizontal = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
             ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    FullAssetCard(
-                        asset = draftAsset,
-                        isExpanded = true,
-                        isEditing = false,
-                        isDragging = false,
-                        showEditButton = false,
-                        cardBg = Color(0xFF1A1A1A),
-                        cardText = Color.White,
-                        onExpandToggle = {},
-                        onEditRequest = {},
-                        onSave = { _, _, _, _, _ -> },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // 👆 OVERLAY SENSORS: Mapping taps to edit sections
-                    Row(modifier = Modifier.matchParentSize()) {
-                        // Icon Sensor
-                        Box(modifier = Modifier.weight(0.9f).fillMaxHeight().clickable { onCardPartTapped("ICON") })
-                        // Identity Sensor
-                        Box(modifier = Modifier.weight(1.4f).fillMaxHeight().clickable { onCardPartTapped("TITLE") })
-                        // Mass/Price Sensor
-                        Box(modifier = Modifier.weight(1.1f).fillMaxHeight().clickable { onCardPartTapped("MASS") })
-                    }
-                }
-            }
-
-            // 🛠️ THE EDIT ZONE
-            LazyColumn(
-                state = scrollState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                contentPadding = PaddingValues(bottom = 120.dp)
-            ) {
-                // 1. MATERIAL TYPE (V19 Real-time Tinting)
-                item {
-                    Column {
-                        Text("MATERIAL TYPE", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                        Spacer(Modifier.height(8.dp))
-                        FunnelGrid(
-                            options = listOf("Gold", "Silver", "Platinum", "Other"),
-                            selected = when {
-                                draftAsset.name.contains("Gold", true) -> "Gold"
-                                draftAsset.name.contains("Silver", true) -> "Silver"
-                                draftAsset.name.contains("Plat", true) -> "Platinum"
-                                else -> "Other"
-                            }
-                        ) { material ->
-                            val currentBase = draftAsset.name
-                                .replace("Gold", "", true)
-                                .replace("Silver", "", true)
-                                .replace("Platinum", "", true).trim()
-                            val newName = if (material == "Other") currentBase else "$material $currentBase".trim()
-                            draftAsset = draftAsset.copy(name = newName, displayName = newName)
-                        }
-                    }
-                }
-
-                // 2. IDENTITY (Text Entry)
-                item {
-                    Column {
-                        Text("ASSET NAME", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                        Spacer(Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = draftAsset.displayName,
-                            onValueChange = { draftAsset = draftAsset.copy(displayName = it, name = it) },
-                            modifier = Modifier.fillMaxWidth().focusRequester(nameFocusRequester),
-                            textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold),
-                            placeholder = { Text("e.g. Eagle, Maple, Bar", color = Color.White.copy(0.3f)) },
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow, unfocusedBorderColor = Color.White.copy(0.2f))
-                        )
-                    }
-                }
-
-                // 3. PHYSICAL FORM (V19 Shape Logic)
-                item {
-                    Column {
-                        Text("PHYSICAL FORM", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                        Spacer(Modifier.height(8.dp))
-                        FunnelGrid(
-                            options = listOf("Bar", "Coin", "Round"),
-                            selected = draftAsset.physicalForm
-                        ) { form ->
-                            draftAsset = draftAsset.copy(physicalForm = form)
-                        }
-                    }
-                }
-
-                // 4. MASS (Weight & V19 Units)
-                item {
-                    Column {
-                        Text("WEIGHT & UNIT", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                        Spacer(Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            OutlinedTextField(
-                                value = if (draftAsset.weight == 0.0) "" else draftAsset.weight.toString(),
-                                onValueChange = { val w = it.toDoubleOrNull() ?: 0.0; draftAsset = draftAsset.copy(weight = w) },
-                                modifier = Modifier.weight(1f).focusRequester(weightFocusRequester),
-                                label = { Text("Weight", fontSize = 10.sp) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Bold),
-                                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow)
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        // ICON AREA (V19 Logic)
+                        Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            MetalIcon(
+                                name = draftAsset.name,
+                                weight = draftAsset.weight,
+                                unit = draftAsset.weightUnit,
+                                physicalForm = draftAsset.physicalForm,
+                                imageUrl = draftAsset.imageUrl,
+                                localPath = draftAsset.localIconPath,
+                                category = draftAsset.category
                             )
-                            Box(modifier = Modifier.weight(1.2f)) {
-                                FunnelGrid(
-                                    options = listOf("OZ", "KILO", "GRAM"),
-                                    selected = draftAsset.weightUnit
-                                ) { unit ->
-                                    draftAsset = draftAsset.copy(weightUnit = unit)
-                                }
+                            Spacer(Modifier.height(8.dp))
+                            // INLINE WEIGHT INPUT
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                BasicTextField(
+                                    value = if (draftAsset.weight == 0.0) "" else draftAsset.weight.toString(),
+                                    onValueChange = { draftAsset = draftAsset.copy(weight = it.toDoubleOrNull() ?: 0.0) },
+                                    textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.Black, fontSize = 12.sp, textAlign = TextAlign.Center),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                    cursorBrush = SolidColor(Color.Yellow),
+                                    modifier = Modifier.width(40.dp)
+                                )
+                                Text(text = draftAsset.weightUnit, color = Color.White.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 10.sp)
                             }
                         }
-                    }
-                }
 
-                // 5. QUANTITY
-                item {
-                    Column {
-                        Text("QUANTITY HELD", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                        Spacer(Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = if (draftAsset.amountHeld == 0.0) "" else draftAsset.amountHeld.toString(),
-                            onValueChange = { val q = it.toDoubleOrNull() ?: 0.0; draftAsset = draftAsset.copy(amountHeld = q) },
-                            modifier = Modifier.fillMaxWidth().focusRequester(quantityFocusRequester),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center),
-                            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow)
-                        )
+                        // IDENTITY AREA
+                        Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("QUANTITY", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            BasicTextField(
+                                value = draftAsset.amountHeld.toString(),
+                                onValueChange = { draftAsset = draftAsset.copy(amountHeld = it.toDoubleOrNull() ?: 0.0) },
+                                textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, textAlign = TextAlign.Center),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                cursorBrush = SolidColor(Color.Yellow),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            // INLINE NAME INPUT
+                            BasicTextField(
+                                value = draftAsset.displayName,
+                                onValueChange = { draftAsset = draftAsset.copy(displayName = it, name = it) },
+                                textStyle = TextStyle(color = Color.White, fontSize = 12.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold),
+                                cursorBrush = SolidColor(Color.Yellow),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        // PRICE/PREMIUM AREA
+                        Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
+                            Text("SPOT PRICE", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Text(text = formatCurrency(draftAsset.officialSpotPrice), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Spacer(Modifier.height(8.dp))
+                            Text("PREMIUM ($)", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            BasicTextField(
+                                value = draftAsset.premium.toString(),
+                                onValueChange = { draftAsset = draftAsset.copy(premium = it.toDoubleOrNull() ?: 0.0) },
+                                textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 14.sp, textAlign = TextAlign.End),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                                cursorBrush = SolidColor(Color.Yellow),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+                    Divider(color = Color.White.copy(alpha = 0.05f))
+                    Spacer(Modifier.height(12.dp))
+
+                    // TOTAL VALUE PREVIEW
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("ESTIMATED VALUE", color = Color.White.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        val total = (draftAsset.officialSpotPrice * draftAsset.weight * draftAsset.amountHeld) + draftAsset.premium
+                        Text(text = formatCurrency(total), color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                 }
             }
 
-            // 💾 THE SAVE BUTTON
-            Box(
+            Spacer(Modifier.height(24.dp))
+
+            // 🛠️ THE COMPACT TOGGLE BAR (Anchored below Card)
+            Column(modifier = Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // MATERIAL TOGGLE
+                Column {
+                    Text("MATERIAL", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                    Spacer(Modifier.height(8.dp))
+                    FunnelGrid(
+                        options = listOf("Gold", "Silver", "Platinum", "Other"),
+                        selected = when {
+                            draftAsset.name.contains("Gold", true) -> "Gold"
+                            draftAsset.name.contains("Silver", true) -> "Silver"
+                            draftAsset.name.contains("Plat", true) -> "Platinum"
+                            else -> "Other"
+                        }
+                    ) { material ->
+                        val currentBase = draftAsset.name
+                            .replace("Gold", "", true)
+                            .replace("Silver", "", true)
+                            .replace("Platinum", "", true).trim()
+                        val newName = if (material == "Other") currentBase else "$material $currentBase".trim()
+                        draftAsset = draftAsset.copy(name = newName, displayName = newName)
+                    }
+                }
+
+                // SHAPE TOGGLE
+                Column {
+                    Text("SHAPE", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                    Spacer(Modifier.height(8.dp))
+                    FunnelGrid(
+                        options = listOf("Bar", "Coin", "Round"),
+                        selected = draftAsset.physicalForm
+                    ) { draftAsset = draftAsset.copy(physicalForm = it) }
+                }
+
+                // UNIT TOGGLE
+                Column {
+                    Text("UNIT", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                    Spacer(Modifier.height(8.dp))
+                    FunnelGrid(
+                        options = listOf("OZ", "KILO", "GRAM"),
+                        selected = draftAsset.weightUnit
+                    ) { draftAsset = draftAsset.copy(weightUnit = it) }
+                }
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            // 💾 FINALIZE BUTTON
+            Button(
+                onClick = { onSave(draftAsset) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Button(
-                    onClick = { onSave(draftAsset) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("FINALIZE & VAULT", fontWeight = FontWeight.Black, fontSize = 18.sp)
-                }
+                Text("FINALIZE & VAULT", fontWeight = FontWeight.Black, fontSize = 16.sp)
             }
         }
     }

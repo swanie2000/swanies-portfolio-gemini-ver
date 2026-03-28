@@ -10,8 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +36,10 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 
+/**
+ * 🛠️ V7.2.6 MISSION: UI RESTORATION & METAL TRIGGER FIX
+ * Restores the unified search UI while providing an instant funnel for Metals.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetPickerScreen(
@@ -79,13 +82,13 @@ fun AssetPickerScreen(
     LaunchedEffect(Unit) {
         if (selectedProvider == null) viewModel.selectProvider("CoinGecko")
         delay(300)
-        focusRequester.requestFocus()
+        if (selectedProvider != "YahooFinance") focusRequester.requestFocus()
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("UNIFIED VAULT SEARCH", fontWeight = FontWeight.Black, color = textColor, fontSize = 16.sp, letterSpacing = 1.sp) },
+                title = { Text("VAULT SELECTOR", fontWeight = FontWeight.Black, color = textColor, fontSize = 16.sp, letterSpacing = 1.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = textColor)
@@ -98,137 +101,195 @@ fun AssetPickerScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize()) {
             
-            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).height(64.dp)) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it; viewModel.searchCoins(it) },
-                    modifier = Modifier.fillMaxSize().focusRequester(focusRequester),
-                    placeholder = { Text("Search Assets...", color = cardText.copy(alpha = 0.4f)) },
-                    leadingIcon = { 
-                        if (isSearchBusy) {
-                            CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
-                        } else {
-                            Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
+            // --- UNIFIED INPUT & PROVIDER AREA ---
+            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                if (selectedProvider == "YahooFinance") {
+                    // 🚀 METAL MODE: Selector + Funnel replace the search bar
+                    Column {
+                        SourceSelectorSurface(
+                            displayLabel = "PRECIOUS METALS",
+                            icon = Icons.Default.Shield,
+                            onClick = { menuExpanded = true },
+                            bgColor = cardBg,
+                            textColor = cardText,
+                            modifier = Modifier.fillMaxWidth().height(56.dp)
+                        )
+                        
+                        Spacer(Modifier.height(20.dp))
+                        
+                        Text(
+                            "SELECT METAL TYPE",
+                            color = textColor.copy(alpha = 0.5f),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp,
+                            modifier = Modifier.padding(bottom = 16.dp).align(Alignment.CenterHorizontally)
+                        )
+                        
+                        FunnelGrid(
+                            options = listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"),
+                            selected = ""
+                        ) { choice ->
+                            if (choice == "Custom") {
+                                navController.navigate("asset_architect/CUSTOM/0.0/Manual")
+                            } else {
+                                val ticker = when (choice) {
+                                    "Gold" -> "XAU"
+                                    "Silver" -> "XAG"
+                                    "Platinum" -> "XPT"
+                                    "Palladium" -> "XPD"
+                                    else -> choice.uppercase()
+                                }
+                                onAssetSelected(AssetEntity(
+                                    coinId = ticker,
+                                    symbol = ticker,
+                                    name = choice.uppercase(),
+                                    category = AssetCategory.METAL,
+                                    priceSource = "YahooFinance",
+                                    baseSymbol = ticker,
+                                    apiId = ticker,
+                                    isMetal = true,
+                                    physicalForm = "Coin"
+                                ))
+                            }
                         }
-                    },
-                    trailingIcon = {
-                        Box(modifier = Modifier.padding(end = 8.dp)) {
-                            Surface(
+                    }
+                } else {
+                    // 🔍 CRYPTO MODE: Standard Search Bar with integrated Dropdown
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it; viewModel.searchCoins(it) },
+                        modifier = Modifier.fillMaxWidth().height(56.dp).focusRequester(focusRequester),
+                        placeholder = { Text("Search Crypto...", color = cardText.copy(alpha = 0.4f)) },
+                        leadingIcon = {
+                            if (isSearchBusy) {
+                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = Color.Yellow)
+                            } else {
+                                Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
+                            }
+                        },
+                        trailingIcon = {
+                            SourceSelectorSurface(
+                                displayLabel = selectedProvider ?: "SOURCE",
+                                icon = Icons.Default.Search,
                                 onClick = { menuExpanded = true },
-                                color = bgColor,
-                                shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.width(150.dp).height(34.dp), 
-                                border = BorderStroke(1.dp, textColor.copy(alpha = 0.3f))
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    val displayLabel = if (selectedProvider == "YahooFinance") "PRECIOUS METALS" else (selectedProvider ?: "SOURCE")
-                                    Text(
-                                        text = displayLabel.uppercase(),
-                                        color = textColor,
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.Black,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                            
-                            DropdownMenu(
-                                expanded = menuExpanded,
-                                onDismissRequest = { menuExpanded = false },
-                                modifier = Modifier.background(Color(0xFF1A1A1A)).border(1.dp, Color.White.copy(0.1f))
-                            ) {
-                                providers.forEach { provider ->
-                                    val menuLabel = if (provider == "YahooFinance") "PRECIOUS METALS" else provider
-                                    DropdownMenuItem(
-                                        text = { Text(menuLabel.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                                        onClick = {
-                                            viewModel.selectProvider(provider)
-                                            menuExpanded = false
-                                            searchQuery = ""
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = cardBg,
-                        unfocusedContainerColor = cardBg,
-                        focusedBorderColor = cardText.copy(alpha = 0.5f),
-                        unfocusedBorderColor = cardText.copy(alpha = 0.15f),
-                        focusedTextColor = cardText,
-                        unfocusedTextColor = cardText
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    singleLine = true
-                )
-            }
-
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    if (selectedProvider == "YahooFinance") {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            val metals = listOf("XAU" to "GOLD", "XAG" to "SILVER", "XPT" to "PLAT", "XPD" to "PALL")
-                            metals.forEach { (ticker, label) ->
-                                Surface(
-                                    onClick = {
-                                        // 🛠️ DATA INTEGRITY FIX: Use technical tickers (XAG/XAU) for background fetching
-                                        // Use label for name, ticker for internal mapping logic.
-                                        onAssetSelected(AssetEntity(
-                                            coinId = ticker, 
-                                            symbol = ticker, // технический ticker
-                                            name = label, // User friendly name
-                                            category = AssetCategory.METAL, 
-                                            priceSource = "YahooFinance",
-                                            baseSymbol = ticker, 
-                                            apiId = ticker
-                                        ))
-                                    },
-                                    color = cardBg.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f)),
-                                    modifier = Modifier.weight(1f).height(44.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text(text = label, color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(searchResults) { asset ->
-                            AssetPickerItem(asset, textColor) {
-                                onAssetSelected(asset)
-                            }
-                        }
-                    }
+                                bgColor = Color.White.copy(alpha = 0.05f),
+                                textColor = cardText,
+                                modifier = Modifier.width(140.dp).padding(end = 8.dp).height(36.dp)
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = cardBg,
+                            unfocusedContainerColor = cardBg,
+                            focusedBorderColor = Color.Yellow.copy(alpha = 0.5f),
+                            unfocusedBorderColor = cardText.copy(alpha = 0.1f),
+                            focusedTextColor = cardText,
+                            unfocusedTextColor = cardText
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+                        singleLine = true
+                    )
                 }
 
-                if (searchResults.isEmpty() && !isSearchBusy) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.swanie_foreground),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(top = 30.dp)
-                                .size(240.dp),
-                            contentScale = ContentScale.Fit
+                // Unified Dropdown Menu
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false },
+                    modifier = Modifier.background(Color(0xFF1A1A1A)).border(1.dp, Color.White.copy(0.1f))
+                ) {
+                    providers.forEach { provider ->
+                        val menuLabel = if (provider == "YahooFinance") "PRECIOUS METALS" else provider
+                        DropdownMenuItem(
+                            text = { Text(menuLabel.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp) },
+                            onClick = {
+                                viewModel.selectProvider(provider)
+                                menuExpanded = false
+                                searchQuery = ""
+                            }
                         )
                     }
                 }
             }
+
+            // --- CONTENT AREA (Results or Branding) ---
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                if (selectedProvider != "YahooFinance") {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(top = 8.dp)
+                        ) {
+                            items(searchResults) { asset ->
+                                AssetPickerItem(asset, textColor) {
+                                    onAssetSelected(asset)
+                                }
+                            }
+                        }
+                    }
+
+                    if (searchResults.isEmpty() && !isSearchBusy) {
+                        BrandedSwanBranding(alpha = 0.3f)
+                    }
+                } else {
+                    // Metal Mode Background Branding
+                    BrandedSwanBranding(alpha = 0.1f)
+                }
+            }
         }
+    }
+}
+
+@Composable
+fun SourceSelectorSurface(
+    displayLabel: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    bgColor: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        color = bgColor,
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier,
+        border = BorderStroke(1.dp, textColor.copy(alpha = 0.15f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(imageVector = icon, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = displayLabel.uppercase(),
+                color = textColor,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Black,
+                textAlign = TextAlign.Center
+            )
+            Icon(Icons.Default.ArrowDropDown, null, tint = textColor.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+        }
+    }
+}
+
+@Composable
+fun BrandedSwanBranding(alpha: Float) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.swanie_foreground),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = 60.dp)
+                .size(240.dp)
+                .alpha(alpha),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
