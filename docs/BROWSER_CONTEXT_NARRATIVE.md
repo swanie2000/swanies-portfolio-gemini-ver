@@ -1,54 +1,48 @@
-NARRATIVE: THE "GOLDEN VAULT" STABILIZATION (V7.2.4)
+NARRATIVE: THE "ARCHITECT ELITE" EVOLUTION (V7.3.0)
 
-Current Version: 7.2.4 (The "Parity Achieved" Edition)
+Current Version: 7.3.0 (The "Bespoke Builder" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (Database V19 Active)
+Build Status: 🟢 ULTRA-STABLE (Database V19 Hardened)
 
-    Note: We have successfully moved beyond the "Sync Gap." The app and the home screen widget are now 1:1 in visual logic, color accuracy, and data persistence. The "Silver Ghost" and "Generic G" bugs are officially resolved.
+    Note: We have moved from "Parity" to "Design." The app is no longer just a viewer; it is a high-fidelity creation tool. The "Asset Architect" allows for surgical precision in building custom physical wealth, ensuring that even non-standard assets look professionally minted on the home screen.
 
-1. THE V19 REVOLUTION: DATA & VISUAL PARITY
+1. THE ARCHITECT REVOLUTION: FROM FORMS TO CANVAS
 
-This session transformed the app from a "guessing" engine into a "fact-based" vault. We hardened the database schema to ensure the UI never has to guess what it is drawing.
+This session transformed the "Add Asset" experience from a clunky search-loop into a streamlined, two-stage design studio. We eliminated the friction of mobile keyboards and hard-coded themes to create a truly bespoke experience.
 
 🚀 Today’s Engineering Wins:
 
-    V19 Schema Hardening: Implemented physicalForm (Bar/Coin/Round) and weightUnit (GRAM, KILO, OZ) directly into the AssetEntity.
+    The Two-Stage Architect: Segregated "Blueprint" setup (Metal/Shape/Unit) from "Live Card" editing. This solved the "Keyboard Overlap" issue by completing the layout choices before the keyboard ever appears.
 
-    The "Chrome & Gold" Sync: Fixed the widget tint logic. Gold assets now render as Gold (#FFD700) and Silver as Silver (#C0C0C0) on the home screen.
+    Direct-Card Editing (WYSIWYG): Implemented BasicTextField logic directly onto the FullAssetCard. Users now type the Name, Quantity, and Premium exactly where they appear on the final card.
 
-    Shape Consistency: The widget now respects the database—Bars render as Rectangles (4dp), and Coins/Rounds render as Circles (16dp).
+    The "1oz" Precision Stamp: Implemented unit-snapping and integer-cleaning logic. The card now renders clean, professional stamps like "5oz" or "100g" instead of computer-generated strings like "5.0 GRAM."
 
-    Precision Stamping: Replaced the "Generic G" with high-contrast black stamps ("1k", "1g", "1/10") that pull directly from the V19 unit data.
+    Search UI Restoration & Theme-Lock: Reclaimed the "Vault Selector" from over-engineering. Restored the single-window provider dropdown and synchronized all borders and cursors to the user's Custom Theme Colors (siteTextColor).
 
-    Build Stabilization: Resolved critical "Unresolved Reference" errors by restoring the FORCE_UPDATE_KEY and fixing the SparklineDrawUtils package path.
+    The Metal Bypass: Tapping "Precious Metals" now instantly swaps the search bar for the Metal Funnel Grid, removing two unnecessary taps and a redundant search requirement.
 
-    Memory Firewall: Verified RGB_565 sparkline optimization is active in the widget, protecting the 2MB Binder limit.
+    Factory Default Safety: Rebranded the "Danger Zone" to a professional "System Actions" menu with a secure, two-step confirmation dialog.
 
-💎 Current UX State:
-
-    App: 🟢 Precision Vault. (Correct shapes, correct stamps, correct names).
-
-    Widget: 🟢 Mirror Image. (1:1 visual parity with the main app).
-
-2. THE "GOLDEN" SPECS (V7.2.4)
+2. THE "ELITE" SPECS (V7.3.0)
    Component	Status	Tech Stack / Logic
-   Data Layer	🟢 STABLE	V19 Unit-Driven displayName logic
-   Database	🟢 V19	Explicit physicalForm & weightUnit fields
-   Widget UI	🟢 SYNCED	Dynamic Tinting (Gold/Silver) & Shape Logic
-   Sparklines	🟢 OPTIMIZED	RGB_565 Memory-safe bitmaps
-   Build State	🟢 GREEN	All constants restored; zero compilation errors
-3. THE PATH FORWARD: GLOBAL VISTA (PHASE 4)
+   Asset Architect	🟢 ELITE	Two-Stage (Blueprint -> Edit) / In-place Card Editing
+   Numeric Logic	🟢 SMART	SmartNumericField with Auto-Clear & .removeSuffix(".0")
+   Vault Selector	🟢 FLUID	Direct-path Metal Funnel / Theme-reactive borders
+   Theme Engine	🟢 SYNCED	All new UI elements track siteTextColor & cardBgHex
+   Widget Sync	🟢 INSTANT	GlanceAppWidgetManager refresh tied to Architect 'Finalize'
+3. THE PATH FORWARD: GLOBAL ANALYTICS (PHASE 4)
 
-With the foundation now logically and visually sound, we move toward asset management and global settings.
+With the entry system now the most polished part of the app, we pivot toward how the user visualizes their total wealth.
 
 🛠️ Refinement & Expansion:
 
-    Vault-Aware Headers: Ensure the widget header dynamically toggles between "METALS" and "CRYPTO" based on the currentVaultId.
+    Portfolio Diversification: Create a high-fidelity "Pie Chart" or "Donut" view on the Analytics screen to show the ratio of Gold vs. Silver vs. Crypto.
 
-    Instant Sync: Implement a WorkManager trigger to update the widget the moment an asset is added, rather than waiting for the system broadcast.
+    Vault Switching UX: Refine the top-level "Vault Toggle" to ensure a smoother transition when moving between the Metals Vault and the Crypto Vault.
 
-    Global Vista Icons: Begin integrating the localIconPath logic to allow custom user icons to persist across migrations.
+    Haptic Feedback Integration: Add subtle haptic "ticks" when selecting metals in the Architect to give the digital buttons a physical, weighted feel.
 
 🔄 Git Hygiene Protocol:
 
-    V7.2.4 Baseline: Commit and push immediately. This is the new "Golden Build" for all future development.
+    V7.3.0 Baseline: Commit 6d405ae is the new "Golden Build." Any future UI experiments must branch from this stable, theme-aware state.
