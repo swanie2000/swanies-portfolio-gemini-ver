@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            // Observing the updated flows from the ViewModel
             val siteBgColor by viewModel.siteBackgroundColor.collectAsStateWithLifecycle()
             val useGradient by viewModel.useGradient.collectAsStateWithLifecycle()
             val gradientAmount by viewModel.gradientAmount.collectAsStateWithLifecycle()
@@ -49,12 +50,14 @@ class MainActivity : ComponentActivity() {
                 insetsController.isAppearanceLightNavigationBars = !isDarkMode
             }
 
+            // Correctly passing parameters to your existing Theme engine
             SwaniesPortfolioTheme(
                 seedColorHex = siteBgColor,
                 isGradientEnabled = useGradient,
                 gradientAmount = gradientAmount
             ) {
                 val navController = rememberNavController()
+                // Passing the viewModel to NavGraph which handles the screen switching
                 NavGraph(navController = navController, mainViewModel = viewModel)
             }
         }
