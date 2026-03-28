@@ -1,9 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -17,21 +14,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -44,13 +36,10 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import androidx.glance.appwidget.AppWidgetId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,14 +48,12 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.widget.PortfolioWidget
-import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,7 +82,6 @@ fun WidgetManagerScreen(
     var draftCrd by rememberSaveable(currentCrd) { mutableStateOf(currentCrd) }
     var draftCrdTxt by rememberSaveable(currentCrdTxt) { mutableStateOf(currentCrdTxt) }
 
-    // 🛠️ SELECTION FIX: Use LaunchedEffect to initialize from DB once, then manage locally
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var hasInitializedSelection by rememberSaveable { mutableStateOf(false) }
 
@@ -110,14 +96,13 @@ fun WidgetManagerScreen(
         mutableStateOf(!(userConfig?.showWidgetTotal ?: false))
     }
 
-    // Expansion controls
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var privacyExpanded by rememberSaveable { mutableStateOf(false) }
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
+    var isExiting by remember { mutableStateOf(false) }
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
 
-    // Timer Logic
     val sharedPrefs = remember { context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
     var cooldownSeconds by remember { mutableIntStateOf(0) }
     LaunchedEffect(Unit) {
@@ -129,12 +114,21 @@ fun WidgetManagerScreen(
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText) },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText) } },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
             )
+        },
+        bottomBar = {
+            if (!isExiting) {
+                BottomNavigationBar(
+                    navController = navController,
+                    onNavigate = { isExiting = true }
+                )
+            }
         },
         floatingActionButton = {
             val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
@@ -170,17 +164,25 @@ fun WidgetManagerScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(0.85f).height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .height(66.dp)
+                    .padding(bottom = 16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow, contentColor = Color.Black),
                 shape = RoundedCornerShape(8.dp),
                 enabled = cooldownSeconds == 0
             ) { Text(if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET", fontWeight = FontWeight.Black) }
         },
-        floatingActionButtonPosition = FabPosition.Center,
-        containerColor = Color.Transparent
+        floatingActionButtonPosition = FabPosition.Center
     ) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(4.dp), contentPadding = PaddingValues(bottom = 100.dp)) {
-            // 1. LIVE SLIM PREVIEW
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
             item {
                 WidgetPreviewSlim(
                     bgHex = draftBg, bgTxtHex = draftBgTxt,
@@ -189,7 +191,6 @@ fun WidgetManagerScreen(
                 )
             }
 
-            // 2. APPEARANCE
             item {
                 SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
                 AnimatedVisibility(visible = appearanceExpanded) {
@@ -202,10 +203,9 @@ fun WidgetManagerScreen(
                         }
                     }
                 }
-                Divider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
             }
 
-            // 3. PRIVACY
             item {
                 SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
                 AnimatedVisibility(visible = privacyExpanded) {
@@ -214,10 +214,9 @@ fun WidgetManagerScreen(
                         Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
                     }
                 }
-                Divider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
             }
 
-            // 4. ASSETS (LOCKED TO 5)
             item {
                 val countText = "${draftSelectedIds.size}/5 SELECTED"
                 SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
@@ -230,11 +229,11 @@ fun WidgetManagerScreen(
                     itemsIndexed(assets) { _, asset ->
                         val isSelected = draftSelectedIds.contains(asset.coinId)
                         val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
-                        
+
                         WidgetAssetSelectItem(
-                            asset = asset, 
-                            isSelected = isSelected, 
-                            orderIndex = orderIndex, 
+                            asset = asset,
+                            isSelected = isSelected,
+                            orderIndex = orderIndex,
                             onToggle = {
                                 if (isSelected) {
                                     draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
@@ -245,7 +244,7 @@ fun WidgetManagerScreen(
                                         Toast.makeText(context, "Max 5 assets for widget", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                            }, 
+                            },
                             themeColor = safeThemeText
                         )
                     }
@@ -298,9 +297,9 @@ fun WidgetStudioInlineCompact(
     val scope = rememberCoroutineScope()
     var activeTarget by rememberSaveable { mutableIntStateOf(0) }
     val targets = listOf("Widget BG", "BG Text", "Card BG", "Card Text")
-    var hue by remember { mutableStateOf(0f) }
-    var saturation by remember { mutableStateOf(1f) }
-    var value by remember { mutableStateOf(1f) }
+    var hue by remember { mutableFloatStateOf(0f) }
+    var saturation by remember { mutableFloatStateOf(1f) }
+    var value by remember { mutableFloatStateOf(1f) }
     var hexInput by remember { mutableStateOf("") }
     var isFlashing by remember { mutableStateOf(false) }
 
@@ -365,9 +364,9 @@ fun WidgetAssetSelectItem(asset: AssetEntity, isSelected: Boolean, orderIndex: I
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             if (asset.category == AssetCategory.METAL) {
                 MetalIcon(
-                    name = asset.symbol, 
-                    weight = asset.weight, 
-                    unit = asset.weightUnit, 
+                    name = asset.symbol,
+                    weight = asset.weight,
+                    unit = asset.weightUnit,
                     physicalForm = asset.physicalForm,
                     size = 20
                 )

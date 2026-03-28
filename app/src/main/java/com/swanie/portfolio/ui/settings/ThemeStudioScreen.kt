@@ -42,6 +42,7 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.theme.ThemeDefaults
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,7 +57,7 @@ fun ThemeStudioScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
 
-    // ViewModel State (Source of Truth)
+    // ViewModel State
     val cardBgColor by viewModel.cardBackgroundColor.collectAsState()
     val cardTextColor by viewModel.cardTextColor.collectAsState()
     val siteBgColor by viewModel.siteBackgroundColor.collectAsState()
@@ -76,6 +77,7 @@ fun ThemeStudioScreen(
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+    var isExiting by remember { mutableStateOf(false) }
 
     // Helper for ThemeDefaults color to Hex String
     fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
@@ -142,7 +144,6 @@ fun ThemeStudioScreen(
         }
     }
 
-    // Sync Local UI when Target Changes
     LaunchedEffect(activeTarget) {
         val currentHex = when (activeTarget) {
             0 -> cardBgColor; 1 -> cardTextColor; 2 -> siteBgColor; else -> siteTextColor
@@ -188,13 +189,25 @@ fun ThemeStudioScreen(
         )
     }
 
-    Scaffold(containerColor = Color(0xFF1C1C1E)) { paddingValues ->
+    Scaffold(
+        containerColor = Color.Transparent,
+        bottomBar = {
+            if (!isExiting) {
+                BottomNavigationBar(
+                    navController = navController,
+                    onNavigate = { isExiting = true }
+                )
+            }
+        }
+    ) { paddingValues ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp, vertical = 4.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // --- HEADER ---
             Box(modifier = Modifier.fillMaxWidth().height(110.dp), contentAlignment = Alignment.Center) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -224,7 +237,6 @@ fun ThemeStudioScreen(
                 )
             }
 
-            // Error Message Pill
             Column(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 AnimatedVisibility(visible = showError, enter = fadeIn() + slideInVertically(), exit = fadeOut() + slideOutVertically()) {
                     Box(modifier = Modifier.clip(CircleShape).background(Color.Red).padding(horizontal = 16.dp, vertical = 4.dp)) {
@@ -233,7 +245,6 @@ fun ThemeStudioScreen(
                 }
             }
 
-            // Preview & Hex Input Row
             Row(modifier = Modifier.fillMaxWidth().height(54.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().background(livePreviewColor, RoundedCornerShape(8.dp)).border(2.dp, Color.White, RoundedCornerShape(8.dp)))
                 Spacer(modifier = Modifier.width(10.dp))
@@ -270,19 +281,16 @@ fun ThemeStudioScreen(
                 }
             }
 
-            // Saturation/Value Box
             StudioSaturationBox(hue, saturation, value, modifier = Modifier.fillMaxWidth().weight(1f)) { s, v ->
                 saturation = s; value = v; hasUnsavedChanges = true
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(hue, s, v).toArgb())
             }
 
-            // Hue Slider
             StudioHueSlider(hue, modifier = Modifier.fillMaxWidth().height(36.dp)) { h ->
                 hue = h; hasUnsavedChanges = true
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(h, saturation, value).toArgb())
             }
 
-            // Selection Grid
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     StudioTargetItem(targets[0], cardBgColor, cardTextColor, activeTarget == 0, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 0 }
@@ -294,7 +302,6 @@ fun ThemeStudioScreen(
                 }
             }
 
-            // Pulsing Apply Button
             Button(
                 onClick = { applyColor() },
                 modifier = Modifier.fillMaxWidth().height(50.dp).scale(pulseScale),
@@ -308,8 +315,7 @@ fun ThemeStudioScreen(
     }
 }
 
-// --- HELPERS ---
-
+// Helpers kept the same...
 @Composable
 private fun StudioTargetItem(label: String, bg: String, txt: String, isSelected: Boolean, hasChanges: Boolean, alpha: Float, modifier: Modifier, onClick: () -> Unit) {
     val borderThickness = if (isSelected && hasChanges) 4.dp else if (isSelected) 2.dp else 1.dp
