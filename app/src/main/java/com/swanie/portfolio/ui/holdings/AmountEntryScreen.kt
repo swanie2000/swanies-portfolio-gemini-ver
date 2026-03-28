@@ -160,6 +160,7 @@ fun AmountEntryScreen(
                     category = AssetCategory.METAL,
                     weight = weight,
                     weightUnit = unit, // 🛠️ V18: Explicit Unit Capture
+                    physicalForm = desc.split("\n").firstOrNull() ?: "Coin", // 🛡️ V18: Explicit Form Capture from Funnel
                     amountHeld = qty.toDoubleOrNull() ?: 0.0,
                     premium = prem.toDoubleOrNull() ?: 0.0,
                     imageUrl = icon ?: "",

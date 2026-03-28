@@ -119,9 +119,14 @@ class AssetRepository @Inject constructor(
             asset.name
         }
 
+        // 🛡️ V18: SCHEMA HARDENING - Sanitize the physicalForm string
+        val finalForm = if (asset.physicalForm.contains("Bar", true)) "Bar" else asset.physicalForm
+
         val sanitizedAsset = asset.copy(
             displayName = finalDisplayName,
             isMetal = isMetal,
+            // 🛡️ V18: Saving the sanitized form
+            physicalForm = finalForm,
             portfolioId = if (asset.portfolioId.isEmpty()) "MAIN" else asset.portfolioId
         )
         assetDao.upsertAsset(sanitizedAsset)

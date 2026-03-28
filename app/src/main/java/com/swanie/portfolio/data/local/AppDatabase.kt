@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    // 🛡️ V18: Explicit Metal Units (GRAM, KILO, OZ)
-    version = 18,
+    // 🛡️ V19: Explicit Physical Form (Coin, Bar, Round)
+    version = 19,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

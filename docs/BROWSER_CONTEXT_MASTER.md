@@ -173,56 +173,79 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-🛡️ NARRATIVE: THE "VISUAL SYNC" STRIKE (V7.2.3)
+NARRATIVE: THE "GOLDEN VAULT" STABILIZATION (V7.2.4)
 
-Current Version: 7.2.3 (The "Parity" Edition)
+Current Version: 7.2.4 (The "Parity Achieved" Edition)
 
-Build Status: 🔴 VISUAL MISMATCH (App V18 Stable / Widget Out-of-Sync)
+Build Status: 🟢 ULTRA-STABLE (Database V19 Active)
 
-    Critical Observation: The main app is successfully displaying the V18 "Precision Vault" data (Rectangular bars, specific unit stamps). However, the Home Screen Widget is failing to render these specific V18 attributes, defaulting to generic "G" placeholders.
+    Note: We have successfully moved beyond the "Sync Gap." The app and the home screen widget are now 1:1 in visual logic, color accuracy, and data persistence. The "Silver Ghost" and "Generic G" bugs are officially resolved.
 
-1. THE V7.2.3 MISSION: TOTAL PARITY
+1. THE V19 REVOLUTION: DATA & VISUAL PARITY
 
-We are currently aligning PortfolioWidget.kt to the V18 schematic. The goal is to move from the "Generic State" to the "Precision State" seen in the app.
+This session transformed the app from a "guessing" engine into a "fact-based" vault. We hardened the database schema to ensure the UI never has to guess what it is drawing.
 
-🚀 Engineering Blockers to Resolve:
+🚀 Today’s Engineering Wins:
 
-    Icon Stamping Failure: The widget is still rendering a static circle with a "G". It needs to be updated to a Box layout that mimics the MetalIcon logic, checking the weightUnit to render "1k", "1g", etc.
+    V19 Schema Hardening: Implemented physicalForm (Bar/Coin/Round) and weightUnit (GRAM, KILO, OZ) directly into the AssetEntity.
 
-    Label Truncation: The widget is pulling asset.name (Gold) instead of asset.displayName (Gold (1kg)). This is causing the user to lose critical context on the home screen.
+    The "Chrome & Gold" Sync: Fixed the widget tint logic. Gold assets now render as Gold (#FFD700) and Silver as Silver (#C0C0C0) on the home screen.
 
-    Shape Consistency: The widget is not respecting the "Bar vs. Coin" distinction. Bars should be rendered as Rounded Rectangles, not circles.
+    Shape Consistency: The widget now respects the database—Bars render as Rectangles (4dp), and Coins/Rounds render as Circles (16dp).
+
+    Precision Stamping: Replaced the "Generic G" with high-contrast black stamps ("1k", "1g", "1/10") that pull directly from the V19 unit data.
+
+    Build Stabilization: Resolved critical "Unresolved Reference" errors by restoring the FORCE_UPDATE_KEY and fixing the SparklineDrawUtils package path.
+
+    Memory Firewall: Verified RGB_565 sparkline optimization is active in the widget, protecting the 2MB Binder limit.
 
 💎 Current UX State:
 
-    App: 🟢 Precision Stamping (1/10oz, 1oz, 10oz, 100oz, 1k, 1g).
+    App: 🟢 Precision Vault. (Correct shapes, correct stamps, correct names).
 
-    Widget: 🔴 Legacy Generic (G, G, G, G, G).
+    Widget: 🟢 Mirror Image. (1:1 visual parity with the main app).
 
-2. THE "FORTRESS" SPECS (V7.2.3)
-   Component	Status	Logic Requirement
-   Data Layer	🟢 STABLE	V18 Unit-Driven displayName
-   Database	🟢 V18	Explicit weightUnit (GRAM, KILO, OZ)
-   Widget UI	🔴 MISALIGNED	Needs AssetCardOriginal refactor
-   Sparklines	🟡 OPTIMIZING	Transitioning to RGB_565 memory safety
-3. THE PATH FORWARD: LOCKING THE SYNC
+2. THE "GOLDEN" SPECS (V7.2.4)
+   Component	Status	Tech Stack / Logic
+   Data Layer	🟢 STABLE	V19 Unit-Driven displayName logic
+   Database	🟢 V19	Explicit physicalForm & weightUnit fields
+   Widget UI	🟢 SYNCED	Dynamic Tinting (Gold/Silver) & Shape Logic
+   Sparklines	🟢 OPTIMIZED	RGB_565 Memory-safe bitmaps
+   Build State	🟢 GREEN	All constants restored; zero compilation errors
+3. THE PATH FORWARD: GLOBAL VISTA (PHASE 4)
 
-To fix the images you just showed me, I need to provide the Full File for PortfolioWidget.kt that specifically addresses the AssetCardOriginal layout. We must replace the generic ImageProvider with a Box/Text combo for the icon and switch the title to asset.displayName.
+With the foundation now logically and visually sound, we move toward asset management and global settings.
+
+🛠️ Refinement & Expansion:
+
+    Vault-Aware Headers: Ensure the widget header dynamically toggles between "METALS" and "CRYPTO" based on the currentVaultId.
+
+    Instant Sync: Implement a WorkManager trigger to update the widget the moment an asset is added, rather than waiting for the system broadcast.
+
+    Global Vista Icons: Begin integrating the localIconPath logic to allow custom user icons to persist across migrations.
+
+🔄 Git Hygiene Protocol:
+
+    V7.2.4 Baseline: Commit and push immediately. This is the new "Golden Build" for all future development.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Fri 03/27/2026 14:23:00.34
+Generated: Fri 03/27/2026 17:18:15.76
 
 Branch:
 main
 Commit:
-32f4e88660ae60c9f5addf37fd8e37d23b7a0589
+385294bd3d3034128582a834e0805d393ade4099
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
+ M app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
+ M app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt
  M app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
- M app/src/main/java/com/swanie/portfolio/widget/SparklineDrawUtils.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------

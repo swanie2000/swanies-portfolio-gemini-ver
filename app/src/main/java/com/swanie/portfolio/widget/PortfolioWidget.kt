@@ -31,6 +31,7 @@ import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.local.AssetCategory
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -43,6 +44,7 @@ import java.util.*
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.state.getAppWidgetState
+import androidx.glance.layout.ContentScale
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -51,13 +53,13 @@ class PortfolioWidget : GlanceAppWidget() {
 
     companion object {
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
-        val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
         val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
-
         val WIDGET_BG_COLOR_KEY = stringPreferencesKey("widget_bg_color")
-        val WIDGET_BG_TEXT_COLOR_KEY = stringPreferencesKey("widget_bg_text_color")
         val WIDGET_CARD_COLOR_KEY = stringPreferencesKey("widget_card_color")
         val WIDGET_CARD_TEXT_COLOR_KEY = stringPreferencesKey("widget_card_text_color")
+
+        // 🛠️ Restored for WidgetManagerScreen.kt compatibility
+        val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
     }
 
     @EntryPoint
@@ -91,19 +93,16 @@ class PortfolioWidget : GlanceAppWidget() {
 
         var totalValue = 0.0
         allVaultAssets.forEach { asset ->
-            // 🛠️ V18 PRECISION: Weight is already troy-normalized. Multipliers are obsolete.
             totalValue += (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
         }
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
         val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: userConfig?.widgetBgColor ?: "#000416"
-        val rawBgTxt = prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: userConfig?.widgetBgTextColor ?: "#FFFFFF"
-        val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#363636"
-        val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#C3C3C3"
+        val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#1E1E1E"
+        val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#FFFFFF"
 
         val bgColor = Color(android.graphics.Color.parseColor(rawBg))
-        val bgTextColor = Color(android.graphics.Color.parseColor(rawBgTxt))
         val cardColor = Color(android.graphics.Color.parseColor(rawCrd))
         val cardTextColor = Color(android.graphics.Color.parseColor(rawCrdTxt))
 
@@ -115,9 +114,9 @@ class PortfolioWidget : GlanceAppWidget() {
                 assetHistoryMap = assetHistoryMap,
                 showTotal = userConfig?.showWidgetTotal == true,
                 bgColor = bgColor,
-                bgTextColor = bgTextColor,
                 cardColor = cardColor,
-                cardTextColor = cardTextColor
+                cardTextColor = cardTextColor,
+                vaultName = if (currentVaultId == 1) "METALS" else "CRYPTO"
             )
         }
     }
@@ -131,9 +130,9 @@ fun WidgetContent(
     assetHistoryMap: Map<String, List<Double>>,
     showTotal: Boolean,
     bgColor: Color,
-    bgTextColor: Color,
     cardColor: Color,
-    cardTextColor: Color
+    cardTextColor: Color,
+    vaultName: String
 ) {
     Column(
         modifier = GlanceModifier
@@ -144,53 +143,30 @@ fun WidgetContent(
     ) {
         Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
             Text(
-                text = "PORTFOLIO",
-                style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                text = vaultName,
+                style = TextStyle(color = ColorProvider(cardTextColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Bold)
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
-
-            Box(
-                modifier = GlanceModifier
-                    .padding(4.dp)
-                    .clickable(actionRunCallback<RefreshCallback>()),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    provider = ImageProvider(android.R.drawable.ic_popup_sync),
-                    contentDescription = "Refresh",
-                    modifier = GlanceModifier.size(28.dp)
-                )
-            }
+            Image(
+                provider = ImageProvider(android.R.drawable.ic_popup_sync),
+                contentDescription = "Refresh",
+                modifier = GlanceModifier.size(20.dp).clickable(actionRunCallback<RefreshCallback>())
+            )
         }
 
         if (showTotal && totalValue.isNotEmpty()) {
             Text(
                 text = totalValue,
-                style = TextStyle(color = ColorProvider(bgTextColor), fontSize = 24.sp, fontWeight = FontWeight.Bold),
-                modifier = GlanceModifier.padding(vertical = 2.dp)
+                style = TextStyle(color = ColorProvider(cardTextColor), fontSize = 22.sp, fontWeight = FontWeight.Bold),
+                modifier = GlanceModifier.padding(vertical = 4.dp)
             )
         }
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        Spacer(modifier = GlanceModifier.height(4.dp))
 
         if (assets.isEmpty()) {
-            // 🛠️ PHASE 3: Branded Empty State
-            Box(modifier = GlanceModifier.fillMaxWidth().defaultWeight(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.Horizontal.CenterHorizontally) {
-                    Image(
-                        provider = ImageProvider(com.swanie.portfolio.R.drawable.swanie_foreground),
-                        contentDescription = null,
-                        modifier = GlanceModifier.size(48.dp).padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = "EMPTY VAULT",
-                        style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    )
-                    Text(
-                        text = "Tap to sync assets",
-                        style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.3f)), fontSize = 10.sp)
-                    )
-                }
+            Box(modifier = GlanceModifier.fillMaxSize().defaultWeight(), contentAlignment = Alignment.Center) {
+                Text("EMPTY VAULT", style = TextStyle(color = ColorProvider(cardTextColor.copy(alpha = 0.3f)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
             }
         } else {
             Column(modifier = GlanceModifier.fillMaxWidth()) {
@@ -201,7 +177,7 @@ fun WidgetContent(
                         cardColor = cardColor,
                         textColor = cardTextColor
                     )
-                    if (index < assets.size - 1) Spacer(modifier = GlanceModifier.height(8.dp))
+                    if (index < assets.size - 1) Spacer(modifier = GlanceModifier.height(6.dp))
                 }
             }
         }
@@ -209,11 +185,7 @@ fun WidgetContent(
         Spacer(modifier = GlanceModifier.defaultWeight())
         Text(
             text = "Updated: $lastUpdated",
-            style = TextStyle(
-                fontSize = 10.sp,
-                color = ColorProvider(bgTextColor.copy(alpha = 0.5f)),
-                textAlign = TextAlign.End
-            ),
+            style = TextStyle(fontSize = 8.sp, color = ColorProvider(cardTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End),
             modifier = GlanceModifier.fillMaxWidth()
         )
     }
@@ -226,58 +198,87 @@ fun AssetCardOriginal(asset: AssetEntity, history: List<Double>, cardColor: Colo
             .fillMaxWidth()
             .cornerRadius(12.dp)
             .background(cardColor)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
+        val isMetal = asset.category == AssetCategory.METAL || asset.isMetal || asset.portfolioId == "1"
+        val isGold = asset.displayName.contains("Gold", true) || asset.name.contains("Gold", true) || asset.symbol.contains("XAU", true)
+
+        val iconBgColor = if (isMetal) {
+            if (isGold) Color(0xFFFFD700) else Color(0xFFC0C0C0)
+        } else {
+            Color.White.copy(alpha = 0.1f)
+        }
+
+        val isBar = asset.physicalForm.equals("Bar", ignoreCase = true)
+        val cornerRadius = if (isBar) 4.dp else 16.dp
+
         Box(
-            modifier = GlanceModifier.size(32.dp).cornerRadius(16.dp).background(Color.White.copy(alpha = 0.05f)),
+            modifier = GlanceModifier.size(32.dp).cornerRadius(cornerRadius).background(iconBgColor),
             contentAlignment = Alignment.Center
         ) {
-            val localPath = asset.localIconPath
-            if (localPath != null && File(localPath).exists()) {
-                val bitmap = BitmapFactory.decodeFile(localPath)
-                if (bitmap != null) {
-                    Image(provider = ImageProvider(bitmap), contentDescription = asset.symbol, modifier = GlanceModifier.size(32.dp).cornerRadius(16.dp), contentScale = ContentScale.Crop)
-                } else { LetterFallback(asset.symbol) }
-            } else { LetterFallback(asset.symbol) }
+            StampFallback(asset, isMetal)
         }
 
         Spacer(modifier = GlanceModifier.width(10.dp))
 
         Column(modifier = GlanceModifier.defaultWeight()) {
-            val nameToUse = if (asset.isMetal) asset.displayName.ifEmpty { asset.name } else asset.name
-            Text(text = nameToUse, style = TextStyle(color = ColorProvider(textColor), fontSize = 14.sp, fontWeight = FontWeight.Bold), maxLines = 1)
-            Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 10.sp), maxLines = 1)
+            Text(text = asset.displayName.ifEmpty { asset.name }, style = TextStyle(color = ColorProvider(textColor), fontSize = 13.sp, fontWeight = FontWeight.Bold), maxLines = 1)
+            Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 9.sp), maxLines = 1)
         }
 
         if (history.size >= 2) {
             val sparkColor = if (history.last() >= history.first()) Color(0xFF00FF00) else Color(0xFFFF0000)
-            // 🚀 RGB_565 Blending: Pass the card background color so the sparkline looks native
-            val sparklineBitmap = SparklineDrawUtils.drawSparklineBitmap(history, sparkColor, cardColor.toArgb())
-            Image(provider = ImageProvider(sparklineBitmap), contentDescription = "Trend", modifier = GlanceModifier.width(120.dp).height(32.dp), contentScale = ContentScale.FillBounds)
+            val sparklineBitmap = com.swanie.portfolio.widget.SparklineDrawUtils.drawSparklineBitmap(history, sparkColor, cardColor.toArgb())
+            Image(
+                provider = ImageProvider(sparklineBitmap),
+                contentDescription = "Trend",
+                modifier = GlanceModifier.width(70.dp).height(24.dp),
+                contentScale = ContentScale.FillBounds
+            )
         }
 
-        Spacer(modifier = GlanceModifier.width(12.dp))
+        Spacer(modifier = GlanceModifier.width(8.dp))
 
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice), style = TextStyle(color = ColorProvider(textColor), fontSize = 13.sp, fontWeight = FontWeight.Bold), maxLines = 1)
+            val assetValue = asset.officialSpotPrice * asset.weight * asset.amountHeld
+            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(assetValue), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold), maxLines = 1)
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF0000)
-            Text(text = "${if(asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
+            Text(text = "${if(asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 9.sp, fontWeight = FontWeight.Bold))
         }
     }
 }
 
 @Composable
-fun LetterFallback(symbol: String) {
-    Text(text = symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 14.sp, fontWeight = FontWeight.Bold))
+fun StampFallback(asset: AssetEntity, isMetal: Boolean) {
+    if (!isMetal) {
+        Text(text = asset.symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 14.sp, fontWeight = FontWeight.Bold))
+    } else {
+        val weightStr = when (asset.weightUnit.uppercase()) {
+            "GRAM" -> "1g"
+            "KILO" -> "1k"
+            "OZ" -> {
+                when {
+                    asset.weight == 0.1 -> "1/10"
+                    asset.weight == 100.0 -> "100"
+                    asset.weight == 10.0 -> "10"
+                    asset.weight == 1.0 -> "1"
+                    else -> if (asset.weight < 1.0) asset.weight.toString().replace("0.", ".") else asset.weight.toInt().toString()
+                }
+            }
+            else -> "1"
+        }
+        Text(text = weightStr, style = TextStyle(color = ColorProvider(Color.Black.copy(alpha = 0.8f)), fontSize = 10.sp, fontWeight = FontWeight.Bold))
+    }
 }
 
 class RefreshCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
-        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = "MAIN")
+        val currentVaultId = entryPoint.themePreferences().currentVaultId.first()
+        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = currentVaultId.toString())
 
-        val newTime = SimpleDateFormat("h:mm:ss a", Locale.getDefault()).format(Date())
+        val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         updateAppWidgetState(context, glanceId) { prefs ->
             prefs[PortfolioWidget.LAST_UPDATED_KEY] = newTime
         }

@@ -12,6 +12,7 @@ data class AssetEntity(
     // 🛠️ PHASE 1: Data Sanitization Fields
     val displayName: String = "", // Sanitized name (e.g., "Gold (1kg)")
     val isMetal: Boolean = false, // Quick-access flag for Widget/UI logic
+    val physicalForm: String = "Coin", // 🛡️ V18: Explicit Form (Coin, Bar, Round)
 
     val imageUrl: String = "",
     val category: AssetCategory,

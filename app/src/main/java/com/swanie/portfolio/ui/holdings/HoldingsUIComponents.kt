@@ -50,6 +50,7 @@ fun MetalIcon(
     name: String,
     weight: Double,
     unit: String = "OZ", // 🛠️ V18: Standardized Unit for stamping
+    physicalForm: String = "Coin", // 🛡️ V18: Explicit Form (Coin, Bar, Round)
     size: Int = 44,
     imageUrl: String = "",
     localPath: String? = null,
@@ -98,7 +99,8 @@ fun MetalIcon(
                 else -> listOf(Color(0xFFCED4DA), Color(0xFFADB5BD), Color(0xFF495057))
             }
 
-            val isBar = name.contains("Bar", true) || name.contains("Ingot", true) || unit == "KILO" || weight >= 10.0
+            // 🛡️ V18: No more guessing. Use physicalForm directly.
+            val isBar = physicalForm.equals("Bar", ignoreCase = true)
 
             Box(modifier = Modifier.size(size.dp), contentAlignment = Alignment.Center) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
@@ -281,7 +283,7 @@ fun MetalSelectionFunnel(
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         Text("LABEL UNDER ICON", color = Color.White.copy(0.5f), fontSize = 10.sp)
                         OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text("Enter Name...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 101 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
                     }
                     11 -> {
                         Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) { if (customIconUri != null) AsyncImage(model = customIconUri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) else Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f)) }
@@ -368,7 +370,15 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                        MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category)
+                        MetalIcon(
+                            name = asset.symbol,
+                            weight = asset.weight,
+                            unit = asset.weightUnit,
+                            physicalForm = asset.physicalForm,
+                            imageUrl = asset.imageUrl,
+                            localPath = asset.localIconPath,
+                            category = asset.category
+                        )
                         if (asset.baseSymbol != "CUSTOM") {
                             Spacer(Modifier.height(6.dp))
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -433,7 +443,18 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
     Box(modifier = modifier.fillMaxWidth()) {
         Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(modifier = Modifier.weight(0.3f)) { MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, size = 32, imageUrl = asset.imageUrl, localPath = asset.localIconPath, category = asset.category) }
+                Box(modifier = Modifier.weight(0.3f)) {
+                    MetalIcon(
+                        name = asset.symbol,
+                        weight = asset.weight,
+                        unit = asset.weightUnit,
+                        physicalForm = asset.physicalForm,
+                        size = 32,
+                        imageUrl = asset.imageUrl,
+                        localPath = asset.localIconPath,
+                        category = asset.category
+                    )
+                }
                 Column(modifier = Modifier.weight(1f)) {
                     val titleText = if (asset.category == AssetCategory.METAL) {
                         asset.displayName.ifEmpty { asset.name }
