@@ -32,6 +32,10 @@ class ThemePreferences @Inject constructor(
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         val CURRENT_VAULT_ID = intPreferencesKey("current_vault_id")
 
+        // --- DEFAULT VAULT LOGIC ---
+        val DEFAULT_VAULT_ID = intPreferencesKey("default_vault_id")
+        val RESET_TO_DEFAULT_ON_START = booleanPreferencesKey("reset_to_default_on_start")
+
         // --- NEW WIDGET KEYS (V8.0.0) ---
         val WIDGET_BG_COLOR = stringPreferencesKey("widget_bg_color")
         val WIDGET_BG_TEXT_COLOR = stringPreferencesKey("widget_bg_text_color")
@@ -53,6 +57,10 @@ class ThemePreferences @Inject constructor(
     val themeMode: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.THEME_MODE_KEY] ?: "SYSTEM" }
     val currentVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.CURRENT_VAULT_ID] ?: 1 }
 
+    // Default Vault Flows
+    val defaultVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.DEFAULT_VAULT_ID] ?: 1 }
+    val resetToDefaultOnStart: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.RESET_TO_DEFAULT_ON_START] ?: false }
+
     // --- NEW WIDGET FLOWS (V8.0.0) ---
     val widgetBgColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_BG_COLOR] ?: "#1C1C1E" }
     val widgetBgTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] ?: "#FFFFFF" }
@@ -72,6 +80,10 @@ class ThemePreferences @Inject constructor(
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
     suspend fun saveThemeMode(mode: String) { appContext.dataStore.edit { it[PreferencesKeys.THEME_MODE_KEY] = mode } }
     suspend fun saveCurrentVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.CURRENT_VAULT_ID] = id } }
+
+    // Default Vault Persistence
+    suspend fun saveDefaultVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.DEFAULT_VAULT_ID] = id } }
+    suspend fun saveResetToDefaultOnStart(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.RESET_TO_DEFAULT_ON_START] = enabled } }
 
     // --- NEW WIDGET SAVE FUNCTIONS (V8.0.0) ---
     suspend fun saveWidgetBgColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_BG_COLOR] = color } }

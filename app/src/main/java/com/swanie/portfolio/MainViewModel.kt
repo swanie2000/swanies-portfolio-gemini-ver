@@ -24,7 +24,11 @@ class MainViewModel @Inject constructor(
     // 🌐 GLOBAL VISTA: Vault State
     val allVaults = vaultDao.getAllVaultsFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val currentVaultId = themePreferences.currentVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
-    
+
+    // NEW: Default Vault flows from ThemePreferences
+    val defaultVaultId = themePreferences.defaultVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+    val resetToDefaultOnStart = themePreferences.resetToDefaultOnStart.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val activeVault = combine(allVaults, currentVaultId) { vaults, id ->
         vaults.find { it.id == id } ?: vaults.firstOrNull() ?: VaultEntity(name = "MAIN PORTFOLIO")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), VaultEntity(name = "MAIN PORTFOLIO"))
@@ -42,6 +46,14 @@ class MainViewModel @Inject constructor(
 
     init {
         _isDataReady.value = true
+
+        // 🛠️ Startup Logic: If user wants to return to default, set the vault ID on cold start
+        viewModelScope.launch {
+            if (themePreferences.resetToDefaultOnStart.first()) {
+                val homeId = themePreferences.defaultVaultId.first()
+                selectVault(homeId)
+            }
+        }
     }
 
     // 🌐 GLOBAL VISTA: Vault Logic
@@ -59,6 +71,27 @@ class MainViewModel @Inject constructor(
 
     fun createNewVault(name: String) = viewModelScope.launch {
         vaultDao.upsertVault(VaultEntity(name = name, baseCurrency = "USD", vaultColor = "#000416"))
+    }
+
+    // 🛠️ NEW: Management logic for Default and Delete
+    fun setDefaultVault(id: Int) = viewModelScope.launch {
+        themePreferences.saveDefaultVaultId(id)
+    }
+
+    fun setResetToDefault(enabled: Boolean) = viewModelScope.launch {
+        themePreferences.saveResetToDefaultOnStart(enabled)
+    }
+
+    fun deleteVault(vault: VaultEntity) = viewModelScope.launch {
+        // Prevent deleting the last remaining vault
+        if (allVaults.value.size > 1) {
+            // If deleting the active vault, switch to another first
+            if (activeVault.value.id == vault.id) {
+                val fallback = allVaults.value.firstOrNull { it.id != vault.id }
+                fallback?.let { selectVault(it.id) }
+            }
+            vaultDao.deleteVault(vault)
+        }
     }
 
     fun setConfirmDelete(enabled: Boolean) = viewModelScope.launch {
