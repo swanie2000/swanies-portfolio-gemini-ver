@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -19,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -55,8 +53,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun MyHoldingsScreen(
@@ -248,32 +244,48 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                Box(
-                    modifier = Modifier.fillMaxWidth().clickable { showVaultManager = true },
-                    contentAlignment = Alignment.Center
+                // --- THE PORTFOLIO HANDLE BOX ---
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(cardBg)
+                        .border(1.dp, cardText.copy(0.1f), RoundedCornerShape(16.dp))
+                        .clickable { showVaultManager = true }
+                        .padding(vertical = 12.dp, horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = activeVault.name.uppercase(),
-                            color = textColor,
+                            color = cardText,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Black,
                             textAlign = TextAlign.Center
                         )
-                        Icon(Icons.Default.ArrowDropDown, null, tint = textColor.copy(0.5f))
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            null,
+                            tint = cardText.copy(0.5f),
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
+
+                    Text(
+                        text = totalValueFormatted,
+                        color = cardText.copy(alpha = 0.7f),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.clickable { isExiting = true; navController.navigate(Routes.ANALYTICS) }
+                    )
                 }
 
-                Text(
-                    text = totalValueFormatted,
-                    color = textColor.copy(alpha = 0.7f),
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().clickable { isExiting = true; navController.navigate(Routes.ANALYTICS) }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
                     TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(40.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
@@ -371,7 +383,7 @@ fun MyHoldingsScreen(
                             symbol = type,
                             name = desc,
                             weight = weight,
-                            weightUnit = unit, // 🛠️ V18: Standardized Persistence
+                            weightUnit = unit,
                             amountHeld = qty.toDoubleOrNull() ?: 0.0,
                             premium = prem.toDoubleOrNull() ?: 0.0,
                             imageUrl = icon ?: asset.imageUrl,
