@@ -55,6 +55,7 @@ class PortfolioWidget : GlanceAppWidget() {
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
         val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
         val WIDGET_BG_COLOR_KEY = stringPreferencesKey("widget_bg_color")
+        val WIDGET_BG_TEXT_COLOR_KEY = stringPreferencesKey("widget_bg_text_color")
         val WIDGET_CARD_COLOR_KEY = stringPreferencesKey("widget_card_color")
         val WIDGET_CARD_TEXT_COLOR_KEY = stringPreferencesKey("widget_card_text_color")
 
@@ -99,10 +100,12 @@ class PortfolioWidget : GlanceAppWidget() {
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
         val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: userConfig?.widgetBgColor ?: "#000416"
+        val rawBgTxt = prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: userConfig?.widgetBgTextColor ?: "#FFFFFF"
         val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#1E1E1E"
         val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#FFFFFF"
 
         val bgColor = Color(android.graphics.Color.parseColor(rawBg))
+        val bgTextColor = Color(android.graphics.Color.parseColor(rawBgTxt))
         val cardColor = Color(android.graphics.Color.parseColor(rawCrd))
         val cardTextColor = Color(android.graphics.Color.parseColor(rawCrdTxt))
 
@@ -114,6 +117,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 assetHistoryMap = assetHistoryMap,
                 showTotal = userConfig?.showWidgetTotal == true,
                 bgColor = bgColor,
+                bgTextColor = bgTextColor,
                 cardColor = cardColor,
                 cardTextColor = cardTextColor,
                 vaultName = if (currentVaultId == 1) "METALS" else "CRYPTO"
@@ -130,6 +134,7 @@ fun WidgetContent(
     assetHistoryMap: Map<String, List<Double>>,
     showTotal: Boolean,
     bgColor: Color,
+    bgTextColor: Color,
     cardColor: Color,
     cardTextColor: Color,
     vaultName: String
@@ -141,24 +146,37 @@ fun WidgetContent(
             .padding(8.dp)
             .clickable(actionStartActivity(Intent(LocalContext.current, MainActivity::class.java)))
     ) {
-        Row(modifier = GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
+        // Header Box to center the vault name while keeping refresh on the right
+        Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
                 text = vaultName,
-                style = TextStyle(color = ColorProvider(cardTextColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                style = TextStyle(
+                    color = ColorProvider(bgTextColor.copy(alpha = 0.6f)), 
+                    fontSize = 10.sp, 
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = GlanceModifier.fillMaxWidth()
             )
-            Spacer(modifier = GlanceModifier.defaultWeight())
-            Image(
-                provider = ImageProvider(android.R.drawable.ic_popup_sync),
-                contentDescription = "Refresh",
-                modifier = GlanceModifier.size(20.dp).clickable(actionRunCallback<RefreshCallback>())
-            )
+            Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                Image(
+                    provider = ImageProvider(android.R.drawable.ic_popup_sync),
+                    contentDescription = "Refresh",
+                    modifier = GlanceModifier.size(20.dp).clickable(actionRunCallback<RefreshCallback>())
+                )
+            }
         }
 
         if (showTotal && totalValue.isNotEmpty()) {
             Text(
                 text = totalValue,
-                style = TextStyle(color = ColorProvider(cardTextColor), fontSize = 22.sp, fontWeight = FontWeight.Bold),
-                modifier = GlanceModifier.padding(vertical = 4.dp)
+                style = TextStyle(
+                    color = ColorProvider(bgTextColor), 
+                    fontSize = 22.sp, 
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp)
             )
         }
 
@@ -166,7 +184,7 @@ fun WidgetContent(
 
         if (assets.isEmpty()) {
             Box(modifier = GlanceModifier.fillMaxSize().defaultWeight(), contentAlignment = Alignment.Center) {
-                Text("EMPTY VAULT", style = TextStyle(color = ColorProvider(cardTextColor.copy(alpha = 0.3f)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                Text("EMPTY VAULT", style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.3f)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
             }
         } else {
             Column(modifier = GlanceModifier.fillMaxWidth()) {
@@ -185,7 +203,7 @@ fun WidgetContent(
         Spacer(modifier = GlanceModifier.defaultWeight())
         Text(
             text = "Updated: $lastUpdated",
-            style = TextStyle(fontSize = 8.sp, color = ColorProvider(cardTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End),
+            style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End),
             modifier = GlanceModifier.fillMaxWidth()
         )
     }

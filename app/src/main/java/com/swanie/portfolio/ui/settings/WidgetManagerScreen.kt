@@ -95,9 +95,17 @@ fun WidgetManagerScreen(
     var draftCrd by rememberSaveable(currentCrd) { mutableStateOf(currentCrd) }
     var draftCrdTxt by rememberSaveable(currentCrdTxt) { mutableStateOf(currentCrdTxt) }
 
-    var draftSelectedIds by remember(userConfig) {
-        mutableStateOf(userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList())
+    // 🛠️ SELECTION FIX: Use LaunchedEffect to initialize from DB once, then manage locally
+    var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var hasInitializedSelection by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(userConfig) {
+        if (!hasInitializedSelection && userConfig != null) {
+            draftSelectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+            hasInitializedSelection = true
+        }
     }
+
     var draftHideTotals by remember(userConfig) {
         mutableStateOf(!(userConfig?.showWidgetTotal ?: false))
     }
@@ -105,7 +113,7 @@ fun WidgetManagerScreen(
     // Expansion controls
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var privacyExpanded by rememberSaveable { mutableStateOf(false) }
-    var assetsExpanded by rememberSaveable { mutableStateOf(false) }
+    var assetsExpanded by rememberSaveable { mutableStateOf(true) }
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
 
@@ -220,13 +228,26 @@ fun WidgetManagerScreen(
                     item { Text("No assets in portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
                 } else {
                     itemsIndexed(assets) { _, asset ->
-                        WidgetAssetSelectItem(asset, draftSelectedIds.contains(asset.coinId), if (draftSelectedIds.contains(asset.coinId)) draftSelectedIds.indexOf(asset.coinId) + 1 else null, {
-                            draftSelectedIds = if (draftSelectedIds.contains(asset.coinId)) {
-                                draftSelectedIds.filter { it != asset.coinId }
-                            } else {
-                                if (draftSelectedIds.size < 5) draftSelectedIds + asset.coinId else draftSelectedIds
-                            }
-                        }, safeThemeText)
+                        val isSelected = draftSelectedIds.contains(asset.coinId)
+                        val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
+                        
+                        WidgetAssetSelectItem(
+                            asset = asset, 
+                            isSelected = isSelected, 
+                            orderIndex = orderIndex, 
+                            onToggle = {
+                                if (isSelected) {
+                                    draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
+                                } else {
+                                    if (draftSelectedIds.size < 5) {
+                                        draftSelectedIds = draftSelectedIds + asset.coinId
+                                    } else {
+                                        Toast.makeText(context, "Max 5 assets for widget", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }, 
+                            themeColor = safeThemeText
+                        )
                     }
                 }
             }
@@ -277,9 +298,9 @@ fun WidgetStudioInlineCompact(
     val scope = rememberCoroutineScope()
     var activeTarget by rememberSaveable { mutableIntStateOf(0) }
     val targets = listOf("Widget BG", "BG Text", "Card BG", "Card Text")
-    var hue by remember { mutableFloatStateOf(0f) }
-    var saturation by remember { mutableFloatStateOf(1f) }
-    var value by remember { mutableFloatStateOf(1f) }
+    var hue by remember { mutableStateOf(0f) }
+    var saturation by remember { mutableStateOf(1f) }
+    var value by remember { mutableStateOf(1f) }
     var hexInput by remember { mutableStateOf("") }
     var isFlashing by remember { mutableStateOf(false) }
 
@@ -342,8 +363,17 @@ fun WidgetAssetSelectItem(asset: AssetEntity, isSelected: Boolean, orderIndex: I
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-            if (asset.category == AssetCategory.METAL) MetalIcon(name = asset.symbol, weight = asset.weight, unit = asset.weightUnit, size = 20)
-            else AsyncImage(model = asset.imageUrl, contentDescription = asset.name, modifier = Modifier.size(20.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+            if (asset.category == AssetCategory.METAL) {
+                MetalIcon(
+                    name = asset.symbol, 
+                    weight = asset.weight, 
+                    unit = asset.weightUnit, 
+                    physicalForm = asset.physicalForm,
+                    size = 20
+                )
+            } else {
+                AsyncImage(model = asset.imageUrl, contentDescription = asset.name, modifier = Modifier.size(20.dp).clip(CircleShape), contentScale = ContentScale.Crop)
+            }
         }
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
