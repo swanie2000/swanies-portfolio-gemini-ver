@@ -1,48 +1,48 @@
-NARRATIVE: THE "ARCHITECT ELITE" EVOLUTION (V7.3.0)
+NARRATIVE: THE "ARCHITECT ELITE" EVOLUTION (V7.4.0)
 
-Current Version: 7.3.0 (The "Bespoke Builder" Edition)
+Current Version: 7.4.0 (The "Cinematic Vault" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (Database V19 Hardened)
+Build Status: 🟢 ULTRA-STABLE (Motion-Hardened)
 
-    Note: We have moved from "Parity" to "Design." The app is no longer just a viewer; it is a high-fidelity creation tool. The "Asset Architect" allows for surgical precision in building custom physical wealth, ensuring that even non-standard assets look professionally minted on the home screen.
+    Note: We have successfully bridged the gap between Data and Design. The app now handles multi-vault navigation with a "Zero-Flash" protocol. By prioritizing the user's visual journey during portfolio swaps, we’ve eliminated the digital "jitter" that plagues most finance apps.
 
-1. THE ARCHITECT REVOLUTION: FROM FORMS TO CANVAS
+1. THE MOTION REVOLUTION: THE "IRON CURTAIN" PROTOCOL
 
-This session transformed the "Add Asset" experience from a clunky search-loop into a streamlined, two-stage design studio. We eliminated the friction of mobile keyboards and hard-coded themes to create a truly bespoke experience.
+This session focused on the Tactile & Visual transition between portfolios. We moved from a simple "snap" to a professional "dissolve" that respects the user's focus and branding.
 
 🚀 Today’s Engineering Wins:
 
-    The Two-Stage Architect: Segregated "Blueprint" setup (Metal/Shape/Unit) from "Live Card" editing. This solved the "Keyboard Overlap" issue by completing the layout choices before the keyboard ever appears.
+    The Iron Curtain (Zero-Flash): Implemented a high-priority zIndex shield that triggers the instant a swipe settles. This "Curtain" uses a solid 100% opaque background to physically block the screen while the database swaps assets in the background.
 
-    Direct-Card Editing (WYSIWYG): Implemented BasicTextField logic directly onto the FullAssetCard. Users now type the Name, Quantity, and Premium exactly where they appear on the final card.
+    Cinematic Cross-Dissolve: Decoupled the "Data Lock" from the "Visual Reveal." The assets and the portfolio total now "materialize" out of the background as the shield fades, creating a high-end dissolve effect.
 
-    The "1oz" Precision Stamp: Implemented unit-snapping and integer-cleaning logic. The card now renders clean, professional stamps like "5oz" or "100g" instead of computer-generated strings like "5.0 GRAM."
+    Floating Header UI: Reclaimed screen real-estate by removing the borders and boxes around the Portfolio Name and Total. These elements now float elegantly over the user's custom background.
 
-    Search UI Restoration & Theme-Lock: Reclaimed the "Vault Selector" from over-engineering. Restored the single-window provider dropdown and synchronized all borders and cursors to the user's Custom Theme Colors (siteTextColor).
+    Layout Stability ($0.00 Logic): Eliminated "Text Jumping" by replacing the temporary "---" placeholder with a correctly sized Spacer. This ensures the Portfolio Name stays perfectly still while the value fades in.
 
-    The Metal Bypass: Tapping "Precious Metals" now instantly swaps the search bar for the Metal Funnel Grid, removing two unnecessary taps and a redundant search requirement.
+    Precision Startup Logic: Finalized the "Default Vault" system. Users can now "Star" a specific portfolio and toggle whether the app should always boot to that "Home" vault or remember their last location.
 
-    Factory Default Safety: Rebranded the "Danger Zone" to a professional "System Actions" menu with a secure, two-step confirmation dialog.
+    Secure Vault Deletion: Implemented a safe-guarded deletion flow that prevents users from deleting their last vault and handles active-vault fallbacks automatically.
 
-2. THE "ELITE" SPECS (V7.3.0)
+2. THE "ELITE" SPECS (V7.4.0)
    Component	Status	Tech Stack / Logic
-   Asset Architect	🟢 ELITE	Two-Stage (Blueprint -> Edit) / In-place Card Editing
-   Numeric Logic	🟢 SMART	SmartNumericField with Auto-Clear & .removeSuffix(".0")
-   Vault Selector	🟢 FLUID	Direct-path Metal Funnel / Theme-reactive borders
-   Theme Engine	🟢 SYNCED	All new UI elements track siteTextColor & cardBgHex
-   Widget Sync	🟢 INSTANT	GlanceAppWidgetManager refresh tied to Architect 'Finalize'
+   Motion Engine	🟢 PREMIUM	Animatable Alpha / zIndex Shielding / 300ms Blind
+   Vault Manager	🟢 SMART	Default Star logic / Startup Behavior Toggles
+   UI Aesthetics	🟢 FLOATING	Box-less Header / 32.sp Hero Text / Cross-Dissolve Reveal
+   Sync Logic	🟢 FLUID	LaunchedEffect gated by activeVault.id / 800ms Linear Dissolve
+   Git Status	🟢 CLEAN	Push 1fe66b9 (V7.2.8) -> V7.4.0 Base ready
 3. THE PATH FORWARD: GLOBAL ANALYTICS (PHASE 4)
 
-With the entry system now the most polished part of the app, we pivot toward how the user visualizes their total wealth.
+With the Vault Container and Navigation now physically perfect, we turn our attention back to the data within.
 
 🛠️ Refinement & Expansion:
 
-    Portfolio Diversification: Create a high-fidelity "Pie Chart" or "Donut" view on the Analytics screen to show the ratio of Gold vs. Silver vs. Crypto.
+    Vault-Specific Analytics: Ensuring the Pie Charts and Growth Graphs react to the "Cinematic Dissolve" so that the data inside the Analytics tab is as vault-aware as the Holdings screen.
 
-    Vault Switching UX: Refine the top-level "Vault Toggle" to ensure a smoother transition when moving between the Metals Vault and the Crypto Vault.
+    Haptic Refinement: Re-evaluating where subtle "ticks" (Haptic Feedback) can enhance the experience without making it feel "broken" or jittery.
 
-    Haptic Feedback Integration: Add subtle haptic "ticks" when selecting metals in the Architect to give the digital buttons a physical, weighted feel.
+    Precious Metals Direct-Path: (Carried over) Streamlining the "Add Asset" flow for metals to skip the search loop entirely.
 
 🔄 Git Hygiene Protocol:
 
-    V7.3.0 Baseline: Commit 6d405ae is the new "Golden Build." Any future UI experiments must branch from this stable, theme-aware state.
+    V7.4.0 Baseline: This is the new "Design Gold." The app's core motion and navigation logic are now considered "Final" and "Hardened." All future UI experiments must respect the Iron Curtain protocol.
