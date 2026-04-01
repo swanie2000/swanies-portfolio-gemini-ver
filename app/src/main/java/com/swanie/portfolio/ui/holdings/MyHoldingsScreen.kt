@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.*
@@ -31,7 +30,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -81,8 +79,6 @@ fun MyHoldingsScreen(
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
 
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
-    val confirmDeleteSetting by mainViewModel.confirmDelete.collectAsStateWithLifecycle(initialValue = true)
-
     val lazyListState = rememberLazyListState()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -96,39 +92,22 @@ fun MyHoldingsScreen(
     val isOverTrash = remember { mutableStateOf(false) }
     var isExiting by remember { mutableStateOf(false) }
 
-    // --- 🛡️ CURTAIN LOGIC (RESTORED TO SWEET SPOT) ---
+    // --- 🛡️ CURTAIN LOGIC ---
     var isUnlocked by remember { mutableStateOf(false) }
     val curtainAlpha = remember { Animatable(1f) }
 
     LaunchedEffect(activeVault.id) {
         isUnlocked = false
         curtainAlpha.snapTo(1f)
-        delay(300) // Fast 300ms Blind
+        delay(300)
         isUnlocked = true
-        curtainAlpha.animateTo(0f, tween(800, easing = LinearOutSlowInEasing)) // 800ms Reveal
+        curtainAlpha.animateTo(0f, tween(800))
     }
 
     // --- PAGER LOGIC ---
     val pagerState = rememberPagerState(
         initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
     ) { allVaults.size.coerceAtLeast(1) }
-
-    LaunchedEffect(activeVault.id) {
-        val targetIndex = allVaults.indexOfFirst { it.id == activeVault.id }
-        if (targetIndex != -1 && targetIndex != pagerState.currentPage) {
-            pagerState.animateScrollToPage(targetIndex)
-        }
-    }
-
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress && allVaults.isNotEmpty()) {
-            val targetVault = allVaults[pagerState.currentPage]
-            if (targetVault.id != activeVault.id) {
-                isUnlocked = false
-                mainViewModel.selectVault(targetVault.id)
-            }
-        }
-    }
 
     val totalValueFormatted by remember(holdings, activeVault.baseCurrency) {
         derivedStateOf {
@@ -155,7 +134,7 @@ fun MyHoldingsScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent).pointerInput(Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(siteBg).pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
@@ -169,7 +148,7 @@ fun MyHoldingsScreen(
         if (!isExiting) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header
-                Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(100.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(100.dp).zIndex(10f)) {
                     Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(100.dp).align(Alignment.Center))
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() }) {
@@ -197,29 +176,14 @@ fun MyHoldingsScreen(
                     val contentAlpha = (1f - (pageOffset * 1.2f).coerceIn(0f, 1f)).pow(2f)
 
                     Column(modifier = Modifier.fillMaxSize()) {
-
-                        // Floating Portfolio Name (No Boxes)
+                        // Portfolio Header
                         Column(
-                            modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                                .fillMaxWidth()
-                                .clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
-                                .padding(vertical = 8.dp)
-                                .graphicsLayer { alpha = contentAlpha },
+                            modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth().clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }.padding(vertical = 8.dp).graphicsLayer { alpha = contentAlpha },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(text = vaultForPage.name.uppercase(), color = textColor, fontSize = 16.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-
                             if (isCurrentPage && isUnlocked) {
-                                Text(
-                                    text = totalValueFormatted,
-                                    color = textColor.copy(alpha = 0.8f),
-                                    fontSize = 32.sp,
-                                    fontWeight = FontWeight.Black,
-                                    modifier = Modifier.graphicsLayer {
-                                        alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f)
-                                    }
-                                )
+                                Text(text = totalValueFormatted, color = textColor.copy(alpha = 0.8f), fontSize = 32.sp, fontWeight = FontWeight.Black, modifier = Modifier.graphicsLayer { alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f) })
                             } else {
                                 Spacer(modifier = Modifier.height(38.dp))
                             }
@@ -228,24 +192,60 @@ fun MyHoldingsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Box(modifier = Modifier.fillMaxSize().weight(1f)) {
-                            // --- 🏗️ THE ASSET LIST ---
                             if (isCurrentPage && isUnlocked) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .graphicsLayer {
-                                            alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f) * contentAlpha
-                                        }
-                                ) {
-                                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        TabRow(selectedTabIndex = selectedTab, modifier = Modifier.weight(1f).height(40.dp), containerColor = Color.Transparent, indicator = { }, divider = { }) {
+                                Column(modifier = Modifier.fillMaxSize().graphicsLayer { alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f) * contentAlpha }) {
+
+                                    // --- 🛡️ THE ORIGINAL TABS + SHIELD LAYOUT ---
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        TabRow(
+                                            selectedTabIndex = selectedTab,
+                                            modifier = Modifier.weight(1f).height(44.dp),
+                                            containerColor = Color.Transparent,
+                                            indicator = { },
+                                            divider = { }
+                                        ) {
                                             tabs.forEachIndexed { index, title ->
                                                 val isSelected = selectedTab == index
-                                                Tab(selected = isSelected, onClick = { selectedTab = index }, modifier = Modifier.padding(horizontal = 4.dp).clip(CircleShape).background(if (isSelected) textColor.copy(0.15f) else Color.Transparent).border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)) {
-                                                    Text(text = title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f), modifier = Modifier.padding(vertical = 4.dp))
+                                                // Shrink METAL tab to make room for the Shield
+                                                val tabWeight = if (index == 2 && isSelected) 0.6f else 1f
+
+                                                Row(
+                                                    modifier = Modifier
+                                                        .weight(tabWeight)
+                                                        .padding(horizontal = 4.dp)
+                                                        .clip(CircleShape)
+                                                        .background(if (isSelected) textColor.copy(0.15f) else Color.Transparent)
+                                                        .border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)
+                                                        .clickable { selectedTab = index }
+                                                        .padding(vertical = 8.dp),
+                                                    horizontalArrangement = Arrangement.Center,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(text = title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f))
+                                                }
+
+                                                // THE ORIGINAL GOLD SHIELD
+                                                if (index == 2 && isSelected) {
+                                                    IconButton(
+                                                        onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) },
+                                                        modifier = Modifier
+                                                            .padding(start = 8.dp)
+                                                            .size(34.dp)
+                                                            .clip(CircleShape)
+                                                            .background(Color.Yellow) // Original Solid Gold color
+                                                    ) {
+                                                        Icon(Icons.Default.Shield, null, tint = Color.Black, modifier = Modifier.size(20.dp))
+                                                    }
                                                 }
                                             }
                                         }
+                                    }
+
+                                    if (isViewModelRefreshing) {
+                                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 24.dp), color = textColor, trackColor = textColor.copy(0.1f))
                                     }
 
                                     LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -259,7 +259,11 @@ fun MyHoldingsScreen(
                                                 val isExpanded = expandedAssetId == asset.coinId
                                                 val dragModifier = Modifier.longPressDraggableHandle(
                                                     onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                                    onDragStopped = { isDraggingActive.value = false; scope.launch { viewModel.updateAssetOrder(localHoldings) } }
+                                                    onDragStopped = {
+                                                        if (isOverTrash.value) { assetPendingDeletion = asset }
+                                                        isDraggingActive.value = false
+                                                        scope.launch { viewModel.updateAssetOrder(localHoldings) }
+                                                    }
                                                 )
                                                 if (isCompactViewEnabled && !isExpanded) CompactAssetCard(asset, isDragging, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, dragModifier)
                                                 else FullAssetCard(asset, isExpanded, false, isDragging, isExpanded, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, { assetBeingEdited = asset }, { _, _, _, _, _ -> }, modifier = dragModifier)
@@ -269,21 +273,39 @@ fun MyHoldingsScreen(
                                 }
                             }
 
-                            // --- 🌫️ THE FOG (SOLID COLOR SHIELD) ---
                             if (isCurrentPage && (!isUnlocked || curtainAlpha.value > 0.01f)) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .zIndex(20f)
-                                        .background(siteBg.copy(alpha = 1f))
-                                        .graphicsLayer { alpha = curtainAlpha.value }
-                                )
+                                Box(modifier = Modifier.fillMaxSize().zIndex(20f).background(siteBg).graphicsLayer { alpha = curtainAlpha.value })
                             }
                         }
                     }
                 }
                 BottomNavigationBar(navController = navController, onNavigate = { isExiting = true })
             }
+        }
+
+        // Action Overlays (Trash, Delete Dialog, etc.)
+        AnimatedVisibility(
+            visible = isDraggingActive.value && !isExiting,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).zIndex(100f).onGloballyPositioned { coords ->
+                val pos = coords.positionInRoot()
+                trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height)
+            }
+        ) {
+            Box(modifier = Modifier.size(90.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray.copy(0.9f)).border(3.dp, if (isOverTrash.value) Color.White else Color.Transparent, CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Delete, null, tint = Color.White, modifier = Modifier.size(40.dp))
+            }
+        }
+
+        assetBeingEdited?.let { asset ->
+            if (asset.category == AssetCategory.CRYPTO) {
+                CryptoEditFunnel(asset = asset, onDismiss = { assetBeingEdited = null }, onSave = { newName, newAmount, newDecimals -> viewModel.updateAsset(asset, newName, newAmount, asset.weight, asset.weightUnit, newDecimals); assetBeingEdited = null })
+            } else {
+                MetalSelectionFunnel(initialMetal = asset.symbol, initialForm = asset.name, initialWeight = asset.weight, initialQty = asset.amountHeld.toString(), initialPrem = asset.premium.toString(), initialManualPrice = asset.officialSpotPrice.toString(), onDismiss = { assetBeingEdited = null }, onConfirmed = { type, desc, weight, unit, qty, prem, icon, isManual, manualPrice -> viewModel.updateAssetEntity(asset.copy(symbol = type, name = desc, weight = weight, weightUnit = unit, amountHeld = qty.toDoubleOrNull() ?: 0.0, premium = prem.toDoubleOrNull() ?: 0.0, imageUrl = icon ?: asset.imageUrl, officialSpotPrice = if(isManual) (manualPrice.toDoubleOrNull() ?: 0.0) else asset.officialSpotPrice)); assetBeingEdited = null })
+            }
+        }
+
+        assetPendingDeletion?.let { asset ->
+            AlertDialog(onDismissRequest = { assetPendingDeletion = null }, containerColor = Color(0xFF1A1A1A), title = { Text("PURGE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) }, text = { Text("Permanently remove ${asset.displayName.ifEmpty { asset.name }}?") }, confirmButton = { TextButton(onClick = { viewModel.deleteAsset(asset); assetPendingDeletion = null }) { Text("DELETE", color = Color.Red) } }, dismissButton = { TextButton(onClick = { assetPendingDeletion = null }) { Text("CANCEL", color = Color.White) } })
         }
     }
 }
