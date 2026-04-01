@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.*
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -79,6 +81,8 @@ fun MyHoldingsScreen(
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
 
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
+    val confirmDeleteSetting by mainViewModel.confirmDelete.collectAsStateWithLifecycle(initialValue = true)
+
     val lazyListState = rememberLazyListState()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
@@ -101,13 +105,30 @@ fun MyHoldingsScreen(
         curtainAlpha.snapTo(1f)
         delay(300)
         isUnlocked = true
-        curtainAlpha.animateTo(0f, tween(800))
+        curtainAlpha.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
     }
 
     // --- PAGER LOGIC ---
     val pagerState = rememberPagerState(
         initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
     ) { allVaults.size.coerceAtLeast(1) }
+
+    LaunchedEffect(activeVault.id) {
+        val targetIndex = allVaults.indexOfFirst { it.id == activeVault.id }
+        if (targetIndex != -1 && targetIndex != pagerState.currentPage) {
+            pagerState.animateScrollToPage(targetIndex)
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress && allVaults.isNotEmpty()) {
+            val targetVault = allVaults[pagerState.currentPage]
+            if (targetVault.id != activeVault.id) {
+                isUnlocked = false
+                mainViewModel.selectVault(targetVault.id)
+            }
+        }
+    }
 
     val totalValueFormatted by remember(holdings, activeVault.baseCurrency) {
         derivedStateOf {
@@ -156,7 +177,7 @@ fun MyHoldingsScreen(
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) {
-                            Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor)
+                            Icon(imageVector = if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, contentDescription = null, tint = textColor)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.clip(CircleShape).background(Color.Yellow).size(44.dp)) {
@@ -176,7 +197,6 @@ fun MyHoldingsScreen(
                     val contentAlpha = (1f - (pageOffset * 1.2f).coerceIn(0f, 1f)).pow(2f)
 
                     Column(modifier = Modifier.fillMaxSize()) {
-                        // Portfolio Header
                         Column(
                             modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth().clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }.padding(vertical = 8.dp).graphicsLayer { alpha = contentAlpha },
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -195,49 +215,54 @@ fun MyHoldingsScreen(
                             if (isCurrentPage && isUnlocked) {
                                 Column(modifier = Modifier.fillMaxSize().graphicsLayer { alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f) * contentAlpha }) {
 
-                                    // --- 🛡️ THE ORIGINAL TABS + SHIELD LAYOUT ---
+                                    // --- 🛡️ FIXED TABS WITH TOP-RIGHT OVERLAY BADGE ---
                                     Row(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(44.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        TabRow(
-                                            selectedTabIndex = selectedTab,
-                                            modifier = Modifier.weight(1f).height(44.dp),
-                                            containerColor = Color.Transparent,
-                                            indicator = { },
-                                            divider = { }
-                                        ) {
-                                            tabs.forEachIndexed { index, title ->
-                                                val isSelected = selectedTab == index
-                                                // Shrink METAL tab to make room for the Shield
-                                                val tabWeight = if (index == 2 && isSelected) 0.6f else 1f
+                                        tabs.forEachIndexed { index, title ->
+                                            val isSelected = selectedTab == index
+                                            val isMetalTab = title == "METAL"
 
+                                            Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                                                // The Standard Tab Button
                                                 Row(
                                                     modifier = Modifier
-                                                        .weight(tabWeight)
+                                                        .fillMaxSize()
                                                         .padding(horizontal = 4.dp)
                                                         .clip(CircleShape)
                                                         .background(if (isSelected) textColor.copy(0.15f) else Color.Transparent)
-                                                        .border(1.dp, if (isSelected) Color.Transparent else textColor.copy(0.15f), CircleShape)
-                                                        .clickable { selectedTab = index }
-                                                        .padding(vertical = 8.dp),
+                                                        .border(1.dp, if (isSelected) textColor.copy(0.3f) else textColor.copy(0.1f), CircleShape)
+                                                        .clickable { selectedTab = index },
                                                     horizontalArrangement = Arrangement.Center,
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Text(text = title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold, color = if (isSelected) textColor else textColor.copy(0.5f))
+                                                    Text(
+                                                        text = title,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                                                        color = if (isSelected) textColor else textColor.copy(0.5f)
+                                                    )
                                                 }
 
-                                                // THE ORIGINAL GOLD SHIELD
-                                                if (index == 2 && isSelected) {
+                                                // THE FLOATING SHIELD BADGE (Upper Right)
+                                                if (isMetalTab && isSelected) {
                                                     IconButton(
-                                                        onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) },
+                                                        onClick = {
+                                                            isExiting = true
+                                                            navController.navigate(Routes.METALS_AUDIT)
+                                                        },
                                                         modifier = Modifier
-                                                            .padding(start = 8.dp)
-                                                            .size(34.dp)
-                                                            .clip(CircleShape)
-                                                            .background(Color.Yellow) // Original Solid Gold color
+                                                            .align(Alignment.TopEnd)
+                                                            .offset(x = 8.dp, y = (-8).dp) // Adjust these for perfect corner placement
+                                                            .size(28.dp)
                                                     ) {
-                                                        Icon(Icons.Default.Shield, null, tint = Color.Black, modifier = Modifier.size(20.dp))
+                                                        Icon(
+                                                            imageVector = Icons.Default.Security,
+                                                            contentDescription = "Metals Audit",
+                                                            tint = Color(0xFFFFD700), // Solid Gold
+                                                            modifier = Modifier.size(22.dp)
+                                                        )
                                                     }
                                                 }
                                             }
@@ -245,7 +270,7 @@ fun MyHoldingsScreen(
                                     }
 
                                     if (isViewModelRefreshing) {
-                                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 24.dp), color = textColor, trackColor = textColor.copy(0.1f))
+                                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 24.dp, vertical = 4.dp), color = textColor, trackColor = textColor.copy(0.1f))
                                     }
 
                                     LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -283,7 +308,6 @@ fun MyHoldingsScreen(
             }
         }
 
-        // Action Overlays (Trash, Delete Dialog, etc.)
         AnimatedVisibility(
             visible = isDraggingActive.value && !isExiting,
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).zIndex(100f).onGloballyPositioned { coords ->
