@@ -173,68 +173,73 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-NARRATIVE: THE "ARCHITECT ELITE" EVOLUTION (V7.4.0)
+📝 UPDATED NARRATIVE: THE "ZERO-KNOWLEDGE" BREAKTHROUGH (V7.5.0)
 
-Current Version: 7.4.0 (The "Cinematic Vault" Edition)
+Current Version: 7.5.0 (The "Sovereign Vault" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (Motion-Hardened)
+Build Status: 🟢 ULTRA-STABLE (Theme-Hardened & Global-Ready)
 
-    Note: We have successfully bridged the gap between Data and Design. The app now handles multi-vault navigation with a "Zero-Flash" protocol. By prioritizing the user's visual journey during portfolio swaps, we’ve eliminated the digital "jitter" that plagues most finance apps.
+    Note: We have redefined the relationship between the developer and the user. By moving to a Client-Side Google Drive model, we have eliminated the need for a central database. The user is now the sole custodian of their data, and the app is the high-performance interface that unlocks it.
 
-1. THE MOTION REVOLUTION: THE "IRON CURTAIN" PROTOCOL
+🛡️ 1. THE ARCHITECTURAL PIVOT: THE "SOVEREIGN VAULT" PROTOCOL
 
-This session focused on the Tactile & Visual transition between portfolios. We moved from a simple "snap" to a professional "dissolve" that respects the user's focus and branding.
+This session transformed the "front door" of the app. We moved away from a traditional sign-up model to a decentralized, encrypted sync strategy.
 
 🚀 Today’s Engineering Wins:
 
-    The Iron Curtain (Zero-Flash): Implemented a high-priority zIndex shield that triggers the instant a swipe settles. This "Curtain" uses a solid 100% opaque background to physically block the screen while the database swaps assets in the background.
+    The Privacy Pledge (Zero-Knowledge): Established the legal and technical "Manifesto." The app now explicitly communicates that the creator has NO access to user data. All portfolio files are AES-256 encrypted and stored in a hidden "App Data" folder on the user’s own Google Drive.
 
-    Cinematic Cross-Dissolve: Decoupled the "Data Lock" from the "Visual Reveal." The assets and the portfolio total now "materialize" out of the background as the shield fades, creating a high-end dissolve effect.
+    High-Fidelity Account Funnel: Built a premium, animated entry screen featuring the Floating Gold Shield and the Swan Logo. This screen serves as the "Universal Header" blueprint for all future top-level pages.
 
-    Floating Header UI: Reclaimed screen real-estate by removing the borders and boxes around the Portfolio Name and Total. These elements now float elegantly over the user's custom background.
+    Universal Header Alignment: Standardized the UI with the Language Globe (Top-Left) and the Security Shield (Top-Right), creating a symmetrical, professional layout that mirrors the "Elite" specs of the Holdings screen.
 
-    Layout Stability ($0.00 Logic): Eliminated "Text Jumping" by replacing the temporary "---" placeholder with a correctly sized Spacer. This ensures the Portfolio Name stays perfectly still while the value fades in.
+    Theme-Responsive "Brackets": Eliminated all hardcoded colors in the entry funnel. Input field outlines (Brackets) and buttons now dynamically glow with the user's selected siteTextColor, making the "Create Account" experience feel native to their custom theme.
 
-    Precision Startup Logic: Finalized the "Default Vault" system. Users can now "Star" a specific portfolio and toggle whether the app should always boot to that "Home" vault or remember their last location.
+    Keyboard-Aware UX: Implemented a "Deep Scroll" protocol using imePadding and bottom spacers. This ensures that even on long forms, the keyboard never obscures critical inputs or the "Connect" button.
 
-    Secure Vault Deletion: Implemented a safe-guarded deletion flow that prevents users from deleting their last vault and handles active-vault fallbacks automatically.
+    Security Safeguards: Added dynamic Password Criteria Chips (8+ Chars, Number, Symbol) and a Recovery Hint field. This ensures users create strong keys while providing a "Safety Net" that survives device swaps without compromising encryption.
 
-2. THE "ELITE" SPECS (V7.4.0)
-   Component	Status	Tech Stack / Logic
-   Motion Engine	🟢 PREMIUM	Animatable Alpha / zIndex Shielding / 300ms Blind
-   Vault Manager	🟢 SMART	Default Star logic / Startup Behavior Toggles
-   UI Aesthetics	🟢 FLOATING	Box-less Header / 32.sp Hero Text / Cross-Dissolve Reveal
-   Sync Logic	🟢 FLUID	LaunchedEffect gated by activeVault.id / 800ms Linear Dissolve
-   Git Status	🟢 CLEAN	Push 1fe66b9 (V7.2.8) -> V7.4.0 Base ready
-3. THE PATH FORWARD: GLOBAL ANALYTICS (PHASE 4)
+🛡️ 2. THE "ELITE" SPECS (V7.5.0)
+Component	Status	Tech Stack / Logic
+Data Model	🟢 SOVEREIGN	User-Owned Google Drive / Hidden App Folder Sync
+Security	🟢 ENCRYPTED	AES-256 Client-Side / Zero-Knowledge Developer Access
+UI Aesthetics	🟢 DYNAMIC	Theme-Aware Outlines / Animated Shield Scale-In
+Nav Logic	🟢 CLEAN	Named Parameter Safeguards / Terms & Conditions Route
+Recovery	🟢 SURVIVABLE	Google 2FA + Vault Password + Password Hint
+🛡️ 3. THE PATH FORWARD: THE "DRIVE BRIDGE" (PHASE 5)
 
-With the Vault Container and Navigation now physically perfect, we turn our attention back to the data within.
+With the entry funnel and privacy terms locked in, we move to the technical "Plumbing" that makes the vault real.
 
 🛠️ Refinement & Expansion:
 
-    Vault-Specific Analytics: Ensuring the Pie Charts and Growth Graphs react to the "Cinematic Dissolve" so that the data inside the Analytics tab is as vault-aware as the Holdings screen.
+    The Google Drive Bridge: Integrating the Google Drive REST API to initialize the hidden app folder and handle the first "Handshake" between the app and the user's cloud.
 
-    Haptic Refinement: Re-evaluating where subtle "ticks" (Haptic Feedback) can enhance the experience without making it feel "broken" or jittery.
+    Market Watch "Bug-Hunt": Fixing the "MyHoldings" refresh button and the "Tap to Edit" logic that broke during the recent layout refactors.
 
-    Precious Metals Direct-Path: (Carried over) Streamlining the "Add Asset" flow for metals to skip the search loop entirely.
+    Global Expansion: Populating the "Full Page" searchable lists for the 6 core languages and 6 core currencies (including the XRP-Base option).
+
+    The "Security Auditor" Hub: Developing the "Gold Shield" pop-up to show real-time encryption status and data-source verification.
 
 🔄 Git Hygiene Protocol:
 
-    V7.4.0 Baseline: This is the new "Design Gold." The app's core motion and navigation logic are now considered "Final" and "Hardened." All future UI experiments must respect the Iron Curtain protocol.
+    V7.5.0 Baseline: This is the new "Privacy Gold." The "Connect Google Vault" flow is now the mandatory entry point. All future features must be built to sync with the hidden Drive folder logic.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sat 03/28/2026 22:31:07.81
+Generated: Wed 04/01/2026 16:26:27.35
 
 Branch:
 main
 Commit:
-1fe66b9bb242bc03a667e7084c73e2dc63171df6
+d30acbbbf9f642050cc74c78eeb40429285c8e5d
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
+AM app/src/main/java/com/swanie/portfolio/ui/features/TermsAndConditionsScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
+ M app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -304,6 +309,7 @@ app/src/main/java/com/swanie/portfolio/ui/components/CustomToast.kt
 app/src/main/java/com/swanie/portfolio/ui/entry/AssetArchitectScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/features/TermsAndConditionsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt

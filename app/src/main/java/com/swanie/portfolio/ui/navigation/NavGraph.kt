@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.swanie.portfolio.ui.navigation
 
 import androidx.compose.animation.*
@@ -20,6 +22,7 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
+import com.swanie.portfolio.ui.features.TermsAndConditionsScreen // ⚖️ New Import
 import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen
 import com.swanie.portfolio.ui.settings.*
@@ -48,7 +51,12 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.CREATE_ACCOUNT) {
-                CreateAccountScreen(navController, mainViewModel)
+                CreateAccountScreen(navController = navController)
+            }
+
+            // ⚖️ TERMS & CONDITIONS DESTINATION
+            composable(Routes.TERMS_CONDITIONS) {
+                TermsAndConditionsScreen(navController = navController)
             }
 
             composable(Routes.SETTINGS) {
