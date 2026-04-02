@@ -7,9 +7,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -52,6 +55,13 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
 
             composable(Routes.CREATE_ACCOUNT) {
                 CreateAccountScreen(navController = navController)
+            }
+
+            // 🏛️ RESTORE VAULT PLACEHOLDER
+            composable(Routes.RESTORE_VAULT) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("RESTORE VAULT SCREEN (Placeholder)", color = Color.White)
+                }
             }
 
             // ⚖️ TERMS & CONDITIONS DESTINATION

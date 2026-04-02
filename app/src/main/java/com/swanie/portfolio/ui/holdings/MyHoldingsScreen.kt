@@ -86,6 +86,8 @@ fun MyHoldingsScreen(
     val lazyListState = rememberLazyListState()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
+
+    // --- 🛡️ LOADING STATE ---
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
@@ -96,7 +98,7 @@ fun MyHoldingsScreen(
     val isOverTrash = remember { mutableStateOf(false) }
     var isExiting by remember { mutableStateOf(false) }
 
-    // --- 🛡️ CURTAIN LOGIC ---
+    // --- 🏰 CURTAIN LOGIC ---
     var isUnlocked by remember { mutableStateOf(false) }
     val curtainAlpha = remember { Animatable(1f) }
 
@@ -172,9 +174,18 @@ fun MyHoldingsScreen(
                 Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(100.dp).zIndex(10f)) {
                     Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(100.dp).align(Alignment.Center))
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() }) {
-                            Icon(Icons.Default.Refresh, null, tint = textColor)
+
+                        // --- 🚀 REFRESH BUTTON FIX ---
+                        IconButton(onClick = {
+                            if (!isViewModelRefreshing) viewModel.refreshAssets()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Refresh Assets",
+                                tint = if (isViewModelRefreshing) textColor.copy(alpha = 0.3f) else textColor
+                            )
                         }
+
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) {
                             Icon(imageVector = if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, contentDescription = null, tint = textColor)
@@ -225,7 +236,6 @@ fun MyHoldingsScreen(
                                             val isMetalTab = title == "METAL"
 
                                             Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                                                // The Standard Tab Button
                                                 Row(
                                                     modifier = Modifier
                                                         .fillMaxSize()
@@ -245,7 +255,6 @@ fun MyHoldingsScreen(
                                                     )
                                                 }
 
-                                                // THE FLOATING SHIELD BADGE (Upper Right)
                                                 if (isMetalTab && isSelected) {
                                                     IconButton(
                                                         onClick = {
@@ -254,13 +263,13 @@ fun MyHoldingsScreen(
                                                         },
                                                         modifier = Modifier
                                                             .align(Alignment.TopEnd)
-                                                            .offset(x = 8.dp, y = (-8).dp) // Adjust these for perfect corner placement
+                                                            .offset(x = 8.dp, y = (-8).dp)
                                                             .size(28.dp)
                                                     ) {
                                                         Icon(
                                                             imageVector = Icons.Default.Security,
                                                             contentDescription = "Metals Audit",
-                                                            tint = Color(0xFFFFD700), // Solid Gold
+                                                            tint = Color(0xFFFFD700),
                                                             modifier = Modifier.size(22.dp)
                                                         )
                                                     }
@@ -269,8 +278,15 @@ fun MyHoldingsScreen(
                                         }
                                     }
 
-                                    if (isViewModelRefreshing) {
-                                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 24.dp, vertical = 4.dp), color = textColor, trackColor = textColor.copy(0.1f))
+                                    // --- 🚀 CHARGING BAR (PROGRESS INDICATOR) FIX ---
+                                    Box(modifier = Modifier.fillMaxWidth().height(12.dp).padding(horizontal = 24.dp)) {
+                                        if (isViewModelRefreshing) {
+                                            LinearProgressIndicator(
+                                                modifier = Modifier.fillMaxWidth().height(2.dp).align(Alignment.Center),
+                                                color = Color.Yellow,
+                                                trackColor = textColor.copy(0.1f)
+                                            )
+                                        }
                                     }
 
                                     LazyColumn(state = lazyListState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -290,6 +306,8 @@ fun MyHoldingsScreen(
                                                         scope.launch { viewModel.updateAssetOrder(localHoldings) }
                                                     }
                                                 )
+
+                                                // These are kept exactly as they were in your working version
                                                 if (isCompactViewEnabled && !isExpanded) CompactAssetCard(asset, isDragging, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, dragModifier)
                                                 else FullAssetCard(asset, isExpanded, false, isDragging, isExpanded, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, { assetBeingEdited = asset }, { _, _, _, _, _ -> }, modifier = dragModifier)
                                             }

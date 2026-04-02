@@ -3,6 +3,10 @@
 package com.swanie.portfolio.ui.features
 
 import android.app.Activity
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -22,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +43,8 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -49,7 +56,9 @@ fun CreateAccountScreen(
     navController: NavController
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
@@ -60,6 +69,8 @@ fun CreateAccountScreen(
     val cardBg = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
     val accentGold = Color(0xFFFFD700)
 
+    val authState by authViewModel.authState.collectAsState()
+
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -68,13 +79,33 @@ fun CreateAccountScreen(
 
     // Privacy States
     var hasAcceptedTerms by remember { mutableStateOf(false) }
-    var showTermsDialog by remember { mutableStateOf(false) }
 
     var selectedCurrency by remember { mutableStateOf("USD") }
     var selectedLanguage by remember { mutableStateOf("English") }
     var showLanguageSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
     val scrollState = rememberScrollState()
+
+    // Activity Result Launcher for Google Handshake
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d("AUTH_DEBUG", "Launcher triggered with Result Code: ${result.resultCode}")
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                // PRECISION FIX: Use ApiException for proper error catching and pass to handleSignInResult
+                val account = task.getResult(ApiException::class.java)
+                authViewModel.handleSignInResult(account)
+            } catch (e: ApiException) {
+                Log.e("AUTH_DEBUG", "Sign-In Exception: ${e.statusCode}", e)
+                authViewModel.handleSignInResult(null)
+            }
+        } else {
+            Log.e("AUTH_DEBUG", "Sign-In Canceled or Failed")
+            authViewModel.handleSignInResult(null)
+        }
+    }
 
     // Password Criteria Logic
     val hasMinLength = password.length >= 8
@@ -92,6 +123,36 @@ fun CreateAccountScreen(
             shieldScale.animateTo(1f, spring())
         }
         formAlpha.animateTo(1f, tween(800))
+    }
+
+    // Navigation logic based on Auth State
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthViewModel.AuthState.VaultFound -> {
+                navController.navigate(Routes.RESTORE_VAULT)
+            }
+            is AuthViewModel.AuthState.NewVaultRequired -> {
+                // Trigger the actual creation of the metadata on Drive
+                authViewModel.initializeNewVault(
+                    VaultMetadata(
+                        fullName = fullName,
+                        baseCurrency = selectedCurrency,
+                        language = selectedLanguage,
+                        passwordHint = passwordHint
+                    )
+                )
+            }
+            is AuthViewModel.AuthState.Authenticated -> {
+                // Finalize setup and enter app
+                navController.navigate(Routes.HOLDINGS) {
+                    popUpTo(Routes.CREATE_ACCOUNT) { inclusive = true }
+                }
+            }
+            is AuthViewModel.AuthState.Error -> {
+                Toast.makeText(context, (authState as AuthViewModel.AuthState.Error).message, Toast.LENGTH_LONG).show()
+            }
+            else -> {}
+        }
     }
 
     val isFormValid = fullName.length > 2 && email.contains("@") && passwordCriteriaMet
@@ -287,9 +348,12 @@ fun CreateAccountScreen(
 
                 // --- 🚀 CONNECT BUTTON ---
                 Button(
-                    onClick = { /* Init Google Drive Sync */ },
+                    onClick = { 
+                        val client = authViewModel.googleDriveService.getGoogleSignInClient()
+                        googleSignInLauncher.launch(client.signInIntent)
+                    },
                     modifier = Modifier.fillMaxWidth().height(60.dp),
-                    enabled = isFormValid && hasAcceptedTerms,
+                    enabled = isFormValid && hasAcceptedTerms && authState !is AuthViewModel.AuthState.Loading && authState !is AuthViewModel.AuthState.InitializingNewVault,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = siteText,
                         contentColor = siteBg,
@@ -298,16 +362,30 @@ fun CreateAccountScreen(
                     shape = RoundedCornerShape(16.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
-                    Icon(Icons.Default.CloudUpload, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "CONNECT GOOGLE VAULT",
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 0.5.sp,
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        softWrap = false
-                    )
+                    when (authState) {
+                        is AuthViewModel.AuthState.Loading -> {
+                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = siteBg, strokeWidth = 2.dp)
+                        }
+                        is AuthViewModel.AuthState.InitializingNewVault -> {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = siteBg, strokeWidth = 2.dp)
+                                Spacer(Modifier.width(8.dp))
+                                Text("ESTABLISHING SOVEREIGN VAULT...", fontSize = 12.sp, fontWeight = FontWeight.Black)
+                            }
+                        }
+                        else -> {
+                            Icon(Icons.Default.CloudUpload, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "CONNECT GOOGLE VAULT",
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp,
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                softWrap = false
+                            )
+                        }
+                    }
                 }
 
                 TextButton(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {

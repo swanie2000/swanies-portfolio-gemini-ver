@@ -29,6 +29,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    packaging {
+        resources {
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+            excludes.add("META-INF/DEPENDENCIES")
+            excludes.add("META-INF/LICENSE")
+            excludes.add("META-INF/NOTICE")
+            excludes.add("META-INF/LICENSE.txt")
+            excludes.add("META-INF/NOTICE.txt")
+        }
+    }
 }
 
 kotlin {
@@ -79,6 +90,12 @@ dependencies {
 
     // WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
+
+    // GOOGLE DRIVE & AUTH (ZERO-KNOWLEDGE SYNC)
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.api.services.drive)
+    implementation(libs.google.http.client.gson)
 
     // Testing
     testImplementation(libs.junit)
