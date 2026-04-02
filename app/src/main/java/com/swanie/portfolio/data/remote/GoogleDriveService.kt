@@ -16,6 +16,7 @@ import com.google.api.services.drive.model.File
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -101,6 +102,53 @@ class GoogleDriveService @Inject constructor(
                 .setFields("id")
                 .execute()
             
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    /**
+     * Downloads the vault_metadata.json from the hidden appDataFolder.
+     * Part of the "Returning Sovereign" recovery path.
+     */
+    suspend fun downloadVaultMetadata(): String? = withContext(Dispatchers.IO) {
+        val service = driveService ?: return@withContext null
+        try {
+            val result = service.files().list()
+                .setSpaces("appDataFolder")
+                .setQ("name = 'vault_metadata.json'")
+                .setFields("files(id, name)")
+                .execute()
+
+            val fileId = result.files?.firstOrNull()?.id ?: return@withContext null
+            val outputStream = ByteArrayOutputStream()
+            
+            service.files().get(fileId).executeMediaAndDownloadTo(outputStream)
+            
+            outputStream.toString("UTF-8")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Deletes the vault_metadata.json from the hidden appDataFolder.
+     * EMERGENCY RESET: Allows the user to start over if they lose their password.
+     */
+    suspend fun deleteVault(): Boolean = withContext(Dispatchers.IO) {
+        val service = driveService ?: return@withContext false
+        try {
+            val result = service.files().list()
+                .setSpaces("appDataFolder")
+                .setQ("name = 'vault_metadata.json'")
+                .setFields("files(id, name)")
+                .execute()
+
+            val fileId = result.files?.firstOrNull()?.id ?: return@withContext false
+            service.files().delete(fileId).execute()
             true
         } catch (e: Exception) {
             e.printStackTrace()

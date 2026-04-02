@@ -5,13 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.navigation.NavGraph
+import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -38,7 +44,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            // Observing the updated flows from the ViewModel
             val siteBgColor by viewModel.siteBackgroundColor.collectAsStateWithLifecycle()
             val useGradient by viewModel.useGradient.collectAsStateWithLifecycle()
             val gradientAmount by viewModel.gradientAmount.collectAsStateWithLifecycle()
@@ -50,15 +55,37 @@ class MainActivity : ComponentActivity() {
                 insetsController.isAppearanceLightNavigationBars = !isDarkMode
             }
 
-            // Correctly passing parameters to your existing Theme engine
             SwaniesPortfolioTheme(
                 seedColorHex = siteBgColor,
                 isGradientEnabled = useGradient,
                 gradientAmount = gradientAmount
             ) {
                 val navController = rememberNavController()
-                // Passing the viewModel to NavGraph which handles the screen switching
-                NavGraph(navController = navController, mainViewModel = viewModel)
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                // 🛡️ SECURITY FIX: Do not show BottomBar on Auth Screens
+                val hideBottomBarRoutes = listOf(
+                    Routes.HOME,
+                    Routes.CREATE_ACCOUNT,
+                    Routes.UNLOCK_VAULT,
+                    Routes.TERMS_CONDITIONS
+                )
+                val shouldShowBottomBar = currentRoute !in hideBottomBarRoutes
+
+                Scaffold(
+                    bottomBar = {
+                        if (shouldShowBottomBar) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) { innerPadding ->
+                    NavGraph(
+                        navController = navController,
+                        mainViewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }
