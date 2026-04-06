@@ -36,7 +36,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
@@ -44,13 +43,11 @@ import kotlin.math.min
 
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
-    // --- THEME BINDING ---
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
-    
+
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
-
     val authState by authViewModel.authState.collectAsState()
 
     val userThemeBgColor = remember(siteBgHex) {
@@ -62,7 +59,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         catch (e: Exception) { Color.White }
     }
 
-    // --- GOOGLE SIGN-IN HANDLER ---
+    // 🛰️ STABILIZED HANDSHAKE (No Auto-Navigate)
+    LaunchedEffect(Unit) {
+        delay(1200)
+        authViewModel.performSilentHandshake()
+    }
+
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -77,146 +79,90 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         }
     }
 
-    // Navigation logic based on Auth State
+    // 🛡️ NAVIGATION ENGINE (Manual Control Only)
     LaunchedEffect(authState) {
-        when (authState) {
-            is AuthViewModel.AuthState.VaultFound -> {
-                navController.navigate(Routes.UNLOCK_VAULT)
+        if (authState is AuthViewModel.AuthState.Authenticated) {
+            navController.navigate(Routes.HOLDINGS) {
+                popUpTo(Routes.HOME) { inclusive = true }
             }
-            is AuthViewModel.AuthState.NewVaultRequired -> {
-                navController.navigate(Routes.CREATE_ACCOUNT)
-            }
-            is AuthViewModel.AuthState.Authenticated -> {
-                navController.navigate(Routes.HOLDINGS) {
-                    popUpTo(Routes.HOME) { inclusive = true }
-                }
-            }
-            else -> {}
         }
     }
 
     // --- ANIMATION STATE ---
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
-    var showSparkleOnS by remember { mutableStateOf(false) }
-    var showSparkleOnSwanHead by remember { mutableStateOf(false) }
     var isExiting by remember { mutableStateOf(false) }
 
-    val radiusPercent by animateFloatAsState(
-        targetValue = if (animationStarted) 1.5f else 0f,
-        animationSpec = tween(800, easing = FastOutSlowInEasing),
-        label = "RadialBurst"
-    )
-
-    val swanYOffset by animateDpAsState(
-        targetValue = if (animationStarted) (-100).dp else (-600).dp,
-        animationSpec = tween(900, delayMillis = 120, easing = CubicBezierEasing(0.165f, 0.84f, 0.44f, 1f)),
-        finishedListener = { animateText = true },
-        label = "SwanGlide"
-    )
-
-    val alpha by animateFloatAsState(
-        targetValue = if (animationStarted) 1f else 0f,
-        animationSpec = tween(700, delayMillis = 120),
-        label = "SwanAlpha"
-    )
+    val radiusPercent by animateFloatAsState(targetValue = if (animationStarted) 1.5f else 0f, animationSpec = tween(800), label = "")
+    val swanYOffset by animateDpAsState(targetValue = if (animationStarted) (-100).dp else (-600).dp, animationSpec = tween(900, delayMillis = 120), finishedListener = { animateText = true }, label = "")
+    val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(700, delayMillis = 120), label = "")
 
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.66f).dp
 
-    LaunchedEffect(animateText) {
-        if (animateText) {
-            delay(400)
-            showSparkleOnS = true
-            delay(200)
-            showSparkleOnSwanHead = true
-        }
-    }
-
     LaunchedEffect(Unit) {
-        delay(50)
-        animationStarted = true
+        delay(50); animationStarted = true
     }
 
-    // --- UI LAYOUT ---
-    Box(modifier = Modifier.fillMaxSize()) {
-
-        // 🛠️ SPLASH TRANSITION LAYER
-        val transitionAlpha by animateFloatAsState(
-            targetValue = if (animationStarted) 0f else 1f,
-            animationSpec = tween(1000),
-            label = "SplashFade"
-        )
-        Box(Modifier.fillMaxSize().alpha(transitionAlpha).background(Color(0xFF000416)))
-
-        // ANIMATED RADIAL REVEAL
+    Box(modifier = Modifier.fillMaxSize().background(userThemeBgColor)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerPoint = Offset(size.width / 2f, size.height / 2f)
             val maxDim = size.width.coerceAtLeast(size.height)
-            
             if (radiusPercent > 0.01f) {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            userThemeBgColor.copy(alpha = 0.35f),
-                            Color.Transparent
-                        ),
-                        center = centerPoint,
-                        radius = maxDim * radiusPercent
-                    ),
-                    radius = maxDim * radiusPercent,
-                    center = centerPoint
-                )
+                drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeBgColor.copy(alpha = 0.35f), Color.Transparent), center = centerPoint, radius = maxDim * radiusPercent), radius = maxDim * radiusPercent, center = centerPoint)
             }
         }
 
-        // THE SWAN LOGO
         if (!isExiting) {
             Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
-                Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
-                    drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
-                })
                 Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
-                if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
             }
 
-            // BRAND TEXT
             AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier.graphicsLayer(clip = false)) {
-                        Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
-                        if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
-                    }
+                    Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
                     Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
                 }
             }
         }
 
-        // AUTH TRAY
+        // --- 🚀 MODIFIED AUTH TRAY ---
         AnimatedVisibility(
             visible = animateText && !isExiting,
-            enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
+            enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
         ) {
             AuthTray(
-                onLoginClick = { 
-                    val client = authViewModel.googleDriveService.getGoogleSignInClient()
-                    googleSignInLauncher.launch(client.signInIntent)
+                authState = authState,
+                onLoginClick = {
+                    if (authState is AuthViewModel.AuthState.VaultFound) {
+                        navController.navigate(Routes.UNLOCK_VAULT)
+                    } else {
+                        val client = authViewModel.googleDriveService.getGoogleSignInClient()
+                        googleSignInLauncher.launch(client.signInIntent)
+                    }
                 },
-                onCreateAccountClick = { 
+                onCreateAccountClick = {
                     isExiting = true
-                    navController.navigate(Routes.CREATE_ACCOUNT) 
+                    navController.navigate(Routes.CREATE_ACCOUNT)
                 },
-                trayTextColor = userThemeTextColor,
-                isLoading = authState is AuthViewModel.AuthState.Loading
+                trayTextColor = userThemeTextColor
             )
         }
     }
 }
 
 @Composable
-fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTextColor: Color, isLoading: Boolean) {
+fun AuthTray(
+    authState: AuthViewModel.AuthState,
+    onLoginClick: () -> Unit,
+    onCreateAccountClick: () -> Unit,
+    trayTextColor: Color
+) {
+    val isLoading = authState is AuthViewModel.AuthState.Loading
+    val isVaultFound = authState is AuthViewModel.AuthState.VaultFound
+
     Card(
         modifier = Modifier.fillMaxWidth(0.90f),
         shape = RoundedCornerShape(32.dp),
@@ -227,30 +173,23 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
             Button(
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isVaultFound) Color(0xFFFFD700) else Color.White,
+                    contentColor = Color.Black
+                ),
                 shape = RoundedCornerShape(16.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
                 } else {
-                    Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                    Text(if (isVaultFound) "UNLOCK VAULT" else "LOGIN", fontWeight = FontWeight.ExtraBold)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             TextButton(onClick = onCreateAccountClick) {
-                Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                Text("Create New Vault", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             }
         }
     }
-}
-
-@Composable
-private fun MetallicShimmer(modifier: Modifier = Modifier, shimmerColor: Color = Color.White) {
-    var scaleState by remember { mutableStateOf(0f) }
-    var rotationState by remember { mutableStateOf(45f) }
-    val scale by animateFloatAsState(targetValue = scaleState, animationSpec = tween(300, easing = CubicBezierEasing(0.17f, 0.89f, 0.32f, 1.28f)), label = "ShimmerScale")
-    val rotation by animateFloatAsState(targetValue = rotationState, animationSpec = tween(500), label = "ShimmerRotation")
-    LaunchedEffect(Unit) { scaleState = 1.4f; rotationState = 180f; delay(300L); scaleState = 0f }
-    Box(modifier = modifier.size(4.dp).graphicsLayer(scaleX = scale, scaleY = scale, rotationZ = rotation).background(shimmerColor))
 }

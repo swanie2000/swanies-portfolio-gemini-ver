@@ -3,7 +3,6 @@
 package com.swanie.portfolio.ui.features
 
 import android.app.Activity
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,16 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -71,91 +69,60 @@ fun CreateAccountScreen(
 
     val authState by authViewModel.authState.collectAsState()
 
+    // --- FORM STATE ---
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var passwordHint by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // Privacy States
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isConfirmPasswordVisible by remember { mutableStateOf(false) }
     var hasAcceptedTerms by remember { mutableStateOf(false) }
 
-    var selectedCurrency by remember { mutableStateOf("USD") }
-    var selectedLanguage by remember { mutableStateOf("English") }
-    var showLanguageSheet by remember { mutableStateOf(false) }
-    var showVaultFoundDialog by remember { mutableStateOf(false) }
-    
-    val sheetState = rememberModalBottomSheetState()
     val scrollState = rememberScrollState()
 
-    // Activity Result Launcher for Google Handshake
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        Log.d("AUTH_DEBUG", "Launcher triggered with Result Code: ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                Log.d("AUTH_DEBUG", "Handshake Success: ${account?.email}")
                 authViewModel.handleSignInResult(account)
             } catch (e: ApiException) {
-                Log.e("AUTH_DEBUG", "Sign-In Exception Code: ${e.statusCode}", e)
-                Toast.makeText(context, "Handshake Failed (Code: ${e.statusCode}). Check SHA-1.", Toast.LENGTH_LONG).show()
                 authViewModel.handleSignInResult(null)
             }
-        } else {
-            Log.e("AUTH_DEBUG", "Sign-In Canceled or Failed (Code: ${result.resultCode})")
-            authViewModel.handleSignInResult(null)
         }
     }
 
-    // Password Criteria Logic
-    val hasMinLength = password.length >= 8
-    val hasNumber = password.any { it.isDigit() }
-    val hasSymbol = password.any { !it.isLetterOrDigit() }
-    val passwordCriteriaMet = hasMinLength && hasNumber && hasSymbol
+    // --- 🛡️ SPACE-KILLER LOGIC: Physically prevents spaces from entering the state ---
+    val cleanPass = password.replace("\\s".toRegex(), "")
+    val cleanConfirm = confirmPassword.replace("\\s".toRegex(), "")
 
-    val shieldScale = remember { Animatable(0f) }
+    val hasMinLength = cleanPass.length >= 8
+    val hasNumber = cleanPass.any { it.isDigit() }
+    val hasSymbol = cleanPass.any { !it.isLetterOrDigit() }
+    val passwordsMatch = cleanPass == cleanConfirm && cleanPass.isNotEmpty()
+
+    val isFormValid = fullName.length > 2 &&
+            email.contains("@") &&
+            hasMinLength && hasNumber && hasSymbol &&
+            passwordsMatch && hasAcceptedTerms
+
     val formAlpha = remember { Animatable(0f) }
-
     LaunchedEffect(Unit) {
         delay(300)
-        scope.launch {
-            shieldScale.animateTo(1.1f, spring(Spring.DampingRatioMediumBouncy))
-            shieldScale.animateTo(1f, spring())
-        }
         formAlpha.animateTo(1f, tween(800))
     }
 
-    // Navigation logic based on Auth State
     LaunchedEffect(authState) {
-        when (authState) {
-            is AuthViewModel.AuthState.VaultFound -> {
-                showVaultFoundDialog = true
+        if (authState is AuthViewModel.AuthState.Authenticated) {
+            navController.navigate(Routes.HOLDINGS) {
+                popUpTo(Routes.CREATE_ACCOUNT) { inclusive = true }
             }
-            is AuthViewModel.AuthState.NewVaultRequired -> {
-                authViewModel.initializeNewVault(
-                    fullName = fullName,
-                    currency = selectedCurrency,
-                    language = selectedLanguage,
-                    hint = passwordHint,
-                    password = password
-                )
-            }
-            is AuthViewModel.AuthState.Authenticated -> {
-                navController.navigate(Routes.HOLDINGS) {
-                    popUpTo(Routes.CREATE_ACCOUNT) { inclusive = true }
-                }
-            }
-            is AuthViewModel.AuthState.Error -> {
-                Toast.makeText(context, (authState as AuthViewModel.AuthState.Error).message, Toast.LENGTH_LONG).show()
-            }
-            else -> {}
         }
     }
-
-    val isFormValid = fullName.length > 2 && email.contains("@") && passwordCriteriaMet
 
     val view = LocalView.current
     SideEffect {
@@ -165,279 +132,133 @@ fun CreateAccountScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(siteBg)
-        .statusBarsPadding()
-        .imePadding()
-    ) {
-        // --- 🏰 STATIC UNIVERSAL HEADER ---
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .zIndex(10f)
-            .padding(horizontal = 16.dp)
-        ) {
-            IconButton(
-                onClick = { showLanguageSheet = true },
-                modifier = Modifier.align(Alignment.CenterStart)
-            ) {
-                Icon(Icons.Default.Language, null, tint = siteText.copy(alpha = 0.6f), modifier = Modifier.size(24.dp))
-            }
-
-            Image(
-                painter = painterResource(id = R.drawable.swanie_foreground),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp).align(Alignment.Center)
-            )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .scale(shieldScale.value)
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(accentGold)
-                    .border(2.dp, siteBg, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Security, null, tint = Color.Black, modifier = Modifier.size(20.dp))
-            }
+    Box(modifier = Modifier.fillMaxSize().background(siteBg).statusBarsPadding().imePadding()) {
+        Box(modifier = Modifier.fillMaxWidth().height(80.dp).zIndex(10f).padding(horizontal = 16.dp)) {
+            Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(60.dp).align(Alignment.Center))
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(110.dp))
-
-            Text("SWANIE'S PORTFOLIO", color = siteText, fontSize = 19.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp, maxLines = 1)
-            Text("SECURE ASSET VAULT", color = siteText.copy(alpha = 0.5f), fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 3.sp)
-
-            Spacer(Modifier.height(40.dp))
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp).verticalScroll(scrollState), horizontalAlignment = Alignment.Start) {
+            Spacer(modifier = Modifier.height(80.dp))
+            Text(text = "CREATE ACCOUNT", color = siteText, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Spacer(Modifier.height(30.dp))
 
             Column(modifier = Modifier.graphicsLayer { alpha = formAlpha.value }) {
                 val textFieldColors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = siteText,
+                    focusedBorderColor = accentGold,
                     unfocusedBorderColor = siteText.copy(0.2f),
-                    focusedLabelColor = siteText,
-                    unfocusedLabelColor = siteText.copy(0.4f),
-                    cursorColor = siteText,
                     focusedTextColor = siteText,
-                    unfocusedTextColor = siteText
+                    unfocusedTextColor = siteText,
+                    cursorColor = accentGold
                 )
 
-                OutlinedTextField(
-                    value = fullName, onValueChange = { fullName = it },
-                    label = { Text("FULL NAME", fontSize = 10.sp) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors,
-                    singleLine = true
-                )
-                Spacer(Modifier.height(12.dp))
+                // Labels are now external to prevent "Disappearing Box" glitch
+                InputLabel("FULL NAME", siteText)
+                OutlinedTextField(value = fullName, onValueChange = { fullName = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true)
 
-                OutlinedTextField(
-                    value = email, onValueChange = { email = it },
-                    label = { Text("EMAIL ADDRESS", fontSize = 10.sp) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = textFieldColors,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
+                InputLabel("EMAIL ADDRESS", siteText)
+                OutlinedTextField(value = email, onValueChange = { email = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
 
+                Spacer(Modifier.height(16.dp))
+
+                // --- 🛡️ PASSWORD 1 ---
+                InputLabel("PASSWORD", siteText)
                 OutlinedTextField(
-                    value = password, onValueChange = { password = it },
-                    label = { Text("VAULT PASSWORD", fontSize = 10.sp) },
+                    value = password,
+                    onValueChange = { password = it.replace("\\s".toRegex(), "") },
                     modifier = Modifier.fillMaxWidth(),
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                            Icon(if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null, tint = siteText.copy(0.6f))
+                            Icon(imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null, tint = siteText.copy(0.6f))
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = textFieldColors,
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, autoCorrectEnabled = true, imeAction = ImeAction.Next)
                 )
 
-                // --- 🔑 PASSWORD CRITERIA INDICATORS ---
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp, start = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CriteriaChip("8+ Chars", hasMinLength, siteText)
-                    CriteriaChip("1 Number", hasNumber, siteText)
-                    CriteriaChip("1 Symbol", hasSymbol, siteText)
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 6.dp, start = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    val dim = siteText.copy(alpha = 0.4f)
+                    Text(text = "• 8+ Chars", color = if (hasMinLength) accentGold else dim, fontSize = 11.sp)
+                    Text(text = "• Number", color = if (hasNumber) accentGold else dim, fontSize = 11.sp)
+                    Text(text = "• Special", color = if (hasSymbol) accentGold else dim, fontSize = 11.sp)
                 }
 
                 Spacer(Modifier.height(16.dp))
 
-                // --- 💡 RECOVERY HINT ---
+                // --- 🛡️ PASSWORD 2 (CONFIRM) ---
+                InputLabel("CONFIRM PASSWORD", siteText)
                 OutlinedTextField(
-                    value = passwordHint,
-                    onValueChange = { passwordHint = it },
-                    label = { Text("RECOVERY HINT", fontSize = 10.sp) },
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it.replace("\\s".toRegex(), "") },
                     modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { isConfirmPasswordVisible = !isConfirmPasswordVisible }) {
+                            Icon(imageVector = if (isConfirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null, tint = siteText.copy(0.6f))
+                        }
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = textFieldColors,
                     singleLine = true,
-                    placeholder = { Text("e.g. My first car", fontSize = 12.sp, color = siteText.copy(0.3f)) }
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, autoCorrectEnabled = true, imeAction = ImeAction.Done)
                 )
-                Text(
-                    text = "This hint is stored on your Google Drive for device recovery.",
-                    color = siteText.copy(alpha = 0.5f),
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(top = 4.dp, start = 4.dp)
-                )
+
+                if (confirmPassword.isNotEmpty() && !passwordsMatch) {
+                    Text(text = "Passwords do not match", color = Color.Red, fontSize = 11.sp, modifier = Modifier.padding(start = 4.dp, top = 4.dp))
+                }
+
+                Spacer(Modifier.height(20.dp))
+                InputLabel("RECOVERY HINT", siteText)
+                OutlinedTextField(value = passwordHint, onValueChange = { passwordHint = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true)
 
                 Spacer(Modifier.height(24.dp))
 
-                // --- 🛡️ THE PRIVACY PLEDGE ---
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { hasAcceptedTerms = !hasAcceptedTerms },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = hasAcceptedTerms,
-                        onCheckedChange = { hasAcceptedTerms = it },
-                        colors = CheckboxDefaults.colors(checkedColor = accentGold, uncheckedColor = siteText.copy(0.4f))
-                    )
-                    Text(
-                        text = "I acknowledge my data is stored ONLY on my personal Google Drive. The creator holds NO access to my info.",
-                        color = siteText.copy(alpha = 0.7f),
-                        fontSize = 11.sp,
-                        lineHeight = 16.sp
-                    )
-                }
-
-                // ⚖️ LINKED TO THE NEW TERMS & CONDITIONS PAGE
-                TextButton(onClick = { navController.navigate(Routes.TERMS_CONDITIONS) }) {
-                    Text("VIEW FULL TERMS & PRIVACY PLEDGE", color = accentGold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Row(modifier = Modifier.fillMaxWidth().clickable { hasAcceptedTerms = !hasAcceptedTerms }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = hasAcceptedTerms, onCheckedChange = { hasAcceptedTerms = it }, colors = CheckboxDefaults.colors(checkedColor = accentGold))
+                    Text(text = "Save data to my Google Drive.", color = siteText.copy(alpha = 0.7f), fontSize = 13.sp)
                 }
 
                 Spacer(Modifier.height(32.dp))
 
-                Text("BASE CURRENCY", color = siteText, fontSize = 10.sp, fontWeight = FontWeight.Black)
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("USD", "EUR", "GBP", "JPY").forEach { curr ->
-                        val isSelected = selectedCurrency == curr
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (isSelected) siteText.copy(0.15f) else Color.Transparent)
-                                .border(1.dp, if (isSelected) siteText else siteText.copy(0.2f), RoundedCornerShape(8.dp))
-                                .clickable { selectedCurrency = curr },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(curr, color = siteText, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Black else FontWeight.Normal)
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(40.dp))
-
-                // --- 🚀 CONNECT BUTTON ---
                 Button(
-                    onClick = { 
+                    onClick = {
                         val client = authViewModel.googleDriveService.getGoogleSignInClient()
                         googleSignInLauncher.launch(client.signInIntent)
                     },
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    enabled = isFormValid && hasAcceptedTerms && authState !is AuthViewModel.AuthState.Loading && authState !is AuthViewModel.AuthState.InitializingNewVault,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = siteText,
-                        contentColor = siteBg,
-                        disabledContainerColor = siteText.copy(0.1f)
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp)
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    enabled = isFormValid,
+                    colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg, disabledContainerColor = siteText.copy(alpha = 0.15f)),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    when (authState) {
-                        is AuthViewModel.AuthState.Loading -> {
-                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = siteBg, strokeWidth = 2.dp)
-                        }
-                        is AuthViewModel.AuthState.InitializingNewVault -> {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = siteBg, strokeWidth = 2.dp)
-                                Spacer(Modifier.width(8.dp))
-                                Text("ESTABLISHING VAULT...", fontSize = 12.sp, fontWeight = FontWeight.Black)
-                            }
-                        }
-                        else -> {
-                            Icon(Icons.Default.CloudUpload, null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "CONNECT GOOGLE VAULT",
-                                fontWeight = FontWeight.Black,
-                                letterSpacing = 0.5.sp,
-                                fontSize = 13.sp,
-                                maxLines = 1,
-                                softWrap = false
-                            )
-                        }
+                    if (authState is AuthViewModel.AuthState.Loading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = siteBg, strokeWidth = 2.dp)
+                    } else {
+                        Text(text = "CREATE ACCOUNT", fontWeight = FontWeight.Black, fontSize = 15.sp)
                     }
                 }
-
-                TextButton(onClick = { 
-                    val client = authViewModel.googleDriveService.getGoogleSignInClient()
-                    googleSignInLauncher.launch(client.signInIntent)
-                }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
-                    Text("ALREADY HAVE A VAULT? SIGN IN", color = siteText.copy(0.5f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                }
             }
-
-            Spacer(modifier = Modifier.height(350.dp))
+            Spacer(modifier = Modifier.height(300.dp))
         }
 
-        // --- 🌎 LANGUAGE SHEET ---
-        if (showLanguageSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showLanguageSheet = false },
-                sheetState = sheetState,
-                containerColor = cardBg
-            ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
-                    Text("SELECT LANGUAGE", color = siteText, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
-                    Spacer(Modifier.height(16.dp))
-                    listOf("English", "Español", "Français", "Deutsch", "日本語").forEach { lang ->
-                        TextButton(onClick = { selectedLanguage = lang; showLanguageSheet = false }, modifier = Modifier.fillMaxWidth()) {
-                            Text(lang, color = siteText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
-                        }
-                    }
-                    Spacer(Modifier.height(40.dp))
-                }
-            }
-        }
-
-        // --- 🏛️ VAULT FOUND DIALOG ---
-        if (showVaultFoundDialog) {
+        // Vault Found Dialog
+        if (authState is AuthViewModel.AuthState.VaultFound) {
             AlertDialog(
-                onDismissRequest = { showVaultFoundDialog = false },
+                onDismissRequest = { },
                 containerColor = cardBg,
-                title = { Text("VAULT FOUND", color = siteText, fontWeight = FontWeight.Black) },
-                text = { Text("An existing vault was found for this account. Would you like to unlock it?", color = siteText.copy(0.7f)) },
+                title = { Text(text = "Vault Found", color = siteText, fontWeight = FontWeight.Bold) },
+                text = { Text(text = "An existing vault was found. Login or overwrite?", color = siteText.copy(0.7f)) },
                 confirmButton = {
-                    TextButton(onClick = { 
-                        showVaultFoundDialog = false
-                        navController.navigate(Routes.UNLOCK_VAULT) 
-                    }) {
-                        Text("UNLOCK VAULT", color = accentGold, fontWeight = FontWeight.Bold)
+                    TextButton(onClick = { navController.navigate(Routes.UNLOCK_VAULT) }) {
+                        Text(text = "LOGIN", color = accentGold, fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showVaultFoundDialog = false }) {
-                        Text("CANCEL", color = siteText.copy(0.5f))
-                    }
+                    TextButton(onClick = {
+                        authViewModel.initializeNewVault(VaultMetadata(fullName, "USD", "EN", passwordHint, cleanPass))
+                    }) { Text(text = "OVERWRITE", color = Color.Red) }
                 }
             )
         }
@@ -445,20 +266,28 @@ fun CreateAccountScreen(
 }
 
 @Composable
-fun CriteriaChip(label: String, isMet: Boolean, themeColor: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = if (isMet) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
-            contentDescription = null,
-            tint = if (isMet) Color(0xFF4CAF50) else themeColor.copy(alpha = 0.3f),
-            modifier = Modifier.size(12.dp)
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = label,
-            color = if (isMet) themeColor else themeColor.copy(alpha = 0.5f),
-            fontSize = 10.sp,
-            fontWeight = if (isMet) FontWeight.Bold else FontWeight.Normal
-        )
+fun InputLabel(label: String, color: Color) {
+    Text(
+        text = label,
+        color = color.copy(alpha = 0.5f),
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+    )
+}
+
+@Composable
+fun CriteriaChip(label: String, isValid: Boolean, siteTextColor: Color) {
+    Surface(
+        shape = CircleShape,
+        color = if (isValid) siteTextColor.copy(alpha = 0.2f) else Color.Transparent,
+        border = BorderStroke(1.dp, if (isValid) siteTextColor else siteTextColor.copy(alpha = 0.3f)),
+        modifier = Modifier.padding(2.dp)
+    ) {
+        Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(imageVector = if (isValid) Icons.Default.Check else Icons.Default.Close, contentDescription = null, tint = if (isValid) siteTextColor else siteTextColor.copy(alpha = 0.5f), modifier = Modifier.size(12.dp))
+            Spacer(Modifier.width(4.dp))
+            Text(text = label, color = if (isValid) siteTextColor else siteTextColor.copy(alpha = 0.5f), fontSize = 10.sp)
+        }
     }
 }

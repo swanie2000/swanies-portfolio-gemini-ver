@@ -43,6 +43,7 @@ class GoogleDriveService @Inject constructor(
     }
 
     fun initializeDriveService(account: GoogleSignInAccount) {
+        Log.d("VAULT_DEBUG", "Initializing Drive Service for: ${account.email}")
         val credential = GoogleAccountCredential.usingOAuth2(
             context, listOf(DriveScopes.DRIVE_APPDATA)
         ).apply {
@@ -55,10 +56,14 @@ class GoogleDriveService @Inject constructor(
             credential
         ).setApplicationName("Swanie's Portfolio")
             .build()
+        Log.d("VAULT_DEBUG", "Drive Service initialized successfully.")
     }
 
     suspend fun checkVaultFolderExists(): Boolean = withContext(Dispatchers.IO) {
-        val service = driveService ?: return@withContext false
+        val service = driveService ?: run {
+            Log.w("VAULT_DEBUG", "checkVaultFolderExists: Drive Service is null.")
+            return@withContext false
+        }
         try {
             val result = service.files().list()
                 .setSpaces("appDataFolder")
@@ -78,8 +83,12 @@ class GoogleDriveService @Inject constructor(
      * This creates the 'vault_backup.json' file for future restores.
      */
     suspend fun uploadFullVaultBackup(assets: List<AssetEntity>): Boolean = withContext(Dispatchers.IO) {
-        val service = driveService ?: return@withContext false
+        val service = driveService ?: run {
+            Log.w("VAULT_DEBUG", "Sync Skipped: Drive Service NOT initialized. Please Login.")
+            return@withContext false
+        }
         try {
+            Log.d("VAULT_DEBUG", "Starting Cloud Sync for ${assets.size} assets...")
             val jsonContent = gson.toJson(assets)
 
             // 1. Check for existing backup to update or create
@@ -99,21 +108,24 @@ class GoogleDriveService @Inject constructor(
                     parents = listOf("appDataFolder")
                 }
                 service.files().create(fileMetadata, contentStream).execute()
-                Log.d("VAULT_DEBUG", "New Vault Backup Created.")
+                Log.d("VAULT_DEBUG", "✅ SUCCESS: New Vault Backup Created in Cloud.")
             } else {
                 // Update Existing
                 service.files().update(existingFile.id, null, contentStream).execute()
-                Log.d("VAULT_DEBUG", "Existing Vault Backup Updated.")
+                Log.d("VAULT_DEBUG", "✅ SUCCESS: Existing Vault Backup Updated in Cloud.")
             }
             true
         } catch (e: Exception) {
-            Log.e("VAULT_DEBUG", "Cloud Sync Failed", e)
+            Log.e("VAULT_DEBUG", "❌ FAILURE: Cloud Sync Failed", e)
             false
         }
     }
 
     suspend fun restoreFullVault(): Boolean = withContext(Dispatchers.IO) {
-        val service = driveService ?: return@withContext false
+        val service = driveService ?: run {
+            Log.w("VAULT_DEBUG", "Restore Skipped: Drive Service NOT initialized.")
+            return@withContext false
+        }
         try {
             val result = service.files().list()
                 .setSpaces("appDataFolder")
@@ -155,7 +167,10 @@ class GoogleDriveService @Inject constructor(
     }
 
     suspend fun createVaultManifest(jsonContent: String): Boolean = withContext(Dispatchers.IO) {
-        val service = driveService ?: return@withContext false
+        val service = driveService ?: run {
+            Log.w("VAULT_DEBUG", "Create Manifest Skipped: Drive Service NOT initialized.")
+            return@withContext false
+        }
         try {
             val fileMetadata = File().apply {
                 name = "vault_metadata.json"

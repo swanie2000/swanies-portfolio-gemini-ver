@@ -20,6 +20,13 @@ interface AssetDao {
     @Query("SELECT * FROM assets WHERE portfolioId = :pId ORDER BY displayOrder ASC")
     suspend fun getAllAssetsOnce(pId: String = "MAIN"): List<AssetEntity>
 
+    /**
+     * 🛰️ GLOBAL SYNC PAYLOAD: Fetches every asset across all vaults and portfolios.
+     * Used for the 'Sovereign Vault' cloud backup to prevent data loss.
+     */
+    @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
+    suspend fun getAllAssetsGlobal(): List<AssetEntity>
+
     @Query("SELECT * FROM assets WHERE showOnWidget = 1 AND portfolioId = :pId ORDER BY widgetOrder ASC")
     suspend fun getWidgetAssets(pId: String = "MAIN"): List<AssetEntity>
 

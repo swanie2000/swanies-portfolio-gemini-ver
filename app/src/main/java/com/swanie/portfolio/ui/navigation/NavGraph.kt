@@ -7,12 +7,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -25,10 +22,11 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
-import com.swanie.portfolio.ui.features.RestoreVaultScreen // 🏛️ New Import
+import com.swanie.portfolio.ui.features.RestoreVaultScreen
+import com.swanie.portfolio.ui.features.UnlockVaultScreen
 import com.swanie.portfolio.ui.features.TermsAndConditionsScreen
 import com.swanie.portfolio.ui.holdings.*
-import com.swanie.portfolio.ui.metals.MetalsAuditScreen
+import com.swanie.portfolio.ui.metals.MetalsAuditScreen // ✅ Fixed: Added missing import
 import com.swanie.portfolio.ui.settings.*
 import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.launch
@@ -58,7 +56,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 CreateAccountScreen(navController = navController)
             }
 
-            // 🏛️ RESTORE VAULT: Real implementation replacing the placeholder
+            composable(Routes.UNLOCK_VAULT) {
+                UnlockVaultScreen(navController = navController)
+            }
+
             composable(Routes.RESTORE_VAULT) {
                 RestoreVaultScreen(navController = navController)
             }

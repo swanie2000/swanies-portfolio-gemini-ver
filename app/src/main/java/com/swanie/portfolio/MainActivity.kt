@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
@@ -31,11 +33,8 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // 🌐 GLOBAL VISTA: Initialize Icon Vault directory
         val iconDir = File(filesDir, "icons")
-        if (!iconDir.exists()) {
-            iconDir.mkdirs()
-        }
+        if (!iconDir.exists()) iconDir.mkdirs()
 
         splashScreen.setKeepOnScreenCondition {
             viewModel.isDataReady.value == false
@@ -64,11 +63,11 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // 🛡️ SECURITY FIX: Do not show BottomBar on Auth Screens
                 val hideBottomBarRoutes = listOf(
                     Routes.HOME,
                     Routes.CREATE_ACCOUNT,
                     Routes.UNLOCK_VAULT,
+                    Routes.RESTORE_VAULT,
                     Routes.TERMS_CONDITIONS
                 )
                 val shouldShowBottomBar = currentRoute !in hideBottomBarRoutes
@@ -80,11 +79,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    NavGraph(
-                        navController = navController,
-                        mainViewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                        NavGraph(
+                            navController = navController,
+                            mainViewModel = viewModel
+                        )
+                    }
                 }
             }
         }

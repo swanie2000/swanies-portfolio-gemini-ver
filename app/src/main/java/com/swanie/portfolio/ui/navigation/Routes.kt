@@ -4,6 +4,7 @@ object Routes {
     const val HOME = "home"
     const val CREATE_ACCOUNT = "create_account"
     const val UNLOCK_VAULT = "unlock_vault" // 🔒 Cleaned up name
+    const val RESTORE_VAULT = "restore_vault" // 🛰️ Added for Sovereign Vault Recovery
     const val HOLDINGS = "my_holdings"
     const val ANALYTICS = "analytics"
     const val SETTINGS = "settings"
