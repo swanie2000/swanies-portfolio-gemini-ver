@@ -25,7 +25,8 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
-import com.swanie.portfolio.ui.features.TermsAndConditionsScreen // ⚖️ New Import
+import com.swanie.portfolio.ui.features.RestoreVaultScreen // 🏛️ New Import
+import com.swanie.portfolio.ui.features.TermsAndConditionsScreen
 import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen
 import com.swanie.portfolio.ui.settings.*
@@ -57,14 +58,11 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 CreateAccountScreen(navController = navController)
             }
 
-            // 🏛️ RESTORE VAULT PLACEHOLDER
+            // 🏛️ RESTORE VAULT: Real implementation replacing the placeholder
             composable(Routes.RESTORE_VAULT) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("RESTORE VAULT SCREEN (Placeholder)", color = Color.White)
-                }
+                RestoreVaultScreen(navController = navController)
             }
 
-            // ⚖️ TERMS & CONDITIONS DESTINATION
             composable(Routes.TERMS_CONDITIONS) {
                 TermsAndConditionsScreen(navController = navController)
             }

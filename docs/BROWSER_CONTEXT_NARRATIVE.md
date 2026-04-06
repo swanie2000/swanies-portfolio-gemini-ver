@@ -1,50 +1,53 @@
-📝 UPDATED NARRATIVE: THE "ZERO-KNOWLEDGE" BREAKTHROUGH (V7.5.0)
+📝 UPDATED NARRATIVE: THE "SOVEREIGN VAULT" BREAKTHROUGH (V7.5.0)
 
 Current Version: 7.5.0 (The "Sovereign Vault" Edition)
 
-Build Status: 🟢 ULTRA-STABLE (Theme-Hardened & Global-Ready)
+Build Status: 🟢 STABLE & FUNCTIONAL (Multi-Vault Architecture Restored)
 
-    Note: We have redefined the relationship between the developer and the user. By moving to a Client-Side Google Drive model, we have eliminated the need for a central database. The user is now the sole custodian of their data, and the app is the high-performance interface that unlocks it.
+    Architectural Manifesto: We have fundamentally redefined the relationship between the developer and the user. By implementing a Client-Side Google Drive "App Data" model, we have eliminated the need for a central database. The user is now the sole custodian of their assets, and the app serves as the high-performance, zero-knowledge interface to that data.
 
-🛡️ 1. THE ARCHITECTURAL PIVOT: THE "SOVEREIGN VAULT" PROTOCOL
+🛡️ 1. THE ENGINEERING VICTORIES: THE "HANDSHAKE" ERA
 
-This session transformed the "front door" of the app. We moved away from a traditional sign-up model to a decentralized, encrypted sync strategy.
+This phase transformed the app from a local-only tool into a globally-synced, private fortress. We successfully bypassed the "Ghost Menu" bugs and established the Silent Handshake protocol.
+🚀 Key Technical Wins:
 
-🚀 Today’s Engineering Wins:
+    The Zero-Knowledge Bridge: Established the GoogleDriveService. The app now communicates directly with a hidden, developer-inaccessible folder on the user's Google Drive. All portfolio data is stored as a vault_backup.json within this private cloud silo.
 
-    The Privacy Pledge (Zero-Knowledge): Established the legal and technical "Manifesto." The app now explicitly communicates that the creator has NO access to user data. All portfolio files are AES-256 encrypted and stored in a hidden "App Data" folder on the user’s own Google Drive.
+    Multi-Vault "Global Vista": Successfully preserved the V8 capability for users to manage multiple distinct vaults (e.g., Swanie1, Swanie2). Each vault maintains its own independent totals and asset lists, filtered locally by vaultId.
 
-    High-Fidelity Account Funnel: Built a premium, animated entry screen featuring the Floating Gold Shield and the Swan Logo. This screen serves as the "Universal Header" blueprint for all future top-level pages.
+    The Auth-Sync Convergence: Fixed the critical Hilt dependency conflict. By decoupling the GoogleDriveService from the AssetDao constructor, we eliminated the "Sea of Red" compilation errors and restored the app's ability to build and run.
 
-    Universal Header Alignment: Standardized the UI with the Language Globe (Top-Left) and the Security Shield (Top-Right), creating a symmetrical, professional layout that mirrors the "Elite" specs of the Holdings screen.
+    Silent Handshake Implementation: Solved the "Login-Loop" where users were authenticated but the Cloud Pipe remained closed. The app now attempts a silent initialization of the Drive Service upon startup to ensure every local change is backed up immediately.
 
-    Theme-Responsive "Brackets": Eliminated all hardcoded colors in the entry funnel. Input field outlines (Brackets) and buttons now dynamically glow with the user's selected siteTextColor, making the "Create Account" experience feel native to their custom theme.
+    Theme-Hardened Funnel: Standardized the high-fidelity entry screen. The UI now features the Floating Gold Shield, dynamic theme-aware "Brackets" for inputs, and a keyboard-aware imePadding layout.
 
-    Keyboard-Aware UX: Implemented a "Deep Scroll" protocol using imePadding and bottom spacers. This ensures that even on long forms, the keyboard never obscures critical inputs or the "Connect" button.
-
-    Security Safeguards: Added dynamic Password Criteria Chips (8+ Chars, Number, Symbol) and a Recovery Hint field. This ensures users create strong keys while providing a "Safety Net" that survives device swaps without compromising encryption.
-
-🛡️ 2. THE "ELITE" SPECS (V7.5.0)
+🛡️ 2. THE "SOVEREIGN" SPECS (V7.5.0)
 Component	Status	Tech Stack / Logic
-Data Model	🟢 SOVEREIGN	User-Owned Google Drive / Hidden App Folder Sync
-Security	🟢 ENCRYPTED	AES-256 Client-Side / Zero-Knowledge Developer Access
-UI Aesthetics	🟢 DYNAMIC	Theme-Aware Outlines / Animated Shield Scale-In
-Nav Logic	🟢 CLEAN	Named Parameter Safeguards / Terms & Conditions Route
-Recovery	🟢 SURVIVABLE	Google 2FA + Vault Password + Password Hint
+Data Model	🟢 DECENTRALIZED	User-Owned Google Drive / Hidden App Folder Sync
+Security	🟢 ENCRYPTED	AES-256 Client-Side / Zero-Knowledge Dev Access
+Sync Logic	🟡 HEARTBEAT	triggerCloudSync() wired to all CRUD operations
+UI Aesthetics	🟢 ELITE	Dynamic Glow / Animated Shield / Cinematic Nav
+Multi-Vault	🟢 ACTIVE	vaultId filtering / Independent Vault Totals
+Recovery	🟢 SURVIVABLE	Google OAuth2 + Hidden AppData Restore Flow
 🛡️ 3. THE PATH FORWARD: THE "DRIVE BRIDGE" (PHASE 5)
 
-With the entry funnel and privacy terms locked in, we move to the technical "Plumbing" that makes the vault real.
+While the app is stable and running, the "Pipe" between the local database and the cloud needs its final verification to ensure no data is ever lost.
+🛠️ Immediate Priorities for the Next Agent:
 
-🛠️ Refinement & Expansion:
+    Verification of the "Heartbeat": Confirm that VAULT_DEBUG logs show a successful uploadFullVaultBackup every time an asset is added or modified.
 
-    The Google Drive Bridge: Integrating the Google Drive REST API to initialize the hidden app folder and handle the first "Handshake" between the app and the user's cloud.
+    Global Metadata Sync: Ensure that vault_metadata.json (user name, currency, language) and vault_backup.json (actual holdings) stay in sync so that a "Full Restore" on a new device brings back the entire user experience, not just the numbers.
 
-    Market Watch "Bug-Hunt": Fixing the "MyHoldings" refresh button and the "Tap to Edit" logic that broke during the recent layout refactors.
+    The "Sovereign Dashboard": Polishing the main dashboard to display the "Global Vista" total (sum of all vaults) while maintaining the "Local Vault" view on the holdings screen.
 
-    Global Expansion: Populating the "Full Page" searchable lists for the 6 core languages and 6 core currencies (including the XRP-Base option).
+    Market Watch Refinement: Restoring the "Tap to Edit" logic and the "Refresh" button cooldowns that were shifted during the architectural pivot.
 
-    The "Security Auditor" Hub: Developing the "Gold Shield" pop-up to show real-time encryption status and data-source verification.
+🔄 Git Hygiene & Master File Protocol:
 
-🔄 Git Hygiene Protocol:
+    V7.5.0 Baseline: This is the "Privacy Gold" standard.
 
-    V7.5.0 Baseline: This is the new "Privacy Gold." The "Connect Google Vault" flow is now the mandatory entry point. All future features must be built to sync with the hidden Drive folder logic.
+    The "No-Manual-Entry" Goal: The objective is a "Zero-Friction" onboarding. Once a user signs in with Google, their "Sovereign Vault" should materialize instantly.
+
+    Safety Rule: Never allow a local database change to persist without an attempted (even if offline) queue for a Cloud Sync.
+
+Current Block: Verify the triggerCloudSync() heartbeat in AssetViewModel. Once the logs show Sync Result: true, the Sovereign Bridge is officially open.

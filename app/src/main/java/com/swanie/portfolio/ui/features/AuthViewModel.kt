@@ -12,11 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- * VaultMetadata holds the non-sensitive configuration for the Sovereign Vault.
- * This is stored in the hidden appDataFolder as vault_metadata.json.
- * ⚠️ WE NEVER STORE THE VAULT PASSWORD HERE.
- */
 data class VaultMetadata(
     val fullName: String,
     val baseCurrency: String,
@@ -24,27 +19,23 @@ data class VaultMetadata(
     val passwordHint: String
 )
 
-/**
- * AuthViewModel handles the business logic for the Sovereign Vault Handshake.
- * It coordinates with GoogleDriveService to initialize the zero-knowledge sync.
- */
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    val googleDriveService: GoogleDriveService
+    val googleDriveService: GoogleDriveService // 🔓 Changed from private to val to fix access error
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState = _authState.asStateFlow()
 
-    /**
-     * Handles the result of the Google Sign-In intent.
-     * Triggers the Drive Handshake if an account is provided.
-     */
+    // 🏛️ UI Helper states for the Restore Screen
+    private val _isRestoring = MutableStateFlow(false)
+    val isRestoring = _isRestoring.asStateFlow()
+
+    private val _authError = MutableStateFlow<String?>(null)
+    val authError = _authError.asStateFlow()
+
     fun handleSignInResult(account: GoogleSignInAccount?) {
-        // PRECISION FIX: Set loading state IMMEDIATELY to trigger UI feedback.
         _authState.value = AuthState.Loading
-        
-        Log.d("AUTH_DEBUG", "Account name: ${account?.displayName}")
 
         if (account == null) {
             _authState.value = AuthState.Error("Sign-in failed: No account selected.")
@@ -53,10 +44,7 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                // Step 1: Initialize the Remote Service with the credentials
                 googleDriveService.initializeDriveService(account)
-
-                // Step 2: Check if a vault already exists for this Sovereign user
                 val vaultExists = googleDriveService.checkVaultFolderExists()
 
                 if (vaultExists) {
@@ -72,16 +60,41 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Initializes a new Sovereign Vault by creating the vault_metadata.json file.
+     * 🚀 SOVEREIGN RESTORE: Pulls the backup and populates the local Room DB.
      */
+    fun restoreVaultFromCloud(onSuccess: () -> Unit) {
+        _isRestoring.value = true
+        _authError.value = null
+
+        viewModelScope.launch {
+            try {
+                // Trigger the download through the service
+                val success = googleDriveService.restoreFullVault()
+
+                if (success) {
+                    _authState.value = AuthState.Authenticated
+                    _isRestoring.value = false
+                    onSuccess()
+                } else {
+                    _isRestoring.value = false
+                    _authError.value = "Restore failed: Backup file not found or corrupted."
+                }
+            } catch (e: Exception) {
+                _isRestoring.value = false
+                _authError.value = "Sync Error: ${e.message}"
+                Log.e("AUTH_DEBUG", "Restore Error", e)
+            }
+        }
+    }
+
     fun initializeNewVault(metadata: VaultMetadata) {
         _authState.value = AuthState.InitializingNewVault
-        
+
         viewModelScope.launch {
             try {
                 val json = Gson().toJson(metadata)
                 val success = googleDriveService.createVaultManifest(json)
-                
+
                 if (success) {
                     _authState.value = AuthState.Authenticated
                 } else {
@@ -97,7 +110,7 @@ class AuthViewModel @Inject constructor(
         object Idle : AuthState()
         object Loading : AuthState()
         object InitializingNewVault : AuthState()
-        object Authenticated : AuthState() // User is fully set up and ready to enter the app
+        object Authenticated : AuthState()
         object VaultFound : AuthState()
         object NewVaultRequired : AuthState()
         data class Error(val message: String) : AuthState()

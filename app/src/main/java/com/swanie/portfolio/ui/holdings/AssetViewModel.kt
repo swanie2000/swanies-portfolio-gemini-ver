@@ -11,6 +11,7 @@ import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.repository.*
+import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +30,8 @@ class AssetViewModel @Inject constructor(
     private val themePreferences: ThemePreferences,
     private val assetDao: AssetDao,
     private val priceHistoryDao: PriceHistoryDao,
-    @param:ApplicationContext private val context: Context
+    private val googleDriveService: GoogleDriveService, // 🛰️ Cloud Service
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
@@ -42,6 +44,24 @@ class AssetViewModel @Inject constructor(
         .flatMapLatest { id -> assetDao.getAssetsByVault(id) }
         .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    /**
+     * 🛰️ INTERNAL HELPER: Pushes the current vault state to Google Drive.
+     * Triggered after any local database modification.
+     */
+    private fun triggerCloudSync() {
+        viewModelScope.launch {
+            try {
+                // Fetch assets once from the DB for the current vault
+                val currentAssets = assetDao.getAllAssetsOnce("MAIN")
+                if (currentAssets.isNotEmpty()) {
+                    googleDriveService.uploadFullVaultBackup(currentAssets)
+                }
+            } catch (e: Exception) {
+                Log.e("CLOUD_SYNC", "Auto-sync failed: ${e.message}")
+            }
+        }
+    }
 
     val isRefreshing: StateFlow<Boolean> = syncCoordinator.syncStatus
         .map { it is SyncStatus.Syncing }
@@ -86,7 +106,6 @@ class AssetViewModel @Inject constructor(
                             val searchProvider = searchRegistry.getProvider(provider)
                                 ?: searchRegistry.getDefaultProvider()
                             val results = searchProvider.search(cleanQuery)
-                            // 🚀 V8 Identity: Ensure search results land with 'MAIN' portfolio default
                             emit(results.map { it.toAssetEntity().copy(portfolioId = "MAIN", vaultId = currentVaultId.value) })
                         } catch (e: Exception) {
                             Log.e("SEARCH_ERROR", "Search failed: ${e.message}")
@@ -120,6 +139,7 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch {
             val taggedAsset = asset.copy(vaultId = currentVaultId.value)
             repository.executeSurgicalAdd(taggedAsset) { _, _ -> }
+            triggerCloudSync() // 🛰️ Backup to Cloud
             onComplete()
         }
     }
@@ -127,11 +147,15 @@ class AssetViewModel @Inject constructor(
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
             repository.deleteAsset(asset)
+            triggerCloudSync() // 🛰️ Sync Delete
         }
     }
 
     fun updateAssetOrder(assets: List<AssetEntity>) {
-        viewModelScope.launch { repository.updateAssetOrder(assets) }
+        viewModelScope.launch {
+            repository.updateAssetOrder(assets)
+            triggerCloudSync() // 🛰️ Sync Order
+        }
     }
 
     fun toggleWidgetVisibility(asset: AssetEntity) {
@@ -149,7 +173,10 @@ class AssetViewModel @Inject constructor(
                     val newIndex = symbols.indexOf(asset.baseSymbol)
                     if (newIndex != -1) asset.copy(displayOrder = newIndex) else asset
                 }
-            if (updatedList.isNotEmpty()) repository.updateAssetOrder(updatedList)
+            if (updatedList.isNotEmpty()) {
+                repository.updateAssetOrder(updatedList)
+                triggerCloudSync() // 🛰️ Sync Metal Order
+            }
         }
     }
 
@@ -159,10 +186,10 @@ class AssetViewModel @Inject constructor(
     fun updateAssetEntity(asset: AssetEntity) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset)
+            triggerCloudSync() // 🛰️ Sync Update
         }
     }
 
-    // 🛠️ V18: Standardized update including unit
     fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset.copy(
@@ -172,6 +199,7 @@ class AssetViewModel @Inject constructor(
                 weightUnit = weightUnit,
                 decimalPreference = decimals
             ))
+            triggerCloudSync() // 🛰️ Sync Detailed Update
         }
     }
 
