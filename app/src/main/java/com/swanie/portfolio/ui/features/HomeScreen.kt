@@ -1,5 +1,9 @@
 package com.swanie.portfolio.ui.features
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
@@ -28,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.components.BottomNavigationBar
@@ -40,8 +46,12 @@ import kotlin.math.min
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     // --- THEME BINDING ---
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
+    
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+
+    val authState by authViewModel.authState.collectAsState()
 
     val userThemeBgColor = remember(siteBgHex) {
         try { Color(android.graphics.Color.parseColor(siteBgHex)) }
@@ -50,6 +60,39 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val userThemeTextColor = remember(siteTextHex) {
         try { Color(android.graphics.Color.parseColor(siteTextHex)) }
         catch (e: Exception) { Color.White }
+    }
+
+    // --- GOOGLE SIGN-IN HANDLER ---
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                authViewModel.handleSignInResult(account)
+            } catch (e: ApiException) {
+                authViewModel.handleSignInResult(null)
+            }
+        }
+    }
+
+    // Navigation logic based on Auth State
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthViewModel.AuthState.VaultFound -> {
+                navController.navigate(Routes.UNLOCK_VAULT)
+            }
+            is AuthViewModel.AuthState.NewVaultRequired -> {
+                navController.navigate(Routes.CREATE_ACCOUNT)
+            }
+            is AuthViewModel.AuthState.Authenticated -> {
+                navController.navigate(Routes.HOLDINGS) {
+                    popUpTo(Routes.HOME) { inclusive = true }
+                }
+            }
+            else -> {}
+        }
     }
 
     // --- ANIMATION STATE ---
@@ -96,92 +139,84 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         animationStarted = true
     }
 
-    // --- UI LAYOUT WRAPPED IN SCAFFOLD ---
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            BottomNavigationBar(navController = navController)
-        },
-        containerColor = Color.Transparent // GRADIENT SYMMETRY
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+    // --- UI LAYOUT ---
+    Box(modifier = Modifier.fillMaxSize()) {
 
-            // 🛠️ SPLASH TRANSITION LAYER: Prevents flicker during launch
-            val transitionAlpha by animateFloatAsState(
-                targetValue = if (animationStarted) 0f else 1f,
-                animationSpec = tween(1000),
-                label = "SplashFade"
-            )
-            Box(Modifier.fillMaxSize().alpha(transitionAlpha).background(Color(0xFF000416)))
+        // 🛠️ SPLASH TRANSITION LAYER
+        val transitionAlpha by animateFloatAsState(
+            targetValue = if (animationStarted) 0f else 1f,
+            animationSpec = tween(1000),
+            label = "SplashFade"
+        )
+        Box(Modifier.fillMaxSize().alpha(transitionAlpha).background(Color(0xFF000416)))
 
-            // ANIMATED RADIAL REVEAL
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val centerPoint = Offset(size.width / 2f, size.height / 2f)
-                val maxDim = size.width.coerceAtLeast(size.height)
-                
-                // CRASH FIX: Ending radius must be > 0
-                if (radiusPercent > 0.01f) {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                userThemeBgColor.copy(alpha = 0.35f),
-                                Color.Transparent
-                            ),
-                            center = centerPoint,
-                            radius = maxDim * radiusPercent
+        // ANIMATED RADIAL REVEAL
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val centerPoint = Offset(size.width / 2f, size.height / 2f)
+            val maxDim = size.width.coerceAtLeast(size.height)
+            
+            if (radiusPercent > 0.01f) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            userThemeBgColor.copy(alpha = 0.35f),
+                            Color.Transparent
                         ),
-                        radius = maxDim * radiusPercent,
-                        center = centerPoint
-                    )
-                }
-            }
-
-            // THE SWAN LOGO (Hidden on Exit to prevent ghosting)
-            if (!isExiting) {
-                Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
-                    Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
-                        drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
-                    })
-                    Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
-                    if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
-                }
-
-                // BRAND TEXT
-                AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(modifier = Modifier.graphicsLayer(clip = false)) {
-                            Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
-                            if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
-                        }
-                        Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
-                    }
-                }
-            }
-
-            // AUTH TRAY
-            AnimatedVisibility(
-                visible = animateText && !isExiting,
-                enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 20.dp)
-            ) {
-                AuthTray(
-                    onLoginClick = { 
-                        isExiting = true
-                        navController.navigate(Routes.HOLDINGS) 
-                    },
-                    onCreateAccountClick = { 
-                        isExiting = true
-                        navController.navigate(Routes.CREATE_ACCOUNT) 
-                    },
-                    trayTextColor = userThemeTextColor
+                        center = centerPoint,
+                        radius = maxDim * radiusPercent
+                    ),
+                    radius = maxDim * radiusPercent,
+                    center = centerPoint
                 )
             }
+        }
+
+        // THE SWAN LOGO
+        if (!isExiting) {
+            Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
+                Spacer(modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha * 0.8f).drawBehind {
+                    drawCircle(brush = Brush.radialGradient(colors = listOf(userThemeTextColor.copy(alpha = 0.3f), Color.Transparent), radius = size.minDimension * 0.4f))
+                })
+                Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
+                if (showSparkleOnSwanHead) MetallicShimmer(modifier = Modifier.offset(x = 45.dp, y = (-50).dp).zIndex(2f))
+            }
+
+            // BRAND TEXT
+            AnimatedVisibility(visible = animateText, enter = fadeIn(tween(500, 50)), modifier = Modifier.align(Alignment.Center).offset(y = (-10).dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(modifier = Modifier.graphicsLayer(clip = false)) {
+                        Text(text = "Swanie's Portfolio", style = MaterialTheme.typography.headlineLarge, color = userThemeTextColor, fontWeight = FontWeight.Bold)
+                        if (showSparkleOnS) MetallicShimmer(modifier = Modifier.align(Alignment.TopStart).offset(x = 14.dp, y = 2.dp))
+                    }
+                    Text(text = "Crypto & Precious Metals", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Thin, fontSize = 12.sp, letterSpacing = 3.sp), color = userThemeTextColor.copy(alpha = 0.8f))
+                }
+            }
+        }
+
+        // AUTH TRAY
+        AnimatedVisibility(
+            visible = animateText && !isExiting,
+            enter = fadeIn(tween(500, 200)) + slideInVertically(initialOffsetY = { it / 2 }, animationSpec = tween(500, 200)),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
+        ) {
+            AuthTray(
+                onLoginClick = { 
+                    val client = authViewModel.googleDriveService.getGoogleSignInClient()
+                    googleSignInLauncher.launch(client.signInIntent)
+                },
+                onCreateAccountClick = { 
+                    isExiting = true
+                    navController.navigate(Routes.CREATE_ACCOUNT) 
+                },
+                trayTextColor = userThemeTextColor,
+                isLoading = authState is AuthViewModel.AuthState.Loading
+            )
         }
     }
 }
 
 @Composable
-fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTextColor: Color) {
+fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTextColor: Color, isLoading: Boolean) {
     Card(
         modifier = Modifier.fillMaxWidth(0.90f),
         shape = RoundedCornerShape(32.dp),
@@ -193,17 +228,18 @@ fun AuthTray(onLoginClick: () -> Unit, onCreateAccountClick: () -> Unit, trayTex
                 onClick = onLoginClick,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                enabled = !isLoading
             ) {
-                Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.Black, strokeWidth = 2.dp)
+                } else {
+                    Text("LOGIN", fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
             TextButton(onClick = onCreateAccountClick) {
                 Text("Create Account", color = trayTextColor, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            TextButton(onClick = { /* Handle Forgot Password logic here */ }) {
-                Text("Forgot Password?", color = trayTextColor.copy(alpha = 0.5f), fontSize = 13.sp)
             }
         }
     }

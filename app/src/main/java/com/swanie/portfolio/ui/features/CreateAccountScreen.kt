@@ -83,6 +83,8 @@ fun CreateAccountScreen(
     var selectedCurrency by remember { mutableStateOf("USD") }
     var selectedLanguage by remember { mutableStateOf("English") }
     var showLanguageSheet by remember { mutableStateOf(false) }
+    var showVaultFoundDialog by remember { mutableStateOf(false) }
+    
     val sheetState = rememberModalBottomSheetState()
     val scrollState = rememberScrollState()
 
@@ -94,15 +96,16 @@ fun CreateAccountScreen(
         if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
-                // PRECISION FIX: Use ApiException for proper error catching and pass to handleSignInResult
                 val account = task.getResult(ApiException::class.java)
+                Log.d("AUTH_DEBUG", "Handshake Success: ${account?.email}")
                 authViewModel.handleSignInResult(account)
             } catch (e: ApiException) {
-                Log.e("AUTH_DEBUG", "Sign-In Exception: ${e.statusCode}", e)
+                Log.e("AUTH_DEBUG", "Sign-In Exception Code: ${e.statusCode}", e)
+                Toast.makeText(context, "Handshake Failed (Code: ${e.statusCode}). Check SHA-1.", Toast.LENGTH_LONG).show()
                 authViewModel.handleSignInResult(null)
             }
         } else {
-            Log.e("AUTH_DEBUG", "Sign-In Canceled or Failed")
+            Log.e("AUTH_DEBUG", "Sign-In Canceled or Failed (Code: ${result.resultCode})")
             authViewModel.handleSignInResult(null)
         }
     }
@@ -129,21 +132,18 @@ fun CreateAccountScreen(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthViewModel.AuthState.VaultFound -> {
-                navController.navigate(Routes.RESTORE_VAULT)
+                showVaultFoundDialog = true
             }
             is AuthViewModel.AuthState.NewVaultRequired -> {
-                // Trigger the actual creation of the metadata on Drive
                 authViewModel.initializeNewVault(
-                    VaultMetadata(
-                        fullName = fullName,
-                        baseCurrency = selectedCurrency,
-                        language = selectedLanguage,
-                        passwordHint = passwordHint
-                    )
+                    fullName = fullName,
+                    currency = selectedCurrency,
+                    language = selectedLanguage,
+                    hint = passwordHint,
+                    password = password
                 )
             }
             is AuthViewModel.AuthState.Authenticated -> {
-                // Finalize setup and enter app
                 navController.navigate(Routes.HOLDINGS) {
                     popUpTo(Routes.CREATE_ACCOUNT) { inclusive = true }
                 }
@@ -370,7 +370,7 @@ fun CreateAccountScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CircularProgressIndicator(modifier = Modifier.size(16.dp), color = siteBg, strokeWidth = 2.dp)
                                 Spacer(Modifier.width(8.dp))
-                                Text("ESTABLISHING SOVEREIGN VAULT...", fontSize = 12.sp, fontWeight = FontWeight.Black)
+                                Text("ESTABLISHING VAULT...", fontSize = 12.sp, fontWeight = FontWeight.Black)
                             }
                         }
                         else -> {
@@ -388,7 +388,10 @@ fun CreateAccountScreen(
                     }
                 }
 
-                TextButton(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+                TextButton(onClick = { 
+                    val client = authViewModel.googleDriveService.getGoogleSignInClient()
+                    googleSignInLauncher.launch(client.signInIntent)
+                }, modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
                     Text("ALREADY HAVE A VAULT? SIGN IN", color = siteText.copy(0.5f), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -414,6 +417,29 @@ fun CreateAccountScreen(
                     Spacer(Modifier.height(40.dp))
                 }
             }
+        }
+
+        // --- 🏛️ VAULT FOUND DIALOG ---
+        if (showVaultFoundDialog) {
+            AlertDialog(
+                onDismissRequest = { showVaultFoundDialog = false },
+                containerColor = cardBg,
+                title = { Text("VAULT FOUND", color = siteText, fontWeight = FontWeight.Black) },
+                text = { Text("An existing vault was found for this account. Would you like to unlock it?", color = siteText.copy(0.7f)) },
+                confirmButton = {
+                    TextButton(onClick = { 
+                        showVaultFoundDialog = false
+                        navController.navigate(Routes.UNLOCK_VAULT) 
+                    }) {
+                        Text("UNLOCK VAULT", color = accentGold, fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showVaultFoundDialog = false }) {
+                        Text("CANCEL", color = siteText.copy(0.5f))
+                    }
+                }
+            )
         }
     }
 }
