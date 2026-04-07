@@ -2,13 +2,13 @@ package com.swanie.portfolio.widget
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.*
@@ -20,6 +20,7 @@ import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.layout.*
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.*
@@ -38,13 +39,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
-import java.io.File
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionStartActivity
-import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.layout.ContentScale
 
 class PortfolioWidget : GlanceAppWidget() {
@@ -53,14 +52,13 @@ class PortfolioWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Exact
 
     companion object {
+        val VAULT_ID_KEY = intPreferencesKey("bound_vault_id") // 🛡️ Multi-Instance Binding
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
         val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
         val WIDGET_BG_COLOR_KEY = stringPreferencesKey("widget_bg_color")
         val WIDGET_BG_TEXT_COLOR_KEY = stringPreferencesKey("widget_bg_text_color")
         val WIDGET_CARD_COLOR_KEY = stringPreferencesKey("widget_card_color")
         val WIDGET_CARD_TEXT_COLOR_KEY = stringPreferencesKey("widget_card_text_color")
-
-        // 🛠️ Restored for WidgetManagerScreen.kt compatibility
         val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
     }
 
@@ -77,15 +75,17 @@ class PortfolioWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidgetEntryPoint::class.java)
-        val prefs = getAppWidgetState<Preferences>(context, id)
+        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
 
+        // 🛡️ Multi-Instance Binding Logic
+        val boundVaultId = prefs[VAULT_ID_KEY]
+        val currentVaultId = boundVaultId ?: entryPoint.themePreferences().currentVaultId.first()
+
         val userConfig = entryPoint.userConfigDao().getUserConfig().first()
-        val currentVaultId = entryPoint.themePreferences().currentVaultId.first()
         val activeVault = entryPoint.vaultDao().getVaultById(currentVaultId)
         val allVaultAssets = entryPoint.assetDao().getAssetsByVault(currentVaultId).first()
 
-        // 🛡️ Data Source PIVOT: Pull from VaultEntity first, then Preferences, then Global (Fallback)
         val selectedIds = activeVault?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() }
             ?: prefs[SELECTED_ASSETS_KEY]?.split(",")?.filter { it.isNotBlank() }
             ?: emptyList()
@@ -104,7 +104,6 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
-        // 🛡️ Appearance Pivot: Use activeVault colors first, falling back to prefs or hardcoded defaults
         val rawBg = activeVault?.widgetBgColor ?: prefs[WIDGET_BG_COLOR_KEY] ?: "#1C1C1E"
         val rawBgTxt = activeVault?.widgetBgTextColor ?: prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: "#FFFFFF"
         val rawCrd = activeVault?.widgetCardColor ?: prefs[WIDGET_CARD_COLOR_KEY] ?: "#2C2C2E"
@@ -152,7 +151,6 @@ fun WidgetContent(
             .padding(8.dp)
             .clickable(actionStartActivity(Intent(LocalContext.current, MainActivity::class.java)))
     ) {
-        // Header Box to center the vault name while keeping refresh on the right
         Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
                 text = vaultName,
@@ -299,12 +297,18 @@ fun StampFallback(asset: AssetEntity, isMetal: Boolean) {
 class RefreshCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
-        val currentVaultId = entryPoint.themePreferences().currentVaultId.first()
+        
+        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val boundVaultId = prefs[PortfolioWidget.VAULT_ID_KEY]
+        val currentVaultId = boundVaultId ?: entryPoint.themePreferences().currentVaultId.first()
+        
         entryPoint.assetRepository().refreshAssets(force = true, portfolioId = currentVaultId.toString())
 
         val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[PortfolioWidget.LAST_UPDATED_KEY] = newTime
+        updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->
+            p.toMutablePreferences().apply {
+                this[PortfolioWidget.LAST_UPDATED_KEY] = newTime
+            }.toPreferences()
         }
         PortfolioWidget().update(context, glanceId)
     }

@@ -22,14 +22,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -235,16 +233,19 @@ fun WidgetManagerScreen(
                                                 draftCrdTxt
                                             )
 
-                                            // 4. Force immediate Glance broadcast with specific data
+                                            // 4. Force immediate Glance broadcast and BIND current widgets to this vault
                                             val manager = GlanceAppWidgetManager(context)
                                             val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
                                             glanceIds.forEach { id ->
                                                 updateAppWidgetState(context, id) { p ->
+                                                    // 🛡️ Multi-Instance Binding: Store which vault this widget instance belongs to
+                                                    p[PortfolioWidget.VAULT_ID_KEY] = selectedVault.id
+                                                    
                                                     p[PortfolioWidget.SELECTED_ASSETS_KEY] = draftSelectedIds.joinToString(",")
-                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_color")] = draftBg
-                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_text_color")] = draftBgTxt
-                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_color")] = draftCrd
-                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_text_color")] = draftCrdTxt
+                                                    p[PortfolioWidget.WIDGET_BG_COLOR_KEY] = draftBg
+                                                    p[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = draftBgTxt
+                                                    p[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = draftCrd
+                                                    p[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = draftCrdTxt
                                                     p[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
                                                 }
                                                 PortfolioWidget().update(context, id)
