@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.swanie.portfolio.ui.settings
 
 import android.content.Context
@@ -24,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -48,14 +51,12 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.widget.PortfolioWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WidgetManagerScreen(
     navController: NavHostController,
@@ -99,12 +100,12 @@ fun WidgetManagerScreen(
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var privacyExpanded by rememberSaveable { mutableStateOf(false) }
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
-    var isExiting by remember { mutableStateOf(false) }
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
 
     val sharedPrefs = remember { context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
     var cooldownSeconds by remember { mutableIntStateOf(0) }
+
     LaunchedEffect(Unit) {
         val lastSave = sharedPrefs.getLong("last_widget_save_time", 0L)
         val elapsed = (System.currentTimeMillis() - lastSave) / 1000
@@ -113,24 +114,132 @@ fun WidgetManagerScreen(
     }
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText) },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText) } },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
-            )
-        },
-        bottomBar = {
-            if (!isExiting) {
-                BottomNavigationBar(
-                    navController = navController,
-                    onNavigate = { isExiting = true }
+    // 🛡️ SURGERY: Replacing Scaffold with Box for global shell compatibility
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+        ) {
+            // --- CUSTOM HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .padding(horizontal = 4.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
+                }
+                Text(
+                    text = "WIDGET MANAGER",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 16.sp,
+                    color = safeThemeText,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
-        },
-        floatingActionButton = {
+
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                // 🛡️ Padding adjusted for the Sync Button and Global Nav Bar
+                contentPadding = PaddingValues(bottom = 120.dp)
+            ) {
+                item {
+                    WidgetPreviewSlim(
+                        bgHex = draftBg, bgTxtHex = draftBgTxt,
+                        cardHex = draftCrd, cardTxtHex = draftCrdTxt,
+                        showTotal = !draftHideTotals
+                    )
+                }
+
+                item {
+                    SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
+                    AnimatedVisibility(visible = appearanceExpanded) {
+                        WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
+                            when(target) {
+                                0 -> draftBg = newHex
+                                1 -> draftBgTxt = newHex
+                                2 -> draftCrd = newHex
+                                3 -> draftCrdTxt = newHex
+                            }
+                        }
+                    }
+                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                }
+
+                item {
+                    SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
+                    AnimatedVisibility(visible = privacyExpanded) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable { draftHideTotals = !draftHideTotals },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Hide Totals", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                            Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
+                        }
+                    }
+                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                }
+
+                item {
+                    val countText = "${draftSelectedIds.size}/5 SELECTED"
+                    SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
+                }
+
+                if (assetsExpanded) {
+                    if (assets.isEmpty()) {
+                        item { Text("No assets in portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
+                    } else {
+                        itemsIndexed(assets) { _, asset ->
+                            val isSelected = draftSelectedIds.contains(asset.coinId)
+                            val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
+
+                            WidgetAssetSelectItem(
+                                asset = asset,
+                                isSelected = isSelected,
+                                orderIndex = orderIndex,
+                                onToggle = {
+                                    if (isSelected) {
+                                        draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
+                                    } else {
+                                        if (draftSelectedIds.size < 5) {
+                                            draftSelectedIds = draftSelectedIds + asset.coinId
+                                        } else {
+                                            Toast.makeText(context, "Max 5 assets for widget", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                },
+                                themeColor = safeThemeText
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- PINNED SYNC BUTTON (Replacing FAB) ---
+        // 🛡️ Positioned above the global BottomBar
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 90.dp) // Clears global Nav Bar
+                .fillMaxWidth(0.9f)
+        ) {
             val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
             Button(
                 onClick = {
@@ -164,96 +273,25 @@ fun WidgetManagerScreen(
                         }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth(0.85f)
-                    .height(66.dp)
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow, contentColor = Color.Black),
-                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow,
+                    contentColor = Color.Black
+                ),
+                shape = RoundedCornerShape(12.dp),
                 enabled = cooldownSeconds == 0
-            ) { Text(if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET", fontWeight = FontWeight.Black) }
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
-            item {
-                WidgetPreviewSlim(
-                    bgHex = draftBg, bgTxtHex = draftBgTxt,
-                    cardHex = draftCrd, cardTxtHex = draftCrdTxt,
-                    showTotal = !draftHideTotals
+            ) {
+                Text(
+                    text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 14.sp
                 )
-            }
-
-            item {
-                SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
-                AnimatedVisibility(visible = appearanceExpanded) {
-                    WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
-                        when(target) {
-                            0 -> draftBg = newHex
-                            1 -> draftBgTxt = newHex
-                            2 -> draftCrd = newHex
-                            3 -> draftCrdTxt = newHex
-                        }
-                    }
-                }
-                HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-            }
-
-            item {
-                SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
-                AnimatedVisibility(visible = privacyExpanded) {
-                    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hide Totals", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                        Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
-                    }
-                }
-                HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-            }
-
-            item {
-                val countText = "${draftSelectedIds.size}/5 SELECTED"
-                SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
-            }
-
-            if (assetsExpanded) {
-                if (assets.isEmpty()) {
-                    item { Text("No assets in portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
-                } else {
-                    itemsIndexed(assets) { _, asset ->
-                        val isSelected = draftSelectedIds.contains(asset.coinId)
-                        val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
-
-                        WidgetAssetSelectItem(
-                            asset = asset,
-                            isSelected = isSelected,
-                            orderIndex = orderIndex,
-                            onToggle = {
-                                if (isSelected) {
-                                    draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
-                                } else {
-                                    if (draftSelectedIds.size < 5) {
-                                        draftSelectedIds = draftSelectedIds + asset.coinId
-                                    } else {
-                                        Toast.makeText(context, "Max 5 assets for widget", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            },
-                            themeColor = safeThemeText
-                        )
-                    }
-                }
             }
         }
     }
 }
 
+// Helper components remain largely unchanged but are scoped properly
 @Composable
 fun WidgetPreviewSlim(bgHex: String, bgTxtHex: String, cardHex: String, cardTxtHex: String, showTotal: Boolean) {
     val bgColor = try { Color(bgHex.toColorInt()) } catch(e: Exception) { Color.Black }
