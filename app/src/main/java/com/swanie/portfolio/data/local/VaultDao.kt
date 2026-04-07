@@ -20,6 +20,9 @@ interface VaultDao {
     @Query("UPDATE vaults SET baseCurrency = :code WHERE id = :id")
     suspend fun updateVaultCurrency(id: Int, code: String)
 
+    @Query("UPDATE vaults SET selectedWidgetAssets = :assets WHERE id = :vaultId")
+    suspend fun updateSelectedWidgetAssets(vaultId: Int, assets: String)
+
     @Delete
     suspend fun deleteVault(vault: VaultEntity)
 }

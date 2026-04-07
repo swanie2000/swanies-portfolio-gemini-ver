@@ -9,6 +9,7 @@ import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.UserConfigEntity
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.VaultDao
+import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -77,12 +78,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration
-    fun saveWidgetConfiguration(selectedIds: List<String>, onComplete: () -> Unit) {
+    // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration (Vault-Specific)
+    fun saveWidgetConfiguration(vaultId: Int, selectedIds: List<String>, onComplete: () -> Unit) {
         viewModelScope.launch {
             _isSaving.value = true
             val idsString = selectedIds.joinToString(",")
-            userConfigDao.updateSelectedWidgetAssets(idsString)
+            vaultDao.updateSelectedWidgetAssets(vaultId, idsString)
             updateWidget()
             _isSaving.value = false
             onComplete()
@@ -90,26 +91,26 @@ class SettingsViewModel @Inject constructor(
     }
 
     // 🛡️ NUCLEAR RESET: Deletes ALL assets, resets widget selections, and resets timestamp.
-    fun clearAllAssets() {
+    fun clearAllAssets(vaultId: Int) {
         viewModelScope.launch {
             assetDao.deleteAll()
-            userConfigDao.updateSelectedWidgetAssets("")
+            vaultDao.updateSelectedWidgetAssets(vaultId, "")
             userConfigDao.updateLastSync(0L)
             updateWidget()
         }
     }
 
-    // 🛡️ SURGICAL RESET: ONLY clears widget selection string to fix "7-10" numbering issue.
-    fun clearWidgetSelection() {
+    // 🛡️ SURGICAL RESET: ONLY clears widget selection string for specific vault.
+    fun clearWidgetSelection(vaultId: Int) {
         viewModelScope.launch {
-            userConfigDao.updateSelectedWidgetAssets("")
+            vaultDao.updateSelectedWidgetAssets(vaultId, "")
             updateWidget()
         }
     }
 
-    fun updateSelectedWidgetAssets(assets: String) {
+    fun updateSelectedWidgetAssets(vaultId: Int, assets: String) {
         viewModelScope.launch {
-            userConfigDao.updateSelectedWidgetAssets(assets)
+            vaultDao.updateSelectedWidgetAssets(vaultId, assets)
             updateWidget()
         }
     }
@@ -153,4 +154,11 @@ class SettingsViewModel @Inject constructor(
             themePreferences.saveConfirmDelete(true)
         }
     }
+
+    fun getVaultById(vaultId: Int) = viewModelScope.launch {
+        vaultDao.getVaultById(vaultId)
+    }
+
+    val allVaults: StateFlow<List<VaultEntity>> = vaultDao.getAllVaultsFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 }

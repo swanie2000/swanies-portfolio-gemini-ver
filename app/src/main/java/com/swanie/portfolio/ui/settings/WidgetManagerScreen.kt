@@ -70,6 +70,10 @@ fun WidgetManagerScreen(
 
     val userConfig by settingsViewModel.userConfig.collectAsStateWithLifecycle(null)
     val assets by assetViewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
+    val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
+    
+    // Defaulting to the first vault for now, as we move toward instance-based selection.
+    val activeVault = vaults.firstOrNull() 
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
     val currentBg by themeViewModel.widgetBgColor.collectAsStateWithLifecycle(initialValue = "#1C1C1E")
@@ -85,9 +89,9 @@ fun WidgetManagerScreen(
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var hasInitializedSelection by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(userConfig) {
-        if (!hasInitializedSelection && userConfig != null) {
-            draftSelectedIds = userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+    LaunchedEffect(activeVault) {
+        if (!hasInitializedSelection && activeVault != null) {
+            draftSelectedIds = activeVault.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
             hasInitializedSelection = true
         }
     }
@@ -124,7 +128,6 @@ fun WidgetManagerScreen(
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
-                // 🛡️ Tightened bottom padding to 0. Global Scaffold handles the rest.
                 contentPadding = PaddingValues(bottom = 0.dp)
             ) {
                 item {
@@ -185,16 +188,15 @@ fun WidgetManagerScreen(
                     }
                 }
 
-                // 🛡️ THE SYNC BUTTON IS NOW PART OF THE LIST
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                     val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
                     Button(
                         onClick = {
-                            if (cooldownSeconds == 0) {
+                            if (cooldownSeconds == 0 && activeVault != null) {
                                 scope.launch {
                                     settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
-                                    settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
+                                    settingsViewModel.saveWidgetConfiguration(activeVault.id, draftSelectedIds) {
                                         themeViewModel.updateWidgetBgColor(draftBg)
                                         themeViewModel.updateWidgetBgTextColor(draftBgTxt)
                                         themeViewModel.updateWidgetCardColor(draftCrd)
@@ -234,15 +236,12 @@ fun WidgetManagerScreen(
                     ) {
                         Text(text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET", fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
-                    // 🛡️ FINAL SPACER FOR GLOBAL BAR CLEARANCE
                     Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }
     }
 }
-
-// ... (Rest of helper functions same as previous working state)
 
 @Composable
 fun WidgetPreviewSlim(bgHex: String, bgTxtHex: String, cardHex: String, cardTxtHex: String, showTotal: Boolean) {

@@ -8,5 +8,6 @@ data class VaultEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val baseCurrency: String = "USD",
-    val vaultColor: String = "#000416"
+    val vaultColor: String = "#000416",
+    val selectedWidgetAssets: String = ""
 )

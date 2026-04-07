@@ -30,6 +30,7 @@ import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.AssetDao
+import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.AssetCategory
 import dagger.hilt.EntryPoint
@@ -70,6 +71,7 @@ class PortfolioWidget : GlanceAppWidget() {
         fun userConfigDao(): UserConfigDao
         fun priceHistoryDao(): PriceHistoryDao
         fun assetDao(): AssetDao
+        fun vaultDao(): VaultDao
         fun themePreferences(): ThemePreferences
     }
 
@@ -80,10 +82,13 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val userConfig = entryPoint.userConfigDao().getUserConfig().first()
         val currentVaultId = entryPoint.themePreferences().currentVaultId.first()
+        val activeVault = entryPoint.vaultDao().getVaultById(currentVaultId)
         val allVaultAssets = entryPoint.assetDao().getAssetsByVault(currentVaultId).first()
 
-        val selectedIds = prefs[SELECTED_ASSETS_KEY]?.split(",")?.filter { it.isNotBlank() }
-            ?: userConfig?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
+        // 🛡️ Data Source PIVOT: Pull from VaultEntity first, then Preferences, then Global (Fallback)
+        val selectedIds = activeVault?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() }
+            ?: prefs[SELECTED_ASSETS_KEY]?.split(",")?.filter { it.isNotBlank() }
+            ?: emptyList()
 
         val filteredAssets = if (selectedIds.isEmpty()) allVaultAssets.take(5)
         else selectedIds.mapNotNull { aid -> allVaultAssets.find { it.coinId == aid } }.take(5)
@@ -99,7 +104,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
-        val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: userConfig?.widgetBgColor ?: "#000416"
+        val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: activeVault?.vaultColor ?: userConfig?.widgetBgColor ?: "#000416"
         val rawBgTxt = prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: userConfig?.widgetBgTextColor ?: "#FFFFFF"
         val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#1E1E1E"
         val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#FFFFFF"
@@ -120,7 +125,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 bgTextColor = bgTextColor,
                 cardColor = cardColor,
                 cardTextColor = cardTextColor,
-                vaultName = if (currentVaultId == 1) "METALS" else "CRYPTO"
+                vaultName = activeVault?.name ?: "PORTFOLIO"
             )
         }
     }

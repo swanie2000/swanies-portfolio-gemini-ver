@@ -24,9 +24,6 @@ interface UserConfigDao {
     @Query("UPDATE user_config SET showWidgetTotal = :show WHERE id = 1")
     suspend fun updateShowWidgetTotal(show: Boolean)
 
-    @Query("UPDATE user_config SET selectedWidgetAssets = :assets WHERE id = 1")
-    suspend fun updateSelectedWidgetAssets(assets: String)
-
     @Query("UPDATE user_config SET widgetBgColor = :color WHERE id = 1")
     suspend fun updateWidgetBgColor(color: String)
 

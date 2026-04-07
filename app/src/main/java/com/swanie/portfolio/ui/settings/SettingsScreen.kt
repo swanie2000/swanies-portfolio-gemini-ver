@@ -30,6 +30,7 @@ fun SettingsScreen(
 ) {
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
+    val currentVaultId by mainViewModel.currentVaultId.collectAsState(initial = 1)
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -62,7 +63,7 @@ fun SettingsScreen(
                 TextButton(
                     onClick = {
                         scope.launch {
-                            settingsViewModel.clearAllAssets()
+                            settingsViewModel.clearAllAssets(currentVaultId)
                             showFactoryResetDialog = false
                         }
                     }
