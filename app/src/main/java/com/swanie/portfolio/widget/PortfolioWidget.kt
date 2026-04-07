@@ -104,10 +104,11 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
-        val rawBg = prefs[WIDGET_BG_COLOR_KEY] ?: activeVault?.vaultColor ?: userConfig?.widgetBgColor ?: "#000416"
-        val rawBgTxt = prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: userConfig?.widgetBgTextColor ?: "#FFFFFF"
-        val rawCrd = prefs[WIDGET_CARD_COLOR_KEY] ?: userConfig?.widgetCardColor ?: "#1E1E1E"
-        val rawCrdTxt = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: userConfig?.widgetCardTextColor ?: "#FFFFFF"
+        // 🛡️ Appearance Pivot: Use activeVault colors first, falling back to prefs or hardcoded defaults
+        val rawBg = activeVault?.widgetBgColor ?: prefs[WIDGET_BG_COLOR_KEY] ?: "#1C1C1E"
+        val rawBgTxt = activeVault?.widgetBgTextColor ?: prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: "#FFFFFF"
+        val rawCrd = activeVault?.widgetCardColor ?: prefs[WIDGET_CARD_COLOR_KEY] ?: "#2C2C2E"
+        val rawCrdTxt = activeVault?.widgetCardTextColor ?: prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: "#FFFFFF"
 
         val bgColor = Color(android.graphics.Color.parseColor(rawBg))
         val bgTextColor = Color(android.graphics.Color.parseColor(rawBgTxt))

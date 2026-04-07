@@ -90,6 +90,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // 🛡️ PER-VAULT APPEARANCE: Saves custom widget colors for a specific vault
+    suspend fun saveWidgetAppearance(vaultId: Int, bg: String, bgText: String, card: String, cardText: String) {
+        vaultDao.updateWidgetColors(vaultId, bg, bgText, card, cardText)
+        updateWidget()
+    }
+
     // 🛡️ NUCLEAR RESET: Deletes ALL assets, resets widget selections, and resets timestamp.
     fun clearAllAssets(vaultId: Int) {
         viewModelScope.launch {

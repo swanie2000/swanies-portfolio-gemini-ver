@@ -94,22 +94,22 @@ fun WidgetManagerScreen(
 
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
-    val currentBg by themeViewModel.widgetBgColor.collectAsStateWithLifecycle(initialValue = "#1C1C1E")
-    val currentBgTxt by themeViewModel.widgetBgTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
-    val currentCrd by themeViewModel.widgetCardColor.collectAsStateWithLifecycle(initialValue = "#2C2C2E")
-    val currentCrdTxt by themeViewModel.widgetCardTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
-
-    var draftBg by rememberSaveable(currentBg) { mutableStateOf(currentBg) }
-    var draftBgTxt by rememberSaveable(currentBgTxt) { mutableStateOf(currentBgTxt) }
-    var draftCrd by rememberSaveable(currentCrd) { mutableStateOf(currentCrd) }
-    var draftCrdTxt by rememberSaveable(currentCrdTxt) { mutableStateOf(currentCrdTxt) }
+    // Draft states for colors, reactive to selected vault changes
+    var draftBg by rememberSaveable { mutableStateOf("#1C1C1E") }
+    var draftBgTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
+    var draftCrd by rememberSaveable { mutableStateOf("#2C2C2E") }
+    var draftCrdTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
 
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
 
-    // Re-initialize selection when vault changes in the strip
+    // Re-initialize selection and colors when vault changes in the strip
     LaunchedEffect(selectedVault?.id) {
         selectedVault?.let {
             draftSelectedIds = it.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
+            draftBg = it.widgetBgColor
+            draftBgTxt = it.widgetBgTextColor
+            draftCrd = it.widgetCardColor
+            draftCrdTxt = it.widgetCardTextColor
         }
     }
 
@@ -220,13 +220,22 @@ fun WidgetManagerScreen(
                         onClick = {
                             if (cooldownSeconds == 0 && selectedVault != null) {
                                 scope.launch {
+                                    // 1. Update privacy global config
                                     settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
+                                    
+                                    // 2. Save vault-specific asset selection
                                     settingsViewModel.saveWidgetConfiguration(selectedVault.id, draftSelectedIds) {
-                                        themeViewModel.updateWidgetBgColor(draftBg)
-                                        themeViewModel.updateWidgetBgTextColor(draftBgTxt)
-                                        themeViewModel.updateWidgetCardColor(draftCrd)
-                                        themeViewModel.updateWidgetCardTextColor(draftCrdTxt)
                                         scope.launch {
+                                            // 3. Save vault-specific colors
+                                            settingsViewModel.saveWidgetAppearance(
+                                                selectedVault.id,
+                                                draftBg,
+                                                draftBgTxt,
+                                                draftCrd,
+                                                draftCrdTxt
+                                            )
+
+                                            // 4. Force immediate Glance broadcast with specific data
                                             val manager = GlanceAppWidgetManager(context)
                                             val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
                                             glanceIds.forEach { id ->
@@ -240,6 +249,7 @@ fun WidgetManagerScreen(
                                                 }
                                                 PortfolioWidget().update(context, id)
                                             }
+
                                             sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
                                             cooldownSeconds = 180
                                             Toast.makeText(context, "Widget Synced!", Toast.LENGTH_SHORT).show()

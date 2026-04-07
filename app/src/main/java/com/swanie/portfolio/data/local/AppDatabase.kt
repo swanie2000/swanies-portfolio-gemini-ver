@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    // 🛡️ V20: Per-Vault Widget Configuration
-    version = 20,
+    // 🛡️ V21: Per-Vault Widget Appearance Colors
+    version = 21,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -51,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
                             // Seed the default vault
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Direct SQL insert for the seed to avoid DAO circular dependency on creation
-                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '')")
+                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets, widgetBgColor, widgetBgTextColor, widgetCardColor, widgetCardTextColor) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '', '#1C1C1E', '#FFFFFF', '#2C2C2E', '#FFFFFF')")
                             }
                         }
                     })

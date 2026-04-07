@@ -9,5 +9,9 @@ data class VaultEntity(
     val name: String,
     val baseCurrency: String = "USD",
     val vaultColor: String = "#000416",
-    val selectedWidgetAssets: String = ""
+    val selectedWidgetAssets: String = "",
+    val widgetBgColor: String = "#1C1C1E",
+    val widgetBgTextColor: String = "#FFFFFF",
+    val widgetCardColor: String = "#2C2C2E",
+    val widgetCardTextColor: String = "#FFFFFF"
 )

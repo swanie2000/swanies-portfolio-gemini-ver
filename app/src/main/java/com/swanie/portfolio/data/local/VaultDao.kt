@@ -23,6 +23,9 @@ interface VaultDao {
     @Query("UPDATE vaults SET selectedWidgetAssets = :assets WHERE id = :vaultId")
     suspend fun updateSelectedWidgetAssets(vaultId: Int, assets: String)
 
+    @Query("UPDATE vaults SET widgetBgColor = :bg, widgetBgTextColor = :bgText, widgetCardColor = :card, widgetCardTextColor = :cardText WHERE id = :vaultId")
+    suspend fun updateWidgetColors(vaultId: Int, bg: String, bgText: String, card: String, cardText: String)
+
     @Delete
     suspend fun deleteVault(vault: VaultEntity)
 }
