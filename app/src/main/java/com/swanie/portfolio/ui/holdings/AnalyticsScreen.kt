@@ -34,7 +34,7 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.ui.components.BottomNavigationBar
+// 🛡️ NO EXTRA IMPORTS ADDED HERE
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import java.text.NumberFormat
 import java.util.Locale
@@ -78,16 +78,16 @@ fun AnalyticsScreen(navController: NavController) {
     val focusedSegment = assetSegments.find { it.asset.coinId == selectedAssetId }
     val pagerState = rememberPagerState(pageCount = { 3 })
 
-    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController, onNavigate = { isExiting = true }) },
-        containerColor = Color.Transparent
-    ) { paddingValues ->
+    // 🛡️ SURGERY: Replacing Scaffold/BottomBar with a simple Box
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
         if (!isExiting) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
                 Box(modifier = Modifier.fillMaxWidth().statusBarsPadding(), contentAlignment = Alignment.Center) {
@@ -203,7 +203,7 @@ fun AnalyticsScreen(navController: NavController) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = safeText.copy(0.05f))
                     }
                 }
-                Spacer(Modifier.height(40.dp))
+                Spacer(Modifier.height(100.dp))
             }
         }
     }
@@ -317,6 +317,7 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
         Row(modifier = Modifier.weight(0.6f), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                 if (segment.asset.category == AssetCategory.METAL) {
+                    // This relies on MetalIcon being available in the package scope
                     MetalIcon(name = segment.asset.name, weight = segment.asset.weight, size = 30, category = segment.asset.category)
                 } else {
                     AsyncImage(
