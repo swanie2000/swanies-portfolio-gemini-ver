@@ -81,13 +81,11 @@ fun MyHoldingsScreen(
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
 
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
-    val confirmDeleteSetting by mainViewModel.confirmDelete.collectAsStateWithLifecycle(initialValue = true)
 
     val lazyListState = rememberLazyListState()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
-    // --- 🛡️ LOADING STATE ---
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
@@ -98,7 +96,6 @@ fun MyHoldingsScreen(
     val isOverTrash = remember { mutableStateOf(false) }
     var isExiting by remember { mutableStateOf(false) }
 
-    // --- 🏰 CURTAIN LOGIC ---
     var isUnlocked by remember { mutableStateOf(false) }
     val curtainAlpha = remember { Animatable(1f) }
 
@@ -110,7 +107,6 @@ fun MyHoldingsScreen(
         curtainAlpha.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
     }
 
-    // --- PAGER LOGIC ---
     val pagerState = rememberPagerState(
         initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
     ) { allVaults.size.coerceAtLeast(1) }
@@ -157,17 +153,22 @@ fun MyHoldingsScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(siteBg).pointerInput(Unit) {
-        awaitPointerEventScope {
-            while (true) {
-                val event = awaitPointerEvent(PointerEventPass.Initial)
-                val change = event.changes.firstOrNull() ?: continue
-                trashBoundsInRoot.value?.let { bounds ->
-                    isOverTrash.value = isDraggingActive.value && bounds.contains(change.position)
+    // 🛡️ REFACTORED: Root container is now a Box, respecting the global Navigation Bar
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(siteBg)
+        .pointerInput(Unit) {
+            awaitPointerEventScope {
+                while (true) {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    val change = event.changes.firstOrNull() ?: continue
+                    trashBoundsInRoot.value?.let { bounds ->
+                        isOverTrash.value = isDraggingActive.value && bounds.contains(change.position)
+                    }
                 }
             }
         }
-    }) {
+    ) {
         if (!isExiting) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header
@@ -175,7 +176,6 @@ fun MyHoldingsScreen(
                     Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(100.dp).align(Alignment.Center))
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
 
-                        // --- 🚀 REFRESH BUTTON FIX ---
                         IconButton(onClick = {
                             if (!isViewModelRefreshing) viewModel.refreshAssets()
                         }) {
@@ -226,7 +226,6 @@ fun MyHoldingsScreen(
                             if (isCurrentPage && isUnlocked) {
                                 Column(modifier = Modifier.fillMaxSize().graphicsLayer { alpha = (1f - curtainAlpha.value).coerceIn(0f, 1f) * contentAlpha }) {
 
-                                    // --- 🛡️ FIXED TABS WITH TOP-RIGHT OVERLAY BADGE ---
                                     Row(
                                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(44.dp),
                                         verticalAlignment = Alignment.CenterVertically
@@ -278,7 +277,6 @@ fun MyHoldingsScreen(
                                         }
                                     }
 
-                                    // --- 🚀 CHARGING BAR (PROGRESS INDICATOR) FIX ---
                                     Box(modifier = Modifier.fillMaxWidth().height(12.dp).padding(horizontal = 24.dp)) {
                                         if (isViewModelRefreshing) {
                                             LinearProgressIndicator(
@@ -307,7 +305,6 @@ fun MyHoldingsScreen(
                                                     }
                                                 )
 
-                                                // These are kept exactly as they were in your working version
                                                 if (isCompactViewEnabled && !isExpanded) CompactAssetCard(asset, isDragging, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, dragModifier)
                                                 else FullAssetCard(asset, isExpanded, false, isDragging, isExpanded, cardBg, cardText, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, { assetBeingEdited = asset }, { _, _, _, _, _ -> }, modifier = dragModifier)
                                             }
@@ -322,13 +319,13 @@ fun MyHoldingsScreen(
                         }
                     }
                 }
-                BottomNavigationBar(navController = navController, onNavigate = { isExiting = true })
+                // 🛡️ REFACTORED: Removed internal BottomNavigationBar. MainActivity now handles this.
             }
         }
 
         AnimatedVisibility(
             visible = isDraggingActive.value && !isExiting,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 120.dp).zIndex(100f).onGloballyPositioned { coords ->
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 40.dp).zIndex(100f).onGloballyPositioned { coords ->
                 val pos = coords.positionInRoot()
                 trashBoundsInRoot.value = Rect(pos.x, pos.y, pos.x + coords.size.width, pos.y + coords.size.height)
             }
