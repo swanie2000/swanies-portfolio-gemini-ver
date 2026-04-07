@@ -2,8 +2,15 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+// 🛡️ Force Metadata Resolution to fix Kotlin 2.1 Compatibility
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
+    }
 }
 
 android {
@@ -79,9 +86,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.datastore:datastore-preferences:1.2.0")
 
-    // HILT - UPGRADED TO 2.54
-    implementation("com.google.dagger:hilt-android:2.54")
-    ksp("com.google.dagger:hilt-android-compiler:2.54")
+    // HILT
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // GLANCE WIDGETS
@@ -91,7 +98,7 @@ dependencies {
     // WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
 
-    // GOOGLE DRIVE & AUTH (ZERO-KNOWLEDGE SYNC)
+    // GOOGLE DRIVE & AUTH
     implementation(libs.play.services.auth)
     implementation(libs.google.api.client.android)
     implementation(libs.google.api.services.drive)
@@ -105,5 +112,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-
-// ===== END OF FILE =====

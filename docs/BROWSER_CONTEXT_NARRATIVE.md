@@ -1,44 +1,44 @@
-UPDATED NARRATIVE: THE MULTI-INSTANCE REVOLUTION (V8.0.0)
+UPDATED NARRATIVE: THE "PRODUCTION READY" MULTI-VAULT SYSTEM (V8.1.0)
 
-Current Version: 8.0.0 (The "Sovereign Dashboard" Edition)
+Current Version: 8.1.0 (The "Picker & Stability" Edition)
 
-Build Status: 🟢 MAJOR MILESTONE / MULTI-INSTANCE FUNCTIONAL
-🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 10 "FUNCTIONAL INDEPENDENCE"
+Build Status: 🟢 STABLE / KOTLIN 2.1 COMPATIBLE
+🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 11 "USER ONBOARDING & STABILITY"
 
-We have successfully breached the final frontier of widget architecture. The app has transitioned from a "Follow-the-Leader" model to a true multi-instance system where every widget on the home screen is a sovereign entity with its own identity and data stream.
+We have successfully refined the multi-instance system by addressing the "First Impression" of widget placement and resolving critical build-path conflicts.
 
 🚀 Key Technical Wins:
 
-    Instance-to-Vault Binding: Implemented VAULT_ID_KEY persistence within Glance Preferences. Each widget instance now "locks" onto a specific vaultId, allowing multiple portfolios (e.g., "Crypto," "Gold," "Stocks") to coexist on the home screen simultaneously.
+    The Placement Picker (WidgetConfigActivity): Implemented a specialized Glance Configuration Activity. Now, the moment a user drags a widget to the home screen, they are met with a themed "Select Vault" UI, ensuring every widget is born with a specific identity.
 
-    The "Hierarchy of Truth" Refactor: Refactored provideGlance to prioritize instance-specific bindings. This ensures that a background refresh of the main app never accidentally "overwrites" a locked widget with the globally active vault data.
+    Kotlin 2.1 & Hilt 2.59 Synchronization: Resolved a critical metadata versioning conflict (Metadata 2.2.0 vs 2.1.0) by upgrading Hilt to 2.59.2 and implementing a resolutionStrategy to force kotlinx-metadata-jvm:0.9.0. This ensures the app is future-proofed for the K2 compiler.
 
-    Intelligent Background Sync: Overhauled WidgetSyncWorker.kt to be instance-aware. The worker now iterates through every active widget, identifies its bound vault, and performs targeted data refreshes for each unique portfolio.
+    DAO Snapshot Logic: Added suspend fun getAllVaults() to the VaultDao. This provides a non-reactive, high-performance one-time fetch for the Configuration Activity, reducing overhead compared to Flow-based observation.
 
-    Sync Deduplication: Implemented a Set-based deduplication strategy in the background worker. This prevents redundant network calls if a user has multiple widgets pointing to the same vault, optimizing battery and data usage.
+    Manifest & Metadata Handshake: Successfully wired the ACTION_APPWIDGET_CONFIGURE intent filter and updated the provider XML, creating a seamless transition from the Android Home Screen into the app's configuration layer.
 
-🛡️ 2. THE "SOVEREIGN" SPECS (V8.0.0)
+🛡️ 2. THE "SOVEREIGN" SPECS (V8.1.0)
 Component	Status	Achievement
-Multi-Instance	🟢 COMPLETE	Multiple widgets can now display different vaults simultaneously.
-Identity Lock	🟢 PERSISTENT	Widgets "remember" their bound vault ID across reboots and refreshes.
-Background Sync	🟢 OPTIMIZED	Worker targets specific vaults and deduplicates network requests.
-Visual Identity	🟢 SOVEREIGN	(V7.9.0 Carry-over) Each instance maintains unique colors and assets.
-🛡️ 3. THE NEW DIRECTION: UX POLISH & PLACEMENT (PHASE 11)
+Placement Picker	🟢 COMPLETE	UI pops up on widget drag to allow immediate vault selection.
+Build Stability	🟢 STABLE	Hilt and Kotlin 2.1 are fully aligned and compiling.
+Multi-Instance	🟢 PRODUCTION	Each widget instance is bound to its own unique vaultId at birth.
+Sync Engine	🟢 VERIFIED	Background worker correctly targets bound vaults independently.
+🛡️ 3. THE NEW DIRECTION: PERFORMANCE & VISUAL POLISH (PHASE 12)
 
-The architecture is now 100% capable of multi-instance support. The next phase focuses on the "User Experience" of managing these instances.
+The architecture is robust and the UX is automated. The next phase focuses on making the dashboard feel alive and ultra-responsive.
 
 🛠️ Immediate Priorities for the Next Agent:
 
-    The Placement Picker (Configuration Activity): Implement a Glance configuration activity. This will trigger a popup when a user drags a new widget to the home screen, allowing them to choose which Vault the widget should "bind" to immediately.
+    "Live" Sync Feedback: Implement a "Syncing..." state within the widget layout that shows when a background fetch is in progress, followed by a "Last Updated" timestamp.
 
-    Manager Sync Feedback: Add a clearer "Sync Progress" indicator in the WidgetManagerScreen to provide visual confirmation that the Glance broadcast was successfully received by the home screen.
+    Asset Search & Filter: Add a search bar to the Asset Selection list in the WidgetManagerScreen to assist users with large, complex portfolios.
 
-    Hilt Worker Optimization: Ensure all entry points in the WidgetSyncWorker are fully optimized for the latest Android background execution limits.
+    Modern Appearance (Glassmorphism): Add an optional "Frosted Glass" background setting for widgets to take advantage of modern Android 15 design aesthetics.
 
 🔄 Git Hygiene & Master File Protocol:
 
-    V8.0.0 Save Point: Major Version Release. The single-vault legacy code is fully deprecated.
+    V8.1.0 Save Point: Major UX and Stability Release.
 
-    Master Protocol: Rebuild BROWSER_CONTEXT_MASTER.md to reflect the new WidgetSyncWorker logic and the VAULT_ID_KEY implementation in PortfolioWidget.
+    Master Protocol: Rebuild BROWSER_CONTEXT_MASTER.md to reflect the new WidgetConfigActivity and the V21 Database schema.
 
-Direction: We have achieved Functional Multi-Presence. Swanie's Portfolio is now a comprehensive financial dashboard capable of displaying a diverse, personalized ecosystem of data on the Android home screen.
+Direction: We have achieved Visual and Functional Sovereignty. Swanie's Portfolio is no longer just an app; it is a premium, multi-instance dashboard ecosystem.

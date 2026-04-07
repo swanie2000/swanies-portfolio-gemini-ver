@@ -1,6 +1,6 @@
 [versions]
 agp = "9.0.1"
-kotlin = "2.2.10"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 coreSplashscreen = "1.0.1"
 junit = "4.13.2"
@@ -12,7 +12,8 @@ composeBom = "2025.01.01"
 navigation = "2.8.5"
 retrofit = "2.11.0"
 room = "2.8.4"
-ksp = "2.3.5"
+ksp = "2.1.10-1.0.29"
+hilt = "2.59.2"
 lifecycle = "2.10.0"
 accompanist = "0.36.0"
 coil = "2.5.0"
@@ -52,9 +53,12 @@ google-api-client-android = { group = "com.google.api-client", name = "google-ap
 google-api-services-drive = { group = "com.google.apis", name = "google-api-services-drive", version.ref = "googleDriveApi" }
 google-http-client-gson = { group = "com.google.http-client", name = "google-http-client-gson", version.ref = "googleHttpClient" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

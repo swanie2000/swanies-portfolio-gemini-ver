@@ -8,6 +8,9 @@ interface VaultDao {
     @Query("SELECT * FROM vaults ORDER BY id ASC")
     fun getAllVaultsFlow(): Flow<List<VaultEntity>>
 
+    @Query("SELECT * FROM vaults ORDER BY id ASC")
+    suspend fun getAllVaults(): List<VaultEntity>
+
     @Query("SELECT * FROM vaults WHERE id = :id")
     suspend fun getVaultById(id: Int): VaultEntity?
 
