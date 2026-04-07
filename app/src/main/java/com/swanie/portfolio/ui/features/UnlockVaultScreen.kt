@@ -173,7 +173,11 @@ fun UnlockVaultScreen(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it; if (authState is AuthViewModel.AuthState.Error) authViewModel.clearError() },
+                // 🛡️ SPACE-KILLER: Sanitizes input on every keystroke
+                onValueChange = {
+                    password = it.replace("\\s".toRegex(), "")
+                    if (authState is AuthViewModel.AuthState.Error) authViewModel.clearError()
+                },
                 label = { Text("PASSWORD", fontSize = 10.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -251,6 +255,29 @@ fun UnlockVaultScreen(
                 }
             }
 
+            Spacer(Modifier.height(16.dp))
+
+            // --- 🚪 EMERGENCY DEBUG BYPASS ---
+            OutlinedButton(
+                onClick = {
+                    navController.navigate(Routes.HOLDINGS) {
+                        popUpTo(Routes.UNLOCK_VAULT) { inclusive = true }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                border = BorderStroke(1.dp, Color.Red.copy(0.4f)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.BugReport, null, tint = Color.Red, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "DEBUG BYPASS",
+                    color = Color.Red,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black
+                )
+            }
+
             TextButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier.padding(top = 16.dp)
@@ -262,7 +289,7 @@ fun UnlockVaultScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
