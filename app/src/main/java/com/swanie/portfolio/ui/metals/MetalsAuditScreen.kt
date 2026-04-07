@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -33,7 +33,6 @@ import com.swanie.portfolio.data.repository.MarketPriceData
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalMarketCard
 import com.swanie.portfolio.ui.settings.ThemeViewModel
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
@@ -52,9 +51,9 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
     val cardTextHex by themeViewModel.cardTextColor.collectAsState()
 
-    val textColor = Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" }))
-    val cardBg = Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" }))
-    val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifHexBlank("#FFFFFF")))
+    val textColor = Color(siteTextHex.ifBlank { "#FFFFFF" }.toColorInt())
+    val cardBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
+    val cardText = Color(cardTextHex.ifHexBlank("#FFFFFF").toColorInt())
 
     var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
     val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
@@ -66,9 +65,9 @@ fun MetalsAuditScreen(navController: NavController) {
             val defaultList = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
-        
+
         viewModel.refreshMarketWatch()
-        
+
         metalsOrder.forEach { (_, sym) ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
@@ -83,7 +82,6 @@ fun MetalsAuditScreen(navController: NavController) {
         metalsOrder = metalsOrder.toMutableList().apply { add(to.index, removeAt(from.index)) }
     }
 
-    // GRADIENT SYMMETRY: Set background to Transparent to allow NavGraph gradient to show
     Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
         Column(modifier = Modifier.fillMaxSize()) {
 
@@ -128,7 +126,9 @@ fun MetalsAuditScreen(navController: NavController) {
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                // 🛡️ ADJUSTED PADDING: We use 80dp at the bottom to clear the global menu
+                // but keep the weight(1f) to ensure the column fills the available gap.
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(metalsOrder, key = { it.second }) { item ->
@@ -168,7 +168,8 @@ fun MetalsAuditScreen(navController: NavController) {
                 }
             }
 
-            BottomNavigationBar(navController = navController)
+            // 🛡️ REMOVED THE 100.dp SPACER:
+            // The LazyColumn contentPadding handles the scrollable gap now.
         }
     }
 }
