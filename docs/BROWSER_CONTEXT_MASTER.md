@@ -173,65 +173,64 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED NARRATIVE: INSTANCE-BASED AUTONOMY & THE V20 SCHEMA (V7.7.0)
+UPDATED NARRATIVE: THE "VAULT NAVIGATOR" & MULTI-PORTFOLIO SYNC (V7.8.0)
 
-Current Version: 7.7.0 (The "Sovereign Vault" Edition)
+Current Version: 7.8.0 (The "Navigator" Edition)
 
-Build Status: 🟢 STABLE / ARCHITECTURALLY PURE
-🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 7 "INDEPENDENT ROOMS"
+Build Status: 🟢 STABLE / MULTI-VAULT FUNCTIONAL
+🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 8 "THE HALLWAY"
 
-This phase marked the end of the "Global Config" era. We successfully decoupled portfolio-specific data from the application-wide configuration, ensuring that what happens in one vault stays in that vault.
+We have successfully bridged the gap between independent vaults. The user can now navigate, configure, and sync multiple portfolio widgets from a single, unified interface.
 
 🚀 Key Technical Wins:
 
-    The V20 "Clean Slate" Migration: Executed a destructive Room database migration to Version 20. This purged legacy "Ghost" data and officially moved selectedWidgetAssets into the VaultEntity.
+    The Vault Strip Navigator: Implemented a high-performance LazyRow (The "Vault Strip") in WidgetManagerScreen. This allows users to horizontally toggle between all portfolios (Swanie1, Swanie2, etc.) instantaneously.
 
-    The Ghost Index Execution: Eliminated the "Index 4/5" selection bug by abandoning list-position indexing in favor of stable, unique coinId (String) identifiers.
+    Reactive State Re-Initialization: Integrated a LaunchedEffect handshake that re-maps draftSelectedIds the moment a new vault is selected in the strip. This ensures 100% data integrity when swapping between portfolios.
 
-    Vault-Aware Widget Handshake: Refactored PortfolioWidget.kt to be context-aware. The home screen widget now dynamically retrieves its asset list, vault name, and theme color directly from the active VaultEntity.
+    Contextual Visual Cues: The Navigator now uses the vaultColor and vaultName dynamically, providing immediate visual feedback to the user on which "Room" they are currently configuring.
 
-    Unified UI Integrity: Successfully refactored SettingsViewModel, WidgetManagerScreen, and SettingsScreen to be vault-aware without re-introducing local Scaffolds or breaking the persistent background gradients.
+    Multi-Vault Sync logic: The "SAVE & SYNC" action is now surgically scoped to the selectedVaultId. This allows users to update their "Long Term" widget and then immediately swap to their "Day Trade" widget for a second sync without leaving the screen.
 
-🛡️ 2. THE "SOVEREIGN" SPECS (V7.7.0)
+🛡️ 2. THE "SOVEREIGN" SPECS (V7.8.0)
 Component	Status	Achievement
-Database	🟢 V20 SCHEMA	Destructive migration successful; selectedWidgetAssets is now vault-owned.
-Widget Logic	🟢 AUTONOMOUS	Widgets now lock to specific vaultId for data and aesthetics.
-Indexing	🟢 STABLE	coinId mapping implemented; ghost offsets eliminated.
-UI Shell	🟢 UNIFIED	Zero local Scaffolds; SettingsScreen now correctly routes vault-specific resets.
-🛡️ 3. THE NEW DIRECTION: THE "VAULT NAVIGATOR" (PHASE 8)
+Navigator	🟢 COMPLETE	Horizontal Vault Strip allows rapid portfolio switching.
+Data Integrity	🟢 REACTIVE	Selection list updates instantly upon vault swap.
+Database	🟢 V20 SCHEMA	Per-vault selectedWidgetAssets fully operational.
+Widget Sync	🟢 TARGETED	Syncs now target specific vaultId for multi-instance support.
+🛡️ 3. THE NEW DIRECTION: LIVE-SYNC & VISUAL REFINEMENT (PHASE 9)
 
-The "Rooms" are now independent; the next goal is making the "Hallway" between them more efficient. We need to allow the user to manage multiple portfolios' widgets from a single interface.
+The "Hallway" is built; now we need to ensure the information travels through it with zero friction.
 
 🛠️ Immediate Priorities for the Next Agent:
 
-    The Portfolio Selector Strip: Add a horizontal scrolling "Vault Strip" to the top of the WidgetManagerScreen. Tapping a vault icon should instantly swap the asset list to show the holdings and selections for that specific portfolio.
+    Vault-Specific Widget Appearance: Currently, while assets are vault-specific, the widget's colors (Background/Card) are still pulled from a global theme. We need to move widgetBgColor, widgetCardColor, etc., into the VaultEntity so each widget has its own unique aesthetic identity.
 
-    Live-Sync Optimization: Fine-tune the RefreshCallback in PortfolioWidget.kt to ensure that as soon as a user hits "Save & Sync" in the app, the Home Screen widget reflects the change with zero latency.
+    Live-Sync Latency Kill: Ensure the GlanceAppWidgetManager broadcast is prioritized during the "Save" action to eliminate the 2-3 second delay sometimes seen on the home screen.
 
-    Refinement of "The Bugs": Resolve minor UI edge cases where the initial data load for a new vault might show an empty state before the first API sync.
+    The "Empty Vault" UX: Implement a specialized empty-state graphic in the WidgetManager for vaults that haven't had assets added yet, guiding the user to the "Asset Architect" instead of showing a blank list.
 
 🔄 Git Hygiene & Master File Protocol:
 
-    V7.7.0 Save Point: Database and Logic are now synchronized.
+    V7.8.0 Save Point: Multi-vault selection is the new standard.
 
-    Code Preservation: Do NOT revert to global UserConfig fields for widget data. All widget-related state must live in VaultEntity.
+    Protocol: Never hard-code a vaultId. Always derive the target from the selectedVaultId state in the UI.
 
-    Safety: Maintain the MainViewModel as the source of truth for the activeVaultId.
-
-Direction: We have achieved Instance-Based Autonomy. Every portfolio now has its own lane. The bridge is built; now we give the user the keys to the entire complex.
+Direction: We have achieved Multi-Portfolio Navigation. The app now acts as a command center for an unlimited number of independent vaults.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 04/07/2026 12:27:29.14
+Generated: Tue 04/07/2026 12:57:27.14
 
 Branch:
 main
 Commit:
-cf11aa756f58d9316e5fe7abf4f7946fa0ea1c73
+e4b75ba1d6e36e4758a8a3117314f8708a94fc2a
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/ui/settings/WidgetManagerScreen.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------

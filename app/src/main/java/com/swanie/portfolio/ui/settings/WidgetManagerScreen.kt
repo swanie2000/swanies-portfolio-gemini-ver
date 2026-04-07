@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,8 +52,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.widget.PortfolioWidget
@@ -63,7 +67,8 @@ fun WidgetManagerScreen(
     navController: NavHostController,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     assetViewModel: AssetViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel()
+    themeViewModel: ThemeViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -72,8 +77,21 @@ fun WidgetManagerScreen(
     val assets by assetViewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
     
-    // Defaulting to the first vault for now, as we move toward instance-based selection.
-    val activeVault = vaults.firstOrNull() 
+    // 🛡️ VAULT STRIP STATE: Manage which vault's widget we are editing
+    val currentAppVaultId by mainViewModel.currentVaultId.collectAsStateWithLifecycle()
+    var selectedVaultId by rememberSaveable { mutableIntStateOf(-1) }
+
+    // Sync initial selection with active app vault
+    LaunchedEffect(currentAppVaultId) {
+        if (selectedVaultId == -1) {
+            selectedVaultId = currentAppVaultId
+        }
+    }
+
+    val selectedVault = remember(selectedVaultId, vaults) {
+        vaults.find { it.id == selectedVaultId } ?: vaults.firstOrNull()
+    }
+
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
     val currentBg by themeViewModel.widgetBgColor.collectAsStateWithLifecycle(initialValue = "#1C1C1E")
@@ -87,12 +105,11 @@ fun WidgetManagerScreen(
     var draftCrdTxt by rememberSaveable(currentCrdTxt) { mutableStateOf(currentCrdTxt) }
 
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
-    var hasInitializedSelection by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(activeVault) {
-        if (!hasInitializedSelection && activeVault != null) {
-            draftSelectedIds = activeVault.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
-            hasInitializedSelection = true
+    // Re-initialize selection when vault changes in the strip
+    LaunchedEffect(selectedVault?.id) {
+        selectedVault?.let {
+            draftSelectedIds = it.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
         }
     }
 
@@ -124,6 +141,14 @@ fun WidgetManagerScreen(
                 }
                 Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center))
             }
+
+            // 🛡️ VAULT STRIP: Swapping between portfolios
+            VaultStrip(
+                vaults = vaults,
+                selectedVaultId = selectedVaultId,
+                onVaultSelected = { selectedVaultId = it },
+                themeColor = safeThemeText
+            )
 
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
@@ -193,10 +218,10 @@ fun WidgetManagerScreen(
                     val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
                     Button(
                         onClick = {
-                            if (cooldownSeconds == 0 && activeVault != null) {
+                            if (cooldownSeconds == 0 && selectedVault != null) {
                                 scope.launch {
                                     settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
-                                    settingsViewModel.saveWidgetConfiguration(activeVault.id, draftSelectedIds) {
+                                    settingsViewModel.saveWidgetConfiguration(selectedVault.id, draftSelectedIds) {
                                         themeViewModel.updateWidgetBgColor(draftBg)
                                         themeViewModel.updateWidgetBgTextColor(draftBgTxt)
                                         themeViewModel.updateWidgetCardColor(draftCrd)
@@ -238,6 +263,64 @@ fun WidgetManagerScreen(
                     }
                     Spacer(modifier = Modifier.height(100.dp))
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun VaultStrip(
+    vaults: List<VaultEntity>,
+    selectedVaultId: Int,
+    onVaultSelected: (Int) -> Unit,
+    themeColor: Color
+) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(vaults) { vault ->
+            val isSelected = vault.id == selectedVaultId
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (isSelected) themeColor.copy(alpha = 0.1f) else Color.Transparent)
+                    .border(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) Color.Yellow else themeColor.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .clickable { onVaultSelected(vault.id) }
+                    .padding(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(try { Color(vault.vaultColor.toColorInt()) } catch(e: Exception) { themeColor.copy(0.2f) }),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = vault.name.take(1).uppercase(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 14.sp
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = vault.name.uppercase(),
+                    color = if (isSelected) Color.Yellow else themeColor,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
