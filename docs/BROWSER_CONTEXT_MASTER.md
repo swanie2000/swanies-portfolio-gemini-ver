@@ -173,65 +173,64 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED NARRATIVE: THE "SCAFFOLD SURGERY" & MULTI-PORTFOLIO PIVOT (V7.6.2)
+UPDATED NARRATIVE: INSTANCE-BASED AUTONOMY & THE V20 SCHEMA (V7.7.0)
 
-Current Version: 7.6.2 (The "Unified Shell" Edition)
+Current Version: 7.7.0 (The "Sovereign Vault" Edition)
 
-Build Status: 🟢 ARCHITECTURALLY CLEAN (Global Navigation Restored)
-🛡️ 1. THE ARCHITECTURAL VICTORIES: THE "SCAFFOLD SURGERY" TRIUMPH
+Build Status: 🟢 STABLE / ARCHITECTURALLY PURE
+🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 7 "INDEPENDENT ROOMS"
 
-This phase was about structural integrity and visual fluidness. We successfully moved the app's "Nervous System" into a single source of truth, eliminating the "Ghost Menu" and flickering transitions that plagued previous versions.
+This phase marked the end of the "Global Config" era. We successfully decoupled portfolio-specific data from the application-wide configuration, ensuring that what happens in one vault stays in that vault.
 
 🚀 Key Technical Wins:
 
-    The Global Scaffold Migration: Successfully stripped local Scaffold, TopAppBar, and BottomNavigationBar components from MyHoldings, Analytics, MetalsMarket, Settings, PortfolioManager, ThemeStudio, and WidgetManager.
+    The V20 "Clean Slate" Migration: Executed a destructive Room database migration to Version 20. This purged legacy "Ghost" data and officially moved selectedWidgetAssets into the VaultEntity.
 
-    The MainActivity Shell: Centralized the UI "Chrome." The app now feels like one continuous, premium experience where the background gradient and navigation menu remain persistent during screen transitions.
+    The Ghost Index Execution: Eliminated the "Index 4/5" selection bug by abandoning list-position indexing in favor of stable, unique coinId (String) identifiers.
 
-    The Debug Emergency Bypass: Implemented a "Red Button" bypass on the UnlockVaultScreen. This allows developers to skip the Auth handshake during UI refactoring without breaking the navigation graph.
+    Vault-Aware Widget Handshake: Refactored PortfolioWidget.kt to be context-aware. The home screen widget now dynamically retrieves its asset list, vault name, and theme color directly from the active VaultEntity.
 
-    Layout Sanitization: Implemented statusBarsPadding() and bottom clearance spacers across all feature screens to ensure content perfectly dodges the system status bar and the new unified navigation menu.
+    Unified UI Integrity: Successfully refactored SettingsViewModel, WidgetManagerScreen, and SettingsScreen to be vault-aware without re-introducing local Scaffolds or breaking the persistent background gradients.
 
-🛡️ 2. THE "SOVEREIGN" SPECS (V7.6.2)
-Component	Status	Logic / Achievement
-Navigation	🟢 UNIFIED	Single BottomNavigationBar in MainActivity.
-UI Shell	🟢 CLEAN	Redundant Scaffolds removed; "Double Menu" bug dead.
-Widget Logic	🟡 PENDING	Sync logic functional; Instance-based separation required.
-Multi-Vault	🟢 STABLE	Switching portfolios updates the UI shell seamlessly.
-Theme Studio	🟢 INTEGRATED	Custom HEX colors now flow into the global Nav Bar.
-🛡️ 3. THE NEW DIRECTION: INSTANCE-BASED PORTFOLIO POWER (PHASE 7)
+🛡️ 2. THE "SOVEREIGN" SPECS (V7.7.0)
+Component	Status	Achievement
+Database	🟢 V20 SCHEMA	Destructive migration successful; selectedWidgetAssets is now vault-owned.
+Widget Logic	🟢 AUTONOMOUS	Widgets now lock to specific vaultId for data and aesthetics.
+Indexing	🟢 STABLE	coinId mapping implemented; ghost offsets eliminated.
+UI Shell	🟢 UNIFIED	Zero local Scaffolds; SettingsScreen now correctly routes vault-specific resets.
+🛡️ 3. THE NEW DIRECTION: THE "VAULT NAVIGATOR" (PHASE 8)
 
-The "House" is clean; now we need to make the "Rooms" independent. The next phase moves the app from a single-stream data model to a multi-instance model, specifically for Home Screen Widgets.
+The "Rooms" are now independent; the next goal is making the "Hallway" between them more efficient. We need to allow the user to manage multiple portfolios' widgets from a single interface.
 
 🛠️ Immediate Priorities for the Next Agent:
 
-    The "Ghost Index" Fix: Resolve the WidgetManager bug where selections start at Index 4/5. Root Cause: The app is currently using a global UserConfig string that holds "ghost" IDs from other portfolios.
+    The Portfolio Selector Strip: Add a horizontal scrolling "Vault Strip" to the top of the WidgetManagerScreen. Tapping a vault icon should instantly swap the asset list to show the holdings and selections for that specific portfolio.
 
-    Vault-Specific Widget Config: Migrate selectedWidgetAssets from the global UserConfig table into the VaultEntity (or a per-vault config table). Each portfolio (Swanie1, Swanie2, Swanie3) must own its own unique 5-asset list.
+    Live-Sync Optimization: Fine-tune the RefreshCallback in PortfolioWidget.kt to ensure that as soon as a user hits "Save & Sync" in the app, the Home Screen widget reflects the change with zero latency.
 
-    The Multi-Widget Handshake: Refactor PortfolioWidget.kt and the Glance state to allow multiple widgets on the home screen simultaneously. Each widget must "lock" onto a specific vaultId.
-
-    The Portfolio Selector: Add a "Portfolio Selection" row to the top of the WidgetManagerScreen. Tapping a portfolio icon should swap the asset list to show only the holdings and selections for that specific vault.
+    Refinement of "The Bugs": Resolve minor UI edge cases where the initial data load for a new vault might show an empty state before the first API sync.
 
 🔄 Git Hygiene & Master File Protocol:
 
-    V7.6.2 Save Point: The UI is perfect. Do not re-introduce local Scaffolds.
+    V7.7.0 Save Point: Database and Logic are now synchronized.
 
-    Per-Vault Sovereignty: The goal is total independence. No portfolio should know what assets are selected in another portfolio's widget config.
+    Code Preservation: Do NOT revert to global UserConfig fields for widget data. All widget-related state must live in VaultEntity.
 
-Direction: We have achieved Structural Unification. Now we are pursuing Instance-Based Autonomy. The bridge is built; now we give every portfolio its own lane.
+    Safety: Maintain the MainViewModel as the source of truth for the activeVaultId.
+
+Direction: We have achieved Instance-Based Autonomy. Every portfolio now has its own lane. The bridge is built; now we give the user the keys to the entire complex.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 04/07/2026 11:10:05.75
+Generated: Tue 04/07/2026 12:27:29.14
 
 Branch:
 main
 Commit:
-860faf47b40cd50bc7b15305dc2367791c571abc
+cf11aa756f58d9316e5fe7abf4f7946fa0ea1c73
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
