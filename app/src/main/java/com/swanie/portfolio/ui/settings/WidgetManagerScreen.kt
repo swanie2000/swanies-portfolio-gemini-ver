@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -67,7 +68,6 @@ fun WidgetManagerScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Data states
     val userConfig by settingsViewModel.userConfig.collectAsStateWithLifecycle(null)
     val assets by assetViewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
@@ -77,7 +77,6 @@ fun WidgetManagerScreen(
     val currentCrd by themeViewModel.widgetCardColor.collectAsStateWithLifecycle(initialValue = "#2C2C2E")
     val currentCrdTxt by themeViewModel.widgetCardTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
-    // Shared Draft states
     var draftBg by rememberSaveable(currentBg) { mutableStateOf(currentBg) }
     var draftBgTxt by rememberSaveable(currentBgTxt) { mutableStateOf(currentBgTxt) }
     var draftCrd by rememberSaveable(currentCrd) { mutableStateOf(currentCrd) }
@@ -93,10 +92,7 @@ fun WidgetManagerScreen(
         }
     }
 
-    var draftHideTotals by remember(userConfig) {
-        mutableStateOf(!(userConfig?.showWidgetTotal ?: false))
-    }
-
+    var draftHideTotals by remember(userConfig) { mutableStateOf(!(userConfig?.showWidgetTotal ?: false)) }
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var privacyExpanded by rememberSaveable { mutableStateOf(false) }
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -114,54 +110,25 @@ fun WidgetManagerScreen(
     }
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
-    // 🛡️ SURGERY: Replacing Scaffold with Box for global shell compatibility
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-        ) {
+    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
+        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+
             // --- CUSTOM HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .padding(horizontal = 4.dp)
-            ) {
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.CenterStart)
-                ) {
+            Box(modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp)) {
+                IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
                 }
-                Text(
-                    text = "WIDGET MANAGER",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 16.sp,
-                    color = safeThemeText,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center))
             }
 
             LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
-                // 🛡️ Padding adjusted for the Sync Button and Global Nav Bar
-                contentPadding = PaddingValues(bottom = 120.dp)
+                // 🛡️ Tightened bottom padding to 0. Global Scaffold handles the rest.
+                contentPadding = PaddingValues(bottom = 0.dp)
             ) {
                 item {
-                    WidgetPreviewSlim(
-                        bgHex = draftBg, bgTxtHex = draftBgTxt,
-                        cardHex = draftCrd, cardTxtHex = draftCrdTxt,
-                        showTotal = !draftHideTotals
-                    )
+                    WidgetPreviewSlim(bgHex = draftBg, bgTxtHex = draftBgTxt, cardHex = draftCrd, cardTxtHex = draftCrdTxt, showTotal = !draftHideTotals)
                 }
 
                 item {
@@ -182,13 +149,7 @@ fun WidgetManagerScreen(
                 item {
                     SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
                     AnimatedVisibility(visible = privacyExpanded) {
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clickable { draftHideTotals = !draftHideTotals },
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
                             Text("Hide Totals", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
                             Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
                         }
@@ -214,84 +175,75 @@ fun WidgetManagerScreen(
                                 isSelected = isSelected,
                                 orderIndex = orderIndex,
                                 onToggle = {
-                                    if (isSelected) {
-                                        draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
-                                    } else {
-                                        if (draftSelectedIds.size < 5) {
-                                            draftSelectedIds = draftSelectedIds + asset.coinId
-                                        } else {
-                                            Toast.makeText(context, "Max 5 assets for widget", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
+                                    if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
+                                    else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
+                                    else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
                                 },
                                 themeColor = safeThemeText
                             )
                         }
                     }
                 }
-            }
-        }
 
-        // --- PINNED SYNC BUTTON (Replacing FAB) ---
-        // 🛡️ Positioned above the global BottomBar
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 90.dp) // Clears global Nav Bar
-                .fillMaxWidth(0.9f)
-        ) {
-            val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
-            Button(
-                onClick = {
-                    if (cooldownSeconds == 0) {
-                        scope.launch {
-                            settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
-                            settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
-                                themeViewModel.updateWidgetBgColor(draftBg)
-                                themeViewModel.updateWidgetBgTextColor(draftBgTxt)
-                                themeViewModel.updateWidgetCardColor(draftCrd)
-                                themeViewModel.updateWidgetCardTextColor(draftCrdTxt)
+                // 🛡️ THE SYNC BUTTON IS NOW PART OF THE LIST
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
+                    Button(
+                        onClick = {
+                            if (cooldownSeconds == 0) {
                                 scope.launch {
-                                    val manager = GlanceAppWidgetManager(context)
-                                    val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
-                                    glanceIds.forEach { id ->
-                                        updateAppWidgetState(context, id) { p ->
-                                            p[PortfolioWidget.SELECTED_ASSETS_KEY] = draftSelectedIds.joinToString(",")
-                                            p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_color")] = draftBg
-                                            p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_text_color")] = draftBgTxt
-                                            p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_color")] = draftCrd
-                                            p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_text_color")] = draftCrdTxt
-                                            p[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
+                                    settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
+                                    settingsViewModel.saveWidgetConfiguration(draftSelectedIds) {
+                                        themeViewModel.updateWidgetBgColor(draftBg)
+                                        themeViewModel.updateWidgetBgTextColor(draftBgTxt)
+                                        themeViewModel.updateWidgetCardColor(draftCrd)
+                                        themeViewModel.updateWidgetCardTextColor(draftCrdTxt)
+                                        scope.launch {
+                                            val manager = GlanceAppWidgetManager(context)
+                                            val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
+                                            glanceIds.forEach { id ->
+                                                updateAppWidgetState(context, id) { p ->
+                                                    p[PortfolioWidget.SELECTED_ASSETS_KEY] = draftSelectedIds.joinToString(",")
+                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_color")] = draftBg
+                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_bg_text_color")] = draftBgTxt
+                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_color")] = draftCrd
+                                                    p[androidx.datastore.preferences.core.stringPreferencesKey("widget_card_text_color")] = draftCrdTxt
+                                                    p[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
+                                                }
+                                                PortfolioWidget().update(context, id)
+                                            }
+                                            sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
+                                            cooldownSeconds = 180
+                                            Toast.makeText(context, "Widget Synced!", Toast.LENGTH_SHORT).show()
                                         }
-                                        PortfolioWidget().update(context, id)
                                     }
-                                    sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                    cooldownSeconds = 180
-                                    Toast.makeText(context, "Widget Synced!", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .padding(bottom = 8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow,
+                            contentColor = Color.Black
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = cooldownSeconds == 0
+                    ) {
+                        Text(text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET", fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(12.dp),
-                enabled = cooldownSeconds == 0
-            ) {
-                Text(
-                    text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 14.sp
-                )
+                    // 🛡️ FINAL SPACER FOR GLOBAL BAR CLEARANCE
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
     }
 }
 
-// Helper components remain largely unchanged but are scoped properly
+// ... (Rest of helper functions same as previous working state)
+
 @Composable
 fun WidgetPreviewSlim(bgHex: String, bgTxtHex: String, cardHex: String, cardTxtHex: String, showTotal: Boolean) {
     val bgColor = try { Color(bgHex.toColorInt()) } catch(e: Exception) { Color.Black }
