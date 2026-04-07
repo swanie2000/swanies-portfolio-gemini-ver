@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.swanie.portfolio.ui.settings
 
 import androidx.compose.foundation.background
@@ -6,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,9 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.VaultEntity
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PortfolioManagerScreen(
     navController: NavHostController,
@@ -47,59 +46,129 @@ fun PortfolioManagerScreen(
     var editName by remember { mutableStateOf("") }
     var vaultToDelete by remember { mutableStateOf<VaultEntity?>(null) }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("PORTFOLIO MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText) },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText) } },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
-            )
-        },
-        bottomBar = { BottomNavigationBar(navController = navController, onNavigate = {}) }
-    ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(horizontal = 20.dp)) {
+    // 🛡️ SURGERY: Root Box instead of Scaffold to allow global gradient visibility
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding() // Replaces TopAppBar spacing
+                .padding(horizontal = 20.dp)
+        ) {
+            // --- CUSTOM HEADER (Manual TopAppBar replacement) ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
+                }
+                Text(
+                    text = "PORTFOLIO MANAGER",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 16.sp,
+                    color = safeThemeText,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
 
             // Startup Strategy Toggle
             Row(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color.White.copy(0.05f)).clickable { mainViewModel.setResetToDefault(!resetToDefault) }.padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White.copy(0.05f))
+                    .clickable { mainViewModel.setResetToDefault(!resetToDefault) }
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("STARTUP BEHAVIOR", color = Color.Yellow, fontSize = 11.sp, fontWeight = FontWeight.Black)
-                    Text(if (resetToDefault) "Always open Default Portfolio" else "Open last viewed portfolio", color = Color.White, fontSize = 13.sp)
+                    Text(
+                        if (resetToDefault) "Always open Default Portfolio" else "Open last viewed portfolio",
+                        color = Color.White,
+                        fontSize = 13.sp
+                    )
                 }
-                Switch(checked = resetToDefault, onCheckedChange = { mainViewModel.setResetToDefault(it) }, colors = SwitchDefaults.colors(checkedThumbColor = Color.Yellow))
+                Switch(
+                    checked = resetToDefault,
+                    onCheckedChange = { mainViewModel.setResetToDefault(it) },
+                    colors = SwitchDefaults.colors(checkedThumbColor = Color.Yellow)
+                )
             }
 
             Spacer(Modifier.height(20.dp))
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.weight(1f)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
                 items(allVaults) { vault ->
                     val isSelected = vault.id == activeVault.id
                     val isDefault = vault.id == defaultVaultId
 
                     Column(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(if (isSelected) safeThemeText.copy(0.1f) else Color.White.copy(0.02f)).border(1.dp, if (isSelected) safeThemeText.copy(0.4f) else Color.White.copy(0.1f), RoundedCornerShape(16.dp)).clickable { mainViewModel.selectVault(vault.id) }.padding(16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (isSelected) safeThemeText.copy(0.1f) else Color.White.copy(0.02f))
+                            .border(1.dp, if (isSelected) safeThemeText.copy(0.4f) else Color.White.copy(0.1f), RoundedCornerShape(16.dp))
+                            .clickable { mainViewModel.selectVault(vault.id) }
+                            .padding(16.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (editingId == vault.id) {
-                                TextField(value = editName, onValueChange = { editName = it }, modifier = Modifier.weight(1f))
-                                IconButton(onClick = { mainViewModel.updateVaultName(vault.id, editName); editingId = -1 }) { Icon(Icons.Default.Check, null, tint = Color.Green) }
+                                TextField(
+                                    value = editName,
+                                    onValueChange = { editName = it },
+                                    modifier = Modifier.weight(1f),
+                                    colors = TextFieldDefaults.colors(
+                                        focusedTextColor = Color.White,
+                                        unfocusedTextColor = Color.White
+                                    )
+                                )
+                                IconButton(onClick = {
+                                    mainViewModel.updateVaultName(vault.id, editName)
+                                    editingId = -1
+                                }) {
+                                    Icon(Icons.Default.Check, null, tint = Color.Green)
+                                }
                             } else {
-                                Text(vault.name.uppercase(), color = if (isSelected) Color.White else Color.White.copy(0.6f), fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+                                Text(
+                                    vault.name.uppercase(),
+                                    color = if (isSelected) Color.White else Color.White.copy(0.6f),
+                                    fontWeight = FontWeight.Black,
+                                    modifier = Modifier.weight(1f)
+                                )
 
                                 // Star Button
                                 IconButton(onClick = { mainViewModel.setDefaultVault(vault.id) }) {
-                                    Icon(if (isDefault) Icons.Default.Star else Icons.Default.StarBorder, null, tint = if (isDefault) Color.Yellow else Color.White.copy(0.2f))
+                                    Icon(
+                                        if (isDefault) Icons.Default.Star else Icons.Default.StarBorder,
+                                        null,
+                                        tint = if (isDefault) Color.Yellow else Color.White.copy(0.2f)
+                                    )
                                 }
 
                                 // Edit Button
-                                IconButton(onClick = { editingId = vault.id; editName = vault.name }) { Icon(Icons.Default.Edit, null, tint = Color.White.copy(0.4f), modifier = Modifier.size(18.dp)) }
+                                IconButton(onClick = { editingId = vault.id; editName = vault.name }) {
+                                    Icon(Icons.Default.Edit, null, tint = Color.White.copy(0.4f), modifier = Modifier.size(18.dp))
+                                }
 
                                 // Delete Button (Safe-guarded)
                                 if (allVaults.size > 1) {
-                                    IconButton(onClick = { vaultToDelete = vault }) { Icon(Icons.Default.Delete, null, tint = Color.Red.copy(0.6f), modifier = Modifier.size(18.dp)) }
+                                    IconButton(onClick = { vaultToDelete = vault }) {
+                                        Icon(Icons.Default.Delete, null, tint = Color.Red.copy(0.6f), modifier = Modifier.size(18.dp))
+                                    }
                                 }
                             }
                         }
@@ -107,11 +176,22 @@ fun PortfolioManagerScreen(
                 }
             }
 
-            Button(onClick = { mainViewModel.createNewVault("NEW PORTFOLIO") }, modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp).height(56.dp)) {
+            Button(
+                onClick = { mainViewModel.createNewVault("NEW PORTFOLIO") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = safeThemeText, contentColor = Color.Black),
+                shape = RoundedCornerShape(12.dp)
+            ) {
                 Icon(Icons.Default.Add, null)
                 Spacer(Modifier.width(8.dp))
-                Text("ADD NEW PORTFOLIO")
+                Text("ADD NEW PORTFOLIO", fontWeight = FontWeight.Bold)
             }
+
+            // 🛡️ Added Bottom Spacer to clear the global Navigation Bar
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 
@@ -120,8 +200,16 @@ fun PortfolioManagerScreen(
             onDismissRequest = { vaultToDelete = null },
             title = { Text("DELETE PORTFOLIO?") },
             text = { Text("This will wipe all assets in '${vault.name}'. This cannot be undone.") },
-            confirmButton = { TextButton(onClick = { mainViewModel.deleteVault(vault); vaultToDelete = null }) { Text("DELETE", color = Color.Red) } },
-            dismissButton = { TextButton(onClick = { vaultToDelete = null }) { Text("CANCEL") } }
+            confirmButton = {
+                TextButton(onClick = { mainViewModel.deleteVault(vault); vaultToDelete = null }) {
+                    Text("DELETE", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { vaultToDelete = null }) {
+                    Text("CANCEL")
+                }
+            }
         )
     }
 }

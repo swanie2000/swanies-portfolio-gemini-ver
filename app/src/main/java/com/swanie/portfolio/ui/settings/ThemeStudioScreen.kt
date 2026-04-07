@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.swanie.portfolio.ui.settings
 
 import androidx.compose.animation.*
@@ -42,12 +44,10 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
-import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.theme.ThemeDefaults
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeStudioScreen(
     navController: NavHostController,
@@ -77,7 +77,6 @@ fun ThemeStudioScreen(
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
-    var isExiting by remember { mutableStateOf(false) }
 
     // Helper for ThemeDefaults color to Hex String
     fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
@@ -189,25 +188,21 @@ fun ThemeStudioScreen(
         )
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        bottomBar = {
-            if (!isExiting) {
-                BottomNavigationBar(
-                    navController = navController,
-                    onNavigate = { isExiting = true }
-                )
-            }
-        }
-    ) { paddingValues ->
+    // 🛡️ SURGERY: Root Box replaces Scaffold to respect MainActivity shell
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .statusBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // --- CUSTOM STUDIO HEADER ---
             Box(modifier = Modifier.fillMaxWidth().height(110.dp), contentAlignment = Alignment.Center) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -311,11 +306,14 @@ fun ThemeStudioScreen(
             ) {
                 Text("APPLY TO ${targets[activeTarget].uppercase()}", color = Color.Black, fontWeight = FontWeight.ExtraBold)
             }
+
+            // 🛡️ Added bottom clearance for the global navigation bar
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
-// Helpers kept the same...
+// Custom Studio Components (Kept for package scope)
 @Composable
 private fun StudioTargetItem(label: String, bg: String, txt: String, isSelected: Boolean, hasChanges: Boolean, alpha: Float, modifier: Modifier, onClick: () -> Unit) {
     val borderThickness = if (isSelected && hasChanges) 4.dp else if (isSelected) 2.dp else 1.dp
