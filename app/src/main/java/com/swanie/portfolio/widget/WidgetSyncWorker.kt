@@ -35,32 +35,36 @@ class WidgetSyncWorker(
         Log.d("SWANIE_TRACE", "8. Worker waking up for Multi-Instance Sync")
         
         return try {
+            val entryPoint = EntryPointAccessors.fromApplication(context, WidgetWorkerEntryPoint::class.java)
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
-            val entryPoint = EntryPointAccessors.fromApplication(context, WidgetWorkerEntryPoint::class.java)
             
             val refreshedVaultIds = mutableSetOf<Int>()
 
+            // 🛡️ COLD START: Check for a specific vault forced via inputData (e.g., from ConfigActivity)
+            val forcedVaultId = inputData.getInt("force_vault_id", 0)
+            if (forcedVaultId != 0) {
+                Log.d("SWANIE_TRACE", "Forcing targeted sync for Vault ID: $forcedVaultId")
+                entryPoint.assetRepository().refreshAssets(force = true, portfolioId = forcedVaultId.toString())
+                refreshedVaultIds.add(forcedVaultId)
+            }
+
             glanceIds.forEach { id ->
-                // 🛡️ Read the bound vault ID for this specific widget instance
                 val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
                 val boundVaultId = prefs[PortfolioWidget.VAULT_ID_KEY]
                 
-                // Fallback to the global active vault if no binding exists
-                val vaultIdToRefresh = boundVaultId ?: entryPoint.themePreferences().currentVaultId.first()
+                val vaultIdToRefresh = boundVaultId ?: entryPoint.themePreferences().defaultVaultId.first()
                 
-                // 🛡️ Deduplication: Only refresh each unique vault once per worker run
                 if (!refreshedVaultIds.contains(vaultIdToRefresh)) {
                     Log.d("SWANIE_TRACE", "Refreshing Bound Vault ID: $vaultIdToRefresh")
                     entryPoint.assetRepository().refreshAssets(force = true, portfolioId = vaultIdToRefresh.toString())
                     refreshedVaultIds.add(vaultIdToRefresh)
                 }
                 
-                // Trigger a redraw for this specific widget
                 PortfolioWidget().update(context, id)
             }
 
-            // Legacy broadcast to ensure OS wakes up (Optional but kept for stability)
+            // Legacy broadcast to ensure OS wakes up
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, PortfolioWidgetReceiver::class.java))
             

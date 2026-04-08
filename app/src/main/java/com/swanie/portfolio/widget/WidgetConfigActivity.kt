@@ -4,6 +4,7 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.work.*
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
@@ -44,20 +46,19 @@ class WidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Set the result to CANCELED. This will cause the widget host to cancel
-        // out of the widget placement if the user presses the back button.
-        setResult(RESULT_CANCELED)
+        // 🛡️ DEFAULT: Set result to CANCELED. This ensures that if the user backs out,
+        // the widget isn't placed in an unconfigured state.
+        setResult(Activity.RESULT_CANCELED)
 
-        // Find the widget id from the intent.
-        val extras = intent.extras
-        if (extras != null) {
-            appWidgetId = extras.getInt(
-                AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID
-            )
-        }
+        // 🛡️ HANDSHAKE: Retrieve the appWidgetId directly from the intent.
+        appWidgetId = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
+        )
 
         // If this activity was started with an invalid widget ID, finish with an error.
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+            Log.e("SWANIE_WIDGET", "Invalid AppWidgetId received in ConfigActivity")
             finish()
             return
         }
@@ -91,7 +92,7 @@ class WidgetConfigActivity : ComponentActivity() {
                         )
                         
                         Text(
-                            text = "Choose which portfolio to track on your home screen.",
+                            text = "Choose which portfolio to track on this widget.",
                             style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
                             modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
                         )
@@ -160,23 +161,40 @@ class WidgetConfigActivity : ComponentActivity() {
 
     private suspend fun handleVaultSelection(vaultId: Int) {
         val context = this@WidgetConfigActivity
-        val glanceId = GlanceAppWidgetManager(context).getGlanceIdBy(appWidgetId)
+        
+        try {
+            val glanceManager = GlanceAppWidgetManager(context)
+            val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
 
-        // 🛡️ Multi-Instance Binding: Save the VAULT_ID_KEY for this specific glanceId
-        updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[PortfolioWidget.VAULT_ID_KEY] = vaultId
-            }.toPreferences()
+            Log.d("SWANIE_WIDGET", "Binding Vault ID $vaultId to AppWidgetId $appWidgetId (GlanceId: $glanceId)")
+
+            // 🛡️ SOVEREIGN SHIELD: Save the VAULT_ID_KEY for this specific glanceId
+            updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                prefs.toMutablePreferences().apply {
+                    this[PortfolioWidget.VAULT_ID_KEY] = vaultId
+                }.toPreferences()
+            }
+
+            // 🛡️ COLD START FIX: Trigger immediate sync for this vault
+            val workRequest = OneTimeWorkRequestBuilder<WidgetSyncWorker>()
+                .setInputData(workDataOf("force_vault_id" to vaultId))
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
+            
+            WorkManager.getInstance(context).enqueue(workRequest)
+
+            // Trigger the first render immediately
+            PortfolioWidget().update(context, glanceId)
+
+            // 🛡️ THE HANDSHAKE: Pass back the original appWidgetId and set RESULT_OK
+            val resultValue = Intent().apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            }
+            setResult(Activity.RESULT_OK, resultValue)
+            finish()
+        } catch (e: Exception) {
+            Log.e("SWANIE_WIDGET", "Failed to bind widget state during configuration", e)
+            finish()
         }
-
-        // Trigger the first render
-        PortfolioWidget().update(context, glanceId)
-
-        // Make sure we pass back the original appWidgetId
-        val resultValue = Intent().apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        }
-        setResult(Activity.RESULT_OK, resultValue)
-        finish()
     }
 }

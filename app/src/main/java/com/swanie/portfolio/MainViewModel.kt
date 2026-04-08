@@ -22,16 +22,35 @@ class MainViewModel @Inject constructor(
     val isDataReady: StateFlow<Boolean> = _isDataReady.asStateFlow()
 
     // 🌐 GLOBAL VISTA: Vault State
-    val allVaults = vaultDao.getAllVaultsFlow().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-    val currentVaultId = themePreferences.currentVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+    val allVaults = vaultDao.getAllVaultsFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // NEW: Default Vault flows from ThemePreferences
-    val defaultVaultId = themePreferences.defaultVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
-    val resetToDefaultOnStart = themePreferences.resetToDefaultOnStart.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val currentVaultId = themePreferences.currentVaultId
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
 
-    val activeVault = combine(allVaults, currentVaultId) { vaults, id ->
-        vaults.find { it.id == id } ?: vaults.firstOrNull() ?: VaultEntity(name = "MAIN PORTFOLIO")
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), VaultEntity(name = "MAIN PORTFOLIO"))
+    val defaultVaultId = themePreferences.defaultVaultId
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+
+    val resetToDefaultOnStart = themePreferences.resetToDefaultOnStart
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    // 🛡️ REFACTORED: The "Source of Truth" for the UI
+    // This flow now explicitly waits until allVaults is not empty and isDataReady is true
+    val activeVault: StateFlow<VaultEntity> = combine(
+        allVaults,
+        currentVaultId,
+        isDataReady
+    ) { vaults, currentId, ready ->
+        if (!ready || vaults.isEmpty()) {
+            VaultEntity(name = "LOADING...", id = -1)
+        } else {
+            vaults.find { it.id == currentId } ?: vaults.first()
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        VaultEntity(name = "INITIALIZING...", id = -1)
+    )
 
     // Preferences observed as StateFlows
     val siteBackgroundColor = themePreferences.siteBackgroundColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#000416")
@@ -45,14 +64,25 @@ class MainViewModel @Inject constructor(
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
     init {
-        _isDataReady.value = true
-
-        // 🛠️ Startup Logic: If user wants to return to default, set the vault ID on cold start
+        // 🛠️ Startup Logic: The authority on the first vault loaded
         viewModelScope.launch {
-            if (themePreferences.resetToDefaultOnStart.first()) {
-                val homeId = themePreferences.defaultVaultId.first()
-                selectVault(homeId)
+            // Wait for vaults to exist in DB
+            val vaults = vaultDao.getAllVaultsFlow().first { it.isNotEmpty() }
+
+            val resetOnStart = themePreferences.resetToDefaultOnStart.first()
+            val defId = themePreferences.defaultVaultId.first()
+            val lastId = themePreferences.currentVaultId.first()
+
+            val targetId = if (resetOnStart) {
+                defId
+            } else {
+                // If the last used vault was deleted or doesn't exist, use default
+                if (vaults.any { it.id == lastId }) lastId else defId
             }
+
+            // Atomically set the ID and signal that the UI is ready to render
+            themePreferences.saveCurrentVaultId(targetId)
+            _isDataReady.value = true
         }
     }
 
@@ -70,12 +100,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun createNewVault(name: String) = viewModelScope.launch {
-        // Find the next sort order
         val nextOrder = (allVaults.value.maxOfOrNull { it.sortOrder } ?: -1) + 1
         vaultDao.upsertVault(VaultEntity(name = name, baseCurrency = "USD", vaultColor = "#000416", sortOrder = nextOrder))
     }
 
-    // 🛠️ NEW: Management logic for Default and Delete
+    // 🛠️ Management logic for Default and Delete
     fun setDefaultVault(id: Int) = viewModelScope.launch {
         themePreferences.saveDefaultVaultId(id)
     }
@@ -85,9 +114,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun deleteVault(vault: VaultEntity) = viewModelScope.launch {
-        // Prevent deleting the last remaining vault
         if (allVaults.value.size > 1) {
-            // If deleting the active vault, switch to another first
             if (activeVault.value.id == vault.id) {
                 val fallback = allVaults.value.firstOrNull { it.id != vault.id }
                 fallback?.let { selectVault(it.id) }
@@ -112,10 +139,6 @@ class MainViewModel @Inject constructor(
         themePreferences.saveGradientAmount(amount)
     }
 
-    /**
-     * Updates the sort order for all vaults based on their position in the new list.
-     * 🛡️ Stabilizes the UI across drags.
-     */
     fun updateVaultOrder(newList: List<VaultEntity>) {
         viewModelScope.launch {
             newList.forEachIndexed { index, vault ->

@@ -2,6 +2,7 @@ package com.swanie.portfolio.widget
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -15,6 +16,7 @@ import androidx.glance.*
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
@@ -49,10 +51,10 @@ import androidx.glance.layout.ContentScale
 class PortfolioWidget : GlanceAppWidget() {
 
     override val stateDefinition = PreferencesGlanceStateDefinition
-    override val sizeMode = SizeMode.Exact
+    override val sizeMode = SizeMode.Single
 
     companion object {
-        val VAULT_ID_KEY = intPreferencesKey("bound_vault_id") // 🛡️ Multi-Instance Binding
+        val VAULT_ID_KEY = intPreferencesKey("bound_vault_id")
         val SELECTED_ASSETS_KEY = stringPreferencesKey("selected_widget_assets")
         val LAST_UPDATED_KEY = stringPreferencesKey("last_updated_time")
         val WIDGET_BG_COLOR_KEY = stringPreferencesKey("widget_bg_color")
@@ -75,16 +77,18 @@ class PortfolioWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidgetEntryPoint::class.java)
+
+        // 🛡️ SOVEREIGN SHIELD: Read state and resolve vaultId without leaking global app state
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
+        val boundId = prefs[VAULT_ID_KEY] ?: 0
+        
+        // Use boundId if present, otherwise fallback to the user's default vault
+        val vaultId = if (boundId != 0) boundId else entryPoint.themePreferences().defaultVaultId.first()
+
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
-
-        // 🛡️ Multi-Instance Binding Logic
-        val boundVaultId = prefs[VAULT_ID_KEY]
-        val currentVaultId = boundVaultId ?: entryPoint.themePreferences().currentVaultId.first()
-
         val userConfig = entryPoint.userConfigDao().getUserConfig().first()
-        val activeVault = entryPoint.vaultDao().getVaultById(currentVaultId)
-        val allVaultAssets = entryPoint.assetDao().getAssetsByVault(currentVaultId).first()
+        val activeVault = entryPoint.vaultDao().getVaultById(vaultId)
+        val allVaultAssets = entryPoint.assetDao().getAssetsByVault(vaultId).first()
 
         val selectedIds = activeVault?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() }
             ?: prefs[SELECTED_ASSETS_KEY]?.split(",")?.filter { it.isNotBlank() }
@@ -104,6 +108,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
+        // Resolve Colors
         val rawBg = activeVault?.widgetBgColor ?: prefs[WIDGET_BG_COLOR_KEY] ?: "#1C1C1E"
         val rawBgTxt = activeVault?.widgetBgTextColor ?: prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: "#FFFFFF"
         val rawCrd = activeVault?.widgetCardColor ?: prefs[WIDGET_CARD_COLOR_KEY] ?: "#2C2C2E"
@@ -155,8 +160,8 @@ fun WidgetContent(
             Text(
                 text = vaultName,
                 style = TextStyle(
-                    color = ColorProvider(bgTextColor.copy(alpha = 0.6f)), 
-                    fontSize = 10.sp, 
+                    color = ColorProvider(bgTextColor.copy(alpha = 0.6f)),
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 ),
@@ -175,8 +180,8 @@ fun WidgetContent(
             Text(
                 text = totalValue,
                 style = TextStyle(
-                    color = ColorProvider(bgTextColor), 
-                    fontSize = 22.sp, 
+                    color = ColorProvider(bgTextColor),
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 ),
@@ -297,12 +302,12 @@ fun StampFallback(asset: AssetEntity, isMetal: Boolean) {
 class RefreshCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
-        
+
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
-        val boundVaultId = prefs[PortfolioWidget.VAULT_ID_KEY]
-        val currentVaultId = boundVaultId ?: entryPoint.themePreferences().currentVaultId.first()
-        
-        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = currentVaultId.toString())
+        val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 0
+        val vaultId = if (boundId != 0) boundId else entryPoint.themePreferences().defaultVaultId.first()
+
+        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = vaultId.toString())
 
         val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->
