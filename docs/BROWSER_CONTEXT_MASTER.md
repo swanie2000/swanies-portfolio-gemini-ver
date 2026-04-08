@@ -173,71 +173,61 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED NARRATIVE: THE "PRODUCTION READY" MULTI-VAULT SYSTEM (V8.1.0)
+UPDATED NARRATIVE: THE "INTERACTION PARITY" ECOSYSTEM (V8.4.0)
 
-Current Version: 8.1.0 (The "Picker & Stability" Edition)
+Current Version: 8.4.0 (The "Perfect Manager" Edition)
+Build Status: 🟢 STABLE / DATABASE V22 / GESTURE-ENABLED
+🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 12-14 "UX SOVEREIGNTY"
 
-Build Status: 🟢 STABLE / KOTLIN 2.1 COMPATIBLE
-🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 11 "USER ONBOARDING & STABILITY"
-
-We have successfully refined the multi-instance system by addressing the "First Impression" of widget placement and resolving critical build-path conflicts.
+We have completed the vertical "diet" and interaction overhaul of the Portfolio Manager, bringing it into 1:1 parity with the main Holdings screen.
 
 🚀 Key Technical Wins:
 
-    The Placement Picker (WidgetConfigActivity): Implemented a specialized Glance Configuration Activity. Now, the moment a user drags a widget to the home screen, they are met with a themed "Select Vault" UI, ensuring every widget is born with a specific identity.
+    The "SortOrder" Persistence (DB V22): Implemented a dedicated sortOrder column in the Room database. This allows users to reorder portfolios without changing primary IDs, protecting the integrity of all asset-to-vault relationships.
 
-    Kotlin 2.1 & Hilt 2.59 Synchronization: Resolved a critical metadata versioning conflict (Metadata 2.2.0 vs 2.1.0) by upgrading Hilt to 2.59.2 and implementing a resolutionStrategy to force kotlinx-metadata-jvm:0.9.0. This ensures the app is future-proofed for the K2 compiler.
+    Gesture-Based Interaction (sh.calvin integration): Standardized the app's interaction language. Users can now long-press to reorder vaults and drag them to a "Bottom Corner Trash Zone" for deletion, mirroring the high-end feel of the main Holdings dashboard.
 
-    DAO Snapshot Logic: Added suspend fun getAllVaults() to the VaultDao. This provides a non-reactive, high-performance one-time fetch for the Configuration Activity, reducing overhead compared to Flow-based observation.
+    Keyboard-Aware Ergonomics: Implemented animateScrollToItem logic and a 450.dp bottom buffer. The moment a user taps to edit a portfolio name, the item "jumps" to the top of the viewport, ensuring it is never obscured by the Android keyboard.
 
-    Manifest & Metadata Handshake: Successfully wired the ACTION_APPWIDGET_CONFIGURE intent filter and updated the provider XML, creating a seamless transition from the Android Home Screen into the app's configuration layer.
+    Chromatic Alignment (Full Theme Sync): Synced all Manager UI elements (borders, text, icons, and cursor) to the user-defined siteTextColor. The Manager now visually transforms alongside the rest of the app when themes are swapped.
 
-🛡️ 2. THE "SOVEREIGN" SPECS (V8.1.0)
+    Visual Legend & Startup Logic: Centered a new visual legend flanked by yellow stars. The "Startup" checkbox was replaced by an intuitive "Yellow Star" toggle that dictates which vault the app opens by default.
+
+🛡️ 2. THE "SOVEREIGN" SPECS (V8.4.0)
 Component	Status	Achievement
-Placement Picker	🟢 COMPLETE	UI pops up on widget drag to allow immediate vault selection.
-Build Stability	🟢 STABLE	Hilt and Kotlin 2.1 are fully aligned and compiling.
-Multi-Instance	🟢 PRODUCTION	Each widget instance is bound to its own unique vaultId at birth.
-Sync Engine	🟢 VERIFIED	Background worker correctly targets bound vaults independently.
-🛡️ 3. THE NEW DIRECTION: PERFORMANCE & VISUAL POLISH (PHASE 12)
+Portfolio Manager	🟢 PERFECT	Gesture reordering, drag-to-delete, and auto-scroll editing.
+Interaction Parity	🟢 COMPLETE	UI behavior is identical between Holdings and Manager screens.
+Database Schema	🟢 V22	sortOrder column added via Auto-Migration for persistent layouts.
+Keyboard UX	🟢 OPTIMIZED	No more "Hidden Text" bugs; active items snap above the keyboard.
+🛡️ 3. THE PATH FORWARD: REFINEMENT & NOSTALGIA
 
-The architecture is robust and the UX is automated. The next phase focuses on making the dashboard feel alive and ultra-responsive.
+With the Manager finalized, we move toward polishing the secondary systems and restoring the app's signature visual flair.
 
-🛠️ Immediate Priorities for the Next Agent:
+🛠️ Immediate Priorities for the Next Session:
 
-    "Live" Sync Feedback: Implement a "Syncing..." state within the widget layout that shows when a background fetch is in progress, followed by a "Last Updated" timestamp.
+    "Live" Sync Feedback: Implement a "Syncing..." state and "Last Updated" timestamp to show real-time engine activity.
 
-    Asset Search & Filter: Add a search bar to the Asset Selection list in the WidgetManagerScreen to assist users with large, complex portfolios.
+    Global Vista (Widget Polish): Finalize the manual save actions within the widget configuration to ensure perfect home-screen sync.
 
-    Modern Appearance (Glassmorphism): Add an optional "Frosted Glass" background setting for widgets to take advantage of modern Android 15 design aesthetics.
+    Metals Audit: Deep-dive into the physical asset tracking system to ensure rigorous accuracy.
 
-🔄 Git Hygiene & Master File Protocol:
+🐞 Future Bug to Squash:
 
-    V8.1.0 Save Point: Major UX and Stability Release.
-
-    Master Protocol: Rebuild BROWSER_CONTEXT_MASTER.md to reflect the new WidgetConfigActivity and the V21 Database schema.
-
-Direction: We have achieved Visual and Functional Sovereignty. Swanie's Portfolio is no longer just an app; it is a premium, multi-instance dashboard ecosystem.
+    The "Swan Twinkle" Restoration: Re-examine the OpeningPage code history. Somewhere during the rebuild, the "twinkle" animation on the Swan logo was lost. We need to perform a "Code Archaeology" session to find and restore that original animation logic.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 04/07/2026 15:11:58.76
+Generated: Tue 04/07/2026 20:12:02.37
 
 Branch:
 main
 Commit:
-688f986940d56140e4370e634db59b1b92b45ec2
+f767e0ca01e56462bcdacd729579b74ae8af9c23
 Working tree status (git status --porcelain):
- M app/build.gradle.kts
- M app/src/main/AndroidManifest.xml
- M app/src/main/java/com/swanie/portfolio/data/local/VaultDao.kt
-AM app/src/main/java/com/swanie/portfolio/widget/WidgetConfigActivity.kt
- M app/src/main/res/xml/portfolio_widget_info.xml
- M build.gradle.kts
  M docs/BROWSER_CONTEXT_NARRATIVE.md
- M gradle/libs.versions.toml
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
