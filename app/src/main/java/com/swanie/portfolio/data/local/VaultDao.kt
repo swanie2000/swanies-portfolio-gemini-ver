@@ -5,10 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VaultDao {
-    @Query("SELECT * FROM vaults ORDER BY id ASC")
+    @Query("SELECT * FROM vaults ORDER BY sortOrder ASC")
     fun getAllVaultsFlow(): Flow<List<VaultEntity>>
 
-    @Query("SELECT * FROM vaults ORDER BY id ASC")
+    @Query("SELECT * FROM vaults ORDER BY sortOrder ASC")
     suspend fun getAllVaults(): List<VaultEntity>
 
     @Query("SELECT * FROM vaults WHERE id = :id")

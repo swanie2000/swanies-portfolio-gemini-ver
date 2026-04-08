@@ -70,7 +70,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun createNewVault(name: String) = viewModelScope.launch {
-        vaultDao.upsertVault(VaultEntity(name = name, baseCurrency = "USD", vaultColor = "#000416"))
+        // Find the next sort order
+        val nextOrder = (allVaults.value.maxOfOrNull { it.sortOrder } ?: -1) + 1
+        vaultDao.upsertVault(VaultEntity(name = name, baseCurrency = "USD", vaultColor = "#000416", sortOrder = nextOrder))
     }
 
     // 🛠️ NEW: Management logic for Default and Delete
@@ -108,5 +110,17 @@ class MainViewModel @Inject constructor(
 
     fun setGradientAmount(amount: Float) = viewModelScope.launch {
         themePreferences.saveGradientAmount(amount)
+    }
+
+    /**
+     * Updates the sort order for all vaults based on their position in the new list.
+     * 🛡️ Stabilizes the UI across drags.
+     */
+    fun updateVaultOrder(newList: List<VaultEntity>) {
+        viewModelScope.launch {
+            newList.forEachIndexed { index, vault ->
+                vaultDao.upsertVault(vault.copy(sortOrder = index))
+            }
+        }
     }
 }
