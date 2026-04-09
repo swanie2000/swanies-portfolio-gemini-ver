@@ -173,61 +173,63 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED NARRATIVE: THE "INTERACTION PARITY" ECOSYSTEM (V8.4.0)
+UPDATED NARRATIVE: THE "SOVEREIGN SHIELD" REVOLUTION (V8.5.0-WIP)
 
-Current Version: 8.4.0 (The "Perfect Manager" Edition)
-Build Status: 🟢 STABLE / DATABASE V22 / GESTURE-ENABLED
-🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 12-14 "UX SOVEREIGNTY"
+Current Version: 8.5.0-WIP (The "Instance Integrity" Edition)
 
-We have completed the vertical "diet" and interaction overhaul of the Portfolio Manager, bringing it into 1:1 parity with the main Holdings screen.
+Build Status: 🟠 WIP / DATABASE V22 / JETPACK GLANCE 1.1.0
+🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 15-17 "SOVEREIGN IDENTITY"
+
+We have effectively decoupled the home-screen widgets from the main app's internal navigation, ensuring each widget instance acts as an independent "Sovereign Entity."
 
 🚀 Key Technical Wins:
 
-    The "SortOrder" Persistence (DB V22): Implemented a dedicated sortOrder column in the Room database. This allows users to reorder portfolios without changing primary IDs, protecting the integrity of all asset-to-vault relationships.
+    The Sovereign Shield: Stripped all widgets of their reliance on currentVaultId (the "Last Viewed" state). Widgets now strictly observe their own private bound_vault_id from the PreferencesGlanceStateDefinition.
 
-    Gesture-Based Interaction (sh.calvin integration): Standardized the app's interaction language. Users can now long-press to reorder vaults and drag them to a "Bottom Corner Trash Zone" for deletion, mirroring the high-end feel of the main Holdings dashboard.
+    Hardened Config Handshake: Rebuilt the WidgetConfigActivity to atomically save the Vault ID to the specific GlanceId. This prevents "musical chairs" where adding a new widget would overwrite the data of an existing one.
 
-    Keyboard-Aware Ergonomics: Implemented animateScrollToItem logic and a 450.dp bottom buffer. The moment a user taps to edit a portfolio name, the item "jumps" to the top of the viewport, ensuring it is never obscured by the Android keyboard.
+    The Sync Pre-loader: Integrated assetRepository().refreshAssets() directly into the configuration flow. This "primes the pump" by fetching market data for the specific vault before the user even returns to the home screen.
 
-    Chromatic Alignment (Full Theme Sync): Synced all Manager UI elements (borders, text, icons, and cursor) to the user-defined siteTextColor. The Manager now visually transforms alongside the rest of the app when themes are swapped.
+    Startup Blindness Mitigation: Refactored the MainViewModel init block with an isDataReady gate. The app now holds the UI until the startup vault identity is legally bound, eliminating the "0 assets on launch" flicker.
 
-    Visual Legend & Startup Logic: Centered a new visual legend flanked by yellow stars. The "Startup" checkbox was replaced by an intuitive "Yellow Star" toggle that dictates which vault the app opens by default.
-
-🛡️ 2. THE "SOVEREIGN" SPECS (V8.4.0)
+🛡️ 2. THE "SOVEREIGN" SPECS (V8.5.0-WIP)
 Component	Status	Achievement
-Portfolio Manager	🟢 PERFECT	Gesture reordering, drag-to-delete, and auto-scroll editing.
-Interaction Parity	🟢 COMPLETE	UI behavior is identical between Holdings and Manager screens.
-Database Schema	🟢 V22	sortOrder column added via Auto-Migration for persistent layouts.
-Keyboard UX	🟢 OPTIMIZED	No more "Hidden Text" bugs; active items snap above the keyboard.
-🛡️ 3. THE PATH FORWARD: REFINEMENT & NOSTALGIA
+Widget Binding	🟢 STABLE	Each widget instance is locked to its own portfolio ID.
+Sync Engine	🟡 REFINING	Configuration now triggers an immediate background price fetch.
+App Startup	🟢 OPTIMIZED	UI waits for the "Yellow Star" vault before rendering assets.
+Manager UI	🟢 PERFECT	Gesture reordering and keyboard-aware scroll fully functional.
+🛡️ 3. THE PATH FORWARD: NOSTALGIA & POLISH (PHASE 18)
 
-With the Manager finalized, we move toward polishing the secondary systems and restoring the app's signature visual flair.
+With the "plumbing" of the multi-instance system secured, we move to the final aesthetic and verification steps.
 
-🛠️ Immediate Priorities for the Next Session:
+🛠️ Immediate Priorities:
 
-    "Live" Sync Feedback: Implement a "Syncing..." state and "Last Updated" timestamp to show real-time engine activity.
+    "Swan Twinkle" Archaeology: Hunt through the OpeningPage history to re-implement the lost logo animation logic.
 
-    Global Vista (Widget Polish): Finalize the manual save actions within the widget configuration to ensure perfect home-screen sync.
+    Cold-Start Verification: Ensure widgets land with data on the first try without requiring a manual refresh.
 
-    Metals Audit: Deep-dive into the physical asset tracking system to ensure rigorous accuracy.
+    Metals Audit Review: Verify the accuracy of physical asset tracking within the new V22 schema.
 
-🐞 Future Bug to Squash:
+🐞 Known Issue:
 
-    The "Swan Twinkle" Restoration: Re-examine the OpeningPage code history. Somewhere during the rebuild, the "twinkle" animation on the Swan logo was lost. We need to perform a "Code Archaeology" session to find and restore that original animation logic.
+    The "Blank Landing" Delay: While the pre-loader is active, there is still a small window where a cold database results in an empty widget. We need to implement a dedicated "INITIALIZING..." state in the WidgetContent layout.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Tue 04/07/2026 20:12:02.37
+Generated: Wed 04/08/2026 17:21:56.98
 
 Branch:
 main
 Commit:
-f767e0ca01e56462bcdacd729579b74ae8af9c23
+eb864a2f628923bcfc81c3dc5846288498701d20
 Working tree status (git status --porcelain):
+ M .idea/deploymentTargetSelector.xml
  M docs/BROWSER_CONTEXT_NARRATIVE.md
+ M gradle/libs.versions.toml
+ M gradle/wrapper/gradle-wrapper.properties
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
