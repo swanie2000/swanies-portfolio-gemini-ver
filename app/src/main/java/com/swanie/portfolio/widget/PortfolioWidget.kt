@@ -1,5 +1,6 @@
 package com.swanie.portfolio.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -28,6 +29,7 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 import com.swanie.portfolio.MainActivity
+import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.data.local.UserConfigDao
@@ -78,21 +80,33 @@ class PortfolioWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidgetEntryPoint::class.java)
 
-        // 🛡️ SOVEREIGN SHIELD: Read state and resolve vaultId without leaking global app state
+        val manager = GlanceAppWidgetManager(context)
+        val appWidgetId = manager.getAppWidgetId(id)
+
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
-        val boundId = prefs[VAULT_ID_KEY] ?: 0
         
-        // Use boundId if present, otherwise fallback to the user's default vault
-        val vaultId = if (boundId != 0) boundId else entryPoint.themePreferences().defaultVaultId.first()
+        val boundId = options.getInt("vault_id", 0).takeIf { it != 0 } 
+            ?: prefs[VAULT_ID_KEY] 
+            ?: 0
+        
+        if (boundId == 0) {
+            provideContent { UnlinkedContent(appWidgetId) }
+            return
+        }
+
+        val activeVault = entryPoint.vaultDao().getVaultById(boundId)
+        if (activeVault == null) {
+            provideContent { UnlinkedContent(appWidgetId) }
+            return
+        }
 
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
         val userConfig = entryPoint.userConfigDao().getUserConfig().first()
-        val activeVault = entryPoint.vaultDao().getVaultById(vaultId)
-        val allVaultAssets = entryPoint.assetDao().getAssetsByVault(vaultId).first()
+        val allVaultAssets = entryPoint.assetDao().getAssetsByVault(boundId).first()
 
-        val selectedIds = activeVault?.selectedWidgetAssets?.split(",")?.filter { it.isNotBlank() }
-            ?: prefs[SELECTED_ASSETS_KEY]?.split(",")?.filter { it.isNotBlank() }
-            ?: emptyList()
+        val selectedIds = activeVault.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
 
         val filteredAssets = if (selectedIds.isEmpty()) allVaultAssets.take(5)
         else selectedIds.mapNotNull { aid -> allVaultAssets.find { it.coinId == aid } }.take(5)
@@ -108,16 +122,10 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
 
-        // Resolve Colors
-        val rawBg = activeVault?.widgetBgColor ?: prefs[WIDGET_BG_COLOR_KEY] ?: "#1C1C1E"
-        val rawBgTxt = activeVault?.widgetBgTextColor ?: prefs[WIDGET_BG_TEXT_COLOR_KEY] ?: "#FFFFFF"
-        val rawCrd = activeVault?.widgetCardColor ?: prefs[WIDGET_CARD_COLOR_KEY] ?: "#2C2C2E"
-        val rawCrdTxt = activeVault?.widgetCardTextColor ?: prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: "#FFFFFF"
-
-        val bgColor = Color(android.graphics.Color.parseColor(rawBg))
-        val bgTextColor = Color(android.graphics.Color.parseColor(rawBgTxt))
-        val cardColor = Color(android.graphics.Color.parseColor(rawCrd))
-        val cardTextColor = Color(android.graphics.Color.parseColor(rawCrdTxt))
+        val bgColor = Color(android.graphics.Color.parseColor(activeVault.widgetBgColor))
+        val bgTextColor = Color(android.graphics.Color.parseColor(activeVault.widgetBgTextColor))
+        val cardColor = Color(android.graphics.Color.parseColor(activeVault.widgetCardColor))
+        val cardTextColor = Color(android.graphics.Color.parseColor(activeVault.widgetCardTextColor))
 
         provideContent {
             WidgetContent(
@@ -130,9 +138,51 @@ class PortfolioWidget : GlanceAppWidget() {
                 bgTextColor = bgTextColor,
                 cardColor = cardColor,
                 cardTextColor = cardTextColor,
-                vaultName = activeVault?.name ?: "PORTFOLIO"
+                vaultName = activeVault.name
             )
         }
+    }
+}
+
+@Composable
+fun UnlinkedContent(appWidgetId: Int) {
+    val context = LocalContext.current
+    val intent = Intent(context, WidgetConfigActivity::class.java).apply {
+        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+    }
+
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(Color(0xFF0A0E1A)) 
+            .padding(16.dp)
+            .clickable(actionStartActivity(intent)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            provider = ImageProvider(R.drawable.swan_launcher_icon),
+            contentDescription = "Swan Logo",
+            modifier = GlanceModifier.size(64.dp)
+        )
+        Spacer(modifier = GlanceModifier.height(16.dp))
+        Text(
+            text = "Unlinked Widget",
+            style = TextStyle(
+                color = ColorProvider(Color.White),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+        Spacer(modifier = GlanceModifier.height(4.dp))
+        Text(
+            text = "Tap to link this widget to a portfolio",
+            style = TextStyle(
+                color = ColorProvider(Color.White.copy(alpha = 0.7f)),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
+        )
     }
 }
 
@@ -149,12 +199,13 @@ fun WidgetContent(
     cardTextColor: Color,
     vaultName: String
 ) {
+    val context = LocalContext.current
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(bgColor)
             .padding(8.dp)
-            .clickable(actionStartActivity(Intent(LocalContext.current, MainActivity::class.java)))
+            .clickable(actionStartActivity(Intent(context, MainActivity::class.java)))
     ) {
         Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
@@ -176,7 +227,7 @@ fun WidgetContent(
             }
         }
 
-        if (showTotal && totalValue.isNotEmpty()) {
+        if (showTotal && totalValue.isNotEmpty() && assets.isNotEmpty()) {
             Text(
                 text = totalValue,
                 style = TextStyle(
@@ -193,7 +244,25 @@ fun WidgetContent(
 
         if (assets.isEmpty()) {
             Box(modifier = GlanceModifier.fillMaxSize().defaultWeight(), contentAlignment = Alignment.Center) {
-                Text("EMPTY VAULT", style = TextStyle(color = ColorProvider(bgTextColor.copy(alpha = 0.3f)), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Portfolio Linked.",
+                        style = TextStyle(
+                            color = ColorProvider(bgTextColor),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Text(
+                        text = "Go to the App's Widget Manager to select assets.",
+                        style = TextStyle(
+                            color = ColorProvider(bgTextColor.copy(alpha = 0.6f)),
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = GlanceModifier.padding(horizontal = 8.dp)
+                    )
+                }
             }
         } else {
             Column(modifier = GlanceModifier.fillMaxWidth()) {
@@ -305,9 +374,9 @@ class RefreshCallback : ActionCallback {
 
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
         val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 0
-        val vaultId = if (boundId != 0) boundId else entryPoint.themePreferences().defaultVaultId.first()
+        if (boundId == 0) return
 
-        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = vaultId.toString())
+        entryPoint.assetRepository().refreshAssets(force = true, portfolioId = boundId.toString())
 
         val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->

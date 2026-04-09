@@ -173,63 +173,66 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED NARRATIVE: THE "SOVEREIGN SHIELD" REVOLUTION (V8.5.0-WIP)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V8.5.0)
+🎯 THE CORE MISSION
 
-Current Version: 8.5.0-WIP (The "Instance Integrity" Edition)
+To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield").
+🛡️ 1. ARCHITECTURAL RECAP (THE STABLE BASELINE)
 
-Build Status: 🟠 WIP / DATABASE V22 / JETPACK GLANCE 1.1.0
-🛡️ 1. THE ARCHITECTURAL VICTORIES: PHASE 15-17 "SOVEREIGN IDENTITY"
+    Database: V22 Schema (Room). Uses vaultId (Int) as the primary key for portfolio isolation.
 
-We have effectively decoupled the home-screen widgets from the main app's internal navigation, ensuring each widget instance acts as an independent "Sovereign Entity."
+    Widget Engine: Jetpack Glance 1.1.0.
 
-🚀 Key Technical Wins:
+    Identity Logic: Each GlanceId is strictly bound to a bound_vault_id in PreferencesGlanceStateDefinition.
 
-    The Sovereign Shield: Stripped all widgets of their reliance on currentVaultId (the "Last Viewed" state). Widgets now strictly observe their own private bound_vault_id from the PreferencesGlanceStateDefinition.
+    Navigation: Decoupled. The Main App's "Last Viewed" state must never influence what a Widget displays.
 
-    Hardened Config Handshake: Rebuilt the WidgetConfigActivity to atomically save the Vault ID to the specific GlanceId. This prevents "musical chairs" where adding a new widget would overwrite the data of an existing one.
+🚧 2. THE CURRENT BLOCKER: THE "IDENTITY HANDSHAKE"
 
-    The Sync Pre-loader: Integrated assetRepository().refreshAssets() directly into the configuration flow. This "primes the pump" by fetching market data for the specific vault before the user even returns to the home screen.
+We are currently fighting a Race Condition during Widget placement.
 
-    Startup Blindness Mitigation: Refactored the MainViewModel init block with an isDataReady gate. The app now holds the UI until the startup vault identity is legally bound, eliminating the "0 assets on launch" flicker.
+    The Symptom: New widgets (e.g., "Swanie 4") land showing the default name "PORTFOLIO" instead of the user-selected Vault Name.
 
-🛡️ 2. THE "SOVEREIGN" SPECS (V8.5.0-WIP)
-Component	Status	Achievement
-Widget Binding	🟢 STABLE	Each widget instance is locked to its own portfolio ID.
-Sync Engine	🟡 REFINING	Configuration now triggers an immediate background price fetch.
-App Startup	🟢 OPTIMIZED	UI waits for the "Yellow Star" vault before rendering assets.
-Manager UI	🟢 PERFECT	Gesture reordering and keyboard-aware scroll fully functional.
-🛡️ 3. THE PATH FORWARD: NOSTALGIA & POLISH (PHASE 18)
+    The Cause: The Widget renders its first frame before the bound_vault_id has finished writing to the persistent DataStore.
 
-With the "plumbing" of the multi-instance system secured, we move to the final aesthetic and verification steps.
+    The Planned Fix: Transition from a Pull model (Widget searching for its ID) to a Push model (Config Activity pushing ID/Name directly into AppWidgetManager options).
 
-🛠️ Immediate Priorities:
+🛠️ 3. ACTIVE PHASE: 18 "POLISH & PROOFING"
+Task	Description	Status
+Direct Push Identity	Move Vault ID/Name into AppWidgetOptions for instant landing.	PRIORITY 1
+"Initializing" State	UI feedback ("Securing Identity...") while the first sync runs.	PENDING
+Swan Twinkle	Recover the logo shimmer logic from OpeningPage history.	ARCHAEOLOGY
+Metals Audit	READ-ONLY VERIFICATION. Ensure V22 weight units render correctly.	AUDIT ONLY
+⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
-    "Swan Twinkle" Archaeology: Hunt through the OpeningPage history to re-implement the lost logo animation logic.
+    CRITICAL: READ BEFORE EDITING
 
-    Cold-Start Verification: Ensure widgets land with data on the first try without requiring a manual refresh.
+        No Scope Creep: Do not modify AssetRepository or Metals logic unless explicitly tasked. The core app logic is stable.
 
-    Metals Audit Review: Verify the accuracy of physical asset tracking within the new V22 schema.
+        Full File Outputs: Always provide full file contents for code changes to avoid partial snippet corruption.
 
-🐞 Known Issue:
+        Logging: Use Log.d("WIDGET_FIX", ...) for all identity handshake troubleshooting.
 
-    The "Blank Landing" Delay: While the pre-loader is active, there is still a small window where a cold database results in an empty widget. We need to implement a dedicated "INITIALIZING..." state in the WidgetContent layout.
+        Git Discipline: If a solution requires touching more than 3 files, stop and ask for permission. Focus on surgical fixes.
+
+🐞 KNOWN "GHOSTS"
+
+    The "Blank Swanie 1": Currently appears in the Main App due to a temporary debug bypass of the Login/Password screen. DO NOT ATTEMPT TO FIX. This will resolve itself once the official login sequence is restored.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Wed 04/08/2026 17:21:56.98
+Generated: Thu 04/09/2026 12:15:38.06
 
 Branch:
 main
 Commit:
-eb864a2f628923bcfc81c3dc5846288498701d20
+30666242b150d4697c23f745ce6507dec97f2c77
 Working tree status (git status --porcelain):
- M .idea/deploymentTargetSelector.xml
+ M .idea/misc.xml
  M docs/BROWSER_CONTEXT_NARRATIVE.md
- M gradle/libs.versions.toml
- M gradle/wrapper/gradle-wrapper.properties
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)

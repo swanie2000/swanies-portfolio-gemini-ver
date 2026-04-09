@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,12 +14,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -46,17 +47,13 @@ class WidgetConfigActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 🛡️ DEFAULT: Set result to CANCELED. This ensures that if the user backs out,
-        // the widget isn't placed in an unconfigured state.
         setResult(Activity.RESULT_CANCELED)
 
-        // 🛡️ HANDSHAKE: Retrieve the appWidgetId directly from the intent.
         appWidgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
 
-        // If this activity was started with an invalid widget ID, finish with an error.
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             Log.e("SWANIE_WIDGET", "Invalid AppWidgetId received in ConfigActivity")
             finish()
@@ -65,6 +62,7 @@ class WidgetConfigActivity : ComponentActivity() {
 
         setContent {
             var vaults by remember { mutableStateOf<List<VaultEntity>>(emptyList()) }
+            var selectedVaultName by remember { mutableStateOf<String?>(null) }
             val scope = rememberCoroutineScope()
 
             LaunchedEffect(Unit) {
@@ -74,49 +72,104 @@ class WidgetConfigActivity : ComponentActivity() {
             SwaniesPortfolioTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFF000416) // SwanieNavy background
+                    color = Color(0xFF000416)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "SELECT VAULT",
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                color = Color(0xFFFFD700), // Gold/Yellow accent
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 2.sp
+                    if (selectedVaultName == null) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "SELECT VAULT",
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    color = Color(0xFFFFD700),
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 2.sp
+                                )
                             )
-                        )
-                        
-                        Text(
-                            text = "Choose which portfolio to track on this widget.",
-                            style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
-                            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
-                        )
 
-                        if (vaults.isEmpty()) {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(color = Color(0xFFFFD700))
-                            }
-                        } else {
-                            LazyColumn(
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                items(vaults) { vault ->
-                                    VaultSelectionCard(vault) {
-                                        scope.launch {
-                                            handleVaultSelection(vault.id)
+                            Text(
+                                text = "Choose which portfolio to track on this widget.",
+                                style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
+                                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+                            )
+
+                            if (vaults.isEmpty()) {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator(color = Color(0xFFFFD700))
+                                }
+                            } else {
+                                LazyColumn(
+                                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    items(vaults) { vault ->
+                                        VaultSelectionCard(vault) {
+                                            scope.launch {
+                                                handleVaultSelection(vault.id)
+                                                selectedVaultName = vault.name
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                    } else {
+                        SuccessUI(selectedVaultName!!) {
+                            val resultValue = Intent().apply {
+                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                            }
+                            setResult(Activity.RESULT_OK, resultValue)
+                            finish()
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun SuccessUI(vaultName: String, onDismiss: () -> Unit) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = Color(0xFF00FF00),
+                modifier = Modifier.size(80.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Linked to $vaultName!",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Now, open the App > Settings > Widget Manager to pick your assets and colors.",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center
+                )
+            )
+            Spacer(modifier = Modifier.height(48.dp))
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD700)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp)
+            ) {
+                Text("GOT IT", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -161,40 +214,35 @@ class WidgetConfigActivity : ComponentActivity() {
 
     private suspend fun handleVaultSelection(vaultId: Int) {
         val context = this@WidgetConfigActivity
-        
+
         try {
             val glanceManager = GlanceAppWidgetManager(context)
             val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
 
-            Log.d("SWANIE_WIDGET", "Binding Vault ID $vaultId to AppWidgetId $appWidgetId (GlanceId: $glanceId)")
+            Log.d("SWANIE_LINK", "Initial placement link for ID: $appWidgetId to Vault: $vaultId")
 
-            // 🛡️ SOVEREIGN SHIELD: Save the VAULT_ID_KEY for this specific glanceId
             updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
                 prefs.toMutablePreferences().apply {
                     this[PortfolioWidget.VAULT_ID_KEY] = vaultId
                 }.toPreferences()
             }
 
-            // 🛡️ COLD START FIX: Trigger immediate sync for this vault
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val options = Bundle().apply {
+                putInt("vault_id", vaultId)
+            }
+            appWidgetManager.updateAppWidgetOptions(appWidgetId, options)
+
             val workRequest = OneTimeWorkRequestBuilder<WidgetSyncWorker>()
                 .setInputData(workDataOf("force_vault_id" to vaultId))
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .build()
-            
+
             WorkManager.getInstance(context).enqueue(workRequest)
 
-            // Trigger the first render immediately
             PortfolioWidget().update(context, glanceId)
-
-            // 🛡️ THE HANDSHAKE: Pass back the original appWidgetId and set RESULT_OK
-            val resultValue = Intent().apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            }
-            setResult(Activity.RESULT_OK, resultValue)
-            finish()
         } catch (e: Exception) {
             Log.e("SWANIE_WIDGET", "Failed to bind widget state during configuration", e)
-            finish()
         }
     }
 }
