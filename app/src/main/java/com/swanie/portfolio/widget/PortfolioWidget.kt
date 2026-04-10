@@ -64,6 +64,8 @@ class PortfolioWidget : GlanceAppWidget() {
         val WIDGET_CARD_COLOR_KEY = stringPreferencesKey("widget_card_color")
         val WIDGET_CARD_TEXT_COLOR_KEY = stringPreferencesKey("widget_card_text_color")
         val FORCE_UPDATE_KEY = longPreferencesKey("force_update_time")
+        val STATIC_VAULT_NAME_KEY = stringPreferencesKey("static_vault_name")
+        val STATIC_TOTAL_BALANCE_KEY = stringPreferencesKey("static_total_balance")
     }
 
     @EntryPoint
@@ -83,13 +85,34 @@ class PortfolioWidget : GlanceAppWidget() {
         val manager = GlanceAppWidgetManager(context)
         val appWidgetId = manager.getAppWidgetId(id)
 
+        // 🚀 INSTANT IDENTITY: Read directly from AppWidget Options first to bypass DataStore delay
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
         
-        val boundId = options.getInt("vault_id", 0).takeIf { it != 0 } 
-            ?: prefs[VAULT_ID_KEY] 
-            ?: 0
+        val boundIdFromOptions = options.getInt("vault_id", 0)
+        val staticNameFromOptions = options.getString("static_vault_name")
+        val staticBalanceFromOptions = options.getString("static_total_balance")
+
+        // ⚡ SAFETY: If we have snapshot data in Options, provide it IMMEDIATELY to kill the "Android Delay"
+        if (boundIdFromOptions != 0 && staticNameFromOptions != null) {
+            provideContent {
+                WidgetContent(
+                    totalValue = staticBalanceFromOptions ?: "",
+                    lastUpdated = "Linking...",
+                    assets = emptyList(),
+                    assetHistoryMap = emptyMap(),
+                    showTotal = true,
+                    bgColor = Color(0xFF000416),
+                    bgTextColor = Color.White,
+                    cardColor = Color(0xFF1C1C1E),
+                    cardTextColor = Color.White,
+                    vaultName = staticNameFromOptions
+                )
+            }
+        }
+
+        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
+        val boundId = boundIdFromOptions.takeIf { it != 0 } ?: prefs[VAULT_ID_KEY] ?: 0
         
         if (boundId == 0) {
             provideContent { UnlinkedContent(appWidgetId) }
@@ -104,6 +127,11 @@ class PortfolioWidget : GlanceAppWidget() {
 
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
         val userConfig = entryPoint.userConfigDao().getUserConfig().first()
+        
+        // ⚡ SNAPSHOT ARCHITECTURE: Check for pre-calculated static data in Options (System Intent) then fall back to DataStore
+        val staticName = staticNameFromOptions ?: prefs[STATIC_VAULT_NAME_KEY]
+        val staticBalance = staticBalanceFromOptions ?: prefs[STATIC_TOTAL_BALANCE_KEY]
+
         val allVaultAssets = entryPoint.assetDao().getAssetsByVault(boundId).first()
 
         val selectedIds = activeVault.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
@@ -120,7 +148,9 @@ class PortfolioWidget : GlanceAppWidget() {
             totalValue += (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
         }
 
-        val displayTotalValue = if (userConfig?.showWidgetTotal == true) NumberFormat.getCurrencyInstance(Locale.US).format(totalValue) else ""
+        val displayTotalValue = if (userConfig?.showWidgetTotal == true) {
+            staticBalance ?: NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
+        } else ""
 
         val bgColor = Color(android.graphics.Color.parseColor(activeVault.widgetBgColor))
         val bgTextColor = Color(android.graphics.Color.parseColor(activeVault.widgetBgTextColor))
@@ -138,7 +168,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 bgTextColor = bgTextColor,
                 cardColor = cardColor,
                 cardTextColor = cardTextColor,
-                vaultName = activeVault.name
+                vaultName = staticName ?: activeVault.name
             )
         }
     }

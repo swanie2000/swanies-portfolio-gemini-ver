@@ -24,16 +24,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.edit
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.work.*
+import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,6 +45,9 @@ class WidgetConfigActivity : ComponentActivity() {
 
     @Inject
     lateinit var vaultDao: VaultDao
+
+    @Inject
+    lateinit var assetDao: AssetDao
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -216,6 +223,15 @@ class WidgetConfigActivity : ComponentActivity() {
         val context = this@WidgetConfigActivity
 
         try {
+            val vault = vaultDao.getVaultById(vaultId) ?: return
+            val assets = assetDao.getAssetsByVault(vaultId).first()
+            
+            var totalValue = 0.0
+            assets.forEach { asset ->
+                totalValue += (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+            }
+            val formattedTotal = NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
+
             val glanceManager = GlanceAppWidgetManager(context)
             val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
 
@@ -224,14 +240,26 @@ class WidgetConfigActivity : ComponentActivity() {
             updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
                 prefs.toMutablePreferences().apply {
                     this[PortfolioWidget.VAULT_ID_KEY] = vaultId
+                    this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = vault.name
+                    this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = formattedTotal
                 }.toPreferences()
             }
 
+            // 🚀 SYNCHRONIZED HANDSHAKE: Write to Options for instant OS recognition
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val options = Bundle().apply {
                 putInt("vault_id", vaultId)
+                putString("static_vault_name", vault.name)
+                putString("static_total_balance", formattedTotal)
             }
             appWidgetManager.updateAppWidgetOptions(appWidgetId, options)
+
+            // 📢 MANUAL BROADCAST RESET: Force the OS to acknowledge the update immediately
+            val updateIntent = Intent(context, PortfolioWidgetReceiver::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+            }
+            context.sendBroadcast(updateIntent)
 
             val workRequest = OneTimeWorkRequestBuilder<WidgetSyncWorker>()
                 .setInputData(workDataOf("force_vault_id" to vaultId))
