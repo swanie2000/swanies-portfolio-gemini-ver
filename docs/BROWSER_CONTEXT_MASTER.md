@@ -173,7 +173,7 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V8.5.0)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V8.6.0)
 🎯 THE CORE MISSION
 
 To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield").
@@ -183,55 +183,63 @@ To maintain a high-performance, multi-instance portfolio tracker where Widgets a
 
     Widget Engine: Jetpack Glance 1.1.0.
 
-    Identity Logic: Each GlanceId is strictly bound to a bound_vault_id in PreferencesGlanceStateDefinition.
+    Identity Logic: Each GlanceId is strictly bound via "The Double-Stamp":
+
+        PreferencesGlanceStateDefinition (Persistent DataStore).
+
+        AppWidgetManager Options Bundle (Synchronous System memory).
 
     Navigation: Decoupled. The Main App's "Last Viewed" state must never influence what a Widget displays.
 
-🚧 2. THE CURRENT BLOCKER: THE "IDENTITY HANDSHAKE"
+🚧 2. THE CURRENT BLOCKER: "THE FIRST-FRAME HYDRATION"
 
-We are currently fighting a Race Condition during Widget placement.
+We have successfully solved the Identity Handshake (the widget now knows who it is instantly). However, we are now fighting the Content Lag.
 
-    The Symptom: New widgets (e.g., "Swanie 4") land showing the default name "PORTFOLIO" instead of the user-selected Vault Name.
+    The Symptom: New widgets land instantly with the correct Vault Name, but show an empty "Portfolio Linked" message instead of assets.
 
-    The Cause: The Widget renders its first frame before the bound_vault_id has finished writing to the persistent DataStore.
+    The Cause: The widget renders its first frame using only the identity "Snapshot." The actual asset list still requires a background database query that isn't fast enough for the initial render.
 
-    The Planned Fix: Transition from a Pull model (Widget searching for its ID) to a Push model (Config Activity pushing ID/Name directly into AppWidgetManager options).
+    The Planned Fix: Upgrade the "Snapshot" to a "Full Portfolio Stamp." The Config Activity will now push the Top 5 Assets directly into the AppWidgetOptions bundle alongside the Vault Name.
 
-🛠️ 3. ACTIVE PHASE: 18 "POLISH & PROOFING"
+🛠️ 3. ACTIVE PHASE: 19 "FIRST-FRAME FIDELITY"
 Task	Description	Status
-Direct Push Identity	Move Vault ID/Name into AppWidgetOptions for instant landing.	PRIORITY 1
-"Initializing" State	UI feedback ("Securing Identity...") while the first sync runs.	PENDING
-Swan Twinkle	Recover the logo shimmer logic from OpeningPage history.	ARCHAEOLOGY
+Top 5 Asset Stamp	Serialize/Push Top 5 Assets into AppWidgetOptions during config.	PRIORITY 1
+Snapshot Parsing	Update PortfolioWidget to render assets from the Bundle if DB is slow.	PENDING
+"Initializing" State	UI feedback ("Syncing live prices...") while background worker runs.	PENDING
+Swan Twinkle	Recover logo shimmer logic from OpeningPage history.	ARCHAEOLOGY
 Metals Audit	READ-ONLY VERIFICATION. Ensure V22 weight units render correctly.	AUDIT ONLY
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
-    CRITICAL: READ BEFORE EDITING
+CRITICAL: READ BEFORE EDITING
 
-        No Scope Creep: Do not modify AssetRepository or Metals logic unless explicitly tasked. The core app logic is stable.
+    No Scope Creep: Do not modify AssetRepository or Metals logic. The core app logic is stable.
 
-        Full File Outputs: Always provide full file contents for code changes to avoid partial snippet corruption.
+    Full File Outputs: Always provide full file contents for code changes to avoid partial snippet corruption.
 
-        Logging: Use Log.d("WIDGET_FIX", ...) for all identity handshake troubleshooting.
+    The Double-Stamp Rule: Every identity change must be written to both updateAppWidgetState and updateAppWidgetOptions.
 
-        Git Discipline: If a solution requires touching more than 3 files, stop and ask for permission. Focus on surgical fixes.
+    Logging: Use Log.d("WIDGET_FIX", ...) for all handshake troubleshooting.
 
 🐞 KNOWN "GHOSTS"
 
-    The "Blank Swanie 1": Currently appears in the Main App due to a temporary debug bypass of the Login/Password screen. DO NOT ATTEMPT TO FIX. This will resolve itself once the official login sequence is restored.
+    The "Blank Swanie 1": Appears in the Main App due to a temporary debug bypass of the Login/Password screen. DO NOT ATTEMPT TO FIX.
+
+🚀 Next Agent Command
+
+"I have updated the narrative to V8.6.0. We are moving from 'Identity' to 'Content Hydration'. Please implement the Top 5 Asset Stamp in WidgetConfigActivity.kt and PortfolioWidget.kt. Provide full files."
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Thu 04/09/2026 12:15:38.06
+Generated: Fri 04/10/2026 16:11:19.38
 
 Branch:
 main
 Commit:
-30666242b150d4697c23f745ce6507dec97f2c77
+8912c960d397ded27ba9a0a895cf48d24996d3b6
 Working tree status (git status --porcelain):
- M .idea/misc.xml
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
