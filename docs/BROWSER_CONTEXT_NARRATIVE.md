@@ -1,49 +1,49 @@
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V10.0.0)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V11.2.0)
 🎯 THE CORE MISSION
 
-To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield"). Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings.
-🛡️ 1. ARCHITECTURAL RECAP (THE GOLDEN BASELINE)
+To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield"). Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with instantaneous visual feedback.
+🛡️ 1. ARCHITECTURAL RECAP (THE SYNCED BASELINE)
 
-    Database: V25 Schema (Room).
+    Database: V25 Schema (Room). Stores the "Source of Truth" for every vault.
 
-        VaultEntity now acts as the Sovereign Registry, storing unique colors (widgetBgColor, etc.), asset IDs, and the privacy toggle (showWidgetTotal).
+    The Synchronous Handshake (Glance 1.1.0): We have abandoned the "Passive Update" (waiting for the database) in favor of Synchronous State Persistence.
 
-    Hilt Isolation: The SettingsViewModel is decoupled from MainViewModel to prevent circular dependencies and startup deadlocks.
+        The SettingsViewModel now writes directly to the PreferencesGlanceStateDefinition (DataStore) during the save.
 
-    Initialization Lock: The UI uses a LaunchedEffect lock to ensure draft states are re-hydrated from the database immediately upon switching portfolios.
+        The Widget renders from this "Shared Mental State" instantly, bypassing the Android 30-second update throttle.
 
-    The Triple-Stamp: Every "Save" operation commits to the Database, updates the Local State, and broadcasts a manual refresh to the Home Screen widgets.
+    The Sovereign Task: The WidgetConfigActivity is now a "Ghost Task" (noHistory, excludeFromRecents) that pops up for edits and vanishes immediately upon saving, matching the "Day Counter" UX.
 
-✅ 2. TODAY’S VICTORIES (MISSION ACCOMPLISHED)
+    UI Foundation: Replaced OutlinedTextField with a BasicTextField + custom DecorationBox to solve the long-standing "Text Clipping" bug in asset search.
 
-    Startup Deadlock Broken: Implemented an emergency timeout and lazy DAO injection to fix the Splash Screen hang.
+✅ 2. TODAY’S VICTORIES (THE BREAKTHROUGH)
 
-    Registry Dropdown: Created a centralized "Pick a Portfolio to edit" menu that switches contexts without data leakage.
+    The 30-Second Wall Breached: Successfully implemented a sub-second "Instant Snap" for background colors and vault names.
 
-    Color Sovereignty: Swanie 1-5 can now hold 5 independent color schemes persistently.
+    Multi-Instance Fluidity: Confirmed Swanie 1-5 can be toggled and saved rapidly with 100% update reliability.
 
-    Privacy Isolation: Moved "Hide Totals" from a global setting to a per-vault setting.
+    Search Box Alignment: Finally achieved perfect vertical centering in the Asset Search bar.
 
-    Sleek Command UI: Implemented a top-right icon-based Save/Undo system with "Dirty State" detection.
+    Task Management: Secured the "Task-Only" configuration mode, keeping the user's "Recents" list clean and focused.
 
-🎨 3. ACTIVE PHASE: "POLISHING THE SHIELD"
+🎨 3. ACTIVE PHASE: "FULL-FREIGHT POLISH"
 Task	Description	Status
-Living Preview	Update WidgetPreviewSlim to show real asset names/counts from the selected vault.	NEXT PRIORITY
-Color Swatch Menu	Add color indicators to the "Pick a Portfolio" dropdown items.	PENDING
-Haptic Lock-In	Add haptic feedback (vibration) to the Header Save Icon.	PENDING
-Visual Fades	Animate color transitions in the preview UI for a premium feel.	PENDING
-Metals Audit	READ-ONLY VERIFICATION. Ensure V25 weight units render correctly.	AUDIT ONLY
+The Asset Stamp	Serialize Top 5 assets into the DataStore "Handshake" so they appear instantly with the color.	NEXT PRIORITY
+Portfolio Elevator	Implement imePadding and scroll-back logic to keep edited portfolios above the keyboard.	PENDING
+Living Preview	Sync the internal Settings Preview to reflect the same "Handshake" data as the real widget.	PENDING
+Color Swatch Menu	Add visual indicators to the "Pick a Portfolio" dropdown items.	PENDING
+Haptic Lock-In	Add vibration feedback to the Header Save Icon.	PENDING
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
 CRITICAL: READ BEFORE EDITING
 
-    The Sovereign Rule: Never use UserConfigEntity (Global) for properties that should be per-portfolio (Vault).
+    The Synchronous Rule: Every vault property change (color, name, assets) MUST be written to the PreferencesGlanceStateDefinition inside the same scope as the database save to ensure an instant snap.
 
     Full File Outputs: Always provide full file contents. No partial snippets.
 
     Dirty State Integrity: Ensure isDirty remains the gatekeeper for the Save/Undo icons.
 
-    Log Tagging: Use Log.d("DATABASE_SAVE", ...) for persistence auditing.
+    Log Tagging: Use Log.d("WIDGET_SYNC", ...) for lifecycle auditing.
 
 🐞 KNOWN "GHOSTS"
 
@@ -51,4 +51,4 @@ CRITICAL: READ BEFORE EDITING
 
 🚀 Next Agent Command
 
-    "I have updated the narrative to V10.0.0. The plumbing is solid. We are now entering the 'Polishing' phase. Please implement the Living Preview in WidgetManagerScreen.kt so the preview reflects real asset data from the selected vault instead of dummy text. Provide full files."
+    "I have updated the narrative to V11.2.0. The Synchronous Handshake is working for colors and names. We are now entering the 'Full-Freight' phase. Please implement the Asset Stamp in SettingsViewModel.kt and PortfolioWidget.kt so the Top 5 assets are pushed into the DataStore and rendered instantly. Provide full files."
