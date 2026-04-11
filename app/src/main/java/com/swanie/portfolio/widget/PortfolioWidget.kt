@@ -143,7 +143,6 @@ class PortfolioWidget : GlanceAppWidget() {
         }
 
         val lastUpdatedTime = prefs[LAST_UPDATED_KEY] ?: "--:--"
-        val userConfig = entryPoint.userConfigDao().getUserConfig().first()
         
         // ⚡ SNAPSHOT ARCHITECTURE: Check for pre-calculated static data in Options (System Intent) then fall back to DataStore
         val staticName = staticNameFromOptions ?: prefs[STATIC_VAULT_NAME_KEY]
@@ -165,7 +164,7 @@ class PortfolioWidget : GlanceAppWidget() {
             totalValue += (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
         }
 
-        val displayTotalValue = if (userConfig?.showWidgetTotal == true) {
+        val displayTotalValue = if (activeVault.showWidgetTotal) {
             staticBalance ?: NumberFormat.getCurrencyInstance(Locale.US).format(totalValue)
         } else ""
 
@@ -180,7 +179,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 lastUpdated = lastUpdatedTime,
                 assets = filteredAssets,
                 assetHistoryMap = assetHistoryMap,
-                showTotal = userConfig?.showWidgetTotal == true,
+                showTotal = activeVault.showWidgetTotal,
                 bgColor = bgColor,
                 bgTextColor = bgTextColor,
                 cardColor = cardColor,

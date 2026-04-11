@@ -103,9 +103,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateShowWidgetTotal(show: Boolean) {
+    fun updateShowWidgetTotal(vaultId: Int, show: Boolean) {
         viewModelScope.launch {
-            userConfigDao.updateShowWidgetTotal(show)
+            vaultDao.updateShowWidgetTotal(vaultId, show)
             triggerWidgetUpdate()
         }
     }
@@ -124,6 +124,7 @@ class SettingsViewModel @Inject constructor(
 
     // 🛡️ PER-VAULT APPEARANCE: Saves custom widget colors for a specific vault
     suspend fun saveWidgetAppearance(vaultId: Int, bg: String, bgText: String, card: String, cardText: String) {
+        android.util.Log.d("DATABASE_SAVE", "Attempting to save colors for Vault ID: $vaultId with BG: $bg")
         vaultDao.updateWidgetColors(vaultId, bg, bgText, card, cardText)
         triggerWidgetUpdate()
     }
@@ -149,6 +150,19 @@ class SettingsViewModel @Inject constructor(
     fun updateSelectedWidgetAssets(vaultId: Int, assets: String) {
         viewModelScope.launch {
             vaultDao.updateSelectedWidgetAssets(vaultId, assets)
+            triggerWidgetUpdate()
+        }
+    }
+
+    fun updateVaultColor(vaultId: Int, target: Int, color: String) {
+        viewModelScope.launch {
+            val v = vaultDao.getVaultById(vaultId) ?: return@launch
+            when (target) {
+                0 -> vaultDao.updateWidgetColors(vaultId, color, v.widgetBgTextColor, v.widgetCardColor, v.widgetCardTextColor)
+                1 -> vaultDao.updateWidgetColors(vaultId, v.widgetBgColor, color, v.widgetCardColor, v.widgetCardTextColor)
+                2 -> vaultDao.updateWidgetColors(vaultId, v.widgetBgColor, v.widgetBgTextColor, color, v.widgetCardTextColor)
+                3 -> vaultDao.updateWidgetColors(vaultId, v.widgetBgColor, v.widgetBgTextColor, v.widgetCardColor, color)
+            }
             triggerWidgetUpdate()
         }
     }

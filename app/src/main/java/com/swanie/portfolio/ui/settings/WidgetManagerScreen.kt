@@ -21,6 +21,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -69,6 +71,14 @@ fun WidgetManagerScreen(
     val userConfig by settingsViewModel.userConfig.collectAsStateWithLifecycle(null)
     val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
     
+    // 🎯 DRAFT STATE: Hoisted to the top for scope visibility
+    var draftBg by rememberSaveable { mutableStateOf("#1C1C1E") }
+    var draftBgTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
+    var draftCrd by rememberSaveable { mutableStateOf("#2C2C2E") }
+    var draftCrdTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
+    var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var draftHideTotals by remember { mutableStateOf(false) }
+
     // 🎯 REGISTRY STATE: The target vault for configuration
     val targetVaultId by settingsViewModel.targetVaultId.collectAsStateWithLifecycle()
     val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
@@ -82,28 +92,49 @@ fun WidgetManagerScreen(
         }
     }
 
+    // 🎯 INITIALIZATION LOCK: Force draft states to match selected vault on every ID change
+    LaunchedEffect(selectedVault?.id) {
+        selectedVault?.let {
+            draftBg = it.widgetBgColor.takeIf { c -> c.isNotEmpty() } ?: "#1C1C1E"
+            draftBgTxt = it.widgetBgTextColor.takeIf { c -> c.isNotEmpty() } ?: "#FFFFFF"
+            draftCrd = it.widgetCardColor.takeIf { c -> c.isNotEmpty() } ?: "#2C2C2E"
+            draftCrdTxt = it.widgetCardTextColor.takeIf { c -> c.isNotEmpty() } ?: "#FFFFFF"
+            draftSelectedIds = it.selectedWidgetAssets.split(",").filter { id -> id.isNotBlank() }
+            draftHideTotals = !it.showWidgetTotal
+        }
+    }
+
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
-    // Draft states for colors, reactive to selected vault changes
-    var draftBg by rememberSaveable { mutableStateOf("#1C1C1E") }
-    var draftBgTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
-    var draftCrd by rememberSaveable { mutableStateOf("#2C2C2E") }
-    var draftCrdTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
+    val isDirty by remember(selectedVault, draftBg, draftBgTxt, draftCrd, draftCrdTxt, draftSelectedIds, draftHideTotals) {
+        derivedStateOf {
+            selectedVault?.let {
+                val originalIds = it.selectedWidgetAssets.split(",").filter { id -> id.isNotBlank() }
+                val originalHideTotals = !it.showWidgetTotal
+                
+                draftBg != it.widgetBgColor ||
+                draftBgTxt != it.widgetBgTextColor ||
+                draftCrd != it.widgetCardColor ||
+                draftCrdTxt != it.widgetCardTextColor ||
+                draftSelectedIds != originalIds ||
+                draftHideTotals != originalHideTotals
+            } ?: false
+        }
+    }
 
-    var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var pendingVaultId by remember { mutableIntStateOf(-1) }
+    var showUnsavedDialog by remember { mutableStateOf(false) }
 
-    // Re-initialize selection and colors when target vault changes
-    LaunchedEffect(selectedVault?.id) {
+    fun revertChanges() {
         selectedVault?.let {
             draftSelectedIds = it.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
             draftBg = it.widgetBgColor
             draftBgTxt = it.widgetBgTextColor
             draftCrd = it.widgetCardColor
             draftCrdTxt = it.widgetCardTextColor
+            draftHideTotals = !it.showWidgetTotal
         }
     }
-
-    var draftHideTotals by remember(userConfig) { mutableStateOf(!(userConfig?.showWidgetTotal ?: false)) }
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var privacyExpanded by rememberSaveable { mutableStateOf(false) }
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
@@ -126,14 +157,59 @@ fun WidgetManagerScreen(
                 IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
                 }
-                Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center))
+                Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 14.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp))
+
+                // 🎯 COMMAND CENTER: Save/Undo Toggle
+                Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
+                    if (isDirty) {
+                        IconButton(
+                            onClick = {
+                                if (cooldownSeconds == 0 && selectedVault != null) {
+                                    scope.launch {
+                                        val targetId = selectedVault!!.id
+                                        // Update Vault-Specific configuration
+                                        settingsViewModel.saveWidgetConfiguration(targetId, draftSelectedIds) {
+                                            scope.launch {
+                                                settingsViewModel.saveWidgetAppearance(
+                                                    targetId,
+                                                    draftBg,
+                                                    draftBgTxt,
+                                                    draftCrd,
+                                                    draftCrdTxt
+                                                )
+                                                // Privacy is now vault-specific
+                                                settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
+
+                                                // Hard refresh to sync state
+                                                settingsViewModel.getVaultById(targetId)
+
+                                                sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
+                                                Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Default.Save, contentDescription = "SAVE", tint = Color.Yellow)
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { revertChanges() }
+                        ) {
+                            Icon(Icons.Default.Undo, contentDescription = "UNDO", tint = safeThemeText.copy(alpha = 0.4f))
+                        }
+                    }
+                }
             }
 
-            // 🎯 PORTFOLIO REGISTRY SELECTOR: Replaces VaultStrip
+            // 🎯 PORTFOLIO REGISTRY SELECTOR
             PortfolioSelectorDropdown(
                 vaults = vaults,
                 selectedVaultId = targetVaultId,
-                onVaultSelected = { settingsViewModel.setTargetVaultId(it) },
+                onVaultSelected = { id ->
+                    settingsViewModel.setTargetVaultId(id)
+                },
                 themeColor = safeThemeText
             )
 
@@ -203,46 +279,17 @@ fun WidgetManagerScreen(
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                     val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
-                    Button(
-                        onClick = {
-                            if (cooldownSeconds == 0 && selectedVault != null) {
-                                scope.launch {
-                                    // 1. Update privacy global config
-                                    settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
-                                    
-                                    // 2. Save vault-specific asset selection
-                                    settingsViewModel.saveWidgetConfiguration(selectedVault!!.id, draftSelectedIds) {
-                                        scope.launch {
-                                            // 3. Save vault-specific colors
-                                            settingsViewModel.saveWidgetAppearance(
-                                                selectedVault!!.id,
-                                                draftBg,
-                                                draftBgTxt,
-                                                draftCrd,
-                                                draftCrdTxt
-                                            )
-
-                                            android.util.Log.d("WIDGET_FIX", "Syncing Vault: $targetVaultId")
-                                            sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                            cooldownSeconds = 0
-                                            Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .padding(bottom = 8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (cooldownSeconds > 0) Color.Gray else Color.Yellow,
-                            contentColor = Color.Black
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        enabled = cooldownSeconds == 0
-                    ) {
-                        Text(text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC REGISTRY", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                    
+                    if (cooldownSeconds > 0) {
+                        Button(
+                            onClick = { },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = false
+                        ) {
+                            Text(text = "WAIT $timeDisplay", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        }
                     }
                     Spacer(modifier = Modifier.height(100.dp))
                 }
@@ -261,14 +308,14 @@ fun PortfolioSelectorDropdown(
     var expanded by remember { mutableStateOf(false) }
     val selectedVault = vaults.find { it.id == selectedVaultId } ?: vaults.firstOrNull()
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text("TARGET REGISTRY", color = themeColor.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Pick a Portfolio to edit", color = themeColor.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, textAlign = TextAlign.Center)
         Spacer(Modifier.height(4.dp))
         
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.widthIn(max = 280.dp)
         ) {
             TextField(
                 value = selectedVault?.name?.uppercase() ?: "SELECT VAULT",

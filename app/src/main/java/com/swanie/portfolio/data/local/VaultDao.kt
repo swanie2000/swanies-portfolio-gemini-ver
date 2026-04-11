@@ -26,11 +26,14 @@ interface VaultDao {
     @Query("UPDATE vaults SET selectedWidgetAssets = :assets WHERE id = :vaultId")
     suspend fun updateSelectedWidgetAssets(vaultId: Int, assets: String)
 
-    @Query("UPDATE vaults SET widgetBgColor = :bg, widgetBgTextColor = :bgText, widgetCardColor = :card, widgetCardTextColor = :cardText WHERE id = :vaultId")
-    suspend fun updateWidgetColors(vaultId: Int, bg: String, bgText: String, card: String, cardText: String)
+    @Query("UPDATE vaults SET widgetBgColor = :bg, widgetBgTextColor = :bgTxt, widgetCardColor = :card, widgetCardTextColor = :cardTxt WHERE id = :vaultId")
+    suspend fun updateWidgetColors(vaultId: Int, bg: String, bgTxt: String, card: String, cardTxt: String)
 
     @Query("UPDATE vaults SET boundAppWidgetId = :appWidgetId WHERE id = :vaultId")
     suspend fun updateBoundAppWidgetId(vaultId: Int, appWidgetId: Int)
+
+    @Query("UPDATE vaults SET showWidgetTotal = :show WHERE id = :vaultId")
+    suspend fun updateShowWidgetTotal(vaultId: Int, show: Boolean)
 
     @Query("SELECT * FROM vaults WHERE boundAppWidgetId = :appWidgetId")
     suspend fun getVaultByAppWidgetId(appWidgetId: Int): VaultEntity?
