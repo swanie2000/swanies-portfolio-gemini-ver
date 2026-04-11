@@ -380,6 +380,8 @@ fun AssetCardOriginal(asset: AssetEntity, history: List<Double>, cardColor: Colo
                 modifier = GlanceModifier.width(70.dp).height(24.dp),
                 contentScale = ContentScale.FillBounds
             )
+        } else {
+            Spacer(modifier = GlanceModifier.width(70.dp).height(24.dp))
         }
 
         Spacer(modifier = GlanceModifier.width(8.dp))

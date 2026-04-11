@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -222,9 +223,15 @@ fun AssetPickerScreen(
                                     Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
                                 }
                                 Spacer(Modifier.width(12.dp))
-                                Box(modifier = Modifier.weight(1f)) {
+                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                                     if (searchQuery.isEmpty()) {
-                                        Text("Search Crypto...", color = cardText.copy(alpha = 0.4f), fontSize = 15.sp)
+                                        Text(
+                                            text = "Search Crypto...",
+                                            color = cardText.copy(alpha = 0.4f),
+                                            fontSize = 12.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
                                     }
                                     innerTextField()
                                 }
