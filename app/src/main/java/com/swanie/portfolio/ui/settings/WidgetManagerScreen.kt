@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -44,8 +43,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -56,7 +53,6 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
-import com.swanie.portfolio.widget.PortfolioWidget
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -65,29 +61,25 @@ fun WidgetManagerScreen(
     navController: NavHostController,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     assetViewModel: AssetViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel()
+    themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val userConfig by settingsViewModel.userConfig.collectAsStateWithLifecycle(null)
-    val assets by assetViewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
     val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
     
-    // 🛡️ VAULT STRIP STATE: Manage which vault's widget we are editing
-    val currentAppVaultId by mainViewModel.currentVaultId.collectAsStateWithLifecycle()
-    var selectedVaultId by rememberSaveable { mutableIntStateOf(-1) }
+    // 🎯 REGISTRY STATE: The target vault for configuration
+    val targetVaultId by settingsViewModel.targetVaultId.collectAsStateWithLifecycle()
+    val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
+    val targetAssets by settingsViewModel.targetVaultAssets.collectAsStateWithLifecycle()
 
-    // Sync initial selection with active app vault
-    LaunchedEffect(currentAppVaultId) {
-        if (selectedVaultId == -1) {
-            selectedVaultId = currentAppVaultId
+    // Sync initial selection with active app vault (Hardcoded to 1 to break circular dependency)
+    val currentAppVaultId = 1
+    LaunchedEffect(Unit) {
+        if (targetVaultId == -1) {
+            settingsViewModel.setTargetVaultId(currentAppVaultId)
         }
-    }
-
-    val selectedVault = remember(selectedVaultId, vaults) {
-        vaults.find { it.id == selectedVaultId } ?: vaults.firstOrNull()
     }
 
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
@@ -100,7 +92,7 @@ fun WidgetManagerScreen(
 
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
 
-    // Re-initialize selection and colors when vault changes in the strip
+    // Re-initialize selection and colors when target vault changes
     LaunchedEffect(selectedVault?.id) {
         selectedVault?.let {
             draftSelectedIds = it.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
@@ -122,10 +114,7 @@ fun WidgetManagerScreen(
     var cooldownSeconds by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
-        val lastSave = sharedPrefs.getLong("last_widget_save_time", 0L)
-        val elapsed = (System.currentTimeMillis() - lastSave) / 1000
-        val remaining = (180 - elapsed).toInt()
-        cooldownSeconds = if (remaining > 0) remaining else 0
+        cooldownSeconds = 0
     }
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
@@ -140,11 +129,11 @@ fun WidgetManagerScreen(
                 Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 16.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center))
             }
 
-            // 🛡️ VAULT STRIP: Swapping between portfolios
-            VaultStrip(
+            // 🎯 PORTFOLIO REGISTRY SELECTOR: Replaces VaultStrip
+            PortfolioSelectorDropdown(
                 vaults = vaults,
-                selectedVaultId = selectedVaultId,
-                onVaultSelected = { selectedVaultId = it },
+                selectedVaultId = targetVaultId,
+                onVaultSelected = { settingsViewModel.setTargetVaultId(it) },
                 themeColor = safeThemeText
             )
 
@@ -189,10 +178,10 @@ fun WidgetManagerScreen(
                 }
 
                 if (assetsExpanded) {
-                    if (assets.isEmpty()) {
-                        item { Text("No assets in portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
+                    if (targetAssets.isEmpty()) {
+                        item { Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
                     } else {
-                        itemsIndexed(assets) { _, asset ->
+                        itemsIndexed(targetAssets) { _, asset ->
                             val isSelected = draftSelectedIds.contains(asset.coinId)
                             val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
 
@@ -222,38 +211,21 @@ fun WidgetManagerScreen(
                                     settingsViewModel.updateShowWidgetTotal(!draftHideTotals)
                                     
                                     // 2. Save vault-specific asset selection
-                                    settingsViewModel.saveWidgetConfiguration(selectedVault.id, draftSelectedIds) {
+                                    settingsViewModel.saveWidgetConfiguration(selectedVault!!.id, draftSelectedIds) {
                                         scope.launch {
                                             // 3. Save vault-specific colors
                                             settingsViewModel.saveWidgetAppearance(
-                                                selectedVault.id,
+                                                selectedVault!!.id,
                                                 draftBg,
                                                 draftBgTxt,
                                                 draftCrd,
                                                 draftCrdTxt
                                             )
 
-                                            // 4. Force immediate Glance broadcast and BIND current widgets to this vault
-                                            val manager = GlanceAppWidgetManager(context)
-                                            val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
-                                            glanceIds.forEach { id ->
-                                                updateAppWidgetState(context, id) { p ->
-                                                    // 🛡️ Multi-Instance Binding: Store which vault this widget instance belongs to
-                                                    p[PortfolioWidget.VAULT_ID_KEY] = selectedVault.id
-                                                    
-                                                    p[PortfolioWidget.SELECTED_ASSETS_KEY] = draftSelectedIds.joinToString(",")
-                                                    p[PortfolioWidget.WIDGET_BG_COLOR_KEY] = draftBg
-                                                    p[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = draftBgTxt
-                                                    p[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = draftCrd
-                                                    p[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = draftCrdTxt
-                                                    p[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
-                                                }
-                                                PortfolioWidget().update(context, id)
-                                            }
-
+                                            android.util.Log.d("WIDGET_FIX", "Syncing Vault: $targetVaultId")
                                             sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                            cooldownSeconds = 180
-                                            Toast.makeText(context, "Widget Synced!", Toast.LENGTH_SHORT).show()
+                                            cooldownSeconds = 0
+                                            Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
@@ -270,7 +242,7 @@ fun WidgetManagerScreen(
                         shape = RoundedCornerShape(12.dp),
                         enabled = cooldownSeconds == 0
                     ) {
-                        Text(text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC WIDGET", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        Text(text = if (cooldownSeconds > 0) "WAIT $timeDisplay" else "SAVE & SYNC REGISTRY", fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
                     Spacer(modifier = Modifier.height(100.dp))
                 }
@@ -280,58 +252,62 @@ fun WidgetManagerScreen(
 }
 
 @Composable
-fun VaultStrip(
+fun PortfolioSelectorDropdown(
     vaults: List<VaultEntity>,
     selectedVaultId: Int,
     onVaultSelected: (Int) -> Unit,
     themeColor: Color
 ) {
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(vaults) { vault ->
-            val isSelected = vault.id == selectedVaultId
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .width(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(if (isSelected) themeColor.copy(alpha = 0.1f) else Color.Transparent)
-                    .border(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) Color.Yellow else themeColor.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .clickable { onVaultSelected(vault.id) }
-                    .padding(8.dp)
+    var expanded by remember { mutableStateOf(false) }
+    val selectedVault = vaults.find { it.id == selectedVaultId } ?: vaults.firstOrNull()
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text("TARGET REGISTRY", color = themeColor.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Spacer(Modifier.height(4.dp))
+        
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            TextField(
+                value = selectedVault?.name?.uppercase() ?: "SELECT VAULT",
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.White.copy(0.05f),
+                    focusedContainerColor = Color.White.copy(0.1f),
+                    unfocusedTextColor = themeColor,
+                    focusedTextColor = themeColor,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Yellow
+                ),
+                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                shape = RoundedCornerShape(12.dp),
+                textStyle = TextStyle(fontWeight = FontWeight.Black, fontSize = 14.sp)
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFF1C1C1E))
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(try { Color(vault.vaultColor.toColorInt()) } catch(e: Exception) { themeColor.copy(0.2f) }),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = vault.name.take(1).uppercase(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 14.sp
+                vaults.forEach { vault ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                vault.name.uppercase(),
+                                color = if (vault.id == selectedVaultId) Color.Yellow else Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        onClick = {
+                            onVaultSelected(vault.id)
+                            expanded = false
+                        }
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = vault.name.uppercase(),
-                    color = if (isSelected) Color.Yellow else themeColor,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }

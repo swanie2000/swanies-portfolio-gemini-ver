@@ -92,6 +92,10 @@ class PortfolioWidget : GlanceAppWidget() {
         val boundIdFromOptions = options.getInt("vault_id", 0)
         val staticNameFromOptions = options.getString("static_vault_name")
         val staticBalanceFromOptions = options.getString("static_total_balance")
+        val staticBgFromOptions = options.getString("static_bg_color")
+        val staticBgTextFromOptions = options.getString("static_bg_text_color")
+        val staticCardFromOptions = options.getString("static_card_color")
+        val staticCardTextFromOptions = options.getString("static_card_text_color")
 
         // ⚡ SAFETY: If we have snapshot data in Options, provide it IMMEDIATELY to kill the "Android Delay"
         if (boundIdFromOptions != 0 && staticNameFromOptions != null) {
@@ -102,18 +106,31 @@ class PortfolioWidget : GlanceAppWidget() {
                     assets = emptyList(),
                     assetHistoryMap = emptyMap(),
                     showTotal = true,
-                    bgColor = Color(0xFF000416),
-                    bgTextColor = Color.White,
-                    cardColor = Color(0xFF1C1C1E),
-                    cardTextColor = Color.White,
+                    bgColor = Color(android.graphics.Color.parseColor(staticBgFromOptions ?: "#000416")),
+                    bgTextColor = Color(android.graphics.Color.parseColor(staticBgTextFromOptions ?: "#FFFFFF")),
+                    cardColor = Color(android.graphics.Color.parseColor(staticCardFromOptions ?: "#1C1C1E")),
+                    cardTextColor = Color(android.graphics.Color.parseColor(staticCardTextFromOptions ?: "#FFFFFF")),
                     vaultName = staticNameFromOptions
                 )
             }
         }
 
         val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
-        val boundId = boundIdFromOptions.takeIf { it != 0 } ?: prefs[VAULT_ID_KEY] ?: 0
+        var boundId = boundIdFromOptions.takeIf { it != 0 } ?: prefs[VAULT_ID_KEY] ?: 0
         
+        // 🛠️ FORCE REFRESH: If DataStore is empty but DB has a link, recover it
+        if (boundId == 0) {
+            val dbVault = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                entryPoint.vaultDao().getVaultByAppWidgetId(appWidgetId)
+            }
+            if (dbVault != null) {
+                boundId = dbVault.id
+                updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { p ->
+                    p.toMutablePreferences().apply { this[VAULT_ID_KEY] = boundId }.toPreferences()
+                }
+            }
+        }
+
         if (boundId == 0) {
             provideContent { UnlinkedContent(appWidgetId) }
             return
@@ -177,9 +194,7 @@ class PortfolioWidget : GlanceAppWidget() {
 @Composable
 fun UnlinkedContent(appWidgetId: Int) {
     val context = LocalContext.current
-    val intent = Intent(context, WidgetConfigActivity::class.java).apply {
-        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-    }
+    val intent = Intent(context, MainActivity::class.java)
 
     Column(
         modifier = GlanceModifier

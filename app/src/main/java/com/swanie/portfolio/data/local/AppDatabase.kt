@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    // 🛡️ V22: Added sortOrder to VaultEntity for drag-to-reorder support
-    version = 22,
+    // 🛡️ V24: Cleanup and Emergency Recovery
+    version = 24,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -51,8 +51,8 @@ abstract class AppDatabase : RoomDatabase() {
                             // Seed the default vault
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Direct SQL insert for the seed to avoid DAO circular dependency on creation
-                                // Updated to include sortOrder column
-                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets, widgetBgColor, widgetBgTextColor, widgetCardColor, widgetCardTextColor, sortOrder) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '', '#1C1C1E', '#FFFFFF', '#2C2C2E', '#FFFFFF', 0)")
+                                // Updated to include sortOrder and boundAppWidgetId columns
+                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets, widgetBgColor, widgetBgTextColor, widgetCardColor, widgetCardTextColor, sortOrder, boundAppWidgetId) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '', '#1C1C1E', '#FFFFFF', '#2C2C2E', '#FFFFFF', 0, -1)")
                             }
                         }
                     })

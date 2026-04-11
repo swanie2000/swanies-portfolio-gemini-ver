@@ -14,5 +14,6 @@ data class VaultEntity(
     val widgetBgTextColor: String = "#FFFFFF",
     val widgetCardColor: String = "#2C2C2E",
     val widgetCardTextColor: String = "#FFFFFF",
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    val boundAppWidgetId: Int = -1
 )

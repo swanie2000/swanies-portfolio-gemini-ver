@@ -251,8 +251,15 @@ class WidgetConfigActivity : ComponentActivity() {
                 putInt("vault_id", vaultId)
                 putString("static_vault_name", vault.name)
                 putString("static_total_balance", formattedTotal)
+                putString("static_bg_color", vault.widgetBgColor)
+                putString("static_bg_text_color", vault.widgetBgTextColor)
+                putString("static_card_color", vault.widgetCardColor)
+                putString("static_card_text_color", vault.widgetCardTextColor)
             }
             appWidgetManager.updateAppWidgetOptions(appWidgetId, options)
+
+            // 🛠️ THE IDENTITY GLUE: Bind appWidgetId to Vault in DB
+            vaultDao.updateBoundAppWidgetId(vaultId, appWidgetId)
 
             // 📢 MANUAL BROADCAST RESET: Force the OS to acknowledge the update immediately
             val updateIntent = Intent(context, PortfolioWidgetReceiver::class.java).apply {

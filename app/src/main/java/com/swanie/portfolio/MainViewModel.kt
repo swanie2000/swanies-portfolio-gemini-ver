@@ -66,6 +66,11 @@ class MainViewModel @Inject constructor(
     init {
         // 🛠️ Startup Logic: The authority on the first vault loaded
         viewModelScope.launch {
+            kotlinx.coroutines.delay(3000L) // EMERGENCY TIMEOUT: Force ready after 3s
+            _isDataReady.value = true
+        }
+
+        viewModelScope.launch {
             // Wait for vaults to exist in DB
             val vaults = vaultDao.getAllVaultsFlow().first { it.isNotEmpty() }
 
