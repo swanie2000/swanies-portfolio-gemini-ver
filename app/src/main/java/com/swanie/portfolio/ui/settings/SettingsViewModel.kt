@@ -5,23 +5,15 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import android.widget.RemoteViews
-import com.swanie.portfolio.R
-import java.text.NumberFormat
-import java.util.Locale
 import androidx.core.graphics.toColorInt
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.R
 import com.swanie.portfolio.data.ThemePreferences
-import com.swanie.portfolio.data.local.AppDatabase
-import com.swanie.portfolio.data.local.AssetDao
-import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.data.local.UserConfigDao
-import com.swanie.portfolio.data.local.UserConfigEntity
-import com.swanie.portfolio.data.local.VaultDao
-import com.swanie.portfolio.data.local.VaultEntity
+import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +21,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -289,8 +283,29 @@ class SettingsViewModel @Inject constructor(
                         this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = v.widgetCardTextColor
                         this[PortfolioWidget.SHOW_TOTAL_KEY] = v.showWidgetTotal
                         
+                        // 🚀 FULL-FREIGHT HANDSHAKE: Serialize Top 5 Assets with File-Aware Icons
+                        val selectedIds = v.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
+                        val allAssets = assetDao.getAssetsByVaultOnce(v.id)
+                        val topAssets = if (selectedIds.isEmpty()) allAssets.take(5)
+                        else selectedIds.mapNotNull { id -> allAssets.find { it.coinId == id } }.take(5)
+
+                        val serializedAssets = topAssets.joinToString("||") { asset ->
+                            val iconSource = when {
+                                asset.category == AssetCategory.METAL || asset.isMetal -> {
+                                    val metalName = asset.symbol.lowercase()
+                                    "res:ic_$metalName"
+                                }
+                                asset.imageUrl.startsWith("file:") -> asset.imageUrl
+                                asset.localIconPath != null -> "file:${asset.localIconPath}"
+                                else -> asset.imageUrl // Fallback to URL or empty
+                            }
+                            val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                            "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|$assetValue|${asset.priceChange24h}"
+                        }
+                        this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
+                        
                         // Calculate total for static balance
-                        val total = assetDao.getAssetsByVaultOnce(v.id).sumOf { 
+                        val total = allAssets.sumOf {
                             (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium 
                         }
                         this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)

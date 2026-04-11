@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 
 package com.swanie.portfolio.ui.settings
 
@@ -8,6 +8,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed // Changed to itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -83,6 +86,15 @@ fun PortfolioManagerScreen(
             }
         }
     )
+
+    val isImeVisible = WindowInsets.isImeVisible
+    
+    // 🚀 KEYBOARD RESET: Reset scroll or handle state when keyboard closes
+    LaunchedEffect(isImeVisible) {
+        if (!isImeVisible && editingId == -1) {
+            // Optional: Snap back or clear specific UI states
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -162,8 +174,8 @@ fun PortfolioManagerScreen(
             LazyColumn(
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(bottom = 450.dp) // Added buffer for keyboard
+                modifier = Modifier.weight(1f).imePadding(),
+                contentPadding = PaddingValues(bottom = 20.dp)
             ) {
                 itemsIndexed(localVaults, key = { _, vault -> vault.id }) { index, vault ->
                     ReorderableItem(reorderableState, key = vault.id) { isDragging ->

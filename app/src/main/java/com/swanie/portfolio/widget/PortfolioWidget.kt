@@ -49,6 +49,8 @@ import java.util.*
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.layout.ContentScale
+import android.graphics.BitmapFactory
+import java.io.File
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -67,7 +69,7 @@ class PortfolioWidget : GlanceAppWidget() {
         val STATIC_VAULT_NAME_KEY = stringPreferencesKey("static_vault_name")
         val STATIC_TOTAL_BALANCE_KEY = stringPreferencesKey("static_total_balance")
         val SHOW_TOTAL_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("show_total")
-        val ASSETS_DATA_KEY = stringPreferencesKey("assets_data")
+        val ASSETS_DATA_KEY = stringPreferencesKey("pushed_assets_key")
     }
 
     @EntryPoint
@@ -110,14 +112,14 @@ class PortfolioWidget : GlanceAppWidget() {
             // This suggests we should have passed the asset list as a serialized string.
             // For now, let's assume we implement that in SettingsViewModel.
             
-            // NOTE: Parsing assets from ASSETS_DATA_KEY (JSON) would go here.
-            // For this version, let's just use the static values provided in prefs for the Header.
-            
+            val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
+            val assets = parseAssetsData(assetsData)
+
             WidgetContent(
                 appWidgetId = appWidgetId,
                 totalValue = totalValue,
                 lastUpdated = prefs[LAST_UPDATED_KEY] ?: "--:--",
-                assets = emptyList(), // We will populate this from ASSETS_DATA_KEY if available
+                assets = assets,
                 assetHistoryMap = emptyMap(),
                 showTotal = showTotal,
                 bgColor = bgColor,
@@ -126,6 +128,27 @@ class PortfolioWidget : GlanceAppWidget() {
                 cardTextColor = cardTextColor,
                 vaultName = vaultName
             )
+        }
+    }
+
+    private fun parseAssetsData(data: String): List<AssetEntity> {
+        if (data.isBlank()) return emptyList()
+        return data.split("||").mapNotNull { entry ->
+            val parts = entry.split("|")
+            if (parts.size >= 6) {
+                AssetEntity(
+                    coinId = parts[0],
+                    symbol = parts[1],
+                    displayName = parts[2],
+                    name = parts[2],
+                    imageUrl = parts[3], // This will be 'res:xxx' or 'file:xxx'
+                    officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
+                    category = AssetCategory.CRYPTO, // Temporary, will be inferred from imageUrl in UI
+                    weight = 1.0,
+                    amountHeld = 1.0,
+                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0
+                )
+            } else null
         }
     }
 }
@@ -293,23 +316,52 @@ fun AssetCardOriginal(asset: AssetEntity, history: List<Double>, cardColor: Colo
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        val isMetal = asset.category == AssetCategory.METAL || asset.isMetal || asset.portfolioId == "1"
-        val isGold = asset.displayName.contains("Gold", true) || asset.name.contains("Gold", true) || asset.symbol.contains("XAU", true)
-
+        val isMetal = asset.imageUrl.startsWith("res:")
+        
         val iconBgColor = if (isMetal) {
+            val isGold = asset.imageUrl.contains("gold", true)
             if (isGold) Color(0xFFFFD700) else Color(0xFFC0C0C0)
         } else {
             Color.White.copy(alpha = 0.1f)
         }
 
-        val isBar = asset.physicalForm.equals("Bar", ignoreCase = true)
-        val cornerRadius = if (isBar) 4.dp else 16.dp
+        val cornerRadius = 16.dp
 
         Box(
             modifier = GlanceModifier.size(32.dp).cornerRadius(cornerRadius).background(iconBgColor),
             contentAlignment = Alignment.Center
         ) {
-            StampFallback(asset, isMetal)
+            if (isMetal) {
+                val resName = asset.imageUrl.substringAfter("res:")
+                val context = LocalContext.current
+                val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+                if (resId != 0) {
+                    Image(
+                        provider = ImageProvider(resId),
+                        contentDescription = null,
+                        modifier = GlanceModifier.size(20.dp)
+                    )
+                }
+            } else if (asset.imageUrl.startsWith("file:")) {
+                val path = asset.imageUrl.substringAfter("file:")
+                val file = java.io.File(path)
+                if (file.exists()) {
+                    val bitmap = android.graphics.BitmapFactory.decodeFile(file.absolutePath)
+                    if (bitmap != null) {
+                        Image(
+                            provider = ImageProvider(bitmap),
+                            contentDescription = null,
+                            modifier = GlanceModifier.size(24.dp).cornerRadius(12.dp)
+                        )
+                    } else {
+                        StampFallback(asset, false)
+                    }
+                } else {
+                    StampFallback(asset, false)
+                }
+            } else {
+                StampFallback(asset, false)
+            }
         }
 
         Spacer(modifier = GlanceModifier.width(10.dp))
