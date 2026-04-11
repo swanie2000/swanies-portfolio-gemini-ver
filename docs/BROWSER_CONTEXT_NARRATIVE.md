@@ -1,49 +1,49 @@
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V8.6.0)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V10.0.0)
 🎯 THE CORE MISSION
 
-To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield").
-🛡️ 1. ARCHITECTURAL RECAP (THE STABLE BASELINE)
+To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield"). Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings.
+🛡️ 1. ARCHITECTURAL RECAP (THE GOLDEN BASELINE)
 
-    Database: V22 Schema (Room). Uses vaultId (Int) as the primary key for portfolio isolation.
+    Database: V25 Schema (Room).
 
-    Widget Engine: Jetpack Glance 1.1.0.
+        VaultEntity now acts as the Sovereign Registry, storing unique colors (widgetBgColor, etc.), asset IDs, and the privacy toggle (showWidgetTotal).
 
-    Identity Logic: Each GlanceId is strictly bound via "The Double-Stamp":
+    Hilt Isolation: The SettingsViewModel is decoupled from MainViewModel to prevent circular dependencies and startup deadlocks.
 
-        PreferencesGlanceStateDefinition (Persistent DataStore).
+    Initialization Lock: The UI uses a LaunchedEffect lock to ensure draft states are re-hydrated from the database immediately upon switching portfolios.
 
-        AppWidgetManager Options Bundle (Synchronous System memory).
+    The Triple-Stamp: Every "Save" operation commits to the Database, updates the Local State, and broadcasts a manual refresh to the Home Screen widgets.
 
-    Navigation: Decoupled. The Main App's "Last Viewed" state must never influence what a Widget displays.
+✅ 2. TODAY’S VICTORIES (MISSION ACCOMPLISHED)
 
-🚧 2. THE CURRENT BLOCKER: "THE FIRST-FRAME HYDRATION"
+    Startup Deadlock Broken: Implemented an emergency timeout and lazy DAO injection to fix the Splash Screen hang.
 
-We have successfully solved the Identity Handshake (the widget now knows who it is instantly). However, we are now fighting the Content Lag.
+    Registry Dropdown: Created a centralized "Pick a Portfolio to edit" menu that switches contexts without data leakage.
 
-    The Symptom: New widgets land instantly with the correct Vault Name, but show an empty "Portfolio Linked" message instead of assets.
+    Color Sovereignty: Swanie 1-5 can now hold 5 independent color schemes persistently.
 
-    The Cause: The widget renders its first frame using only the identity "Snapshot." The actual asset list still requires a background database query that isn't fast enough for the initial render.
+    Privacy Isolation: Moved "Hide Totals" from a global setting to a per-vault setting.
 
-    The Planned Fix: Upgrade the "Snapshot" to a "Full Portfolio Stamp." The Config Activity will now push the Top 5 Assets directly into the AppWidgetOptions bundle alongside the Vault Name.
+    Sleek Command UI: Implemented a top-right icon-based Save/Undo system with "Dirty State" detection.
 
-🛠️ 3. ACTIVE PHASE: 19 "FIRST-FRAME FIDELITY"
+🎨 3. ACTIVE PHASE: "POLISHING THE SHIELD"
 Task	Description	Status
-Top 5 Asset Stamp	Serialize/Push Top 5 Assets into AppWidgetOptions during config.	PRIORITY 1
-Snapshot Parsing	Update PortfolioWidget to render assets from the Bundle if DB is slow.	PENDING
-"Initializing" State	UI feedback ("Syncing live prices...") while background worker runs.	PENDING
-Swan Twinkle	Recover logo shimmer logic from OpeningPage history.	ARCHAEOLOGY
-Metals Audit	READ-ONLY VERIFICATION. Ensure V22 weight units render correctly.	AUDIT ONLY
+Living Preview	Update WidgetPreviewSlim to show real asset names/counts from the selected vault.	NEXT PRIORITY
+Color Swatch Menu	Add color indicators to the "Pick a Portfolio" dropdown items.	PENDING
+Haptic Lock-In	Add haptic feedback (vibration) to the Header Save Icon.	PENDING
+Visual Fades	Animate color transitions in the preview UI for a premium feel.	PENDING
+Metals Audit	READ-ONLY VERIFICATION. Ensure V25 weight units render correctly.	AUDIT ONLY
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
 CRITICAL: READ BEFORE EDITING
 
-    No Scope Creep: Do not modify AssetRepository or Metals logic. The core app logic is stable.
+    The Sovereign Rule: Never use UserConfigEntity (Global) for properties that should be per-portfolio (Vault).
 
-    Full File Outputs: Always provide full file contents for code changes to avoid partial snippet corruption.
+    Full File Outputs: Always provide full file contents. No partial snippets.
 
-    The Double-Stamp Rule: Every identity change must be written to both updateAppWidgetState and updateAppWidgetOptions.
+    Dirty State Integrity: Ensure isDirty remains the gatekeeper for the Save/Undo icons.
 
-    Logging: Use Log.d("WIDGET_FIX", ...) for all handshake troubleshooting.
+    Log Tagging: Use Log.d("DATABASE_SAVE", ...) for persistence auditing.
 
 🐞 KNOWN "GHOSTS"
 
@@ -51,4 +51,4 @@ CRITICAL: READ BEFORE EDITING
 
 🚀 Next Agent Command
 
-"I have updated the narrative to V8.6.0. We are moving from 'Identity' to 'Content Hydration'. Please implement the Top 5 Asset Stamp in WidgetConfigActivity.kt and PortfolioWidget.kt. Provide full files."
+    "I have updated the narrative to V10.0.0. The plumbing is solid. We are now entering the 'Polishing' phase. Please implement the Living Preview in WidgetManagerScreen.kt so the preview reflects real asset data from the selected vault instead of dummy text. Provide full files."
