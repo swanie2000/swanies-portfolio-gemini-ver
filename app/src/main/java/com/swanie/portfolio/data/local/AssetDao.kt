@@ -17,6 +17,9 @@ interface AssetDao {
     @Query("SELECT * FROM assets WHERE vaultId = :vaultId ORDER BY displayOrder ASC")
     fun getAssetsByVault(vaultId: Int): Flow<List<AssetEntity>>
 
+    @Query("SELECT * FROM assets WHERE vaultId = :vaultId ORDER BY displayOrder ASC")
+    suspend fun getAssetsByVaultOnce(vaultId: Int): List<AssetEntity>
+
     @Query("SELECT * FROM assets WHERE portfolioId = :pId ORDER BY displayOrder ASC")
     suspend fun getAllAssetsOnce(pId: String = "MAIN"): List<AssetEntity>
 

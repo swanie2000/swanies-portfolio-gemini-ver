@@ -195,48 +195,58 @@ fun AssetPickerScreen(
                     }
                 } else {
                     // 🔍 CRYPTO MODE: Standard Search Bar with integrated Dropdown
-                    OutlinedTextField(
+                    androidx.compose.foundation.text.BasicTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it; viewModel.searchCoins(it) },
-                        modifier = Modifier.fillMaxWidth().height(56.dp).focusRequester(focusRequester),
-                        placeholder = { Text("Search Crypto...", color = cardText.copy(alpha = 0.4f)) },
-                        leadingIcon = {
-                            if (isSearchBusy) {
-                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = textColor)
-                            } else {
-                                Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
-                            }
-                        },
-                        trailingIcon = {
-                            Box(modifier = Modifier.padding(end = 4.dp)) {
-                                Surface(
-                                    onClick = { menuExpanded = true },
-                                    color = Color.White.copy(alpha = 0.05f),
-                                    shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.width(130.dp).height(32.dp),
-                                    border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f))
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .focusRequester(focusRequester)
+                            .background(cardBg, RoundedCornerShape(16.dp))
+                            .border(1.dp, textColor.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
+                        textStyle = LocalTextStyle.current.copy(
+                            color = textColor,
+                            fontSize = 15.sp,
+                            lineHeight = 24.sp
+                        ),
+                        singleLine = true,
+                        cursorBrush = androidx.compose.ui.graphics.SolidColor(textColor),
+                        decorationBox = { innerTextField ->
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (isSearchBusy) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = textColor)
+                                } else {
+                                    Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Box(modifier = Modifier.weight(1f)) {
+                                    if (searchQuery.isEmpty()) {
+                                        Text("Search Crypto...", color = cardText.copy(alpha = 0.4f), fontSize = 15.sp)
+                                    }
+                                    innerTextField()
+                                }
+                                Box(modifier = Modifier.padding(start = 8.dp)) {
+                                    Surface(
+                                        onClick = { menuExpanded = true },
+                                        color = Color.White.copy(alpha = 0.05f),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier.width(130.dp).height(32.dp),
+                                        border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f))
                                     ) {
-                                        Text(text = (selectedProvider ?: "SOURCE").uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                                        Icon(Icons.Default.ArrowDropDown, null, tint = cardText.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(text = (selectedProvider ?: "SOURCE").uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
+                                            Icon(Icons.Default.ArrowDropDown, null, tint = cardText.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                                        }
                                     }
                                 }
                             }
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = cardBg,
-                            unfocusedContainerColor = cardBg,
-                            focusedBorderColor = textColor.copy(alpha = 0.5f), // 🎨 THEME LOCKED
-                            unfocusedBorderColor = textColor.copy(alpha = 0.15f), // 🎨 THEME LOCKED
-                            focusedTextColor = textColor,
-                            unfocusedTextColor = textColor,
-                            cursorColor = textColor // 🎨 THEME LOCKED
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        singleLine = true
+                        }
                     )
                 }
 

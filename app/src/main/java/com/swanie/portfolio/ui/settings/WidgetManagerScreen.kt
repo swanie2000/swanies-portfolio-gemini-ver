@@ -6,10 +6,12 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -60,10 +62,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun WidgetManagerScreen(
-    navController: NavHostController,
+    navController: NavHostController? = null,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     assetViewModel: AssetViewModel = hiltViewModel(),
-    themeViewModel: ThemeViewModel = hiltViewModel()
+    themeViewModel: ThemeViewModel = hiltViewModel(),
+    isConfigMode: Boolean = false,
+    configAppWidgetId: Int = -1,
+    onConfigComplete: () -> Unit = {},
+    onBack: () -> Unit = { navController?.popBackStack() }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,11 +90,17 @@ fun WidgetManagerScreen(
     val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
     val targetAssets by settingsViewModel.targetVaultAssets.collectAsStateWithLifecycle()
 
-    // Sync initial selection with active app vault (Hardcoded to 1 to break circular dependency)
-    val currentAppVaultId = 1
+    // 🚀 CONFIG MODE AUTO-SELECT: Find the vault already bound to this widget, or default
     LaunchedEffect(Unit) {
-        if (targetVaultId == -1) {
-            settingsViewModel.setTargetVaultId(currentAppVaultId)
+        if (isConfigMode && configAppWidgetId != -1) {
+            val boundVault = settingsViewModel.getVaultByAppWidgetId(configAppWidgetId)
+            if (boundVault != null) {
+                settingsViewModel.setTargetVaultId(boundVault.id)
+            } else if (targetVaultId == -1) {
+                settingsViewModel.setTargetVaultId(1) // Default fallback
+            }
+        } else if (targetVaultId == -1) {
+            settingsViewModel.setTargetVaultId(1)
         }
     }
 
@@ -122,9 +134,6 @@ fun WidgetManagerScreen(
         }
     }
 
-    var pendingVaultId by remember { mutableIntStateOf(-1) }
-    var showUnsavedDialog by remember { mutableStateOf(false) }
-
     fun revertChanges() {
         selectedVault?.let {
             draftSelectedIds = it.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
@@ -141,6 +150,18 @@ fun WidgetManagerScreen(
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
 
+    val lazyListState = rememberLazyListState()
+    val isKeyboardVisible by androidx.compose.ui.platform.LocalWindowInfo.current.let { 
+        // Note: Simple way to detect keyboard in this specific setup if needed, 
+        // but let's use a more standard LaunchedEffect with LocalSoftwareKeyboardController
+        remember { mutableStateOf(false) } 
+    }
+    
+    // 🚀 KEYBOARD RESET: Scroll to top when keyboard closes
+    val keyboardController = LocalSoftwareKeyboardController.current
+    // Using a side effect to detect focus clearing as a proxy for keyboard closing in this UI
+    val focusManager = LocalFocusManager.current
+
     val sharedPrefs = remember { context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
     var cooldownSeconds by remember { mutableIntStateOf(0) }
 
@@ -154,19 +175,31 @@ fun WidgetManagerScreen(
 
             // --- CUSTOM HEADER ---
             Box(modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp)) {
-                IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart)) {
+                IconButton(onClick = { onBack() }, modifier = Modifier.align(Alignment.CenterStart)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
                 }
-                Text(text = "WIDGET MANAGER", fontWeight = FontWeight.Black, fontSize = 14.sp, color = safeThemeText, modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp))
+                Text(
+                    text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER", 
+                    fontWeight = FontWeight.Black, 
+                    fontSize = 14.sp, 
+                    color = safeThemeText, 
+                    modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp)
+                )
 
                 // 🎯 COMMAND CENTER: Save/Undo Toggle
                 Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                    if (isDirty) {
+                    if (isDirty || isConfigMode) {
                         IconButton(
                             onClick = {
                                 if (cooldownSeconds == 0 && selectedVault != null) {
                                     scope.launch {
                                         val targetId = selectedVault!!.id
+                                        
+                                        // 🛡️ SURGICAL BINDING: In config mode, update the bound ID first
+                                        if (isConfigMode && configAppWidgetId != -1) {
+                                            settingsViewModel.bindVaultToWidget(targetId, configAppWidgetId)
+                                        }
+
                                         // Update Vault-Specific configuration
                                         settingsViewModel.saveWidgetConfiguration(targetId, draftSelectedIds) {
                                             scope.launch {
@@ -183,8 +216,19 @@ fun WidgetManagerScreen(
                                                 // Hard refresh to sync state
                                                 settingsViewModel.getVaultById(targetId)
 
+                                                // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
+                                                if (isConfigMode && configAppWidgetId != -1) {
+                                                    val syncAppWidgetId = configAppWidgetId // Synchronous Lock
+                                                    settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, syncAppWidgetId)
+                                                }
+
                                                 sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                                Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                                
+                                                if (isConfigMode) {
+                                                    onConfigComplete()
+                                                } else {
+                                                    Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
                                         }
                                     }
@@ -214,6 +258,7 @@ fun WidgetManagerScreen(
             )
 
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 contentPadding = PaddingValues(bottom = 0.dp)
@@ -225,12 +270,21 @@ fun WidgetManagerScreen(
                 item {
                     SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
                     AnimatedVisibility(visible = appearanceExpanded) {
-                        WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
-                            when(target) {
-                                0 -> draftBg = newHex
-                                1 -> draftBgTxt = newHex
-                                2 -> draftCrd = newHex
-                                3 -> draftCrdTxt = newHex
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
+                        ) {
+                            Column(Modifier.padding(12.dp)) {
+                                WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
+                                    when(target) {
+                                        0 -> draftBg = newHex
+                                        1 -> draftBgTxt = newHex
+                                        2 -> draftCrd = newHex
+                                        3 -> draftCrdTxt = newHex
+                                    }
+                                }
                             }
                         }
                     }
@@ -238,12 +292,17 @@ fun WidgetManagerScreen(
                 }
 
                 item {
+                    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                        Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
+                    }
+                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                }
+
+                item {
                     SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
                     AnimatedVisibility(visible = privacyExpanded) {
-                        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
-                            Text("Hide Totals", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                            Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
-                        }
+                        Text("Privacy settings for this vault.", color = safeThemeText.copy(0.6f), fontSize = 12.sp, modifier = Modifier.padding(vertical = 8.dp))
                     }
                     HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
                 }
@@ -254,24 +313,36 @@ fun WidgetManagerScreen(
                 }
 
                 if (assetsExpanded) {
-                    if (targetAssets.isEmpty()) {
-                        item { Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp)) }
-                    } else {
-                        itemsIndexed(targetAssets) { _, asset ->
-                            val isSelected = draftSelectedIds.contains(asset.coinId)
-                            val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
+                        ) {
+                            Column(Modifier.padding(8.dp)) {
+                                if (targetAssets.isEmpty()) {
+                                    Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp))
+                                } else {
+                                    targetAssets.forEach { asset ->
+                                        val isSelected = draftSelectedIds.contains(asset.coinId)
+                                        val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
 
-                            WidgetAssetSelectItem(
-                                asset = asset,
-                                isSelected = isSelected,
-                                orderIndex = orderIndex,
-                                onToggle = {
-                                    if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
-                                    else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
-                                    else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
-                                },
-                                themeColor = safeThemeText
-                            )
+                                        WidgetAssetSelectItem(
+                                            asset = asset,
+                                            isSelected = isSelected,
+                                            orderIndex = orderIndex,
+                                            onToggle = {
+                                                if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
+                                                else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
+                                                else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
+                                            },
+                                            themeColor = safeThemeText
+                                        )
+                                        Spacer(Modifier.height(4.dp))
+                                    }
+                                }
+                            }
                         }
                     }
                 }
