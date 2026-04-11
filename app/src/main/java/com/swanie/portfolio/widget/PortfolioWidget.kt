@@ -213,6 +213,7 @@ fun WidgetContent(
     vaultName: String
 ) {
     val context = LocalContext.current
+    
     // 🚀 THE DIRECT-LINK PIVOT: Tap widget goes to Configurator, not Main App
     val intent = Intent(context, WidgetConfigActivity::class.java).apply {
         putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -284,7 +285,9 @@ fun WidgetContent(
                 }
             }
         } else {
-            Column(modifier = GlanceModifier.fillMaxWidth()) {
+            // 🚀 THE SPRING SHIELD: Soft Stretch Spacing
+            // Wrap assets in a weighted column and place spacers between/after them
+            Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
                 assets.forEachIndexed { index, asset ->
                     AssetCardOriginal(
                         asset = asset,
@@ -292,12 +295,13 @@ fun WidgetContent(
                         cardColor = cardColor,
                         textColor = cardTextColor
                     )
-                    if (index < assets.size - 1) Spacer(modifier = GlanceModifier.height(6.dp))
+                    // Elastic Gap between and after cards
+                    Spacer(modifier = GlanceModifier.defaultWeight())
                 }
             }
         }
 
-        Spacer(modifier = GlanceModifier.defaultWeight())
+        // Footer remains at natural height at the absolute bottom
         Text(
             text = "Updated: $lastUpdated",
             style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End),

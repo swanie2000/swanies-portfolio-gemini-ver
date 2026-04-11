@@ -283,11 +283,11 @@ class SettingsViewModel @Inject constructor(
                         this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = v.widgetCardTextColor
                         this[PortfolioWidget.SHOW_TOTAL_KEY] = v.showWidgetTotal
                         
-                        // 🚀 FULL-FREIGHT HANDSHAKE: Serialize Top 5 Assets with File-Aware Icons
+                        // 🚀 FULL-FREIGHT HANDSHAKE: Serialize Top 10 Assets with File-Aware Icons
                         val selectedIds = v.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
                         val allAssets = assetDao.getAssetsByVaultOnce(v.id)
-                        val topAssets = if (selectedIds.isEmpty()) allAssets.take(5)
-                        else selectedIds.mapNotNull { id -> allAssets.find { it.coinId == id } }.take(5)
+                        val topAssets = if (selectedIds.isEmpty()) allAssets.take(10)
+                        else selectedIds.mapNotNull { id -> allAssets.find { it.coinId == id } }.take(10)
 
                         val serializedAssets = topAssets.joinToString("||") { asset ->
                             val iconSource = when {

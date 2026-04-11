@@ -145,7 +145,6 @@ fun WidgetManagerScreen(
         }
     }
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
-    var privacyExpanded by rememberSaveable { mutableStateOf(false) }
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
@@ -295,14 +294,6 @@ fun WidgetManagerScreen(
                     Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
                         Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
                         Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
-                    }
-                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-                }
-
-                item {
-                    SectionHeaderSmall("PRIVACY", privacyExpanded, safeThemeText) { privacyExpanded = !privacyExpanded }
-                    AnimatedVisibility(visible = privacyExpanded) {
-                        Text("Privacy settings for this vault.", color = safeThemeText.copy(0.6f), fontSize = 12.sp, modifier = Modifier.padding(vertical = 8.dp))
                     }
                     HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
                 }

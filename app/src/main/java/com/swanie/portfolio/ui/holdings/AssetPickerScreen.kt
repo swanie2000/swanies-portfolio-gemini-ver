@@ -228,7 +228,8 @@ fun AssetPickerScreen(
                                         Text(
                                             text = "Search Crypto...",
                                             color = cardText.copy(alpha = 0.4f),
-                                            fontSize = 12.sp,
+                                            fontSize = 10.5.sp,
+                                            letterSpacing = (-0.3).sp,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
