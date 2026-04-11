@@ -377,7 +377,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(0.9f).height(85.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Column(modifier = Modifier.weight(0.9f).height(95.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         MetalIcon(
                             name = asset.symbol,
                             weight = asset.weight,
@@ -387,38 +387,50 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                             localPath = asset.localIconPath,
                             category = asset.category
                         )
-                        if (asset.baseSymbol != "CUSTOM") {
-                            Spacer(Modifier.height(6.dp))
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                // 🛠️ V18: High-Precision UI Labels
-                                val weightLabel = when (asset.weightUnit.uppercase()) {
-                                    "KILO" -> "1"
-                                    "GRAM" -> "1"
-                                    else -> formatAmount(asset.weight)
-                                }
-                                Text(text = weightLabel, color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp)
-                                Text(text = asset.weightUnit, color = cardText.copy(alpha = 0.6f), fontWeight = FontWeight.Black, fontSize = 9.sp)
-                            }
-                        } else {
-                            Text(asset.symbol, color = cardText, fontWeight = FontWeight.Black, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = asset.symbol.uppercase(),
+                            color = cardText,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 11.sp
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1.6f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                        val nameToUse = asset.displayName.ifEmpty { asset.name }
+                        Text(
+                            text = nameToUse.uppercase(),
+                            color = cardText.copy(alpha = 0.5f),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = formatAmount(asset.amountHeld),
+                            color = cardText,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 32.sp,
+                            maxLines = 1
+                        )
+                        if (asset.category == AssetCategory.METAL) {
+                            Text(
+                                text = "${formatAmount(asset.weight)} ${asset.weightUnit}".uppercase(),
+                                color = cardText.copy(alpha = 0.4f),
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
-                    Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("QUANTITY", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        Text(formatAmount(asset.amountHeld), color = cardText, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                        Box(modifier = Modifier.height(55.dp), contentAlignment = Alignment.Center) {
-                            val nameToUse = asset.displayName.ifEmpty { asset.name }
-                            val forced = if (nameToUse.contains(" ") && !nameToUse.contains("\n")) nameToUse.replaceFirst(" ", "\n") else nameToUse
-                            Text(text = forced, color = cardText, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, lineHeight = 13.sp, maxLines = 3)
-                        }
-                    }
-                    Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
+                    Column(modifier = Modifier.weight(0.9f), horizontalAlignment = Alignment.End) {
                         if (showEditButton && !isEditing) {
                             IconButton(onClick = { onEditRequest() }, modifier = Modifier.size(40.dp).background(Color.Yellow, CircleShape)) { Icon(Icons.Default.Edit, null, tint = Color.Black) }
                         } else {
-                            SparklineChart(asset.sparklineData, Modifier.width(75.dp).height(32.dp).padding(top = 12.dp))
+                            SparklineChart(asset.sparklineData, Modifier.width(70.dp).height(30.dp).padding(top = 8.dp))
                             Spacer(Modifier.height(4.dp))
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(20.dp)); Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) }
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) { 
+                                Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(18.dp))
+                                Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.2f", asset.priceChange24h)}%", color = trendColor, fontSize = 9.sp, fontWeight = FontWeight.Black) 
+                            }
                         }
                     }
                 }
