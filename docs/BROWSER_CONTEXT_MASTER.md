@@ -173,69 +173,59 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V12.0.1)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V19 PRO REBUILD)
 🎯 THE CORE MISSION
 
-To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities. Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with hardware-verified targeting.
-🛡️ 1. ARCHITECTURAL RECAP (THE SYNCED BASELINE)
+To transition "Swanie’s Portfolio" from a development prototype into a commercial-grade, subscription-ready financial vault. The mission prioritizes zero-liability architecture (User-Owned Vaults), hardware-level security (Biometrics), and global scalability (Multi-language).
+🛡️ 1. ARCHITECTURAL RECAP (THE CLEAN SLATE)
 
-    The Registration Lock (V11.9.7): Hard-links appWidgetId to a specific VaultEntity in Room (v26).
+    Version Control: Reverted to V12.0.1 (Stable). Purged all "ghost" OAuth configurations and broken Firebase handshake attempts.
 
-    The URI-First Identity: Uses Data URIs (swanie://relayed/id/$id/$timestamp) to neutralize Intent Conflation.
+    The Widget Logic: Maintained the 1:1 visual parity and "Trinity" layout. Database is successfully tracking individual widget names (Swanie 1-5).
 
-    The Three-Zone Layout: Locked Proportional Trinity (Identity Left, Pulse Center, Data Right).
+    Data Isolation: Every portfolio instance remains a unique identity using URI-First routing.
 
-    The OAuth Handshake (V12.0.0): Transitioned to a verified Web Client ID architecture within the google-services.json to enable secure Google Drive appdata sync for Eun and Mom.
+📉 2. TODAY’S BATTLE REPORT (THE OAUTH RETREAT)
 
-✅ 2. TODAY’S VICTORIES (THE OAUTH GAUNTLET)
+    The Conflict: Encountered persistent "Identical OAuth Client" errors caused by Google’s 30-day "Deleted Credentials" trash bin.
 
-    The Identity Fix: Manually generated the missing Web Application Client ID in Google Cloud Console, resolving the oauth_client: [] empty array bug.
+    The Decision: Abandoned the brittle, manual Firebase handshakes in favor of a Professional SDK approach (RevenueCat + BiometricPrompt).
 
-    Fingerprint Alignment: Successfully synchronized the local development SHA-1 with the Firebase/Google Cloud production environment.
+    The Result: A clean local environment, a "Working Tree Clean" Git status, and a pivot toward a $25 Google Developer Account for commercial publishing.
 
-    VIP Whitelisting: Explicitly authorized eun.oh70@gmail.com and other family testers in the OAuth Audience settings to bypass "Unverified App" blocks.
+🚀 3. THE FUTURE PATH (THE PRO ROADMAP)
+Task	Description	Priority
+Front Door	Implement BiometricPrompt (Finger/Face) for "Lock on Startup" security.	IMMEDIATE
+The Bridge	Integrate RevenueCat SDK to handle Play Store billing and license verification.	HIGH
+Global Ready	Move hardcoded strings to strings.xml for Multi-language (Spanish, French, etc.) support.	MEDIUM
+Silent Vault	Re-implement Google Drive sync using the App Data Folder API (Silent, Zero-Liability).	PENDING
+⚠️ 4. DEVELOPER GUARDRAILS (FOR THE NEW AGENT)
 
-    The Debug Auto-Unlock: Implemented a temporary logic bypass in AuthViewModel.kt that forces AuthState.Authenticated upon a successful Google handshake, ensuring the "Loop" is dead.
+    COMMERCIAL MINDSET: All code must now be written with a "Subscription" logic in mind (Pro vs. Basic features).
 
-⚠️ 3. THE NEXT TRENCHES (PICKING UP TOMORROW)
-Task	Description	Status
-The Asset Stamp	Serialize Top 5 assets into DataStore "Handshake" for instant rendering.	IMMEDIATE PRIORITY
-Login Shield	Re-implement the Vault Password layer once the Google Drive sync is verified.	HIGH PRIORITY
-Registry Cleanup	Re-verify that the newly minted google-services.json is survived by the "Elephant" Gradle sync.	PENDING
-Living Preview	Sync the internal Settings Preview to reflect "Handshake" data 1:1.	PENDING
-⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
+    ZERO LIABILITY: Do not suggest hosting user data on Firebase/Firestore. Data must remain in the user's private Google Drive "App Data" folder.
 
-    CRITICAL: IDENTITY INTEGRITY: Do not revert the google-services.json. The client_type: 3 entry is the only thing keeping the "Access Blocked" bouncer away.
+    SECURITY FIRST: Implement BiometricPrompt using standard Android best practices. Do not store biometric data; only listen for the hardware "Success" callback.
 
-    THE BYPASS NOTICE: The current AuthViewModel.kt contains a Debug Auto-Unlock. This is intentional for the next 24 hours to ensure connectivity is stable before re-locking the vault.
-
-    FULL FILE OUTPUTS: No partial snippets. Provide entire files to maintain context and avoid breaking the newly established OAuth handshake.
+    FULL FILE OUTPUTS: No partial snippets. Provide full files to ensure the "Working Tree Clean" status remains intact.
 
 🚀 Next Agent Command
 
-    "I have updated the narrative to V12.0.1. The OAuth Handshake is fixed and the 'Access Blocked' error is dead. We are currently in Debug Auto-Unlock mode. Task 1: Implement the Asset Stamp. Update SettingsViewModel.kt to serialize Top 5 asset names and prices into the PreferencesGlanceStateDefinition during the save. Task 2: Update PortfolioWidget.kt to render these cached assets immediately for instant visual feedback. Task 3: Verify the default_web_client_id resource is still resolving. Provide full files. Confirm 'KEEP ALL'."
+    "I have updated the narrative to V19 PRO REBUILD. The OAuth 'Circle' has been purged and the project is clean. Task 1: Implement the 'Front Door.' Create a SecurityManager.kt using androidx.biometric:biometric to handle Fingerprint/Face ID. Task 2: Update SettingsViewModel.kt to include a isBiometricEnabled toggle. Task 3: Prepare the UI to lock the app on startup if the biometric toggle is active. Provide full files only. Confirm 'KEEP ALL'."
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 04/12/2026 23:00:06.94
+Generated: Mon 04/13/2026 14:41:08.36
 
 Branch:
 main
 Commit:
-014e6b59b8745af76e53ae583fb67279ff139e8a
+6bd8c831aac941cf9076d867e2c4c0a6cd635364
 Working tree status (git status --porcelain):
- M app/build.gradle.kts
- M app/src/main/java/com/swanie/portfolio/data/remote/GoogleDriveService.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/UnlockVaultScreen.kt
- M build.gradle.kts
  M docs/BROWSER_CONTEXT_NARRATIVE.md
- M gradle/libs.versions.toml
-?? app/google-services.json
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
