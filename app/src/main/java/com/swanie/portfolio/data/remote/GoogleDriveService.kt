@@ -36,6 +36,7 @@ class GoogleDriveService @Inject constructor(
 
     fun getGoogleSignInClient(): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(com.swanie.portfolio.R.string.default_web_client_id))
             .requestEmail()
             .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
             .build()

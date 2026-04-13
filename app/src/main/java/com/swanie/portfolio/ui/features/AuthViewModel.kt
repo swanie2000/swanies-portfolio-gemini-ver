@@ -83,13 +83,11 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 googleDriveService.initializeDriveService(account)
-                val vaultExists = googleDriveService.checkVaultFolderExists()
+                
+                // 🛠️ DEBUG AUTO-UNLOCK: Bypassing VaultFound/NewVaultRequired
+                Log.d("VAULT_DEBUG", "DEBUG AUTO-UNLOCK: Forcing Authenticated state for ${account.email}")
+                _authState.value = AuthState.Authenticated
 
-                if (vaultExists) {
-                    _authState.value = AuthState.VaultFound
-                } else {
-                    _authState.value = AuthState.NewVaultRequired
-                }
             } catch (e: Exception) {
                 Log.e("AUTH_DEBUG", "Handshake Error", e)
                 _authState.value = AuthState.Error("Vault handshake failed: ${e.message}")

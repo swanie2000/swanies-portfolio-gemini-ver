@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "82963966593",
+    "project_id": "swanies-portfolio",
+    "storage_bucket": "swanies-portfolio.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82963966593:android:704443162917330c3e7b80",
+        "android_client_info": {
+          "package_name": "com.swanie.portfolio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82963966593-6lcli4lii2rjbevfpj13ogdk10rg9k5j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfu-crk0VTYEFTR595mFIAChr2cQKzPNA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82963966593-6lcli4lii2rjbevfpj13ogdk10rg9k5j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

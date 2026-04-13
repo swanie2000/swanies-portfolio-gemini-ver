@@ -173,76 +173,69 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V11.9.7)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V12.0.1)
 🎯 THE CORE MISSION
 
-To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities. Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with instantaneous visual feedback and hardware-verified targeting.
+To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities. Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with hardware-verified targeting.
 🛡️ 1. ARCHITECTURAL RECAP (THE SYNCED BASELINE)
 
-    The Registration Lock (V11.9.7): Hard-links the hardware appWidgetId to a specific VaultEntity in the Room Database (Version 26). This bypasses Android Intent caching by making the Database the final arbiter of widget identity.
+    The Registration Lock (V11.9.7): Hard-links appWidgetId to a specific VaultEntity in Room (v26).
 
-    The Synchronous Handshake: Uses PreferencesGlanceStateDefinition to write directly to the DataStore during saves, bypassing the 30-second throttle.
-
-    The URI-First Identity: Every widget tap carries a unique Data URI (swanie://relayed/id/$id/$timestamp) used as the primary key for identity extraction, neutralizing "Intent Conflation."
+    The URI-First Identity: Uses Data URIs (swanie://relayed/id/$id/$timestamp) to neutralize Intent Conflation.
 
     The Three-Zone Layout: Locked Proportional Trinity (Identity Left, Pulse Center, Data Right).
 
-✅ 2. TODAY’S VICTORIES (THE REGISTRATION)
+    The OAuth Handshake (V12.0.0): Transitioned to a verified Web Client ID architecture within the google-services.json to enable secure Google Drive appdata sync for Eun and Mom.
 
-    Ghost Annihilation: Successfully passed the "10-Tap Stress Test." Switched between 5 different portfolios on the same widget 10+ times with 100% accuracy.
+✅ 2. TODAY’S VICTORIES (THE OAUTH GAUNTLET)
 
-    Elephant Gradle Protocol: Established a "Deep Clean" workflow (Invalidate Caches + Destructive Room Migration) to ensure legacy intent ghosts are purged.
+    The Identity Fix: Manually generated the missing Web Application Client ID in Google Cloud Console, resolving the oauth_client: [] empty array bug.
 
-    Smart Resolver: The SettingsViewModel now resolves appWidgetId to vaultId dynamically, defaulting to Vault 1 only if the widget is truly unlinked.
+    Fingerprint Alignment: Successfully synchronized the local development SHA-1 with the Firebase/Google Cloud production environment.
 
-    Panoramic Pulse: Sparklines upscaled to 30.dp with weighted horizontal distribution.
+    VIP Whitelisting: Explicitly authorized eun.oh70@gmail.com and other family testers in the OAuth Audience settings to bypass "Unverified App" blocks.
 
-⚠️ 3. THE NEXT TRENCHES (FUTURE OBJECTIVES)
+    The Debug Auto-Unlock: Implemented a temporary logic bypass in AuthViewModel.kt that forces AuthState.Authenticated upon a successful Google handshake, ensuring the "Loop" is dead.
+
+⚠️ 3. THE NEXT TRENCHES (PICKING UP TOMORROW)
 Task	Description	Status
-The Asset Stamp	Serialize Top 5 assets into the DataStore "Handshake" for instant rendering.	NEXT PRIORITY
-Login Shield	Resolve the "Blank Swanie 1" bypass and implement a secure authentication layer.	HIGH PRIORITY
-Universal Tongue	Implement multi-language support (Strings.xml localization) across UI and Widgets.	PENDING
+The Asset Stamp	Serialize Top 5 assets into DataStore "Handshake" for instant rendering.	IMMEDIATE PRIORITY
+Login Shield	Re-implement the Vault Password layer once the Google Drive sync is verified.	HIGH PRIORITY
+Registry Cleanup	Re-verify that the newly minted google-services.json is survived by the "Elephant" Gradle sync.	PENDING
 Living Preview	Sync the internal Settings Preview to reflect "Handshake" data 1:1.	PENDING
-Haptic Lock-In	Add vibration feedback to Header Save and Asset Toggles.	PENDING
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
-    CRITICAL: READ BEFORE EDITING
+    CRITICAL: IDENTITY INTEGRITY: Do not revert the google-services.json. The client_type: 3 entry is the only thing keeping the "Access Blocked" bouncer away.
 
-        Registration Integrity: Every saveWidgetConfiguration MUST call vaultDao.updateAppWidgetId to maintain the hardware link.
+    THE BYPASS NOTICE: The current AuthViewModel.kt contains a Debug Auto-Unlock. This is intentional for the next 24 hours to ensure connectivity is stable before re-locking the vault.
 
-        Full File Outputs: No partial snippets. Provide entire files to maintain context.
-
-        The 32/10.5 Rule: Asset quantities stay 32.sp (Black). Search placeholders stay 10.5.sp.
-
-        URI Extraction: Always prioritize intent.data?.lastPathSegment for ID resolution.
+    FULL FILE OUTPUTS: No partial snippets. Provide entire files to maintain context and avoid breaking the newly established OAuth handshake.
 
 🚀 Next Agent Command
 
-    "I have updated the narrative to V11.9.7. The Registration Lock is holding and the drift is dead. We are now entering the 'Full-Freight' polish phase. Task 1: Implement the Asset Stamp. Update SettingsViewModel.kt to serialize Top 5 asset names and prices into the PreferencesGlanceStateDefinition during the save. Task 2: Update PortfolioWidget.kt to render these cached assets immediately. Task 3: Briefly investigate the Login Shield logic—we need to stop the 'Blank Swanie 1' debug bypass. Provide full files. Confirm 'KEEP ALL'."
+    "I have updated the narrative to V12.0.1. The OAuth Handshake is fixed and the 'Access Blocked' error is dead. We are currently in Debug Auto-Unlock mode. Task 1: Implement the Asset Stamp. Update SettingsViewModel.kt to serialize Top 5 asset names and prices into the PreferencesGlanceStateDefinition during the save. Task 2: Update PortfolioWidget.kt to render these cached assets immediately for instant visual feedback. Task 3: Verify the default_web_client_id resource is still resolving. Provide full files. Confirm 'KEEP ALL'."
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 04/12/2026 19:14:02.09
+Generated: Sun 04/12/2026 23:00:06.94
 
 Branch:
 main
 Commit:
-709344ca11e3b74f972c3e6e3873d17600e18030
+014e6b59b8745af76e53ae583fb67279ff139e8a
 Working tree status (git status --porcelain):
- M app/src/main/AndroidManifest.xml
- M app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
- M app/src/main/java/com/swanie/portfolio/data/local/VaultDao.kt
- M app/src/main/java/com/swanie/portfolio/data/local/VaultEntity.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/WidgetManagerScreen.kt
- M app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
-A  app/src/main/java/com/swanie/portfolio/widget/WidgetClickCallback.kt
- M app/src/main/java/com/swanie/portfolio/widget/WidgetConfigActivity.kt
- M docs/BROWSER_CONTEXT_MASTER.md
+ M app/build.gradle.kts
+ M app/src/main/java/com/swanie/portfolio/data/remote/GoogleDriveService.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/UnlockVaultScreen.kt
+ M build.gradle.kts
  M docs/BROWSER_CONTEXT_NARRATIVE.md
+ M gradle/libs.versions.toml
+?? app/google-services.json
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)

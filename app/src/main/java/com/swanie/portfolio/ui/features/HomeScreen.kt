@@ -72,8 +72,18 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
+                Log.d("AUTH_DEBUG", "Google Sign-In Success: ${account.email}")
                 authViewModel.handleSignInResult(account)
             } catch (e: ApiException) {
+                val statusCode = e.statusCode
+                val statusMessage = com.google.android.gms.common.api.CommonStatusCodes.getStatusCodeString(statusCode)
+                Log.e("AUTH_DEBUG", "Google Sign-In Failed! Status: $statusCode ($statusMessage)")
+                
+                // Show Error specifically for Developer/Configuration issues
+                if (statusCode == 10 || statusCode == 12501) {
+                    Log.e("AUTH_DEBUG", "CRITICAL: Check SHA-1 and Web Client ID in Firebase Console.")
+                }
+
                 authViewModel.handleSignInResult(null)
             }
         }
