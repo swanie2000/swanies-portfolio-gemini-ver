@@ -2,7 +2,9 @@
 
 package com.swanie.portfolio.ui.settings
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -14,8 +16,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -51,7 +51,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.VaultEntity
@@ -67,14 +66,13 @@ fun WidgetManagerScreen(
     assetViewModel: AssetViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
     isConfigMode: Boolean = false,
-    configAppWidgetId: Int = -1,
+    configAppWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID,
     onConfigComplete: () -> Unit = {},
     onBack: () -> Unit = { navController?.popBackStack() }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val userConfig by settingsViewModel.userConfig.collectAsStateWithLifecycle(null)
     val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
     
     // 🎯 DRAFT STATE: Hoisted to the top for scope visibility
@@ -90,17 +88,13 @@ fun WidgetManagerScreen(
     val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
     val targetAssets by settingsViewModel.targetVaultAssets.collectAsStateWithLifecycle()
 
-    // 🚀 CONFIG MODE AUTO-SELECT: Find the vault already bound to this widget, or default
-    LaunchedEffect(Unit) {
-        if (isConfigMode && configAppWidgetId != -1) {
-            val boundVault = settingsViewModel.getVaultByAppWidgetId(configAppWidgetId)
-            if (boundVault != null) {
-                settingsViewModel.setTargetVaultId(boundVault.id)
-            } else if (targetVaultId == -1) {
-                settingsViewModel.setTargetVaultId(1) // Default fallback
-            }
+    // 🚀 CONFIG MODE AUTO-SELECT: Handled via ViewModel's forceVaultSwitch on entry
+    // (Actual logic moved to Activity for Intent-level control, but kept here as fallback)
+    LaunchedEffect(configAppWidgetId) {
+        if (targetVaultId == -1 && configAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+            settingsViewModel.forceVaultSwitch(configAppWidgetId, isAppWidgetId = true)
         } else if (targetVaultId == -1) {
-            settingsViewModel.setTargetVaultId(1)
+            settingsViewModel.forceVaultSwitch(1)
         }
     }
 
@@ -150,17 +144,7 @@ fun WidgetManagerScreen(
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
 
     val lazyListState = rememberLazyListState()
-    val isKeyboardVisible by androidx.compose.ui.platform.LocalWindowInfo.current.let { 
-        // Note: Simple way to detect keyboard in this specific setup if needed, 
-        // but let's use a more standard LaunchedEffect with LocalSoftwareKeyboardController
-        remember { mutableStateOf(false) } 
-    }
     
-    // 🚀 KEYBOARD RESET: Scroll to top when keyboard closes
-    val keyboardController = LocalSoftwareKeyboardController.current
-    // Using a side effect to detect focus clearing as a proxy for keyboard closing in this UI
-    val focusManager = LocalFocusManager.current
-
     val sharedPrefs = remember { context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
     var cooldownSeconds by remember { mutableIntStateOf(0) }
 
@@ -170,190 +154,198 @@ fun WidgetManagerScreen(
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
-        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        if (targetVaultId == -1) {
+            // 🚀 THE STATE FLICKER: 10ms transient black hole to break Intent ghosting
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = safeThemeText, strokeWidth = 2.dp)
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
-            // --- CUSTOM HEADER ---
-            Box(modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp)) {
-                IconButton(onClick = { onBack() }, modifier = Modifier.align(Alignment.CenterStart)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
-                }
-                Text(
-                    text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER", 
-                    fontWeight = FontWeight.Black, 
-                    fontSize = 14.sp, 
-                    color = safeThemeText, 
-                    modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp)
-                )
+                // --- CUSTOM HEADER ---
+                Box(modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp)) {
+                    IconButton(onClick = { onBack() }, modifier = Modifier.align(Alignment.CenterStart)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
+                    }
+                    Text(
+                        text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER", 
+                        fontWeight = FontWeight.Black, 
+                        fontSize = 14.sp, 
+                        color = safeThemeText, 
+                        modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp)
+                    )
 
-                // 🎯 COMMAND CENTER: Save/Undo Toggle
-                Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                    if (isDirty || isConfigMode) {
-                        IconButton(
-                            onClick = {
-                                if (cooldownSeconds == 0 && selectedVault != null) {
-                                    scope.launch {
-                                        val targetId = selectedVault!!.id
-                                        
-                                        // 🛡️ SURGICAL BINDING: In config mode, update the bound ID first
-                                        if (isConfigMode && configAppWidgetId != -1) {
-                                            settingsViewModel.bindVaultToWidget(targetId, configAppWidgetId)
-                                        }
+                    // 🎯 COMMAND CENTER: Save/Undo Toggle
+                    Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
+                        if (isDirty || (isConfigMode && selectedVault != null)) {
+                            IconButton(
+                                onClick = {
+                                    if (cooldownSeconds == 0 && selectedVault != null) {
+                                        scope.launch {
+                                            val targetId = selectedVault!!.id
+                                            val currentWidgetId = if (isConfigMode) configAppWidgetId else null
+                                            
+                                            // 🛡️ REGISTRATION LOCK: Links the hardware appWidgetId to the VaultEntity in Room.
+                                            settingsViewModel.saveWidgetConfiguration(targetId, currentWidgetId, draftSelectedIds) {
+                                                scope.launch {
+                                                    settingsViewModel.saveWidgetAppearance(
+                                                        targetId,
+                                                        draftBg,
+                                                        draftBgTxt,
+                                                        draftCrd,
+                                                        draftCrdTxt
+                                                    )
+                                                    // Privacy is now vault-specific
+                                                    settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
 
-                                        // Update Vault-Specific configuration
-                                        settingsViewModel.saveWidgetConfiguration(targetId, draftSelectedIds) {
-                                            scope.launch {
-                                                settingsViewModel.saveWidgetAppearance(
-                                                    targetId,
-                                                    draftBg,
-                                                    draftBgTxt,
-                                                    draftCrd,
-                                                    draftCrdTxt
-                                                )
-                                                // Privacy is now vault-specific
-                                                settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
+                                                    // Hard refresh to sync state
+                                                    settingsViewModel.getVaultById(targetId)
 
-                                                // Hard refresh to sync state
-                                                settingsViewModel.getVaultById(targetId)
+                                                    // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
+                                                    if (currentWidgetId != null && currentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                                                        settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, currentWidgetId)
+                                                    }
 
-                                                // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
-                                                if (isConfigMode && configAppWidgetId != -1) {
-                                                    val syncAppWidgetId = configAppWidgetId // Synchronous Lock
-                                                    settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, syncAppWidgetId)
-                                                }
-
-                                                sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                                
-                                                if (isConfigMode) {
-                                                    onConfigComplete()
-                                                } else {
-                                                    Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                                    sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
+                                                    
+                                                    if (isConfigMode) {
+                                                        onConfigComplete()
+                                                    } else {
+                                                        Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            ) {
+                                Icon(Icons.Default.Save, contentDescription = "SAVE", tint = if (selectedVault != null) Color.Yellow else safeThemeText.copy(0.2f))
                             }
-                        ) {
-                            Icon(Icons.Default.Save, contentDescription = "SAVE", tint = Color.Yellow)
-                        }
-                    } else {
-                        IconButton(
-                            onClick = { revertChanges() }
-                        ) {
-                            Icon(Icons.Default.Undo, contentDescription = "UNDO", tint = safeThemeText.copy(alpha = 0.4f))
+                        } else {
+                            IconButton(
+                                onClick = { revertChanges() }
+                            ) {
+                                Icon(Icons.Default.Undo, contentDescription = "UNDO", tint = safeThemeText.copy(alpha = 0.4f))
+                            }
                         }
                     }
                 }
-            }
 
-            // 🎯 PORTFOLIO REGISTRY SELECTOR
-            PortfolioSelectorDropdown(
-                vaults = vaults,
-                selectedVaultId = targetVaultId,
-                onVaultSelected = { id ->
-                    settingsViewModel.setTargetVaultId(id)
-                },
-                themeColor = safeThemeText
-            )
+                // 🎯 PORTFOLIO REGISTRY SELECTOR (Always Visible Safety Valve)
+                PortfolioSelectorDropdown(
+                    vaults = vaults,
+                    selectedVaultId = targetVaultId,
+                    onVaultSelected = { id ->
+                        settingsViewModel.forceVaultSwitch(id)
+                    },
+                    themeColor = safeThemeText
+                )
 
-            LazyColumn(
-                state = lazyListState,
-                modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                contentPadding = PaddingValues(bottom = 0.dp)
-            ) {
-                item {
-                    WidgetPreviewSlim(bgHex = draftBg, bgTxtHex = draftBgTxt, cardHex = draftCrd, cardTxtHex = draftCrdTxt, showTotal = !draftHideTotals)
-                }
+                if (selectedVault == null) {
+                    // 🛡️ THE SAFETY VALVE: Break the infinite spinner for new widgets
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = safeThemeText, strokeWidth = 2.dp)
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            "LINK THIS WIDGET TO A PORTFOLIO", 
+                            color = safeThemeText, 
+                            fontSize = 10.5.sp, 
+                            fontWeight = FontWeight.Black, 
+                            letterSpacing = (-0.3).sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        contentPadding = PaddingValues(bottom = 0.dp)
+                    ) {
+                        item {
+                            WidgetPreviewSlim(bgHex = draftBg, bgTxtHex = draftBgTxt, cardHex = draftCrd, cardTxtHex = draftCrdTxt, showTotal = !draftHideTotals)
+                        }
 
-                item {
-                    SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
-                    AnimatedVisibility(visible = appearanceExpanded) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                            colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
-                        ) {
-                            Column(Modifier.padding(12.dp)) {
-                                WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
-                                    when(target) {
-                                        0 -> draftBg = newHex
-                                        1 -> draftBgTxt = newHex
-                                        2 -> draftCrd = newHex
-                                        3 -> draftCrdTxt = newHex
+                        item {
+                            SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
+                            AnimatedVisibility(visible = appearanceExpanded) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                    colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
+                                ) {
+                                    Column(Modifier.padding(12.dp)) {
+                                        WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
+                                            when(target) {
+                                                0 -> draftBg = newHex
+                                                1 -> draftBgTxt = newHex
+                                                2 -> draftCrd = newHex
+                                                3 -> draftCrdTxt = newHex
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                        }
+
+                        item {
+                            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
+                                Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
+                            }
+                            HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                        }
+
+                        item {
+                            val countText = "${draftSelectedIds.size}/5 SELECTED"
+                            SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
+                        }
+
+                        if (assetsExpanded) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
+                                ) {
+                                    Column(Modifier.padding(8.dp)) {
+                                        if (targetAssets.isEmpty()) {
+                                            Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp))
+                                        } else {
+                                            targetAssets.forEach { asset ->
+                                                val isSelected = draftSelectedIds.contains(asset.coinId)
+                                                val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
+
+                                                WidgetAssetSelectItem(
+                                                    asset = asset,
+                                                    isSelected = isSelected,
+                                                    orderIndex = orderIndex,
+                                                    onToggle = {
+                                                        if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
+                                                        else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
+                                                        else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
+                                                    },
+                                                    themeColor = safeThemeText
+                                                )
+                                                Spacer(Modifier.height(4.dp))
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-                }
 
-                item {
-                    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
-                        Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                        Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
-                    }
-                    HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-                }
-
-                item {
-                    val countText = "${draftSelectedIds.size}/5 SELECTED"
-                    SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
-                }
-
-                if (assetsExpanded) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
-                            shape = RoundedCornerShape(12.dp),
-                            border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
-                        ) {
-                            Column(Modifier.padding(8.dp)) {
-                                if (targetAssets.isEmpty()) {
-                                    Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp))
-                                } else {
-                                    targetAssets.forEach { asset ->
-                                        val isSelected = draftSelectedIds.contains(asset.coinId)
-                                        val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
-
-                                        WidgetAssetSelectItem(
-                                            asset = asset,
-                                            isSelected = isSelected,
-                                            orderIndex = orderIndex,
-                                            onToggle = {
-                                                if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
-                                                else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
-                                                else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
-                                            },
-                                            themeColor = safeThemeText
-                                        )
-                                        Spacer(Modifier.height(4.dp))
-                                    }
-                                }
-                            }
+                        item {
+                            Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    val timeDisplay = String.format("%d:%02d", cooldownSeconds / 60, cooldownSeconds % 60)
-                    
-                    if (cooldownSeconds > 0) {
-                        Button(
-                            onClick = { },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-                            shape = RoundedCornerShape(12.dp),
-                            enabled = false
-                        ) {
-                            Text(text = "WAIT $timeDisplay", fontWeight = FontWeight.Black, fontSize = 14.sp)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }
@@ -432,7 +424,7 @@ fun WidgetPreviewSlim(bgHex: String, bgTxtHex: String, cardHex: String, cardTxtH
     Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(bgColor).border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp)).padding(8.dp)) {
         if (showTotal) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Text("$42,069.00", color = bgTextColor, fontSize = 16.sp, fontWeight = FontWeight.Black)
+                Text("$42,069.00", color = bgTextColor, fontSize = 32.sp, fontWeight = FontWeight.Black)
                 Spacer(Modifier.width(8.dp))
                 Text("+5.2%", color = Color(0xFF00FF00), fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
@@ -487,7 +479,7 @@ fun WidgetStudioInlineCompact(
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             targets.forEachIndexed { i, label ->
                 val isSel = activeTarget == i
-                Box(Modifier.weight(1f).height(32.dp).background(if(isSel) Color.White.copy(0.1f) else Color.Transparent, RoundedCornerShape(4.dp)).border(1.dp, if(isSel) Color.Yellow else Color.Gray.copy(0.3f), RoundedCornerShape(4.dp)).clickable { activeTarget = i }, contentAlignment = Alignment.Center) {
+                Box(Modifier.weight(1f).height(48.dp).background(if(isSel) Color.White.copy(0.1f) else Color.Transparent, RoundedCornerShape(4.dp)).border(1.dp, if(isSel) Color.Yellow else Color.Gray.copy(0.3f), RoundedCornerShape(4.dp)).clickable { activeTarget = i }, contentAlignment = Alignment.Center) {
                     Text(label, color = if(isSel) Color.Yellow else Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -514,7 +506,7 @@ fun WidgetStudioInlineCompact(
             onColorChanged(activeTarget, "#$hexInput")
             isFlashing = true; scope.launch { delay(200); isFlashing = false }
             keyboardController?.hide(); focusManager.clearFocus()
-        }, modifier = Modifier.fillMaxWidth().height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isFlashing) Color.White else Color.Yellow)) {
+        }, modifier = Modifier.fillMaxWidth().height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isFlashing) Color.White else Color.Yellow)) {
             Text("SET DRAFT ${targets[activeTarget].uppercase()}", color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Black)
         }
     }

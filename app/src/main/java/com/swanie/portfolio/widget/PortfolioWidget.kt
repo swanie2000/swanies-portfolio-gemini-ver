@@ -3,6 +3,7 @@ package com.swanie.portfolio.widget
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -15,6 +16,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.*
 import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -107,11 +109,6 @@ class PortfolioWidget : GlanceAppWidget() {
             val cardColor = Color(android.graphics.Color.parseColor(cardColorHex))
             val cardTextColor = Color(android.graphics.Color.parseColor(cardTextColorHex))
 
-            // For assets, we can still use the database as a fallback or if we want real-time updates beyond what's in prefs
-            // But the instruction says "DO NOT perform a database query inside provideContent".
-            // This suggests we should have passed the asset list as a serialized string.
-            // For now, let's assume we implement that in SettingsViewModel.
-            
             val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
             val assets = parseAssetsData(assetsData)
 
@@ -141,12 +138,13 @@ class PortfolioWidget : GlanceAppWidget() {
                     symbol = parts[1],
                     displayName = parts[2],
                     name = parts[2],
-                    imageUrl = parts[3], // This will be 'res:xxx' or 'file:xxx'
+                    imageUrl = parts[3], 
                     officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
-                    category = AssetCategory.CRYPTO, // Temporary, will be inferred from imageUrl in UI
+                    category = AssetCategory.CRYPTO,
                     weight = 1.0,
                     amountHeld = 1.0,
-                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0
+                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
+                    localIconPath = if (parts.size >= 7) parts[6] else null 
                 )
             } else null
         }
@@ -155,20 +153,12 @@ class PortfolioWidget : GlanceAppWidget() {
 
 @Composable
 fun UnlinkedContent(appWidgetId: Int) {
-    val context = LocalContext.current
-    // 🚀 THE DIRECT-LINK PIVOT: Tap unlinked goes to Config, not Main
-    val intent = Intent(context, WidgetConfigActivity::class.java).apply {
-        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        // Add flags to treat it as a fresh config task
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-    }
-
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(Color(0xFF0A0E1A)) 
             .padding(16.dp)
-            .clickable(actionStartActivity(intent)),
+            .clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(WidgetClickCallback.WIDGET_ID_KEY to appWidgetId))),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -212,20 +202,12 @@ fun WidgetContent(
     cardTextColor: Color,
     vaultName: String
 ) {
-    val context = LocalContext.current
-    
-    // 🚀 THE DIRECT-LINK PIVOT: Tap widget goes to Configurator, not Main App
-    val intent = Intent(context, WidgetConfigActivity::class.java).apply {
-        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-    }
-
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(bgColor)
             .padding(8.dp)
-            .clickable(actionStartActivity(intent))
+            .clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(WidgetClickCallback.WIDGET_ID_KEY to appWidgetId)))
     ) {
         Box(modifier = GlanceModifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
@@ -239,11 +221,17 @@ fun WidgetContent(
                 modifier = GlanceModifier.fillMaxWidth()
             )
             Row(modifier = GlanceModifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                Image(
-                    provider = ImageProvider(android.R.drawable.ic_popup_sync),
-                    contentDescription = "Refresh",
-                    modifier = GlanceModifier.size(20.dp).clickable(actionRunCallback<RefreshCallback>())
-                )
+                // 🚀 REFRESH HITBOX: Preserving 48.dp target area (KEEP ALL)
+                Box(
+                    modifier = GlanceModifier.size(48.dp).clickable(actionRunCallback<RefreshCallback>()),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        provider = ImageProvider(android.R.drawable.ic_popup_sync),
+                        contentDescription = "Refresh",
+                        modifier = GlanceModifier.size(24.dp)
+                    )
+                }
             }
         }
 
@@ -285,8 +273,7 @@ fun WidgetContent(
                 }
             }
         } else {
-            // 🚀 THE SPRING SHIELD: Soft Stretch Spacing
-            // Wrap assets in a weighted column and place spacers between/after them
+            // 🚀 THE SPRING SHIELD: Soft Stretch Spacing between assets
             Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
                 assets.forEachIndexed { index, asset ->
                     AssetCardOriginal(
@@ -295,13 +282,11 @@ fun WidgetContent(
                         cardColor = cardColor,
                         textColor = cardTextColor
                     )
-                    // Elastic Gap between and after cards
                     Spacer(modifier = GlanceModifier.defaultWeight())
                 }
             }
         }
 
-        // Footer remains at natural height at the absolute bottom
         Text(
             text = "Updated: $lastUpdated",
             style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End),
@@ -320,81 +305,120 @@ fun AssetCardOriginal(asset: AssetEntity, history: List<Double>, cardColor: Colo
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        val isMetal = asset.imageUrl.startsWith("res:")
-        
-        val iconBgColor = if (isMetal) {
-            val isGold = asset.imageUrl.contains("gold", true)
-            if (isGold) Color(0xFFFFD700) else Color(0xFFC0C0C0)
-        } else {
-            Color.White.copy(alpha = 0.1f)
-        }
-
-        val cornerRadius = 16.dp
-
-        Box(
-            modifier = GlanceModifier.size(32.dp).cornerRadius(cornerRadius).background(iconBgColor),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = GlanceModifier.wrapContentWidth(),
+            verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
-            if (isMetal) {
-                val resName = asset.imageUrl.substringAfter("res:")
-                val context = LocalContext.current
-                val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                if (resId != 0) {
-                    Image(
-                        provider = ImageProvider(resId),
-                        contentDescription = null,
-                        modifier = GlanceModifier.size(20.dp)
-                    )
-                }
-            } else if (asset.imageUrl.startsWith("file:")) {
-                val path = asset.imageUrl.substringAfter("file:")
-                val file = java.io.File(path)
-                if (file.exists()) {
-                    val bitmap = android.graphics.BitmapFactory.decodeFile(file.absolutePath)
-                    if (bitmap != null) {
+            val isMetal = asset.imageUrl.startsWith("res:")
+            val iconBgColor = if (isMetal) {
+                val isGold = asset.imageUrl.contains("gold", true)
+                if (isGold) Color(0xFFFFD700) else Color(0xFFC0C0C0)
+            } else {
+                Color.White.copy(alpha = 0.1f)
+            }
+
+            Box(
+                modifier = GlanceModifier.size(32.dp).cornerRadius(16.dp).background(iconBgColor),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isMetal) {
+                    val resName = asset.imageUrl.substringAfter("res:")
+                    val context = LocalContext.current
+                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+                    if (resId != 0) {
                         Image(
-                            provider = ImageProvider(bitmap),
+                            provider = ImageProvider(resId),
                             contentDescription = null,
-                            modifier = GlanceModifier.size(24.dp).cornerRadius(12.dp)
+                            modifier = GlanceModifier.size(20.dp)
                         )
+                    }
+                } else if (asset.imageUrl.startsWith("file:")) {
+                    val path = asset.imageUrl.substringAfter("file:")
+                    val file = java.io.File(path)
+                    if (file.exists()) {
+                        val bitmap = android.graphics.BitmapFactory.decodeFile(file.absolutePath)
+                        if (bitmap != null) {
+                            Image(
+                                provider = ImageProvider(bitmap),
+                                contentDescription = null,
+                                modifier = GlanceModifier.size(24.dp).cornerRadius(12.dp)
+                            )
+                        } else {
+                            StampFallback(asset, false)
+                        }
                     } else {
                         StampFallback(asset, false)
                     }
                 } else {
                     StampFallback(asset, false)
                 }
-            } else {
-                StampFallback(asset, false)
+            }
+
+            Spacer(modifier = GlanceModifier.width(8.dp))
+
+            Column {
+                Text(
+                    text = asset.symbol.uppercase(),
+                    style = TextStyle(
+                        color = ColorProvider(textColor),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    maxLines = 1
+                )
             }
         }
 
-        Spacer(modifier = GlanceModifier.width(10.dp))
+        Box(
+            modifier = GlanceModifier.defaultWeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            asset.localIconPath?.let { path ->
+                if (path != "none") {
+                    val file = java.io.File(path)
+                    if (file.exists()) {
+                        val bitmap = try {
+                            android.graphics.BitmapFactory.decodeFile(path)
+                        } catch (e: Exception) {
+                            null
+                        }
 
-        Column(modifier = GlanceModifier.defaultWeight()) {
-            Text(text = asset.displayName.ifEmpty { asset.name }, style = TextStyle(color = ColorProvider(textColor), fontSize = 13.sp, fontWeight = FontWeight.Bold), maxLines = 1)
-            Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 9.sp), maxLines = 1)
+                        if (bitmap != null) {
+                            Image(
+                                provider = ImageProvider(bitmap),
+                                contentDescription = "Trend",
+                                modifier = GlanceModifier.height(30.dp).fillMaxWidth(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    }
+                }
+            }
         }
 
-        if (history.size >= 2) {
-            val sparkColor = if (history.last() >= history.first()) Color(0xFF00FF00) else Color(0xFFFF0000)
-            val sparklineBitmap = com.swanie.portfolio.widget.SparklineDrawUtils.drawSparklineBitmap(history, sparkColor, cardColor.toArgb())
-            Image(
-                provider = ImageProvider(sparklineBitmap),
-                contentDescription = "Trend",
-                modifier = GlanceModifier.width(70.dp).height(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        } else {
-            Spacer(modifier = GlanceModifier.width(70.dp).height(24.dp))
-        }
-
-        Spacer(modifier = GlanceModifier.width(8.dp))
-
-        Column(horizontalAlignment = Alignment.End) {
+        Column(
+            modifier = GlanceModifier.wrapContentWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
             val assetValue = asset.officialSpotPrice * asset.weight * asset.amountHeld
-            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(assetValue), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold), maxLines = 1)
+            Text(
+                text = NumberFormat.getCurrencyInstance(Locale.US).format(assetValue),
+                style = TextStyle(
+                    color = ColorProvider(textColor),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 1
+            )
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF0000)
-            Text(text = "${if(asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 9.sp, fontWeight = FontWeight.Bold))
+            Text(
+                text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%",
+                style = TextStyle(
+                    color = ColorProvider(trendColor),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
         }
     }
 }

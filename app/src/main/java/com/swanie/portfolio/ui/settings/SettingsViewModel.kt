@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.graphics.toColorInt
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.R
@@ -21,6 +20,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
@@ -86,6 +94,27 @@ class SettingsViewModel @Inject constructor(
         _targetVaultId.value = id
     }
 
+    /**
+     * 🚀 THE SMART RESOLVER: Forces a UI reset and resolves appWidgetIds if needed.
+     * If the appWidgetId is new/unbound, it defaults to Vault 1 to avoid the infinite spinner.
+     */
+    fun forceVaultSwitch(id: Int, isAppWidgetId: Boolean = false) {
+        viewModelScope.launch {
+            _targetVaultId.value = -1
+            delay(10)
+            if (isAppWidgetId) {
+                val bound = vaultDao.getVaultByAppWidgetId(id)
+                _targetVaultId.value = bound?.id ?: 1
+            } else {
+                _targetVaultId.value = id
+            }
+        }
+    }
+
+    fun clearTargetVault() {
+        _targetVaultId.value = -1
+    }
+
     fun saveIsDarkMode(isDark: Boolean) {
         viewModelScope.launch {
             themePreferences.saveIsDarkMode(isDark)
@@ -110,9 +139,17 @@ class SettingsViewModel @Inject constructor(
     }
 
     // 🌐 GLOBAL VISTA: Manual Save Action for Widget Configuration (Vault-Specific)
-    fun saveWidgetConfiguration(vaultId: Int, selectedIds: List<String>, onComplete: () -> Unit) {
+    // 🛡️ REGISTRATION LOCK: Links the hardware appWidgetId to the VaultEntity in Room.
+    fun saveWidgetConfiguration(vaultId: Int, appWidgetId: Int?, selectedIds: List<String>, onComplete: () -> Unit) {
         viewModelScope.launch {
             _isSaving.value = true
+            
+            // 🛡️ 1-TO-1 REGISTRATION: Clear this widget ID from any other vaults first
+            if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                vaultDao.clearAppWidgetId(appWidgetId)
+                vaultDao.updateAppWidgetId(vaultId, appWidgetId)
+            }
+
             val idsString = selectedIds.joinToString(",")
             vaultDao.updateSelectedWidgetAssets(vaultId, idsString)
             triggerWidgetUpdate(vaultId)
@@ -126,13 +163,6 @@ class SettingsViewModel @Inject constructor(
         android.util.Log.d("DATABASE_SAVE", "Attempting to save colors for Vault ID: $vaultId with BG: $bg")
         vaultDao.updateWidgetColors(vaultId, bg, bgText, card, cardText)
         triggerWidgetUpdate(vaultId)
-    }
-
-    // 🛡️ SURGICAL BINDING: Links a vault to a specific appWidgetId in the DB
-    fun bindVaultToWidget(vaultId: Int, appWidgetId: Int) {
-        viewModelScope.launch {
-            vaultDao.updateBoundAppWidgetId(vaultId, appWidgetId)
-        }
     }
 
     suspend fun getVaultByAppWidgetId(appWidgetId: Int): VaultEntity? {
@@ -254,8 +284,8 @@ class SettingsViewModel @Inject constructor(
 
         val idsToUpdate = if (vaultId != null) {
             val vault = vaultDao.getVaultById(vaultId)
-            if (vault?.boundAppWidgetId != null && vault.boundAppWidgetId != -1) {
-                intArrayOf(vault.boundAppWidgetId)
+            if (vault?.appWidgetId != null && vault.appWidgetId != -1) {
+                intArrayOf(vault.appWidgetId!!)
             } else {
                 appWidgetManager.getAppWidgetIds(componentName)
             }
@@ -270,42 +300,69 @@ class SettingsViewModel @Inject constructor(
         // 1. Update Glance Internal State for specific IDs
         val glanceManager = GlanceAppWidgetManager(context)
         idsToUpdate.forEach { id ->
-            vault?.let { v ->
+            val v = if (vaultId != null) vault else {
+                vaultDao.getVaultByAppWidgetId(id)
+            }
+
+            v?.let { vSafe ->
                 // 🚀 DATASTORE HANDSHAKE: Write directly to PreferencesGlanceStateDefinition
                 val glanceId = glanceManager.getGlanceIdBy(id)
                 androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, glanceId) { prefs ->
                     prefs.toMutablePreferences().apply {
-                        this[PortfolioWidget.VAULT_ID_KEY] = v.id
-                        this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = v.name
-                        this[PortfolioWidget.WIDGET_BG_COLOR_KEY] = v.widgetBgColor
-                        this[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = v.widgetBgTextColor
-                        this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = v.widgetCardColor
-                        this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = v.widgetCardTextColor
-                        this[PortfolioWidget.SHOW_TOTAL_KEY] = v.showWidgetTotal
+                        this[PortfolioWidget.VAULT_ID_KEY] = vSafe.id
+                        this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = vSafe.name
+                        this[PortfolioWidget.WIDGET_BG_COLOR_KEY] = vSafe.widgetBgColor
+                        this[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = vSafe.widgetBgTextColor
+                        this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = vSafe.widgetCardColor
+                        this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
+                        this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
                         
-                        // 🚀 FULL-FREIGHT HANDSHAKE: Serialize Top 10 Assets with File-Aware Icons
-                        val selectedIds = v.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
-                        val allAssets = assetDao.getAssetsByVaultOnce(v.id)
-                        val topAssets = if (selectedIds.isEmpty()) allAssets.take(10)
-                        else selectedIds.mapNotNull { id -> allAssets.find { it.coinId == id } }.take(10)
+                        // 🚀 THREADED PULSE: Serialize Top 10 Assets with Sparkline Generation on IO
+                        val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
+                        val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
+                        val filteredAssets = if (selectedIds.isEmpty()) {
+                            allAssetsForVault.take(10)
+                        } else {
+                            allAssetsForVault.filter { it.coinId in selectedIds }
+                        }
 
-                        val serializedAssets = topAssets.joinToString("||") { asset ->
-                            val iconSource = when {
-                                asset.category == AssetCategory.METAL || asset.isMetal -> {
-                                    val metalName = asset.symbol.lowercase()
-                                    "res:ic_$metalName"
+                        val serializedAssets = withContext(Dispatchers.IO) {
+                            filteredAssets.map { asset ->
+                                val iconSource = when {
+                                    asset.category == AssetCategory.METAL || asset.isMetal -> {
+                                        val metalName = asset.symbol.lowercase()
+                                        "res:ic_$metalName"
+                                    }
+                                    asset.imageUrl.startsWith("file:") -> asset.imageUrl
+                                    asset.localIconPath != null -> "file:${asset.localIconPath}"
+                                    else -> asset.imageUrl // Fallback to URL or empty
                                 }
-                                asset.imageUrl.startsWith("file:") -> asset.imageUrl
-                                asset.localIconPath != null -> "file:${asset.localIconPath}"
-                                else -> asset.imageUrl // Fallback to URL or empty
-                            }
-                            val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                            "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|$assetValue|${asset.priceChange24h}"
+
+                                val history = database.priceHistoryDao().getRecentHistory(asset.coinId)
+                                val historyData = history.map { it.price }
+                                var sparkPath = "none"
+                                if (historyData.size >= 2) {
+                                    val isPositive = historyData.last() >= historyData.first()
+                                    val bitmap = generateSparklineBitmap(historyData, isPositive)
+                                    val file = File(context.cacheDir, "spark_${asset.coinId}.png")
+                                    try {
+                                        FileOutputStream(file).use { out ->
+                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                        }
+                                        sparkPath = file.absolutePath
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+
+                                val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|$assetValue|${asset.priceChange24h}|$sparkPath"
+                            }.joinToString("||")
                         }
                         this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
                         
                         // Calculate total for static balance
-                        val total = allAssets.sumOf {
+                        val total = allAssetsForVault.sumOf {
                             (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium 
                         }
                         this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
@@ -317,13 +374,13 @@ class SettingsViewModel @Inject constructor(
                 
                 // Keep Double-Stamp for redundancy with system options
                 val options = appWidgetManager.getAppWidgetOptions(id)
-                options.putInt("vault_id", v.id)
-                options.putString("static_vault_name", v.name)
-                options.putBoolean("static_show_total", v.showWidgetTotal)
-                options.putString("static_bg_color", v.widgetBgColor)
-                options.putString("static_bg_text_color", v.widgetBgTextColor)
-                options.putString("static_card_color", v.widgetCardColor)
-                options.putString("static_card_text_color", v.widgetCardTextColor)
+                options.putInt("vault_id", vSafe.id)
+                options.putString("static_vault_name", vSafe.name)
+                options.putBoolean("static_show_total", vSafe.showWidgetTotal)
+                options.putString("static_bg_color", vSafe.widgetBgColor)
+                options.putString("static_bg_text_color", vSafe.widgetBgTextColor)
+                options.putString("static_card_color", vSafe.widgetCardColor)
+                options.putString("static_card_text_color", vSafe.widgetCardTextColor)
                 appWidgetManager.updateAppWidgetOptions(id, options)
             }
         }
@@ -342,6 +399,38 @@ class SettingsViewModel @Inject constructor(
             themePreferences.saveIsCompactViewEnabled(false)
             themePreferences.saveConfirmDelete(true)
         }
+    }
+
+    private fun generateSparklineBitmap(history: List<Double>, isPositive: Boolean): Bitmap {
+        val width = 140 // 70dp * 2
+        val height = 60 // 30dp * 2
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            color = if (isPositive) android.graphics.Color.GREEN else android.graphics.Color.RED
+            style = Paint.Style.STROKE
+            strokeWidth = 4f
+            isAntiAlias = true
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+        }
+
+        if (history.size < 2) return bitmap
+
+        val min = history.minOrNull() ?: 0.0
+        val max = history.maxOrNull() ?: 1.0
+        val range = if (max - min > 0) max - min else 1.0
+        val path = Path()
+        val stepX = width.toFloat() / (history.size - 1)
+
+        history.forEachIndexed { index, value ->
+            val x = index * stepX
+            val normalizedY = ((value - min) / range).toFloat()
+            val y = height - (normalizedY * (height - 8) + 4)
+            if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+        canvas.drawPath(path, paint)
+        return bitmap
     }
 
     fun getVaultById(vaultId: Int) = viewModelScope.launch {

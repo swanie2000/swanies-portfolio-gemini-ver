@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
         VaultEntity::class,
         PriceHistoryEntity::class
     ],
-    // 🛡️ V25: Total Privacy Isolation (Per-Vault Widget Totals)
-    version = 25,
+    // 🛡️ V26: The Registration Lock (Null-safe appWidgetId Mapping)
+    version = 26,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -51,8 +51,8 @@ abstract class AppDatabase : RoomDatabase() {
                             // Seed the default vault
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Direct SQL insert for the seed to avoid DAO circular dependency on creation
-                                // Updated to include sortOrder, boundAppWidgetId, and showWidgetTotal columns
-                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets, widgetBgColor, widgetBgTextColor, widgetCardColor, widgetCardTextColor, showWidgetTotal, sortOrder, boundAppWidgetId) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '', '#1C1C1E', '#FFFFFF', '#2C2C2E', '#FFFFFF', 1, 0, -1)")
+                                // Updated to include sortOrder, appWidgetId, and showWidgetTotal columns
+                                db.execSQL("INSERT INTO vaults (id, name, baseCurrency, vaultColor, selectedWidgetAssets, widgetBgColor, widgetBgTextColor, widgetCardColor, widgetCardTextColor, showWidgetTotal, sortOrder, appWidgetId) VALUES (1, 'MAIN PORTFOLIO', 'USD', '#000416', '', '#1C1C1E', '#FFFFFF', '#2C2C2E', '#FFFFFF', 1, 0, NULL)")
                             }
                         }
                     })

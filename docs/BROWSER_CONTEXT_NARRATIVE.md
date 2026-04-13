@@ -1,54 +1,46 @@
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V11.2.0)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V11.9.7)
 🎯 THE CORE MISSION
 
-To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities ("Sovereign Shield"). Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with instantaneous visual feedback.
+To maintain a high-performance, multi-instance portfolio tracker where Widgets and the Main App operate as independent, data-isolated entities. Every portfolio (Swanie 1-5) must possess its own unique identity, appearance, and privacy settings with instantaneous visual feedback and hardware-verified targeting.
 🛡️ 1. ARCHITECTURAL RECAP (THE SYNCED BASELINE)
 
-    Database: V25 Schema (Room). Stores the "Source of Truth" for every vault.
+    The Registration Lock (V11.9.7): Hard-links the hardware appWidgetId to a specific VaultEntity in the Room Database (Version 26). This bypasses Android Intent caching by making the Database the final arbiter of widget identity.
 
-    The Synchronous Handshake (Glance 1.1.0): We have abandoned the "Passive Update" (waiting for the database) in favor of Synchronous State Persistence.
+    The Synchronous Handshake: Uses PreferencesGlanceStateDefinition to write directly to the DataStore during saves, bypassing the 30-second throttle.
 
-        The SettingsViewModel now writes directly to the PreferencesGlanceStateDefinition (DataStore) during the save.
+    The URI-First Identity: Every widget tap carries a unique Data URI (swanie://relayed/id/$id/$timestamp) used as the primary key for identity extraction, neutralizing "Intent Conflation."
 
-        The Widget renders from this "Shared Mental State" instantly, bypassing the Android 30-second update throttle.
+    The Three-Zone Layout: Locked Proportional Trinity (Identity Left, Pulse Center, Data Right).
 
-    The Sovereign Task: The WidgetConfigActivity is now a "Ghost Task" (noHistory, excludeFromRecents) that pops up for edits and vanishes immediately upon saving, matching the "Day Counter" UX.
+✅ 2. TODAY’S VICTORIES (THE REGISTRATION)
 
-    UI Foundation: Replaced OutlinedTextField with a BasicTextField + custom DecorationBox to solve the long-standing "Text Clipping" bug in asset search.
+    Ghost Annihilation: Successfully passed the "10-Tap Stress Test." Switched between 5 different portfolios on the same widget 10+ times with 100% accuracy.
 
-✅ 2. TODAY’S VICTORIES (THE BREAKTHROUGH)
+    Elephant Gradle Protocol: Established a "Deep Clean" workflow (Invalidate Caches + Destructive Room Migration) to ensure legacy intent ghosts are purged.
 
-    The 30-Second Wall Breached: Successfully implemented a sub-second "Instant Snap" for background colors and vault names.
+    Smart Resolver: The SettingsViewModel now resolves appWidgetId to vaultId dynamically, defaulting to Vault 1 only if the widget is truly unlinked.
 
-    Multi-Instance Fluidity: Confirmed Swanie 1-5 can be toggled and saved rapidly with 100% update reliability.
+    Panoramic Pulse: Sparklines upscaled to 30.dp with weighted horizontal distribution.
 
-    Search Box Alignment: Finally achieved perfect vertical centering in the Asset Search bar.
-
-    Task Management: Secured the "Task-Only" configuration mode, keeping the user's "Recents" list clean and focused.
-
-🎨 3. ACTIVE PHASE: "FULL-FREIGHT POLISH"
+⚠️ 3. THE NEXT TRENCHES (FUTURE OBJECTIVES)
 Task	Description	Status
-The Asset Stamp	Serialize Top 5 assets into the DataStore "Handshake" so they appear instantly with the color.	NEXT PRIORITY
-Portfolio Elevator	Implement imePadding and scroll-back logic to keep edited portfolios above the keyboard.	PENDING
-Living Preview	Sync the internal Settings Preview to reflect the same "Handshake" data as the real widget.	PENDING
-Color Swatch Menu	Add visual indicators to the "Pick a Portfolio" dropdown items.	PENDING
-Haptic Lock-In	Add vibration feedback to the Header Save Icon.	PENDING
+The Asset Stamp	Serialize Top 5 assets into the DataStore "Handshake" for instant rendering.	NEXT PRIORITY
+Login Shield	Resolve the "Blank Swanie 1" bypass and implement a secure authentication layer.	HIGH PRIORITY
+Universal Tongue	Implement multi-language support (Strings.xml localization) across UI and Widgets.	PENDING
+Living Preview	Sync the internal Settings Preview to reflect "Handshake" data 1:1.	PENDING
+Haptic Lock-In	Add vibration feedback to Header Save and Asset Toggles.	PENDING
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE AGENT)
 
-CRITICAL: READ BEFORE EDITING
+    CRITICAL: READ BEFORE EDITING
 
-    The Synchronous Rule: Every vault property change (color, name, assets) MUST be written to the PreferencesGlanceStateDefinition inside the same scope as the database save to ensure an instant snap.
+        Registration Integrity: Every saveWidgetConfiguration MUST call vaultDao.updateAppWidgetId to maintain the hardware link.
 
-    Full File Outputs: Always provide full file contents. No partial snippets.
+        Full File Outputs: No partial snippets. Provide entire files to maintain context.
 
-    Dirty State Integrity: Ensure isDirty remains the gatekeeper for the Save/Undo icons.
+        The 32/10.5 Rule: Asset quantities stay 32.sp (Black). Search placeholders stay 10.5.sp.
 
-    Log Tagging: Use Log.d("WIDGET_SYNC", ...) for lifecycle auditing.
-
-🐞 KNOWN "GHOSTS"
-
-    The "Blank Swanie 1": Appears in the Main App due to a temporary debug bypass of the Login/Password screen. DO NOT ATTEMPT TO FIX.
+        URI Extraction: Always prioritize intent.data?.lastPathSegment for ID resolution.
 
 🚀 Next Agent Command
 
-    "I have updated the narrative to V11.2.0. The Synchronous Handshake is working for colors and names. We are now entering the 'Full-Freight' phase. Please implement the Asset Stamp in SettingsViewModel.kt and PortfolioWidget.kt so the Top 5 assets are pushed into the DataStore and rendered instantly. Provide full files."
+    "I have updated the narrative to V11.9.7. The Registration Lock is holding and the drift is dead. We are now entering the 'Full-Freight' polish phase. Task 1: Implement the Asset Stamp. Update SettingsViewModel.kt to serialize Top 5 asset names and prices into the PreferencesGlanceStateDefinition during the save. Task 2: Update PortfolioWidget.kt to render these cached assets immediately. Task 3: Briefly investigate the Login Shield logic—we need to stop the 'Blank Swanie 1' debug bypass. Provide full files. Confirm 'KEEP ALL'."

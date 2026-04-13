@@ -16,5 +16,5 @@ data class VaultEntity(
     val widgetCardTextColor: String = "#FFFFFF",
     val showWidgetTotal: Boolean = true,
     val sortOrder: Int = 0,
-    val boundAppWidgetId: Int = -1
+    val appWidgetId: Int? = null
 )

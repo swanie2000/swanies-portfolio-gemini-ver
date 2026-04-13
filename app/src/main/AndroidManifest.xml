@@ -35,10 +35,11 @@
             </intent-filter>
         </activity>
 
-        <!-- Configuration Activity for Multi-Instance Widget -->
+        <!-- 🚀 THE SOVEREIGN RECOVERY: Restore process consistency for widget functionality -->
         <activity
             android:name=".widget.WidgetConfigActivity"
             android:exported="true"
+            android:launchMode="standard"
             android:noHistory="true"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.SwaniesPortfolio">
