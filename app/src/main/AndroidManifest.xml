@@ -48,9 +48,7 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+
 
         <!-- SYMMETRY FIX: Pointing to the correct Glance Receiver package -->
         <receiver

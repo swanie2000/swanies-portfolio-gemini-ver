@@ -43,6 +43,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
+import com.swanie.portfolio.ui.features.AuthViewModel
+import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.VaultEntity
 import kotlinx.coroutines.launch // Required for auto-scroll
@@ -55,6 +57,7 @@ fun PortfolioManagerScreen(
     mainViewModel: MainViewModel,
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
+    val authViewModel: AuthViewModel = hiltViewModel()
     val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
     val defaultVaultId by mainViewModel.defaultVaultId.collectAsStateWithLifecycle()
@@ -207,7 +210,13 @@ fun PortfolioManagerScreen(
                                     if (isSelected || isDragging) safeThemeText.copy(0.4f) else safeThemeText.copy(0.1f),
                                     RoundedCornerShape(12.dp)
                                 )
-                                .clickable { mainViewModel.selectVault(vault.id) }
+                                .clickable { 
+                                    if (vault.id != activeVault.id) {
+                                        authViewModel.setLocked()
+                                        mainViewModel.selectVault(vault.id) 
+                                        navController.navigate(Routes.UNLOCK_VAULT)
+                                    }
+                                }
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {

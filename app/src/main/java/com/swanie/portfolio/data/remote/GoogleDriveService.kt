@@ -2,11 +2,6 @@ package com.swanie.portfolio.data.remote
 
 import android.content.Context
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.ByteArrayContent
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -34,22 +29,12 @@ class GoogleDriveService @Inject constructor(
     private var driveService: Drive? = null
     private val gson = Gson()
 
-    fun getGoogleSignInClient(): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(com.swanie.portfolio.R.string.default_web_client_id))
-            .requestEmail()
-            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
-            .build()
-        return GoogleSignIn.getClient(context, gso)
-    }
-
-    fun initializeDriveService(account: GoogleSignInAccount) {
-        Log.d("VAULT_DEBUG", "Initializing Drive Service for: ${account.email}")
-        val credential = GoogleAccountCredential.usingOAuth2(
-            context, listOf(DriveScopes.DRIVE_APPDATA)
-        ).apply {
-            selectedAccount = account.account
-        }
+    /**
+     * 🛡️ SOVEREIGN INITIALIZATION: Initializes the Drive Service using a credential
+     * provided by the OS-level Account Manager. No legacy Sign-In Client required.
+     */
+    fun initializeDriveService(credential: GoogleAccountCredential) {
+        Log.d("VAULT_DEBUG", "Initializing Drive Service via Professional Bridge.")
 
         driveService = Drive.Builder(
             NetHttpTransport(),
@@ -74,25 +59,24 @@ class GoogleDriveService @Inject constructor(
             val files = result.files
             !files.isNullOrEmpty()
         } catch (e: Exception) {
-            Log.e("DRIVE_SERVICE", "Check Vault Error", e)
+            Log.e("VAULT_DEBUG", "Check Vault Error", e)
             false
         }
     }
 
     /**
-     * 🛰️ CLOUD PUSH: Uploads the current local holdings to the Sovereign Vault.
-     * This creates the 'vault_backup.json' file for future restores.
+     * 🛰️ CLOUD PUSH: Uploads local holdings to the user's hidden AppData folder.
+     * This keeps you liability-free as the data stays in the user's own Drive.
      */
     suspend fun uploadFullVaultBackup(assets: List<AssetEntity>): Boolean = withContext(Dispatchers.IO) {
         val service = driveService ?: run {
-            Log.w("VAULT_DEBUG", "Sync Skipped: Drive Service NOT initialized. Please Login.")
+            Log.w("VAULT_DEBUG", "Sync Skipped: Drive Service NOT initialized.")
             return@withContext false
         }
         try {
             Log.d("VAULT_DEBUG", "Starting Cloud Sync for ${assets.size} assets...")
             val jsonContent = gson.toJson(assets)
 
-            // 1. Check for existing backup to update or create
             val existingResult = service.files().list()
                 .setSpaces("appDataFolder")
                 .setQ("name = 'vault_backup.json'")
@@ -103,17 +87,15 @@ class GoogleDriveService @Inject constructor(
             val contentStream = ByteArrayContent.fromString("application/json", jsonContent)
 
             if (existingFile == null) {
-                // Create New
                 val fileMetadata = File().apply {
                     name = "vault_backup.json"
                     parents = listOf("appDataFolder")
                 }
                 service.files().create(fileMetadata, contentStream).execute()
-                Log.d("VAULT_DEBUG", "✅ SUCCESS: New Vault Backup Created in Cloud.")
+                Log.d("VAULT_DEBUG", "✅ SUCCESS: New Vault Backup Created.")
             } else {
-                // Update Existing
                 service.files().update(existingFile.id, null, contentStream).execute()
-                Log.d("VAULT_DEBUG", "✅ SUCCESS: Existing Vault Backup Updated in Cloud.")
+                Log.d("VAULT_DEBUG", "✅ SUCCESS: Vault Backup Updated.")
             }
             true
         } catch (e: Exception) {
@@ -122,6 +104,9 @@ class GoogleDriveService @Inject constructor(
         }
     }
 
+    /**
+     * 📥 CLOUD PULL: Restores the database from the user's hidden vault.
+     */
     suspend fun restoreFullVault(): Boolean = withContext(Dispatchers.IO) {
         val service = driveService ?: run {
             Log.w("VAULT_DEBUG", "Restore Skipped: Drive Service NOT initialized.")
@@ -134,25 +119,15 @@ class GoogleDriveService @Inject constructor(
                 .execute()
 
             val files = result.files ?: emptyList()
-            Log.d("VAULT_DEBUG", "Files found in Cloud: ${files.map { it.name }}")
-
             val file = files.find { it.name == "vault_backup.json" }
-                ?: files.find { it.name == "vault_metadata.json" }
                 ?: return@withContext false
-
-            Log.d("VAULT_DEBUG", "Targeting file for restore: ${file.name}")
 
             val outputStream = ByteArrayOutputStream()
             service.files().get(file.id).executeMediaAndDownloadTo(outputStream)
             val jsonString = outputStream.toString()
 
             val type = object : TypeToken<List<AssetEntity>>() {}.type
-            val restoredAssets: List<AssetEntity> = try {
-                gson.fromJson(jsonString, type)
-            } catch (e: Exception) {
-                Log.e("VAULT_DEBUG", "Corrupt file or wrong format: ${file.name}")
-                return@withContext false
-            }
+            val restoredAssets: List<AssetEntity> = gson.fromJson(jsonString, type)
 
             if (restoredAssets.isNotEmpty()) {
                 assetDao.upsertAll(restoredAssets)
@@ -181,7 +156,7 @@ class GoogleDriveService @Inject constructor(
             service.files().create(fileMetadata, contentStream).setFields("id").execute()
             true
         } catch (e: Exception) {
-            Log.e("DRIVE_SERVICE", "Create Manifest Error", e)
+            Log.e("VAULT_DEBUG", "Create Manifest Error", e)
             false
         }
     }

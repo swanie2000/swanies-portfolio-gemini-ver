@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.google.services)
 }
 
 // 🛡️ Force Metadata Resolution to fix Kotlin 2.1 Compatibility
@@ -59,6 +58,7 @@ kotlin {
 dependencies {
     // Core Android & Compose
     implementation(libs.androidx.core.ktx)
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -72,7 +72,9 @@ dependencies {
 
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
+
+    // Native Fingerprint and Face ID support
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
     // Drag-to-reorder (maintained)
     implementation("sh.calvin.reorderable:reorderable:3.0.0")
@@ -103,8 +105,7 @@ dependencies {
     // WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
 
-    // GOOGLE DRIVE & AUTH
-    implementation(libs.play.services.auth)
+    // GOOGLE DRIVE
     implementation(libs.google.api.client.android)
     implementation(libs.google.api.services.drive)
     implementation(libs.google.http.client.gson)

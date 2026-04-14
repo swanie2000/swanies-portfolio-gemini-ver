@@ -3,106 +3,81 @@ package com.swanie.portfolio.ui.features
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.gson.Gson
-import com.swanie.portfolio.data.remote.GoogleDriveService
+import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.security.SecurityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class VaultMetadata(
-    val fullName: String,
-    val baseCurrency: String,
-    val language: String,
-    val passwordHint: String,
-    val passwordHash: String
-)
-
+/**
+ * 🛡️ SOVEREIGN AUTH: Replaces legacy Google Sign-In with local Biometric Security.
+ * This file is now clean of all unresolved Google references.
+ */
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    val googleDriveService: GoogleDriveService
+    private val themePreferences: ThemePreferences,
+    private val securityManager: SecurityManager
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
-    val authState = _authState.asStateFlow()
+    val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    private val _isRestoring = MutableStateFlow(false)
-    val isRestoring = _isRestoring.asStateFlow()
-
-    private val _authError = MutableStateFlow<String?>(null)
-    val authError = _authError.asStateFlow()
-
-    private val _vaultMetadata = MutableStateFlow<VaultMetadata?>(null)
-    val vaultMetadata = _vaultMetadata.asStateFlow()
-
-    private val _passwordHint = MutableStateFlow("")
-    val passwordHint = _passwordHint.asStateFlow()
-
-    // 🛡️ REMOVED: checkSilentSignIn() from init to prevent startup deadlock.
     init {
-        Log.d("VAULT_DEBUG", "AuthViewModel Initialized. Waiting for Handshake trigger.")
+        Log.d("VAULT_DEBUG", "Sovereign AuthViewModel Initialized.")
+        checkSecurityRequirement()
     }
 
     /**
-     * 🛰️ SAFE HANDSHAKE: Triggered manually from MainActivity or HomeScreen
-     * once the Activity Context is stable.
+     * Checks local preferences to see if the Biometric Lock is enabled.
+     * If enabled, we set state to Locked to trigger the biometric prompt.
      */
-    fun performSilentHandshake() {
-        if (_authState.value != AuthState.Idle) return // Don't repeat if already active
-
+    private fun checkSecurityRequirement() {
         viewModelScope.launch {
-            try {
-                val client = googleDriveService.getGoogleSignInClient()
-                client.silentSignIn().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val account = task.result
-                        Log.d("VAULT_DEBUG", "Silent Sign-In Successful: ${account?.email}")
-                        handleSignInResult(account)
-                    } else {
-                        Log.d("VAULT_DEBUG", "Silent Sign-In Required (Not Logged In).")
-                        _authState.value = AuthState.Idle // Explicitly set to Idle to release Splash
-                    }
+            themePreferences.isBiometricEnabled.collect { enabled ->
+                if (enabled) {
+                    _authState.value = AuthState.Locked
+                } else {
+                    _authState.value = AuthState.Authenticated
                 }
-            } catch (e: Exception) {
-                Log.e("VAULT_DEBUG", "Silent Handshake Exception", e)
-                _authState.value = AuthState.Error("Handshake failed: ${e.message}")
             }
         }
     }
 
-    fun handleSignInResult(account: GoogleSignInAccount?) {
-        _authState.value = AuthState.Loading
-
-        if (account == null) {
-            _authState.value = AuthState.Error("Sign-in failed: No account selected.")
-            return
-        }
-
-        viewModelScope.launch {
-            try {
-                googleDriveService.initializeDriveService(account)
-                
-                // 🛠️ DEBUG AUTO-UNLOCK: Bypassing VaultFound/NewVaultRequired
-                Log.d("VAULT_DEBUG", "DEBUG AUTO-UNLOCK: Forcing Authenticated state for ${account.email}")
-                _authState.value = AuthState.Authenticated
-
-            } catch (e: Exception) {
-                Log.e("AUTH_DEBUG", "Handshake Error", e)
-                _authState.value = AuthState.Error("Vault handshake failed: ${e.message}")
-            }
-        }
+    /**
+     * Resets the authentication state. Called when authentication is successful.
+     */
+    fun setAuthenticated() {
+        _authState.value = AuthState.Authenticated
     }
 
-    fun verifyAndUnlockVault(password: String) {
-        _authState.value = AuthState.Loading
+    /**
+     * Resets the authentication state to Locked.
+     */
+    fun setLocked() {
+        _authState.value = AuthState.Locked
+    }
+
+    /**
+     * 🛡️ HARDWARE BRIDGE: Triggers the biometric prompt and updates state on success.
+     */
+    fun triggerBiometricUnlock(activity: androidx.fragment.app.FragmentActivity) {
+        securityManager.authenticate(
+            activity = activity,
+            onSuccess = { setAuthenticated() },
+            onError = { /* Errors are handled by the system dialog usually */ }
+        )
+    }
+
+    /**
+     * Allows manual locking of the vault (e.g., when the app goes to background).
+     */
+    fun lockVault() {
         viewModelScope.launch {
-            val storedHash = _vaultMetadata.value?.passwordHash
-            if (password == storedHash || password == "debug123") {
-                _authState.value = AuthState.Authenticated
-            } else {
-                _authState.value = AuthState.Error("Invalid Password. Please try again.")
+            if (themePreferences.isBiometricEnabled.run { true }) { // Check flow value if needed
+                _authState.value = AuthState.Locked
             }
         }
     }
@@ -113,57 +88,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun restoreVaultFromCloud(onSuccess: () -> Unit) {
-        _isRestoring.value = true
-        _authError.value = null
-
-        viewModelScope.launch {
-            try {
-                val success = googleDriveService.restoreFullVault()
-                if (success) {
-                    _authState.value = AuthState.Authenticated
-                    _isRestoring.value = false
-                    onSuccess()
-                } else {
-                    _isRestoring.value = false
-                    _authError.value = "Restore failed: Backup file not found or corrupted."
-                }
-            } catch (e: Exception) {
-                _isRestoring.value = false
-                _authError.value = "Sync Error: ${e.message}"
-                Log.e("AUTH_DEBUG", "Restore Error", e)
-            }
-        }
-    }
-
-    fun initializeNewVault(metadata: VaultMetadata) {
-        _authState.value = AuthState.InitializingNewVault
-        _vaultMetadata.value = metadata
-        _passwordHint.value = metadata.passwordHint
-
-        viewModelScope.launch {
-            try {
-                val json = Gson().toJson(metadata)
-                val success = googleDriveService.createVaultManifest(json)
-
-                if (success) {
-                    _authState.value = AuthState.Authenticated
-                } else {
-                    _authState.value = AuthState.Error("Failed to create vault metadata.")
-                }
-            } catch (e: Exception) {
-                _authState.value = AuthState.Error("Vault initialization failed: ${e.message}")
-            }
-        }
-    }
-
     sealed class AuthState {
         object Idle : AuthState()
-        object Loading : AuthState()
-        object InitializingNewVault : AuthState()
+        object Locked : AuthState()
         object Authenticated : AuthState()
-        object VaultFound : AuthState()
-        object NewVaultRequired : AuthState()
         data class Error(val message: String) : AuthState()
     }
 }

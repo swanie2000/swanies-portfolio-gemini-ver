@@ -11,10 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
@@ -28,9 +30,11 @@ fun SettingsScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
     val currentVaultId by mainViewModel.currentVaultId.collectAsState(initial = 1)
+    val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -100,7 +104,27 @@ fun SettingsScreen(
 
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
-                    // --- VISUAL SETTINGS ---
+                    // --- SECURITY ---
+                    Text("SECURITY", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    SettingsToggleItem(
+                        title = "Sovereign Vault Lock",
+                        subtitle = "Require fingerprint to access assets.",
+                        checked = isBiometricEnabled,
+                        onCheckedChange = { enabled ->
+                            val activity = context as? FragmentActivity
+                            if (activity != null) {
+                                settingsViewModel.toggleBiometricLock(activity, enabled) { error ->
+                                    // Error handling can be added here (e.g., Toast)
+                                }
+                            }
+                        },
+                        themeColor = safeText
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // --- INTERFACE ---
                     Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     SettingsToggleItem(
@@ -121,7 +145,7 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // --- THEME & GRADIENT ---
+                    // --- THEME & DEPTH ---
                     Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     SettingsToggleItem(

@@ -31,6 +31,7 @@ class ThemePreferences @Inject constructor(
         val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
         val THEME_MODE_KEY = stringPreferencesKey("theme_mode")
         val CURRENT_VAULT_ID = intPreferencesKey("current_vault_id")
+        val IS_BIOMETRIC_ENABLED = booleanPreferencesKey("is_biometric_enabled")
 
         // --- DEFAULT VAULT LOGIC ---
         val DEFAULT_VAULT_ID = intPreferencesKey("default_vault_id")
@@ -56,6 +57,7 @@ class ThemePreferences @Inject constructor(
     val metalsDisplayOrder: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.METALS_DISPLAY_ORDER] ?: "XAU,XAG,XPT,XPD" }
     val themeMode: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.THEME_MODE_KEY] ?: "SYSTEM" }
     val currentVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.CURRENT_VAULT_ID] ?: 1 }
+    val isBiometricEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_BIOMETRIC_ENABLED] ?: false }
 
     // Default Vault Flows
     val defaultVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.DEFAULT_VAULT_ID] ?: 1 }
@@ -80,6 +82,7 @@ class ThemePreferences @Inject constructor(
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
     suspend fun saveThemeMode(mode: String) { appContext.dataStore.edit { it[PreferencesKeys.THEME_MODE_KEY] = mode } }
     suspend fun saveCurrentVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.CURRENT_VAULT_ID] = id } }
+    suspend fun saveIsBiometricEnabled(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_BIOMETRIC_ENABLED] = enabled } }
 
     // Default Vault Persistence
     suspend fun saveDefaultVaultId(id: Int) { appContext.dataStore.edit { it[PreferencesKeys.DEFAULT_VAULT_ID] = id } }

@@ -3,7 +3,6 @@
 package com.swanie.portfolio.ui.features
 
 import android.app.Activity
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -27,6 +26,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.FragmentActivity
+import com.swanie.portfolio.security.SecurityManager
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
@@ -45,6 +47,7 @@ fun UnlockVaultScreen(
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
@@ -55,18 +58,17 @@ fun UnlockVaultScreen(
     val accentGold = Color(0xFFFFD700)
 
     val authState by authViewModel.authState.collectAsState()
-    val passwordHint by authViewModel.passwordHint.collectAsState()
-    val metadata by authViewModel.vaultMetadata.collectAsState()
-
-    var password by remember { mutableStateOf("") }
-    var isPasswordVisible by remember { mutableStateOf(false) }
-    var showHint by remember { mutableStateOf(false) }
 
     val shieldScale = remember { Animatable(0f) }
     val contentAlpha = remember { Animatable(0f) }
 
+    // --- 🛡️ TRIGGER BIOMETRICS ON ENTRY ---
     LaunchedEffect(Unit) {
-        delay(300)
+        delay(500)
+        (context as? FragmentActivity)?.let { activity ->
+            authViewModel.triggerBiometricUnlock(activity)
+        }
+        
         scope.launch {
             shieldScale.animateTo(1.1f, spring(Spring.DampingRatioMediumBouncy))
             shieldScale.animateTo(1f, spring())
@@ -74,11 +76,9 @@ fun UnlockVaultScreen(
         contentAlpha.animateTo(1f, tween(800))
     }
 
-    // --- 🛡️ THE SOVEREIGN BYPASS ---
-    // This logic ensures that if the Google Login is blocked (Testing mode)
-    // or returns an error, we force navigation to the main app anyway.
+    // --- 🛡️ NAVIGATION LOGIC ---
     LaunchedEffect(authState) {
-        if (authState is AuthViewModel.AuthState.Authenticated || authState is AuthViewModel.AuthState.Error) {
+        if (authState is AuthViewModel.AuthState.Authenticated) {
             navController.navigate(Routes.HOLDINGS) {
                 popUpTo(Routes.UNLOCK_VAULT) { inclusive = true }
             }
@@ -87,7 +87,7 @@ fun UnlockVaultScreen(
 
     val view = LocalView.current
     SideEffect {
-        val window = (view.context as? Activity)?.window ?: return@SideEffect
+        val window = (view.context as? FragmentActivity)?.window ?: (view.context as? Activity)?.window ?: return@SideEffect
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val isDark = ColorUtils.calculateLuminance(siteBg.toArgb()) < 0.5
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
@@ -99,7 +99,7 @@ fun UnlockVaultScreen(
         .statusBarsPadding()
         .imePadding()
     ) {
-        // --- 🏰 UNIVERSAL HEADER ---
+        // --- 🏰 HEADER ---
         Box(modifier = Modifier
             .fillMaxWidth()
             .height(100.dp)
@@ -144,148 +144,38 @@ fun UnlockVaultScreen(
                 letterSpacing = 2.sp
             )
             Text(
-                text = "ENTER PASSWORD TO DECRYPT",
+                text = "USE BIOMETRICS OR PIN",
                 color = siteText.copy(alpha = 0.5f),
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
             )
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(80.dp))
 
-            Text(
-                text = "Welcome back, ${metadata?.fullName ?: "User"}",
-                color = siteText,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(Modifier.height(32.dp))
-
-            val textFieldColors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = siteText,
-                unfocusedBorderColor = siteText.copy(0.2f),
-                focusedLabelColor = siteText,
-                unfocusedLabelColor = siteText.copy(0.4f),
-                cursorColor = siteText,
-                focusedTextColor = siteText,
-                unfocusedTextColor = siteText
-            )
-
-            OutlinedTextField(
-                value = password,
-                // 🛡️ SPACE-KILLER: Sanitizes input on every keystroke
-                onValueChange = {
-                    password = it.replace("\\s".toRegex(), "")
-                    if (authState is AuthViewModel.AuthState.Error) authViewModel.clearError()
-                },
-                label = { Text("PASSWORD", fontSize = 10.sp) },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                        Icon(
-                            if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            null,
-                            tint = siteText.copy(0.6f)
-                        )
-                    }
-                },
-                shape = RoundedCornerShape(12.dp),
-                colors = textFieldColors,
-                singleLine = true,
-                isError = authState is AuthViewModel.AuthState.Error
-            )
-
-            if (authState is AuthViewModel.AuthState.Error) {
-                Text(
-                    text = (authState as AuthViewModel.AuthState.Error).message,
-                    color = Color.Red,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(top = 4.dp, start = 4.dp).fillMaxWidth(),
-                    textAlign = TextAlign.Start
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // --- 💡 RECOVERY HINT LOGIC ---
-            if (!showHint) {
-                TextButton(onClick = { showHint = true }) {
-                    Text("FORGOT PASSWORD?", color = accentGold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(siteText.copy(alpha = 0.05f))
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Text("HINT:", color = accentGold, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                        Text(text = passwordHint.ifBlank { "No hint stored." }, color = siteText.copy(0.8f), fontSize = 13.sp)
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(40.dp))
-
-            // --- 🚀 UNLOCK BUTTON ---
+            // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
             Button(
-                onClick = { authViewModel.verifyAndUnlockVault(password) },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = password.length >= 8 && authState !is AuthViewModel.AuthState.Loading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = siteText,
-                    contentColor = siteBg,
-                    disabledContainerColor = siteText.copy(0.1f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                if (authState is AuthViewModel.AuthState.Loading) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = siteBg, strokeWidth = 2.dp)
-                } else {
-                    Icon(Icons.Default.LockOpen, null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = "UNLOCK VAULT",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 13.sp
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // --- 🚪 EMERGENCY DEBUG BYPASS (Manual fallback) ---
-            OutlinedButton(
                 onClick = {
-                    navController.navigate(Routes.HOLDINGS) {
-                        popUpTo(Routes.UNLOCK_VAULT) { inclusive = true }
+                    (context as? FragmentActivity)?.let { activity ->
+                        authViewModel.triggerBiometricUnlock(activity)
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
-                border = BorderStroke(1.dp, Color.Red.copy(0.4f)),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(Icons.Default.BugReport, null, tint = Color.Red, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "DEBUG BYPASS",
-                    color = Color.Red,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Black
-                )
+                Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(12.dp))
+                Text("RE-ATTEMPT BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
             }
+
+            Spacer(Modifier.height(24.dp))
 
             TextButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.padding(top = 16.dp)
+                onClick = { navController.popBackStack() }
             ) {
                 Text(
-                    text = "SWITCH ACCOUNT",
+                    text = "CANCEL",
                     color = siteText.copy(alpha = 0.4f),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold

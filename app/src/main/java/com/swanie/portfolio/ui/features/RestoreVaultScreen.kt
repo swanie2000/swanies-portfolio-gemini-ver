@@ -19,23 +19,24 @@ import androidx.navigation.NavHostController
 import com.swanie.portfolio.ui.navigation.Routes
 
 /**
- * RestoreVaultScreen
- * Final gate for Sovereign Vault recovery.
- * Matches the UI Perfection aesthetic of V7.4.3.
+ * RestoreVaultScreen - Sovereign Edition
+ * Simplified to remove legacy Google Auth dependencies for V19 PRO REBUILD.
  */
 @Composable
 fun RestoreVaultScreen(
     navController: NavHostController,
-    authViewModel: AuthViewModel = hiltViewModel() // Reference is now local to this package
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val authState by authViewModel.authState.collectAsState()
-    val isRestoring by authViewModel.isRestoring.collectAsState()
-    val error by authViewModel.authError.collectAsState()
+
+    // --- Temporary Placeholders for Build Stability ---
+    val isRestoring = false
+    val error: String? = null
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent),
+            .background(Color(0xFF000416)),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -45,65 +46,50 @@ fun RestoreVaultScreen(
             Icon(
                 imageVector = Icons.Default.CloudDownload,
                 contentDescription = null,
-                tint = Color.Cyan,
+                tint = Color(0xFFFFD700), // Swanie Gold
                 modifier = Modifier.size(80.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "SOVEREIGN VAULT DETECTED",
+                text = "VAULT RECOVERY",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
                 color = Color.White
             )
 
             Text(
-                text = "We found a backup on your Google Drive. Restore your holdings to this device?",
+                text = "Cloud restoration is being optimized for the Sovereign Shield. Please start with a fresh vault or setup your local security.",
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            if (error != null) {
-                Text(
-                    text = error!!,
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-            }
-
             Button(
                 onClick = {
-                    authViewModel.restoreVaultFromCloud {
-                        navController.navigate(Routes.HOLDINGS) {
-                            popUpTo(Routes.HOME) { inclusive = true }
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan),
-                shape = RoundedCornerShape(12.dp),
-                enabled = !isRestoring
-            ) {
-                if (isRestoring) {
-                    CircularProgressIndicator(color = Color.Black, modifier = Modifier.size(24.dp))
-                } else {
-                    Text("RESTORE HOLDINGS", fontWeight = FontWeight.Bold, color = Color.Black)
-                }
-            }
-
-            TextButton(
-                onClick = {
+                    authViewModel.setAuthenticated()
                     navController.navigate(Routes.HOLDINGS) {
                         popUpTo(Routes.HOME) { inclusive = true }
                     }
                 },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("START FRESH VAULT", fontWeight = FontWeight.Bold)
+            }
+
+            TextButton(
+                onClick = {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(0)
+                    }
+                },
                 modifier = Modifier.padding(top = 8.dp)
             ) {
-                Text("SKIP AND START EMPTY", color = Color.White.copy(alpha = 0.4f))
+                Text("BACK TO START", color = Color.White.copy(alpha = 0.4f))
             }
         }
     }

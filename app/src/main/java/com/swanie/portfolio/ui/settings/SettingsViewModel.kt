@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.*
+import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -35,9 +37,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    @ApplicationContext private val context: Context,
     private val themePreferences: ThemePreferences,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val securityManager: SecurityManager
 ) : ViewModel() {
 
     private val userConfigDao = database.userConfigDao()
@@ -46,6 +49,10 @@ class SettingsViewModel @Inject constructor(
 
     private val _isSaving = MutableStateFlow(false)
     val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
+
+    // 🎯 PRO PLACEHOLDER: State for subscription logic
+    private val _isProUser = MutableStateFlow(false)
+    val isProUser: StateFlow<Boolean> = _isProUser.asStateFlow()
 
     // 🎯 THE REGISTRY: Track the currently targeted vault for widget configuration
     private val _targetVaultId = MutableStateFlow<Int>(-1)
@@ -59,6 +66,9 @@ class SettingsViewModel @Inject constructor(
 
     val confirmDelete: StateFlow<Boolean> = themePreferences.confirmDelete
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val isBiometricEnabled: StateFlow<Boolean> = themePreferences.isBiometricEnabled
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
         .onEach { config ->
@@ -130,6 +140,41 @@ class SettingsViewModel @Inject constructor(
     fun saveConfirmDelete(enabled: Boolean) {
         viewModelScope.launch {
             themePreferences.saveConfirmDelete(enabled)
+        }
+    }
+
+    fun toggleBiometricLock(activity: FragmentActivity, enabled: Boolean, onError: (String) -> Unit) {
+        if (enabled) {
+            if (securityManager.canAuthenticate()) {
+                securityManager.authenticate(
+                    activity = activity,
+                    onSuccess = {
+                        viewModelScope.launch {
+                            themePreferences.saveIsBiometricEnabled(true)
+                        }
+                    },
+                    onError = onError
+                )
+            } else {
+                onError("Biometric authentication not available on this device.")
+            }
+        } else {
+            // If disabling, we still want a security check before turning it off
+            if (isBiometricEnabled.value) {
+                securityManager.authenticate(
+                    activity = activity,
+                    onSuccess = {
+                        viewModelScope.launch {
+                            themePreferences.saveIsBiometricEnabled(false)
+                        }
+                    },
+                    onError = onError
+                )
+            } else {
+                viewModelScope.launch {
+                    themePreferences.saveIsBiometricEnabled(false)
+                }
+            }
         }
     }
 
