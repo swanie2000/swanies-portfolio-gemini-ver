@@ -17,4 +17,5 @@ object Routes {
     const val ASSET_ARCHITECT = "asset_architect/{symbol}/{price}/{source}"
     const val PORTFOLIO_MANAGER = "portfolio_manager"
     const val TERMS_CONDITIONS = "terms_conditions" // ⚖️ New Route for Privacy Pledge
+    const val LEGACY_HOME = "legacy_home"
 }

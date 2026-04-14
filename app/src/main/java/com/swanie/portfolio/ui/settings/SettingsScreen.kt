@@ -231,6 +231,17 @@ fun SettingsScreen(
                         Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = { navController.navigate(Routes.LEGACY_HOME) },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta.copy(alpha = 0.2f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("DEBUG: VIEW ORIGINAL DESIGN", color = Color.Magenta, fontWeight = FontWeight.Black)
+                    }
+
                     Text(
                         text = "Wipe all assets, vaults, and settings to start fresh.",
                         color = safeText.copy(alpha = 0.4f),

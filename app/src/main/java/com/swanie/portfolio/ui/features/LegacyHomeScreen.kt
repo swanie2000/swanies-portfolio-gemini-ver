@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -31,8 +32,9 @@ import kotlinx.coroutines.delay
 import kotlin.math.min
 
 @Composable
-fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
+fun LegacyHomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
 
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
@@ -48,19 +50,22 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
-    var showSparkles by remember { mutableStateOf(false) }
+    var animateTwinkle by remember { mutableStateOf(false) }
 
     val radiusPercent by animateFloatAsState(targetValue = if (animationStarted) 1.5f else 0f, animationSpec = tween(1200), label = "")
+    val swanYOffset by animateDpAsState(targetValue = if (animationStarted) (-120).dp else (-600).dp, animationSpec = tween(1500, delayMillis = 200), finishedListener = { animateText = true; animateTwinkle = true }, label = "")
+    val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(1000, delayMillis = 200), label = "")
 
-    val swanYOffset by animateDpAsState(
-        targetValue = if (animationStarted) (-80).dp else (-600).dp,
-        animationSpec = tween(1500, delayMillis = 200),
-        finishedListener = {
-            animateText = true
-        },
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val twinkleAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
         label = ""
     )
-    val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(1000, delayMillis = 200), label = "")
 
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
@@ -71,15 +76,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         animationStarted = true
     }
 
-    LaunchedEffect(animateText) {
-        if (animateText) {
-            delay(1100)
-            showSparkles = true
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize().background(userThemeBgColor), contentAlignment = Alignment.Center) {
-
+    Box(modifier = Modifier.fillMaxSize().background(userThemeBgColor)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerPoint = Offset(size.width / 2f, size.height / 2f)
             val maxDim = size.width.coerceAtLeast(size.height)
@@ -96,65 +93,63 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             }
         }
 
-        Box(
-            modifier = Modifier
-                .size(logoSize)
-                .offset(y = swanYOffset)
-                .zIndex(2f),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.swanie_foreground),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize().graphicsLayer(alpha = alpha)
-            )
-
-            if (showSparkles) {
-                MetallicShimmer(
-                    delayMs = 0,
-                    modifier = Modifier
-                        .offset(x = (-113).dp, y = 53.dp)
-                        .zIndex(3f)
-                )
-
-                MetallicShimmer(
-                    delayMs = 500,
-                    modifier = Modifier
-                        .offset(x = 50.dp, y = (-55).dp)
-                        .zIndex(3f)
-                )
-            }
+        Box(modifier = Modifier.align(Alignment.Center).offset(y = swanYOffset).zIndex(1f), contentAlignment = Alignment.Center) {
+            Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(logoSize).graphicsLayer(alpha = alpha))
         }
 
-        AnimatedVisibility(
-            visible = animateText,
-            enter = fadeIn(tween(800, 100)),
-            modifier = Modifier
-                .align(Alignment.Center)
-                .offset(y = (logoSize / 2) - 125.dp)
-                .zIndex(1f)
-        ) {
+        // --- ✨ THE TWINKLES (RESTORED MONTH-OLD STYLE) ---
+        if (animateTwinkle) {
+            // Twinkle 1: Hits the 'S' in Swanie's
+            Spacer(
+                modifier = Modifier
+                    .size(18.dp)
+                    .align(Alignment.Center)
+                    .offset(x = (-105).dp, y = 55.dp) 
+                    .graphicsLayer(alpha = twinkleAlpha)
+                    .drawBehind {
+                        drawCircle(
+                            brush = Brush.radialGradient(listOf(Color.White, Color.Transparent)),
+                            radius = size.minDimension / 2
+                        )
+                    }
+            )
+            // Twinkle 2: Hits the Swan's Head
+            Spacer(
+                modifier = Modifier
+                    .size(15.dp)
+                    .align(Alignment.Center)
+                    .offset(x = 12.dp, y = swanYOffset - 72.dp)
+                    .graphicsLayer(alpha = twinkleAlpha)
+                    .drawBehind {
+                        drawCircle(
+                            brush = Brush.radialGradient(listOf(Color.White, Color.Transparent)),
+                            radius = size.minDimension / 2
+                        )
+                    }
+            )
+        }
+
+        // --- 🖋️ THE BRANDING (RESTORED MONTH-OLD STYLE) ---
+        AnimatedVisibility(visible = animateText, enter = fadeIn(tween(800, 100)), modifier = Modifier.align(Alignment.Center).offset(y = 60.dp)) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Swanie's Portfolio",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White,
+                    text = "Swanie's Portfolio", 
+                    style = MaterialTheme.typography.headlineLarge, 
+                    color = Color.White, 
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Crypto & Precious Metals",
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = "Crypto & Precious Metals", 
+                    style = MaterialTheme.typography.bodyLarge, 
                     color = Color.LightGray.copy(alpha = 0.8f)
                 )
             }
         }
 
+        // --- 🚀 THE RITUAL BUTTONS ---
         AnimatedVisibility(
             visible = animateText,
-            enter = fadeIn(tween(1000, 1800)) + slideInVertically(
-                initialOffsetY = { it / 2 },
-                animationSpec = tween(1000, 1800)
-            ),
+            enter = fadeIn(tween(800, 400)) + slideInVertically(initialOffsetY = { it / 2 }),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -164,53 +159,15 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     colors = ButtonDefaults.buttonColors(containerColor = userThemeTextColor, contentColor = userThemeBgColor),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("LOGIN", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                    Text("LOGIN TO VAULT", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 }
 
-                Spacer(modifier = Modifier.height(40.dp)) // Increased spacing for more breathing room
+                Spacer(modifier = Modifier.height(16.dp))
 
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
-                    Text("CREATE ACCOUNT", color = userThemeTextColor.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    Text("CREATE NEW ACCOUNT", color = userThemeTextColor.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 }
             }
         }
     }
-}
-
-@Composable
-private fun MetallicShimmer(delayMs: Int, modifier: Modifier = Modifier) {
-    var scaleState by remember { mutableStateOf(0f) }
-    var rotationState by remember { mutableStateOf(45f) }
-
-    val scale by animateFloatAsState(
-        targetValue = scaleState,
-        animationSpec = tween(300, easing = LinearOutSlowInEasing),
-        label = "SparkleScale"
-    )
-
-    val rotation by animateFloatAsState(
-        targetValue = rotationState,
-        animationSpec = tween(600),
-        label = "SparkleRotation"
-    )
-
-    LaunchedEffect(Unit) {
-        delay(delayMs.toLong())
-        scaleState = 1f
-        rotationState = 135f
-        delay(400)
-        scaleState = 0f
-    }
-
-    Box(
-        modifier = modifier
-            .size(6.dp)
-            .graphicsLayer(
-                scaleX = scale,
-                scaleY = scale,
-                rotationZ = rotation,
-                alpha = scale
-            )
-            .background(Color.White)
-    )
 }
