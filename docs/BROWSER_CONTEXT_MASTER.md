@@ -176,61 +176,64 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V20: KINETIC REBIRTH)
 🎯 THE CORE MISSION
 
-To transition "Swanie’s Portfolio" from a development prototype into a commercial-grade, subscription-ready financial vault. The mission prioritizes zero-liability architecture (User-Owned Vaults), hardware-level security (Biometrics), and global scalability (Multi-language).
+To transition "Swanie’s Portfolio" into a commercial-grade financial vault. The mission prioritizes user-owned data (Zero-Liability), hardware-level biometrics, and a professional, "Cinematic" user experience.
 🛡️ 1. ARCHITECTURAL RECAP (THE KINETIC RESTORATION)
 
-    Visual Logic: Successfully restored the "Cinematic Build" sequence. The Home Screen now features the staggered arrival of the Swan, the Branding reveal, and the precision "one-two" twinkle flash (Bottom at 300ms, Top at 800ms).
+    Visual Logic: Restored the staggered Swan arrival and the precision "one-two" sparkle flash. All coordinates (Head at 50x, -55y; "S" at -113x, 53y) are verified.
 
-    The Front Door: Rebuilt the CreateAccountScreen to include the full security suite: Email validation, Password complexity rules (Upper/Number/Special), space-purging logic, and the Recovery Hint field.
+    UI Parity: Synchronized the Home Screen and Create Account flows. The "LOGIN" and "CREATE ACCOUNT" buttons now share a unified design language.
 
-    UI Parity: Synchronized the Home Screen button spacing and labels ("LOGIN" / "CREATE ACCOUNT") with the Create Account flow for a seamless user experience.
+    Clean Slate: Successfully purged all legacy OAuth configurations and unresolved Google references, reaching a "Working Tree: Clean" status.
 
-📉 2. TODAY’S BATTLE REPORT (THE UI RECLAMATION)
+📉 2. TODAY’S BATTLE REPORT (THE FRONT DOOR SECURITY)
 
-    The Conflict: After a "clean slate" rebuild, the UI had lost its precision and felt "crowded" or "messy."
+    The Conflict: The biometric security was initially obstructing the cinematic Home Screen animation, triggering a "Sovereign" branded popup immediately after the Splash Screen.
 
-    The Decision: Manually nudged UI elements (Star coordinates: Head at 50x, -55y; "S" at -113x, 53y) to match the user's "Gold Master" memory.
+    The Solution: Moved the security gate. The app now flows from Splash → Home Animation. Security is only triggered by the "LOGIN" button or when the app is locked.
 
-    The Result: A stabilized, professional-looking interface that feels "Alive." All "ghost" OAuth configurations remain purged. Working Tree: Clean.
+    The UI Refinement: Stripped redundant "Sovereign" verbiage from the biometric popup to stop it from appearing twice. Adjusted the PromptInfo text height to ensure the "RE-ATTEMPT" button is properly masked by the OS bottom sheet.
+
+    The Result: The "Front Door" is functional but silent until called. The visual animation remains the star of the show.
 
 🚀 3. THE FUTURE PATH (THE PRO ROADMAP)
 Task	Description	Priority
-Front Door	Implement BiometricPrompt (Finger/Face) for "Lock on Startup" security.	IMMEDIATE
-Silent Vault	Re-implement Google Drive sync using the App Data Folder API (Silent, User-Owned).	HIGH
-The Bridge	Integrate RevenueCat SDK to handle Play Store billing and Pro license verification.	MEDIUM
-Global Ready	Move remaining hardcoded strings to strings.xml for Multi-language support.	PENDING
+Biometric Icon	Create ic_vault_auth.xml with insets to fix the zoomed-in/clipped Swan icon in the popup.	IMMEDIATE
+Silent Vault	Re-implement Google Drive sync using the App Data Folder API (User-Owned).	HIGH
+The Bridge	Integrate RevenueCat SDK for subscription logic and Pro features.	MEDIUM
+Global Ready	Migrate hardcoded strings to strings.xml for multi-language support.	PENDING
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE NEXT AGENT)
 
-    LOCK THE LOOK: The Home Screen animation timings and Sparkle coordinates are now LOCKED. Do not change them unless explicitly requested.
+    LOCK THE LOOK: Do not move the Swan or Sparkles. They are positioned exactly to the user's memory.
 
-    COMMERCIAL MINDSET: All code must be written with "Subscription" logic in mind (Pro vs. Basic features).
+    POPUP VERBIAGE: Keep the SecurityManager title and subtitle simplified but long enough to cover the underlying UI buttons.
 
-    ZERO LIABILITY: Data must remain in the user's private Google Drive "App Data" folder. No Firebase/Firestore hosting.
+    NO GHOST POPUPS: Ensure AuthViewModel and MainActivity do not trigger biometrics during the initial Home Screen animation.
 
-    FULL FILE OUTPUTS: No partial snippets. Provide full files to ensure the "Working Tree Clean" status remains intact.
+    FULL FILE OUTPUTS: Provide complete files only to maintain the integrity of the project.
 
 🚀 Next Agent Command
 
-"I have updated the narrative to V20: KINETIC REBIRTH. The Home and Create Account screens are verified and locked. Task 1: Implement the 'Front Door.' Create SecurityManager.kt using androidx.biometric:biometric to handle Fingerprint/Face ID. Task 2: Update SettingsViewModel.kt to include an isBiometricEnabled toggle. Task 3: Prepare the UI to lock the app on startup if the biometric toggle is active. Provide full files only. Confirm 'KEEP ALL'."
+"The narrative is updated to V20: KINETIC REBIRTH. The Home Screen animation is clear, and the 'Front Door' logic is moved to the Login action. Task 1: Resolve the biometric icon clipping issue using an inset drawable (ic_vault_auth.xml). Task 2: Begin the transition to the Google Drive 'App Data' folder for silent sync. Provide full files only. Confirm 'KEEP ALL'."
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 04/13/2026 20:35:49.26
+Generated: Mon 04/13/2026 22:02:24.70
 
 Branch:
 main
 Commit:
-db6f32508738f83ccf375efab364c5cd450a204c
+16a4021c478cd0832c1be707998f3a145e375ac8
 Working tree status (git status --porcelain):
+ M app/src/main/java/com/swanie/portfolio/MainActivity.kt
+ M app/src/main/java/com/swanie/portfolio/MainViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/security/SecurityManager.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt
  M app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
-A  app/src/main/java/com/swanie/portfolio/ui/features/LegacyHomeScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
  M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------

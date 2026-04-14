@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -86,11 +87,10 @@ fun SettingsScreen(
         )
     }
 
-    // 🛡️ SURGERY: Replacing Scaffold with Box. Local BottomBar removed.
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent) // Respects global gradient
+            .background(Color.Transparent)
     ) {
         if (!isExiting) {
             Column(
@@ -109,13 +109,13 @@ fun SettingsScreen(
 
                     SettingsToggleItem(
                         title = "Sovereign Vault Lock",
-                        subtitle = "Require fingerprint to access assets.",
+                        subtitle = "Require biometric authentication on startup.",
                         checked = isBiometricEnabled,
                         onCheckedChange = { enabled ->
                             val activity = context as? FragmentActivity
                             if (activity != null) {
                                 settingsViewModel.toggleBiometricLock(activity, enabled) { error ->
-                                    // Error handling can be added here (e.g., Toast)
+                                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
@@ -242,14 +242,6 @@ fun SettingsScreen(
                         Text("DEBUG: VIEW ORIGINAL DESIGN", color = Color.Magenta, fontWeight = FontWeight.Black)
                     }
 
-                    Text(
-                        text = "Wipe all assets, vaults, and settings to start fresh.",
-                        color = safeText.copy(alpha = 0.4f),
-                        fontSize = 11.sp,
-                        modifier = Modifier.padding(top = 8.dp, start = 4.dp)
-                    )
-
-                    // 🛡️ Added Bottom Spacer to clear global BottomBar
                     Spacer(modifier = Modifier.height(120.dp))
                 }
             }
@@ -270,13 +262,14 @@ fun SettingsToggleItem(title: String, subtitle: String, checked: Boolean, onChec
             Text(text = title, color = themeColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Text(text = subtitle, color = themeColor.copy(alpha = 0.6f), fontSize = 14.sp)
         }
-        Checkbox(
+        Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = themeColor,
-                uncheckedColor = themeColor.copy(alpha = 0.3f),
-                checkmarkColor = Color.Black
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.Yellow,
+                checkedTrackColor = Color.Yellow.copy(alpha = 0.5f),
+                uncheckedThumbColor = themeColor.copy(alpha = 0.4f),
+                uncheckedTrackColor = themeColor.copy(alpha = 0.1f)
             )
         )
     }

@@ -76,8 +76,9 @@ fun CreateAccountScreen(
 
     LaunchedEffect(authState) {
         if (authState is AuthViewModel.AuthState.Authenticated) {
+            // 🚀 JUMP TO HOLDINGS: Clear backstack so setup form is unreachable
             navController.navigate(Routes.HOLDINGS) {
-                popUpTo(Routes.CREATE_ACCOUNT) { inclusive = true }
+                popUpTo(Routes.HOME) { inclusive = true }
             }
         }
     }
@@ -161,8 +162,9 @@ fun CreateAccountScreen(
             Spacer(Modifier.height(32.dp))
             Button(
                 onClick = {
-                    // This actually triggers the real account creation logic
-                    authViewModel.setAuthenticated()
+                    // 🏛️ SOVEREIGN INITIALIZATION: Provision the vault and navigate
+                    val vaultName = if (fullName.isNotBlank()) "$fullName's Vault" else "Sovereign Vault"
+                    authViewModel.initializeNewVault(vaultName)
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = isFormValid,

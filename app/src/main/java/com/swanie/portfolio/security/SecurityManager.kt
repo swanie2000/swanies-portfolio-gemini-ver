@@ -15,13 +15,13 @@ class SecurityManager @Inject constructor(
 ) {
     fun canAuthenticate(): Boolean {
         val biometricManager = BiometricManager.from(context)
-        val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or 
-                           BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
         return biometricManager.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
     fun authenticate(activity: FragmentActivity, onSuccess: () -> Unit, onError: (String) -> Unit) {
-        val executor = ContextCompat.getMainExecutor(context)
+        val executor = ContextCompat.getMainExecutor(activity)
         val biometricPrompt = BiometricPrompt(activity, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -32,14 +32,19 @@ class SecurityManager @Inject constructor(
                     super.onAuthenticationError(errorCode, errString)
                     onError(errString.toString())
                 }
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                }
             })
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Sovereign Vault Access")
-            .setSubtitle("Authenticate to unlock your portfolio")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or 
-                                     BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+            // 🖋️ Added back specific verbiage to increase popup height
+            .setTitle("UNLOCK")
+            .setSubtitle("To Confirm your identity, Please")
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()
+
         biometricPrompt.authenticate(promptInfo)
     }
 }
