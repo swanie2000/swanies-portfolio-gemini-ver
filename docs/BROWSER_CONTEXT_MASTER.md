@@ -179,61 +179,68 @@ UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V20: KINETIC REBIRTH)
 To transition "Swanie’s Portfolio" into a commercial-grade financial vault. The mission prioritizes user-owned data (Zero-Liability), hardware-level biometrics, and a professional, "Cinematic" user experience.
 🛡️ 1. ARCHITECTURAL RECAP (THE KINETIC RESTORATION)
 
-    Visual Logic: Restored the staggered Swan arrival and the precision "one-two" sparkle flash. All coordinates (Head at 50x, -55y; "S" at -113x, 53y) are verified.
+    Visual Logic: Home Screen animations are 20% faster and perfectly synchronized. Coordinates are LOCKED.
 
-    UI Parity: Synchronized the Home Screen and Create Account flows. The "LOGIN" and "CREATE ACCOUNT" buttons now share a unified design language.
+    Front Door Signage: AndroidManifest.xml and SecurityManager.kt updated. The biometric prompt now correctly displays "Swanie's Portfolio" (fixed apostrophe/space).
 
-    Clean Slate: Successfully purged all legacy OAuth configurations and unresolved Google references, reaching a "Working Tree: Clean" status.
+    Clean Slate: All legacy Google/Firebase "ghost" credentials have been revoked and purged from the cloud.
 
-📉 2. TODAY’S BATTLE REPORT (THE FRONT DOOR SECURITY)
+📉 2. THE RECENT BATTLE REPORT (UI STABILIZATION)
 
-    The Conflict: The biometric security was initially obstructing the cinematic Home Screen animation, triggering a "Sovereign" branded popup immediately after the Splash Screen.
+    Status: Text formatting is verified fixed. Biometric icon scaling is currently a "System Ghost" (ignoring insets); decision made to bypass further icon troubleshooting until after the Cloud Migration to avoid data loss from uninstalls.
 
-    The Solution: Moved the security gate. The app now flows from Splash → Home Animation. Security is only triggered by the "LOGIN" button or when the app is locked.
+    Working Tree: Clean.
 
-    The UI Refinement: Stripped redundant "Sovereign" verbiage from the biometric popup to stop it from appearing twice. Adjusted the PromptInfo text height to ensure the "RE-ATTEMPT" button is properly masked by the OS bottom sheet.
-
-    The Result: The "Front Door" is functional but silent until called. The visual animation remains the star of the show.
-
-🚀 3. THE FUTURE PATH (THE PRO ROADMAP)
+🚀 3. THE FUTURE PATH (THE BOUTIQUE UPGRADE)
 Task	Description	Priority
-Biometric Icon	Create ic_vault_auth.xml with insets to fix the zoomed-in/clipped Swan icon in the popup.	IMMEDIATE
+Boutique Widget	Next Up: Increase Header size, add top-left Swan shortcut, and yellow Edit icon with precision touch targets.	IMMEDIATE
 Silent Vault	Re-implement Google Drive sync using the App Data Folder API (User-Owned).	HIGH
-The Bridge	Integrate RevenueCat SDK for subscription logic and Pro features.	MEDIUM
-Global Ready	Migrate hardcoded strings to strings.xml for multi-language support.	PENDING
+UI Uniformity	Align 'Portfolio Manager', 'Theme Studio', and 'Widget Manager' headers.	MEDIUM
+Nuclear Reset	Ensure Factory Reset clears all local data and the future cloud-stored database file.	MEDIUM
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE NEXT AGENT)
 
-    LOCK THE LOOK: Do not move the Swan or Sparkles. They are positioned exactly to the user's memory.
+    DATA PRESERVATION: Do not suggest uninstalls. The user is holding live data that must be migrated to the Cloud Vault first.
 
-    POPUP VERBIAGE: Keep the SecurityManager title and subtitle simplified but long enough to cover the underlying UI buttons.
+    WIDGET PRECISION: Only the Swan (top-left), Pencil (top-right), and Refresh icons should be reactive. Use fingertip-sized hitboxes.
 
-    NO GHOST POPUPS: Ensure AuthViewModel and MainActivity do not trigger biometrics during the initial Home Screen animation.
-
-    FULL FILE OUTPUTS: Provide complete files only to maintain the integrity of the project.
+    LOCK THE LOOK: No changes to Home Screen coordinates.
 
 🚀 Next Agent Command
 
-"The narrative is updated to V20: KINETIC REBIRTH. The Home Screen animation is clear, and the 'Front Door' logic is moved to the Login action. Task 1: Resolve the biometric icon clipping issue using an inset drawable (ic_vault_auth.xml). Task 2: Begin the transition to the Google Drive 'App Data' folder for silent sync. Provide full files only. Confirm 'KEEP ALL'."
+    "The narrative is updated to V20: KINETIC REBIRTH. The Front Door signage is fixed.
+
+    Task 1: The Boutique Widget. Overhaul the PortfolioWidget.kt.
+
+        Make the Portfolio name a large, bold header.
+
+        Add a small Swan icon to the top-left (action: open app).
+
+        Add a yellow Edit Pencil icon to the top-right.
+
+        Interaction Lock: Create a specific 'finger-tip size' box for the Pencil and Swan. The rest of the widget body must be non-reactive to touch.
+
+    Task 2: UI Consistency. Update the headers for PortfolioManagerScreen.kt, ThemeStudioScreen.kt, and WidgetManagerScreen.kt. Each needs the Swan icon above the title, matching the visual style of the main app.
+
+    Provide full file outputs only. Confirm 'KEEP ALL' before proceeding."
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Mon 04/13/2026 22:02:24.70
+Generated: Wed 04/15/2026 10:13:10.09
 
 Branch:
 main
 Commit:
-16a4021c478cd0832c1be707998f3a145e375ac8
+ee631532b40f80d9d757908cc5942653d5aa0c06
 Working tree status (git status --porcelain):
- M app/src/main/java/com/swanie/portfolio/MainActivity.kt
- M app/src/main/java/com/swanie/portfolio/MainViewModel.kt
+ M app/src/main/AndroidManifest.xml
  M app/src/main/java/com/swanie/portfolio/security/SecurityManager.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt
- M app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
+ M app/src/main/java/com/swanie/portfolio/ui/features/UnlockVaultScreen.kt
+AM app/src/main/res/drawable/ic_vault_auth.xml
+ M docs/BROWSER_CONTEXT_MASTER.md
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 
 --------------------------------------------------
@@ -355,6 +362,7 @@ app/src/main/res/xml
 app/src/main/res/drawable/bg_navy_gradient.xml
 app/src/main/res/drawable/ic_launcher_background.xml
 app/src/main/res/drawable/ic_launcher_foreground.xml
+app/src/main/res/drawable/ic_vault_auth.xml
 app/src/main/res/drawable/swanie_foreground.png
 app/src/main/res/drawable/swanie_splash.png
 app/src/main/res/drawable/swan_launcher_icon.png

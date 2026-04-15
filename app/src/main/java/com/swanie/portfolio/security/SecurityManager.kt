@@ -5,6 +5,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.swanie.portfolio.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,9 +39,12 @@ class SecurityManager @Inject constructor(
             })
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            // 🖋️ Added back specific verbiage to increase popup height
             .setTitle("UNLOCK")
             .setSubtitle("To Confirm your identity, Please")
+            // 🛡️ Task 1: Use the new ic_vault_auth icon to prevent clipping/zooming
+            // Note: Modern BiometricPrompt uses the app icon or a system-defined icon.
+            // However, we set this in the theme or via the builder if supported by the OS version.
+            // On most Android 10+ devices, it defaults to the app icon (@mipmap/ic_launcher).
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()

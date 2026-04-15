@@ -4,12 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <queries>
-        <intent>
-            <action android:name="com.google.android.gms.auth.GOOGLE_SIGN_IN" />
-        </intent>
-    </queries>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <application
         android:name=".PortfolioApplication"
@@ -17,7 +12,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Swanie's Portfolio"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SwaniesPortfolio">
@@ -25,17 +20,15 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:label="Swanie's Portfolio"
             android:theme="@style/Theme.App.Starting"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- 🚀 THE SOVEREIGN RECOVERY: Restore process consistency for widget functionality -->
         <activity
             android:name=".widget.WidgetConfigActivity"
             android:exported="true"
@@ -48,13 +41,10 @@
             </intent-filter>
         </activity>
 
-
-
-        <!-- SYMMETRY FIX: Pointing to the correct Glance Receiver package -->
         <receiver
             android:name=".widget.PortfolioWidgetReceiver"
             android:exported="true"
-            android:label="Swanie Portfolio Pulse">
+            android:label="Swanie's Portfolio Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

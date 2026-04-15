@@ -50,30 +50,36 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkles by remember { mutableStateOf(false) }
 
-    val radiusPercent by animateFloatAsState(targetValue = if (animationStarted) 1.5f else 0f, animationSpec = tween(1200), label = "")
+    // ⚡ SNAPPY REVEAL: 1200ms -> 960ms (20% reduction)
+    val radiusPercent by animateFloatAsState(targetValue = if (animationStarted) 1.5f else 0f, animationSpec = tween(960), label = "")
 
+    // ⚡ SNAPPY REVEAL: 1500ms -> 1200ms, delay 200ms -> 160ms (20% reduction)
     val swanYOffset by animateDpAsState(
         targetValue = if (animationStarted) (-80).dp else (-600).dp,
-        animationSpec = tween(1500, delayMillis = 200),
+        animationSpec = tween(1200, delayMillis = 160),
         finishedListener = {
             animateText = true
         },
         label = ""
     )
-    val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(1000, delayMillis = 200), label = "")
+    
+    // ⚡ SNAPPY REVEAL: 1000ms -> 800ms, delay 200ms -> 160ms (20% reduction)
+    val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(800, delayMillis = 160), label = "")
 
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.7f).dp
 
     LaunchedEffect(Unit) {
-        delay(300)
+        // ⚡ SNAPPY REVEAL: Initial delay 300ms -> 240ms (20% reduction)
+        delay(240)
         animationStarted = true
     }
 
     LaunchedEffect(animateText) {
         if (animateText) {
-            delay(1100)
+            // ⚡ SNAPPY REVEAL: Sparkle delay 1100ms -> 880ms (20% reduction)
+            delay(880)
             showSparkles = true
         }
     }
@@ -117,8 +123,9 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         .zIndex(3f)
                 )
 
+                // ⚡ SNAPPY REVEAL: Stagger 500ms -> 400ms (20% reduction)
                 MetallicShimmer(
-                    delayMs = 500,
+                    delayMs = 400,
                     modifier = Modifier
                         .offset(x = 50.dp, y = (-55).dp)
                         .zIndex(3f)
@@ -128,7 +135,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
         AnimatedVisibility(
             visible = animateText,
-            enter = fadeIn(tween(800, 100)),
+            enter = fadeIn(tween(640, 80)), // ⚡ SNAPPY REVEAL: 800, 100 -> 640, 80
             modifier = Modifier
                 .align(Alignment.Center)
                 .offset(y = (logoSize / 2) - 125.dp)
@@ -151,9 +158,9 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
         AnimatedVisibility(
             visible = animateText,
-            enter = fadeIn(tween(1000, 1800)) + slideInVertically(
+            enter = fadeIn(tween(800, 1600)) + slideInVertically(
                 initialOffsetY = { it / 2 },
-                animationSpec = tween(1000, 1800)
+                animationSpec = tween(800, 1600) // ⚡ SNAPPY REVEAL: 2000ms -> 1600ms as requested
             ),
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 80.dp)
         ) {
@@ -167,7 +174,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     Text("LOGIN", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 }
 
-                Spacer(modifier = Modifier.height(40.dp)) // Increased spacing for more breathing room
+                Spacer(modifier = Modifier.height(40.dp))
 
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
                     Text("CREATE ACCOUNT", color = userThemeTextColor.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -184,13 +191,13 @@ private fun MetallicShimmer(delayMs: Int, modifier: Modifier = Modifier) {
 
     val scale by animateFloatAsState(
         targetValue = scaleState,
-        animationSpec = tween(300, easing = LinearOutSlowInEasing),
+        animationSpec = tween(240, easing = LinearOutSlowInEasing), // ⚡ SNAPPY REVEAL: 300 -> 240
         label = "SparkleScale"
     )
 
     val rotation by animateFloatAsState(
         targetValue = rotationState,
-        animationSpec = tween(600),
+        animationSpec = tween(480), // ⚡ SNAPPY REVEAL: 600 -> 480
         label = "SparkleRotation"
     )
 
@@ -198,7 +205,7 @@ private fun MetallicShimmer(delayMs: Int, modifier: Modifier = Modifier) {
         delay(delayMs.toLong())
         scaleState = 1f
         rotationState = 135f
-        delay(400)
+        delay(320) // ⚡ SNAPPY REVEAL: 400 -> 320
         scaleState = 0f
     }
 

@@ -21,8 +21,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -134,7 +132,8 @@ fun UnlockVaultScreen(
                 .graphicsLayer { alpha = contentAlpha.value },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(120.dp))
+            // 🛡️ Task 3: Adjusted spacer to ensure content is visible behind/below OS prompt
+            Spacer(modifier = Modifier.height(140.dp))
 
             Text(
                 text = "VAULT LOCKED",
@@ -151,7 +150,8 @@ fun UnlockVaultScreen(
                 letterSpacing = 2.sp
             )
 
-            Spacer(Modifier.height(80.dp))
+            // 🛡️ Task 3: Adjusted spacer to push the button lower
+            Spacer(Modifier.height(120.dp))
 
             // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
             Button(
@@ -166,7 +166,8 @@ fun UnlockVaultScreen(
             ) {
                 Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
                 Spacer(Modifier.width(12.dp))
-                Text("RE-ATTEMPT BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                // 🛡️ Task 3: Renamed to "RETRY BIOMETRICS" for clarity
+                Text("RETRY BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
             }
 
             Spacer(Modifier.height(24.dp))
