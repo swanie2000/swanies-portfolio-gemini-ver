@@ -1,3 +1,13 @@
+# --- GOOGLE SERVICES & SECRETS (EMERGENCY SHIELD) ---
+app/google-services.json
+app/src/debug/google-services.json
+app/src/release/google-services.json
+*.jks
+*.keystore
+local.properties
+secrets.xml
+
+# --- ANDROID STUDIO & BUILD ---
 *.iml
 .gradle
 /local.properties
@@ -6,10 +16,21 @@
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/assetWizard.settings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+/app/build
+
+# --- KOTLIN & OTHER ---
+.kotlin
+bin/
+gen/
+
+# --- LOGS & MISC ---
+*.log
+captures/
+.externalNativeBuild/
+.cxx/
