@@ -9,6 +9,7 @@ import com.swanie.portfolio.data.local.UserConfigDao
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.util.Locale
 import kotlin.math.abs
 
@@ -23,10 +24,6 @@ class AssetRepository @Inject constructor(
 
     fun getAssetsForPortfolio(portfolioId: String) = assetDao.getAssetsByPortfolio(portfolioId)
 
-    /**
-     * Phase 1: Data Sanitization Utility (V18 - Precision Force)
-     * Now leverages explicit weightUnit for perfect labels.
-     */
     private fun cleanMetalName(rawName: String, symbol: String, weight: Double, unit: String): String {
         val upperSymbol = symbol.uppercase(Locale.ROOT)
         val upperName = rawName.uppercase(Locale.ROOT)
@@ -39,7 +36,6 @@ class AssetRepository @Inject constructor(
             else -> symbol.replace("=F", "")
         }
 
-        // 🛠️ V18: TRUST EXPLICIT UNIT FIRST
         val unitLabel = when (unit.uppercase(Locale.ROOT)) {
             "KILO" -> "(1kg)"
             "GRAM" -> "(1g)"
@@ -81,7 +77,6 @@ class AssetRepository @Inject constructor(
                     }?.let { update ->
                         val isMetal = existing.category == AssetCategory.METAL
 
-                        // 🛠️ V18: High-precision label refresh
                         val finalDisplayName = if (isMetal) {
                             cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight, existing.weightUnit)
                         } else {
@@ -112,27 +107,23 @@ class AssetRepository @Inject constructor(
 
     suspend fun upsertAsset(asset: AssetEntity) {
         val isMetal = asset.category == AssetCategory.METAL
-        // 🛠️ V18: FORCE SANITIZATION ON EVERY UPSERT
         val finalDisplayName = if (isMetal) {
             cleanMetalName(asset.name, asset.symbol, asset.weight, asset.weightUnit)
         } else {
             asset.name
         }
 
-        // 🛡️ V18: SCHEMA HARDENING - Sanitize the physicalForm string
         val finalForm = if (asset.physicalForm.contains("Bar", true)) "Bar" else asset.physicalForm
 
         val sanitizedAsset = asset.copy(
             displayName = finalDisplayName,
             isMetal = isMetal,
-            // 🛡️ V18: Saving the sanitized form
             physicalForm = finalForm,
             portfolioId = if (asset.portfolioId.isEmpty()) "MAIN" else asset.portfolioId
         )
         assetDao.upsertAsset(sanitizedAsset)
     }
 
-    // --- Helpers (No changes) ---
     suspend fun healMetadata(asset: AssetEntity): AssetEntity {
         if (asset.priceSource == "CoinGecko" || asset.category == AssetCategory.METAL) return asset
         return try {
@@ -185,5 +176,30 @@ class AssetRepository @Inject constructor(
 
     suspend fun refreshMarketWatch() {
         refreshAssets(force = false)
+    }
+
+    // 🌐 WIDGET BRIDGE: Pushes raw Spot Price AND Holding data
+    suspend fun pushAssetsToWidget(context: android.content.Context, portfolioId: String) {
+        try {
+            val assets = assetDao.getAssetsByPortfolio(portfolioId).first()
+            val assetsData = assets.take(5).joinToString("||") { asset ->
+                // 🛡️ THE PIPE: Sending 8 parts including weight and amountHeld
+                "${asset.coinId}|${asset.symbol}|${asset.displayName}|${asset.imageUrl}|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}"
+            }
+
+            val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(com.swanie.portfolio.widget.PortfolioWidget::class.java)
+
+            glanceIds.forEach { id ->
+                androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, id) { prefs ->
+                    prefs.toMutablePreferences().apply {
+                        this[com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY] = assetsData
+                    }.toPreferences()
+                }
+                com.swanie.portfolio.widget.PortfolioWidget().update(context, id)
+            }
+        } catch (e: Exception) {
+            Log.e("SWANIE_WIDGET", "Push failed", e)
+        }
     }
 }

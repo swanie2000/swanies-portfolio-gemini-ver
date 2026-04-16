@@ -33,41 +33,42 @@ class WidgetSyncWorker(
 
     override suspend fun doWork(): Result {
         Log.d("SWANIE_TRACE", "8. Worker waking up for Multi-Instance Sync")
-        
+
         return try {
             val entryPoint = EntryPointAccessors.fromApplication(context, WidgetWorkerEntryPoint::class.java)
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(PortfolioWidget::class.java)
-            
+
             val refreshedVaultIds = mutableSetOf<Int>()
 
-            // 🛡️ COLD START: Check for a specific vault forced via inputData (e.g., from ConfigActivity)
             val forcedVaultId = inputData.getInt("force_vault_id", 0)
             if (forcedVaultId != 0) {
                 Log.d("SWANIE_TRACE", "Forcing targeted sync for Vault ID: $forcedVaultId")
                 entryPoint.assetRepository().refreshAssets(force = true, portfolioId = forcedVaultId.toString())
+                // 🚀 Push data after refresh
+                entryPoint.assetRepository().pushAssetsToWidget(context, forcedVaultId.toString())
                 refreshedVaultIds.add(forcedVaultId)
             }
 
             glanceIds.forEach { id ->
                 val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, id)
                 val boundVaultId = prefs[PortfolioWidget.VAULT_ID_KEY]
-                
                 val vaultIdToRefresh = boundVaultId ?: entryPoint.themePreferences().defaultVaultId.first()
-                
+
                 if (!refreshedVaultIds.contains(vaultIdToRefresh)) {
                     Log.d("SWANIE_TRACE", "Refreshing Bound Vault ID: $vaultIdToRefresh")
                     entryPoint.assetRepository().refreshAssets(force = true, portfolioId = vaultIdToRefresh.toString())
+                    // 🚀 Push data after refresh
+                    entryPoint.assetRepository().pushAssetsToWidget(context, vaultIdToRefresh.toString())
                     refreshedVaultIds.add(vaultIdToRefresh)
                 }
-                
+
                 PortfolioWidget().update(context, id)
             }
 
-            // Legacy broadcast to ensure OS wakes up
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, PortfolioWidgetReceiver::class.java))
-            
+
             if (ids != null && ids.isNotEmpty()) {
                 val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
                     component = ComponentName(context, PortfolioWidgetReceiver::class.java)
@@ -76,7 +77,7 @@ class WidgetSyncWorker(
                 }
                 context.sendBroadcast(intent)
             }
-            
+
             Result.success()
         } catch (e: Exception) {
             Log.e("SWANIE_TRACE", "Multi-Instance Worker failed", e)
