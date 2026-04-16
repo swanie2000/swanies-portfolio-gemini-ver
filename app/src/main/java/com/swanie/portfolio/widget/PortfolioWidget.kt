@@ -3,6 +3,7 @@ package com.swanie.portfolio.widget
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -119,8 +120,7 @@ class PortfolioWidget : GlanceAppWidget() {
         if (data.isBlank()) return emptyList()
         return data.split("||").mapNotNull { entry ->
             val parts = entry.split("|")
-            // 🛡️ SYNC PROTECTION: We must have at least 8 parts for holding math to work
-            if (parts.size >= 8) {
+            if (parts.size >= 9) {
                 AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
@@ -132,21 +132,8 @@ class PortfolioWidget : GlanceAppWidget() {
                     priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
-                    localIconPath = if (parts.size >= 9) parts[8] else null
-                )
-            } else if (parts.size >= 6) {
-                AssetEntity(
-                    coinId = parts[0],
-                    symbol = parts[1],
-                    displayName = parts[2],
-                    name = parts[2],
-                    imageUrl = parts[3],
-                    officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
-                    category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
-                    weight = 1.0,
-                    amountHeld = 1.0,
-                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
-                    localIconPath = if (parts.size >= 7) parts[6] else null
+                    premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal in part 9
+                    localIconPath = if (parts.size >= 10) parts[9] else "none"
                 )
             } else null
         }
@@ -183,29 +170,28 @@ fun WidgetContent(
     vaultName: String
 ) {
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
-        // --- 🦢 HEADER ---
-        Row(modifier = GlanceModifier.fillMaxWidth().height(40.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = GlanceModifier.width(60.dp), contentAlignment = Alignment.CenterStart) {
-                Box(modifier = GlanceModifier.size(40.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
-                    Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = "Home", modifier = GlanceModifier.size(26.dp))
+        Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = GlanceModifier.width(56.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
+                Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
+                    Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = "Home", modifier = GlanceModifier.size(28.dp))
                 }
             }
-            Text(text = vaultName.uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
-            Box(modifier = GlanceModifier.width(80.dp), contentAlignment = Alignment.CenterEnd) {
+            Text(text = "Swanie's Portfolio", style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
+            Box(modifier = GlanceModifier.width(96.dp).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = GlanceModifier.size(36.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))), contentAlignment = Alignment.Center) {
-                        Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = "Edit", modifier = GlanceModifier.size(18.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
+                    Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))), contentAlignment = Alignment.Center) {
+                        Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = "Edit", modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
                     }
-                    Spacer(modifier = GlanceModifier.width(8.dp))
-                    Box(modifier = GlanceModifier.size(36.dp).clickable(actionRunCallback<RefreshCallback>()), contentAlignment = Alignment.Center) {
-                        Image(provider = ImageProvider(android.R.drawable.ic_popup_sync), contentDescription = "Refresh", modifier = GlanceModifier.size(18.dp))
+                    Spacer(modifier = GlanceModifier.width(4.dp))
+                    Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<RefreshCallback>()), contentAlignment = Alignment.Center) {
+                        Image(provider = ImageProvider(android.R.drawable.ic_popup_sync), contentDescription = "Refresh", modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.White)))
                     }
                 }
             }
         }
 
         if (showTotal && totalValue.isNotEmpty()) {
-            Text(text = totalValue, style = TextStyle(color = ColorProvider(bgTextColor), fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(bottom = 2.dp))
+            Text(text = totalValue, style = TextStyle(color = ColorProvider(bgTextColor), fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(bottom = 4.dp))
         }
 
         Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
@@ -214,66 +200,55 @@ fun WidgetContent(
                 Spacer(modifier = GlanceModifier.defaultWeight())
             }
         }
-
-        Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 7.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth())
+        Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp))
     }
 }
 
 @Composable
 fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, textColor: Color) {
-    Row(modifier = GlanceModifier.fillMaxWidth().cornerRadius(8.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
-
-        // --- LEFT COLUMN: Icon + [Symbol over Spot Price] ---
+    Row(modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
         Row(modifier = GlanceModifier.wrapContentWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
             val isMetal = asset.imageUrl.startsWith("res:")
             val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
-            Box(modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
+            Box(modifier = GlanceModifier.size(30.dp).cornerRadius(15.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
                 if (isMetal) {
                     val resName = asset.imageUrl.substringAfter("res:")
                     val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(18.dp))
+                    if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(20.dp))
                 } else if (asset.imageUrl.startsWith("file:")) {
                     val path = asset.imageUrl.substringAfter("file:")
                     val bitmap = BitmapFactory.decodeFile(path)
-                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(20.dp)) else StampFallback(asset)
+                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(22.dp)) else StampFallback(asset)
                 } else StampFallback(asset)
             }
-            Spacer(modifier = GlanceModifier.width(8.dp))
+            Spacer(modifier = GlanceModifier.width(10.dp))
             Column {
-                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
-
-                // 💎 RAW SPOT PRICE (Left side)
-                val spotPrice = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
-                Text(text = spotPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 9.sp, fontWeight = FontWeight.Medium))
+                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                val marketPrice = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
+                Text(text = marketPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Medium))
             }
         }
-
         Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.Center) {
             asset.localIconPath?.let { path ->
                 if (path != "none") {
                     val bitmap = BitmapFactory.decodeFile(path)
-                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = "Trend", modifier = GlanceModifier.height(24.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
+                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = "Trend", modifier = GlanceModifier.height(26.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
                 }
             }
         }
-
-        // --- RIGHT COLUMN: [Bag Total over Trend] ---
         Column(modifier = GlanceModifier.wrapContentWidth(), horizontalAlignment = Alignment.End) {
-
-            // 💰 BAG TOTAL (Price * Weight * Amount)
-            // If weight and amountHeld are pulled correctly from the 8-part string, this will be different from the left side.
-            val totalHoldingValue = asset.officialSpotPrice * asset.weight * asset.amountHeld
-
-            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(totalHoldingValue), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+            // Part 9 of the string (mapped to 'premium' in parseAssetsData) is the pre-calculated total
+            val bagTotal = asset.premium
+            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(bagTotal), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold))
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF4444)
-            Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 9.sp, fontWeight = FontWeight.Bold))
+            Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
         }
     }
 }
 
 @Composable
 fun StampFallback(asset: AssetEntity) {
-    Text(text = asset.symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+    Text(text = asset.symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 13.sp, fontWeight = FontWeight.Bold))
 }
 
 class RefreshCallback : ActionCallback {
@@ -285,10 +260,7 @@ class RefreshCallback : ActionCallback {
         if (boundId == 0) return
         try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
         repo.refreshAssets(force = true, portfolioId = boundId.toString())
-
-        // 🚀 FORCE SYNC: Repack the suitcase on refresh
         repo.pushAssetsToWidget(context, boundId.toString())
-
         val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->
             p.toMutablePreferences().apply {

@@ -308,17 +308,9 @@ class SettingsViewModel @Inject constructor(
                                     asset.localIconPath != null -> "file:${asset.localIconPath}"
                                     else -> asset.imageUrl
                                 }
-                                val history = database.priceHistoryDao().getRecentHistory(asset.coinId)
-                                val historyData = history.map { it.price }
-                                var sparkPath = "none"
-                                if (historyData.size >= 2) {
-                                    val bitmap = generateSparklineBitmap(historyData, historyData.last() >= historyData.first())
-                                    val file = File(context.cacheDir, "spark_${asset.coinId}.png")
-                                    FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                                    sparkPath = file.absolutePath
-                                }
                                 val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|$assetValue|${asset.priceChange24h}|$sparkPath"
+                                // 🛡️ Packing 9 parts: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal
+                                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$assetValue"
                             }.joinToString("||")
                         }
                         this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets

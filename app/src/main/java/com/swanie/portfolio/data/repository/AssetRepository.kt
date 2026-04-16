@@ -60,7 +60,11 @@ class AssetRepository @Inject constructor(
         var isSuccess = false
         try {
             syncCoordinator.startSync()
-            val assets = assetDao.getAllAssetsOnce(portfolioId)
+            val assets = if (portfolioId.all { it.isDigit() }) {
+                assetDao.getAssetsByVaultOnce(portfolioId.toInt())
+            } else {
+                assetDao.getAllAssetsOnce(portfolioId)
+            }
             if (assets.isEmpty()) {
                 isSuccess = true
                 return
@@ -178,13 +182,27 @@ class AssetRepository @Inject constructor(
         refreshAssets(force = false)
     }
 
-    // 🌐 WIDGET BRIDGE: Pushes raw Spot Price AND Holding data
     suspend fun pushAssetsToWidget(context: android.content.Context, portfolioId: String) {
         try {
-            val assets = assetDao.getAssetsByPortfolio(portfolioId).first()
-            val assetsData = assets.take(5).joinToString("||") { asset ->
-                // 🛡️ THE PIPE: Sending 8 parts including weight and amountHeld
-                "${asset.coinId}|${asset.symbol}|${asset.displayName}|${asset.imageUrl}|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}"
+            val assets = if (portfolioId.all { it.isDigit() }) {
+                assetDao.getAssetsByVaultOnce(portfolioId.toInt())
+            } else {
+                assetDao.getAllAssetsOnce(portfolioId)
+            }
+
+            // 🛡️ Packing the "Suitcase" with 9 parts (V20: Kinetic Rebirth)
+            // Format: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal
+            val assetsData = assets.filter { it.showOnWidget }.take(10).joinToString("||") { asset ->
+                val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                
+                val iconSource = when {
+                    asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
+                    asset.imageUrl.startsWith("file:") -> asset.imageUrl
+                    asset.localIconPath != null -> "file:${asset.localIconPath}"
+                    else -> asset.imageUrl
+                }
+
+                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal"
             }
 
             val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
