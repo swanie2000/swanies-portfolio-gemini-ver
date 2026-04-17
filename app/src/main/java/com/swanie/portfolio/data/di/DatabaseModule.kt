@@ -59,9 +59,10 @@ object DatabaseModule {
         assetDao: AssetDao,
         priceHistoryDao: PriceHistoryDao,
         userConfigDao: UserConfigDao,
+        vaultDao: VaultDao,
         searchRegistry: SearchEngineRegistry,
         syncCoordinator: DataSyncCoordinator
     ): AssetRepository {
-        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, searchRegistry, syncCoordinator)
+        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, vaultDao, searchRegistry, syncCoordinator)
     }
 }

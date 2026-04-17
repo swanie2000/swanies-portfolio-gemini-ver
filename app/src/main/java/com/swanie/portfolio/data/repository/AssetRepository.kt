@@ -1,21 +1,36 @@
 package com.swanie.portfolio.data.repository
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.UserConfigDao
+import com.swanie.portfolio.data.local.VaultDao
+import com.swanie.portfolio.widget.PortfolioWidget
+import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import com.swanie.portfolio.widget.SparklineDrawUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.abs
 
@@ -25,6 +40,7 @@ class AssetRepository @Inject constructor(
     private val assetDao: AssetDao,
     private val priceHistoryDao: PriceHistoryDao,
     private val userConfigDao: UserConfigDao,
+    private val vaultDao: VaultDao,
     private val searchRegistry: SearchEngineRegistry,
     private val syncCoordinator: DataSyncCoordinator
 ) {
@@ -78,17 +94,18 @@ class AssetRepository @Inject constructor(
                 return
             }
 
+            val allUpdatedAssets = mutableListOf<AssetEntity>()
             assets.groupBy { it.priceSource }.forEach { (sourceName, providerAssets) ->
                 val provider = searchRegistry.getProvider(sourceName) ?: return@forEach
                 val idString = providerAssets.joinToString(",") { it.apiId }
-                val updatedList = provider.getPrices(idString)
+                val updatedList = try { provider.getPrices(idString) } catch (e: Exception) { emptyList() }
 
-                val updatesToSave = providerAssets.mapNotNull { existing ->
-                    updatedList.find {
+                val updatesToSave = providerAssets.map { existing ->
+                    val update = updatedList.find {
                         it.apiId.equals(existing.apiId, true) || it.symbol.equals(existing.symbol, true)
-                    }?.let { update ->
+                    }
+                    if (update != null) {
                         val isMetal = existing.category == AssetCategory.METAL
-
                         val finalDisplayName = if (isMetal) {
                             cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight, existing.weightUnit)
                         } else {
@@ -103,9 +120,12 @@ class AssetRepository @Inject constructor(
                             priceChange24h = update.priceChange24h,
                             sparklineData = if (update.sparklineData.isNotEmpty()) update.sparklineData else existing.sparklineData,
                             lastUpdated = System.currentTimeMillis()
-                        )
+                        ).also { allUpdatedAssets.add(it) }
+                    } else {
+                        allUpdatedAssets.add(existing)
+                        null
                     }
-                }
+                }.filterNotNull()
                 
                 if (updatesToSave.isNotEmpty()) {
                     assetDao.upsertAll(updatesToSave)
@@ -114,15 +134,92 @@ class AssetRepository @Inject constructor(
             isSuccess = true
             userConfigDao.updateLastSync(System.currentTimeMillis())
             
-            // 🚀 DATABASE-FIRST REFRESH: Push to widget ONLY after DB write is confirmed
-            // Add a small delay to ensure SQLite WAL is fully committed
-            kotlinx.coroutines.delay(500)
-            pushAssetsToWidget(context, portfolioId)
+            // 🚀 RACE CONDITION KILLER: Use the freshly updated list directly
+            pushFreshAssetsToWidget(context.applicationContext, portfolioId, allUpdatedAssets)
         } catch (e: Exception) {
             Log.e("REPO_REFRESH", "Error: ${e.message}")
             isSuccess = false
         } finally {
             syncCoordinator.endSync(isSuccess)
+        }
+    }
+
+    suspend fun pushFreshAssetsToWidget(context: Context, portfolioId: String, freshAssets: List<AssetEntity>) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val componentName = ComponentName(context, PortfolioWidgetReceiver::class.java)
+        
+        val vaultIdInt = portfolioId.toIntOrNull() ?: 1
+        val vault = vaultDao.getVaultById(vaultIdInt) ?: return
+        
+        val idsToUpdate = if (vault.appWidgetId != null && vault.appWidgetId != -1) {
+            intArrayOf(vault.appWidgetId)
+        } else {
+            appWidgetManager.getAppWidgetIds(componentName)
+        }
+
+        if (idsToUpdate.isEmpty()) return
+        val glanceManager = GlanceAppWidgetManager(context)
+
+        idsToUpdate.forEach { id ->
+            val vSafe = vaultDao.getVaultByAppWidgetId(id) ?: vault
+            val glanceId = try { glanceManager.getGlanceIdBy(id) } catch (e: Exception) { null } ?: return@forEach
+
+            updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                prefs.toMutablePreferences().apply {
+                    this[PortfolioWidget.VAULT_ID_KEY] = vSafe.id
+                    this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = vSafe.name
+                    this[PortfolioWidget.WIDGET_BG_COLOR_KEY] = vSafe.widgetBgColor
+                    this[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = vSafe.widgetBgTextColor
+                    this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = vSafe.widgetCardColor
+                    this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
+                    this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
+
+                    val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
+                    val filteredAssets = if (selectedIds.isEmpty()) freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.take(10) 
+                                         else freshAssets.filter { it.coinId in selectedIds }
+
+                    val serializedAssets = filteredAssets.map { asset ->
+                        val iconSource = when {
+                            asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
+                            asset.imageUrl.startsWith("file:") -> asset.imageUrl
+                            asset.localIconPath != null -> "file:${asset.localIconPath}"
+                            else -> asset.imageUrl
+                        }
+                        val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                        
+                        // 📈 Generate Sparkline for Widget
+                        val history = try { priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed() } catch (e: Exception) { emptyList() }
+                        val sparklinePath = if (history.size >= 2) {
+                            val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
+                            val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
+                            val file = File(context.cacheDir, "spark_${asset.coinId}.png")
+                            FileOutputStream(file).use { out ->
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                            }
+                            file.absolutePath
+                        } else "none"
+
+                        val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
+                        val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
+                        
+                        "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$assetValue|$sparklinePath"
+                    }.joinToString("||")
+
+                    if (serializedAssets.isNotBlank()) {
+                        this.remove(PortfolioWidget.ASSETS_DATA_KEY)
+                        this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
+                    }
+                    this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
+                    val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }
+                    this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
+                }.toPreferences()
+            }
+            PortfolioWidget().update(context, glanceId)
+        }
+
+        // 🚚 Ensure final delivery across all instances
+        ProcessLifecycleOwner.get().lifecycleScope.launch {
+            PortfolioWidget().updateAll(context.applicationContext)
         }
     }
 
@@ -199,101 +296,13 @@ class AssetRepository @Inject constructor(
         refreshAssets(force = false)
     }
 
-    suspend fun pushAssetsToWidget(context: android.content.Context, portfolioId: String) {
-        val finalId = if (portfolioId == "0" || portfolioId.isBlank()) "1" else portfolioId
-        try {
-            var assets = if (finalId.all { it.isDigit() }) {
-                assetDao.getAssetsByVaultOnce(finalId.toInt())
-            } else {
-                assetDao.getAllAssetsOnce(finalId)
-            }
-
-            if (assets.isEmpty()) {
-                Log.d("SWANIE_PIPE", "DB Fetch empty for portfolioId: $finalId. Trying global...")
-                assets = assetDao.getAllAssetsGlobal()
-            }
-
-            Log.d("SWANIE_PIPE", "DB Fetch Success: ${assets.size} assets found for ID: $finalId. Top Price: ${assets.firstOrNull()?.officialSpotPrice}")
-
-            // 🛡️ Packing the "Suitcase" (Limit to 8 to prevent Binder Transaction limit crashes)
-            // Format: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
-            val assetsData = assets.filter { it.showOnWidget }.take(5).map { asset ->
-                Log.d("SWANIE_PIPE", "Packing asset: ${asset.symbol} | Price: ${asset.officialSpotPrice}")
-                val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                
-                val iconSource = when {
-                    asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
-                    asset.imageUrl.startsWith("file:") -> asset.imageUrl
-                    asset.localIconPath != null -> "file:${asset.localIconPath}"
-                    else -> asset.imageUrl
-                }
-
-                // 📈 Generate Sparkline for Widget
-                val sparklinePath = try {
-                    val history = priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed()
-                    if (history.size >= 2) {
-                        val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
-                        val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
-                        val file = File(context.cacheDir, "spark_${asset.coinId}.png")
-                        FileOutputStream(file).use { out ->
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                        }
-                        file.absolutePath
-                    } else "none"
-                } catch (e: Exception) {
-                    Log.e("SWANIE_PIPE", "Sparkline failed for ${asset.symbol}", e)
-                    "none"
-                }
-
-                val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
-                val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
-
-                "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|$sparklinePath"
-            }.joinToString("||")
-
-            if (assetsData.isBlank() && assets.isNotEmpty()) {
-                Log.d("SWANIE_PIPE", "Suitcase is blank but assets found. Emergency Pack triggered.")
-                // EMERGENCY PACK: No sparklines, just raw data
-                val emergencyData = assets.filter { it.showOnWidget }.take(5).map { asset ->
-                    val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                    val iconSource = if (asset.category == AssetCategory.METAL || asset.isMetal) "res:ic_${asset.symbol.lowercase()}" else asset.imageUrl
-                    val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
-                    val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
-                    "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|none"
-                }.joinToString("||")
-                
-                if (emergencyData.isNotBlank()) {
-                    pushFinalSuitcase(context, emergencyData)
-                }
-                return
-            }
-
-            if (assetsData.isBlank()) {
-                Log.d("SWANIE_PIPE", "Suitcase is blank and no assets found, aborting push.")
-                return
-            }
-
-            Log.d("SWANIE_PIPE", "Suitcase Packed: $assetsData")
-            pushFinalSuitcase(context, assetsData)
-        } catch (e: Exception) {
-            Log.e("SWANIE_WIDGET", "Push failed", e)
+    // This method is now legacy, replaced by pushFreshAssetsToWidget for better data consistency
+    suspend fun pushAssetsToWidget(context: Context, portfolioId: String) {
+        val assets = if (portfolioId.all { it.isDigit() }) {
+            assetDao.getAssetsByVaultOnce(portfolioId.toInt())
+        } else {
+            assetDao.getAllAssetsOnce(portfolioId)
         }
-    }
-
-    private suspend fun pushFinalSuitcase(context: android.content.Context, assetsData: String) {
-        Log.d("SWANIE_SYNC", "Pushing to Glance: $assetsData")
-        val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
-        val glanceIds = manager.getGlanceIds(com.swanie.portfolio.widget.PortfolioWidget::class.java)
-
-        glanceIds.forEach { id ->
-            androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, id) { prefs ->
-                prefs.toMutablePreferences().apply {
-                    this.remove(com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY)
-                    this[com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY] = assetsData
-                    this[com.swanie.portfolio.widget.PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
-                }.toPreferences()
-            }
-            com.swanie.portfolio.widget.PortfolioWidget().update(context, id)
-        }
+        pushFreshAssetsToWidget(context, portfolioId, assets)
     }
 }
