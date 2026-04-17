@@ -91,6 +91,7 @@ dependencies {
 
     // Lifecycle & Storage
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
     implementation("androidx.datastore:datastore-preferences:1.2.0")
 
     // HILT

@@ -78,6 +78,8 @@ class PortfolioWidget : GlanceAppWidget() {
             val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
             val boundId = prefs[VAULT_ID_KEY] ?: 0
+            val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
+            Log.d("SWANIE_PIPE", "Widget Received Suitcase for Vault $boundId: $assetsData")
 
             if (boundId == 0) {
                 UnlinkedContent(appWidgetId)
@@ -97,23 +99,35 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
 
                 val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
+                Log.d("SWANIE_SYNC", "Widget Reading: $assetsData")
+                
                 val assets = parseAssetsData(assetsData)
 
-                WidgetContent(
-                    context = context,
-                    appWidgetId = appWidgetId,
-                    totalValue = totalValue,
-                    lastUpdated = prefs[LAST_UPDATED_KEY] ?: "--:--",
-                    assets = assets,
-                    showTotal = showTotal,
-                    bgColor = bgColor,
-                    bgTextColor = bgTextColor,
-                    cardColor = cardColor,
-                    cardTextColor = cardTextColor,
-                    vaultName = vaultName
-                )
+                if (assets.isEmpty()) {
+                    SyncingContent(bgColor, bgTextColor)
+                } else {
+                    WidgetContent(
+                        context = context,
+                        appWidgetId = appWidgetId,
+                        totalValue = totalValue,
+                        lastUpdated = prefs[LAST_UPDATED_KEY] ?: "--:--",
+                        assets = assets,
+                        showTotal = showTotal,
+                        bgColor = bgColor,
+                        bgTextColor = bgTextColor,
+                        cardColor = cardColor,
+                        cardTextColor = cardTextColor,
+                        vaultName = vaultName
+                    )
+                }
             }
         }
+    }
+
+    suspend fun updateAll(context: Context) {
+        val manager = GlanceAppWidgetManager(context)
+        val ids = manager.getGlanceIds(this.javaClass)
+        ids.forEach { update(context, it) }
     }
 
     private fun parseAssetsData(data: String): List<AssetEntity> {
@@ -223,9 +237,10 @@ fun WidgetContent(
 @Composable
 fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, textColor: Color) {
     Row(modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
+        val isMetal = asset.imageUrl.startsWith("res:")
+        val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
+
         Row(modifier = GlanceModifier.wrapContentWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-            val isMetal = asset.imageUrl.startsWith("res:")
-            val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
             Box(modifier = GlanceModifier.size(30.dp).cornerRadius(15.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
                 if (isMetal) {
                     val resName = asset.imageUrl.substringAfter("res:")
@@ -233,7 +248,7 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
                     if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(20.dp))
                 } else if (asset.imageUrl.startsWith("file:")) {
                     val path = asset.imageUrl.substringAfter("file:")
-                    val bitmap = BitmapFactory.decodeFile(path)
+                    val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
                     if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(22.dp)) else StampFallback(asset)
                 } else StampFallback(asset)
             }
@@ -245,17 +260,25 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
             }
         }
         Box(modifier = GlanceModifier.defaultWeight().height(40.dp).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
-            asset.localIconPath?.let { path ->
-                if (path != "none") {
-                    val bitmap = BitmapFactory.decodeFile(path)
-                    // 📈 BOUTIQUE STYLE: Consistent height (38dp), Center Alignment, Fit, and Padding
-                    if (bitmap != null) Image(
+            val path = asset.localIconPath
+            if (path != null && path != "none") {
+                val bitmap = try {
+                    BitmapFactory.decodeFile(path)
+                } catch (e: Exception) {
+                    null
+                }
+                if (bitmap != null) {
+                    Image(
                         provider = ImageProvider(bitmap),
                         contentDescription = "Trend",
                         modifier = GlanceModifier.height(38.dp).fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp),
                         contentScale = ContentScale.Fit
                     )
+                } else {
+                    Spacer(modifier = GlanceModifier.defaultWeight())
                 }
+            } else {
+                Spacer(modifier = GlanceModifier.defaultWeight())
             }
         }
         Column(modifier = GlanceModifier.wrapContentWidth(), horizontalAlignment = Alignment.End) {
@@ -269,33 +292,57 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
 }
 
 @Composable
+fun SyncingContent(bgColor: Color, textColor: Color) {
+    Column(
+        modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            provider = ImageProvider(R.drawable.swan_launcher_icon),
+            contentDescription = null,
+            modifier = GlanceModifier.size(48.dp),
+            colorFilter = ColorFilter.tint(ColorProvider(textColor.copy(alpha = 0.5f)))
+        )
+        Spacer(modifier = GlanceModifier.height(12.dp))
+        Text(
+            text = "Syncing Assets...",
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        )
+    }
+}
+
+@Composable
 fun StampFallback(asset: AssetEntity) {
     Text(text = asset.symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 13.sp, fontWeight = FontWeight.Bold))
 }
 
 class RefreshCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
-        val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
-        val repo = entryPoint.assetRepository()
-        
-        // 🛡️ THE SECRET SAUCE: Use the extension on PortfolioWidget to get latest state
-        val prefs = PortfolioWidget().getAppWidgetState<Preferences>(context, glanceId)
-        val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1 // Default to 1 if null
-        
-        Log.d("SWANIE_REFRESH", "Refreshing vault: $boundId")
-        
-        try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
-        
-        repo.refreshAssets(force = true, portfolioId = boundId.toString())
-        repo.pushAssetsToWidget(context, boundId.toString())
+        val appContext = context.applicationContext
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val entryPoint = EntryPointAccessors.fromApplication(appContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
+                val repo = entryPoint.assetRepository()
+                
+                // 🛡️ THE SECRET SAUCE: Use the extension on PortfolioWidget to get latest state
+                val prefs = PortfolioWidget().getAppWidgetState<Preferences>(appContext, glanceId)
+                val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1 // Default to 1 if null
+                
+                try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
+                repo.refreshAssets(force = true, portfolioId = boundId.toString())
 
-        val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-        updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->
-            p.toMutablePreferences().apply {
-                this[PortfolioWidget.LAST_UPDATED_KEY] = newTime
-                this[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
-            }.toPreferences()
+                val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
+                updateAppWidgetState(appContext, PreferencesGlanceStateDefinition, glanceId) { p ->
+                    p.toMutablePreferences().apply {
+                        this[PortfolioWidget.LAST_UPDATED_KEY] = newTime
+                        this[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
+                    }.toPreferences()
+                }
+                PortfolioWidget().update(appContext, glanceId)
+            } catch (e: Exception) {
+                Log.e("PortfolioWidget", "Refresh failed", e)
+            }
         }
-        PortfolioWidget().update(context, glanceId)
     }
 }

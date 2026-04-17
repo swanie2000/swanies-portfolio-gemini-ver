@@ -83,7 +83,7 @@ class AssetRepository @Inject constructor(
                 val idString = providerAssets.joinToString(",") { it.apiId }
                 val updatedList = provider.getPrices(idString)
 
-                providerAssets.forEach { existing ->
+                val updatesToSave = providerAssets.mapNotNull { existing ->
                     updatedList.find {
                         it.apiId.equals(existing.apiId, true) || it.symbol.equals(existing.symbol, true)
                     }?.let { update ->
@@ -95,7 +95,7 @@ class AssetRepository @Inject constructor(
                             update.name.ifEmpty { existing.name }
                         }
 
-                        assetDao.upsertAsset(existing.copy(
+                        existing.copy(
                             name = update.name.ifEmpty { existing.name },
                             displayName = finalDisplayName,
                             isMetal = isMetal,
@@ -103,12 +103,21 @@ class AssetRepository @Inject constructor(
                             priceChange24h = update.priceChange24h,
                             sparklineData = if (update.sparklineData.isNotEmpty()) update.sparklineData else existing.sparklineData,
                             lastUpdated = System.currentTimeMillis()
-                        ))
+                        )
                     }
+                }
+                
+                if (updatesToSave.isNotEmpty()) {
+                    assetDao.upsertAll(updatesToSave)
                 }
             }
             isSuccess = true
             userConfigDao.updateLastSync(System.currentTimeMillis())
+            
+            // 🚀 DATABASE-FIRST REFRESH: Push to widget ONLY after DB write is confirmed
+            // Add a small delay to ensure SQLite WAL is fully committed
+            kotlinx.coroutines.delay(500)
+            pushAssetsToWidget(context, portfolioId)
         } catch (e: Exception) {
             Log.e("REPO_REFRESH", "Error: ${e.message}")
             isSuccess = false
@@ -192,7 +201,6 @@ class AssetRepository @Inject constructor(
 
     suspend fun pushAssetsToWidget(context: android.content.Context, portfolioId: String) {
         val finalId = if (portfolioId == "0" || portfolioId.isBlank()) "1" else portfolioId
-        Log.d("SWANIE_DEBUG", "Packing suitcase for Vault: $finalId")
         try {
             var assets = if (finalId.all { it.isDigit() }) {
                 assetDao.getAssetsByVaultOnce(finalId.toInt())
@@ -201,13 +209,16 @@ class AssetRepository @Inject constructor(
             }
 
             if (assets.isEmpty()) {
-                Log.e("SWANIE_DEBUG", "No assets found for $finalId! FALLBACK TO GLOBAL.")
+                Log.d("SWANIE_PIPE", "DB Fetch empty for portfolioId: $finalId. Trying global...")
                 assets = assetDao.getAllAssetsGlobal()
             }
 
-            // 🛡️ Packing the "Suitcase" with 10 parts (V21: Sparkline Restoration)
+            Log.d("SWANIE_PIPE", "DB Fetch Success: ${assets.size} assets found for ID: $finalId. Top Price: ${assets.firstOrNull()?.officialSpotPrice}")
+
+            // 🛡️ Packing the "Suitcase" (Limit to 8 to prevent Binder Transaction limit crashes)
             // Format: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
-            val assetsData = assets.filter { it.showOnWidget }.take(10).map { asset ->
+            val assetsData = assets.filter { it.showOnWidget }.take(5).map { asset ->
+                Log.d("SWANIE_PIPE", "Packing asset: ${asset.symbol} | Price: ${asset.officialSpotPrice}")
                 val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
                 
                 val iconSource = when {
@@ -218,33 +229,71 @@ class AssetRepository @Inject constructor(
                 }
 
                 // 📈 Generate Sparkline for Widget
-                val history = priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed()
-                val sparklinePath = if (history.size >= 2) {
-                    val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
-                    val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
-                    val file = File(context.cacheDir, "spark_${asset.coinId}.png")
-                    FileOutputStream(file).use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                    }
-                    file.absolutePath
-                } else "none"
+                val sparklinePath = try {
+                    val history = priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed()
+                    if (history.size >= 2) {
+                        val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
+                        val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
+                        val file = File(context.cacheDir, "spark_${asset.coinId}.png")
+                        FileOutputStream(file).use { out ->
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+                        file.absolutePath
+                    } else "none"
+                } catch (e: Exception) {
+                    Log.e("SWANIE_PIPE", "Sparkline failed for ${asset.symbol}", e)
+                    "none"
+                }
 
-                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|$sparklinePath"
+                val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
+                val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
+
+                "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|$sparklinePath"
             }.joinToString("||")
 
-            val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
-            val glanceIds = manager.getGlanceIds(com.swanie.portfolio.widget.PortfolioWidget::class.java)
-
-            glanceIds.forEach { id ->
-                androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, id) { prefs ->
-                    prefs.toMutablePreferences().apply {
-                        this[com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY] = assetsData
-                    }.toPreferences()
+            if (assetsData.isBlank() && assets.isNotEmpty()) {
+                Log.d("SWANIE_PIPE", "Suitcase is blank but assets found. Emergency Pack triggered.")
+                // EMERGENCY PACK: No sparklines, just raw data
+                val emergencyData = assets.filter { it.showOnWidget }.take(5).map { asset ->
+                    val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                    val iconSource = if (asset.category == AssetCategory.METAL || asset.isMetal) "res:ic_${asset.symbol.lowercase()}" else asset.imageUrl
+                    val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
+                    val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
+                    "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|none"
+                }.joinToString("||")
+                
+                if (emergencyData.isNotBlank()) {
+                    pushFinalSuitcase(context, emergencyData)
                 }
-                com.swanie.portfolio.widget.PortfolioWidget().update(context, id)
+                return
             }
+
+            if (assetsData.isBlank()) {
+                Log.d("SWANIE_PIPE", "Suitcase is blank and no assets found, aborting push.")
+                return
+            }
+
+            Log.d("SWANIE_PIPE", "Suitcase Packed: $assetsData")
+            pushFinalSuitcase(context, assetsData)
         } catch (e: Exception) {
             Log.e("SWANIE_WIDGET", "Push failed", e)
+        }
+    }
+
+    private suspend fun pushFinalSuitcase(context: android.content.Context, assetsData: String) {
+        Log.d("SWANIE_SYNC", "Pushing to Glance: $assetsData")
+        val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+        val glanceIds = manager.getGlanceIds(com.swanie.portfolio.widget.PortfolioWidget::class.java)
+
+        glanceIds.forEach { id ->
+            androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, id) { prefs ->
+                prefs.toMutablePreferences().apply {
+                    this.remove(com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY)
+                    this[com.swanie.portfolio.widget.PortfolioWidget.ASSETS_DATA_KEY] = assetsData
+                    this[com.swanie.portfolio.widget.PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
+                }.toPreferences()
+            }
+            com.swanie.portfolio.widget.PortfolioWidget().update(context, id)
         }
     }
 }
