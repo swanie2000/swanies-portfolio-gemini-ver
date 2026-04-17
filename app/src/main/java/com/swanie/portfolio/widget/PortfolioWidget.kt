@@ -120,7 +120,7 @@ class PortfolioWidget : GlanceAppWidget() {
         if (data.isBlank()) return emptyList()
         return data.split("||").mapNotNull { entry ->
             val parts = entry.split("|")
-            if (parts.size >= 9) {
+            if (parts.size >= 10) {
                 AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
@@ -133,7 +133,22 @@ class PortfolioWidget : GlanceAppWidget() {
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
                     premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal in part 9
-                    localIconPath = if (parts.size >= 10) parts[9] else "none"
+                    localIconPath = parts[9] // Part 10 is the Sparkline Path
+                )
+            } else if (parts.size == 9) {
+                AssetEntity(
+                    coinId = parts[0],
+                    symbol = parts[1],
+                    displayName = parts[2],
+                    name = parts[2],
+                    imageUrl = parts[3],
+                    officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
+                    category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
+                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
+                    weight = parts[6].toDoubleOrNull() ?: 1.0,
+                    amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
+                    premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal
+                    localIconPath = "none"
                 )
             } else null
         }
@@ -171,13 +186,14 @@ fun WidgetContent(
 ) {
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = GlanceModifier.width(56.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
+            // 🎯 BOUTIQUE CENTERED HEADER: Left/Right fixed at 80dp
+            Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
                 Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
                     Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = "Home", modifier = GlanceModifier.size(28.dp))
                 }
             }
-            Text(text = "Swanie's Portfolio", style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
-            Box(modifier = GlanceModifier.width(96.dp).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
+            Text(text = vaultName.uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
+            Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))), contentAlignment = Alignment.Center) {
                         Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = "Edit", modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
@@ -200,7 +216,7 @@ fun WidgetContent(
                 Spacer(modifier = GlanceModifier.defaultWeight())
             }
         }
-        Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.4f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp))
+        Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.5f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp))
     }
 }
 
@@ -228,11 +244,17 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
                 Text(text = marketPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Medium))
             }
         }
-        Box(modifier = GlanceModifier.defaultWeight(), contentAlignment = Alignment.Center) {
+        Box(modifier = GlanceModifier.defaultWeight().height(40.dp).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
             asset.localIconPath?.let { path ->
                 if (path != "none") {
                     val bitmap = BitmapFactory.decodeFile(path)
-                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = "Trend", modifier = GlanceModifier.height(26.dp).fillMaxWidth(), contentScale = ContentScale.Fit)
+                    // 📈 BOUTIQUE STYLE: Consistent height (38dp), Center Alignment, Fit, and Padding
+                    if (bitmap != null) Image(
+                        provider = ImageProvider(bitmap),
+                        contentDescription = "Trend",
+                        modifier = GlanceModifier.height(38.dp).fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp),
+                        contentScale = ContentScale.Fit
+                    )
                 }
             }
         }
@@ -255,12 +277,18 @@ class RefreshCallback : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
         val repo = entryPoint.assetRepository()
-        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
-        val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 0
-        if (boundId == 0) return
+        
+        // 🛡️ THE SECRET SAUCE: Use the extension on PortfolioWidget to get latest state
+        val prefs = PortfolioWidget().getAppWidgetState<Preferences>(context, glanceId)
+        val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1 // Default to 1 if null
+        
+        Log.d("SWANIE_REFRESH", "Refreshing vault: $boundId")
+        
         try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
+        
         repo.refreshAssets(force = true, portfolioId = boundId.toString())
         repo.pushAssetsToWidget(context, boundId.toString())
+
         val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
         updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { p ->
             p.toMutablePreferences().apply {

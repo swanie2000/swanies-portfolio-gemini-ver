@@ -1,21 +1,29 @@
 package com.swanie.portfolio.data.repository
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.UserConfigDao
+import com.swanie.portfolio.widget.SparklineDrawUtils
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Locale
 import kotlin.math.abs
 
 @Singleton
 class AssetRepository @Inject constructor(
+    private val context: Context,
     private val assetDao: AssetDao,
+    private val priceHistoryDao: PriceHistoryDao,
     private val userConfigDao: UserConfigDao,
     private val searchRegistry: SearchEngineRegistry,
     private val syncCoordinator: DataSyncCoordinator
@@ -183,16 +191,23 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun pushAssetsToWidget(context: android.content.Context, portfolioId: String) {
+        val finalId = if (portfolioId == "0" || portfolioId.isBlank()) "1" else portfolioId
+        Log.d("SWANIE_DEBUG", "Packing suitcase for Vault: $finalId")
         try {
-            val assets = if (portfolioId.all { it.isDigit() }) {
-                assetDao.getAssetsByVaultOnce(portfolioId.toInt())
+            var assets = if (finalId.all { it.isDigit() }) {
+                assetDao.getAssetsByVaultOnce(finalId.toInt())
             } else {
-                assetDao.getAllAssetsOnce(portfolioId)
+                assetDao.getAllAssetsOnce(finalId)
             }
 
-            // 🛡️ Packing the "Suitcase" with 9 parts (V20: Kinetic Rebirth)
-            // Format: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal
-            val assetsData = assets.filter { it.showOnWidget }.take(10).joinToString("||") { asset ->
+            if (assets.isEmpty()) {
+                Log.e("SWANIE_DEBUG", "No assets found for $finalId! FALLBACK TO GLOBAL.")
+                assets = assetDao.getAllAssetsGlobal()
+            }
+
+            // 🛡️ Packing the "Suitcase" with 10 parts (V21: Sparkline Restoration)
+            // Format: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
+            val assetsData = assets.filter { it.showOnWidget }.take(10).map { asset ->
                 val calculatedTotal = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
                 
                 val iconSource = when {
@@ -202,8 +217,20 @@ class AssetRepository @Inject constructor(
                     else -> asset.imageUrl
                 }
 
-                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal"
-            }
+                // 📈 Generate Sparkline for Widget
+                val history = priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed()
+                val sparklinePath = if (history.size >= 2) {
+                    val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
+                    val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
+                    val file = File(context.cacheDir, "spark_${asset.coinId}.png")
+                    FileOutputStream(file).use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    }
+                    file.absolutePath
+                } else "none"
+
+                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$calculatedTotal|$sparklinePath"
+            }.joinToString("||")
 
             val manager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(com.swanie.portfolio.widget.PortfolioWidget::class.java)

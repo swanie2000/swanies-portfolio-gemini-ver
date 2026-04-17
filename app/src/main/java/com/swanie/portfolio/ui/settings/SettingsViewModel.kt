@@ -16,6 +16,7 @@ import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
+import com.swanie.portfolio.widget.SparklineDrawUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -309,8 +310,21 @@ class SettingsViewModel @Inject constructor(
                                     else -> asset.imageUrl
                                 }
                                 val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                                // 🛡️ Packing 9 parts: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal
-                                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$assetValue"
+                                
+                                // 📈 Generate Sparkline for Widget
+                                val history = database.priceHistoryDao().getRecentHistory(asset.coinId).map { it.price }.reversed()
+                                val sparklinePath = if (history.size >= 2) {
+                                    val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
+                                    val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
+                                    val file = File(context.cacheDir, "spark_${asset.coinId}.png")
+                                    FileOutputStream(file).use { out ->
+                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                                    }
+                                    file.absolutePath
+                                } else "none"
+
+                                // 🛡️ Packing 10 parts: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
+                                "${asset.coinId}|${asset.symbol}|${asset.displayName.ifBlank { asset.name }}|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$assetValue|$sparklinePath"
                             }.joinToString("||")
                         }
                         this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets

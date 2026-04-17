@@ -55,11 +55,13 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideAssetRepository(
+        @ApplicationContext context: Context,
         assetDao: AssetDao,
+        priceHistoryDao: PriceHistoryDao,
         userConfigDao: UserConfigDao,
         searchRegistry: SearchEngineRegistry,
         syncCoordinator: DataSyncCoordinator
     ): AssetRepository {
-        return AssetRepository(assetDao, userConfigDao, searchRegistry, syncCoordinator)
+        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, searchRegistry, syncCoordinator)
     }
 }

@@ -14,15 +14,15 @@ object SparklineDrawUtils {
      * Dimensions: 120px x 60px (equivalent to 60dp x 30dp @ 2x density)
      * 🛠️ V7.2.0 Optimization: Uses RGB_565 to reduce memory footprint by 50%.
      */
-    fun drawSparklineBitmap(points: List<Double>, color: Color, backgroundColor: Int = android.graphics.Color.BLACK): Bitmap {
+    fun drawSparklineBitmap(points: List<Double>, color: Color): Bitmap {
         val width = 120
         val height = 60
-        // 🚀 MEMORY WIN: RGB_565 is 16-bit (2 bytes/pixel) vs ARGB_8888 (4 bytes/pixel)
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+        // 🚀 BOUTIQUE UPGRADE: Use ARGB_8888 for transparency support
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         
-        // RGB_565 doesn't support transparency, so we must fill with the card background color first
-        canvas.drawColor(backgroundColor)
+        // Transparent background
+        canvas.drawColor(android.graphics.Color.TRANSPARENT)
 
         if (points.size < 2) return bitmap
 
@@ -33,7 +33,7 @@ object SparklineDrawUtils {
         val paint = Paint().apply {
             this.color = color.toArgb()
             this.style = Paint.Style.STROKE
-            this.strokeWidth = 4f // 2.dp equivalent
+            this.strokeWidth = 2.5f // Surgical Sweet Spot
             this.isAntiAlias = true
             this.strokeCap = Paint.Cap.ROUND
             this.strokeJoin = Paint.Join.ROUND
