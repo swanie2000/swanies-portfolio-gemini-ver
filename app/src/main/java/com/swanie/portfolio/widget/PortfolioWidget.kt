@@ -236,52 +236,52 @@ fun WidgetContent(
 
 @Composable
 fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, textColor: Color) {
-    Row(modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
+    Row(
+        modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.Vertical.CenterVertically
+    ) {
         val isMetal = asset.imageUrl.startsWith("res:")
         val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
 
-        Row(modifier = GlanceModifier.wrapContentWidth(), verticalAlignment = Alignment.Vertical.CenterVertically) {
-            Box(modifier = GlanceModifier.size(30.dp).cornerRadius(15.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
+        // 🎯 LANE 1: IDENTITY (Fixed 120dp for High-Precision)
+        Row(modifier = GlanceModifier.width(120.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
+            Box(modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
                 if (isMetal) {
                     val resName = asset.imageUrl.substringAfter("res:")
                     val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(20.dp))
+                    if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(18.dp))
                 } else if (asset.imageUrl.startsWith("file:")) {
                     val path = asset.imageUrl.substringAfter("file:")
                     val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
-                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(22.dp)) else StampFallback(asset)
+                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(20.dp)) else StampFallback(asset)
                 } else StampFallback(asset)
             }
-            Spacer(modifier = GlanceModifier.width(10.dp))
+            Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
-                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
                 val marketPrice = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
-                Text(text = marketPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 10.sp, fontWeight = FontWeight.Medium))
+                Text(text = marketPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 9.sp, fontWeight = FontWeight.Medium))
             }
         }
-        Box(modifier = GlanceModifier.defaultWeight().height(40.dp).padding(horizontal = 4.dp), contentAlignment = Alignment.Center) {
+
+        // 🎯 LANE 2: SPARKLINE (Fixed 80dp)
+        Box(modifier = GlanceModifier.width(80.dp).height(40.dp), contentAlignment = Alignment.CenterStart) {
             val path = asset.localIconPath
             if (path != null && path != "none") {
-                val bitmap = try {
-                    BitmapFactory.decodeFile(path)
-                } catch (e: Exception) {
-                    null
-                }
+                val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
                 if (bitmap != null) {
                     Image(
                         provider = ImageProvider(bitmap),
                         contentDescription = "Trend",
-                        modifier = GlanceModifier.height(38.dp).fillMaxWidth().padding(vertical = 4.dp, horizontal = 8.dp),
-                        contentScale = ContentScale.Fit
+                        modifier = GlanceModifier.fillMaxSize(),
+                        contentScale = ContentScale.FillBounds
                     )
-                } else {
-                    Spacer(modifier = GlanceModifier.defaultWeight())
                 }
-            } else {
-                Spacer(modifier = GlanceModifier.defaultWeight())
             }
         }
-        Column(modifier = GlanceModifier.wrapContentWidth(), horizontalAlignment = Alignment.End) {
+
+        // 🎯 LANE 3: HOLDINGS (Flexible / Right-Aligned)
+        Column(modifier = GlanceModifier.defaultWeight().fillMaxWidth(), horizontalAlignment = Alignment.End) {
             // Part 9 of the string (mapped to 'premium' in parseAssetsData) is the pre-calculated total
             val bagTotal = asset.premium
             Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(bagTotal), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold))
