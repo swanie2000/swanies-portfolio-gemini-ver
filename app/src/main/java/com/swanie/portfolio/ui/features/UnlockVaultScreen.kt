@@ -53,11 +53,9 @@ fun UnlockVaultScreen(
 
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
     val siteText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
-    val accentGold = Color(0xFFFFD700)
 
     val authState by authViewModel.authState.collectAsState()
 
-    val shieldScale = remember { Animatable(0f) }
     val contentAlpha = remember { Animatable(0f) }
 
     // --- 🛡️ TRIGGER BIOMETRICS ON ENTRY ---
@@ -65,11 +63,6 @@ fun UnlockVaultScreen(
         delay(500)
         (context as? FragmentActivity)?.let { activity ->
             authViewModel.triggerBiometricUnlock(activity)
-        }
-        
-        scope.launch {
-            shieldScale.animateTo(1.1f, spring(Spring.DampingRatioMediumBouncy))
-            shieldScale.animateTo(1f, spring())
         }
         contentAlpha.animateTo(1f, tween(800))
     }
@@ -109,19 +102,6 @@ fun UnlockVaultScreen(
                 contentDescription = null,
                 modifier = Modifier.size(100.dp).align(Alignment.Center)
             )
-
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .scale(shieldScale.value)
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(accentGold)
-                    .border(2.dp, siteBg, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Security, null, tint = Color.Black, modifier = Modifier.size(20.dp))
-            }
         }
 
         Column(
@@ -132,7 +112,6 @@ fun UnlockVaultScreen(
                 .graphicsLayer { alpha = contentAlpha.value },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 🛡️ Task 3: Adjusted spacer to ensure content is visible behind/below OS prompt
             Spacer(modifier = Modifier.height(140.dp))
 
             Text(
@@ -150,7 +129,6 @@ fun UnlockVaultScreen(
                 letterSpacing = 2.sp
             )
 
-            // 🛡️ Task 3: Adjusted spacer to push the button lower
             Spacer(Modifier.height(120.dp))
 
             // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
@@ -166,7 +144,6 @@ fun UnlockVaultScreen(
             ) {
                 Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
                 Spacer(Modifier.width(12.dp))
-                // 🛡️ Task 3: Renamed to "RETRY BIOMETRICS" for clarity
                 Text("RETRY BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
             }
 

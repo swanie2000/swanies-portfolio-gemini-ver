@@ -5,10 +5,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,6 +44,7 @@ class MainActivity : FragmentActivity() {
         val iconDir = File(filesDir, "icons")
         if (!iconDir.exists()) iconDir.mkdirs()
 
+        // 🌊 SPLASH TRANSITION: Keep splash until data is ready
         splashScreen.setKeepOnScreenCondition {
             viewModel.isDataReady.value == false
         }
@@ -52,6 +57,7 @@ class MainActivity : FragmentActivity() {
             val gradientAmount by viewModel.gradientAmount.collectAsStateWithLifecycle()
             val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
 
+            // 🌊 NAVY FADE COORDINATION: Ensuring the system bars and background are ready for the entry animation
             LaunchedEffect(isDarkMode) {
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
                 insetsController.isAppearanceLightStatusBars = !isDarkMode
@@ -77,6 +83,7 @@ class MainActivity : FragmentActivity() {
                 val shouldShowBottomBar = currentRoute !in hideBottomBarRoutes
 
                 Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         if (shouldShowBottomBar) {
                             BottomNavigationBar(navController = navController)

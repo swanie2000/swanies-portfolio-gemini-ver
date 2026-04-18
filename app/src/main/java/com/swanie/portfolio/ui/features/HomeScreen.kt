@@ -16,11 +16,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
@@ -33,13 +35,17 @@ import kotlin.math.min
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
 
+    val navyColor = Color(0xFF000416)
     val userThemeBgColor = remember(siteBgHex) {
         try { Color(android.graphics.Color.parseColor(siteBgHex)) }
-        catch (e: Exception) { Color(0xFF000416) }
+        catch (e: Exception) { navyColor }
     }
     val userThemeTextColor = remember(siteTextHex) {
         try { Color(android.graphics.Color.parseColor(siteTextHex)) }
@@ -49,6 +55,15 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
     var showSparkles by remember { mutableStateOf(false) }
+
+    val authState by authViewModel.authState.collectAsState()
+
+    // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
+    val backgroundAlpha by animateFloatAsState(
+        targetValue = if (animationStarted) 1f else 0f,
+        animationSpec = tween(1800, easing = FastOutSlowInEasing),
+        label = "BackgroundFade"
+    )
 
     // ⚡ SNAPPY REVEAL: 1200ms -> 960ms (20% reduction)
     val radiusPercent by animateFloatAsState(targetValue = if (animationStarted) 1.5f else 0f, animationSpec = tween(960), label = "")
@@ -84,7 +99,28 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(userThemeBgColor), contentAlignment = Alignment.Center) {
+    // --- 🛡️ SUCCESS NAVIGATION: Graceful Fade into Holdings ---
+    LaunchedEffect(authState) {
+        if (authState is AuthViewModel.AuthState.Authenticated) {
+            navController.navigate(Routes.HOLDINGS) {
+                popUpTo(Routes.HOME) { inclusive = true }
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(navyColor), // Root background is fixed Navy
+        contentAlignment = Alignment.Center
+    ) {
+        // 🎨 COLOR LAYER: Fades in the user's theme color over the navy base
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(alpha = backgroundAlpha)
+                .background(userThemeBgColor)
+        )
 
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerPoint = Offset(size.width / 2f, size.height / 2f)
@@ -92,7 +128,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             if (radiusPercent > 0.01f) {
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(userThemeBgColor.copy(alpha = 0.35f), Color.Transparent),
+                        colors = listOf(userThemeBgColor.copy(alpha = 0.35f * backgroundAlpha), Color.Transparent),
                         center = centerPoint,
                         radius = maxDim * radiusPercent
                     ),
@@ -166,7 +202,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         ) {
             Column(modifier = Modifier.fillMaxWidth(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(
-                    onClick = { navController.navigate(Routes.UNLOCK_VAULT) },
+                    onClick = { 
+                        // 🛡️ ELIMINATE MIDDLEMAN: Pop biometric immediately from Home
+                        (context as? FragmentActivity)?.let { activity ->
+                            authViewModel.triggerBiometricUnlock(activity)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = userThemeTextColor, contentColor = userThemeBgColor),
                     shape = RoundedCornerShape(16.dp)
@@ -183,6 +224,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         }
     }
 }
+
 
 @Composable
 private fun MetallicShimmer(delayMs: Int, modifier: Modifier = Modifier) {
