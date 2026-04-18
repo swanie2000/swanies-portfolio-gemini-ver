@@ -316,7 +316,8 @@ class SettingsViewModel @Inject constructor(
                                         else -> asset.imageUrl
                                     }
                                     val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
-                                    
+                                    val formattedTotal = formatBoutiquePrice(assetValue)
+
                                     // 📈 Generate Sparkline for Widget
                                     val history = database.priceHistoryDao().getRecentHistory(asset.coinId).map { it.price }.reversed()
                                     val sparklinePath = if (history.size >= 2) {
@@ -333,7 +334,12 @@ class SettingsViewModel @Inject constructor(
                                     val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
                                     val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
                                     
-                                    "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|${asset.officialSpotPrice}|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$assetValue|$sparklinePath"
+                                    // 🎯 DYNAMIC PRECISION: Bulletproof Boutique Formatter
+                                    val price = asset.officialSpotPrice
+                                    val formattedPrice = formatBoutiquePrice(price)
+                                    Log.d("SWANIE_PRECISION", "Asset: $safeSymbol | Raw Bits: ${java.lang.Double.doubleToLongBits(price)} | Raw: $price | Formatted: $formattedPrice")
+                                    
+                                    "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                                 }.joinToString("||")
                             }
                             if (serializedAssets.isNotBlank()) {
@@ -379,5 +385,13 @@ class SettingsViewModel @Inject constructor(
         }
         canvas.drawPath(path, paint)
         return bitmap
+    }
+
+    private fun formatBoutiquePrice(price: Double): String {
+        return when {
+            price >= 0.10 -> String.format(Locale.US, "%.2f", price)
+            price >= 0.0001 -> String.format(Locale.US, "%.5f", price)
+            else -> String.format(Locale.US, "%.8f", price)
+        }
     }
 }

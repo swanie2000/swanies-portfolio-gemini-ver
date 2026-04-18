@@ -130,12 +130,12 @@ class PortfolioWidget : GlanceAppWidget() {
         ids.forEach { update(context, it) }
     }
 
-    private fun parseAssetsData(data: String): List<AssetEntity> {
+    private fun parseAssetsData(data: String): List<Triple<AssetEntity, String, String>> {
         if (data.isBlank()) return emptyList()
         return data.split("||").mapNotNull { entry ->
             val parts = entry.split("|")
             if (parts.size >= 10) {
-                AssetEntity(
+                val asset = AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
                     displayName = parts[2],
@@ -149,8 +149,9 @@ class PortfolioWidget : GlanceAppWidget() {
                     premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal in part 9
                     localIconPath = parts[9] // Part 10 is the Sparkline Path
                 )
+                Triple(asset, parts[4], parts[8])
             } else if (parts.size == 9) {
-                AssetEntity(
+                val asset = AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
                     displayName = parts[2],
@@ -164,6 +165,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal
                     localIconPath = "none"
                 )
+                Triple(asset, parts[4], parts[8])
             } else null
         }
     }
@@ -190,7 +192,7 @@ fun WidgetContent(
     appWidgetId: Int,
     totalValue: String,
     lastUpdated: String,
-    assets: List<AssetEntity>,
+    assets: List<Triple<AssetEntity, String, String>>,
     showTotal: Boolean,
     bgColor: Color,
     bgTextColor: Color,
@@ -225,8 +227,8 @@ fun WidgetContent(
         }
 
         Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-            assets.take(5).forEach { asset ->
-                AssetCardOriginal(context, asset, cardColor, cardTextColor)
+            assets.take(5).forEach { (asset, priceStr, totalStr) ->
+                AssetCardOriginal(context, asset, priceStr, totalStr, cardColor, cardTextColor)
                 Spacer(modifier = GlanceModifier.defaultWeight())
             }
         }
@@ -235,7 +237,7 @@ fun WidgetContent(
 }
 
 @Composable
-fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, textColor: Color) {
+fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, totalStr: String, cardColor: Color, textColor: Color) {
     Row(
         modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically
@@ -243,8 +245,8 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
         val isMetal = asset.imageUrl.startsWith("res:")
         val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
 
-        // 🎯 LANE 1: IDENTITY (Fixed 120dp for High-Precision)
-        Row(modifier = GlanceModifier.width(120.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
+        // 🎯 LANE 1: IDENTITY (Fixed 130dp for High-Precision)
+        Row(modifier = GlanceModifier.width(130.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
             Box(modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
                 if (isMetal) {
                     val resName = asset.imageUrl.substringAfter("res:")
@@ -259,13 +261,21 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
             Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
                 Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
-                val marketPrice = NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
-                Text(text = marketPrice, style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 9.sp, fontWeight = FontWeight.Medium))
+                
+                // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
+                val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 
+                                   else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
+                
+                Text(
+                    text = displayPrice, 
+                    style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 9.sp, fontWeight = FontWeight.Medium),
+                    maxLines = 1
+                )
             }
         }
 
         // 🎯 LANE 2: SPARKLINE (Fixed 80dp)
-        Box(modifier = GlanceModifier.width(80.dp).height(40.dp), contentAlignment = Alignment.CenterStart) {
+        Box(modifier = GlanceModifier.width(80.dp).height(40.dp), contentAlignment = Alignment.Center) {
             val path = asset.localIconPath
             if (path != null && path != "none") {
                 val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
@@ -282,9 +292,20 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, cardColor: Color, te
 
         // 🎯 LANE 3: HOLDINGS (Flexible / Right-Aligned)
         Column(modifier = GlanceModifier.defaultWeight().fillMaxWidth(), horizontalAlignment = Alignment.End) {
-            // Part 9 of the string (mapped to 'premium' in parseAssetsData) is the pre-calculated total
-            val bagTotal = asset.premium
-            Text(text = NumberFormat.getCurrencyInstance(Locale.US).format(bagTotal), style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold))
+            // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
+            val displayTotal = if (totalStr.isNotEmpty()) {
+                val formatted = try { 
+                    val value = totalStr.toDouble()
+                    NumberFormat.getCurrencyInstance(Locale.US).apply { maximumFractionDigits = 2 }.format(value)
+                } catch (e: Exception) { totalStr }
+                formatted
+            } else NumberFormat.getCurrencyInstance(Locale.US).format(asset.premium)
+
+            Text(
+                text = displayTotal, 
+                style = TextStyle(color = ColorProvider(textColor), fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                maxLines = 1
+            )
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF4444)
             Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
         }
