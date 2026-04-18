@@ -228,6 +228,15 @@ fun getCurrencySymbol(code: String): String = when (code.uppercase()) {
     else -> "$"
 }
 
+fun formatBoutiquePrice(price: Double, currencyCode: String = "USD"): String {
+    val symbol = getCurrencySymbol(currencyCode)
+    return when {
+        price >= 0.10 -> String.format(Locale.US, "%s%,.2f", symbol, price)
+        price >= 0.0001 -> String.format(Locale.US, "%s%,.5f", symbol, price)
+        else -> String.format(Locale.US, "%s%,.8f", symbol, price)
+    }
+}
+
 fun formatCurrency(v: Double, d: Int = 2, currencyCode: String = "USD"): String {
     val multiplier = when (currencyCode.uppercase()) {
         "EUR" -> 0.92
@@ -439,7 +448,7 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                     val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
                     Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(priceLabel, color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        AutoResizingText(text = formatCurrency(asset.officialSpotPrice, asset.decimalPreference, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                        AutoResizingText(text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
                     }
                     Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Black)
@@ -482,7 +491,7 @@ fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, car
                         asset.symbol
                     }
                     AutoResizingText(titleText, TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = 11.sp))
-                    AutoResizingText(formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+                    AutoResizingText(formatBoutiquePrice(asset.officialSpotPrice, baseCurrency), TextStyle(color = cardText.copy(0.6f), fontSize = 11.sp, fontWeight = FontWeight.Bold))
                 }
                 SparklineChart(asset.sparklineData, Modifier.weight(0.7f).height(24.dp).padding(top = 12.dp))
             }
