@@ -175,8 +175,15 @@ class AssetRepository @Inject constructor(
                     this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
 
                     val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
-                    val filteredAssets = if (selectedIds.isEmpty()) freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.take(10) 
-                                         else freshAssets.filter { it.coinId in selectedIds }
+                    
+                    // 🚀 SEQUENTIAL ORDER FIX: Map the selectedIds list to maintain user numbering/sorting
+                    val filteredAssets = if (selectedIds.isEmpty()) {
+                        freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.take(10)
+                    } else {
+                        selectedIds.mapNotNull { id -> 
+                            freshAssets.find { it.coinId == id } 
+                        }
+                    }
 
                     val serializedAssets = filteredAssets.map { asset ->
                         val iconSource = when {
@@ -211,10 +218,9 @@ class AssetRepository @Inject constructor(
                         "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                     }.joinToString("||")
 
-                    if (serializedAssets.isNotBlank()) {
-                        this.remove(PortfolioWidget.ASSETS_DATA_KEY)
-                        this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
-                    }
+                    // 🚀 ANTI-GHOSTING: Always update the state, even if empty, to ensure deleted assets are cleared from view
+                    this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
+                    
                     this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
                     val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }
                     this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
@@ -276,8 +282,45 @@ class AssetRepository @Inject constructor(
         } catch (e: Exception) { asset }
     }
 
-    suspend fun deleteAsset(asset: AssetEntity) = assetDao.deleteAssetById(asset.coinId)
-    suspend fun deleteAsset(id: String) = assetDao.deleteAssetById(id)
+    suspend fun deleteAsset(asset: AssetEntity) {
+        assetDao.deleteAssetById(asset.coinId)
+        // 🧹 CASCADE CLEANUP: Remove from Widget Selection across all vaults
+        cleanAssetFromWidgetSelection(asset.coinId)
+        // 🚀 IMMEDIATE UPDATE: Force widget refresh to remove ghost
+        pushAssetsToWidget(context, asset.vaultId.toString())
+    }
+
+    suspend fun deleteAsset(id: String) {
+        // Fetch asset info before deletion to know which vault to update
+        val allAssets = assetDao.getAllAssetsGlobal()
+        val asset = allAssets.find { it.coinId == id }
+
+        assetDao.deleteAssetById(id)
+        // 🧹 CASCADE CLEANUP: Remove from Widget Selection across all vaults
+        cleanAssetFromWidgetSelection(id)
+
+        // 🚀 IMMEDIATE UPDATE: Force widget refresh
+        asset?.let {
+            pushAssetsToWidget(context, it.vaultId.toString())
+        }
+    }
+
+    private suspend fun cleanAssetFromWidgetSelection(coinId: String) {
+        try {
+            val vaults = vaultDao.getAllVaults()
+            vaults.forEach { vault ->
+                val currentIds = vault.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
+                if (coinId in currentIds) {
+                    val newIds = currentIds.filter { it != coinId }.joinToString(",")
+                    vaultDao.updateSelectedWidgetAssets(vault.id, newIds)
+                    Log.d("REPO_CLEANUP", "Removed ghost asset $coinId from vault ${vault.name}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("REPO_CLEANUP", "Failed to clean widget selection: ${e.message}")
+        }
+    }
+
     suspend fun updateAssetOrder(assets: List<AssetEntity>) { assetDao.updateAssetOrder(assets) }
     suspend fun updateAssetEntity(asset: AssetEntity) { assetDao.updateAssetEntity(asset) }
     suspend fun toggleWidgetVisibility(id: String, isVisible: Boolean) { assetDao.updateWidgetVisibility(id, isVisible) }

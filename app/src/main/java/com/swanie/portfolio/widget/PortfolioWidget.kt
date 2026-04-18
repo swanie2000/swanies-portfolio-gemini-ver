@@ -98,13 +98,15 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardColor = try { Color(android.graphics.Color.parseColor(cardColorHex)) } catch (e: Exception) { Color(0xFF1C1C1E) }
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
 
-                val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
-                Log.d("SWANIE_SYNC", "Widget Reading: $assetsData")
-                
                 val assets = parseAssetsData(assetsData)
 
                 if (assets.isEmpty()) {
-                    SyncingContent(bgColor, bgTextColor)
+                    // 🛡️ HARDENED SYNC: Differentiate between "Syncing" and "Nothing to show"
+                    if (assetsData.isEmpty()) {
+                        EmptyWidgetContent(bgColor, bgTextColor, appWidgetId)
+                    } else {
+                        SyncingContent(bgColor, bgTextColor)
+                    }
                 } else {
                     WidgetContent(
                         context = context,
@@ -134,7 +136,7 @@ class PortfolioWidget : GlanceAppWidget() {
         if (data.isBlank()) return emptyList()
         return data.split("||").mapNotNull { entry ->
             val parts = entry.split("|")
-            if (parts.size >= 10) {
+            if (parts.size >= 10 && parts[0].isNotBlank()) {
                 val asset = AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
@@ -146,11 +148,11 @@ class PortfolioWidget : GlanceAppWidget() {
                     priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
-                    premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal in part 9
-                    localIconPath = parts[9] // Part 10 is the Sparkline Path
+                    premium = parts[8].toDoubleOrNull() ?: 0.0, 
+                    localIconPath = parts[9] 
                 )
                 Triple(asset, parts[4], parts[8])
-            } else if (parts.size == 9) {
+            } else if (parts.size == 9 && parts[0].isNotBlank()) {
                 val asset = AssetEntity(
                     coinId = parts[0],
                     symbol = parts[1],
@@ -162,7 +164,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
-                    premium = parts[8].toDoubleOrNull() ?: 0.0, // Used for calculatedTotal
+                    premium = parts[8].toDoubleOrNull() ?: 0.0,
                     localIconPath = "none"
                 )
                 Triple(asset, parts[4], parts[8])
@@ -202,7 +204,6 @@ fun WidgetContent(
 ) {
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
-            // 🎯 BOUTIQUE CENTERED HEADER: Left/Right fixed at 80dp
             Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
                 Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
                     Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = "Home", modifier = GlanceModifier.size(28.dp))
@@ -223,7 +224,8 @@ fun WidgetContent(
         }
 
         if (showTotal && totalValue.isNotEmpty()) {
-            Text(text = totalValue, style = TextStyle(color = ColorProvider(bgTextColor), fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(bottom = 4.dp))
+            val totalFontSize = if (totalValue.length > 13) 16.sp else 20.sp
+            Text(text = totalValue, style = TextStyle(color = ColorProvider(bgTextColor), fontSize = totalFontSize, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.fillMaxWidth().padding(bottom = 4.dp))
         }
 
         Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
@@ -266,9 +268,12 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                 val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 
                                    else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
                 
+                // 🛠️ Task 3: Handle high-precision bleed on high font scales (Million Dollar Asset fix)
+                val dynamicFontSize = if (displayPrice.length > 12) 7.sp else 9.sp
+
                 Text(
                     text = displayPrice, 
-                    style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = 9.sp, fontWeight = FontWeight.Medium),
+                    style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = dynamicFontSize, fontWeight = FontWeight.Medium),
                     maxLines = 1
                 )
             }
@@ -292,7 +297,6 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
 
         // 🎯 LANE 3: HOLDINGS (Flexible / Right-Aligned)
         Column(modifier = GlanceModifier.defaultWeight().fillMaxWidth(), horizontalAlignment = Alignment.End) {
-            // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
             val displayTotal = if (totalStr.isNotEmpty()) {
                 val formatted = try { 
                     val value = totalStr.toDouble()
@@ -334,6 +338,31 @@ fun SyncingContent(bgColor: Color, textColor: Color) {
 }
 
 @Composable
+fun EmptyWidgetContent(bgColor: Color, textColor: Color, appWidgetId: Int) {
+    Column(
+        modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(16.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            provider = ImageProvider(R.drawable.swan_launcher_icon),
+            contentDescription = null,
+            modifier = GlanceModifier.size(40.dp),
+            colorFilter = ColorFilter.tint(ColorProvider(textColor.copy(alpha = 0.5f)))
+        )
+        Spacer(modifier = GlanceModifier.height(12.dp))
+        Text(
+            text = "No Assets Selected",
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.8f)), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        )
+        Text(
+            text = "Tap Swan or Pencil to setup",
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 11.sp)
+        )
+    }
+}
+
+@Composable
 fun StampFallback(asset: AssetEntity) {
     Text(text = asset.symbol.take(1).uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 13.sp, fontWeight = FontWeight.Bold))
 }
@@ -346,9 +375,8 @@ class RefreshCallback : ActionCallback {
                 val entryPoint = EntryPointAccessors.fromApplication(appContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
                 val repo = entryPoint.assetRepository()
                 
-                // 🛡️ THE SECRET SAUCE: Use the extension on PortfolioWidget to get latest state
                 val prefs = PortfolioWidget().getAppWidgetState<Preferences>(appContext, glanceId)
-                val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1 // Default to 1 if null
+                val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1
                 
                 try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
                 repo.refreshAssets(force = true, portfolioId = boundId.toString())

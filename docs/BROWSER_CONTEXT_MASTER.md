@@ -173,65 +173,65 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V20: KINETIC REBIRTH)
+UPDATED MASTER DOCUMENT: SOVEREIGN SHIELD (V24: FULL-SPECTRUM PRECISION)
 🎯 THE CORE MISSION
 
-To transition "Swanie’s Portfolio" into a commercial-grade financial vault. The mission prioritizes user-owned data (Zero-Liability), hardware-level biometrics, and a professional, "Cinematic" user experience.
+To transition "Swanie’s Portfolio" into a commercial-grade financial vault. The mission prioritizes user-owned data, high-precision asset tracking (8 decimals), and a professional "Boutique" aesthetic.
 🛡️ 1. ARCHITECTURAL RECAP (THE KINETIC RESTORATION)
 
-    Visual Logic: Home Screen animations are 20% faster and perfectly synchronized. Coordinates are LOCKED.
+    Visual Logic: Home Screen animations are synchronized. Coordinates are LOCKED.
 
-    Front Door Signage: AndroidManifest.xml and SecurityManager.kt updated. The biometric prompt and unlinked widget now correctly display "Swanie's Portfolio" with fixed branding.
+    Signage & Branding: Manifest and SecurityManager updated to "Swanie's Portfolio."
 
-    Clean Slate: All legacy Google/Firebase "ghost" credentials have been revoked and purged.
+    Security: Legacy credentials purged; Biometric Handshake is the standard.
 
-    Handshake Secured: The widget "Front Door" is fixed. Tapping the unlinked widget or the yellow pencil icon now correctly triggers the configuration task.
+    Suitcase Protocol: Asset data is serialized into a 10-part string for the widget to prevent Binder transaction overhead and rounding errors.
 
-📉 2. THE RECENT BATTLE REPORT (WIDGET SYNC)
+📉 2. THE BATTLE REPORT (TODAY’S VICTORIES: V24)
 
-    Status: The "Double Total" bug is currently being addressed via the Suitcase Strategy.
+    Tiered Precision Logic: Implemented across Repository, Widget, and UI.
 
-    Data Bridge: AssetRepository.kt now packages weight and amountHeld into the sync string, and WidgetSyncWorker.kt ensures delivery.
+        ≥$0.10→ 2 decimals.
 
-    Current State: UI is stable and branding is correct. Working tree is CLEAN.
+        $0.0001 to $0.10→ 5 decimals.
+
+        <$0.0001→ 8 decimals (Squashed the "$0.00" bug for micro-assets like PEPECAT).
+
+    Widget Mastering: Expanded the "Identity Lane" to 130dp for breathing room and centered the sparklines.
+
+    UI Uniformity: Synchronized the "Compact" and "Full" asset cards in HoldingsUIComponents.kt to match the 8-decimal standard.
+
+    Database Stability: Reverted AssetEntity schema changes to fix Room Identity Hash crashes. The "Suitcase" carries the display strings, keeping the DB clean.
+
+    Status: Working tree is CLEAN (Git Commit: 1ed166a).
 
 🚀 3. THE FUTURE PATH (THE BOUTIQUE UPGRADE)
 Task	Description	Priority
-Boutique Widget	Increase Header size, add top-left Swan shortcut, and yellow Edit icon with precision touch targets.	IMMEDIATE
-Silent Vault	Re-implement Google Drive sync using the App Data Folder API (User-Owned).	HIGH
-UI Uniformity	Align 'Portfolio Manager', 'Theme Studio', and 'Widget Manager' headers with the Swan logo.	MEDIUM
-Nuclear Reset	Ensure Factory Reset clears all local data and the future cloud-stored database file.	MEDIUM
+Big Bug Squash	[Insert specific details of the newly found bug here]	IMMEDIATE
+Responsive Shield	Fix layout breakage on high-font-scale devices (Wife's Phone) using maxLines=1 and LocalDensity clamping.	HIGH
+Silent Vault	Re-implement Google Drive sync using the App Data Folder API.	HIGH
+Boutique Reveal	Implement a flicker-free "Soft Pulse" entry transition (One-Shot only).	MEDIUM
 ⚠️ 4. DEVELOPER GUARDRAILS (FOR THE NEXT AGENT)
 
-    DATA PRESERVATION: Do not suggest uninstalls. Live data is present and must be migrated to the Cloud Vault first.
+    NO SCHEMA CHANGES: Do not touch AssetEntity.kt without a version bump. Use the "Suitcase" for UI-only display strings.
 
-    WIDGET PRECISION: Only the Swan (top-left), Pencil (top-right), and Refresh icons should be reactive. Use fingertip-sized hitboxes.
+    PRECISION LOCK: Always use the 2/5/8 decimal tier system for price displays.
 
-    LOCK THE LOOK: No changes to Home Screen coordinates.
+    WIDGET HITBOXES: Only the Swan (top-left) and Pencil (top-right) are reactive. The body of the widget is a "View Only" zone.
 
-    MARKET WATCH LOGIC: The left side of the widget card must display Market Price (Spot); the right side displays Bag Total.
-
-🚀 Next Agent Command
-
-    "The narrative is updated to V20: KINETIC REBIRTH. The Front Door signage is fixed and the sync plumbing is laid.
-
-    Task 1: The Boutique Widget. Finalize the PortfolioWidget.kt overhaul. Ensure the Swan icon (top-left) and yellow Edit Pencil (top-right) have 'finger-tip size' hitboxes. The body of the widget must remain non-reactive.
-
-    Task 2: UI Consistency. Update headers for PortfolioManagerScreen.kt, ThemeStudioScreen.kt, and WidgetManagerScreen.kt. Each needs the Swan icon centered above the title to match the Unified Shell.
-
-    Provide full file outputs only. Confirm 'KEEP ALL' before proceeding."
+    FULL FILE OUTPUTS ONLY: Do not provide snippets.
 ### END_NARRATIVE
 
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Wed 04/15/2026 22:11:40.80
+Generated: Sat 04/18/2026 13:52:45.20
 
 Branch:
 main
 Commit:
-b4cfb08a989d988d0586ffaedc58e9bd00b238f6
+1ed166a99ca0e3f718b7594c37f43de3bd1d0d20
 Working tree status (git status --porcelain):
  M docs/BROWSER_CONTEXT_NARRATIVE.md
 

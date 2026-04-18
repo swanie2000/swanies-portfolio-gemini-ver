@@ -328,9 +328,15 @@ fun WidgetManagerScreen(
                                                     isSelected = isSelected,
                                                     orderIndex = orderIndex,
                                                     onToggle = {
-                                                        if (isSelected) draftSelectedIds = draftSelectedIds.filter { it != asset.coinId }
-                                                        else if (draftSelectedIds.size < 5) draftSelectedIds = draftSelectedIds + asset.coinId
-                                                        else Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
+                                                        // 🛠️ Task 2: Recalculate count based on actual existence
+                                                        val currentExistingIds = draftSelectedIds.filter { id -> targetAssets.any { it.coinId == id } }
+                                                        if (isSelected) {
+                                                            draftSelectedIds = currentExistingIds.filter { it != asset.coinId }
+                                                        } else if (currentExistingIds.size < 5) {
+                                                            draftSelectedIds = currentExistingIds + asset.coinId
+                                                        } else {
+                                                            Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
+                                                        }
                                                     },
                                                     themeColor = safeThemeText
                                                 )
