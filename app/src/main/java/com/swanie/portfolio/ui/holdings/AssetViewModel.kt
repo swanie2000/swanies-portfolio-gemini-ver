@@ -18,6 +18,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,13 +40,21 @@ class AssetViewModel @Inject constructor(
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
 
     // 🌐 GLOBAL VISTA: Track Current Vault
-    val currentVaultId = themePreferences.currentVaultId.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+    // Task 2: Instant Data Handshake - Use runBlocking for the absolute first state to avoid "Vault 1" flicker
+    val currentVaultId = themePreferences.currentVaultId.stateIn(
+        viewModelScope, 
+        SharingStarted.Eagerly, 
+        runBlocking { themePreferences.currentVaultId.first() }
+    )
 
     // 🌐 GLOBAL VISTA: Filter holdings by currentVaultId
-    val holdings: StateFlow<List<AssetEntity>> = currentVaultId
-        .flatMapLatest { id -> assetDao.getAssetsByVault(id) }
-        .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault") }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    // Ensure we emit the Room flow immediately. The skeleton is handled by the initial null value.
+    val holdings: StateFlow<List<AssetEntity>?> = currentVaultId
+        .flatMapLatest { id ->
+            assetDao.getAssetsByVault(id)
+        }
+        .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault ${currentVaultId.value}") }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     /**
      * 🛰️ INTERNAL HELPER: Pushes the current vault state to Google Drive.
@@ -177,7 +188,7 @@ class AssetViewModel @Inject constructor(
     fun saveMetalDisplayOrder(symbols: List<String>) {
         sharedPrefs.edit().putString("metals_order", symbols.joinToString(",")).apply()
         viewModelScope.launch {
-            val currentHoldings = holdings.value
+            val currentHoldings = holdings.value ?: emptyList()
             val updatedList =
                 currentHoldings.filter { it.category == AssetCategory.METAL }.map { asset ->
                     val newIndex = symbols.indexOf(asset.baseSymbol)

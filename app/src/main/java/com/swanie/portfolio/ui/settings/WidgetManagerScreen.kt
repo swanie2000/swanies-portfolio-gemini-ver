@@ -58,6 +58,7 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.VaultEntity
+import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import kotlinx.coroutines.delay
@@ -169,97 +170,55 @@ fun WidgetManagerScreen(
             Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
                 // --- 🦢 BOUTIQUE HEADER ---
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(110.dp)
-                        .zIndex(10f)
-                ) {
-                    IconButton(
-                        onClick = { onBack() },
-                        modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
-                    }
-
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy((-4).dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.swanie_foreground),
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp)
-                        )
-                        Text(
-                            text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = safeThemeText,
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 2.sp
-                        )
-                    }
-
-                    // 🎯 COMMAND CENTER: Save/Undo Toggle
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 8.dp, end = 8.dp)
-                    ) {
+                BoutiqueHeader(
+                    title = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER",
+                    onBack = { onBack() },
+                    actionIcon = if (isDirty || (isConfigMode && selectedVault != null)) Icons.Default.Save else Icons.Default.Undo,
+                    onAction = {
                         if (isDirty || (isConfigMode && selectedVault != null)) {
-                            IconButton(
-                                onClick = {
-                                    if (cooldownSeconds == 0 && selectedVault != null) {
+                            if (cooldownSeconds == 0 && selectedVault != null) {
+                                scope.launch {
+                                    val targetId = selectedVault!!.id
+                                    val currentWidgetId = if (isConfigMode) configAppWidgetId else null
+
+                                    // 🛡️ REGISTRATION LOCK: Links the hardware appWidgetId to the VaultEntity in Room.
+                                    settingsViewModel.saveWidgetConfiguration(targetId, currentWidgetId, draftSelectedIds) {
                                         scope.launch {
-                                            val targetId = selectedVault!!.id
-                                            val currentWidgetId = if (isConfigMode) configAppWidgetId else null
-                                            
-                                            // 🛡️ REGISTRATION LOCK: Links the hardware appWidgetId to the VaultEntity in Room.
-                                            settingsViewModel.saveWidgetConfiguration(targetId, currentWidgetId, draftSelectedIds) {
-                                                scope.launch {
-                                                    settingsViewModel.saveWidgetAppearance(
-                                                        targetId,
-                                                        draftBg,
-                                                        draftBgTxt,
-                                                        draftCrd,
-                                                        draftCrdTxt
-                                                    )
-                                                    // Privacy is now vault-specific
-                                                    settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
+                                            settingsViewModel.saveWidgetAppearance(
+                                                targetId,
+                                                draftBg,
+                                                draftBgTxt,
+                                                draftCrd,
+                                                draftCrdTxt
+                                            )
+                                            // Privacy is now vault-specific
+                                            settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
 
-                                                    // Hard refresh to sync state
-                                                    settingsViewModel.getVaultById(targetId)
+                                            // Hard refresh to sync state
+                                            settingsViewModel.getVaultById(targetId)
 
-                                                    // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
-                                                    if (currentWidgetId != null && currentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                                                        settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, currentWidgetId)
-                                                    }
+                                            // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
+                                            if (currentWidgetId != null && currentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                                                settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, currentWidgetId)
+                                            }
 
-                                                    sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
-                                                    
-                                                    if (isConfigMode) {
-                                                        onConfigComplete()
-                                                    } else {
-                                                        Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                }
+                                            sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
+
+                                            if (isConfigMode) {
+                                                onConfigComplete()
+                                            } else {
+                                                Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
                                             }
                                         }
                                     }
                                 }
-                            ) {
-                                Icon(Icons.Default.Save, contentDescription = "SAVE", tint = if (selectedVault != null) Color.Yellow else safeThemeText.copy(0.2f))
                             }
                         } else {
-                            IconButton(
-                                onClick = { revertChanges() }
-                            ) {
-                                Icon(Icons.Default.Undo, contentDescription = "UNDO", tint = safeThemeText.copy(alpha = 0.4f))
-                            }
+                            revertChanges()
                         }
-                    }
-                }
+                    },
+                    textColor = safeThemeText
+                )
 
                 // 🎯 PORTFOLIO REGISTRY SELECTOR (Always Visible Safety Valve)
                 PortfolioSelectorDropdown(

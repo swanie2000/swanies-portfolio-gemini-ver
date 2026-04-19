@@ -48,7 +48,8 @@ fun AnalyticsScreen(navController: NavController) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
 
-    val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = emptyList())
+    val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = null)
+    val safeHoldings = holdings ?: emptyList()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
@@ -60,12 +61,12 @@ fun AnalyticsScreen(navController: NavController) {
         Color(0xFF2979FF), Color(0xFFEEFF41), Color(0xFFB2FF59)
     )
 
-    val totalValue = holdings.sumOf { it.officialSpotPrice * (it.weight * it.amountHeld) }
+    val totalValue = safeHoldings.sumOf { it.officialSpotPrice * (it.weight * it.amountHeld) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     var selectedAssetId by remember { mutableStateOf<String?>(null) }
 
-    val assetSegments = holdings.mapIndexed { index, asset ->
+    val assetSegments = safeHoldings.mapIndexed { index, asset ->
         val assetValue = asset.officialSpotPrice * (asset.weight * asset.amountHeld)
         AssetSegment(
             asset = asset,

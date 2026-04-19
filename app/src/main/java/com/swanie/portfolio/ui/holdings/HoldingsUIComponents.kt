@@ -32,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,8 +50,8 @@ import java.util.Locale
 fun MetalIcon(
     name: String,
     weight: Double,
-    unit: String = "OZ", // 🛠️ V18: Standardized Unit for stamping
-    physicalForm: String = "Coin", // 🛡️ V18: Explicit Form (Coin, Bar, Round)
+    unit: String = "OZ", 
+    physicalForm: String = "Coin", 
     size: Int = 44,
     imageUrl: String = "",
     localPath: String? = null,
@@ -99,7 +100,6 @@ fun MetalIcon(
                 else -> listOf(Color(0xFFCED4DA), Color(0xFFADB5BD), Color(0xFF495057))
             }
 
-            // 🛡️ V18: No more guessing. Use physicalForm directly.
             val isBar = physicalForm.equals("Bar", ignoreCase = true)
 
             Box(modifier = Modifier.size(size.dp), contentAlignment = Alignment.Center) {
@@ -126,7 +126,6 @@ fun MetalIcon(
                     }
                 }
 
-                // 🛠️ V18: High-Precision Stamping Logic
                 val weightStr = when (unit.uppercase()) {
                     "GRAM" -> "1g"
                     "KILO" -> "1k"
@@ -257,7 +256,7 @@ fun MetalSelectionFunnel(
     initialMetal: String, initialForm: String, initialWeight: Double, initialQty: String, initialPrem: String, initialManualPrice: String,
     onDismiss: () -> Unit,
     onConfirmed: (String, String, Double, String, String, String, String?, Boolean, String) -> Unit,
-    onNavigateToArchitect: (() -> Unit)? = null // 🛠️ V7.2.5: Integrated for Custom Asset building
+    onNavigateToArchitect: (() -> Unit)? = null 
 ) {
     var step by remember { mutableIntStateOf(1) }
     val startMetal = when {
@@ -271,7 +270,7 @@ fun MetalSelectionFunnel(
     var l1 by remember { mutableStateOf(initialForm) }
     var l2 by remember { mutableStateOf("") }
     var selectedWeight by remember { mutableDoubleStateOf(initialWeight) }
-    var selectedUnit by remember { mutableStateOf("OZ") } // 🛠️ V18: Explicit Tracking
+    var selectedUnit by remember { mutableStateOf("OZ") } 
     var qtyInput by remember { mutableStateOf(initialQty) }
     var premInput by remember { mutableStateOf(initialPrem) }
     var manualPriceInput by remember { mutableStateOf(initialManualPrice) }
@@ -372,13 +371,21 @@ fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String,
 @Composable
 fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, isDragging: Boolean, showEditButton: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, onEditRequest: () -> Unit, onSave: (String, Double, Double, String, Int) -> Unit, onCancel: () -> Unit = {}, modifier: Modifier = Modifier) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    val scale by animateFloatAsState(if (isDragging) 1.05f else 1f, label = "grabScale")
-    val elevation by animateDpAsState(if (isDragging) 12.dp else 0.dp, label = "grabElevation")
+    val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "grabScale")
+    val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "grabElevation")
+    val alpha by animateFloatAsState(if (isDragging) 0.9f else 1f, label = "grabAlpha")
     Box(modifier = modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .graphicsLayer { scaleX = scale; scaleY = scale; shadowElevation = elevation.toPx(); clip = true; shape = RoundedCornerShape(16.dp) }
+                .graphicsLayer { 
+                    scaleX = scale
+                    scaleY = scale
+                    shadowElevation = elevation.toPx()
+                    this.alpha = alpha
+                    clip = true
+                    shape = RoundedCornerShape(16.dp) 
+                }
                 .clickable(enabled = !isEditing) { onExpandToggle() },
             colors = CardDefaults.cardColors(containerColor = cardBg),
             shape = RoundedCornerShape(16.dp),
@@ -406,10 +413,12 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                     }
                     Column(modifier = Modifier.weight(1.6f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                         val nameToUse = asset.displayName.ifEmpty { asset.name }
+                        val density = LocalDensity.current
+                        
                         Text(
                             text = nameToUse.uppercase(),
                             color = cardText.copy(alpha = 0.5f),
-                            fontSize = 10.sp,
+                            fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
                             fontWeight = FontWeight.Black,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -418,15 +427,18 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
                             text = formatAmount(asset.amountHeld),
                             color = cardText,
                             fontWeight = FontWeight.Black,
-                            fontSize = 32.sp,
-                            maxLines = 1
+                            fontSize = with(density) { (32.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         if (asset.category == AssetCategory.METAL) {
                             Text(
                                 text = "${formatAmount(asset.weight)} ${asset.weightUnit}".uppercase(),
                                 color = cardText.copy(alpha = 0.4f),
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -467,10 +479,27 @@ fun FullAssetCard(asset: AssetEntity, isExpanded: Boolean, isEditing: Boolean, i
 
 @Composable
 fun CompactAssetCard(asset: AssetEntity, isDragging: Boolean, cardBg: Color, cardText: Color, baseCurrency: String = "USD", onExpandToggle: () -> Unit, modifier: Modifier = Modifier) {
-    val scale by animateFloatAsState(if (isDragging) 1.04f else 1f, label = "compactGrabScale")
+    val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "compactGrabScale")
+    val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "compactGrabElevation")
+    val alpha by animateFloatAsState(if (isDragging) 0.9f else 1f, label = "compactGrabAlpha")
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     Box(modifier = modifier.fillMaxWidth()) {
-        Card(modifier = Modifier.fillMaxWidth().graphicsLayer { scaleX = scale; scaleY = scale; clip = true; shape = RoundedCornerShape(12.dp) }.clickable { onExpandToggle() }, colors = CardDefaults.cardColors(containerColor = cardBg), shape = RoundedCornerShape(12.dp), border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer { 
+                    scaleX = scale
+                    scaleY = scale
+                    shadowElevation = elevation.toPx()
+                    this.alpha = alpha
+                    clip = true
+                    shape = RoundedCornerShape(12.dp) 
+                }
+                .clickable { onExpandToggle() }, 
+            colors = CardDefaults.cardColors(containerColor = cardBg), 
+            shape = RoundedCornerShape(12.dp), 
+            border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
+        ) {
             Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.weight(0.3f)) {
                     MetalIcon(

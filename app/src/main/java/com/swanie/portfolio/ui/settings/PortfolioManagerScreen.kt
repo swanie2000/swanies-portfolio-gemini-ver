@@ -43,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
+import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.R
@@ -121,51 +122,13 @@ fun PortfolioManagerScreen(
                 .padding(horizontal = 20.dp)
         ) {
             // --- 🦢 BOUTIQUE HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .height(110.dp)
-                    .zIndex(10f)
-            ) {
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
-                }
-
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy((-4).dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.swanie_foreground),
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp)
-                    )
-                    Text(
-                        text = "PORTFOLIO MANAGER",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = safeThemeText,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp
-                    )
-                }
-
-                IconButton(
-                    onClick = { mainViewModel.createNewVault("NEW PORTFOLIO") },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 12.dp, end = 12.dp)
-                        .clip(CircleShape)
-                        .background(Color.Yellow)
-                        .size(36.dp)
-                ) {
-                    Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(20.dp))
-                }
-            }
+            BoutiqueHeader(
+                title = "PORTFOLIO MANAGER",
+                onBack = { navController.popBackStack() },
+                textColor = safeThemeText,
+                actionIcon = Icons.Default.Add,
+                onAction = { mainViewModel.createNewVault("NEW PORTFOLIO") }
+            )
 
             // --- ⭐ LEGEND ⭐ ---
             Row(

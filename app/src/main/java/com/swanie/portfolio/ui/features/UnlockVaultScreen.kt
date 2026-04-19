@@ -34,6 +34,7 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
@@ -90,77 +91,59 @@ fun UnlockVaultScreen(
         .statusBarsPadding()
         .imePadding()
     ) {
-        // --- 🏰 HEADER ---
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .zIndex(10f)
-            .padding(horizontal = 16.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.swanie_foreground),
-                contentDescription = null,
-                modifier = Modifier.size(100.dp).align(Alignment.Center)
-            )
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
-                .graphicsLayer { alpha = contentAlpha.value },
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(140.dp))
-
-            Text(
-                text = "VAULT LOCKED",
-                color = siteText,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp
-            )
-            Text(
-                text = "USE BIOMETRICS OR PIN",
-                color = siteText.copy(alpha = 0.5f),
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp
+            // --- 🦢 BOUTIQUE HEADER ---
+            BoutiqueHeader(
+                title = "VAULT LOCKED",
+                onBack = { navController.popBackStack() },
+                textColor = siteText
             )
 
-            Spacer(Modifier.height(120.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
-            Button(
-                onClick = {
-                    (context as? FragmentActivity)?.let { activity ->
-                        authViewModel.triggerBiometricUnlock(activity)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
-                shape = RoundedCornerShape(12.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .graphicsLayer { alpha = contentAlpha.value },
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
-                Spacer(Modifier.width(12.dp))
-                Text("RETRY BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            TextButton(
-                onClick = { navController.popBackStack() }
-            ) {
+                Spacer(modifier = Modifier.height(60.dp))
+                
                 Text(
-                    text = "CANCEL",
-                    color = siteText.copy(alpha = 0.4f),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "IDENTITY VERIFICATION",
+                    color = siteText.copy(alpha = 0.5f),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.sp
                 )
-            }
 
-            Spacer(modifier = Modifier.height(100.dp))
+                Spacer(Modifier.height(100.dp))
+
+                // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
+                Button(
+                    onClick = {
+                        (context as? FragmentActivity)?.let { activity ->
+                            authViewModel.triggerBiometricUnlock(activity)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Text("RETRY BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+            }
         }
     }
 }

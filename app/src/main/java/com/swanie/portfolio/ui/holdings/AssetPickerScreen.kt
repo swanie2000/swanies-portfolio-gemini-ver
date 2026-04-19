@@ -34,6 +34,7 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 
@@ -86,22 +87,19 @@ fun AssetPickerScreen(
         if (selectedProvider != "YahooFinance") focusRequester.requestFocus()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("VAULT SELECTOR", fontWeight = FontWeight.Black, color = textColor, fontSize = 16.sp, letterSpacing = 1.sp) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = textColor)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        },
-        containerColor = Color.Transparent
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(bgColor)
+    ) {
+        Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             
+            // --- 🦢 BOUTIQUE HEADER ---
+            BoutiqueHeader(
+                title = "VAULT SELECTOR",
+                onBack = { navController.popBackStack() },
+                textColor = textColor
+            )
+
             // --- UNIFIED INPUT AREA (One Window Strategy) ---
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
                 if (selectedProvider == "YahooFinance") {

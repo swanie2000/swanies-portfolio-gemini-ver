@@ -134,7 +134,8 @@ fun MetalsAuditScreen(navController: NavController) {
                 items(metalsOrder, key = { it.second }) { item ->
                     val (name, sym) = item
                     ReorderableItem(reorderableLazyListState, key = sym) { isDragging ->
-                        val isOwned = holdings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
+                        val safeHoldings = holdings ?: emptyList()
+                        val isOwned = safeHoldings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
                         val marketData = marketDataMap[sym]
                         val scale by animateFloatAsState(if (isDragging) 1.1f else 1f, label = "reorderScale")
                         val elevation by animateDpAsState(if (isDragging) 15.dp else 2.dp, label = "reorderElevation")
