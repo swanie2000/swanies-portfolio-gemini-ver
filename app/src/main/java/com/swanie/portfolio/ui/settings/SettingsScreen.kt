@@ -186,7 +186,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("MANAGE PORTFOLIOS", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("PORTFOLIO MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -200,7 +200,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("OPEN THEME STUDIO", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("THEME MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -214,7 +214,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("OPEN WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
+                        Text("WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(48.dp))
@@ -229,17 +229,6 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Button(
-                        onClick = { navController.navigate(Routes.LEGACY_HOME) },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta.copy(alpha = 0.2f)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("DEBUG: VIEW ORIGINAL DESIGN", color = Color.Magenta, fontWeight = FontWeight.Black)
                     }
 
                     Spacer(modifier = Modifier.height(120.dp))

@@ -14,8 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.ui.settings.SettingsViewModel
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.settings.WidgetManagerScreen
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +30,7 @@ class WidgetConfigActivity : ComponentActivity() {
     lateinit var vaultDao: VaultDao
     
     private val settingsViewModel: SettingsViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels()
 
     private var appWidgetId by mutableIntStateOf(AppWidgetManager.INVALID_APPWIDGET_ID)
 
@@ -38,10 +41,13 @@ class WidgetConfigActivity : ComponentActivity() {
         handleIntent(intent)
 
         setContent {
+            val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsState()
+            val siteBgColor = try { Color(siteBgColorHex.toColorInt()) } catch (e: Exception) { Color(0xFF000416) }
+
             SwaniesPortfolioTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFF000416)
+                    color = siteBgColor
                 ) {
                     if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                         WidgetManagerScreen(
@@ -54,7 +60,7 @@ class WidgetConfigActivity : ComponentActivity() {
                                     data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
                                 }
                                 setResult(Activity.RESULT_OK, resultValue)
-                                finishAndRemoveTask()
+                                finish()
                             },
                             onBack = {
                                 finish()

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +81,8 @@ fun ThemeStudioScreen(
 
     // Helper for ThemeDefaults color to Hex String
     fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
+
+    val safeSiteTextColor = try { Color(siteTextColor.toColorInt()) } catch (e: Exception) { Color.White }
 
     // Pulse & Glow Animations
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -202,34 +205,51 @@ fun ThemeStudioScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // --- CUSTOM STUDIO HEADER ---
-            Box(modifier = Modifier.fillMaxWidth().height(110.dp), contentAlignment = Alignment.Center) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            // --- 🦢 BOUTIQUE HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)
+                    .zIndex(10f),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp).clickable { navController.popBackStack() }
-                    )
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy((-2).dp),
-                        modifier = Modifier.clickable { showResetDialog = true }
-                    ) {
-                        Text("DEFAULT", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
-                        Text("COLOR", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
-                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeSiteTextColor)
                 }
-                Image(
-                    painter = painterResource(id = R.drawable.swanie_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp)
-                )
+
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy((-4).dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.swanie_foreground),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Text(
+                        text = "THEME MANAGER",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = safeSiteTextColor,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy((-2).dp),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 16.dp, end = 12.dp)
+                        .clickable { showResetDialog = true }
+                ) {
+                    Text("DEFAULT", color = safeSiteTextColor, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
+                    Text("COLOR", color = safeSiteTextColor, fontSize = 10.sp, fontWeight = FontWeight.Bold, lineHeight = 10.sp)
+                }
             }
 
             Column(modifier = Modifier.fillMaxWidth().height(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {

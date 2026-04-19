@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.res.painterResource
+import com.swanie.portfolio.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -110,6 +114,7 @@ fun WidgetManagerScreen(
         }
     }
 
+    val siteBgColor by themeViewModel.siteBackgroundColor.collectAsStateWithLifecycle(initialValue = "#000416")
     val siteTextColor by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
 
     val isDirty by remember(selectedVault, draftBg, draftBgTxt, draftCrd, draftCrdTxt, draftSelectedIds, draftHideTotals) {
@@ -117,13 +122,13 @@ fun WidgetManagerScreen(
             selectedVault?.let {
                 val originalIds = it.selectedWidgetAssets.split(",").filter { id -> id.isNotBlank() }
                 val originalHideTotals = !it.showWidgetTotal
-                
+
                 draftBg != it.widgetBgColor ||
-                draftBgTxt != it.widgetBgTextColor ||
-                draftCrd != it.widgetCardColor ||
-                draftCrdTxt != it.widgetCardTextColor ||
-                draftSelectedIds != originalIds ||
-                draftHideTotals != originalHideTotals
+                        draftBgTxt != it.widgetBgTextColor ||
+                        draftCrd != it.widgetCardColor ||
+                        draftCrdTxt != it.widgetCardTextColor ||
+                        draftSelectedIds != originalIds ||
+                        draftHideTotals != originalHideTotals
             } ?: false
         }
     }
@@ -142,6 +147,7 @@ fun WidgetManagerScreen(
     var assetsExpanded by rememberSaveable { mutableStateOf(true) }
 
     val safeThemeText = try { Color((siteTextColor ?: "#FFFFFF").toColorInt()) } catch(e: Exception) { Color.White }
+    val safeSiteBg = try { Color((siteBgColor ?: "#000416").toColorInt()) } catch(e: Exception) { Color(0xFF000416) }
 
     val lazyListState = rememberLazyListState()
     
@@ -153,7 +159,7 @@ fun WidgetManagerScreen(
     }
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
+    Box(modifier = Modifier.fillMaxSize().background(if (isConfigMode) safeSiteBg else Color.Transparent)) {
         if (targetVaultId == -1) {
             // 🚀 THE STATE FLICKER: 10ms transient black hole to break Intent ghosting
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -162,21 +168,45 @@ fun WidgetManagerScreen(
         } else {
             Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
-                // --- CUSTOM HEADER ---
-                Box(modifier = Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 4.dp)) {
-                    IconButton(onClick = { onBack() }, modifier = Modifier.align(Alignment.CenterStart)) {
+                // --- 🦢 BOUTIQUE HEADER ---
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(110.dp)
+                        .zIndex(10f)
+                ) {
+                    IconButton(
+                        onClick = { onBack() },
+                        modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
                     }
-                    Text(
-                        text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER", 
-                        fontWeight = FontWeight.Black, 
-                        fontSize = 14.sp, 
-                        color = safeThemeText, 
-                        modifier = Modifier.align(Alignment.Center).padding(horizontal = 48.dp)
-                    )
+
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy((-4).dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.swanie_foreground),
+                            contentDescription = null,
+                            modifier = Modifier.size(80.dp)
+                        )
+                        Text(
+                            text = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = safeThemeText,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp
+                        )
+                    }
 
                     // 🎯 COMMAND CENTER: Save/Undo Toggle
-                    Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 8.dp, end = 8.dp)
+                    ) {
                         if (isDirty || (isConfigMode && selectedVault != null)) {
                             IconButton(
                                 onClick = {

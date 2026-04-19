@@ -120,39 +120,50 @@ fun PortfolioManagerScreen(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-            // --- 🦢 HEADER ---
+            // --- 🦢 BOUTIQUE HEADER ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .height(100.dp)
+                    .height(110.dp)
                     .zIndex(10f)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.swanie_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp).align(Alignment.Center)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
-                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = safeThemeText)
+                }
 
-                    Spacer(modifier = Modifier.weight(1f))
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy((-4).dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.swanie_foreground),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Text(
+                        text = "PORTFOLIO MANAGER",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = safeThemeText,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp
+                    )
+                }
 
-                    IconButton(
-                        onClick = { mainViewModel.createNewVault("NEW PORTFOLIO") },
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Color.Yellow)
-                            .size(44.dp)
-                    ) {
-                        Icon(Icons.Default.Add, null, tint = Color.Black)
-                    }
+                IconButton(
+                    onClick = { mainViewModel.createNewVault("NEW PORTFOLIO") },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 12.dp, end = 12.dp)
+                        .clip(CircleShape)
+                        .background(Color.Yellow)
+                        .size(36.dp)
+                ) {
+                    Icon(Icons.Default.Add, null, tint = Color.Black, modifier = Modifier.size(20.dp))
                 }
             }
 
