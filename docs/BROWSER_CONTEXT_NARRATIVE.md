@@ -1,53 +1,46 @@
-This is the perfect way to cap off a heavy 3-hour session. By generating a clean, structured Narrative now, you ensure the next agent doesn't just see "code"—they see the Sovereign Vision.
-
-I have integrated the V27 Fluid Architecture wins into this document, specifically highlighting the "Split-Zone" breakthrough and the "Grip" restoration.
-🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V27: THE FLUID SOVEREIGN)
-
+🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V34: THE DECK OF CARDS)
 🎯 THE CORE MISSION
+
 To maintain a commercial-grade financial vault where user data is sovereign, biometrics are hardware-enforced, and the UI is a "Cinematic Masterpiece." We prioritize high-precision layouts that survive high-density screen settings.
-🛡️ 1. ARCHITECTURAL PILLARS (THE FLUID SHIFT)
+⚠️ 1. MANDATORY AGENT OPERATING PROCEDURES (THE LANE LOCK)
 
-    The Split-Zone Protocol: Navigation (Portfolio Swiping) is isolated to the Top 150dp Control Deck. The Vault Floor (Asset List) is static and independent. This resolves 100% of the gesture conflicts between swiping and reordering.
+    SCOPE ENFORCEMENT: Do NOT act on the "Future Path" or "To-Do" lists unless explicitly commanded in the current prompt.
 
-    The "Grip" standard: Asset reordering follows the Portfolio Manager pattern. Card "lifting" (1.03x scale + shadow) and immediate haptic feedback are mandatory.
+    CONTEXT PRESERVATION: If you identify a layout issue during a task, report it, but do NOT refactor other files unless requested. This prevents "Payload Overload" (4MB limits).
 
-    Suitcase Protocol: Asset data for the widget is serialized into a 10-part string to bypass Binder transaction limits and preserve 8-decimal precision.
+    FULL FILE OUTPUTS ONLY: Never provide partial snippets. Swanie requires full file context to maintain project integrity.
 
-    Process Isolation: WidgetConfigActivity operates in a standalone task (taskAffinity) to prevent main-app interference during home-screen configuration.
+    DENSITY SHIELD: All UI must be tested mentally at 1.5x font scale. Use LocalDensity to clamp font sizes where headers or cards risk overlapping.
 
-📉 2. THE BATTLE REPORT (RECENT VICTORIES: V26-V27)
+🛡️ 2. ARCHITECTURAL PILLARS (V34 STANDARDS)
 
-    The Ghost Handshake: Replaced the legacy "Curtain" with AnimatedContent cross-fades and Skeleton pulsing. This reduced perceived portfolio switching latency by 50%.
+    The Identity Deck (Hard Isolation): The HorizontalPager is strictly confined to a top 140dp Box. The Asset List sits on the "Vault Floor" outside the pager. This permanently resolves gesture conflicts between swiping and reordering.
 
-    Adaptive Branding: Standardized the BoutiqueHeader (80dp Swan + Bold Title) which intelligently scales by 0.85x on narrow devices to prevent layout breakage.
+    The Iron Anchor: Identity Cards use fixed-slot positioning. The Vault Name and Total Value occupy reserved vertical space so they never "jump" or shift when data loads.
 
-    Density Shield (Lane 1): Locked the 130dp Identity Lane with dynamic font scaling. Assets remain centered and legible even at 1.5x system font scale.
+    Pure Dissolve (The 1.5s Pour): Portfolio transitions use a 1500ms Crossfade on the global container. No sliding, no popping—just a high-end cinematic dissolve.
 
-    The "Fog" Fix: Implemented isScrollInProgress logic to ensure UI elements are always 100% opacity when the pager is static.
+    Night-Vault Aesthetic: Identity cards use a derived background color (20% darker than siteBg) to create physical depth and a "Glass in the Void" feel.
 
-    V27 Status: Working tree is CLEAN. UI is responsive and tactile.
+📉 3. THE BATTLE REPORT (SESSION WINS: V28-V34)
 
-🚀 3. THE FUTURE PATH (THE SOVEREIGN UPGRADE)
+    The 64dp Boutique Standard: Reverted asset cards to 64dp for optimal legibility and "Density Shield" protection.
+
+    Minimalist Gold Badge: Re-instated the Metals Audit trigger as a floating Gold Shield icon (Security) without a circular container.
+
+    Zero-Scale Pager: Disabled all dynamic scaling in the HorizontalPager to eliminate the "twitch" when cards center.
+
+    Build Restoration: Repaired BoutiqueHeader.kt and AnalyticsScreen.kt by correctly scoping LocalDensity within with(density) blocks.
+
+🚀 4. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
-Boutique Audit	Final verification of all screens at 1.5x font scale for layout overlap.	IMMEDIATE
-Silent Vault	Re-implement Google Drive sync using the hidden App Data Folder API.	HIGH
-Silent Sync	Ensure background cloud backups trigger after every manual asset edit.	MEDIUM
-⚠️ 4. DEVELOPER GUARDRAILS (FOR THE NEXT AGENT)
-
-    NO PAGER NESTING: Do not move the LazyColumn back inside the HorizontalPager. The "Split-Zone" is the permanent architecture.
-
-    IDENTITY LANE LOCK: The 130dp left-lane in asset cards is a hard boundary. Never allow price text to wrap; use maxLines = 1 and TextOverflow.Ellipsis.
-
-    FULL FILE OUTPUTS ONLY: Do not provide snippets. Swanie requires full file context for every change.
-
-    PRECISION INTEGRITY: Maintain the 2/5/8 decimal tier system ($/Metals/Crypto) across all calculations and UI nodes.
-
+Motion Polish	Refine the "Pure Dissolve" to ensure zero ghosting during the 1.5s transition.	IMMEDIATE
+Typography Audit	Address auto-text sizing to ensure "Total Value" never clips the Identity Box.	HIGH
+Boutique Audit	Final verification of all screens at 1.5x font scale for layout overlap.	MEDIUM
 🚀 NEXT AGENT COMMAND
 
-    "The narrative is updated to V27: THE FLUID SOVEREIGN. The 'Split-Zone' architecture is active, and the 'Ghost Handshake' transition is smooth.
+    "The narrative is updated to V34: THE DECK OF CARDS. The 'Hard Isolation' architecture is active, and we are refining the 'Pure Dissolve' transition.
 
-    Current Objective: Perform a 'Boutique Layout Audit.'
+    Current Objective: address the 'Pure Dissolve' weirdness on the MyHoldingsScreen vault floor and perform a typography audit on the Identity Deck.
 
-    Check all screens (MyHoldings, Analytics, MetalsAudit, ThemeStudio) at 1.5x font scale. Ensure the 80dp Swan headers and the 130dp Widget lanes do not wrap or overlap. If text is too long, clamp the font size using LocalDensity or apply Ellipsis.
-
-    Provide full file outputs only. Confirm 'SOVEREIGN LOCK' before proceeding."
+    Constraint: Do not refactor the 'To-Do' list. Stay in your lane. Provide full file outputs for MyHoldingsScreen.kt only. Confirm 'SOVEREIGN LOCK' before proceeding."

@@ -20,6 +20,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -112,13 +114,16 @@ fun MetalsAuditScreen(navController: NavController) {
                 }
             }
 
+            val density = LocalDensity.current
             Text(
                 text = "METALS MARKET WATCH",
                 color = textColor,
-                fontSize = 20.sp,
+                fontSize = with(density) { (20.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
                 fontWeight = FontWeight.Black,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(24.dp))

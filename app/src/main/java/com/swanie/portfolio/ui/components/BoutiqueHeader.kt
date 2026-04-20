@@ -3,7 +3,7 @@ package com.swanie.portfolio.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -13,9 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.R
@@ -29,15 +31,21 @@ fun BoutiqueHeader(
     textColor: Color = Color.White
 ) {
     val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
     val screenWidth = configuration.screenWidthDp
     val scaleFactor = if (screenWidth < 360) 0.85f else 1f
+    
+    // Boutique Density Clamp: Prevent title from expanding into button safe-zones at high font scales
+    val clampedFontSize = with(density) { 
+        ((24 * scaleFactor).sp.toPx() / fontScale.coerceAtLeast(1.0f)).toSp()
+    }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, bottom = 8.dp)
     ) {
-        // Back Button
+        // Back Button (Safe Zone: Start)
         IconButton(
             onClick = onBack,
             modifier = Modifier
@@ -45,7 +53,7 @@ fun BoutiqueHeader(
                 .padding(start = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
                 tint = textColor
             )
@@ -53,7 +61,9 @@ fun BoutiqueHeader(
 
         // Branding (Swan + Title)
         Column(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 56.dp), // Hard boundary to prevent button overlap
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -64,19 +74,20 @@ fun BoutiqueHeader(
             
             Text(
                 text = title,
-                fontSize = (24 * scaleFactor).sp,
+                fontSize = clampedFontSize,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp,
                 color = textColor,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
+                    .fillMaxWidth()
                     .padding(top = 4.dp)
             )
         }
 
-        // Action Button
+        // Action Button (Safe Zone: End)
         if (actionIcon != null && onAction != null) {
             IconButton(
                 onClick = onAction,

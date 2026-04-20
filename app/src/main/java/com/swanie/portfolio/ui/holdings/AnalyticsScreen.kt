@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -99,13 +100,16 @@ fun AnalyticsScreen(navController: NavController) {
                     )
                 }
 
+                val density = LocalDensity.current
                 Text(
                     text = "PORTFOLIO INTELLIGENCE",
                     color = safeText,
-                    fontSize = 20.sp,
+                    fontSize = with(density) { (20.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
                     fontWeight = FontWeight.Black,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Surface(
@@ -148,17 +152,18 @@ fun AnalyticsScreen(navController: NavController) {
                                 .height(110.dp),
                             contentAlignment = Alignment.Center
                         ) {
+                            val density = LocalDensity.current
                             Crossfade(targetState = focusedSegment, label = "footerFade") { segment ->
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                                 ) {
                                     if (segment != null) {
                                         Text(
                                             text = segment.asset.name.replace("\n", " ").uppercase(),
                                             color = segment.color,
-                                            fontSize = 10.sp,
+                                            fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
                                             fontWeight = FontWeight.Black,
                                             textAlign = TextAlign.Center,
                                             maxLines = 1,
@@ -167,20 +172,39 @@ fun AnalyticsScreen(navController: NavController) {
                                         Text(
                                             text = currencyFormatter.format(segment.value),
                                             color = Color.White,
-                                            fontSize = 24.sp,
+                                            fontSize = with(density) { (24.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
                                             fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
                                             text = "${String.format("%.1f", segment.ratio * 100)}% OF TOTAL",
                                             color = segment.color.copy(alpha = 0.8f),
-                                            fontSize = 12.sp,
+                                            fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
                                             fontWeight = FontWeight.ExtraBold,
-                                            textAlign = TextAlign.Center
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     } else {
-                                        Text(text = "TOTAL PORTFOLIO VALUE", color = Color.White.copy(0.4f), fontSize = 10.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                                        Text(text = currencyFormatter.format(totalValue), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center)
+                                        Text(
+                                            text = "TOTAL PORTFOLIO VALUE",
+                                            color = Color.White.copy(0.4f),
+                                            fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1
+                                        )
+                                        Text(
+                                            text = currencyFormatter.format(totalValue),
+                                            color = Color.White,
+                                            fontSize = with(density) { (24.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
                                         Text(text = " ", fontSize = 12.sp)
                                     }
                                 }
@@ -192,9 +216,11 @@ fun AnalyticsScreen(navController: NavController) {
                 Text(
                     text = "HOLDINGS KEY",
                     color = safeText.copy(0.5f),
-                    fontSize = 12.sp,
+                    fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
                     fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 12.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
@@ -299,6 +325,7 @@ fun InteractiveBarChart(segments: List<AssetSegment>, selectedId: String?, onSel
 fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean, onClick: () -> Unit) {
     val bgColor by animateColorAsState(if (isSelected) segment.color.copy(0.12f) else Color.Transparent, label = "")
     val borderColor by animateColorAsState(if (isSelected) segment.color.copy(0.5f) else Color.Transparent, label = "")
+    val density = LocalDensity.current
 
     val symbol = segment.asset.symbol.uppercase()
     val cleanName = segment.asset.name.replace("\n", " ").trim().uppercase()
@@ -335,7 +362,7 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
                 Text(
                     text = displayTitle,
                     color = if(isSelected) segment.color else textColor,
-                    fontSize = 13.sp,
+                    fontSize = with(density) { (13.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
                     fontWeight = FontWeight.Black,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -352,8 +379,21 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
         }
 
         Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.End) {
-            Text(NumberFormat.getCurrencyInstance(Locale.US).format(segment.value), color = textColor, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
-            Text("${String.format("%.1f", segment.ratio * 100)}%", color = segment.color, fontSize = 11.sp, fontWeight = FontWeight.Black)
+            Text(
+                text = NumberFormat.getCurrencyInstance(Locale.US).format(segment.value),
+                color = textColor,
+                fontSize = with(density) { (14.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "${String.format("%.1f", segment.ratio * 100)}%",
+                color = segment.color,
+                fontSize = with(density) { (11.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
+                fontWeight = FontWeight.Black,
+                maxLines = 1
+            )
         }
     }
 }

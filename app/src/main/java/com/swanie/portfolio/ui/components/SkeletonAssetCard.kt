@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SkeletonAssetCard() {
+fun SkeletonAssetCard(height: Int = 80) {
     val infiniteTransition = rememberInfiniteTransition(label = "skeleton")
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
@@ -27,22 +27,23 @@ fun SkeletonAssetCard() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(height.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(Color.LightGray.copy(alpha = alpha * 0.2f))
     )
 }
 
 @Composable
-fun SkeletonAssetList() {
+fun SkeletonAssetList(isCompact: Boolean = false) {
+    val itemHeight = if (isCompact) 58 else 150
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        repeat(5) {
-            SkeletonAssetCard()
+        repeat(6) {
+            SkeletonAssetCard(height = itemHeight)
         }
     }
 }
