@@ -1,49 +1,53 @@
-NARRATIVE UPDATE: V35 (THE SOVEREIGN RESET)
-
-🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V35: THE SOVEREIGN RESET)
+🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V36: THE PAID ASCENCY)
 
 🎯 THE CORE MISSION
 To maintain a commercial-grade financial vault where user data is sovereign, biometrics are hardware-enforced, and the UI is a "Cinematic Masterpiece." We prioritize high-precision layouts that survive high-density screen settings.
 
 ⚠️ 1. MANDATORY AGENT OPERATING PROCEDURES (THE LANE LOCK)
 
-    SCOPE ENFORCEMENT: Do NOT act on the "Future Path" or "To-Do" lists unless explicitly commanded in the current prompt.
+    FULL FILE OUTPUTS ONLY: Swanie requires full file context. Partial snippets are strictly forbidden.
 
-    CONTEXT PRESERVATION: If you identify a layout issue during a task, report it, but do NOT refactor other files unless requested.
+    PAID TIER PROTOCOL: The Agent is now operating via a Paid API Key ($25.00 Pre-funded). High-token outputs are encouraged to maintain Source of Truth integrity.
 
-    FULL FILE OUTPUTS ONLY: Never provide partial snippets. Swanie requires full file context.
+    SOVEREIGN SHIELD: Never push local.properties or API keys to GitHub. The .gitignore must be strictly enforced.
 
-    DENSITY SHIELD: All UI must be tested mentally at 1.5x font scale. Use LocalDensity to clamp font sizes.
+    DENSITY SHIELD: All UI must utilize the mathematical font clamp: (originalSp.toPx() / fontScale.coerceAtMost(1.15f)).toSp().
 
-🛡️ 2. ARCHITECTURAL PILLARS (V35 STANDARDS)
+🛡️ 2. ARCHITECTURAL PILLARS (V36 STANDARDS)
 
-    The Identity Deck (Hard Isolation): The HorizontalPager is strictly confined to a top 140dp Box. The Asset List sits on the "Vault Floor" outside the pager.
+    The Pin-Anchor Layout (V36): All asset cards (Full & Compact) must utilize the 3-Column Architecture:
 
-    The Iron Anchor (Typography Shield): AutoResizingText is mandatory for high-value headers. Font scaling is mathematically clamped (e.g., coerceAtMost(1.15f)) to prevent container clipping.
+        Left Anchor (80.dp): Fixed width for Icon/Symbol.
 
-    3-Stage Interaction State: Compact cards follow a strict lifecycle: Tap 1 (Expand) ➔ Tap 2 (Show Edit/Pencil) ➔ Tap 3 (Collapse).
+        Middle Slot (weight 1f): Flexible center for large Holding amounts and Names.
 
-    Standardized Action Slot: All asset cards (Compact & Full) reserve an anchored 80dp right-hand slot for Sparklines or the Pencil Icon to ensure visual alignment during transitions.
+        Right Anchor (64.dp): Fixed width for Sparklines and Action Icons (Pencil).
 
-📉 3. THE BATTLE REPORT (SESSION WINS: V34-V35)
+    Zero-Twitch Parity: The expanded state of a CompactAssetCard must be a dimensional twin of the FullAssetCard. Icon scale (44.dp) and vertical footprint (160.dp min) must be identical to eliminate visual "jumps."
 
-    Build Restoration: Resolved critical signature mismatches in HoldingsUIComponents.kt and MyHoldingsScreen.kt.
+    Single-Truth Rendering: Use if (!isExpanded) checks to prevent "Double-Header" rendering during card transitions.
 
-    Interaction Lockdown: Successfully implemented the 3-stage state machine for Compact cards and the 2-stage Pencil toggle for Full cards.
+📉 3. THE BATTLE REPORT (SESSION WINS: V36)
 
-    Refresh Anchor: Relocated the LinearProgressIndicator to the Vault Floor, syncing the "work" indicator with the actual asset content.
+    Panda 4 Migration: Successfully navigated the Android Studio Panda 4 upgrade and resolved "Limit: 0" quota roadblocks.
 
-    Density Hardening: Integrated AutoResizingText in the Identity Deck to handle large currency values at high system font scales.
+    Financial Pipeline: Established a funded Google AI Studio Tier 1 API path, bypassing consumer-grade throttling.
+
+    Layout Perfection: Refactored HoldingsUIComponents.kt to fix the "12,190" holding clipping issue.
+
+    Dimensional Parity: Unified the Full and Compact asset card architectures with pixel-perfect "Zero-Twitch" expansion.
+
+    Security Lock: Updated .gitignore to protect the new Paid API credentials from public exposure.
 
 🚀 4. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
-Logic Cleanup	Fix the Edit Icon (Pencil) click handling to ensure it correctly launches the edit funnel.	IMMEDIATE
-State Polish	Ensure the "Third Tap" collapse functions consistently across both card types.	HIGH
-Motion Audit	Final verification of the 1500ms "Pure Dissolve" for ghosting artifacts.	MEDIUM
+Market Watch Rebuild	Apply the Pin-Anchor architecture to the Price/Market screen for app-wide UI harmony.	IMMEDIATE
+Sovereign Bridge	Harden the Google Drive Sync logic using the now-unlimited Paid API pipe.	HIGH
+Metal V20 Schema	Refine Room DB for physical metal tracking (Golden Vault stabilization).	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is updated to V35: THE SOVEREIGN RESET. The build is stable and compiling. Our focus is now on the refinement of the 3-stage interaction logic.
+"The narrative is updated to V36: THE PAID ASCENCY. The build is stable, the working tree is clean, and the UI is pixel-perfect. We have successfully stabilized the Vault Floor.
 
-Current Objective: Fix the Pencil icon click-through in MyHoldingsScreen.kt and HoldingsUIComponents.kt to ensure the Edit Funnel launches, and verify the collapse logic on the third tap.
+Current Objective: Apply the V36 Pin-Anchor architecture to the Market Watch / Price List components to ensure the entire app reflects the new cinematic standard.
 
-Constraint: Provide full file outputs only. Stay in your lane. Confirm 'SOVEREIGN LOCK' before proceeding."
+Constraint: Provide full file outputs only. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before proceeding."
