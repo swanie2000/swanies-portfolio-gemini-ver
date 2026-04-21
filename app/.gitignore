@@ -1,1 +1,31 @@
-/build
+# --- SWANIE'S SECURITY SHIELD ---
+# This section prevents your Paid API Keys from leaking to GitHub
+local.properties
+.env
+signing.properties
+*.keystore
+*.jks
+
+# --- ANDROID STUDIO / JETBRAINS ---
+.idea/
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# --- KOTLIN/JVM ---
+*.class
+*.log
+*.pyc
+*.swp
+
+# --- OS SPECIFIC ---
+.DS_Store
+Thumbs.db
+
+# --- PROJECT SPECIFIC ---
+# Do not ignore the Sovereign Bridge or Narrative files
+# (Ensure docs/ is NOT in this list)

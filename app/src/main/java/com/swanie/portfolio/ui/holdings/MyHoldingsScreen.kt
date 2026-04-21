@@ -253,12 +253,12 @@ fun MyHoldingsScreen(
                                         ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                             val hndl = Modifier.longPressDraggableHandle(
                                                 onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                                onDragStopped = { 
+                                                onDragStopped = {
                                                     if (isOverTrash.value) {
                                                         viewModel.deleteAsset(asset)
                                                     }
                                                     isDraggingActive.value = false
-                                                    viewModel.updateAssetOrder(localHoldings) 
+                                                    viewModel.updateAssetOrder(localHoldings)
                                                 }
                                             )
                                             val cardBgCol = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
