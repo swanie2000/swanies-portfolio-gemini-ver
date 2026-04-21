@@ -27,10 +27,13 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -44,7 +47,8 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.ui.components.*
+import com.swanie.portfolio.ui.holdings.formatAmount
+import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import sh.calvin.reorderable.ReorderableItem
@@ -83,7 +87,7 @@ fun MyHoldingsScreen(
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
-    var assetPendingDeletion by remember { mutableStateOf<AssetEntity?>(null) }
+    var editingAssetId by remember { mutableStateOf<String?>(null) }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
     val isDraggingActive = remember { mutableStateOf(false) }
     val isOverTrash = remember { mutableStateOf(false) }
@@ -165,20 +169,14 @@ fun MyHoldingsScreen(
                 Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(80.dp).zIndex(10f)) {
                     Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(70.dp).align(Alignment.Center))
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() }) {
-                            Icon(Icons.Default.Refresh, "Refresh", tint = textColor)
-                        }
+                        IconButton(onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() }) { Icon(Icons.Default.Refresh, "Refresh", tint = textColor) }
                         Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = { mainViewModel.toggleCompactView() }) {
-                            Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor)
-                        }
-                        IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)) {
-                            Icon(Icons.Default.Add, null, tint = Color.Black)
-                        }
+                        IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
+                        IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)) { Icon(Icons.Default.Add, null, tint = Color.Black) }
                     }
                 }
 
-                // Identity Deck (Pure Dissolve Refinement)
+                // Identity Deck
                 Box(modifier = Modifier.fillMaxWidth().height(140.dp).zIndex(5f)) {
                     HorizontalPager(
                         state = pagerState,
@@ -194,50 +192,31 @@ fun MyHoldingsScreen(
                         val contentAlpha = (1f - (pageOffset * 1.8f).coerceIn(0f, 1f))
 
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(110.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(nightVaultColor)
-                                .border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                                .graphicsLayer { alpha = contentAlpha.pow(2f) }
-                                .clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
+                            modifier = Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).graphicsLayer { alpha = contentAlpha.pow(2f) }.clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
                         ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize().padding(12.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                // Slot 1: Title (Anchored)
-                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
-                                    Text(
-                                        text = vaultForPage.name.uppercase(),
-                                        color = textColor,
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Black,
-                                        letterSpacing = 2.sp
-                                    )
-                                }
-
+                            Column(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) { Text(text = vaultForPage.name.uppercase(), color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp) }
                                 Spacer(modifier = Modifier.height(4.dp))
-
-                                // Slot 2: Value (No Skeleton Box)
                                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
                                     if (isCurrent && holdings != null) {
-                                        Text(
+                                        AutoResizingText(
                                             text = totalValueFormatted,
-                                            color = textColor.copy(0.7f),
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Bold
+                                            style = TextStyle(
+                                                color = textColor.copy(0.7f),
+                                                fontSize = with(LocalDensity.current) { (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = TextAlign.Center
+                                            ),
+                                            modifier = Modifier.fillMaxWidth()
                                         )
                                     }
-                                    // Empty space keeps the anchor stable
                                 }
                             }
                         }
                     }
                 }
 
-                // Vault Floor (The 1.5s Pure Cross-Dissolve)
+                // Vault Floor
                 Box(modifier = Modifier.fillMaxSize().weight(1f)) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -246,20 +225,21 @@ fun MyHoldingsScreen(
                                 Box(modifier = Modifier.weight(1f).height(40.dp).padding(horizontal = 4.dp).clip(CircleShape).background(if (sel) textColor.copy(0.15f) else Color.Transparent).border(1.dp, textColor.copy(if (sel) 0.3f else 0.1f), CircleShape).clickable { selectedTab = i }, contentAlignment = Alignment.Center) {
                                     Text(t, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (sel) textColor else textColor.copy(0.5f))
                                 }
-                                if (t == "METAL" && sel) {
-                                    IconButton(onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) }) {
-                                        Icon(Icons.Default.Security, null, tint = Color(0xFFFFD700), modifier = Modifier.size(20.dp))
-                                    }
-                                }
+                                if (t == "METAL" && sel) { IconButton(onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) }) { Icon(Icons.Default.Security, null, tint = Color(0xFFFFD700), modifier = Modifier.size(20.dp)) } }
                             }
                         }
 
-                        // 🛡️ PURE DISSOLVE: Forced no-slide transition
+                        if (isViewModelRefreshing) {
+                            LinearProgressIndicator(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(2.dp),
+                                color = Color.Yellow,
+                                trackColor = Color.Transparent
+                            )
+                        }
+
                         AnimatedContent(
                             targetState = activeVault.id,
-                            transitionSpec = {
-                                fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(1200))
-                            },
+                            transitionSpec = { fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(1500)) },
                             label = "PureDissolve"
                         ) { _ ->
                             LazyColumn(
@@ -273,15 +253,43 @@ fun MyHoldingsScreen(
                                         ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                             val hndl = Modifier.longPressDraggableHandle(
                                                 onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                                onDragStopped = { if (isOverTrash.value) assetPendingDeletion = asset; isDraggingActive.value = false; viewModel.updateAssetOrder(localHoldings) }
+                                                onDragStopped = { 
+                                                    if (isOverTrash.value) {
+                                                        viewModel.deleteAsset(asset)
+                                                    }
+                                                    isDraggingActive.value = false
+                                                    viewModel.updateAssetOrder(localHoldings) 
+                                                }
                                             )
                                             val cardBgCol = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
                                             val cardTextCol = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
+                                            val isExpanded = expandedAssetId == asset.coinId
+                                            val showEdit = editingAssetId == asset.coinId
+
                                             if (isCompactViewEnabled) {
-                                                CompactAssetCard(asset, isDragging, cardBgCol, cardTextCol, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, hndl)
+                                                CompactAssetCard(
+                                                    asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
+                                                    onExpandToggle = {
+                                                        if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
+                                                        else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
+                                                        else { expandedAssetId = null; editingAssetId = null }
+                                                    },
+                                                    onEditRequest = { assetBeingEdited = asset },
+                                                    modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit
+                                                )
                                             } else {
-                                                FullAssetCard(asset, expandedAssetId == asset.coinId, false, isDragging, expandedAssetId == asset.coinId, cardBgCol, cardTextCol, activeVault.baseCurrency, { expandedAssetId = if (expandedAssetId == asset.coinId) null else asset.coinId }, { assetBeingEdited = asset }, { _, _, _, _, _ -> }, modifier = hndl)
+                                                FullAssetCard(
+                                                    asset = asset, isExpanded = true, isEditing = false, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
+                                                    onExpandToggle = {
+                                                        if (editingAssetId != asset.coinId) editingAssetId = asset.coinId else editingAssetId = null
+                                                    },
+                                                    onEditRequest = { assetBeingEdited = asset },
+                                                    onSave = { newName, newAmount, newWeight, weightUnit, decimals ->
+                                                        viewModel.updateAsset(asset, newName, newAmount, newWeight, weightUnit, decimals)
+                                                    },
+                                                    showEditButton = showEdit, modifier = hndl
+                                                )
                                             }
                                         }
                                     }
@@ -293,7 +301,31 @@ fun MyHoldingsScreen(
             }
         }
 
-        // Trash Zone...
+        // Selection Funnels
+        assetBeingEdited?.let { asset ->
+            if (asset.category == AssetCategory.METAL) {
+                MetalSelectionFunnel(
+                    initialMetal = asset.name, initialForm = asset.physicalForm, initialWeight = asset.weight, initialQty = asset.amountHeld.toString(), initialPrem = asset.premium.toString(), initialManualPrice = asset.officialSpotPrice.toString(),
+                    onDismiss = { assetBeingEdited = null },
+                    onConfirmed = { name, form, w, unit, qty, prem, icon, manual, price ->
+                        viewModel.updateAssetEntity(asset.copy(name = name, physicalForm = form, weight = w, weightUnit = unit, amountHeld = qty.toDoubleOrNull() ?: 0.0, premium = prem.toDoubleOrNull() ?: 0.0, imageUrl = icon ?: asset.imageUrl, officialSpotPrice = price.toDoubleOrNull() ?: asset.officialSpotPrice))
+                        assetBeingEdited = null
+                        editingAssetId = null
+                    }
+                )
+            } else {
+                CryptoEditFunnel(
+                    asset = asset, onDismiss = { assetBeingEdited = null },
+                    onSave = { name, amt, dec ->
+                        viewModel.updateAssetEntity(asset.copy(amountHeld = amt, decimalPreference = dec))
+                        assetBeingEdited = null
+                        editingAssetId = null
+                    }
+                )
+            }
+        }
+
+        // Trash Zone
         AnimatedVisibility(visible = isDraggingActive.value, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.align(Alignment.BottomEnd).padding(30.dp).onGloballyPositioned { c -> val p = c.positionInRoot(); trashBoundsInRoot.value = Rect(p.x, p.y, p.x + c.size.width, p.y + c.size.height) }) {
             Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(if (isOverTrash.value) Color.Red else Color.DarkGray).border(2.dp, Color.White, CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Default.Delete, null, tint = Color.White) }
         }

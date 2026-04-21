@@ -1,46 +1,49 @@
-🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V34: THE DECK OF CARDS)
-🎯 THE CORE MISSION
+NARRATIVE UPDATE: V35 (THE SOVEREIGN RESET)
 
+🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V35: THE SOVEREIGN RESET)
+
+🎯 THE CORE MISSION
 To maintain a commercial-grade financial vault where user data is sovereign, biometrics are hardware-enforced, and the UI is a "Cinematic Masterpiece." We prioritize high-precision layouts that survive high-density screen settings.
+
 ⚠️ 1. MANDATORY AGENT OPERATING PROCEDURES (THE LANE LOCK)
 
     SCOPE ENFORCEMENT: Do NOT act on the "Future Path" or "To-Do" lists unless explicitly commanded in the current prompt.
 
-    CONTEXT PRESERVATION: If you identify a layout issue during a task, report it, but do NOT refactor other files unless requested. This prevents "Payload Overload" (4MB limits).
+    CONTEXT PRESERVATION: If you identify a layout issue during a task, report it, but do NOT refactor other files unless requested.
 
-    FULL FILE OUTPUTS ONLY: Never provide partial snippets. Swanie requires full file context to maintain project integrity.
+    FULL FILE OUTPUTS ONLY: Never provide partial snippets. Swanie requires full file context.
 
-    DENSITY SHIELD: All UI must be tested mentally at 1.5x font scale. Use LocalDensity to clamp font sizes where headers or cards risk overlapping.
+    DENSITY SHIELD: All UI must be tested mentally at 1.5x font scale. Use LocalDensity to clamp font sizes.
 
-🛡️ 2. ARCHITECTURAL PILLARS (V34 STANDARDS)
+🛡️ 2. ARCHITECTURAL PILLARS (V35 STANDARDS)
 
-    The Identity Deck (Hard Isolation): The HorizontalPager is strictly confined to a top 140dp Box. The Asset List sits on the "Vault Floor" outside the pager. This permanently resolves gesture conflicts between swiping and reordering.
+    The Identity Deck (Hard Isolation): The HorizontalPager is strictly confined to a top 140dp Box. The Asset List sits on the "Vault Floor" outside the pager.
 
-    The Iron Anchor: Identity Cards use fixed-slot positioning. The Vault Name and Total Value occupy reserved vertical space so they never "jump" or shift when data loads.
+    The Iron Anchor (Typography Shield): AutoResizingText is mandatory for high-value headers. Font scaling is mathematically clamped (e.g., coerceAtMost(1.15f)) to prevent container clipping.
 
-    Pure Dissolve (The 1.5s Pour): Portfolio transitions use a 1500ms Crossfade on the global container. No sliding, no popping—just a high-end cinematic dissolve.
+    3-Stage Interaction State: Compact cards follow a strict lifecycle: Tap 1 (Expand) ➔ Tap 2 (Show Edit/Pencil) ➔ Tap 3 (Collapse).
 
-    Night-Vault Aesthetic: Identity cards use a derived background color (20% darker than siteBg) to create physical depth and a "Glass in the Void" feel.
+    Standardized Action Slot: All asset cards (Compact & Full) reserve an anchored 80dp right-hand slot for Sparklines or the Pencil Icon to ensure visual alignment during transitions.
 
-📉 3. THE BATTLE REPORT (SESSION WINS: V28-V34)
+📉 3. THE BATTLE REPORT (SESSION WINS: V34-V35)
 
-    The 64dp Boutique Standard: Reverted asset cards to 64dp for optimal legibility and "Density Shield" protection.
+    Build Restoration: Resolved critical signature mismatches in HoldingsUIComponents.kt and MyHoldingsScreen.kt.
 
-    Minimalist Gold Badge: Re-instated the Metals Audit trigger as a floating Gold Shield icon (Security) without a circular container.
+    Interaction Lockdown: Successfully implemented the 3-stage state machine for Compact cards and the 2-stage Pencil toggle for Full cards.
 
-    Zero-Scale Pager: Disabled all dynamic scaling in the HorizontalPager to eliminate the "twitch" when cards center.
+    Refresh Anchor: Relocated the LinearProgressIndicator to the Vault Floor, syncing the "work" indicator with the actual asset content.
 
-    Build Restoration: Repaired BoutiqueHeader.kt and AnalyticsScreen.kt by correctly scoping LocalDensity within with(density) blocks.
+    Density Hardening: Integrated AutoResizingText in the Identity Deck to handle large currency values at high system font scales.
 
 🚀 4. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
-Motion Polish	Refine the "Pure Dissolve" to ensure zero ghosting during the 1.5s transition.	IMMEDIATE
-Typography Audit	Address auto-text sizing to ensure "Total Value" never clips the Identity Box.	HIGH
-Boutique Audit	Final verification of all screens at 1.5x font scale for layout overlap.	MEDIUM
+Logic Cleanup	Fix the Edit Icon (Pencil) click handling to ensure it correctly launches the edit funnel.	IMMEDIATE
+State Polish	Ensure the "Third Tap" collapse functions consistently across both card types.	HIGH
+Motion Audit	Final verification of the 1500ms "Pure Dissolve" for ghosting artifacts.	MEDIUM
+
 🚀 NEXT AGENT COMMAND
+"The narrative is updated to V35: THE SOVEREIGN RESET. The build is stable and compiling. Our focus is now on the refinement of the 3-stage interaction logic.
 
-    "The narrative is updated to V34: THE DECK OF CARDS. The 'Hard Isolation' architecture is active, and we are refining the 'Pure Dissolve' transition.
+Current Objective: Fix the Pencil icon click-through in MyHoldingsScreen.kt and HoldingsUIComponents.kt to ensure the Edit Funnel launches, and verify the collapse logic on the third tap.
 
-    Current Objective: address the 'Pure Dissolve' weirdness on the MyHoldingsScreen vault floor and perform a typography audit on the Identity Deck.
-
-    Constraint: Do not refactor the 'To-Do' list. Stay in your lane. Provide full file outputs for MyHoldingsScreen.kt only. Confirm 'SOVEREIGN LOCK' before proceeding."
+Constraint: Provide full file outputs only. Stay in your lane. Confirm 'SOVEREIGN LOCK' before proceeding."
