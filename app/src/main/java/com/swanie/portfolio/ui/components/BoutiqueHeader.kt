@@ -1,6 +1,7 @@
 package com.swanie.portfolio.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,6 +29,7 @@ fun BoutiqueHeader(
     onBack: () -> Unit,
     actionIcon: ImageVector? = null,
     onAction: (() -> Unit)? = null,
+    actionLabel: String? = null,
     textColor: Color = Color.White
 ) {
     val configuration = LocalConfiguration.current
@@ -40,10 +42,11 @@ fun BoutiqueHeader(
         ((24 * scaleFactor).sp.toPx() / fontScale.coerceAtLeast(1.0f)).toSp()
     }
 
+    val bottomPadding = if (actionLabel != null) 20.dp else 8.dp
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp, bottom = 8.dp)
+            .padding(top = 16.dp, bottom = bottomPadding)
     ) {
         // Back Button (Safe Zone: Start)
         IconButton(
@@ -88,18 +91,32 @@ fun BoutiqueHeader(
         }
 
         // Action Button (Safe Zone: End)
-        if (actionIcon != null && onAction != null) {
-            IconButton(
-                onClick = onAction,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 8.dp)
-            ) {
-                Icon(
-                    imageVector = actionIcon,
-                    contentDescription = "Action",
-                    tint = textColor
+        if (onAction != null) {
+            if (actionLabel != null) {
+                Text(
+                    text = actionLabel,
+                    color = textColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 0.6.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 12.dp, end = 12.dp)
+                        .clickable { onAction() }
                 )
+            } else if (actionIcon != null) {
+                IconButton(
+                    onClick = onAction,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = actionIcon,
+                        contentDescription = "Action",
+                        tint = textColor
+                    )
+                }
             }
         }
     }

@@ -203,20 +203,6 @@ fun SettingsScreen(
                         Text("THEME MANAGER", color = safeText, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = {
-                            isExiting = true
-                            navController.navigate(Routes.WIDGET_MANAGER)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("WIDGET MANAGER", color = safeText, fontWeight = FontWeight.Bold)
-                    }
-
                     Spacer(modifier = Modifier.height(48.dp))
 
                     // --- SYSTEM ACTIONS ---

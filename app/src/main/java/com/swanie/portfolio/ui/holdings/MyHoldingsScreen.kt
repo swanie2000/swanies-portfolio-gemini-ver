@@ -94,8 +94,8 @@ fun MyHoldingsScreen(
     var isExiting by remember { mutableStateOf(false) }
 
     // 🛡️ DELETION SHIELD STATE
-    val confirmDelete by viewModel.confirmDelete.collectAsStateWithLifecycle()
-    var assetToDelete by remember { mutableStateOf<AssetEntity?>(null) }
+    val confirmDeleteEnabled by mainViewModel.confirmDelete.collectAsStateWithLifecycle()
+    val assetToDelete by viewModel.confirmDelete.collectAsStateWithLifecycle()
 
     val pagerState = rememberPagerState(
         initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
@@ -259,9 +259,8 @@ fun MyHoldingsScreen(
                                                 onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
                                                 onDragStopped = {
                                                     if (isOverTrash.value) {
-                                                        // 🛡️ V38.1 DELETION SHIELD INJECTION
-                                                        if (confirmDelete) {
-                                                            assetToDelete = asset
+                                                        if (confirmDeleteEnabled) {
+                                                            viewModel.requestDeleteConfirmation(asset)
                                                         } else {
                                                             viewModel.deleteAsset(asset)
                                                         }
@@ -337,20 +336,20 @@ fun MyHoldingsScreen(
         // --- 🛡️ V38.1 ASSET DELETION DIALOG ---
         assetToDelete?.let { asset ->
             AlertDialog(
-                onDismissRequest = { assetToDelete = null },
+                onDismissRequest = { viewModel.clearDeleteConfirmation() },
                 containerColor = Color(0xFF1A1A1A),
                 title = { Text("REMOVE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
                 text = { Text("Are you sure you want to remove ${asset.symbol} from your vault?", color = Color.White) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.deleteAsset(asset)
-                        assetToDelete = null
+                        viewModel.clearDeleteConfirmation()
                     }) {
                         Text("REMOVE", color = Color.Red)
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { assetToDelete = null }) {
+                    TextButton(onClick = { viewModel.clearDeleteConfirmation() }) {
                         Text("CANCEL", color = Color.White)
                     }
                 }

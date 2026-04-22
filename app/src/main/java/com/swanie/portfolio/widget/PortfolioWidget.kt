@@ -268,8 +268,7 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
             }
             Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
-                // 🎯 V38.11 VISUAL LOG: Display widgetOrder index
-                Text(text = "[${asset.widgetOrder}] ${asset.symbol.uppercase()}", style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
                 
                 // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
                 val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 

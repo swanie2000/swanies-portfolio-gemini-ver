@@ -9,26 +9,28 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.settings.WidgetManagerScreen
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
+/**
+ * Opens only from the home widget (pencil) with a valid [AppWidgetManager.EXTRA_APPWIDGET_ID].
+ * No intent-filters; not exported — see [AndroidManifest.xml].
+ */
 @AndroidEntryPoint
 class WidgetConfigActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var vaultDao: VaultDao
-    
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val themeViewModel: ThemeViewModel by viewModels()
 
@@ -36,42 +38,46 @@ class WidgetConfigActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+        title = "Widget Manager"
         setResult(Activity.RESULT_CANCELED)
-        handleIntent(intent)
+
+        if (!applyIntent(intent)) {
+            Log.w(TAG, "finish: missing or invalid appWidgetId")
+            finish()
+            return
+        }
 
         setContent {
             val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsState()
-            val siteBgColor = try { Color(siteBgColorHex.toColorInt()) } catch (e: Exception) { Color(0xFF000416) }
+            val siteBgColor = try {
+                Color(siteBgColorHex.toColorInt())
+            } catch (e: Exception) {
+                Color(0xFF000416)
+            }
 
             SwaniesPortfolioTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = siteBgColor
-                ) {
-                    if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                        WidgetManagerScreen(
-                            isConfigMode = true,
-                            configAppWidgetId = appWidgetId,
-                            onConfigComplete = {
-                                val resultValue = Intent().apply {
-                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                    // 🛡️ Ensure the data URI is mirrored in the result
-                                    data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
-                                }
-                                setResult(Activity.RESULT_OK, resultValue)
-                                finish()
-                            },
-                            onBack = {
-                                finish()
+                Surface(modifier = Modifier.fillMaxSize(), color = siteBgColor) {
+                    WidgetManagerScreen(
+                        isConfigMode = true,
+                        configAppWidgetId = appWidgetId,
+                        onConfigComplete = {
+                            val resultValue = Intent().apply {
+                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                                data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
                             }
-                        )
-                    } else {
-                        // Error fallback
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                            Text("Invalid Widget ID", color = Color.White)
-                        }
-                    }
+                            setResult(Activity.RESULT_OK, resultValue)
+
+                            sendBroadcast(
+                                Intent(this@WidgetConfigActivity, PortfolioWidgetReceiver::class.java).apply {
+                                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+                                },
+                            )
+
+                            finishAndRemoveTask()
+                        },
+                        onBack = { finishAndRemoveTask() },
+                    )
                 }
             }
         }
@@ -79,36 +85,37 @@ class WidgetConfigActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // 🚀 THE LOCK: Explicitly set the new intent and force re-processing
         setIntent(intent)
-        handleIntent(intent)
+        if (!applyIntent(intent)) {
+            finish()
+        }
     }
 
-    private fun handleIntent(intent: Intent) {
-        // 🔍 PRIMARY: URI Path Segment (swanie://widget/ID/TIMESTAMP)
-        // This bypasses Intent Extra conflation entirely.
-        val idFromUri = intent.data?.lastPathSegment?.toIntOrNull() ?: AppWidgetManager.INVALID_APPWIDGET_ID
-        
-        // 🔍 SECONDARY: Standard Extra
-        val idFromExtra = intent.getIntExtra(
-            AppWidgetManager.EXTRA_APPWIDGET_ID,
-            AppWidgetManager.INVALID_APPWIDGET_ID
-        )
-        
-        val resolvedId = if (idFromUri != AppWidgetManager.INVALID_APPWIDGET_ID) idFromUri else idFromExtra
-        
-        Log.d("SWANIE", "Activity Created with ID: $resolvedId (URI: $idFromUri, Extra: $idFromExtra)")
-        
-        if (resolvedId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            Log.e("SWANIE_WIDGET", "No valid AppWidgetId found in intent/URI")
-            if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) finish()
-        } else {
-            // 🚀 THE SINGULARITY: Force state reset in the UI by toggling the ID
-            appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-            appWidgetId = resolvedId
+    private fun applyIntent(intent: Intent): Boolean {
+        val resolved = resolveAppWidgetId(intent)
+        if (resolved == AppWidgetManager.INVALID_APPWIDGET_ID) return false
+        appWidgetId = resolved
+        settingsViewModel.forceVaultSwitch(resolved, isAppWidgetId = true)
+        return true
+    }
 
-            // 🚀 THE SMART RESOLVER: Resolve the appWidgetId to its vault and flicker
-            settingsViewModel.forceVaultSwitch(resolvedId, isAppWidgetId = true)
+    private fun resolveAppWidgetId(intent: Intent): Int {
+        val fromExtra = intent.getIntExtra(
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID,
+        )
+        if (fromExtra != AppWidgetManager.INVALID_APPWIDGET_ID) return fromExtra
+
+        // Fallback: Glance relay URI swanie://relayed/id/{widgetId}/… (extra is authoritative when present)
+        val segments = intent.data?.pathSegments ?: return AppWidgetManager.INVALID_APPWIDGET_ID
+        val idIdx = segments.indexOf("id")
+        if (idIdx >= 0 && idIdx + 1 < segments.size) {
+            return segments[idIdx + 1].toIntOrNull() ?: AppWidgetManager.INVALID_APPWIDGET_ID
         }
+        return AppWidgetManager.INVALID_APPWIDGET_ID
+    }
+
+    private companion object {
+        private const val TAG = "WidgetConfigActivity"
     }
 }

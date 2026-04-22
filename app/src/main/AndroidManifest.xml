@@ -31,16 +31,12 @@
 
         <activity
             android:name=".widget.WidgetConfigActivity"
-            android:exported="true"
+            android:exported="false"
             android:launchMode="singleInstance"
             android:taskAffinity="com.swanie.portfolio.widget.config"
             android:noHistory="true"
             android:excludeFromRecents="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <receiver
             android:name=".widget.PortfolioWidgetReceiver"

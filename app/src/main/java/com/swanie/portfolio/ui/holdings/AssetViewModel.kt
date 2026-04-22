@@ -1,6 +1,9 @@
 package com.swanie.portfolio.ui.holdings
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +16,7 @@ import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.repository.*
 import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
+import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,6 +44,9 @@ class AssetViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
+    private val _confirmDelete = MutableStateFlow<AssetEntity?>(null)
+    val confirmDelete: StateFlow<AssetEntity?> = _confirmDelete.asStateFlow()
+    private val _widgetSelectionVaultId = MutableStateFlow<Int?>(null)
 
     // 🌐 GLOBAL VISTA: Track Current Vault
     // Task 2: Instant Data Handshake - Use runBlocking for the absolute first state to avoid "Vault 1" flicker
@@ -59,8 +66,16 @@ class AssetViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     // Keep widget state vault-scoped to match SettingsViewModel contract.
+    // Can be overridden by screens that edit a vault different from currentVaultId.
+    private val widgetContractVaultId: StateFlow<Int> = combine(
+        _widgetSelectionVaultId,
+        currentVaultId
+    ) { overrideId, currentId ->
+        overrideId ?: currentId
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, currentVaultId.value)
+
     val widgetSelectedAssetIds: StateFlow<List<String>> = combine(
-        currentVaultId,
+        widgetContractVaultId,
         vaultDao.getAllVaultsFlow()
     ) { vaultId, vaults ->
         vaults.find { it.id == vaultId }
@@ -72,11 +87,15 @@ class AssetViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val widgetShowTotal: StateFlow<Boolean> = combine(
-        currentVaultId,
+        widgetContractVaultId,
         vaultDao.getAllVaultsFlow()
     ) { vaultId, vaults ->
         vaults.find { it.id == vaultId }?.showWidgetTotal ?: true
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun setWidgetSelectionVaultId(vaultId: Int?) {
+        _widgetSelectionVaultId.value = vaultId?.takeIf { it > 0 }
+    }
 
     /**
      * 🛰️ INTERNAL HELPER: Pushes the current vault state to Google Drive.
@@ -194,6 +213,14 @@ class AssetViewModel @Inject constructor(
         }
     }
 
+    fun requestDeleteConfirmation(asset: AssetEntity) {
+        _confirmDelete.value = asset
+    }
+
+    fun clearDeleteConfirmation() {
+        _confirmDelete.value = null
+    }
+
     fun updateAssetOrder(assets: List<AssetEntity>) {
         viewModelScope.launch {
             repository.updateAssetOrder(assets)
@@ -208,11 +235,13 @@ class AssetViewModel @Inject constructor(
 
     fun updateWidgetSelectionForCurrentVault(selectedIds: List<String>) {
         viewModelScope.launch {
-            val vaultId = currentVaultId.value
+            val vaultId = widgetContractVaultId.value
+            // Persist only explicitly checked IDs; keep order and hard-cap at 5.
             val normalized = selectedIds
                 .map { it.trim() }
                 .filter { it.isNotBlank() }
                 .distinct()
+                .take(5)
             vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
             repository.pushAssetsToWidget(context, vaultId.toString())
         }
@@ -230,16 +259,59 @@ class AssetViewModel @Inject constructor(
             }
 
             if (nextIds != currentIds) {
-                val vaultId = currentVaultId.value
+                val vaultId = widgetContractVaultId.value
                 vaultDao.updateSelectedWidgetAssets(vaultId, nextIds.joinToString(","))
                 repository.pushAssetsToWidget(context, vaultId.toString())
             }
         }
     }
 
+    /**
+     * Persists widget asset selection and optional home-screen binding for [portfolioVaultId],
+     * then pushes Glance state and sends [ACTION_APPWIDGET_UPDATE] for the affected instance(s).
+     */
+    fun saveWidgetConfiguration(
+        portfolioVaultId: Int,
+        appWidgetId: Int?,
+        selectedIds: List<String>,
+        onComplete: () -> Unit,
+    ) {
+        if (portfolioVaultId <= 0) return
+        viewModelScope.launch {
+            try {
+                if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    vaultDao.clearAppWidgetId(appWidgetId)
+                    vaultDao.updateAppWidgetId(portfolioVaultId, appWidgetId)
+                }
+                vaultDao.updateSelectedWidgetAssets(portfolioVaultId, selectedIds.joinToString(","))
+                val fresh = assetDao.getAssetsByVaultOnce(portfolioVaultId)
+                repository.pushFreshAssetsToWidget(
+                    context.applicationContext,
+                    portfolioVaultId.toString(),
+                    fresh,
+                )
+                val widgetIdsToRefresh =
+                    if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                        intArrayOf(appWidgetId)
+                    } else {
+                        val component = ComponentName(context, PortfolioWidgetReceiver::class.java)
+                        AppWidgetManager.getInstance(context).getAppWidgetIds(component)
+                    }
+                context.sendBroadcast(
+                    Intent(context, PortfolioWidgetReceiver::class.java).apply {
+                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIdsToRefresh)
+                    },
+                )
+            } finally {
+                onComplete()
+            }
+        }
+    }
+
     fun updateWidgetShowTotalForCurrentVault(show: Boolean) {
         viewModelScope.launch {
-            val vaultId = currentVaultId.value
+            val vaultId = widgetContractVaultId.value
             vaultDao.updateShowWidgetTotal(vaultId, show)
             repository.pushAssetsToWidget(context, vaultId.toString())
         }

@@ -80,10 +80,6 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 ThemeStudioScreen(navController)
             }
 
-            composable(Routes.WIDGET_MANAGER) {
-                WidgetManagerScreen(navController)
-            }
-
             composable(Routes.PORTFOLIO_MANAGER) {
                 PortfolioManagerScreen(
                     navController = navController,

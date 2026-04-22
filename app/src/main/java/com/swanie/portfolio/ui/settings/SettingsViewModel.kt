@@ -51,9 +51,6 @@ class SettingsViewModel @Inject constructor(
     private val assetDao = database.assetDao()
     private val vaultDao = database.vaultDao()
 
-    private val _isSaving = MutableStateFlow(false)
-    val isSaving: StateFlow<Boolean> = _isSaving.asStateFlow()
-
     // 🎯 PRO PLACEHOLDER: State for subscription logic
     private val _isProUser = MutableStateFlow(false)
     val isProUser: StateFlow<Boolean> = _isProUser.asStateFlow()
@@ -189,21 +186,6 @@ class SettingsViewModel @Inject constructor(
     suspend fun updateShowWidgetTotal(vaultId: Int, show: Boolean) {
         vaultDao.updateShowWidgetTotal(vaultId, show)
         triggerWidgetUpdate(vaultId)
-    }
-
-    fun saveWidgetConfiguration(vaultId: Int, appWidgetId: Int?, selectedIds: List<String>, onComplete: () -> Unit) {
-        viewModelScope.launch {
-            _isSaving.value = true
-            if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                vaultDao.clearAppWidgetId(appWidgetId)
-                vaultDao.updateAppWidgetId(vaultId, appWidgetId)
-            }
-            val idsString = selectedIds.joinToString(",")
-            vaultDao.updateSelectedWidgetAssets(vaultId, idsString)
-            triggerWidgetUpdate(vaultId)
-            _isSaving.value = false
-            onComplete()
-        }
     }
 
     suspend fun saveWidgetAppearance(vaultId: Int, bg: String, bgText: String, card: String, cardText: String) {
