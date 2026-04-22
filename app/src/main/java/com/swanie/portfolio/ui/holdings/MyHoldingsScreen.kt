@@ -93,6 +93,10 @@ fun MyHoldingsScreen(
     val isOverTrash = remember { mutableStateOf(false) }
     var isExiting by remember { mutableStateOf(false) }
 
+    // 🛡️ DELETION SHIELD STATE
+    val confirmDelete by viewModel.confirmDelete.collectAsStateWithLifecycle()
+    var assetToDelete by remember { mutableStateOf<AssetEntity?>(null) }
+
     val pagerState = rememberPagerState(
         initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
     ) { allVaults.size.coerceAtLeast(1) }
@@ -255,7 +259,12 @@ fun MyHoldingsScreen(
                                                 onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
                                                 onDragStopped = {
                                                     if (isOverTrash.value) {
-                                                        viewModel.deleteAsset(asset)
+                                                        // 🛡️ V38.1 DELETION SHIELD INJECTION
+                                                        if (confirmDelete) {
+                                                            assetToDelete = asset
+                                                        } else {
+                                                            viewModel.deleteAsset(asset)
+                                                        }
                                                     }
                                                     isDraggingActive.value = false
                                                     viewModel.updateAssetOrder(localHoldings)
@@ -323,6 +332,29 @@ fun MyHoldingsScreen(
                     }
                 )
             }
+        }
+
+        // --- 🛡️ V38.1 ASSET DELETION DIALOG ---
+        assetToDelete?.let { asset ->
+            AlertDialog(
+                onDismissRequest = { assetToDelete = null },
+                containerColor = Color(0xFF1A1A1A),
+                title = { Text("REMOVE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
+                text = { Text("Are you sure you want to remove ${asset.symbol} from your vault?", color = Color.White) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.deleteAsset(asset)
+                        assetToDelete = null
+                    }) {
+                        Text("REMOVE", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { assetToDelete = null }) {
+                        Text("CANCEL", color = Color.White)
+                    }
+                }
+            )
         }
 
         // Trash Zone

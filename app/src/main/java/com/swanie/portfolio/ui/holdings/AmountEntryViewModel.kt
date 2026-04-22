@@ -22,7 +22,7 @@ class AmountEntryViewModel @Inject constructor(
     private val themePreferences: ThemePreferences,
     private val iconManager: IconManager,
     private val priceHistoryDao: PriceHistoryDao,
-    private val googleDriveService: GoogleDriveService, // 🛰️ Inject Cloud Service
+    private val googleDriveService: GoogleDriveService, // 🛡️ Local-First Stub
     private val assetDao: AssetDao // 🛡️ Inject Dao for Global Sync
 ) : ViewModel() {
 
@@ -71,14 +71,13 @@ class AmountEntryViewModel @Inject constructor(
                     // 🚀 SEED PRICE HISTORY: Ensure sparkline appears immediately
                     seedPriceHistory(populatedAsset.coinId, populatedAsset.officialSpotPrice)
                     
-                    // 🛰️ CLOUD SYNC: Ensure the new asset is pushed to the Sovereign Vault
+                    // 🛡️ LOCAL SYNC: Keeping code structure for future local backup logic
                     viewModelScope.launch {
                         try {
                             val allAssets = assetDao.getAllAssetsGlobal()
                             googleDriveService.uploadFullVaultBackup(allAssets)
-                            Log.d("VAULT_DEBUG", "AmountEntry: Sync Triggered after surgical add.")
                         } catch (e: Exception) {
-                            Log.e("VAULT_DEBUG", "AmountEntry: Sync Failed", e)
+                            Log.e("VAULT_DEBUG", "Local Backup Failed", e)
                         }
                     }
 

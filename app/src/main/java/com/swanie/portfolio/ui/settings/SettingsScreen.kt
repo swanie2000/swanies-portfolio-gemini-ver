@@ -54,14 +54,16 @@ fun SettingsScreen(
             onDismissRequest = { showFactoryResetDialog = false },
             title = {
                 Text(
-                    text = "Reset to Factory Defaults?",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    text = "RESET VAULT TO FACTORY?",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 20.sp,
+                    color = Color.Red
                 )
             },
             text = {
                 Text(
-                    text = "This will completely wipe the entire app, including all assets, custom themes, and vault history. This action cannot be undone."
+                    text = "This will completely wipe the current vault, including all assets and history. This action is sovereign and permanent.",
+                    color = Color.White
                 )
             },
             confirmButton = {
@@ -81,9 +83,7 @@ fun SettingsScreen(
                     Text("CANCEL", color = safeText.copy(alpha = 0.6f))
                 }
             },
-            containerColor = Color(0xFF1C1C1E),
-            textContentColor = Color.White,
-            titleContentColor = Color.White
+            containerColor = Color(0xFF1C1C1E)
         )
     }
 

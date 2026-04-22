@@ -17,6 +17,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -25,10 +26,7 @@ import androidx.compose.ui.res.painterResource
 import com.swanie.portfolio.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,10 +37,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -61,8 +62,11 @@ import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.MetalIcon
+import com.swanie.portfolio.ui.holdings.formatBoutiquePrice
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun WidgetManagerScreen(
@@ -77,10 +81,14 @@ fun WidgetManagerScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
 
     val vaults by settingsViewModel.allVaults.collectAsStateWithLifecycle(initialValue = emptyList())
     
-    // 🎯 DRAFT STATE: Hoisted to the top for scope visibility
+    // 🎯 V38.5 IRON GRAVITY: UNFILTERED PIPE
+    val allAssetsByPipe by assetViewModel.allAssets.collectAsStateWithLifecycle()
+
+    // 🎯 DRAFT STATE
     var draftBg by rememberSaveable { mutableStateOf("#1C1C1E") }
     var draftBgTxt by rememberSaveable { mutableStateOf("#FFFFFF") }
     var draftCrd by rememberSaveable { mutableStateOf("#2C2C2E") }
@@ -88,22 +96,16 @@ fun WidgetManagerScreen(
     var draftSelectedIds by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var draftHideTotals by remember { mutableStateOf(false) }
 
-    // 🎯 REGISTRY STATE: The target vault for configuration
+    // 🎯 REGISTRY STATE
     val targetVaultId by settingsViewModel.targetVaultId.collectAsStateWithLifecycle()
     val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
-    val targetAssets by settingsViewModel.targetVaultAssets.collectAsStateWithLifecycle()
-
-    // 🚀 CONFIG MODE AUTO-SELECT: Handled via ViewModel's forceVaultSwitch on entry
-    // (Actual logic moved to Activity for Intent-level control, but kept here as fallback)
-    LaunchedEffect(configAppWidgetId) {
-        if (targetVaultId == -1 && configAppWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-            settingsViewModel.forceVaultSwitch(configAppWidgetId, isAppWidgetId = true)
-        } else if (targetVaultId == -1) {
-            settingsViewModel.forceVaultSwitch(1)
-        }
+    
+    // UI-Only Filter (Zero-Lag Emission)
+    val targetAssets = remember(allAssetsByPipe, targetVaultId) {
+        if (targetVaultId == -1) emptyList() else allAssetsByPipe.filter { it.vaultId == targetVaultId }
     }
 
-    // 🎯 INITIALIZATION LOCK: Force draft states to match selected vault on every ID change
+    // 🚀 INITIALIZATION LOCK
     LaunchedEffect(selectedVault?.id) {
         selectedVault?.let {
             draftBg = it.widgetBgColor.takeIf { c -> c.isNotEmpty() } ?: "#1C1C1E"
@@ -112,6 +114,14 @@ fun WidgetManagerScreen(
             draftCrdTxt = it.widgetCardTextColor.takeIf { c -> c.isNotEmpty() } ?: "#FFFFFF"
             draftSelectedIds = it.selectedWidgetAssets.split(",").filter { id -> id.isNotBlank() }
             draftHideTotals = !it.showWidgetTotal
+        }
+    }
+
+    // 🎯 TACTICAL SYNC
+    val isDraggingActive = remember { mutableStateOf(false) }
+    LaunchedEffect(targetAssets, isDraggingActive.value) {
+        if (!isDraggingActive.value && selectedVault != null) {
+            draftSelectedIds = selectedVault!!.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
         }
     }
 
@@ -152,24 +162,45 @@ fun WidgetManagerScreen(
 
     val lazyListState = rememberLazyListState()
     
+    // 🌐 IRON GRAVITY: REORDERABLE STATE (UI-FIRST)
+    var uiAssetList by remember { mutableStateOf(emptyList<AssetEntity>()) }
+    
+    // Sync UI list from pipe only when NOT dragging
+    LaunchedEffect(targetAssets, isDraggingActive.value) {
+        if (!isDraggingActive.value) {
+            uiAssetList = targetAssets
+            Log.d("IRON_GRAVITY", "UI List synced from Pipe: ${uiAssetList.size} items.")
+        }
+    }
+
+    val reorderableState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
+        onMove = { from, to ->
+            if (from.index >= 5 && to.index >= 5) {
+                uiAssetList = uiAssetList.toMutableList().apply {
+                    val fromIdx = from.index - 5
+                    val toIdx = to.index - 5
+                    if (fromIdx in indices && toIdx in indices) {
+                        add(toIdx, removeAt(fromIdx))
+                    }
+                }
+            }
+        }
+    )
+
     val sharedPrefs = remember { context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
     var cooldownSeconds by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        cooldownSeconds = 0
-    }
     LaunchedEffect(cooldownSeconds) { if (cooldownSeconds > 0) { delay(1000L); cooldownSeconds -= 1 } }
 
     Box(modifier = Modifier.fillMaxSize().background(if (isConfigMode) safeSiteBg else Color.Transparent)) {
-        if (targetVaultId == -1) {
-            // 🚀 THE STATE FLICKER: 10ms transient black hole to break Intent ghosting
+        if (targetVaultId == -1 && isConfigMode) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = safeThemeText, strokeWidth = 2.dp)
             }
         } else {
             Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
 
-                // --- 🦢 BOUTIQUE HEADER ---
                 BoutiqueHeader(
                     title = if (isConfigMode) "WIDGET CONFIG" else "WIDGET MANAGER",
                     onBack = { onBack() },
@@ -181,27 +212,15 @@ fun WidgetManagerScreen(
                                     val targetId = selectedVault!!.id
                                     val currentWidgetId = if (isConfigMode) configAppWidgetId else null
 
-                                    // 🛡️ REGISTRATION LOCK: Links the hardware appWidgetId to the VaultEntity in Room.
                                     settingsViewModel.saveWidgetConfiguration(targetId, currentWidgetId, draftSelectedIds) {
                                         scope.launch {
-                                            settingsViewModel.saveWidgetAppearance(
-                                                targetId,
-                                                draftBg,
-                                                draftBgTxt,
-                                                draftCrd,
-                                                draftCrdTxt
-                                            )
-                                            // Privacy is now vault-specific
+                                            settingsViewModel.saveWidgetAppearance(targetId, draftBg, draftBgTxt, draftCrd, draftCrdTxt)
                                             settingsViewModel.updateShowWidgetTotal(targetId, !draftHideTotals)
-
-                                            // Hard refresh to sync state
                                             settingsViewModel.getVaultById(targetId)
 
-                                            // 🚀 DIRECT DRAW: Manually push RemoteViews for instant feedback
                                             if (currentWidgetId != null && currentWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                                                 settingsViewModel.forceImmediateRemoteViewsUpdate(targetId, currentWidgetId)
                                             }
-
                                             sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
 
                                             if (isConfigMode) {
@@ -220,125 +239,129 @@ fun WidgetManagerScreen(
                     textColor = safeThemeText
                 )
 
-                // 🎯 PORTFOLIO REGISTRY SELECTOR (Always Visible Safety Valve)
                 PortfolioSelectorDropdown(
                     vaults = vaults,
                     selectedVaultId = targetVaultId,
-                    onVaultSelected = { id ->
-                        settingsViewModel.forceVaultSwitch(id)
-                    },
+                    onVaultSelected = { id -> settingsViewModel.forceVaultSwitch(id) },
                     themeColor = safeThemeText
                 )
 
-                if (selectedVault == null) {
-                    // 🛡️ THE SAFETY VALVE: Break the infinite spinner for new widgets
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = safeThemeText, strokeWidth = 2.dp)
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            "LINK THIS WIDGET TO A PORTFOLIO", 
-                            color = safeThemeText, 
-                            fontSize = 10.5.sp, 
-                            fontWeight = FontWeight.Black, 
-                            letterSpacing = (-0.3).sp,
-                            textAlign = TextAlign.Center
-                        )
+                // 🦢 THE VAULT FLOOR: Single Source of Truth
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    // INDEX 0: PREVIEW
+                    item { WidgetPreviewSlim(bgHex = draftBg, bgTxtHex = draftBgTxt, cardHex = draftCrd, cardTxtHex = draftCrdTxt, showTotal = !draftHideTotals) }
+
+                    // INDEX 1: APPEARANCE
+                    item {
+                        SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
+                        AnimatedVisibility(visible = appearanceExpanded) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
+                            ) {
+                                Column(Modifier.padding(12.dp)) {
+                                    WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
+                                        when(target) {
+                                            0 -> draftBg = newHex
+                                            1 -> draftBgTxt = newHex
+                                            2 -> draftCrd = newHex
+                                            3 -> draftCrdTxt = newHex
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
                     }
-                } else {
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(bottom = 0.dp)
-                    ) {
-                        item {
-                            WidgetPreviewSlim(bgHex = draftBg, bgTxtHex = draftBgTxt, cardHex = draftCrd, cardTxtHex = draftCrdTxt, showTotal = !draftHideTotals)
-                        }
 
-                        item {
-                            SectionHeaderSmall("APPEARANCE", appearanceExpanded, safeThemeText) { appearanceExpanded = !appearanceExpanded }
-                            AnimatedVisibility(visible = appearanceExpanded) {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                                    colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
-                                ) {
-                                    Column(Modifier.padding(12.dp)) {
-                                        WidgetStudioInlineCompact(draftBg, draftBgTxt, draftCrd, draftCrdTxt) { target, newHex ->
-                                            when(target) {
-                                                0 -> draftBg = newHex
-                                                1 -> draftBgTxt = newHex
-                                                2 -> draftCrd = newHex
-                                                3 -> draftCrdTxt = newHex
-                                            }
-                                        }
+                    // INDEX 2: PRIVACY
+                    item {
+                        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
+                            Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                            Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
+                        }
+                        HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
+                    }
+
+                    // INDEX 3: ASSET HEADER
+                    item {
+                        val countText = "${draftSelectedIds.size}/5 SELECTED"
+                        SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
+                    }
+
+                    // INDEX 4: V38.6 SPINNER KILL FALLBACK (VULNERABILITY FIX)
+                    item {
+                         if (assetsExpanded && uiAssetList.isEmpty()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = if (allAssetsByPipe.isEmpty()) "Scanning Vault..." else "No assets in this portfolio", 
+                                    color = safeThemeText.copy(0.4f), 
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                if (allAssetsByPipe.isEmpty()) {
+                                    Spacer(Modifier.height(12.dp))
+                                    Button(
+                                        onClick = { assetViewModel.addTestAsset() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow)
+                                    ) {
+                                        Text("ADD TEST ASSET", color = Color.Black, fontWeight = FontWeight.Black)
                                     }
                                 }
                             }
-                            HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-                        }
+                         }
+                    }
 
-                        item {
-                            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { draftHideTotals = !draftHideTotals }, verticalAlignment = Alignment.CenterVertically) {
-                                Text("Hide Numbers", color = safeThemeText, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                                Checkbox(checked = draftHideTotals, onCheckedChange = { draftHideTotals = it }, colors = CheckboxDefaults.colors(checkedColor = safeThemeText))
-                            }
-                            HorizontalDivider(color = safeThemeText.copy(0.1f), thickness = 1.dp)
-                        }
-
-                        item {
-                            val countText = "${draftSelectedIds.size}/5 SELECTED"
-                            SectionHeaderSmall("ASSETS ($countText)", assetsExpanded, safeThemeText) { assetsExpanded = !assetsExpanded }
-                        }
-
-                        if (assetsExpanded) {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(containerColor = try { Color(draftCrd.toColorInt()).copy(alpha = 0.5f) } catch(e: Exception) { Color.DarkGray.copy(alpha = 0.5f) }),
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, safeThemeText.copy(alpha = 0.1f))
-                                ) {
-                                    Column(Modifier.padding(8.dp)) {
-                                        if (targetAssets.isEmpty()) {
-                                            Text("No assets in this portfolio", color = safeThemeText.copy(0.4f), modifier = Modifier.padding(16.dp))
+                    // INDEX 5+: STABLE ASSET ITEMS
+                    if (assetsExpanded) {
+                        itemsIndexed(uiAssetList, key = { _, asset -> asset.coinId }) { index, asset ->
+                            ReorderableItem(reorderableState, key = asset.coinId) { isDragging ->
+                                val isSelected = draftSelectedIds.contains(asset.coinId)
+                                
+                                WidgetAssetSelectItem(
+                                    asset = asset,
+                                    isSelected = isSelected,
+                                    themeColor = safeThemeText,
+                                    isDragging = isDragging,
+                                    modifier = Modifier.longPressDraggableHandle(
+                                        onDragStarted = {
+                                            isDraggingActive.value = true
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        },
+                                        onDragStopped = {
+                                            isDraggingActive.value = false
+                                            // V38.12 SEQUENTIAL HAMMER: Break the Deadlock
+                                            assetViewModel.updateWidgetOrderBulk(uiAssetList.map { it.coinId })
+                                            // Sync selection state
+                                            if (selectedVault != null) {
+                                                assetViewModel.updateWidgetOrder(selectedVault!!.id, uiAssetList.filter { it.coinId in draftSelectedIds }.map { it.coinId })
+                                            }
+                                            // Force UI refresh
+                                            assetViewModel.refreshWidgetOrder()
+                                        }
+                                    ),
+                                    onToggle = {
+                                        val currentExistingIds = draftSelectedIds.filter { id -> uiAssetList.any { it.coinId == id } }
+                                        if (isSelected) {
+                                            draftSelectedIds = currentExistingIds.filter { it != asset.coinId }
+                                        } else if (currentExistingIds.size < 5) {
+                                            draftSelectedIds = currentExistingIds + asset.coinId
                                         } else {
-                                            targetAssets.forEach { asset ->
-                                                val isSelected = draftSelectedIds.contains(asset.coinId)
-                                                val orderIndex = if (isSelected) draftSelectedIds.indexOf(asset.coinId) + 1 else null
-
-                                                WidgetAssetSelectItem(
-                                                    asset = asset,
-                                                    isSelected = isSelected,
-                                                    orderIndex = orderIndex,
-                                                    onToggle = {
-                                                        // 🛠️ Task 2: Recalculate count based on actual existence
-                                                        val currentExistingIds = draftSelectedIds.filter { id -> targetAssets.any { it.coinId == id } }
-                                                        if (isSelected) {
-                                                            draftSelectedIds = currentExistingIds.filter { it != asset.coinId }
-                                                        } else if (currentExistingIds.size < 5) {
-                                                            draftSelectedIds = currentExistingIds + asset.coinId
-                                                        } else {
-                                                            Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
-                                                        }
-                                                    },
-                                                    themeColor = safeThemeText
-                                                )
-                                                Spacer(Modifier.height(4.dp))
-                                            }
+                                            Toast.makeText(context, "Max 5 assets", Toast.LENGTH_SHORT).show()
                                         }
                                     }
-                                }
+                                )
                             }
-                        }
-
-                        item {
-                            Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
                 }
@@ -508,42 +531,66 @@ fun WidgetStudioInlineCompact(
 }
 
 @Composable
-fun WidgetAssetSelectItem(asset: AssetEntity, isSelected: Boolean, orderIndex: Int?, onToggle: () -> Unit, themeColor: Color) {
+fun WidgetAssetSelectItem(
+    asset: AssetEntity,
+    isSelected: Boolean,
+    themeColor: Color,
+    isDragging: Boolean,
+    modifier: Modifier = Modifier,
+    onToggle: () -> Unit
+) {
+    val density = LocalDensity.current
+    
+    // V38.7 VISUAL PARITY: Using Compact architecture and 12dp master padding
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clip(RoundedCornerShape(8.dp))
-            .background(if (isSelected) themeColor.copy(0.05f) else Color.Transparent)
-            .border(1.dp, if (isSelected) themeColor.copy(0.2f) else themeColor.copy(0.05f), RoundedCornerShape(8.dp))
-            .clickable { onToggle() }.padding(vertical = 10.dp, horizontal = 12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp)
+            .heightIn(min = 64.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isDragging) themeColor.copy(0.15f) else Color.White.copy(0.02f))
+            .border(1.dp, if (isDragging) themeColor.copy(0.4f) else themeColor.copy(0.05f), RoundedCornerShape(12.dp))
+            .clickable { onToggle() }
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-            if (asset.category == AssetCategory.METAL) {
-                MetalIcon(
-                    name = asset.symbol,
-                    weight = asset.weight,
-                    unit = asset.weightUnit,
-                    physicalForm = asset.physicalForm,
-                    size = 20
-                )
-            } else {
-                AsyncImage(model = asset.imageUrl, contentDescription = asset.name, modifier = Modifier.size(20.dp).clip(CircleShape), contentScale = ContentScale.Crop)
-            }
+        // Anchor Left (80dp)
+        Box(modifier = Modifier.width(80.dp), contentAlignment = Alignment.CenterStart) {
+            MetalIcon(
+                name = asset.symbol, 
+                weight = asset.weight, 
+                unit = asset.weightUnit, 
+                physicalForm = asset.physicalForm, 
+                size = 44, // Master Icon Scale
+                imageUrl = asset.imageUrl,
+                localPath = asset.localIconPath,
+                category = asset.category
+            )
         }
-        Spacer(Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = asset.symbol.uppercase(), color = themeColor, fontWeight = FontWeight.Black, fontSize = 13.sp)
-            Text(text = asset.name.replace("\n", " "), color = themeColor.copy(0.6f), fontSize = 11.sp)
+
+        // Middle Slot (weight 1f)
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
+            Text(
+                text = "[${asset.widgetOrder}] ${asset.symbol.uppercase()}",
+                color = themeColor, 
+                fontWeight = FontWeight.Black, 
+                fontSize = with(density) { (13.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }
+            )
+            Text(
+                text = formatBoutiquePrice(asset.officialSpotPrice), 
+                color = themeColor.copy(0.6f), 
+                fontSize = with(density) { (11.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, 
+                maxLines = 1
+            )
         }
-        Spacer(Modifier.width(16.dp))
-        if (isSelected && orderIndex != null) {
-            Box(modifier = Modifier.size(26.dp).clip(CircleShape).background(Color.Yellow), contentAlignment = Alignment.Center) {
-                Text(
-                    text = orderIndex.toString(), color = Color.Black,
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, lineHeight = 14.sp, platformStyle = PlatformTextStyle(includeFontPadding = false))
-                )
-            }
-        } else {
-            Box(modifier = Modifier.size(26.dp).clip(CircleShape).border(1.5.dp, themeColor.copy(0.15f), CircleShape))
+
+        // Anchor Right (64dp)
+        Box(modifier = Modifier.width(64.dp), contentAlignment = Alignment.CenterEnd) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { onToggle() },
+                colors = CheckboxDefaults.colors(checkedColor = themeColor, uncheckedColor = themeColor.copy(0.3f))
+            )
         }
     }
 }

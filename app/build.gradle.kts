@@ -70,9 +70,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-
     // Native Fingerprint and Face ID support
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
 
@@ -105,11 +102,6 @@ dependencies {
 
     // WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
-
-    // GOOGLE DRIVE
-    implementation(libs.google.api.client.android)
-    implementation(libs.google.api.services.drive)
-    implementation(libs.google.http.client.gson)
 
     // Testing
     testImplementation(libs.junit)

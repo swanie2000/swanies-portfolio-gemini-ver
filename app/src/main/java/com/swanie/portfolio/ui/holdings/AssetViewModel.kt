@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.holdings
 
 import android.content.Context
 import android.util.Log
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
@@ -10,8 +11,10 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.PriceHistoryDao
+import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.repository.*
-import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
+import com.swanie.portfolio.data.remote.GoogleDriveService // 🛡️ Local-First Stub
+import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +23,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,51 +34,71 @@ class AssetViewModel @Inject constructor(
     private val searchRegistry: SearchEngineRegistry,
     private val themePreferences: ThemePreferences,
     private val assetDao: AssetDao,
+    private val vaultDao: VaultDao,
     private val priceHistoryDao: PriceHistoryDao,
-    private val googleDriveService: GoogleDriveService, // 🛰️ Cloud Service
+    private val googleDriveService: GoogleDriveService, // 🛡️ Local-First Stub
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val sharedPrefs = context.getSharedPreferences("portfolio_prefs", Context.MODE_PRIVATE)
 
+    /**
+     * 🎯 V38.9 NITRO: AUTO-WAKE HEARTBEAT
+     */
+    init {
+        viewModelScope.launch {
+            Log.d("NITRO_SYNC", "Wake-up Signal Sent: Initializing asset pipe.")
+            repository.refreshAssets()
+        }
+    }
+
     // 🌐 GLOBAL VISTA: Track Current Vault
-    // Task 2: Instant Data Handshake - Use runBlocking for the absolute first state to avoid "Vault 1" flicker
     val currentVaultId = themePreferences.currentVaultId.stateIn(
         viewModelScope, 
         SharingStarted.Eagerly, 
         runBlocking { themePreferences.currentVaultId.first() }
     )
 
+    // 🛡️ DELETION SHIELD: Track the confirm delete setting
+    val confirmDelete = themePreferences.confirmDelete
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     // 🌐 GLOBAL VISTA: Filter holdings by currentVaultId
-    // Ensure we emit the Room flow immediately. The skeleton is handled by the initial null value.
     val holdings: StateFlow<List<AssetEntity>?> = currentVaultId
         .flatMapLatest { id ->
+            Log.d("VM_TRACE", "Fetching assets for vault: $id")
             assetDao.getAssetsByVault(id)
         }
-        .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault ${currentVaultId.value}") }
+        .onEach { Log.d("VM_TRACE", "UI observing ${it?.size ?: 0} assets for vault ${currentVaultId.value}") }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     /**
-     * 🛰️ INTERNAL HELPER: Pushes the current vault state to Google Drive.
-     * Triggered after any local database modification.
-     * 
-     * REVISION V7.5.0: Now fetches ALL assets across ALL vaults to ensure 
-     * the cloud backup is a complete mirror of the local database.
+     * 🎯 V38.14 TRANSACTIONAL GRAVITY: EXPLICIT ORDERED FEED
+     * Explicitly sorted stream for the Widget Manager/Config screens.
      */
-    private fun triggerCloudSync() {
+    val widgetAssetsOrdered: StateFlow<List<AssetEntity>> = currentVaultId
+        .flatMapLatest { id ->
+            assetDao.getAssetsOrderedByWidget(id)
+        }
+        .onEach { Log.d("VM_PIPE", "Ordered Gravity Feed: ${it.size} assets flowing.") }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /**
+     * 🎯 V38.5 IRON GRAVITY: RAW PIPE
+     */
+    val allAssets: StateFlow<List<AssetEntity>> = assetDao.getAllAssetsGlobalFlow()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /**
+     * 🛡️ INTERNAL HELPER: Local Sync Heartbeat.
+     */
+    private fun triggerLocalSync() {
         viewModelScope.launch {
             try {
-                // Fetch EVERY asset from the DB (Global Capture)
                 val allAssets = assetDao.getAllAssetsGlobal()
                 if (allAssets.isNotEmpty()) {
-                    val success = googleDriveService.uploadFullVaultBackup(allAssets)
-                    if (success) {
-                        Log.d("VAULT_DEBUG", "Heartbeat: Cloud Sync Successful (${allAssets.size} assets)")
-                    } else {
-                        Log.w("VAULT_DEBUG", "Heartbeat: Cloud Sync Skipped or Failed.")
-                    }
-                } else {
-                    Log.d("VAULT_DEBUG", "Heartbeat: No assets to sync.")
+                    googleDriveService.uploadFullVaultBackup(allAssets)
+                    Log.d("VAULT_DEBUG", "Heartbeat: Local Sync Triggered.")
                 }
             } catch (e: Exception) {
                 Log.e("VAULT_DEBUG", "Heartbeat: Auto-sync error", e)
@@ -160,7 +182,7 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch {
             val taggedAsset = asset.copy(vaultId = currentVaultId.value)
             repository.executeSurgicalAdd(taggedAsset) { _, _ -> }
-            triggerCloudSync() // 🛰️ Backup to Cloud
+            triggerLocalSync()
             onComplete()
         }
     }
@@ -168,20 +190,52 @@ class AssetViewModel @Inject constructor(
     fun deleteAsset(asset: AssetEntity) {
         viewModelScope.launch {
             repository.deleteAsset(asset)
-            triggerCloudSync() // 🛰️ Sync Delete
+            triggerLocalSync()
         }
     }
 
     fun updateAssetOrder(assets: List<AssetEntity>) {
         viewModelScope.launch {
             repository.updateAssetOrder(assets)
-            triggerCloudSync() // 🛰️ Sync Order
+            triggerLocalSync()
+        }
+    }
+
+    /**
+     * 🎯 V38.14 DECK SHUFFLE: Save-on-Move Persistence
+     * Hard-coded sequence assignment with transactional write and broadcast.
+     */
+    fun updateWidgetOrderBulk(assets: List<AssetEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val assetIds = assets.map { it.coinId }
+            // 🛡️ Atomic Deck Shuffle
+            assetDao.updateWidgetOrderBulk(assetIds)
+            Log.d("NITRO_SYNC", "Transactional Gravity: Sequence Saved (${assets.size} items)")
+            
+            // 🚀 Final Broadcast
+            delay(300) 
+            PortfolioWidget().updateAll(context)
+            Log.d("NITRO_SYNC", "Broadast Complete.")
+            
+            triggerLocalSync()
+        }
+    }
+
+    fun updateWidgetOrder(vaultId: Int, selectedIds: List<String>) {
+        viewModelScope.launch {
+            vaultDao.updateSelectedWidgetAssets(vaultId, selectedIds.joinToString(","))
+            delay(250)
+            PortfolioWidget().updateAll(context)
+            Log.d("WIDGET_ORDER", "Synced selection for vault $vaultId.")
         }
     }
 
     fun toggleWidgetVisibility(asset: AssetEntity) {
         viewModelScope.launch {
             repository.toggleWidgetVisibility(asset.coinId, !asset.showOnWidget)
+            delay(250)
+            PortfolioWidget().updateAll(context)
+            triggerLocalSync()
         }
     }
 
@@ -196,7 +250,7 @@ class AssetViewModel @Inject constructor(
                 }
             if (updatedList.isNotEmpty()) {
                 repository.updateAssetOrder(updatedList)
-                triggerCloudSync() // 🛰️ Sync Metal Order
+                triggerLocalSync()
             }
         }
     }
@@ -207,7 +261,7 @@ class AssetViewModel @Inject constructor(
     fun updateAssetEntity(asset: AssetEntity) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset)
-            triggerCloudSync() // 🛰️ Sync Update
+            triggerLocalSync()
         }
     }
 
@@ -220,12 +274,30 @@ class AssetViewModel @Inject constructor(
                 weightUnit = weightUnit,
                 decimalPreference = decimals
             ))
-            triggerCloudSync() // 🛰️ Sync Detailed Update
+            triggerLocalSync()
         }
     }
 
     fun getPriceHistory(assetId: String): Flow<List<Double>> = flow {
         val history = priceHistoryDao.getRecentHistory(assetId).map { it.price }.reversed()
         emit(history)
+    }
+
+    fun addTestAsset() {
+        viewModelScope.launch {
+            val testAsset = AssetEntity(
+                coinId = "test-swan-${System.currentTimeMillis()}",
+                symbol = "SWAN",
+                name = "Test Asset",
+                vaultId = currentVaultId.value,
+                portfolioId = "MAIN",
+                category = AssetCategory.CRYPTO,
+                officialSpotPrice = 1.0,
+                priceChange24h = 5.0,
+                amountHeld = 1.0
+            )
+            repository.executeSurgicalAdd(testAsset) { _, _ -> }
+            Log.d("VM_PIPE", "Added Test Asset to Vault ${currentVaultId.value}")
+        }
     }
 }

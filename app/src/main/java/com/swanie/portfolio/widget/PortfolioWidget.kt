@@ -98,10 +98,14 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardColor = try { Color(android.graphics.Color.parseColor(cardColorHex)) } catch (e: Exception) { Color(0xFF1C1C1E) }
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
 
-                val assets = parseAssetsData(assetsData)
+                /**
+                 * 🎯 V38.11 GLANCE AUDIT: FLAT SORT
+                 * Removed all groupBy or secondary sort logic. 
+                 * Use ONLY widgetOrder ASC on the entire flat list.
+                 */
+                val assets = parseAssetsData(assetsData).sortedBy { it.first.widgetOrder }
 
                 if (assets.isEmpty()) {
-                    // 🛡️ HARDENED SYNC: Differentiate between "Syncing" and "Nothing to show"
                     if (assetsData.isEmpty()) {
                         EmptyWidgetContent(bgColor, bgTextColor, appWidgetId)
                     } else {
@@ -149,7 +153,8 @@ class PortfolioWidget : GlanceAppWidget() {
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
                     premium = parts[8].toDoubleOrNull() ?: 0.0, 
-                    localIconPath = parts[9] 
+                    localIconPath = parts[9],
+                    widgetOrder = if (parts.size > 10) parts[10].toIntOrNull() ?: 0 else 0
                 )
                 Triple(asset, parts[4], parts[8])
             } else if (parts.size == 9 && parts[0].isNotBlank()) {
@@ -165,7 +170,8 @@ class PortfolioWidget : GlanceAppWidget() {
                     weight = parts[6].toDoubleOrNull() ?: 1.0,
                     amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
                     premium = parts[8].toDoubleOrNull() ?: 0.0,
-                    localIconPath = "none"
+                    localIconPath = "none",
+                    widgetOrder = 0
                 )
                 Triple(asset, parts[4], parts[8])
             } else null
@@ -262,13 +268,13 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
             }
             Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
-                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
+                // 🎯 V38.11 VISUAL LOG: Display widgetOrder index
+                Text(text = "[${asset.widgetOrder}] ${asset.symbol.uppercase()}", style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
                 
                 // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
                 val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 
                                    else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
                 
-                // 🛠️ Task 3: Handle high-precision bleed on high font scales (Million Dollar Asset fix)
                 val dynamicFontSize = if (displayPrice.length > 12) 7.sp else 9.sp
 
                 Text(

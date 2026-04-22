@@ -30,6 +30,23 @@ interface AssetDao {
     @Query("SELECT * FROM assets ORDER BY displayOrder ASC")
     suspend fun getAllAssetsGlobal(): List<AssetEntity>
 
+    /**
+     * 🎯 V38.5 IRON GRAVITY: RAW PIPE
+     * Unfiltered stream of all assets across all vaults.
+     */
+    @Query("SELECT * FROM assets ORDER BY widgetOrder ASC, displayOrder ASC")
+    fun getAllAssetsGlobalFlow(): Flow<List<AssetEntity>>
+
+    /**
+     * 🎯 V38.14 TRANSACTIONAL GRAVITY: EXPLICIT WIDGET ORDER
+     * Definitive source of truth for ordered widget assets.
+     */
+    @Query("SELECT * FROM assets WHERE vaultId = :vId ORDER BY widgetOrder ASC")
+    fun getAssetsOrderedByWidget(vId: Int): Flow<List<AssetEntity>>
+
+    @Query("SELECT * FROM assets WHERE showOnWidget = 1 AND vaultId = :vId ORDER BY widgetOrder ASC")
+    suspend fun getWidgetAssetsByVault(vId: Int): List<AssetEntity>
+
     @Query("SELECT * FROM assets WHERE showOnWidget = 1 AND portfolioId = :pId ORDER BY widgetOrder ASC")
     suspend fun getWidgetAssets(pId: String = "MAIN"): List<AssetEntity>
 
@@ -55,6 +72,17 @@ interface AssetDao {
     suspend fun updateAssetOrder(assets: List<AssetEntity>) {
         assets.forEachIndexed { index, asset ->
             updateAssetDisplayOrder(asset.coinId, index)
+        }
+    }
+
+    /**
+     * 🎯 V38.12 SEQUENTIAL HAMMER: Atomic Bulk Re-indexing
+     * Enforces a hard sequential write for the entire set to break any index deadlocks.
+     */
+    @Transaction
+    suspend fun updateWidgetOrderBulk(assetIds: List<String>) {
+        assetIds.forEachIndexed { index, id ->
+            updateWidgetOrder(id, index)
         }
     }
 
