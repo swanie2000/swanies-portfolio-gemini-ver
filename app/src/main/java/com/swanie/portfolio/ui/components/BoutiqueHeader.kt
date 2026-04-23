@@ -30,7 +30,12 @@ fun BoutiqueHeader(
     actionIcon: ImageVector? = null,
     onAction: (() -> Unit)? = null,
     actionLabel: String? = null,
-    textColor: Color = Color.White
+    textColor: Color = Color.White,
+    /**
+     * Placed below the top bar (back / title / action), visually separated from navigation.
+     * Widget manager passes the portfolio picker and sub-page tabs here.
+     */
+    belowBrandingContent: (@Composable () -> Unit)? = null,
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -42,82 +47,97 @@ fun BoutiqueHeader(
         ((24 * scaleFactor).sp.toPx() / fontScale.coerceAtLeast(1.0f)).toSp()
     }
 
-    val bottomPadding = if (actionLabel != null) 20.dp else 8.dp
-    Box(
+    val bottomPadding = when {
+        belowBrandingContent != null -> 4.dp
+        actionLabel != null -> 20.dp
+        else -> 8.dp
+    }
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, bottom = bottomPadding)
     ) {
-        // Back Button (Safe Zone: Start)
-        IconButton(
-            onClick = onBack,
+        Box(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 8.dp)
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = textColor
-            )
-        }
-
-        // Branding (Swan + Title)
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 56.dp), // Hard boundary to prevent button overlap
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.swanie_foreground),
-                contentDescription = "Swan Logo",
-                modifier = Modifier.size((80 * scaleFactor).dp)
-            )
-            
-            Text(
-                text = title,
-                fontSize = clampedFontSize,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 2.sp,
-                color = textColor,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            // Back Button (Safe Zone: Start)
+            IconButton(
+                onClick = onBack,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            )
-        }
-
-        // Action Button (Safe Zone: End)
-        if (onAction != null) {
-            if (actionLabel != null) {
-                Text(
-                    text = actionLabel,
-                    color = textColor,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 0.6.sp,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 12.dp, end = 12.dp)
-                        .clickable { onAction() }
+                    .align(Alignment.TopStart)
+                    .padding(start = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = textColor
                 )
-            } else if (actionIcon != null) {
-                IconButton(
-                    onClick = onAction,
+            }
+
+            // Branding (Swan + Title)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 56.dp), // Hard boundary to prevent button overlap
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.swanie_foreground),
+                    contentDescription = "Swan Logo",
+                    modifier = Modifier.size((80 * scaleFactor).dp)
+                )
+
+                Text(
+                    text = title,
+                    fontSize = clampedFontSize,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 2.sp,
+                    color = textColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = actionIcon,
-                        contentDescription = "Action",
-                        tint = textColor
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                )
+            }
+
+            // Action Button (Safe Zone: End)
+            if (onAction != null) {
+                if (actionLabel != null) {
+                    Text(
+                        text = actionLabel,
+                        color = textColor,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 0.6.sp,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 12.dp, end = 12.dp)
+                            .clickable { onAction() }
                     )
+                } else if (actionIcon != null) {
+                    IconButton(
+                        onClick = onAction,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = actionIcon,
+                            contentDescription = "Action",
+                            tint = textColor
+                        )
+                    }
                 }
             }
+        }
+
+        if (belowBrandingContent != null) {
+            Spacer(modifier = Modifier.height(10.dp))
+            belowBrandingContent()
         }
     }
 }

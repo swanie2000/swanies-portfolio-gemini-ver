@@ -3,6 +3,7 @@ package com.swanie.portfolio.widget
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import com.swanie.portfolio.R
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -66,6 +67,9 @@ class WidgetConfigActivity : ComponentActivity() {
                                 data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
                             }
                             setResult(Activity.RESULT_OK, resultValue)
+
+                            AppWidgetManager.getInstance(this@WidgetConfigActivity)
+                                .notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_root)
 
                             sendBroadcast(
                                 Intent(this@WidgetConfigActivity, PortfolioWidgetReceiver::class.java).apply {

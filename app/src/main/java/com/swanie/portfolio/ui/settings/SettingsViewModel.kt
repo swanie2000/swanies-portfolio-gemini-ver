@@ -39,6 +39,10 @@ import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Settings and widget-registry flows. Assets-versus-appearance sub-navigation in the widget manager
+ * is local compose state in [WidgetManagerScreen]; this class continues to own vault targeting and sync.
+ */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -201,6 +205,15 @@ class SettingsViewModel @Inject constructor(
         return vaultDao.getVaultById(vaultId)
     }
 
+    /**
+     * Moves [appWidgetId] binding from any prior vault row onto [newVaultId] immediately (widget picker / switch).
+     */
+    suspend fun bindWidgetInstanceToVault(appWidgetId: Int, newVaultId: Int) {
+        if (newVaultId <= 0) return
+        vaultDao.clearAppWidgetId(appWidgetId)
+        vaultDao.updateAppWidgetId(newVaultId, appWidgetId)
+    }
+
     fun clearAllAssets(vaultId: Int) {
         viewModelScope.launch {
             assetDao.deleteAll()
@@ -287,8 +300,12 @@ class SettingsViewModel @Inject constructor(
                             this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
                             this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
                             val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
-                            val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
-                            val filteredAssets = if (selectedIds.isEmpty()) allAssetsForVault.take(10) else allAssetsForVault.filter { it.coinId in selectedIds }
+                            val selectedIds = vSafe.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            val filteredAssets = if (selectedIds.isEmpty()) {
+                                allAssetsForVault.take(10)
+                            } else {
+                                selectedIds.mapNotNull { coinId -> allAssetsForVault.find { it.coinId == coinId } }
+                            }
                             val serializedAssets = withContext(Dispatchers.IO) {
                                 filteredAssets.map { asset ->
                                     val iconSource = when {

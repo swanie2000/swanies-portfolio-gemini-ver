@@ -98,12 +98,8 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardColor = try { Color(android.graphics.Color.parseColor(cardColorHex)) } catch (e: Exception) { Color(0xFF1C1C1E) }
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
 
-                /**
-                 * 🎯 V38.11 GLANCE AUDIT: FLAT SORT
-                 * Removed all groupBy or secondary sort logic. 
-                 * Use ONLY widgetOrder ASC on the entire flat list.
-                 */
-                val assets = parseAssetsData(assetsData).sortedBy { it.first.widgetOrder }
+                // Order must match the packed "||" sequence from the repo (UI top → bottom). Do not re-sort.
+                val assets = parseAssetsData(assetsData)
 
                 if (assets.isEmpty()) {
                     if (assetsData.isEmpty()) {

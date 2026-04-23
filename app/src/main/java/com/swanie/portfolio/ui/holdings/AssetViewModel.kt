@@ -234,17 +234,24 @@ class AssetViewModel @Inject constructor(
     }
 
     fun updateWidgetSelectionForCurrentVault(selectedIds: List<String>) {
-        viewModelScope.launch {
-            val vaultId = widgetContractVaultId.value
-            // Persist only explicitly checked IDs; keep order and hard-cap at 5.
-            val normalized = selectedIds
-                .map { it.trim() }
-                .filter { it.isNotBlank() }
-                .distinct()
-                .take(5)
-            vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
-            repository.pushAssetsToWidget(context, vaultId.toString())
-        }
+        viewModelScope.launch { persistWidgetSelectionOrderForCurrentVault(selectedIds) }
+    }
+
+    /**
+     * Same as [updateWidgetSelectionForCurrentVault] but suspends until the DB write and widget push finish.
+     * Returns false if normalization produced nothing to write or the vault id was invalid.
+     */
+    suspend fun persistWidgetSelectionOrderForCurrentVault(selectedIds: List<String>): Boolean {
+        val vaultId = widgetContractVaultId.value
+        if (vaultId <= 0) return false
+        val normalized = selectedIds
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(5)
+        vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
+        repository.pushAssetsToWidget(context, vaultId.toString())
+        return true
     }
 
     fun toggleAssetInWidgetSelection(asset: AssetEntity, maxSelected: Int = 5) {
@@ -283,7 +290,16 @@ class AssetViewModel @Inject constructor(
                     vaultDao.clearAppWidgetId(appWidgetId)
                     vaultDao.updateAppWidgetId(portfolioVaultId, appWidgetId)
                 }
-                vaultDao.updateSelectedWidgetAssets(portfolioVaultId, selectedIds.joinToString(","))
+                val orderedCsv = buildList {
+                    val seen = LinkedHashSet<String>()
+                    for (raw in selectedIds) {
+                        val id = raw.trim()
+                        if (id.isEmpty() || id in seen) continue
+                        seen.add(id)
+                        add(id)
+                    }
+                }.joinToString(",")
+                vaultDao.updateSelectedWidgetAssets(portfolioVaultId, orderedCsv)
                 val fresh = assetDao.getAssetsByVaultOnce(portfolioVaultId)
                 repository.pushFreshAssetsToWidget(
                     context.applicationContext,
