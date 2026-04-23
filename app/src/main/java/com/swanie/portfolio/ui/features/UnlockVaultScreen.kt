@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ fun UnlockVaultScreen(
     navController: NavController
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -55,15 +57,21 @@ fun UnlockVaultScreen(
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
     val siteText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
+    val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
     val authState by authViewModel.authState.collectAsState()
 
     val contentAlpha = remember { Animatable(0f) }
 
     // --- 🛡️ TRIGGER BIOMETRICS ON ENTRY ---
-    LaunchedEffect(Unit) {
-        delay(500)
-        (context as? FragmentActivity)?.let { activity ->
-            authViewModel.triggerBiometricUnlock(activity)
+    LaunchedEffect(isBiometricEnabled) {
+        if (!isBiometricEnabled) {
+            // Direct pass: when biometric login is disabled, immediately unlock.
+            authViewModel.setAuthenticated()
+        } else {
+            delay(500)
+            (context as? FragmentActivity)?.let { activity ->
+                authViewModel.triggerBiometricUnlock(activity)
+            }
         }
         contentAlpha.animateTo(1f, tween(800))
     }
@@ -129,8 +137,12 @@ fun UnlockVaultScreen(
                 // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
                 Button(
                     onClick = {
-                        (context as? FragmentActivity)?.let { activity ->
-                            authViewModel.triggerBiometricUnlock(activity)
+                        if (!isBiometricEnabled) {
+                            authViewModel.setAuthenticated()
+                        } else {
+                            (context as? FragmentActivity)?.let { activity ->
+                                authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),

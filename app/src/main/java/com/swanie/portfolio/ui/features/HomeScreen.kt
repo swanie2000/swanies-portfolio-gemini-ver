@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.min
@@ -35,6 +36,7 @@ import kotlin.math.min
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -57,6 +59,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var showSparkles by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
+    val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
 
     // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
     val backgroundAlpha by animateFloatAsState(
@@ -202,10 +205,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         ) {
             Column(modifier = Modifier.fillMaxWidth(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(
-                    onClick = { 
-                        // 🛡️ ELIMINATE MIDDLEMAN: Pop biometric immediately from Home
-                        (context as? FragmentActivity)?.let { activity ->
-                            authViewModel.triggerBiometricUnlock(activity)
+                    onClick = {
+                        if (!isBiometricEnabled) {
+                            authViewModel.setAuthenticated()
+                        } else {
+                            (context as? FragmentActivity)?.let { activity ->
+                                authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),

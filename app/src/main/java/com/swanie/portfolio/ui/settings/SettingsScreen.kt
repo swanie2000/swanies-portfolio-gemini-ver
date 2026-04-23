@@ -107,14 +107,14 @@ fun SettingsScreen(
                     // --- SECURITY ---
                     Text("SECURITY", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    SettingsToggleItem(
-                        title = "Sovereign Vault Lock",
+                    SettingsCheckboxItem(
+                        title = "LOGIN OPTION",
                         subtitle = "Require biometric authentication on startup.",
                         checked = isBiometricEnabled,
                         onCheckedChange = { enabled ->
                             val activity = context as? FragmentActivity
                             if (activity != null) {
-                                settingsViewModel.toggleBiometricLock(activity, enabled) { error ->
+                                settingsViewModel.setBiometricEnabled(activity, enabled) { error ->
                                     Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                                 }
                             }
@@ -237,14 +237,42 @@ fun SettingsToggleItem(title: String, subtitle: String, checked: Boolean, onChec
             Text(text = title, color = themeColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             Text(text = subtitle, color = themeColor.copy(alpha = 0.6f), fontSize = 14.sp)
         }
-        Switch(
+        Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.Yellow,
-                checkedTrackColor = Color.Yellow.copy(alpha = 0.5f),
-                uncheckedThumbColor = themeColor.copy(alpha = 0.4f),
-                uncheckedTrackColor = themeColor.copy(alpha = 0.1f)
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color.Yellow,
+                checkmarkColor = Color.Black
+            )
+        )
+    }
+}
+
+@Composable
+fun SettingsCheckboxItem(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    themeColor: Color,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+            .clickable { onCheckedChange(!checked) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title, color = themeColor, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text(text = subtitle, color = themeColor.copy(alpha = 0.6f), fontSize = 14.sp)
+        }
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = Color.Yellow,
+                checkmarkColor = Color.Black
             )
         )
     }

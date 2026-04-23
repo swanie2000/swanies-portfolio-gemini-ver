@@ -9,9 +9,11 @@ import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.security.SecurityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +30,12 @@ class AuthViewModel @Inject constructor(
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
+    val isBiometricEnabled: StateFlow<Boolean> =
+        themePreferences.isBiometricEnabled.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false,
+        )
 
     init {
         Log.d("VAULT_DEBUG", "AuthViewModel Initialized. Ready for login.")
@@ -64,7 +72,15 @@ class AuthViewModel @Inject constructor(
     /**
      * 🛡️ HARDWARE BRIDGE: Triggered manually by the Login button.
      */
-    fun triggerBiometricUnlock(activity: androidx.fragment.app.FragmentActivity) {
+    fun triggerBiometricUnlock(
+        activity: androidx.fragment.app.FragmentActivity,
+        forcePrompt: Boolean = false,
+    ) {
+        if (!isBiometricEnabled.value && !forcePrompt) {
+            // Direct pass: never initialize biometric prompt when setting is disabled.
+            setAuthenticated()
+            return
+        }
         securityManager.authenticate(
             activity = activity,
             onSuccess = { setAuthenticated() },

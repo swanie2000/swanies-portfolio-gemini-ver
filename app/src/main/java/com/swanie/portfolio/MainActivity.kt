@@ -33,6 +33,7 @@ class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
+    private var hasPromptedBiometricThisSession: Boolean = false
 
     @Inject
     lateinit var securityManager: SecurityManager
@@ -98,6 +99,26 @@ class MainActivity : FragmentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val biometricEnabled = viewModel.isBiometricEnabled.value
+        println("DEBUG: Biometric Enabled: $biometricEnabled")
+        val isAuthenticated = authViewModel.authState.value is AuthViewModel.AuthState.Authenticated
+
+        if (biometricEnabled != true) {
+            // If biometric login is disabled, proceed directly to the main UI.
+            authViewModel.setAuthenticated()
+            hasPromptedBiometricThisSession = false
+            return
+        }
+
+        if (biometricEnabled == true && !isAuthenticated && !hasPromptedBiometricThisSession) {
+            hasPromptedBiometricThisSession = true
+            authViewModel.triggerBiometricUnlock(this)
         }
     }
 }

@@ -149,6 +149,18 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * UI-facing entrypoint for the login option toggle.
+     * Enforces biometric hardware/auth readiness before persisting enabled state.
+     */
+    fun setBiometricEnabled(
+        activity: FragmentActivity,
+        enabled: Boolean,
+        onError: (String) -> Unit,
+    ) {
+        toggleBiometricLock(activity, enabled, onError)
+    }
+
+    /**
      * 🛡️ THE SECURITY HANDSHAKE:
      * Requires the user to authenticate before enabling or disabling biometric security.
      */
