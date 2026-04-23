@@ -154,7 +154,11 @@ fun MetalIcon(
 }
 
 @Composable
-fun SparklineChart(historyData: List<Double>, modifier: Modifier = Modifier) {
+fun SparklineChart(
+    historyData: List<Double>,
+    modifier: Modifier = Modifier,
+    lineColorOverride: Color? = null
+) {
     if (historyData.size < 2) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Text("Gathering Data...", color = Color.Gray, fontSize = 8.sp, fontWeight = FontWeight.Bold)
@@ -166,7 +170,7 @@ fun SparklineChart(historyData: List<Double>, modifier: Modifier = Modifier) {
     }
     val lastPrice = historyData.last()
     val firstPrice = historyData.first()
-    val trendColor = if (lastPrice >= firstPrice) Color(0xFF00FF00) else Color(0xFFFF0000)
+    val trendColor = lineColorOverride ?: if (lastPrice >= firstPrice) Color(0xFF00FF00) else Color(0xFFFF0000)
     val min = historyData.minOrNull() ?: 0.0
     val max = historyData.maxOrNull() ?: 1.0
     val range = if ((max - min) > 0) max - min else 1.0
@@ -181,7 +185,7 @@ fun SparklineChart(historyData: List<Double>, modifier: Modifier = Modifier) {
             moveTo(points[0].x, points[0].y)
             for (i in 1 until points.size) lineTo(points[i].x, points[i].y)
         }
-        drawPath(path, trendColor, style = Stroke(2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+        drawPath(path, trendColor, style = Stroke(2.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     }
 }
 
@@ -565,16 +569,25 @@ fun CompactAssetCard(
                     ) {
                         // Anchor Left: Icon Slot (80dp)
                         Box(modifier = Modifier.width(80.dp), contentAlignment = Alignment.CenterStart) {
-                            MetalIcon(
-                                name = asset.symbol,
-                                weight = asset.weight,
-                                unit = asset.weightUnit,
-                                physicalForm = asset.physicalForm,
-                                size = 32,
-                                imageUrl = asset.imageUrl,
-                                localPath = asset.localIconPath,
-                                category = asset.category
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(cardText.copy(alpha = 0.08f))
+                                    .padding(3.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                MetalIcon(
+                                    name = asset.symbol,
+                                    weight = asset.weight,
+                                    unit = asset.weightUnit,
+                                    physicalForm = asset.physicalForm,
+                                    size = 30,
+                                    imageUrl = asset.imageUrl,
+                                    localPath = asset.localIconPath,
+                                    category = asset.category
+                                )
+                            }
                         }
 
                         // Middle Slot: The Real Estate (weight 1f)
@@ -594,15 +607,33 @@ fun CompactAssetCard(
                             )
                             Text(
                                 text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
-                                color = cardText.copy(0.6f),
+                                color = cardText.copy(alpha = 0.7f),
                                 fontSize = with(density) { (11.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
                                 fontWeight = FontWeight.Bold,
                                 maxLines = 1
                             )
                         }
 
-                        // Anchor Right: Action Slot (64dp)
-                        Box(modifier = Modifier.width(64.dp).height(64.dp), contentAlignment = Alignment.CenterEnd) {
+                        // Sparkline lane (fixed width)
+                        Box(
+                            modifier = Modifier
+                                .width(80.dp)
+                                .height(40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            SparklineChart(
+                                historyData = asset.sparklineData,
+                                modifier = Modifier.fillMaxSize(),
+                                lineColorOverride = trendColor,
+                            )
+                        }
+
+                        // Right lane: total over trend (home/widget parity)
+                        Column(
+                            modifier = Modifier.width(86.dp),
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.Center
+                        ) {
                             if (showEditButton) {
                                 IconButton(
                                     onClick = { onEditRequest() },
@@ -611,7 +642,21 @@ fun CompactAssetCard(
                                     Icon(Icons.Default.Edit, null, tint = Color.Black, modifier = Modifier.size(20.dp))
                                 }
                             } else {
-                                SparklineChart(asset.sparklineData, Modifier.width(64.dp).height(24.dp))
+                                Text(
+                                    text = formatCurrency((asset.officialSpotPrice * asset.amountHeld) + asset.premium, 2, baseCurrency),
+                                    color = cardText,
+                                    fontSize = with(density) { (14.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
+                                    color = trendColor.copy(alpha = 0.7f),
+                                    fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1
+                                )
                             }
                         }
                     }
@@ -743,11 +788,13 @@ fun CompactAssetCard(
                 }
             }
         }
-        WatermarkBadge(
-            source = asset.priceSource,
-            color = cardText,
-            modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
-        )
+        if (isExpanded) {
+            WatermarkBadge(
+                source = asset.priceSource,
+                color = cardText,
+                modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
+            )
+        }
     }
 }
 
