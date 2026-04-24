@@ -76,6 +76,9 @@ class AssetViewModel @Inject constructor(
         .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault ${currentVaultId.value}") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    fun getHoldingsForVault(vaultId: Int): Flow<List<AssetEntity>> =
+        assetDao.getAssetsByVault(vaultId)
+
     init {
         viewModelScope.launch {
             flow {
