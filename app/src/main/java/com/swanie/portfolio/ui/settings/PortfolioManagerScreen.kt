@@ -24,7 +24,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -43,7 +42,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
-import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.R
@@ -65,9 +63,12 @@ fun PortfolioManagerScreen(
 
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
     val safeThemeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+    val goldPrimary = Color.Yellow
+    val nightVaultColor = Color(0xFF121212)
 
-    val scope = rememberCoroutineScope() // Scope for auto-scrolling
-    var editingId by remember { mutableIntStateOf(-1) }
+    val scope = rememberCoroutineScope() // Scope for async tasks
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedVaultForEdit by remember { mutableStateOf<VaultEntity?>(null) }
     var editName by remember { mutableStateOf("") }
     var vaultToDelete by remember { mutableStateOf<VaultEntity?>(null) }
 
@@ -95,7 +96,7 @@ fun PortfolioManagerScreen(
     
     // 🚀 KEYBOARD RESET: Reset scroll or handle state when keyboard closes
     LaunchedEffect(isImeVisible) {
-        if (!isImeVisible && editingId == -1) {
+        if (!isImeVisible && !showEditDialog) {
             // Optional: Snap back or clear specific UI states
         }
     }
@@ -121,14 +122,48 @@ fun PortfolioManagerScreen(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-            // --- 🦢 BOUTIQUE HEADER ---
-            BoutiqueHeader(
-                title = "PORTFOLIO MANAGER",
-                onBack = { navController.popBackStack() },
-                textColor = safeThemeText,
-                actionIcon = Icons.Default.Add,
-                onAction = { mainViewModel.createNewVault("NEW PORTFOLIO") }
-            )
+            // --- 🦢 HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(top = 8.dp, bottom = 10.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = safeThemeText)
+                }
+                Column(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.swanie_foreground),
+                        contentDescription = null,
+                        modifier = Modifier.height(80.dp)
+                    )
+                    Text(
+                        text = "PORTFOLIO MANAGER",
+                        color = safeThemeText,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.TopEnd)
+                        .clip(CircleShape)
+                        .background(goldPrimary)
+                        .clickable { mainViewModel.createNewVault("NEW PORTFOLIO") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Add, null, tint = Color.Black)
+                }
+            }
 
             // --- ⭐ LEGEND ⭐ ---
             Row(
@@ -194,66 +229,36 @@ fun PortfolioManagerScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (editingId == vault.id) {
-                                    TextField(
-                                        value = editName,
-                                        onValueChange = { editName = it },
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .onFocusChanged { focusState ->
-                                                if (focusState.isFocused) {
-                                                    // 🛡️ AUTO-CLEAR
-                                                    if (editName.uppercase() == "NEW PORTFOLIO") { editName = "" }
-                                                    // 🚀 AUTO-SCROLL: Jump to top of keyboard
-                                                    scope.launch {
-                                                        lazyListState.animateScrollToItem(index)
-                                                    }
-                                                }
-                                            },
-                                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = safeThemeText),
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            cursorColor = safeThemeText
-                                        )
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            selectedVaultForEdit = vault
+                                            editName = vault.name
+                                            showEditDialog = true
+                                        }
+                                ) {
+                                    Text(
+                                        vault.name.uppercase(),
+                                        color = if (isSelected) safeThemeText else safeThemeText.copy(0.6f),
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 13.sp
                                     )
-                                    IconButton(onClick = {
-                                        mainViewModel.updateVaultName(vault.id, editName.ifBlank { "PORTFOLIO" })
-                                        editingId = -1
-                                    }) {
-                                        Icon(Icons.Default.Check, null, tint = Color.Green)
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .clickable {
-                                                editingId = vault.id
-                                                editName = vault.name
-                                            }
-                                    ) {
-                                        Text(
-                                            vault.name.uppercase(),
-                                            color = if (isSelected) safeThemeText else safeThemeText.copy(0.6f),
-                                            fontWeight = FontWeight.Black,
-                                            fontSize = 13.sp
-                                        )
-                                    }
+                                }
 
-                                    IconButton(
-                                        onClick = {
-                                            mainViewModel.setDefaultVault(vault.id)
-                                            mainViewModel.setResetToDefault(true)
-                                        },
-                                        modifier = Modifier.size(36.dp)
-                                    ) {
-                                        Icon(
-                                            if (isDefault) Icons.Default.Star else Icons.Default.StarBorder,
-                                            null,
-                                            tint = if (isDefault) Color.Yellow else safeThemeText.copy(0.2f),
-                                            modifier = Modifier.size(30.dp)
-                                        )
-                                    }
+                                IconButton(
+                                    onClick = {
+                                        mainViewModel.setDefaultVault(vault.id)
+                                        mainViewModel.setResetToDefault(true)
+                                    },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        if (isDefault) Icons.Default.Star else Icons.Default.StarBorder,
+                                        null,
+                                        tint = if (isDefault) Color.Yellow else safeThemeText.copy(0.2f),
+                                        modifier = Modifier.size(30.dp)
+                                    )
                                 }
                             }
                         }
@@ -304,5 +309,66 @@ fun PortfolioManagerScreen(
                 }
             }
         )
+    }
+
+    if (showEditDialog && selectedVaultForEdit != null) {
+        BasicAlertDialog(
+            onDismissRequest = {
+                showEditDialog = false
+                selectedVaultForEdit = null
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(nightVaultColor)
+                    .border(1.dp, safeThemeText.copy(alpha = 0.18f), RoundedCornerShape(16.dp))
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text(
+                    text = "EDIT PORTFOLIO",
+                    color = safeThemeText,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 14.sp
+                )
+                TextField(
+                    value = editName,
+                    onValueChange = { editName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = LocalTextStyle.current.copy(
+                        color = safeThemeText,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    ),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        cursorColor = safeThemeText
+                    )
+                )
+                Button(
+                    onClick = {
+                        selectedVaultForEdit?.let { target ->
+                            mainViewModel.updateVaultName(target.id, editName.ifBlank { "PORTFOLIO" })
+                        }
+                        showEditDialog = false
+                        selectedVaultForEdit = null
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = goldPrimary,
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Text("SAVE", fontWeight = FontWeight.Black)
+                }
+            }
+        }
     }
 }
