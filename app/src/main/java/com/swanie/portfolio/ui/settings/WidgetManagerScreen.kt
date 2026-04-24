@@ -192,6 +192,8 @@ fun WidgetManagerScreen(
 
     DisposableEffect(Unit) {
         onDispose {
+            dragOrderedIds = null
+            postDragOrderLock = null
             assetViewModel.setWidgetSelectionVaultId(null)
         }
     }
@@ -489,14 +491,23 @@ fun WidgetManagerScreen(
                                             .padding(top = 4.dp, bottom = 8.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Text(
-                                            "ASSETS",
-                                            color = safeThemeText,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Black,
-                                            letterSpacing = 1.sp,
+                                        Column(
                                             modifier = Modifier.weight(1f),
-                                        )
+                                            horizontalAlignment = Alignment.Start,
+                                        ) {
+                                            Text(
+                                                "SELECTED ASSETS",
+                                                color = safeThemeText.copy(alpha = 0.6f),
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                            Text(
+                                                "CAN BE REORDERED",
+                                                color = safeThemeText.copy(alpha = 0.6f),
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                        }
                                         Surface(
                                             shape = RoundedCornerShape(999.dp),
                                             color = safeThemeText.copy(alpha = 0.12f),

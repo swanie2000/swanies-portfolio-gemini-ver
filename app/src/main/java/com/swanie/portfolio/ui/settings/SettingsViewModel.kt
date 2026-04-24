@@ -348,8 +348,6 @@ class SettingsViewModel @Inject constructor(
                                     // 🎯 DYNAMIC PRECISION: Bulletproof Boutique Formatter
                                     val price = asset.officialSpotPrice
                                     val formattedPrice = formatBoutiquePrice(price)
-                                    Log.d("SWANIE_PRECISION", "Asset: $safeSymbol | Raw Bits: ${java.lang.Double.doubleToLongBits(price)} | Raw: $price | Formatted: $formattedPrice")
-                                    
                                     "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                                 }.joinToString("||")
                             }

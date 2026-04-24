@@ -249,9 +249,12 @@ class AssetViewModel @Inject constructor(
             .filter { it.isNotBlank() }
             .distinct()
             .take(5)
-        vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
-        repository.pushAssetsToWidget(context, vaultId.toString())
-        return true
+        val persisted = withTimeoutOrNull(3000L) {
+            vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
+            repository.pushAssetsToWidget(context, vaultId.toString())
+            true
+        }
+        return persisted == true
     }
 
     fun toggleAssetInWidgetSelection(asset: AssetEntity, maxSelected: Int = 5) {

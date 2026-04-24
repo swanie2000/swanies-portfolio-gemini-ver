@@ -106,7 +106,6 @@ class MainActivity : FragmentActivity() {
         super.onResume()
 
         val biometricEnabled = viewModel.isBiometricEnabled.value
-        println("DEBUG: Biometric Enabled: $biometricEnabled")
         val isAuthenticated = authViewModel.authState.value is AuthViewModel.AuthState.Authenticated
 
         if (biometricEnabled != true) {
