@@ -21,12 +21,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -47,6 +48,8 @@ class AssetViewModel @Inject constructor(
     private val _confirmDelete = MutableStateFlow<AssetEntity?>(null)
     val confirmDelete: StateFlow<AssetEntity?> = _confirmDelete.asStateFlow()
     private val _widgetSelectionVaultId = MutableStateFlow<Int?>(null)
+    private val _vaultAssets = MutableStateFlow<List<AssetEntity>>(emptyList())
+    private val _isUpdating = MutableStateFlow(false)
 
     // 🌐 GLOBAL VISTA: Track Current Vault
     // Task 2: Instant Data Handshake - Use runBlocking for the absolute first state to avoid "Vault 1" flicker
@@ -64,6 +67,21 @@ class AssetViewModel @Inject constructor(
         }
         .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault ${currentVaultId.value}") }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    init {
+        viewModelScope.launch {
+            currentVaultId
+                .drop(1)
+                .collect {
+                    clearVaultState()
+                }
+        }
+        viewModelScope.launch {
+            holdings.collect { latest ->
+                _vaultAssets.value = latest ?: emptyList()
+            }
+        }
+    }
 
     // Keep widget state vault-scoped to match SettingsViewModel contract.
     // Can be overridden by screens that edit a vault different from currentVaultId.
@@ -95,6 +113,10 @@ class AssetViewModel @Inject constructor(
 
     fun setWidgetSelectionVaultId(vaultId: Int?) {
         _widgetSelectionVaultId.value = vaultId?.takeIf { it > 0 }
+    }
+
+    fun clearVaultState() {
+        _vaultAssets.value = emptyList()
     }
 
     /**
@@ -234,7 +256,8 @@ class AssetViewModel @Inject constructor(
     }
 
     fun updateWidgetSelectionForCurrentVault(selectedIds: List<String>) {
-        viewModelScope.launch { persistWidgetSelectionOrderForCurrentVault(selectedIds) }
+        if (_isUpdating.value) return
+        viewModelScope.launch(Dispatchers.IO) { persistWidgetSelectionOrderForCurrentVault(selectedIds) }
     }
 
     /**
@@ -242,6 +265,7 @@ class AssetViewModel @Inject constructor(
      * Returns false if normalization produced nothing to write or the vault id was invalid.
      */
     suspend fun persistWidgetSelectionOrderForCurrentVault(selectedIds: List<String>): Boolean {
+        if (_isUpdating.value) return false
         val vaultId = widgetContractVaultId.value
         if (vaultId <= 0) return false
         val normalized = selectedIds
@@ -249,29 +273,42 @@ class AssetViewModel @Inject constructor(
             .filter { it.isNotBlank() }
             .distinct()
             .take(5)
-        val persisted = withTimeoutOrNull(3000L) {
-            vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
-            repository.pushAssetsToWidget(context, vaultId.toString())
-            true
+        _isUpdating.value = true
+        return try {
+            val persisted = withTimeoutOrNull(3000L) {
+                withContext(Dispatchers.IO) {
+                    vaultDao.updateSelectedWidgetAssets(vaultId, normalized.joinToString(","))
+                    repository.pushAssetsToWidget(context, vaultId.toString())
+                }
+                true
+            }
+            persisted == true
+        } finally {
+            _isUpdating.value = false
         }
-        return persisted == true
     }
 
     fun toggleAssetInWidgetSelection(asset: AssetEntity, maxSelected: Int = 5) {
-        viewModelScope.launch {
-            val currentIds = widgetSelectedAssetIds.value
-            val nextIds = if (asset.coinId in currentIds) {
-                currentIds.filter { it != asset.coinId }
-            } else if (currentIds.size < maxSelected) {
-                currentIds + asset.coinId
-            } else {
-                currentIds
-            }
+        if (_isUpdating.value) return
+        viewModelScope.launch(Dispatchers.IO) {
+            _isUpdating.value = true
+            try {
+                val currentIds = widgetSelectedAssetIds.value
+                val nextIds = if (asset.coinId in currentIds) {
+                    currentIds.filter { it != asset.coinId }
+                } else if (currentIds.size < maxSelected) {
+                    currentIds + asset.coinId
+                } else {
+                    currentIds
+                }
 
-            if (nextIds != currentIds) {
-                val vaultId = widgetContractVaultId.value
-                vaultDao.updateSelectedWidgetAssets(vaultId, nextIds.joinToString(","))
-                repository.pushAssetsToWidget(context, vaultId.toString())
+                if (nextIds != currentIds) {
+                    val vaultId = widgetContractVaultId.value
+                    vaultDao.updateSelectedWidgetAssets(vaultId, nextIds.joinToString(","))
+                    repository.pushAssetsToWidget(context, vaultId.toString())
+                }
+            } finally {
+                _isUpdating.value = false
             }
         }
     }
@@ -287,7 +324,7 @@ class AssetViewModel @Inject constructor(
         onComplete: () -> Unit,
     ) {
         if (portfolioVaultId <= 0) return
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                     vaultDao.clearAppWidgetId(appWidgetId)
@@ -329,7 +366,7 @@ class AssetViewModel @Inject constructor(
     }
 
     fun updateWidgetShowTotalForCurrentVault(show: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val vaultId = widgetContractVaultId.value
             vaultDao.updateShowWidgetTotal(vaultId, show)
             repository.pushAssetsToWidget(context, vaultId.toString())

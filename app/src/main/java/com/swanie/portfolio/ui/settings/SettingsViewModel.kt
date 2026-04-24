@@ -62,6 +62,7 @@ class SettingsViewModel @Inject constructor(
     // 🎯 THE REGISTRY: Track the currently targeted vault for widget configuration
     private val _targetVaultId = MutableStateFlow<Int>(-1)
     val targetVaultId: StateFlow<Int> = _targetVaultId.asStateFlow()
+    private val _isUpdating = MutableStateFlow(false)
 
     val isDarkMode: StateFlow<Boolean> = themePreferences.isDarkMode
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
@@ -236,16 +237,28 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun clearWidgetSelection(vaultId: Int) {
-        viewModelScope.launch {
-            vaultDao.updateSelectedWidgetAssets(vaultId, "")
-            triggerWidgetUpdate(vaultId)
+        if (_isUpdating.value) return
+        viewModelScope.launch(Dispatchers.IO) {
+            _isUpdating.value = true
+            try {
+                vaultDao.updateSelectedWidgetAssets(vaultId, "")
+                triggerWidgetUpdate(vaultId)
+            } finally {
+                _isUpdating.value = false
+            }
         }
     }
 
     fun updateSelectedWidgetAssets(vaultId: Int, assets: String) {
-        viewModelScope.launch {
-            vaultDao.updateSelectedWidgetAssets(vaultId, assets)
-            triggerWidgetUpdate(vaultId)
+        if (_isUpdating.value) return
+        viewModelScope.launch(Dispatchers.IO) {
+            _isUpdating.value = true
+            try {
+                vaultDao.updateSelectedWidgetAssets(vaultId, assets)
+                triggerWidgetUpdate(vaultId)
+            } finally {
+                _isUpdating.value = false
+            }
         }
     }
 
