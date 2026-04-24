@@ -84,7 +84,7 @@ fun MyHoldingsScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
-    val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var editingAssetId by remember { mutableStateOf<String?>(null) }
@@ -173,7 +173,14 @@ fun MyHoldingsScreen(
                 Box(modifier = Modifier.fillMaxWidth().statusBarsPadding().height(80.dp).zIndex(10f)) {
                     Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(70.dp).align(Alignment.Center))
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { if (!isViewModelRefreshing) viewModel.refreshAssets() }) { Icon(Icons.Default.Refresh, "Refresh", tint = textColor) }
+                        IconButton(
+                            onClick = {
+                                if (!isViewModelRefreshing) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    viewModel.refreshAssets()
+                                }
+                            },
+                        ) { Icon(Icons.Default.Refresh, "Refresh", tint = textColor) }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
                         IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)) { Icon(Icons.Default.Add, null, tint = Color.Black) }

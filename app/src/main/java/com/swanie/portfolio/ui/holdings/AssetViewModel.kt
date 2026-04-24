@@ -241,8 +241,13 @@ class AssetViewModel @Inject constructor(
 
     suspend fun healMetadata(asset: AssetEntity): AssetEntity = repository.healMetadata(asset)
 
+    /** User-initiated refresh: must bypass rate limit so [syncCoordinator] enters Syncing (yellow bar). */
     fun refreshAssets() {
-        viewModelScope.launch { repository.refreshAssets() }
+        viewModelScope.launch {
+            val vaultId = currentVaultId.value
+            val portfolioId = if (vaultId > 0) vaultId.toString() else "MAIN"
+            repository.refreshAssets(force = true, portfolioId = portfolioId)
+        }
     }
 
     fun refreshMarketWatch() {
