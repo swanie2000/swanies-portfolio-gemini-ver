@@ -67,7 +67,7 @@ fun MyHoldingsScreen(
 
     val holdings by viewModel.holdings.collectAsStateWithLifecycle(initialValue = null)
     var localHoldings by remember { mutableStateOf<List<AssetEntity>>(emptyList()) }
-    val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
+    val allVaults by viewModel.allVaults.collectAsStateWithLifecycle(initialValue = null)
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
@@ -97,20 +97,21 @@ fun MyHoldingsScreen(
     val confirmDeleteEnabled by mainViewModel.confirmDelete.collectAsStateWithLifecycle()
     val assetToDelete by viewModel.confirmDelete.collectAsStateWithLifecycle()
 
+    val resolvedVaults = allVaults ?: emptyList()
     val pagerState = rememberPagerState(
-        initialPage = allVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
-    ) { allVaults.size.coerceAtLeast(1) }
+        initialPage = resolvedVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
+    ) { resolvedVaults.size.coerceAtLeast(1) }
 
     LaunchedEffect(activeVault.id) {
-        val targetIndex = allVaults.indexOfFirst { it.id == activeVault.id }
+        val targetIndex = resolvedVaults.indexOfFirst { it.id == activeVault.id }
         if (targetIndex != -1 && targetIndex != pagerState.currentPage) {
             pagerState.animateScrollToPage(targetIndex)
         }
     }
 
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress && allVaults.isNotEmpty()) {
-            val targetVault = allVaults[pagerState.currentPage]
+        if (!pagerState.isScrollInProgress && resolvedVaults.isNotEmpty()) {
+            val targetVault = resolvedVaults[pagerState.currentPage]
             if (targetVault.id != activeVault.id) mainViewModel.selectVault(targetVault.id)
         }
     }
@@ -187,39 +188,41 @@ fun MyHoldingsScreen(
                     }
                 }
 
-                // Identity Deck
-                Box(modifier = Modifier.fillMaxWidth().height(140.dp).zIndex(5f)) {
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 24.dp),
-                        pageSpacing = 15.dp,
-                        userScrollEnabled = !isDraggingActive.value,
-                        key = { page -> allVaults.getOrNull(page)?.id ?: page }
-                    ) { page ->
-                        val vaultForPage = allVaults.getOrNull(page) ?: activeVault
-                        val isCurrent = vaultForPage.id == activeVault.id
-                        val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-                        val contentAlpha = (1f - (pageOffset * 1.8f).coerceIn(0f, 1f))
+                if (resolvedVaults.isNotEmpty()) {
+                    // Identity Deck
+                    Box(modifier = Modifier.fillMaxWidth().height(140.dp).zIndex(5f)) {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 24.dp),
+                            pageSpacing = 15.dp,
+                            userScrollEnabled = !isDraggingActive.value,
+                            key = { page -> resolvedVaults.getOrNull(page)?.id ?: page }
+                        ) { page ->
+                            val vaultForPage = resolvedVaults.getOrNull(page) ?: activeVault
+                            val isCurrent = vaultForPage.id == activeVault.id
+                            val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+                            val contentAlpha = (1f - (pageOffset * 1.8f).coerceIn(0f, 1f))
 
-                        Box(
-                            modifier = Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).graphicsLayer { alpha = contentAlpha.pow(2f) }.clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
-                        ) {
-                            Column(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) { Text(text = vaultForPage.name.uppercase(), color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp) }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                                    if (isCurrent && holdings != null) {
-                                        AutoResizingText(
-                                            text = totalValueFormatted,
-                                            style = TextStyle(
-                                                color = textColor.copy(0.7f),
-                                                fontSize = with(LocalDensity.current) { (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                                fontWeight = FontWeight.Bold,
-                                                textAlign = TextAlign.Center
-                                            ),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(110.dp).clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).graphicsLayer { alpha = contentAlpha.pow(2f) }.clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
+                            ) {
+                                Column(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) { Text(text = vaultForPage.name.uppercase(), color = textColor, fontSize = 18.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp) }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                                        if (isCurrent && holdings != null) {
+                                            AutoResizingText(
+                                                text = totalValueFormatted,
+                                                style = TextStyle(
+                                                    color = textColor.copy(0.7f),
+                                                    fontSize = with(LocalDensity.current) { (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                                    fontWeight = FontWeight.Bold,
+                                                    textAlign = TextAlign.Center
+                                                ),
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -248,63 +251,91 @@ fun MyHoldingsScreen(
                             )
                         }
 
-                        AnimatedContent(
-                            targetState = activeVault.id,
-                            transitionSpec = { fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(1500)) },
-                            label = "PureDissolve"
-                        ) { _ ->
-                            LazyColumn(
-                                state = lazyListState,
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                        if (allVaults != null && resolvedVaults.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                if (holdings != null) {
-                                    items(items = filteredHoldings, key = { it.coinId }) { asset ->
-                                        ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
-                                            val hndl = Modifier.longPressDraggableHandle(
-                                                onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                                onDragStopped = {
-                                                    if (isOverTrash.value) {
-                                                        if (confirmDeleteEnabled) {
-                                                            viewModel.requestDeleteConfirmation(asset)
-                                                        } else {
-                                                            viewModel.deleteAsset(asset)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    Text(
+                                        text = "Welcome to Swanies Portfolio",
+                                        color = textColor,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Button(
+                                        onClick = {
+                                            isExiting = true
+                                            navController.navigate(Routes.PORTFOLIO_MANAGER)
+                                        }
+                                    ) {
+                                        Text("Create Your First Portfolio")
+                                    }
+                                }
+                            }
+                        } else {
+                            AnimatedContent(
+                                targetState = activeVault.id,
+                                transitionSpec = { fadeIn(animationSpec = tween(1500)) togetherWith fadeOut(animationSpec = tween(1500)) },
+                                label = "PureDissolve"
+                            ) { _ ->
+                                LazyColumn(
+                                    state = lazyListState,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    if (holdings != null) {
+                                        items(items = filteredHoldings, key = { it.coinId }) { asset ->
+                                            ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
+                                                val hndl = Modifier.longPressDraggableHandle(
+                                                    onDragStarted = { isDraggingActive.value = true; haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
+                                                    onDragStopped = {
+                                                        if (isOverTrash.value) {
+                                                            if (confirmDeleteEnabled) {
+                                                                viewModel.requestDeleteConfirmation(asset)
+                                                            } else {
+                                                                viewModel.deleteAsset(asset)
+                                                            }
                                                         }
+                                                        isDraggingActive.value = false
+                                                        viewModel.updateAssetOrder(localHoldings)
                                                     }
-                                                    isDraggingActive.value = false
-                                                    viewModel.updateAssetOrder(localHoldings)
+                                                )
+                                                val cardBgCol = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
+                                                val cardTextCol = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+
+                                                val isExpanded = expandedAssetId == asset.coinId
+                                                val showEdit = editingAssetId == asset.coinId
+
+                                                if (isCompactViewEnabled) {
+                                                    CompactAssetCard(
+                                                        asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
+                                                        onExpandToggle = {
+                                                            if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
+                                                            else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
+                                                            else { expandedAssetId = null; editingAssetId = null }
+                                                        },
+                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit
+                                                    )
+                                                } else {
+                                                    FullAssetCard(
+                                                        asset = asset, isExpanded = true, isEditing = false, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
+                                                        onExpandToggle = {
+                                                            if (editingAssetId != asset.coinId) editingAssetId = asset.coinId else editingAssetId = null
+                                                        },
+                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        onSave = { newName, newAmount, newWeight, weightUnit, decimals ->
+                                                            viewModel.updateAsset(asset, newName, newAmount, newWeight, weightUnit, decimals)
+                                                        },
+                                                        showEditButton = showEdit, modifier = hndl
+                                                    )
                                                 }
-                                            )
-                                            val cardBgCol = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
-                                            val cardTextCol = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
-
-                                            val isExpanded = expandedAssetId == asset.coinId
-                                            val showEdit = editingAssetId == asset.coinId
-
-                                            if (isCompactViewEnabled) {
-                                                CompactAssetCard(
-                                                    asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
-                                                    onExpandToggle = {
-                                                        if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
-                                                        else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
-                                                        else { expandedAssetId = null; editingAssetId = null }
-                                                    },
-                                                    onEditRequest = { assetBeingEdited = asset },
-                                                    modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit
-                                                )
-                                            } else {
-                                                FullAssetCard(
-                                                    asset = asset, isExpanded = true, isEditing = false, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = activeVault.baseCurrency,
-                                                    onExpandToggle = {
-                                                        if (editingAssetId != asset.coinId) editingAssetId = asset.coinId else editingAssetId = null
-                                                    },
-                                                    onEditRequest = { assetBeingEdited = asset },
-                                                    onSave = { newName, newAmount, newWeight, weightUnit, decimals ->
-                                                        viewModel.updateAsset(asset, newName, newAmount, newWeight, weightUnit, decimals)
-                                                    },
-                                                    showEditButton = showEdit, modifier = hndl
-                                                )
                                             }
                                         }
                                     }

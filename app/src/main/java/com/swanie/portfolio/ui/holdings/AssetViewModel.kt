@@ -16,6 +16,7 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.PriceHistoryDao
+import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.repository.*
 import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
@@ -139,6 +140,10 @@ class AssetViewModel @Inject constructor(
     ) { vaultId, vaults ->
         vaults.find { it.id == vaultId }?.showWidgetTotal ?: true
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    // Null = loading; emptyList = loaded but no vaults exist yet.
+    val allVaults: StateFlow<List<VaultEntity>?> = vaultDao.getAllVaultsFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun setWidgetSelectionVaultId(vaultId: Int?) {
         _widgetSelectionVaultId.value = vaultId?.takeIf { it > 0 }

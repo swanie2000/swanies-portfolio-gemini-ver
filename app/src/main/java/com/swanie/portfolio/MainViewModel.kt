@@ -83,18 +83,18 @@ class MainViewModel @Inject constructor(
                     _isDataReady.value = true
                 }
                 launch {
-                    // Wait for vaults to exist in DB
-                    val vaults = vaultDao.getAllVaultsFlow().first { it.isNotEmpty() }
+                    // Resolve once DB is available, even if it's currently empty.
+                    val vaults = vaultDao.getAllVaultsFlow().first()
 
                     val resetOnStart = themePreferences.resetToDefaultOnStart.first()
                     val defId = themePreferences.defaultVaultId.first()
                     val lastId = themePreferences.currentVaultId.first()
 
-                    val targetId = if (resetOnStart) {
-                        defId
-                    } else {
-                        // If the last used vault was deleted or doesn't exist, use default
-                        if (vaults.any { it.id == lastId }) lastId else defId
+                    val targetId = when {
+                        vaults.isEmpty() -> defId
+                        resetOnStart -> defId
+                        vaults.any { it.id == lastId } -> lastId
+                        else -> defId
                     }
 
                     // Atomically set the ID and signal that the UI is ready to render
