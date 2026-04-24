@@ -123,6 +123,12 @@ fun MyHoldingsScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
+    val curtainAlpha by animateFloatAsState(
+        targetValue = if (allVaults != null) 0f else 1f,
+        animationSpec = tween(durationMillis = 420, easing = FastOutSlowInEasing),
+        label = "curtain"
+    )
+
     Box(modifier = Modifier.fillMaxSize().background(siteBg).pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
@@ -132,6 +138,7 @@ fun MyHoldingsScreen(
             }
         }
     }) {
+        Box(modifier = Modifier.fillMaxSize()) {
         if (!isExiting) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Fixed Header Swan Logo
@@ -351,6 +358,17 @@ fun MyHoldingsScreen(
                         }
                     }
                 }
+            }
+        }
+
+            if (!isExiting && curtainAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .zIndex(20f)
+                        .background(nightVaultColor)
+                        .alpha(curtainAlpha)
+                )
             }
         }
 
