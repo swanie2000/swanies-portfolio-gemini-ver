@@ -70,6 +70,9 @@ class SettingsViewModel @Inject constructor(
     val isCompactViewEnabled: StateFlow<Boolean> = themePreferences.isCompactViewEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isHighVisibilityMode: StateFlow<Boolean> = themePreferences.isHighVisibilityMode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val confirmDelete: StateFlow<Boolean> = themePreferences.confirmDelete
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
@@ -140,6 +143,12 @@ class SettingsViewModel @Inject constructor(
     fun saveIsCompactViewEnabled(isEnabled: Boolean) {
         viewModelScope.launch {
             themePreferences.saveIsCompactViewEnabled(isEnabled)
+        }
+    }
+
+    fun saveIsHighVisibilityMode(isEnabled: Boolean) {
+        viewModelScope.launch {
+            themePreferences.saveIsHighVisibilityMode(isEnabled)
         }
     }
 

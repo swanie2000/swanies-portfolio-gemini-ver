@@ -67,6 +67,7 @@ class MainViewModel @Inject constructor(
     val useGradient = themePreferences.useGradient.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val gradientAmount = themePreferences.gradientAmount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.5f)
     val isCompactViewEnabled = themePreferences.isCompactViewEnabled.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val isHighVisibilityMode = themePreferences.isHighVisibilityMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val isDarkMode = themePreferences.isDarkMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val isBiometricEnabled = themePreferences.isBiometricEnabled.stateIn(
@@ -159,6 +160,10 @@ class MainViewModel @Inject constructor(
 
     fun toggleCompactView() = viewModelScope.launch {
         themePreferences.saveIsCompactViewEnabled(!isCompactViewEnabled.value)
+    }
+
+    fun setHighVisibilityMode(enabled: Boolean) = viewModelScope.launch {
+        themePreferences.saveIsHighVisibilityMode(enabled)
     }
 
     fun setUseGradient(enabled: Boolean) = viewModelScope.launch {

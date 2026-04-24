@@ -79,6 +79,7 @@ fun MyHoldingsScreen(
     val nightVaultColor = lerp(siteBg, Color.Black, 0.25f)
 
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
+    val isHighVisibilityMode by mainViewModel.isHighVisibilityMode.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("ALL", "CRYPTO", "METAL")
 
@@ -336,7 +337,8 @@ fun MyHoldingsScreen(
                                                         else { expandedAssetId = null; editingAssetId = null }
                                                     },
                                                     onEditRequest = { assetBeingEdited = asset },
-                                                    modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit
+                                                    modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                    isHighVisibilityMode = isHighVisibilityMode
                                                 )
                                             } else {
                                                 FullAssetCard(
@@ -348,7 +350,9 @@ fun MyHoldingsScreen(
                                                     onSave = { newName, newAmount, newWeight, weightUnit, decimals ->
                                                         viewModel.updateAsset(asset, newName, newAmount, newWeight, weightUnit, decimals)
                                                     },
-                                                    showEditButton = showEdit, modifier = hndl
+                                                    showEditButton = showEdit,
+                                                    isHighVisibilityMode = isHighVisibilityMode,
+                                                    modifier = hndl
                                                 )
                                             }
                                         }

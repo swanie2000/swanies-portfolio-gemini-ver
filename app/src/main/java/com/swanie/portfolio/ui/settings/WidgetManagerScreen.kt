@@ -49,11 +49,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +73,7 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.components.BoutiqueHeader
 import com.swanie.portfolio.ui.holdings.AssetViewModel
+import com.swanie.portfolio.ui.holdings.AssetCardFontScaleScope
 import com.swanie.portfolio.ui.holdings.CompactAssetCard
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.ui.holdings.SparklineChart
@@ -131,6 +134,7 @@ fun WidgetManagerScreen(
 
     // 🎯 REGISTRY STATE: The target vault for configuration
     val targetVaultId by settingsViewModel.targetVaultId.collectAsStateWithLifecycle()
+    val isHighVisibilityMode by settingsViewModel.isHighVisibilityMode.collectAsStateWithLifecycle()
     val selectedVault by settingsViewModel.targetVault.collectAsStateWithLifecycle()
     val targetAssets by settingsViewModel.targetVaultAssets.collectAsStateWithLifecycle()
     val allVaults by settingsViewModel.allVaults.collectAsStateWithLifecycle()
@@ -551,6 +555,7 @@ fun WidgetManagerScreen(
                                                 cardBg = safeCardBg,
                                                 cardText = safeCardText,
                                                 baseCurrency = selectedVault?.baseCurrency ?: "USD",
+                                                isHighVisibilityMode = isHighVisibilityMode,
                                                 animatePlacement = isChecked || isDragging,
                                                 onToggleChecked = { checked ->
                                                     if (checked) {
@@ -640,6 +645,7 @@ fun WidgetManagerScreen(
                                     cardHex = draftCrd,
                                     cardTxtHex = draftCrdTxt,
                                     showTotal = !draftHideTotals,
+                                    isHighVisibilityMode = isHighVisibilityMode,
                                 )
                                 Spacer(Modifier.height(10.dp))
                                 HorizontalDivider(color = safeThemeText.copy(alpha = 0.12f))
@@ -706,6 +712,7 @@ fun WidgetManagerScreen(
                                                 cardHex = draftCrd,
                                                 cardTxtHex = draftCrdTxt,
                                                 showTotal = !draftHideTotals,
+                                                isHighVisibilityMode = isHighVisibilityMode,
                                             )
                                         } else {
                                             Box(
@@ -911,6 +918,7 @@ private fun HeroWidgetPreview(
     cardHex: String,
     cardTxtHex: String,
     showTotal: Boolean,
+    isHighVisibilityMode: Boolean = false,
 ) {
     val bgColor = try { Color(bgHex.toColorInt()) } catch (e: Exception) { Color(0xFF000416) }
     val bgTextColor = try { Color(bgTxtHex.toColorInt()) } catch (e: Exception) { Color.White }
@@ -989,6 +997,7 @@ private fun HeroWidgetPreview(
                                     asset = asset,
                                     cardColor = cardColor,
                                     cardTextColor = cardTextColor,
+                                    isHighVisibilityMode = isHighVisibilityMode,
                                 )
                             }
                         }
@@ -1011,8 +1020,19 @@ private fun SimulatedAssetRow(
     asset: AssetEntity,
     cardColor: Color,
     cardTextColor: Color,
+    isHighVisibilityMode: Boolean = false,
 ) {
-    val density = LocalDensity.current
+    val hi = isHighVisibilityMode
+    val tickerSize = if (hi) 18.sp else 14.sp
+    val subSize = if (hi) 14.sp else 12.sp
+    val lineCluster = if (hi) 1.em else 1.32.em
+    val platformCluster =
+        if (hi) PlatformTextStyle(includeFontPadding = false)
+        else PlatformTextStyle(includeFontPadding = true)
+    val rowHeight = if (hi) 64.dp else 68.dp
+    val textStackGap = if (hi) (-2).dp else 2.dp
+    val sparklineH = if (hi) 20.dp else 16.dp
+    val sparklineStartPad = if (hi) 6.dp else 10.dp
     val displayPrice = runCatching {
         val safePrice = asset.officialSpotPrice
         if (!safePrice.isFinite()) error("invalid price")
@@ -1031,14 +1051,15 @@ private fun SimulatedAssetRow(
         asset.priceChange24h < 0 -> Color(0xFFD32F2F)
         else -> cardTextColor.copy(alpha = 0.7f)
     }
+    AssetCardFontScaleScope {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(cardColor, RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = if (hi) 10.dp else 14.dp),
     ) {
         Row(
-            modifier = Modifier.height(60.dp),
+            modifier = Modifier.height(rowHeight),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Lane 1 (left): fixed 100dp for icon + text.
@@ -1069,9 +1090,9 @@ private fun SimulatedAssetRow(
                         category = asset.category,
                     )
                 }
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(if (hi) 4.dp else 6.dp))
                 Column(
-                    verticalArrangement = Arrangement.spacedBy((-2).dp, Alignment.CenterVertically),
+                    verticalArrangement = Arrangement.spacedBy(textStackGap, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.Start,
                 ) {
                     val titleText = if (asset.category == AssetCategory.METAL) {
@@ -1081,19 +1102,30 @@ private fun SimulatedAssetRow(
                     }
                     Text(
                         text = titleText.uppercase(),
-                        color = cardTextColor,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                        lineHeight = 11.sp,
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                color = cardTextColor,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = tickerSize,
+                                lineHeight = lineCluster,
+                                platformStyle = platformCluster,
+                            )
+                        ),
                         maxLines = 1,
                         softWrap = false,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = displayPrice,
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = with(density) { (8.5.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                        fontWeight = FontWeight.Bold,
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = subSize,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = lineCluster,
+                                platformStyle = platformCluster,
+                            )
+                        ),
                         maxLines = 1,
                         softWrap = false,
                         overflow = TextOverflow.Ellipsis,
@@ -1105,7 +1137,7 @@ private fun SimulatedAssetRow(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 10.dp)
+                    .padding(start = sparklineStartPad)
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .align(Alignment.CenterVertically),
                 contentAlignment = Alignment.Center,
@@ -1114,7 +1146,7 @@ private fun SimulatedAssetRow(
                     historyData = asset.sparklineData,
                     modifier = Modifier
                         .width(75.dp)
-                        .height(16.dp),
+                        .height(sparklineH),
                     lineColorOverride = trendColor,
                 )
             }
@@ -1125,27 +1157,39 @@ private fun SimulatedAssetRow(
                     .width(100.dp)
                     .align(Alignment.CenterVertically),
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy((-2).dp, Alignment.CenterVertically),
+                verticalArrangement = Arrangement.spacedBy(textStackGap, Alignment.CenterVertically),
             ) {
                 Text(
                     text = totalValue,
-                    color = cardTextColor,
-                    fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 11.sp,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            color = cardTextColor,
+                            fontSize = tickerSize,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = lineCluster,
+                            platformStyle = platformCluster,
+                        )
+                    ),
                     maxLines = 1,
                     softWrap = false,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = if (changeText == "N/A") "N/A" else "${if (asset.priceChange24h > 0) "+" else ""}$changeText%",
-                    color = trendColor.copy(alpha = 0.9f),
-                    fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                    fontWeight = FontWeight.Bold,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            color = trendColor.copy(alpha = 0.9f),
+                            fontSize = subSize,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = lineCluster,
+                            platformStyle = platformCluster,
+                        )
+                    ),
                     maxLines = 1,
                 )
             }
         }
+    }
     }
 }
 
@@ -1157,6 +1201,7 @@ fun WidgetReorderVisibilityItem(
     cardBg: Color,
     cardText: Color,
     baseCurrency: String,
+    isHighVisibilityMode: Boolean = false,
     animatePlacement: Boolean = false,
     onToggleChecked: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -1176,6 +1221,7 @@ fun WidgetReorderVisibilityItem(
             onExpandToggle = {},
             showEditButton = false,
             isExpanded = false,
+            isHighVisibilityMode = isHighVisibilityMode,
             modifier = modifier
                 .then(placementModifier)
                 .alpha(if (isChecked) 1f else 0.45f)
@@ -1204,7 +1250,8 @@ fun WidgetPreviewSlim(
     bgTxtHex: String,
     cardHex: String,
     cardTxtHex: String,
-    showTotal: Boolean
+    showTotal: Boolean,
+    isHighVisibilityMode: Boolean = false,
 ) {
     val bgColor = try { Color(bgHex.toColorInt()) } catch(e: Exception) { Color.Black }
     val bgTextColor = try { Color(bgTxtHex.toColorInt()) } catch(e: Exception) { Color.White }
@@ -1240,6 +1287,7 @@ fun WidgetPreviewSlim(
                 asset = sampleAsset,
                 cardColor = cardColor,
                 cardTextColor = cardTextColor,
+                isHighVisibilityMode = isHighVisibilityMode,
             )
         } else {
             Box(

@@ -29,13 +29,15 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
@@ -393,15 +395,33 @@ fun FullAssetCard(
     onEditRequest: () -> Unit,
     onSave: (newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) -> Unit,
     onCancel: () -> Unit = {},
+    isHighVisibilityMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "grabScale")
     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "grabElevation")
     val alpha by animateFloatAsState(if (isDragging) 0.9f else 1f, label = "grabAlpha")
-    val density = LocalDensity.current
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    AssetCardFontScaleScope {
+        val hi = isHighVisibilityMode
+        val symSize = if (hi) 14.sp else 12.sp
+        val nameLabelSize = if (hi) 13.sp else 10.sp
+        val amountSize = if (hi) 36.sp else 32.sp
+        val metalDetailSize = if (hi) 11.sp else 9.sp
+        val changePctSize = if (hi) 10.sp else 8.sp
+        val statLabelSize = if (hi) 11.sp else 9.sp
+        val priceValSize = if (hi) 18.sp else 15.sp
+        val totalValSize = if (hi) 22.sp else 17.sp
+        val platformCluster =
+            if (hi) PlatformTextStyle(includeFontPadding = false)
+            else PlatformTextStyle(includeFontPadding = true)
+        val lineTight = if (hi) 1.em else 1.35.em
+        val cardPaddingH = if (hi) 10.dp else 14.dp
+        val iconSymbolGap = if (hi) 4.dp else 7.dp
+        val sectionGapV = if (hi) 6.dp else 10.dp
+
+        Box(modifier = modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -418,7 +438,7 @@ fun FullAssetCard(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.padding(horizontal = cardPaddingH, vertical = cardPaddingH)) {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     // Anchor Left: Icon Slot (80dp)
                     Column(
@@ -438,43 +458,79 @@ fun FullAssetCard(
                             category = asset.category,
                             size = 44 // Master Icon Scale
                         )
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(iconSymbolGap))
                         Text(
                             text = asset.symbol.uppercase(),
-                            color = cardText,
-                            fontWeight = FontWeight.Black,
-                            fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                            modifier = Modifier.fillMaxWidth(),
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = cardText,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = symSize,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = lineTight,
+                                    platformStyle = platformCluster,
+                                )
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
 
                     // Middle Slot: The Real Estate (weight 1f)
-                    Column(modifier = Modifier.weight(1f).padding(horizontal = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Column(
+                        modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         val nameToUse = asset.displayName.ifEmpty { asset.name }
 
                         Text(
                             text = nameToUse.uppercase(),
-                            color = cardText.copy(alpha = 0.5f),
-                            fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.fillMaxWidth(),
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = cardText.copy(alpha = 0.5f),
+                                    fontSize = nameLabelSize,
+                                    fontWeight = FontWeight.Black,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = lineTight,
+                                    platformStyle = platformCluster,
+                                )
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = formatAmount(asset.amountHeld),
-                            color = cardText,
-                            fontWeight = FontWeight.Black,
-                            fontSize = with(density) { (32.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                            modifier = Modifier.fillMaxWidth(),
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = cardText,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = amountSize,
+                                    textAlign = TextAlign.Center,
+                                    lineHeight = lineTight,
+                                    platformStyle = platformCluster,
+                                )
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         if (asset.category == AssetCategory.METAL) {
                             Text(
                                 text = "${formatAmount(asset.weight)} ${asset.weightUnit}".uppercase(),
-                                color = cardText.copy(alpha = 0.4f),
-                                fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        color = cardText.copy(alpha = 0.4f),
+                                        fontSize = metalDetailSize,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = lineTight,
+                                        platformStyle = platformCluster,
+                                    )
+                                ),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -495,21 +551,78 @@ fun FullAssetCard(
                             Spacer(Modifier.height(4.dp))
                             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(trendColor.copy(alpha = 0.15f)).padding(horizontal = 4.dp)) {
                                 Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(16.dp))
-                                Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%", color = trendColor, fontSize = with(density) { (8.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Black)
+                                Text(
+                                    text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = trendColor,
+                                            fontSize = changePctSize,
+                                            fontWeight = FontWeight.Black,
+                                            lineHeight = lineTight,
+                                            platformStyle = platformCluster,
+                                        )
+                                    ),
+                                )
                             }
                         }
                     }
                 }
-                Spacer(Modifier.height(8.dp)); HorizontalDivider(color = cardText.copy(alpha = 0.05f)); Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(sectionGapV))
+                HorizontalDivider(color = cardText.copy(alpha = 0.05f))
+                Spacer(Modifier.height(sectionGapV))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
                     Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(priceLabel, color = cardText.copy(0.6f), fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Bold)
-                        AutoResizingText(text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = with(density) { (15.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                        Text(
+                            priceLabel,
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = cardText.copy(0.6f),
+                                    fontSize = statLabelSize,
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = lineTight,
+                                    platformStyle = platformCluster,
+                                )
+                            ),
+                        )
+                        AutoResizingText(
+                            text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                            style = TextStyle(
+                                color = cardText,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = priceValSize,
+                                textAlign = TextAlign.Center,
+                                lineHeight = lineTight,
+                                platformStyle = platformCluster,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                     Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Black)
-                        AutoResizingText(text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = with(density) { (17.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                        Text(
+                            "TOTAL VALUE",
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    color = cardText.copy(0.6f),
+                                    fontSize = statLabelSize,
+                                    fontWeight = FontWeight.Black,
+                                    lineHeight = lineTight,
+                                    platformStyle = platformCluster,
+                                )
+                            ),
+                        )
+                        AutoResizingText(
+                            text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency),
+                            style = TextStyle(
+                                color = cardText,
+                                fontWeight = FontWeight.Black,
+                                fontSize = totalValSize,
+                                textAlign = TextAlign.Center,
+                                lineHeight = lineTight,
+                                platformStyle = platformCluster,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 }
             }
@@ -519,6 +632,7 @@ fun FullAssetCard(
             color = cardText,
             modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
         )
+        }
     }
 }
 
@@ -533,15 +647,38 @@ fun CompactAssetCard(
     onEditRequest: () -> Unit = {},
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
-    showEditButton: Boolean = false
+    showEditButton: Boolean = false,
+    /** Dense dashboard typography vs airy boutique row. */
+    isHighVisibilityMode: Boolean = false
 ) {
     val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "compactGrabScale")
     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "compactGrabElevation")
     val alpha by animateFloatAsState(if (isDragging) 0.9f else 1f, label = "compactGrabAlpha")
-    val density = LocalDensity.current
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    AssetCardFontScaleScope {
+        val hi = isHighVisibilityMode
+        val symSize = if (hi) 14.sp else 12.sp
+        val nameLabelSize = if (hi) 13.sp else 10.sp
+        val amountSize = if (hi) 36.sp else 32.sp
+        val metalDetailSize = if (hi) 11.sp else 9.sp
+        val changePctSize = if (hi) 10.sp else 8.sp
+        val statLabelSize = if (hi) 11.sp else 9.sp
+        val priceValSize = if (hi) 18.sp else 15.sp
+        val totalValSize = if (hi) 22.sp else 17.sp
+        val expandedLine = if (hi) 1.em else 1.35.em
+        val expandedPlatform =
+            if (hi) PlatformTextStyle(includeFontPadding = false)
+            else PlatformTextStyle(includeFontPadding = true)
+        val collapsedPadH = if (hi) 10.dp else 14.dp
+        val iconTextGapW = if (hi) 4.dp else 8.dp
+        val sparklineStartPad = if (hi) 4.dp else 8.dp
+        val expandedPad = if (hi) 10.dp else 14.dp
+        val expandedMinHeight = if (hi) 152.dp else 172.dp
+        val expandedDividerGapV = if (hi) 6.dp else 10.dp
+        val expandedIconSymbolGap = if (hi) 4.dp else 8.dp
+
+        Box(modifier = modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -561,14 +698,37 @@ fun CompactAssetCard(
             Column {
                 // V37.1 Single-Truth Fix: Collapsed header ONLY visible if !isExpanded
                 if (!isExpanded) {
+                    val tickerSize = if (hi) 18.sp else 14.sp
+                    val subPointSize = if (hi) 14.sp else 12.sp
+                    val lineCluster = if (hi) 1.em else 1.32.em
+                    val platformCluster =
+                        if (hi) PlatformTextStyle(includeFontPadding = false)
+                        else PlatformTextStyle(includeFontPadding = true)
+                    val rowHeight = if (hi) 72.dp else 78.dp
+                    val sparklineOuterH = if (hi) 36.dp else 30.dp
+                    val sparklineInnerH = if (hi) 34.dp else 28.dp
+
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 12.dp)
-                            .height(64.dp),
+                            .padding(horizontal = collapsedPadH)
+                            .heightIn(min = 64.dp)
+                            .height(rowHeight),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Anchor Left: Icon Slot (80dp)
-                        Box(modifier = Modifier.width(80.dp), contentAlignment = Alignment.CenterStart) {
+                        val titleText = if (asset.category == AssetCategory.METAL) {
+                            asset.displayName.ifEmpty { asset.name }
+                        } else {
+                            asset.symbol
+                        }
+
+                        // Left cluster: icon + ticker + sub-price (full-height, centered vs icon)
+                        Row(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .fillMaxHeight(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(38.dp)
@@ -588,49 +748,65 @@ fun CompactAssetCard(
                                     category = asset.category
                                 )
                             }
-                        }
-
-                        // Middle Slot: The Real Estate (weight 1f)
-                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
-                            val titleText = if (asset.category == AssetCategory.METAL) {
-                                asset.displayName.ifEmpty { asset.name }
-                            } else {
-                                asset.symbol
+                            Spacer(modifier = Modifier.width(iconTextGapW))
+                            Column(
+                                modifier = Modifier.fillMaxHeight(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                Text(
+                                    text = titleText.uppercase(),
+                                    style = LocalTextStyle.current.copy(
+                                        color = cardText,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = tickerSize,
+                                        lineHeight = lineCluster,
+                                        platformStyle = platformCluster
+                                    ),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                                    style = LocalTextStyle.current.copy(
+                                        color = cardText.copy(alpha = 0.75f),
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = subPointSize,
+                                        lineHeight = lineCluster,
+                                        platformStyle = platformCluster
+                                    ),
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
-                            Text(
-                                text = titleText.uppercase(),
-                                color = cardText,
-                                fontWeight = FontWeight.Black,
-                                fontSize = with(density) { (11.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
-                                color = cardText.copy(alpha = 0.7f),
-                                fontSize = with(density) { (11.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1
-                            )
                         }
 
-                        // Sparkline lane (fixed width)
+                        // Sparkline: immediately after price, height matches two-line text block
                         Box(
                             modifier = Modifier
-                                .width(80.dp)
-                                .height(40.dp),
-                            contentAlignment = Alignment.Center
+                                .padding(start = sparklineStartPad)
+                                .width(76.dp)
+                                .height(sparklineOuterH),
+                            contentAlignment = Alignment.CenterStart
                         ) {
                             SparklineChart(
                                 historyData = asset.sparklineData,
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .width(72.dp)
+                                    .height(sparklineInnerH),
                                 lineColorOverride = trendColor,
                             )
                         }
 
-                        // Right lane: total over trend (home/widget parity)
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Right cluster: mirror typography, snapped vertical pair
                         Column(
-                            modifier = Modifier.width(86.dp),
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .fillMaxHeight(),
                             horizontalAlignment = Alignment.End,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -642,20 +818,37 @@ fun CompactAssetCard(
                                     Icon(Icons.Default.Edit, null, tint = Color.Black, modifier = Modifier.size(20.dp))
                                 }
                             } else {
-                                Text(
-                                    text = formatCurrency((asset.officialSpotPrice * asset.amountHeld) + asset.premium, 2, baseCurrency),
-                                    color = cardText,
-                                    fontSize = with(density) { (14.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                AutoResizingText(
+                                    text = formatCurrency(
+                                        (asset.officialSpotPrice * asset.amountHeld) + asset.premium,
+                                        2,
+                                        baseCurrency
+                                    ),
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = tickerSize,
+                                            lineHeight = lineCluster,
+                                            textAlign = TextAlign.End,
+                                            platformStyle = platformCluster
+                                        )
+                                    ),
+                                    modifier = Modifier.wrapContentWidth(),
+                                    maxLines = 1
                                 )
                                 Text(
                                     text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
-                                    color = trendColor.copy(alpha = 0.7f),
-                                    fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1
+                                    style = LocalTextStyle.current.copy(
+                                        color = trendColor.copy(alpha = 0.9f),
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = subPointSize,
+                                        lineHeight = lineCluster,
+                                        textAlign = TextAlign.End,
+                                        platformStyle = platformCluster
+                                    ),
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }
@@ -667,8 +860,8 @@ fun CompactAssetCard(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 160.dp)
-                            .padding(12.dp)
+                            .heightIn(min = expandedMinHeight)
+                            .padding(expandedPad)
                     ) {
                         // The One-Card Header (Strict structural twin of FullAssetCard)
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -690,12 +883,20 @@ fun CompactAssetCard(
                                     localPath = asset.localIconPath,
                                     category = asset.category
                                 )
-                                Spacer(Modifier.height(6.dp))
+                                Spacer(Modifier.height(expandedIconSymbolGap))
                                 Text(
                                     text = asset.symbol.uppercase(),
-                                    color = cardText,
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText,
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = symSize,
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = expandedLine,
+                                            platformStyle = expandedPlatform,
+                                        )
+                                    ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -710,26 +911,50 @@ fun CompactAssetCard(
                                 val nameToUse = asset.displayName.ifEmpty { asset.name }
                                 Text(
                                     text = nameToUse.uppercase(),
-                                    color = cardText.copy(alpha = 0.5f),
-                                    fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                    fontWeight = FontWeight.Black,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText.copy(alpha = 0.5f),
+                                            fontSize = nameLabelSize,
+                                            fontWeight = FontWeight.Black,
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = expandedLine,
+                                            platformStyle = expandedPlatform,
+                                        )
+                                    ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = formatAmount(asset.amountHeld),
-                                    color = cardText,
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = with(density) { (32.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, // Master Typo Parity
+                                    modifier = Modifier.fillMaxWidth(),
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText,
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = amountSize,
+                                            textAlign = TextAlign.Center,
+                                            lineHeight = expandedLine,
+                                            platformStyle = expandedPlatform,
+                                        )
+                                    ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 if (asset.category == AssetCategory.METAL) {
                                     Text(
                                         text = "${formatAmount(asset.weight)} ${asset.weightUnit}".uppercase(),
-                                        color = cardText.copy(alpha = 0.4f),
-                                        fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = LocalTextStyle.current.merge(
+                                            TextStyle(
+                                                color = cardText.copy(alpha = 0.4f),
+                                                fontSize = metalDetailSize,
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = expandedLine,
+                                                platformStyle = expandedPlatform,
+                                            )
+                                        ),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -759,29 +984,79 @@ fun CompactAssetCard(
                                         Icon(if (asset.priceChange24h >= 0) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown, null, tint = trendColor, modifier = Modifier.size(16.dp))
                                         Text(
                                             text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
-                                            color = trendColor,
-                                            fontSize = with(density) { (8.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
-                                            fontWeight = FontWeight.Black
+                                            style = LocalTextStyle.current.merge(
+                                                TextStyle(
+                                                    color = trendColor,
+                                                    fontSize = changePctSize,
+                                                    fontWeight = FontWeight.Black,
+                                                    lineHeight = expandedLine,
+                                                    platformStyle = expandedPlatform,
+                                                )
+                                            ),
                                         )
                                     }
                                 }
                             }
                         }
 
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(expandedDividerGapV))
                         HorizontalDivider(color = cardText.copy(alpha = 0.05f))
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(expandedDividerGapV))
 
                         // Bottom Row: Price / Total Value parity
                         Row(modifier = Modifier.fillMaxWidth()) {
                             val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
                             Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(priceLabel, color = cardText.copy(0.6f), fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Bold)
-                                AutoResizingText(text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Bold, fontSize = with(density) { (15.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                                Text(
+                                    priceLabel,
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText.copy(0.6f),
+                                            fontSize = statLabelSize,
+                                            fontWeight = FontWeight.Bold,
+                                            lineHeight = expandedLine,
+                                            platformStyle = expandedPlatform,
+                                        )
+                                    ),
+                                )
+                                AutoResizingText(
+                                    text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                                    style = TextStyle(
+                                        color = cardText,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = priceValSize,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = expandedLine,
+                                        platformStyle = expandedPlatform,
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
                             }
                             Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("TOTAL VALUE", color = cardText.copy(0.6f), fontSize = with(density) { (9.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Black)
-                                AutoResizingText(text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency), style = TextStyle(color = cardText, fontWeight = FontWeight.Black, fontSize = with(density) { (17.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, textAlign = TextAlign.Center), modifier = Modifier.fillMaxWidth())
+                                Text(
+                                    "TOTAL VALUE",
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            color = cardText.copy(0.6f),
+                                            fontSize = statLabelSize,
+                                            fontWeight = FontWeight.Black,
+                                            lineHeight = expandedLine,
+                                            platformStyle = expandedPlatform,
+                                        )
+                                    ),
+                                )
+                                AutoResizingText(
+                                    text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency),
+                                    style = TextStyle(
+                                        color = cardText,
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = totalValSize,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = expandedLine,
+                                        platformStyle = expandedPlatform,
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
                             }
                         }
                     }
@@ -794,6 +1069,7 @@ fun CompactAssetCard(
                 color = cardText,
                 modifier = Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 0.dp).offset(y = (-4).dp).zIndex(1f)
             )
+        }
         }
     }
 }
@@ -814,7 +1090,7 @@ fun MetalMarketCard(
     modifier: Modifier = Modifier
 ) {
     val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
-    val density = LocalDensity.current
+    AssetCardFontScaleScope {
     Card(
         modifier = modifier.fillMaxWidth().height(195.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
@@ -831,20 +1107,20 @@ fun MetalMarketCard(
                         text = name.uppercase(),
                         fontWeight = FontWeight.Black,
                         color = cardText,
-                        fontSize = with(density) { (16.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                        fontSize = 16.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = symbol,
-                            fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = cardText.copy(alpha = 0.4f),
                             maxLines = 1
                         )
                         if (isOwned) {
-                            Text(text = "    \"Holding\"", fontSize = with(density) { (8.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() }, fontWeight = FontWeight.Black, color = Color.Yellow)
+                            Text(text = "    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
                         }
                     }
                 }
@@ -854,13 +1130,13 @@ fun MetalMarketCard(
                             text = formatCurrency(officialSpotPrice, 2, baseCurrency),
                             fontWeight = FontWeight.Black,
                             color = cardText,
-                            fontSize = with(density) { (18.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                            fontSize = 18.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%",
-                            fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = trendColor,
                             maxLines = 1
@@ -878,7 +1154,7 @@ fun MetalMarketCard(
                     val lowStr = if (dayLow <= 0.0) "${getCurrencySymbol(baseCurrency)} --.--" else formatCurrency(dayLow, 2, baseCurrency)
                     Text(
                         text = lowStr,
-                        fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = cardText,
                         maxLines = 1
@@ -888,7 +1164,7 @@ fun MetalMarketCard(
                     val highStr = if (dayHigh <= 0.0) "${getCurrencySymbol(baseCurrency)} --.--" else formatCurrency(dayHigh, 2, baseCurrency)
                     Text(
                         text = highStr,
-                        fontSize = with(density) { (12.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = cardText,
                         maxLines = 1
@@ -896,5 +1172,6 @@ fun MetalMarketCard(
                 }
             }
         }
+    }
     }
 }

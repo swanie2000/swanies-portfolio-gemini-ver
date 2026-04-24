@@ -33,6 +33,7 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
+    val isHighVisibilityMode by settingsViewModel.isHighVisibilityMode.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
     val currentVaultId by mainViewModel.currentVaultId.collectAsState(initial = 1)
     val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
@@ -132,6 +133,15 @@ fun SettingsScreen(
                         subtitle = "Shrink asset cards to show more on screen",
                         checked = isCompactMode,
                         onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
+                        themeColor = safeText
+                    )
+
+                    // Syncs to ThemePreferences + MainViewModel; holdings/widget previews read the same flow.
+                    SettingsToggleItem(
+                        title = "High-Visibility Compact Cards",
+                        subtitle = "18/14 dashboard rows vs 14/12 boutique; cards use a fixed font-scale lock so system text size does not override layout.",
+                        checked = isHighVisibilityMode,
+                        onCheckedChange = { settingsViewModel.saveIsHighVisibilityMode(it) },
                         themeColor = safeText
                     )
 

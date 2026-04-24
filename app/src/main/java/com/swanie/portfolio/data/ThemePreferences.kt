@@ -26,6 +26,7 @@ class ThemePreferences @Inject constructor(
         val USE_GRADIENT = booleanPreferencesKey("use_gradient")
         val GRADIENT_AMOUNT = floatPreferencesKey("gradient_amount")
         val IS_COMPACT_VIEW_ENABLED = booleanPreferencesKey("is_compact_view_enabled")
+        val IS_HIGH_VISIBILITY_MODE = booleanPreferencesKey("is_high_visibility_mode")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
         val CONFIRM_DELETE = booleanPreferencesKey("confirm_delete")
         val METALS_DISPLAY_ORDER = stringPreferencesKey("metals_display_order")
@@ -52,6 +53,7 @@ class ThemePreferences @Inject constructor(
     val useGradient: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.USE_GRADIENT] ?: false }
     val gradientAmount: Flow<Float> = appContext.dataStore.data.map { it[PreferencesKeys.GRADIENT_AMOUNT] ?: 0.5f }
     val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false }
+    val isHighVisibilityMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_HIGH_VISIBILITY_MODE] ?: false }
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_DARK_MODE] ?: true }
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
     val metalsDisplayOrder: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.METALS_DISPLAY_ORDER] ?: "XAU,XAG,XPT,XPD" }
@@ -77,6 +79,7 @@ class ThemePreferences @Inject constructor(
     suspend fun saveUseGradient(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.USE_GRADIENT] = enabled } }
     suspend fun saveGradientAmount(amount: Float) { appContext.dataStore.edit { it[PreferencesKeys.GRADIENT_AMOUNT] = amount } }
     suspend fun saveIsCompactViewEnabled(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] = enabled } }
+    suspend fun saveIsHighVisibilityMode(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_HIGH_VISIBILITY_MODE] = enabled } }
     suspend fun saveIsDarkMode(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.IS_DARK_MODE] = enabled } }
     suspend fun saveConfirmDelete(enabled: Boolean) { appContext.dataStore.edit { it[PreferencesKeys.CONFIRM_DELETE] = enabled } }
     suspend fun saveMetalsDisplayOrder(order: String) { appContext.dataStore.edit { it[PreferencesKeys.METALS_DISPLAY_ORDER] = order } }
