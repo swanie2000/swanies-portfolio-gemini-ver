@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
@@ -188,6 +189,11 @@ fun MyHoldingsScreen(
                             key = { page -> resolvedVaults[page].id }
                         ) { page ->
                             val vaultForPage = resolvedVaults[page]
+                            val pageOffset = pagerState.getOffsetDistanceInPages(page)
+                            val absOffset = kotlin.math.abs(pageOffset).coerceIn(0f, 1f)
+                            val rawAlpha = (1f - absOffset) * (1f - absOffset)
+                            val pageAlpha = 0.1f + (rawAlpha * 0.9f)
+                            val deckScale = 0.85f + (1f - 0.85f) * (1f - absOffset)
                             val holdingsForPage by viewModel.getHoldingsForVault(vaultForPage.id)
                                 .collectAsStateWithLifecycle(initialValue = emptyList())
                             var localHoldingsForPage by remember(vaultForPage.id) { mutableStateOf(emptyList<AssetEntity>()) }
@@ -228,10 +234,13 @@ fun MyHoldingsScreen(
                                 }
                             )
 
-                            Column(modifier = Modifier.fillMaxSize()) {
+                            Column(modifier = Modifier.fillMaxSize().alpha(pageAlpha)) {
                                 Box(modifier = Modifier.fillMaxWidth().height(140.dp).zIndex(5f).padding(horizontal = 24.dp)) {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth().height(110.dp).align(Alignment.Center).clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
+                                        modifier = Modifier.fillMaxWidth().height(110.dp).align(Alignment.Center).graphicsLayer {
+                                            scaleX = deckScale
+                                            scaleY = deckScale
+                                        }.clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
                                     ) {
                                         Column(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
