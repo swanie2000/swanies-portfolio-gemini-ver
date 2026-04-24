@@ -5,6 +5,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
@@ -21,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -48,8 +52,11 @@ class AssetViewModel @Inject constructor(
     private val _confirmDelete = MutableStateFlow<AssetEntity?>(null)
     val confirmDelete: StateFlow<AssetEntity?> = _confirmDelete.asStateFlow()
     private val _widgetSelectionVaultId = MutableStateFlow<Int?>(null)
-    private val _vaultAssets = MutableStateFlow<List<AssetEntity>>(emptyList())
     private val _isUpdating = MutableStateFlow(false)
+
+    private companion object {
+        private const val PRICE_POLL_INTERVAL_MS = 60_000L
+    }
 
     // 🌐 GLOBAL VISTA: Track Current Vault
     // Task 2: Instant Data Handshake - Use runBlocking for the absolute first state to avoid "Vault 1" flicker
@@ -66,20 +73,42 @@ class AssetViewModel @Inject constructor(
             assetDao.getAssetsByVault(id)
         }
         .onEach { Log.d("VM_TRACE", "UI observing ${it.size} assets for vault ${currentVaultId.value}") }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     init {
         viewModelScope.launch {
-            currentVaultId
-                .drop(1)
-                .collect {
-                    clearVaultState()
+            flow {
+                emit(Unit)
+                while (true) {
+                    delay(PRICE_POLL_INTERVAL_MS)
+                    emit(Unit)
                 }
-        }
-        viewModelScope.launch {
-            holdings.collect { latest ->
-                _vaultAssets.value = latest ?: emptyList()
             }
+                .flowWithLifecycle(
+                    ProcessLifecycleOwner.get().lifecycle,
+                    Lifecycle.State.STARTED,
+                )
+                .catch { e ->
+                    if (e is CancellationException) throw e
+                    Log.e("PRICE_POLL", "Price polling flow failed", e)
+                }
+                .collect {
+                    try {
+                        val vaultId = currentVaultId.value
+                        if (vaultId > 0) {
+                            withContext(Dispatchers.IO) {
+                                repository.refreshAssets(
+                                    force = false,
+                                    portfolioId = vaultId.toString(),
+                                )
+                            }
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.e("PRICE_POLL", "Price refresh failed", e)
+                    }
+                }
         }
     }
 
@@ -113,10 +142,6 @@ class AssetViewModel @Inject constructor(
 
     fun setWidgetSelectionVaultId(vaultId: Int?) {
         _widgetSelectionVaultId.value = vaultId?.takeIf { it > 0 }
-    }
-
-    fun clearVaultState() {
-        _vaultAssets.value = emptyList()
     }
 
     /**
@@ -156,7 +181,12 @@ class AssetViewModel @Inject constructor(
             emit(syncCoordinator.getRemainingCooldown())
             delay(1000)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    }
+        .flowWithLifecycle(
+            ProcessLifecycleOwner.get().lifecycle,
+            Lifecycle.State.STARTED,
+        )
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
     private val _searchQuery = MutableStateFlow("")
     private val _selectedProvider = MutableStateFlow<String?>(null)

@@ -7,9 +7,12 @@ import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.supervisorScope
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +24,9 @@ class MainViewModel @Inject constructor(
 
     private val _isDataReady = MutableStateFlow(false)
     val isDataReady: StateFlow<Boolean> = _isDataReady.asStateFlow()
+
+    /** 3s splash fallback; cancelled when vault handshake finishes or activity stops. */
+    private var emergencyDataReadyFallback: Job? = null
 
     // 🌐 GLOBAL VISTA: Vault State
     val allVaults = vaultDao.getAllVaultsFlow()
@@ -70,31 +76,44 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        // 🛠️ Startup Logic: The authority on the first vault loaded
         viewModelScope.launch {
-            kotlinx.coroutines.delay(3000L) // EMERGENCY TIMEOUT: Force ready after 3s
-            _isDataReady.value = true
-        }
+            supervisorScope {
+                emergencyDataReadyFallback = launch {
+                    delay(3000L) // EMERGENCY TIMEOUT: Force ready after 3s
+                    _isDataReady.value = true
+                }
+                launch {
+                    // Wait for vaults to exist in DB
+                    val vaults = vaultDao.getAllVaultsFlow().first { it.isNotEmpty() }
 
-        viewModelScope.launch {
-            // Wait for vaults to exist in DB
-            val vaults = vaultDao.getAllVaultsFlow().first { it.isNotEmpty() }
+                    val resetOnStart = themePreferences.resetToDefaultOnStart.first()
+                    val defId = themePreferences.defaultVaultId.first()
+                    val lastId = themePreferences.currentVaultId.first()
 
-            val resetOnStart = themePreferences.resetToDefaultOnStart.first()
-            val defId = themePreferences.defaultVaultId.first()
-            val lastId = themePreferences.currentVaultId.first()
+                    val targetId = if (resetOnStart) {
+                        defId
+                    } else {
+                        // If the last used vault was deleted or doesn't exist, use default
+                        if (vaults.any { it.id == lastId }) lastId else defId
+                    }
 
-            val targetId = if (resetOnStart) {
-                defId
-            } else {
-                // If the last used vault was deleted or doesn't exist, use default
-                if (vaults.any { it.id == lastId }) lastId else defId
+                    // Atomically set the ID and signal that the UI is ready to render
+                    themePreferences.saveCurrentVaultId(targetId)
+                    _isDataReady.value = true
+                    emergencyDataReadyFallback?.cancel()
+                    emergencyDataReadyFallback = null
+                }
             }
-
-            // Atomically set the ID and signal that the UI is ready to render
-            themePreferences.saveCurrentVaultId(targetId)
-            _isDataReady.value = true
         }
+    }
+
+    /**
+     * Called from [MainActivity.onStop]: cancels the splash "force ready" timer so it does not
+     * fire while the activity is not visible (avoids orphaned handshake work).
+     */
+    fun cancelEmergencyDataReadyFallback() {
+        emergencyDataReadyFallback?.cancel()
+        emergencyDataReadyFallback = null
     }
 
     // 🌐 GLOBAL VISTA: Vault Logic

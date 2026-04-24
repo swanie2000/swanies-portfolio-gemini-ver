@@ -102,6 +102,11 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    override fun onStop() {
+        viewModel.cancelEmergencyDataReadyFallback()
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
 
