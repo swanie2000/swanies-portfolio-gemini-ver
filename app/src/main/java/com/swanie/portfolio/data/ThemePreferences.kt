@@ -36,6 +36,7 @@ class ThemePreferences @Inject constructor(
         val REQUIRE_PASSWORD_AFTER_BIOMETRIC_FAILURE =
             booleanPreferencesKey("require_password_after_biometric_failure")
         val LOGIN_RESUME_TIMEOUT_SECONDS = intPreferencesKey("login_resume_timeout_seconds")
+        val LANGUAGE_CODE = stringPreferencesKey("language_code")
 
         // --- DEFAULT VAULT LOGIC ---
         val DEFAULT_VAULT_ID = intPreferencesKey("default_vault_id")
@@ -67,6 +68,8 @@ class ThemePreferences @Inject constructor(
         appContext.dataStore.data.map { it[PreferencesKeys.REQUIRE_PASSWORD_AFTER_BIOMETRIC_FAILURE] ?: true }
     val loginResumeTimeoutSeconds: Flow<Int> =
         appContext.dataStore.data.map { it[PreferencesKeys.LOGIN_RESUME_TIMEOUT_SECONDS] ?: 60 }
+    val languageCode: Flow<String> =
+        appContext.dataStore.data.map { it[PreferencesKeys.LANGUAGE_CODE] ?: "system" }
 
     // Default Vault Flows
     val defaultVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.DEFAULT_VAULT_ID] ?: 1 }
@@ -98,6 +101,9 @@ class ThemePreferences @Inject constructor(
     }
     suspend fun saveLoginResumeTimeoutSeconds(seconds: Int) {
         appContext.dataStore.edit { it[PreferencesKeys.LOGIN_RESUME_TIMEOUT_SECONDS] = seconds }
+    }
+    suspend fun saveLanguageCode(languageCode: String) {
+        appContext.dataStore.edit { it[PreferencesKeys.LANGUAGE_CODE] = languageCode }
     }
 
     // Default Vault Persistence

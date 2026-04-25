@@ -13,6 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -55,12 +57,18 @@ class MainActivity : FragmentActivity() {
             val useGradient by viewModel.useGradient.collectAsStateWithLifecycle()
             val gradientAmount by viewModel.gradientAmount.collectAsStateWithLifecycle()
             val isDarkMode by viewModel.isDarkMode.collectAsStateWithLifecycle()
+            val languageCode by viewModel.languageCode.collectAsStateWithLifecycle()
 
             // 🌊 NAVY FADE COORDINATION: Ensuring the system bars and background are ready for the entry animation
             LaunchedEffect(isDarkMode) {
                 val insetsController = WindowCompat.getInsetsController(window, window.decorView)
                 insetsController.isAppearanceLightStatusBars = !isDarkMode
                 insetsController.isAppearanceLightNavigationBars = !isDarkMode
+            }
+
+            LaunchedEffect(languageCode) {
+                val languageTags = if (languageCode == "system") "" else languageCode
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTags))
             }
 
             SwaniesPortfolioTheme(

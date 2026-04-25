@@ -95,6 +95,11 @@ class MainViewModel @Inject constructor(
         SharingStarted.Eagerly,
         runBlocking { themePreferences.loginResumeTimeoutSeconds.first() }
     )
+    val languageCode = themePreferences.languageCode.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        runBlocking { themePreferences.languageCode.first() }
+    )
 
     init {
         viewModelScope.launch {

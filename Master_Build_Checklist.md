@@ -41,6 +41,14 @@
   - Expanded `AuthPolicyTest` with coverage for display-name fallback, whitespace normalization, auth lock gating, and password strength validity.
   - Validation passed via targeted unit test run and debug Kotlin compile.
 
+- [x] V40.40 Localization Foundation (Phase 1) - COMPLETED
+  - Added persisted `language_code` preference flow and save path in `ThemePreferences`.
+  - Applied app locale at runtime/launch via `AppCompatDelegate.setApplicationLocales` in `MainActivity`.
+  - Added language selector in Settings (`System default`, `English`, `Espanol`) with persisted selection.
+  - Added Home-screen quick language access (top-left globe icon) with current language label shown beneath icon.
+  - Added base localization string resources in `values/strings.xml` and `values-es/strings.xml`.
+  - Validation passed with lint clean and debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

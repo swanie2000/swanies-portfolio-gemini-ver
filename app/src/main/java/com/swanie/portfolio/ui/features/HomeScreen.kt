@@ -7,6 +7,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +32,7 @@ import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.min
@@ -36,6 +41,7 @@ import kotlin.math.min
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val activity = LocalContext.current as FragmentActivity
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel(activity)
     val scope = rememberCoroutineScope()
 
@@ -57,6 +63,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var showSparkles by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
+    val languageCode by settingsViewModel.languageCode.collectAsState()
+    var languageMenuExpanded by remember { mutableStateOf(false) }
+    val selectedLanguageLabel = when (languageCode) {
+        "en" -> stringResource(R.string.language_english)
+        "es" -> stringResource(R.string.language_spanish)
+        else -> stringResource(R.string.language_system_default)
+    }
 
     // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
     val backgroundAlpha by animateFloatAsState(
@@ -114,6 +127,64 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             .background(navyColor), // Root background is fixed Navy
         contentAlignment = Alignment.Center
     ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding()
+                .padding(start = 12.dp, top = 8.dp)
+                .zIndex(5f)
+        ) {
+            Column(horizontalAlignment = Alignment.Start) {
+                IconButton(
+                    onClick = { languageMenuExpanded = true },
+                    modifier = Modifier.size(46.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = stringResource(R.string.language_selector_title),
+                        tint = userThemeTextColor,
+                        modifier = Modifier.size(34.dp)
+                    )
+                }
+                Text(
+                    text = selectedLanguageLabel,
+                    color = userThemeTextColor.copy(alpha = 0.9f),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(start = 6.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = languageMenuExpanded,
+                onDismissRequest = { languageMenuExpanded = false }
+            ) {
+                val languageOptions = listOf("system", "en", "es")
+                languageOptions.forEach { option ->
+                    val optionLabel = when (option) {
+                        "en" -> stringResource(R.string.language_english)
+                        "es" -> stringResource(R.string.language_spanish)
+                        else -> stringResource(R.string.language_system_default)
+                    }
+                    DropdownMenuItem(
+                        text = { Text(optionLabel) },
+                        onClick = {
+                            settingsViewModel.saveLanguageCode(option)
+                            languageMenuExpanded = false
+                        },
+                        trailingIcon = {
+                            if (option == languageCode) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = userThemeTextColor
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
         // 🎨 COLOR LAYER: Fades in the user's theme color over the navy base
         Box(
             modifier = Modifier

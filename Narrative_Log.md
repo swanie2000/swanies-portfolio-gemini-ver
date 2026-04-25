@@ -172,3 +172,32 @@ Release recorded: V40.39 "Shared Password Policy + Auth Guardrail Tests".
 - V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
 - V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
 - V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.
+
+---
+
+## V40.40 - Localization Foundation (Phase 1)
+
+Release recorded: V40.40 "Localization Foundation (Phase 1)".
+
+- Added persisted language preference foundation:
+  - Introduced `language_code` in `ThemePreferences` with flow + save path.
+  - Exposed language state via `MainViewModel` and `SettingsViewModel`.
+- Applied locale globally:
+  - `MainActivity` now applies selected locale using `AppCompatDelegate.setApplicationLocales(...)`.
+  - Supports `system`, `en`, and `es` language tags.
+- Added user language controls:
+  - Settings interface now includes language selector dropdown (`System default`, `English`, `Espanol`).
+  - Home screen now provides immediate language access via top-left globe menu.
+  - Globe control was refined with larger icon and current selected language label beneath it.
+- Added initial localization resources:
+  - Added language strings in `values/strings.xml`.
+  - Added Spanish variant file `values-es/strings.xml`.
+- Validation:
+  - Lint checks stayed clean on touched files.
+  - `:app:compileDebugKotlin` passed after integration.
+
+### Next Phase (Projected Path)
+
+- V40.36.1 Localization Surface Expansion: migrate high-visibility auth/settings/home user-facing literals to string resources.
+- V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
+- V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.

@@ -84,6 +84,8 @@ class SettingsViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val loginResumeTimeoutSeconds: StateFlow<Int> = themePreferences.loginResumeTimeoutSeconds
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
+    val languageCode: StateFlow<String> = themePreferences.languageCode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
 
     val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
         .onEach { config ->
@@ -172,6 +174,12 @@ class SettingsViewModel @Inject constructor(
     fun saveRequirePasswordAfterBiometricFailure(enabled: Boolean) {
         viewModelScope.launch {
             themePreferences.saveRequirePasswordAfterBiometricFailure(enabled)
+        }
+    }
+
+    fun saveLanguageCode(languageCode: String) {
+        viewModelScope.launch {
+            themePreferences.saveLanguageCode(languageCode)
         }
     }
 

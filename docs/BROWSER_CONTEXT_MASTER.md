@@ -364,7 +364,21 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
       - Prevents silent drift between account creation and password update requirements.
       - Tightens regression safety around auth and password policy changes.
 
-🚀 13. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🌐 13. V40.40 — LOCALIZATION FOUNDATION (PHASE 1)
+
+    - Persistence + runtime locale:
+      - Added `language_code` persistence flow in `ThemePreferences`.
+      - `MainActivity` now applies locale via `AppCompatDelegate.setApplicationLocales(...)`.
+      - Supports `system`, `en`, and `es`.
+    - User language controls:
+      - Added Settings language selector (`System default`, `English`, `Espanol`).
+      - Added Home quick-access globe (top-left) for language switching before login.
+      - Globe now shows selected language label below icon for immediate visibility.
+    - Resource groundwork:
+      - Added localization strings in `values/strings.xml`.
+      - Added Spanish resource file `values-es/strings.xml`.
+
+🚀 14. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
@@ -377,9 +391,9 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.39: Shared Password Policy + Auth Guardrail Tests.
+"The narrative is now V40.40: Localization Foundation (Phase 1).
 
-Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.39 auth and password-policy hardening constraints.
+Current Objective: Continue V40.36.1 by migrating high-visibility user-facing literals to string resources while preserving V40.40 locale-switching baseline and prior auth hardening constraints.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE

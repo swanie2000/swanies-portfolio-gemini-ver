@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,10 +28,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
+import com.swanie.portfolio.R
 import com.swanie.portfolio.security.AuthPolicy
 import com.swanie.portfolio.ui.navigation.Routes
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavHostController,
@@ -56,6 +59,7 @@ fun SettingsScreen(
         .requirePasswordAfterBiometricFailure
         .collectAsState()
     val loginResumeTimeoutSeconds by settingsViewModel.loginResumeTimeoutSeconds.collectAsState()
+    val languageCode by settingsViewModel.languageCode.collectAsState()
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -78,6 +82,7 @@ fun SettingsScreen(
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
     var showFactoryResetDialog by remember { mutableStateOf(false) }
+    var languageExpanded by remember { mutableStateOf(false) }
 
     val passwordStrength = AuthPolicy.evaluatePasswordStrength(newPassword)
     val cleanNewPassword = passwordStrength.normalized
@@ -451,6 +456,57 @@ fun SettingsScreen(
 
                     // --- INTERFACE ---
                     Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    val languageOptions = listOf("system", "en", "es")
+                    val selectedLanguageLabel = when (languageCode) {
+                        "en" -> stringResource(R.string.language_english)
+                        "es" -> stringResource(R.string.language_spanish)
+                        else -> stringResource(R.string.language_system_default)
+                    }
+                    ExposedDropdownMenuBox(
+                        expanded = languageExpanded,
+                        onExpandedChange = { languageExpanded = !languageExpanded },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedLanguageLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            label = { Text(stringResource(R.string.language_selector_title)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = safeText,
+                                unfocusedTextColor = safeText,
+                                focusedBorderColor = safeText.copy(alpha = 0.6f),
+                                unfocusedBorderColor = safeText.copy(alpha = 0.3f),
+                                cursorColor = safeText
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = languageExpanded,
+                            onDismissRequest = { languageExpanded = false }
+                        ) {
+                            languageOptions.forEach { option ->
+                                val optionLabel = when (option) {
+                                    "en" -> stringResource(R.string.language_english)
+                                    "es" -> stringResource(R.string.language_spanish)
+                                    else -> stringResource(R.string.language_system_default)
+                                }
+                                DropdownMenuItem(
+                                    text = { Text(optionLabel) },
+                                    onClick = {
+                                        settingsViewModel.saveLanguageCode(option)
+                                        languageExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     SettingsToggleItem(
                         title = "Use Compact Cards",
