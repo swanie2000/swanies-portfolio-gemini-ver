@@ -5,6 +5,9 @@
     <string name="language_english">English</string>
     <string name="language_spanish">Espanol</string>
     <string name="language_korean">Korean</string>
+    <string name="language_name_english_native">English</string>
+    <string name="language_name_spanish_native">Español</string>
+    <string name="language_name_korean_native">한국어</string>
     <string name="action_login">LOGIN</string>
     <string name="action_create_account">CREATE ACCOUNT</string>
     <string name="home_title">Swanie\'s Portfolio</string>

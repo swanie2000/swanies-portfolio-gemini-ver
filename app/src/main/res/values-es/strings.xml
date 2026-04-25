@@ -5,6 +5,9 @@
     <string name="language_english">Ingles</string>
     <string name="language_spanish">Espanol</string>
     <string name="language_korean">Coreano</string>
+    <string name="language_name_english_native">English</string>
+    <string name="language_name_spanish_native">Español</string>
+    <string name="language_name_korean_native">한국어</string>
     <string name="action_login">INICIAR SESION</string>
     <string name="action_create_account">CREAR CUENTA</string>
     <string name="home_title">Portafolio de Swanie</string>

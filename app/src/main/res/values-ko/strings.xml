@@ -5,6 +5,9 @@
     <string name="language_english">영어</string>
     <string name="language_spanish">스페인어</string>
     <string name="language_korean">한국어</string>
+    <string name="language_name_english_native">English</string>
+    <string name="language_name_spanish_native">Español</string>
+    <string name="language_name_korean_native">한국어</string>
     <string name="action_login">로그인</string>
     <string name="action_create_account">계정 만들기</string>
     <string name="home_title">스와니 포트폴리오</string>
