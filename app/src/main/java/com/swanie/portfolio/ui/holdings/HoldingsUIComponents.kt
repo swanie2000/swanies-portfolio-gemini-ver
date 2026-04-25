@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextMeasurer
@@ -170,7 +171,7 @@ fun SparklineChart(
 ) {
     if (historyData.size < 2) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("Gathering Data...", color = Color.Gray, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.sparkline_gathering_data), color = Color.Gray, fontSize = 8.sp, fontWeight = FontWeight.Bold)
             Canvas(Modifier.fillMaxSize()) {
                 drawLine(color = Color.White.copy(alpha = 0.1f), start = Offset(0f, size.height / 2), end = Offset(size.width, size.height / 2), strokeWidth = 1.dp.toPx())
             }
@@ -409,7 +410,15 @@ fun MetalSelectionFunnel(
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
             Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = when(step) { 1 -> "SELECT TYPE"; 10 -> "NAME"; 11 -> "ICON"; 12 -> "LABELS"; 13 -> "VALUE"; 4 -> "QUANTITY"; else -> "PREMIUM" }, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Text(text = when(step) {
+                    1 -> stringResource(R.string.funnel_select_type)
+                    10 -> stringResource(R.string.funnel_name)
+                    11 -> stringResource(R.string.funnel_icon)
+                    12 -> stringResource(R.string.funnel_labels)
+                    13 -> stringResource(R.string.funnel_value)
+                    4 -> stringResource(R.string.funnel_quantity)
+                    else -> stringResource(R.string.funnel_premium)
+                }, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
                 Spacer(Modifier.height(20.dp))
                 when (step) {
                     1 -> FunnelGrid(listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"), selectedMetal) {
@@ -424,9 +433,9 @@ fun MetalSelectionFunnel(
                     }
                     10 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text("LABEL UNDER ICON", color = Color.White.copy(0.5f), fontSize = 10.sp)
-                        OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text("Enter Name...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Text(stringResource(R.string.funnel_label_under_icon), color = Color.White.copy(0.5f), fontSize = 10.sp)
+                        OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text(stringResource(R.string.funnel_enter_name), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
                     }
                     11 -> {
                         Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) {
@@ -436,19 +445,19 @@ fun MetalSelectionFunnel(
                                 Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
                             }
                         }
-                        Text("TAP PHOTO (OR SWAN)", color = Color.White.copy(0.5f), fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp)); Button(onClick = { step = 12 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Text(stringResource(R.string.funnel_tap_photo), color = Color.White.copy(0.5f), fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp)); Button(onClick = { step = 12 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
                     }
                     12 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text("DESCRIPTION LINES", color = Color.White.copy(0.5f), fontSize = 10.sp)
-                        OutlinedTextField(value = l1, onValueChange = { l1 = it }, placeholder = { Text("Line 1...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Spacer(Modifier.height(8.dp)); OutlinedTextField(value = l2, onValueChange = { l2 = it }, placeholder = { Text("Line 2...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth(), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { step = 4 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        Text(stringResource(R.string.funnel_description_lines), color = Color.White.copy(0.5f), fontSize = 10.sp)
+                        OutlinedTextField(value = l1, onValueChange = { l1 = it }, placeholder = { Text(stringResource(R.string.funnel_line_1), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Spacer(Modifier.height(8.dp)); OutlinedTextField(value = l2, onValueChange = { l2 = it }, placeholder = { Text(stringResource(R.string.funnel_line_2), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth(), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { step = 4 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
                     }
                     13 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text("UNIT VALUE", color = Color.White.copy(0.5f), fontSize = 10.sp); OutlinedTextField(value = manualPriceInput, onValueChange = { manualPriceInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, "OZ", qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                        Text(stringResource(R.string.funnel_unit_value), color = Color.White.copy(0.5f), fontSize = 10.sp); OutlinedTextField(value = manualPriceInput, onValueChange = { manualPriceInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, "OZ", qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_finalize)) }
                     }
                     2 -> FunnelGrid(listOf("Bars", "Coins", "Rounds", "Custom"), l1) { l1 = it; step = 3 }
                     3 -> FunnelGrid(listOf("1/10 OZ", "1 OZ", "10 OZ", "100 OZ", "1 KILO", "1 GRAM", "Custom"), "") { label ->
@@ -467,16 +476,16 @@ fun MetalSelectionFunnel(
                     }
                     4 -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
-                        OutlinedTextField(value = qtyInput, onValueChange = { qtyInput = it }, placeholder = { Text("Enter Quantity...", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(qtyInput.isNotBlank()) { if(isTrueManualFlag) step = 13 else step = 5 } }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("NEXT") }
+                        OutlinedTextField(value = qtyInput, onValueChange = { qtyInput = it }, placeholder = { Text(stringResource(R.string.funnel_enter_quantity), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
+                        Button(onClick = { if(qtyInput.isNotBlank()) { if(isTrueManualFlag) step = 13 else step = 5 } }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
                     }
                     else -> {
                         LaunchedEffect(Unit) { focus.requestFocus() }
                         OutlinedTextField(value = premInput, onValueChange = { premInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, selectedUnit, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("FINALIZE") }
+                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, selectedUnit, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_finalize)) }
                     }
                 }
-                if (step > 1) { val prev = when(step) { 10 -> 1; 11 -> 10; 12 -> 11; 13 -> 4; else -> step - 1 }; TextButton(onClick = { step = prev }) { Text("BACK", color = Color.Gray) } }
+                if (step > 1) { val prev = when(step) { 10 -> 1; 11 -> 10; 12 -> 11; 13 -> 4; else -> step - 1 }; TextButton(onClick = { step = prev }) { Text(stringResource(R.string.action_back), color = Color.Gray) } }
             }
         }
     }
@@ -490,11 +499,11 @@ fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String,
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
             Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("${asset.symbol.uppercase()} SETTINGS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp); Spacer(Modifier.height(24.dp))
-                Text("QUANTITY HELD", color = Color.White.copy(0.6f), fontSize = 10.sp); BasicTextField(value = amt, onValueChange = { amt = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 28.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().focusRequester(focus))
-                Spacer(Modifier.height(20.dp)); Text("PRICE DECIMALS: ${dec.toInt()}", color = Color.White.copy(0.6f), fontSize = 10.sp); Slider(value = dec, onValueChange = { dec = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
-                Button(onClick = { onSave(asset.name, amt.toDoubleOrNull() ?: asset.amountHeld, dec.toInt()) }, modifier = Modifier.fillMaxWidth().padding(top = 30.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text("SAVE CHANGES", fontWeight = FontWeight.Black) }
-                TextButton(onClick = onDismiss) { Text("CANCEL", color = Color.Gray) }
+                Text(stringResource(R.string.crypto_settings_title, asset.symbol.uppercase()), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp); Spacer(Modifier.height(24.dp))
+                Text(stringResource(R.string.crypto_quantity_held), color = Color.White.copy(0.6f), fontSize = 10.sp); BasicTextField(value = amt, onValueChange = { amt = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 28.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().focusRequester(focus))
+                Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.crypto_price_decimals, dec.toInt()), color = Color.White.copy(0.6f), fontSize = 10.sp); Slider(value = dec, onValueChange = { dec = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
+                Button(onClick = { onSave(asset.name, amt.toDoubleOrNull() ?: asset.amountHeld, dec.toInt()) }, modifier = Modifier.fillMaxWidth().padding(top = 30.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_save_changes), fontWeight = FontWeight.Black) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = Color.Gray) }
             }
         }
     }

@@ -16,12 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.holdings.FunnelGrid
@@ -69,13 +71,13 @@ fun AssetArchitectScreen(
             CenterAlignedTopAppBar(
                 title = { 
                     Text(
-                        if (isBlueprintStage) "STAGE 1: BLUEPRINT" else "STAGE 2: LIVE CARD", 
+                        if (isBlueprintStage) stringResource(R.string.architect_stage_blueprint) else stringResource(R.string.architect_stage_live_card),
                         style = TextStyle(fontWeight = FontWeight.Black, fontSize = 14.sp, letterSpacing = 2.sp)
                     ) 
                 },
                 navigationIcon = { 
                     IconButton(onClick = onCancel) { 
-                        Icon(Icons.Default.Close, contentDescription = "Cancel", tint = Color.White) 
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.action_cancel), tint = Color.White)
                     } 
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFF000416), titleContentColor = Color.White)
@@ -102,7 +104,7 @@ fun AssetArchitectScreen(
 
                     // METAL SELECT
                     Column {
-                        Text("SELECT METAL", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.architect_select_metal), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
                         Spacer(Modifier.height(8.dp))
                         FunnelGrid(
                             options = listOf("Gold", "Silver", "Platinum", "Palladium"),
@@ -125,7 +127,7 @@ fun AssetArchitectScreen(
 
                     // SHAPE SELECT
                     Column {
-                        Text("SELECT SHAPE", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.architect_select_shape), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
                         Spacer(Modifier.height(8.dp))
                         FunnelGrid(
                             options = listOf("Bar", "Coin", "Round"),
@@ -135,7 +137,7 @@ fun AssetArchitectScreen(
 
                     // UNIT SELECT
                     Column {
-                        Text("SELECT UNIT", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.architect_select_unit), color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Black)
                         Spacer(Modifier.height(8.dp))
                         FunnelGrid(
                             options = listOf("OZ", "KILO", "GRAM"),
@@ -151,7 +153,7 @@ fun AssetArchitectScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("PROCEED TO CARD", fontWeight = FontWeight.Black, fontSize = 16.sp)
+                        Text(stringResource(R.string.architect_proceed_to_card), fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                     Spacer(Modifier.height(20.dp))
                 }
@@ -203,7 +205,7 @@ fun AssetArchitectScreen(
 
                                 // IDENTITY AREA
                                 Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("QUANTITY", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.architect_quantity), color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                     SmartNumericField(
                                         value = draftAsset.amountHeld,
                                         onValueChange = { draftAsset = draftAsset.copy(amountHeld = it) },
@@ -223,10 +225,10 @@ fun AssetArchitectScreen(
 
                                 // PRICE/PREMIUM AREA
                                 Column(modifier = Modifier.weight(1.1f), horizontalAlignment = Alignment.End) {
-                                    Text("SPOT PRICE", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.architect_spot_price), color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                     Text(text = formatCurrency(draftAsset.officialSpotPrice), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                     Spacer(Modifier.height(8.dp))
-                                    Text("PREMIUM ($)", color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.architect_premium), color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                     SmartNumericField(
                                         value = draftAsset.premium,
                                         onValueChange = { draftAsset = draftAsset.copy(premium = it) },
@@ -242,7 +244,7 @@ fun AssetArchitectScreen(
 
                             // TOTAL VALUE PREVIEW
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("ESTIMATED VALUE", color = Color.White.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Black)
+                                Text(stringResource(R.string.architect_estimated_value), color = Color.White.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Black)
                                 val total = (draftAsset.officialSpotPrice * draftAsset.weight * draftAsset.amountHeld) + draftAsset.premium
                                 Text(text = formatCurrency(total), color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 16.sp)
                             }
@@ -258,11 +260,11 @@ fun AssetArchitectScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("FINALIZE & VAULT", fontWeight = FontWeight.Black, fontSize = 18.sp)
+                        Text(stringResource(R.string.architect_finalize_vault), fontWeight = FontWeight.Black, fontSize = 18.sp)
                     }
 
                     TextButton(onClick = { isBlueprintStage = true }, modifier = Modifier.padding(top = 8.dp)) {
-                        Text("BACK TO BLUEPRINT", color = Color.Gray, fontSize = 12.sp)
+                        Text(stringResource(R.string.architect_back_to_blueprint), color = Color.Gray, fontSize = 12.sp)
                     }
                     
                     Spacer(Modifier.height(24.dp))
