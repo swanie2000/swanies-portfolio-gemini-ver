@@ -84,7 +84,10 @@ class AuthViewModel @Inject constructor(
         securityManager.authenticate(
             activity = activity,
             onSuccess = { setAuthenticated() },
-            onError = { Log.e("AUTH_ERROR", "Biometric unlock failed: $it") }
+            onError = {
+                Log.e("AUTH_ERROR", "Biometric unlock failed: $it")
+                _authState.value = AuthState.Error(it)
+            }
         )
     }
 

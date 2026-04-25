@@ -7,6 +7,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -39,20 +41,19 @@ import androidx.navigation.NavController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
-import kotlinx.coroutines.Dispatchers
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun UnlockVaultScreen(
     navController: NavController
 ) {
+    val activity = LocalContext.current as FragmentActivity
     val mainViewModel: MainViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
-    val authViewModel: AuthViewModel = hiltViewModel()
-    val context = LocalContext.current
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
+    val context = activity
     val scope = rememberCoroutineScope()
     val siteBg = Color(0xFF000416)
     val siteText = Color.White
@@ -62,23 +63,39 @@ fun UnlockVaultScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
+    var biometricLockedUntilPassword by remember { mutableStateOf(false) }
 
     val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
+    val requirePasswordAfterBiometricFailure by settingsViewModel
+        .requirePasswordAfterBiometricFailure
+        .collectAsState()
+    val authState by authViewModel.authState.collectAsState()
 
     val contentAlpha = remember { Animatable(0f) }
 
-    // --- 🛡️ TRIGGER BIOMETRICS ON ENTRY ---
-    LaunchedEffect(isBiometricEnabled) {
-        if (!isBiometricEnabled) {
-            // Direct pass: when biometric login is disabled, immediately unlock.
-            authViewModel.setAuthenticated()
-        } else {
-            delay(500)
-            (context as? FragmentActivity)?.let { activity ->
-                authViewModel.triggerBiometricUnlock(activity)
-            }
-        }
+    // UI-only intro fade; authentication is explicit via password or biometric button tap.
+    LaunchedEffect(Unit) {
         contentAlpha.animateTo(1f, tween(800))
+    }
+
+    // Navigate immediately after a successful biometric authentication.
+    LaunchedEffect(authState) {
+        when (val state = authState) {
+            is AuthViewModel.AuthState.Authenticated -> {
+                navController.navigate(Routes.HOLDINGS) {
+                    popUpTo(Routes.HOME) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+            is AuthViewModel.AuthState.Error -> {
+                loginError = state.message
+                if (requirePasswordAfterBiometricFailure) {
+                    biometricLockedUntilPassword = true
+                }
+                authViewModel.clearError()
+            }
+            else -> Unit
+        }
     }
 
     val view = LocalView.current
@@ -101,22 +118,30 @@ fun UnlockVaultScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentSilver)
                 }
-                Text(
-                    text = "VAULT LOCKED",
-                    color = siteText,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 1.5.sp
-                )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            Image(
+                painter = painterResource(id = R.drawable.swanie_foreground),
+                contentDescription = null,
+                modifier = Modifier.size(60.dp)
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "PORTFOLIO LOCKED",
+                color = siteText,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.5.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             Column(
                 modifier = Modifier
@@ -126,8 +151,8 @@ fun UnlockVaultScreen(
                     .graphicsLayer { alpha = contentAlpha.value },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(60.dp))
-                
+                Spacer(modifier = Modifier.height(40.dp))
+
                 Text(
                     text = "IDENTITY VERIFICATION",
                     color = siteText.copy(alpha = 0.5f),
@@ -147,6 +172,12 @@ fun UnlockVaultScreen(
                     label = { Text("Username", color = siteText.copy(alpha = 0.7f)) },
                     placeholder = { Text("Username", color = siteText.copy(alpha = 0.45f)) },
                     textStyle = LocalTextStyle.current.copy(color = siteText),
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
+                    visualTransformation = VisualTransformation.None,
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = accentSilver,
@@ -163,7 +194,11 @@ fun UnlockVaultScreen(
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Password", color = siteText.copy(alpha = 0.7f)) },
                     textStyle = LocalTextStyle.current.copy(color = siteText),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -198,25 +233,33 @@ fun UnlockVaultScreen(
                         if (isLoggingIn) return@Button
                         isLoggingIn = true
                         scope.launch {
-                            val normalizedUserName = nameInput.trim().replace("\\s".toRegex(), "")
-                            val normalizedPassword = passwordInput.trim().replace("\\s".toRegex(), "")
-                            val success = mainViewModel.verifyCredentials(normalizedUserName, normalizedPassword)
-                            withContext(Dispatchers.Main) {
+                            var success = false
+                            try {
+                                val normalizedUserName = nameInput.trim().replace("\\s".toRegex(), "")
+                                val normalizedPassword = passwordInput.trim().replace("\\s".toRegex(), "")
+                                success = mainViewModel.verifyCredentials(normalizedUserName, normalizedPassword)
+                            } catch (_: Exception) {
+                                loginError = "Authentication failed. Please try again."
+                            } finally {
+                                delay(2000)
                                 isLoggingIn = false
-                                if (success) {
+                            }
+
+                            if (success) {
+                                    biometricLockedUntilPassword = false
+                                    authViewModel.setAuthenticated()
                                     navController.navigate(Routes.HOLDINGS) {
                                         popUpTo(Routes.HOME) { inclusive = true }
                                         launchSingleTop = true
                                     }
-                                } else {
-                                    loginError = "Incorrect Name or Password"
-                                    nameInput = ""
-                                    passwordInput = ""
-                                }
+                            } else {
+                                loginError = "Incorrect Name or Password"
+                                nameInput = ""
+                                passwordInput = ""
                             }
-                        }
+                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    modifier = Modifier.fillMaxWidth(0.94f).height(50.dp),
                     enabled = !isLoggingIn,
                     colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
                     shape = RoundedCornerShape(12.dp)
@@ -228,30 +271,36 @@ fun UnlockVaultScreen(
                     }
                 }
 
-                // --- 🚀 UNLOCK BUTTON (TRIPWIRE) ---
-                Button(
-                    onClick = {
-                        if (!isBiometricEnabled) {
-                            authViewModel.setAuthenticated()
-                        } else {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (isBiometricEnabled && !biometricLockedUntilPassword) {
+                    // Show biometric option only when user enables it in settings.
+                    Button(
+                        onClick = {
                             (context as? FragmentActivity)?.let { activity ->
                                 authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
                             }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text("RETRY BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        },
+                        modifier = Modifier.fillMaxWidth(0.94f).height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text("USE BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                    }
+                } else if (isBiometricEnabled && biometricLockedUntilPassword) {
+                    Text(
+                        text = "Use password to continue before trying biometrics again.",
+                        color = siteText.copy(alpha = 0.7f),
+                        fontSize = 12.sp
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
                     Text(
-                        "Don't have an account? Create one here",
+                        "CREATE ACCOUNT",
                         color = accentSilver,
                         fontWeight = FontWeight.Medium
                     )

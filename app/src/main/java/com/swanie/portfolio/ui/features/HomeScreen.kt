@@ -28,17 +28,15 @@ import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
-import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlin.math.min
 
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
+    val activity = LocalContext.current as FragmentActivity
     val themeViewModel: ThemeViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
-    val authViewModel: AuthViewModel = hiltViewModel()
-    val context = LocalContext.current
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
     val scope = rememberCoroutineScope()
 
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
@@ -59,7 +57,6 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var showSparkles by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
-    val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
 
     // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
     val backgroundAlpha by animateFloatAsState(
@@ -206,12 +203,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             Column(modifier = Modifier.fillMaxWidth(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Button(
                     onClick = {
-                        if (!isBiometricEnabled) {
-                            authViewModel.setAuthenticated()
-                        } else {
-                            (context as? FragmentActivity)?.let { activity ->
-                                authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
-                            }
+                        navController.navigate(Routes.UNLOCK_VAULT) {
+                            launchSingleTop = true
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),

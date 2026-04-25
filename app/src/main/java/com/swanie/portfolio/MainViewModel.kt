@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @HiltViewModel
@@ -89,6 +88,11 @@ class MainViewModel @Inject constructor(
         viewModelScope,
         SharingStarted.Eagerly,
         runBlocking { themePreferences.isBiometricEnabled.first() }
+    )
+    val loginResumeTimeoutSeconds = themePreferences.loginResumeTimeoutSeconds.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        runBlocking { themePreferences.loginResumeTimeoutSeconds.first() }
     )
 
     init {
@@ -209,7 +213,7 @@ class MainViewModel @Inject constructor(
             return false
         }
 
-        val profile = withTimeoutOrNull(2000L) { userDao.getFirstUser() }
+        val profile = userDao.getFirstUser()
         if (profile == null) {
             _isVaultUnlocked.value = false
             return false
@@ -217,6 +221,14 @@ class MainViewModel @Inject constructor(
 
         val storedUserName = profile.userName
             .ifBlank { profile.displayName.trim().replace("\\s".toRegex(), "") }
+            .replace("\\s".toRegex(), "")
+            .lowercase()
+        val storedDisplayName = profile.displayName
+            .trim()
+            .replace("\\s".toRegex(), "")
+            .lowercase()
+        val storedEmail = profile.email
+            .trim()
             .lowercase()
         val inputUserName = normalizedName.lowercase()
         Log.d(
@@ -224,7 +236,10 @@ class MainViewModel @Inject constructor(
             "Input Username: $inputUserName, DB Username: $storedUserName, DB Email: ${profile.email}, DB Password: ${profile.loginPassword}"
         )
 
-        val isMatch = inputUserName == storedUserName &&
+        val userMatch = inputUserName == storedUserName ||
+            inputUserName == storedDisplayName ||
+            inputUserName == storedEmail
+        val isMatch = userMatch &&
             profile.loginPassword == normalizedPassword
         Log.d("VAULT_AUTH", "Comparison Result: $isMatch")
         _isVaultUnlocked.value = isMatch

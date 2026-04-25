@@ -5,21 +5,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.NavGraph
@@ -27,8 +24,8 @@ import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.AndroidEntryPoint
+import android.os.SystemClock
 import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -36,10 +33,7 @@ class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
-    private var hasPromptedBiometricThisSession: Boolean = false
-
-    @Inject
-    lateinit var securityManager: SecurityManager
+    private var lastBackgroundedAtMs: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -118,22 +112,26 @@ class MainActivity : FragmentActivity() {
         super.onStop()
     }
 
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        // Stamp only when user actually leaves the app, avoiding false timeout triggers
+        // during system overlays (e.g., biometric prompt transitions).
+        lastBackgroundedAtMs = SystemClock.elapsedRealtime()
+    }
+
     override fun onResume() {
         super.onResume()
-
-        val biometricEnabled = viewModel.isBiometricEnabled.value
+        val backgroundedAt = lastBackgroundedAtMs
         val isAuthenticated = authViewModel.authState.value is AuthViewModel.AuthState.Authenticated
+        val timeoutSeconds = viewModel.loginResumeTimeoutSeconds.value
 
-        if (biometricEnabled != true) {
-            // If biometric login is disabled, proceed directly to the main UI.
-            authViewModel.setAuthenticated()
-            hasPromptedBiometricThisSession = false
-            return
+        if (backgroundedAt != null && isAuthenticated && timeoutSeconds >= 0) {
+            val elapsedMs = SystemClock.elapsedRealtime() - backgroundedAt
+            val timeoutMs = timeoutSeconds * 1000L
+            if (elapsedMs > timeoutMs) {
+                authViewModel.setLocked()
+            }
         }
-
-        if (biometricEnabled == true && !isAuthenticated && !hasPromptedBiometricThisSession) {
-            hasPromptedBiometricThisSession = true
-            authViewModel.triggerBiometricUnlock(this)
-        }
+        lastBackgroundedAtMs = null
     }
 }

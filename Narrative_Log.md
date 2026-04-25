@@ -36,3 +36,35 @@ Release recorded: V40.22 "The High-Fidelity Mirror".
 - V40.34 "Auth Surface Unification": consolidate biometric trigger UX labels and action semantics across Home, Unlock, and Settings surfaces.
 - Add a regression pass for biometric states (enabled, disabled, canceled prompt, failed prompt) covering launch, resume, and manual login.
 - Validate navigation/state continuity so Authenticated transitions remain deterministic across lifecycle edges.
+
+---
+
+## V40.34 - Auth Surface Unification + Session Control
+
+Release recorded: V40.34 "Auth Surface Unification + Session Control".
+
+- Resolved login lockout loops by unifying auth state ownership across screens to a shared activity-scoped `AuthViewModel`.
+- Rewired login flow to always route `HOME -> UNLOCK_VAULT -> HOLDINGS`, removing unintended direct bypasses.
+- Added startup/login security controls:
+  - `Allow biometrics for login` toggle now strictly controls biometric button visibility on login screen.
+  - Login timeout added with options `Never`, `15s`, `30s`, `60s`, `5m`, `15m`.
+  - Background timeout enforcement now uses true user-leave signal (`onUserLeaveHint`) to avoid false lockouts during system overlays.
+- Hardened authentication behavior:
+  - Password verification now supports normalized username, display name, or email identity matching.
+  - Biometric failures now provide friendly user-facing messages and optional password-first recovery flow.
+  - Added `Require Password After Biometric Failure` safety toggle (default ON).
+- Completed UI/UX polish:
+  - Unlock screen rebrand and structure polish (`PORTFOLIO LOCKED`, swan-first header).
+  - Biometric CTA updated to `USE BIOMETRICS`.
+  - Security setting copy simplified for plain-language readability.
+  - App orientation locked to portrait via manifest.
+- Stability validation:
+  - Repeated lint checks passed on touched files.
+  - Repeated Kotlin compile checks passed after each auth/security increment.
+
+### Next Phase (Projected Path)
+
+- V40.35 "Auth Reliability Harness": add targeted regression tests for credential success/failure, biometric success/cancel/fail, and timeout boundary behavior (`timeout - 1s`, `timeout + 1s`, `Never`).
+- Add lightweight auth diagnostics mode (developer-only) to surface active auth state and session timeout decisions for faster field debugging.
+- Validate cross-device biometric behavior matrix (Pixel, Samsung, emulator) to confirm consistent callback handling and error wording.
+- Optional UX refinement: make timeout selector more explicit with labeled tick marks or chips while preserving current behavior.

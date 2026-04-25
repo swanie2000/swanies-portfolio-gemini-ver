@@ -31,12 +31,24 @@ fun SettingsScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
+    val timeoutOptionsSeconds = listOf(-1, 15, 30, 60, 300, 900)
+    fun formatTimeoutLabel(seconds: Int): String = when {
+        seconds < 0 -> "Never"
+        seconds < 60 -> "$seconds seconds"
+        seconds % 60 == 0 -> "${seconds / 60} minutes"
+        else -> "$seconds seconds"
+    }
+
     val context = LocalContext.current
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val isHighVisibilityMode by settingsViewModel.isHighVisibilityMode.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
     val currentVaultId by mainViewModel.currentVaultId.collectAsState(initial = 1)
     val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
+    val requirePasswordAfterBiometricFailure by settingsViewModel
+        .requirePasswordAfterBiometricFailure
+        .collectAsState()
+    val loginResumeTimeoutSeconds by settingsViewModel.loginResumeTimeoutSeconds.collectAsState()
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -115,7 +127,7 @@ fun SettingsScreen(
 
                     SettingsCheckboxItem(
                         title = "LOGIN OPTION",
-                        subtitle = "Require biometric authentication on startup.",
+                        subtitle = "Allow biometrics for login.",
                         checked = isBiometricEnabled,
                         onCheckedChange = { enabled ->
                             val activity = context as? FragmentActivity
@@ -127,6 +139,77 @@ fun SettingsScreen(
                         },
                         themeColor = safeText
                     )
+
+                    SettingsToggleItem(
+                        title = "Require Password After Biometric Failure",
+                        subtitle = "After biometric failure, require password before retrying biometrics.",
+                        checked = requirePasswordAfterBiometricFailure,
+                        onCheckedChange = { settingsViewModel.saveRequirePasswordAfterBiometricFailure(it) },
+                        themeColor = safeText
+                    )
+
+                    val selectedTimeoutIndex = timeoutOptionsSeconds
+                        .indices
+                        .minByOrNull { index ->
+                            if (loginResumeTimeoutSeconds < 0) {
+                                if (timeoutOptionsSeconds[index] < 0) 0 else Int.MAX_VALUE
+                            } else if (timeoutOptionsSeconds[index] < 0) {
+                                Int.MAX_VALUE
+                            } else {
+                                kotlin.math.abs(timeoutOptionsSeconds[index] - loginResumeTimeoutSeconds)
+                            }
+                        } ?: 2
+                    var timeoutSliderValue by remember(loginResumeTimeoutSeconds) {
+                        mutableStateOf(selectedTimeoutIndex.toFloat())
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "LOGIN TIMEOUT",
+                            color = safeText,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "Current: ${formatTimeoutLabel(loginResumeTimeoutSeconds)}",
+                            color = safeText.copy(alpha = 0.85f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = if (loginResumeTimeoutSeconds < 0) {
+                                "Never require login again from background timeout."
+                            } else {
+                                "Require login again after ${formatTimeoutLabel(loginResumeTimeoutSeconds)} in background."
+                            },
+                            color = safeText.copy(alpha = 0.6f),
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "Applies when returning to the app from background.",
+                            color = safeText.copy(alpha = 0.5f),
+                            fontSize = 12.sp
+                        )
+                        Slider(
+                            value = timeoutSliderValue,
+                            onValueChange = { timeoutSliderValue = it },
+                            onValueChangeFinished = {
+                                val mappedIndex = timeoutSliderValue.toInt().coerceIn(0, timeoutOptionsSeconds.lastIndex)
+                                settingsViewModel.saveLoginResumeTimeoutSeconds(timeoutOptionsSeconds[mappedIndex])
+                            },
+                            valueRange = 0f..timeoutOptionsSeconds.lastIndex.toFloat(),
+                            steps = timeoutOptionsSeconds.size - 2,
+                            colors = SliderDefaults.colors(
+                                thumbColor = Color.Yellow,
+                                activeTrackColor = Color.Yellow,
+                                inactiveTrackColor = safeText.copy(alpha = 0.2f)
+                            )
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -144,7 +227,7 @@ fun SettingsScreen(
                     // Syncs to ThemePreferences + MainViewModel; holdings/widget previews read the same flow.
                     SettingsToggleItem(
                         title = "High-Visibility Compact Cards",
-                        subtitle = "18/14 dashboard rows vs 14/12 boutique; cards use a fixed font-scale lock so system text size does not override layout.",
+                        subtitle = "Makes compact cards easier to read with larger, clearer text.",
                         checked = isHighVisibilityMode,
                         onCheckedChange = { settingsViewModel.saveIsHighVisibilityMode(it) },
                         themeColor = safeText

@@ -1,4 +1,4 @@
-🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V40.4 FINAL: WIZARD FUNNEL + PURE PENCIL)
+🦢 SWANIES PORTFOLIO: MASTER NARRATIVE (V40.34: AUTH SURFACE UNIFICATION + SESSION CONTROL)
 
 🎯 THE CORE MISSION
 To maintain a commercial-grade financial vault where user data is sovereign, biometrics are hardware-enforced, and the UI is a cinematic, high-precision experience that survives high-density settings and real-world widget workflows.
@@ -78,15 +78,69 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
       - Global app vault: [ThemePreferences.currentVaultId].
       - Widget-edit vault: driven by the widget instance → [VaultDao.getVaultByAppWidgetId] path when opened from the pencil (may differ from the active app vault while editing).
 
-🚀 6. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🛡️ 6. V40.34 — AUTH SURFACE UNIFICATION + SESSION CONTROL (LATEST STABLE)
+
+    Authentication architecture:
+      - Auth ownership is unified to shared activity-scoped [AuthViewModel] across Home, Unlock, NavGraph, Create, Restore, and Portfolio Manager surfaces.
+      - Login path is deterministic: `HOME -> UNLOCK_VAULT -> HOLDINGS`.
+      - Removed unintended direct auth bypass behaviors from startup/resume and login entry routines.
+
+    Session controls:
+      - Login timeout is user-configurable: `Never`, `15s`, `30s`, `60s`, `5m`, `15m`.
+      - Timeout enforcement now uses true user-leave signal (`onUserLeaveHint`) to avoid false lockouts during system overlays.
+      - Orientation is locked to portrait at [MainActivity] manifest contract.
+
+    Credential + biometric reliability:
+      - Password verification accepts normalized identity input against username/displayName/email.
+      - Biometric prompt copy and error messages are user-friendly and deterministic.
+      - Safety control added: `Require Password After Biometric Failure` (default ON).
+      - Biometric login CTA is exposed only when `Allow biometrics for login` is enabled in Settings.
+
+    UX polish:
+      - Unlock header aligned with app style (`PORTFOLIO LOCKED`, swan-first layout).
+      - CTA language simplified and standardized (`LOGIN`, `USE BIOMETRICS`, `CREATE ACCOUNT`).
+      - Settings security copy simplified for non-technical readability.
+
+🧷 7. DO NOT REGRESS (AUTH + SESSION HARD RULES)
+
+    - Do NOT reintroduce automatic auth bypass on app resume.
+    - Do NOT set background timeout stamps from generic lifecycle edges that can fire during overlays (`onStop`).
+    - Do NOT expose biometric login button when `Allow biometrics for login` is disabled.
+    - Do NOT split auth state ownership across multiple screen-scoped auth viewmodels.
+    - Do NOT remove `Never` from login timeout options.
+    - Do NOT bypass `UNLOCK_VAULT` from HOME login flow for standard credentialed login.
+    - Do NOT silently swallow biometric errors; surface user-friendly messages.
+    - Do NOT break portrait lock in `MainActivity` manifest contract.
+
+🧭 8. AUTH SOURCE OF TRUTH (FILES + SYMBOLS)
+
+    - Primary auth state authority:
+      - [AuthViewModel.authState] in `app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt`
+    - Navigation gate authority:
+      - [NavGraph.shouldForceUnlock] in `app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt`
+    - Login/auth execution surface:
+      - `app/src/main/java/com/swanie/portfolio/ui/features/UnlockVaultScreen.kt`
+      - Password path uses [MainViewModel.verifyCredentials]
+      - Biometric path uses [AuthViewModel.triggerBiometricUnlock]
+    - Session timeout authority:
+      - Preference key + flow in `app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt`
+      - Resume lock enforcement in `app/src/main/java/com/swanie/portfolio/MainActivity.kt`
+    - Settings authority for security toggles:
+      - `app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt`
+      - `app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt`
+
+🚀 9. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
-Widget Contract Hardening	Add regression coverage for reorder persistence, pencil-only entry, and widget instance rebinding.	IMMEDIATE
-Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces for full app parity.	HIGH
+Auth Reliability Harness	Add regression coverage for credential success/failure, biometric success/cancel/failure, and timeout boundary behavior (`timeout-1s`, `timeout+1s`, `Never`).	IMMEDIATE
+Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
+Cross-Device Biometric Validation	Validate biometric callback consistency and prompt/error UX across major OEM devices.	HIGH
+Widget Contract Hardening	Keep planned widget regression coverage for reorder persistence and instance rebinding.	MEDIUM
+Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces for full app parity.	MEDIUM
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.4 FINAL: Wizard Funnel + Pure Pencil architecture.
+"The narrative is now V40.34: Auth Surface Unification + Session Control.
 
-Current Objective: Stabilize PREVIEW page rendering path and verify wizard funnel page-state persistence (`currentPage`) across widget-config lifecycle edges.
+Current Objective: Build V40.35 Auth Reliability Harness with minimal-risk targeted coverage for login, biometrics, and timeout boundaries.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."

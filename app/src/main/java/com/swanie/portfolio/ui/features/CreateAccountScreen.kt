@@ -45,7 +45,8 @@ fun CreateAccountScreen(
     navController: NavController,
     mainViewModel: MainViewModel
 ) {
-    val authViewModel: AuthViewModel = hiltViewModel()
+    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
 
     val siteBg = Color(0xFF000416)
     val siteText = Color.White
@@ -65,7 +66,9 @@ fun CreateAccountScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isCreatingAccount by remember { mutableStateOf(false) }
+    var showReceiptDialog by remember { mutableStateOf(false) }
     var receiptProfile by remember { mutableStateOf<UserProfileEntity?>(null) }
+    var receiptReadySignal by remember { mutableStateOf(0) }
 
     // --- VALIDATION ---
     val cleanPass = password.trim().replace("\\s".toRegex(), "")
@@ -79,6 +82,12 @@ fun CreateAccountScreen(
     val isFormValid = fullName.length > 2 && email.contains("@") &&
             hasMinLength && hasCapital && hasNumber && hasSymbol &&
             passwordsMatch
+
+    LaunchedEffect(receiptReadySignal) {
+        if (receiptReadySignal > 0 && receiptProfile != null) {
+            showReceiptDialog = true
+        }
+    }
 
     val view = LocalView.current
     SideEffect {
@@ -120,6 +129,12 @@ fun CreateAccountScreen(
                 value = fullName,
                 onValueChange = { fullName = it.replace("\\s".toRegex(), "") },
                 modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+                visualTransformation = VisualTransformation.None,
                 shape = RoundedCornerShape(12.dp),
                 colors = textFieldColors,
                 singleLine = true,
@@ -137,6 +152,7 @@ fun CreateAccountScreen(
                 onValueChange = { password = it.replace("\\s".toRegex(), "") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 ),
@@ -170,6 +186,7 @@ fun CreateAccountScreen(
                 onValueChange = { confirmPassword = it.replace("\\s".toRegex(), "") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 ),
@@ -241,6 +258,7 @@ fun CreateAccountScreen(
                             mainViewModel.updateTOSAccepted(true)
                             authViewModel.initializeNewVault(vaultName)
                             receiptProfile = stored
+                            receiptReadySignal++
                         } else {
                             isCreatingAccount = false
                         }
@@ -259,7 +277,7 @@ fun CreateAccountScreen(
             }
             TextButton(onClick = { navController.navigate(Routes.UNLOCK_VAULT) }) {
                 Text(
-                    "Already have an account? Login here",
+                    "LOGIN",
                     color = accentSilver,
                     fontWeight = FontWeight.Medium,
                     textDecoration = TextDecoration.Underline
@@ -269,7 +287,11 @@ fun CreateAccountScreen(
         }
     }
 
-    receiptProfile?.let { profile ->
+    if (showReceiptDialog) {
+        val profile = receiptProfile
+        if (profile == null) {
+            showReceiptDialog = false
+        } else {
         AlertDialog(
             onDismissRequest = {},
             title = { Text("Account Created Successfully") },
@@ -283,6 +305,7 @@ fun CreateAccountScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        showReceiptDialog = false
                         receiptProfile = null
                         isCreatingAccount = false
                         navController.navigate(Routes.UNLOCK_VAULT) {
@@ -295,6 +318,7 @@ fun CreateAccountScreen(
                 }
             }
         )
+        }
     }
 }
 

@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,9 +25,10 @@ import com.swanie.portfolio.ui.navigation.Routes
  */
 @Composable
 fun RestoreVaultScreen(
-    navController: NavHostController,
-    authViewModel: AuthViewModel = hiltViewModel()
+    navController: NavHostController
 ) {
+    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
     val authState by authViewModel.authState.collectAsState()
 
     // --- Temporary Placeholders for Build Stability ---

@@ -5,7 +5,6 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.swanie.portfolio.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +30,18 @@ class SecurityManager @Inject constructor(
                 }
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    onError(errString.toString())
+                    val friendlyMessage = when (errorCode) {
+                        BiometricPrompt.ERROR_USER_CANCELED,
+                        BiometricPrompt.ERROR_NEGATIVE_BUTTON,
+                        BiometricPrompt.ERROR_CANCELED -> "Authentication cancelled."
+                        BiometricPrompt.ERROR_LOCKOUT,
+                        BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> "Too many attempts. Please use your password."
+                        BiometricPrompt.ERROR_NO_BIOMETRICS -> "No biometric credentials enrolled on this device."
+                        BiometricPrompt.ERROR_HW_NOT_PRESENT -> "Biometric hardware is not available on this device."
+                        BiometricPrompt.ERROR_HW_UNAVAILABLE -> "Biometric sensor is temporarily unavailable. Try again."
+                        else -> errString.toString()
+                    }
+                    onError(friendlyMessage)
                 }
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
@@ -39,12 +49,8 @@ class SecurityManager @Inject constructor(
             })
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("UNLOCK")
-            .setSubtitle("To Confirm your identity, Please")
-            // 🛡️ Task 1: Use the new ic_vault_auth icon to prevent clipping/zooming
-            // Note: Modern BiometricPrompt uses the app icon or a system-defined icon.
-            // However, we set this in the theme or via the builder if supported by the OS version.
-            // On most Android 10+ devices, it defaults to the app icon (@mipmap/ic_launcher).
+            .setTitle("Unlock Portfolio")
+            .setSubtitle("Confirm your identity to continue")
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()

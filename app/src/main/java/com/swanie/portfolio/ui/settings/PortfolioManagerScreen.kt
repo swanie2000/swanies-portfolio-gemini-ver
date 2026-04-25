@@ -31,6 +31,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +57,8 @@ fun PortfolioManagerScreen(
     mainViewModel: MainViewModel,
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
-    val authViewModel: AuthViewModel = hiltViewModel()
+    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
     val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
     val starredVaultId by mainViewModel.starredVaultId.collectAsStateWithLifecycle()

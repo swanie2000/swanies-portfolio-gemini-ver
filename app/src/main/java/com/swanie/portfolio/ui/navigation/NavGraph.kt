@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -28,6 +29,7 @@ import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.features.RestoreVaultScreen
 import com.swanie.portfolio.ui.features.UnlockVaultScreen
 import com.swanie.portfolio.ui.features.TermsAndConditionsScreen
+import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen // ✅ Fixed: Added missing import
 import com.swanie.portfolio.ui.settings.*
@@ -42,14 +44,16 @@ fun NavGraph(
     mainViewModel: MainViewModel,
     startDestination: String = Routes.HOME
 ) {
+    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
     val assetViewModel: AssetViewModel = hiltViewModel()
     val amountEntryViewModel: AmountEntryViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel(activity)
     val scope = rememberCoroutineScope()
-    val isVaultUnlocked = mainViewModel.isVaultUnlocked.collectAsStateWithLifecycle().value
+    val authState = authViewModel.authState.collectAsStateWithLifecycle().value
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val shouldForceUnlock = !isVaultUnlocked &&
+    val shouldForceUnlock = authState !is AuthViewModel.AuthState.Authenticated &&
         currentRoute != Routes.UNLOCK_VAULT &&
         currentRoute != Routes.CREATE_ACCOUNT
 

@@ -79,6 +79,11 @@ class SettingsViewModel @Inject constructor(
     // 🛡️ SECURITY PREFERENCE: Track if the biometric lock is active
     val isBiometricEnabled: StateFlow<Boolean> = themePreferences.isBiometricEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val requirePasswordAfterBiometricFailure: StateFlow<Boolean> =
+        themePreferences.requirePasswordAfterBiometricFailure
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+    val loginResumeTimeoutSeconds: StateFlow<Int> = themePreferences.loginResumeTimeoutSeconds
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
 
     val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
         .onEach { config ->
@@ -155,6 +160,18 @@ class SettingsViewModel @Inject constructor(
     fun saveConfirmDelete(enabled: Boolean) {
         viewModelScope.launch {
             themePreferences.saveConfirmDelete(enabled)
+        }
+    }
+
+    fun saveLoginResumeTimeoutSeconds(seconds: Int) {
+        viewModelScope.launch {
+            themePreferences.saveLoginResumeTimeoutSeconds(seconds)
+        }
+    }
+
+    fun saveRequirePasswordAfterBiometricFailure(enabled: Boolean) {
+        viewModelScope.launch {
+            themePreferences.saveRequirePasswordAfterBiometricFailure(enabled)
         }
     }
 
