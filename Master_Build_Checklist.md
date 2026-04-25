@@ -78,6 +78,13 @@
   - Removed unused `language_system_default` string keys from English, Spanish, and Korean resources.
   - Validation passed with debug Kotlin compile success.
 
+- [x] V40.46 Top-20 Language Expansion + Translation Feedback Intake - COMPLETED
+  - Expanded Home and Settings language pickers to a Top-20 locale list with native-language labels.
+  - Added Settings `REPORT TRANSLATION ISSUE` dialog with prefilled email handoff for low-cost user correction intake.
+  - Added Terms disclaimer clarifying English as the authoritative language and non-English locales as AI-translated.
+  - Added supporting string resources for new language labels and translation feedback UI copy.
+  - Validation passed with debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

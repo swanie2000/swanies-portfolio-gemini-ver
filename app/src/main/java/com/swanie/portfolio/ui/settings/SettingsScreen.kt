@@ -1,5 +1,7 @@
 package com.swanie.portfolio.ui.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -83,6 +85,11 @@ fun SettingsScreen(
 
     var showFactoryResetDialog by remember { mutableStateOf(false) }
     var languageExpanded by remember { mutableStateOf(false) }
+    var showTranslationFeedbackDialog by remember { mutableStateOf(false) }
+    var translationScreenInput by remember { mutableStateOf("") }
+    var translationCurrentTextInput by remember { mutableStateOf("") }
+    var translationSuggestedTextInput by remember { mutableStateOf("") }
+    var translationNotesInput by remember { mutableStateOf("") }
 
     val passwordStrength = AuthPolicy.evaluatePasswordStrength(newPassword)
     val cleanNewPassword = passwordStrength.normalized
@@ -335,6 +342,121 @@ fun SettingsScreen(
         )
     }
 
+    if (showTranslationFeedbackDialog) {
+        AlertDialog(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding(),
+            onDismissRequest = { showTranslationFeedbackDialog = false },
+            title = { Text(stringResource(R.string.settings_translation_feedback_title)) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 340.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.settings_translation_feedback_subtitle),
+                        fontSize = 13.sp,
+                        color = safeText.copy(alpha = 0.8f)
+                    )
+                    OutlinedTextField(
+                        value = effectiveLanguageCode,
+                        onValueChange = {},
+                        readOnly = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.language_selector_title)) },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = translationScreenInput,
+                        onValueChange = { translationScreenInput = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.settings_translation_feedback_screen)) },
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = translationCurrentTextInput,
+                        onValueChange = { translationCurrentTextInput = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.settings_translation_feedback_current_text)) }
+                    )
+                    OutlinedTextField(
+                        value = translationSuggestedTextInput,
+                        onValueChange = { translationSuggestedTextInput = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.settings_translation_feedback_suggested_text)) }
+                    )
+                    OutlinedTextField(
+                        value = translationNotesInput,
+                        onValueChange = { translationNotesInput = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.settings_translation_feedback_notes)) }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (translationSuggestedTextInput.isBlank()) {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.settings_translation_feedback_required),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@TextButton
+                        }
+
+                        val emailSubject = context.getString(
+                            R.string.settings_translation_feedback_email_subject,
+                            effectiveLanguageCode
+                        )
+                        val emailBody = context.getString(
+                            R.string.settings_translation_feedback_email_body,
+                            effectiveLanguageCode,
+                            translationScreenInput.ifBlank { "-" },
+                            translationCurrentTextInput.ifBlank { "-" },
+                            translationSuggestedTextInput,
+                            translationNotesInput.ifBlank { "-" }
+                        )
+                        val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:")
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@swaniesportfolio.app"))
+                            putExtra(Intent.EXTRA_SUBJECT, emailSubject)
+                            putExtra(Intent.EXTRA_TEXT, emailBody)
+                        }
+                        runCatching {
+                            context.startActivity(
+                                Intent.createChooser(
+                                    mailIntent,
+                                    context.getString(R.string.settings_translation_feedback_chooser_title)
+                                )
+                            )
+                        }.onFailure {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.settings_translation_feedback_no_email_app),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.settings_translation_feedback_submit))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTranslationFeedbackDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -466,11 +588,31 @@ fun SettingsScreen(
                     // --- INTERFACE ---
                     Text(stringResource(R.string.settings_interface), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    val languageOptions = listOf("en", "es", "ko")
+                    val languageOptions = listOf(
+                        "en", "es", "pt-BR", "fr", "de", "ja", "ko", "zh-CN", "hi", "ar",
+                        "zh-TW", "it", "ru", "tr", "id", "vi", "th", "pl", "nl", "uk"
+                    )
                     val selectedLanguageLabel = when (effectiveLanguageCode) {
                         "en" -> stringResource(R.string.language_name_english_native)
                         "es" -> stringResource(R.string.language_name_spanish_native)
+                        "pt-BR" -> stringResource(R.string.language_name_portuguese_brazil_native)
+                        "fr" -> stringResource(R.string.language_name_french_native)
+                        "de" -> stringResource(R.string.language_name_german_native)
+                        "ja" -> stringResource(R.string.language_name_japanese_native)
                         "ko" -> stringResource(R.string.language_name_korean_native)
+                        "zh-CN" -> stringResource(R.string.language_name_chinese_simplified_native)
+                        "hi" -> stringResource(R.string.language_name_hindi_native)
+                        "ar" -> stringResource(R.string.language_name_arabic_native)
+                        "zh-TW" -> stringResource(R.string.language_name_chinese_traditional_native)
+                        "it" -> stringResource(R.string.language_name_italian_native)
+                        "ru" -> stringResource(R.string.language_name_russian_native)
+                        "tr" -> stringResource(R.string.language_name_turkish_native)
+                        "id" -> stringResource(R.string.language_name_indonesian_native)
+                        "vi" -> stringResource(R.string.language_name_vietnamese_native)
+                        "th" -> stringResource(R.string.language_name_thai_native)
+                        "pl" -> stringResource(R.string.language_name_polish_native)
+                        "nl" -> stringResource(R.string.language_name_dutch_native)
+                        "uk" -> stringResource(R.string.language_name_ukrainian_native)
                         else -> stringResource(R.string.language_name_english_native)
                     }
                     ExposedDropdownMenuBox(
@@ -505,7 +647,24 @@ fun SettingsScreen(
                                 val optionLabel = when (option) {
                                     "en" -> stringResource(R.string.language_name_english_native)
                                     "es" -> stringResource(R.string.language_name_spanish_native)
+                                    "pt-BR" -> stringResource(R.string.language_name_portuguese_brazil_native)
+                                    "fr" -> stringResource(R.string.language_name_french_native)
+                                    "de" -> stringResource(R.string.language_name_german_native)
+                                    "ja" -> stringResource(R.string.language_name_japanese_native)
                                     "ko" -> stringResource(R.string.language_name_korean_native)
+                                    "zh-CN" -> stringResource(R.string.language_name_chinese_simplified_native)
+                                    "hi" -> stringResource(R.string.language_name_hindi_native)
+                                    "ar" -> stringResource(R.string.language_name_arabic_native)
+                                    "zh-TW" -> stringResource(R.string.language_name_chinese_traditional_native)
+                                    "it" -> stringResource(R.string.language_name_italian_native)
+                                    "ru" -> stringResource(R.string.language_name_russian_native)
+                                    "tr" -> stringResource(R.string.language_name_turkish_native)
+                                    "id" -> stringResource(R.string.language_name_indonesian_native)
+                                    "vi" -> stringResource(R.string.language_name_vietnamese_native)
+                                    "th" -> stringResource(R.string.language_name_thai_native)
+                                    "pl" -> stringResource(R.string.language_name_polish_native)
+                                    "nl" -> stringResource(R.string.language_name_dutch_native)
+                                    "uk" -> stringResource(R.string.language_name_ukrainian_native)
                                     else -> stringResource(R.string.language_name_english_native)
                                 }
                                 DropdownMenuItem(
@@ -519,6 +678,25 @@ fun SettingsScreen(
                             }
                         }
                     }
+                    TextButton(
+                        onClick = { showTranslationFeedbackDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_translation_feedback_button),
+                            color = safeText,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.settings_translation_feedback_hint),
+                        color = safeText.copy(alpha = 0.6f),
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
 
                     SettingsToggleItem(
                         title = stringResource(R.string.settings_compact_cards),

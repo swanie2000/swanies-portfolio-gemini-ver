@@ -281,3 +281,22 @@ Release recorded: V40.45 "Language Picker Final Cleanup".
   - `app/src/main/res/values-ko/strings.xml`.
 - Validation:
   - `:app:compileDebugKotlin` passed after cleanup.
+
+---
+
+## V40.46 - Top-20 Language Expansion + Translation Feedback Intake
+
+Release recorded: V40.46 "Top-20 Language Expansion + Translation Feedback Intake".
+
+- Expanded language support controls to a Top-20 locale list on both:
+  - Home globe quick-switch menu,
+  - Settings language selector.
+- Added native-language labels for all Top-20 options in `values/strings.xml` for cleaner picker readability.
+- Added user-driven translation feedback intake in Settings:
+  - New `REPORT TRANSLATION ISSUE` action opens a keyboard-safe feedback dialog.
+  - Submit action launches prefilled email handoff for quick issue reporting without backend overhead.
+- Added Terms and Conditions disclaimer confirming:
+  - English is the authoritative/master legal and product language,
+  - Non-English locales may be AI-translated and can contain wording differences.
+- Validation:
+  - `:app:compileDebugKotlin` passed after integration.

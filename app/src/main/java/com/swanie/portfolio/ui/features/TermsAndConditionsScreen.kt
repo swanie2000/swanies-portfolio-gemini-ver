@@ -60,6 +60,9 @@ fun TermsAndConditionsScreen(navController: NavController) {
             TermSection("5. NO FINANCIAL ADVICE",
                 "This app is a tracking tool. Price data is pulled from third-party APIs (CoinGecko, etc). We are not responsible for market fluctuations or the accuracy of external data providers.")
 
+            TermSection("6. LANGUAGE TRANSLATION DISCLAIMER",
+                "English is the master legal and product language for this app. Non-English translations may be AI-generated and can contain wording differences. If there is any conflict, ambiguity, or legal interpretation issue, the English text controls.")
+
             Spacer(modifier = Modifier.height(50.dp))
 
             Text(

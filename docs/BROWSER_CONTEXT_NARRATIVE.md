@@ -261,3 +261,24 @@ Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'S
 Current Objective: Continue localization surface migration (V40.36.1) and translation parity while preserving V40.45 picker behavior and existing auth/session guardrails.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
+
+🌍 18. V40.46 — TOP-20 LANGUAGE EXPANSION + TRANSLATION FEEDBACK INTAKE
+
+    - Language surface expansion:
+      - Expanded both Home globe menu and Settings selector to Top-20 locale coverage.
+      - Added native labels for each supported locale in the base string bundle for consistent picker rendering.
+    - Translation quality intake:
+      - Added `REPORT TRANSLATION ISSUE` in Settings.
+      - Users can submit screen/current/suggested text via keyboard-safe dialog and prefilled email handoff.
+      - Chosen approach intentionally avoids backend complexity while enabling real-user correction loops.
+    - Legal/clarity guardrail:
+      - Added Terms disclaimer establishing English as master/authoritative text with AI-translated locale caveat.
+    - Validation:
+      - Debug Kotlin compile passed after rollout.
+
+🚀 NEXT AGENT COMMAND
+"The narrative is now V40.46: Top-20 Language Expansion + Translation Feedback Intake.
+
+Current Objective: Continue localization rollout by adding resource bundles for prioritized Top-20 locales and applying translation parity checks while preserving V40.46 picker/feedback and existing auth/session guardrails.
+
+Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
