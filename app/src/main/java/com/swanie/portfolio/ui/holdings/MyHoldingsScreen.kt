@@ -334,17 +334,29 @@ fun MyHoldingsScreen(
                                             val showEdit = editingAssetId == asset.coinId
 
                                             if (isCompactViewEnabled) {
-                                                CompactAssetCard(
-                                                    asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
-                                                    onExpandToggle = {
-                                                        if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
-                                                        else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
-                                                        else { expandedAssetId = null; editingAssetId = null }
-                                                    },
-                                                    onEditRequest = { assetBeingEdited = asset },
-                                                    modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
-                                                    isHighVisibilityMode = isHighVisibilityMode
-                                                )
+                                                if (isHighVisibilityMode) {
+                                                    HighDensityAssetCard(
+                                                        asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
+                                                        onExpandToggle = {
+                                                            if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
+                                                            else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
+                                                            else { expandedAssetId = null; editingAssetId = null }
+                                                        },
+                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                    )
+                                                } else {
+                                                    PolishedAssetCard(
+                                                        asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
+                                                        onExpandToggle = {
+                                                            if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
+                                                            else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
+                                                            else { expandedAssetId = null; editingAssetId = null }
+                                                        },
+                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                    )
+                                                }
                                             } else {
                                                 FullAssetCard(
                                                     asset = asset, isExpanded = true, isEditing = false, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
