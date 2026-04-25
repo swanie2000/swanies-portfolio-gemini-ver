@@ -8,11 +8,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -34,15 +37,26 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 
 @Composable
-fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
+fun NavGraph(
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    startDestination: String = Routes.HOME
+) {
     val assetViewModel: AssetViewModel = hiltViewModel()
     val amountEntryViewModel: AmountEntryViewModel = hiltViewModel()
     val scope = rememberCoroutineScope()
+    val isVaultUnlocked = mainViewModel.isVaultUnlocked.collectAsStateWithLifecycle().value
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val shouldForceUnlock = !isVaultUnlocked &&
+        currentRoute != Routes.UNLOCK_VAULT &&
+        currentRoute != Routes.CREATE_ACCOUNT
 
     Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
         NavHost(
             navController = navController,
-            startDestination = Routes.HOME,
+            startDestination = startDestination,
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) },
             popEnterTransition = { fadeIn(animationSpec = tween(400)) },
@@ -53,7 +67,10 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.CREATE_ACCOUNT) {
-                CreateAccountScreen(navController = navController)
+                CreateAccountScreen(
+                    navController = navController,
+                    mainViewModel = mainViewModel
+                )
             }
 
             composable(Routes.UNLOCK_VAULT) {
@@ -88,10 +105,44 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
             }
 
             composable(Routes.HOLDINGS) {
-                MyHoldingsScreen(
-                    mainViewModel = mainViewModel,
-                    navController = navController
+                if (shouldForceUnlock) {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Routes.UNLOCK_VAULT) {
+                            popUpTo(Routes.HOLDINGS) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                } else {
+                    MyHoldingsScreen(
+                        mainViewModel = mainViewModel,
+                        navController = navController
+                    )
+                }
+            }
+            composable(
+                route = Routes.HOLDINGS_WITH_VAULT,
+                arguments = listOf(
+                    navArgument("vaultId") {
+                        type = NavType.IntType
+                        defaultValue = Routes.PRIMARY_VAULT_ID
+                    }
                 )
+            ) { backStackEntry ->
+                val targetVaultId = backStackEntry.arguments?.getInt("vaultId") ?: Routes.PRIMARY_VAULT_ID
+                if (shouldForceUnlock) {
+                    LaunchedEffect(Unit) {
+                        navController.navigate(Routes.UNLOCK_VAULT) {
+                            popUpTo(Routes.HOLDINGS_WITH_VAULT) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                } else {
+                    MyHoldingsScreen(
+                        mainViewModel = mainViewModel,
+                        navController = navController,
+                        requestedVaultId = targetVaultId
+                    )
+                }
             }
 
             composable(Routes.ANALYTICS) {
@@ -102,7 +153,16 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 MetalsAuditScreen(navController = navController)
             }
 
-            composable(Routes.ASSET_PICKER) {
+            composable(
+                route = Routes.ASSET_PICKER,
+                arguments = listOf(
+                    navArgument("vaultId") {
+                        type = NavType.IntType
+                        defaultValue = Routes.PRIMARY_VAULT_ID
+                    }
+                )
+            ) { backStackEntry ->
+                val vaultId = backStackEntry.arguments?.getInt("vaultId") ?: Routes.PRIMARY_VAULT_ID
                 AssetPickerScreen(
                     navController = navController,
                     onAssetSelected = { asset ->
@@ -110,14 +170,14 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                             val healedAsset = assetViewModel.healMetadata(asset)
                             val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "NONE", "UTF-8")
                             val encodedSource = URLEncoder.encode(healedAsset.priceSource, "UTF-8")
-                            navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource")
+                            navController.navigate("amount_entry/${healedAsset.coinId}/${healedAsset.symbol}/${healedAsset.apiId}/$encodedThumb/${healedAsset.category.name}/${healedAsset.officialSpotPrice}/$encodedSource/$vaultId")
                         }
                     }
                 )
             }
 
             composable(
-                route = "amount_entry/{coinId}/{symbol}/{apiId}/{iconUrl}/{category}/{price}/{priceSource}",
+                route = Routes.AMOUNT_ENTRY,
                 arguments = listOf(
                     navArgument("coinId") { type = NavType.StringType },
                     navArgument("symbol") { type = NavType.StringType },
@@ -125,7 +185,11 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     navArgument("iconUrl") { type = NavType.StringType },
                     navArgument("category") { type = NavType.StringType },
                     navArgument("price") { type = NavType.StringType },
-                    navArgument("priceSource") { type = NavType.StringType }
+                    navArgument("priceSource") { type = NavType.StringType },
+                    navArgument("vaultId") {
+                        type = NavType.IntType
+                        defaultValue = Routes.PRIMARY_VAULT_ID
+                    }
                 )
             ) { backStackEntry ->
                 val coinId = backStackEntry.arguments?.getString("coinId") ?: ""
@@ -138,6 +202,7 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 val categoryString = backStackEntry.arguments?.getString("category") ?: "CRYPTO"
                 val category = AssetCategory.valueOf(categoryString)
                 val price = backStackEntry.arguments?.getString("price")?.toDoubleOrNull() ?: 0.0
+                val vaultId = backStackEntry.arguments?.getInt("vaultId") ?: Routes.PRIMARY_VAULT_ID
 
                 AmountEntryScreen(
                     coinId = coinId,
@@ -148,15 +213,15 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     category = category,
                     officialSpotPrice = price,
                     priceSource = priceSource,
-                    onSave = {
-                        navController.navigate(Routes.HOLDINGS) {
-                            popUpTo(Routes.HOLDINGS) { inclusive = true }
+                    onSave = { targetVaultId ->
+                        navController.navigate(Routes.holdingsRoute(targetVaultId)) {
+                            popUpTo(Routes.HOLDINGS) { inclusive = false }
                         }
                     },
                     onCancel = { navController.popBackStack() },
                     onNavigateToArchitect = { sym: String, p: Double, src: String ->
                         val encodedSrc = URLEncoder.encode(src, "UTF-8")
-                        navController.navigate("asset_architect/$sym/$p/$encodedSrc")
+                        navController.navigate("asset_architect/$sym/$p/$encodedSrc/$vaultId")
                     }
                 )
             }
@@ -166,12 +231,17 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                 arguments = listOf(
                     navArgument("symbol") { type = NavType.StringType },
                     navArgument("price") { type = NavType.FloatType },
-                    navArgument("source") { type = NavType.StringType }
+                    navArgument("source") { type = NavType.StringType },
+                    navArgument("vaultId") {
+                        type = NavType.IntType
+                        defaultValue = Routes.PRIMARY_VAULT_ID
+                    }
                 )
             ) { backStackEntry ->
                 val symbol = backStackEntry.arguments?.getString("symbol") ?: "GOLD"
                 val price = backStackEntry.arguments?.getFloat("price")?.toDouble() ?: 0.0
                 val source = URLDecoder.decode(backStackEntry.arguments?.getString("source") ?: "Manual", "UTF-8")
+                val vaultId = backStackEntry.arguments?.getInt("vaultId") ?: Routes.PRIMARY_VAULT_ID
 
                 AssetArchitectScreen(
                     initialSymbol = symbol,
@@ -179,8 +249,8 @@ fun NavGraph(navController: NavHostController, mainViewModel: MainViewModel) {
                     initialSource = source,
                     onSave = { entity: AssetEntity ->
                         amountEntryViewModel.performSurgicalAdd(entity) {
-                            navController.navigate(Routes.HOLDINGS) {
-                                popUpTo(Routes.HOLDINGS) { inclusive = true }
+                            navController.navigate(Routes.holdingsRoute(vaultId)) {
+                                popUpTo(Routes.HOLDINGS) { inclusive = false }
                             }
                         }
                     },

@@ -245,6 +245,29 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    suspend fun factoryResetAllData() {
+        withContext(Dispatchers.IO) {
+            // Room wipe for all entities.
+            database.clearAllTables()
+
+            // Clear DataStore settings/toggles/starred portfolio preference.
+            themePreferences.clearAllPreferences()
+
+            // Optional nuclear fallback: remove DB files entirely.
+            context.deleteDatabase(AppDatabase.DB_NAME)
+            context.deleteDatabase("portfolio_database")
+        }
+
+        // Best-effort widget cleanup refresh after wipe.
+        withContext(NonCancellable) {
+            try {
+                PortfolioWidget().updateAll(context)
+            } catch (e: Exception) {
+                Log.e("FACTORY_RESET", "Widget refresh after wipe failed", e)
+            }
+        }
+    }
+
     fun clearWidgetSelection(vaultId: Int) {
         if (_isUpdating.value) return
         viewModelScope.launch(Dispatchers.IO) {
@@ -376,6 +399,7 @@ class SettingsViewModel @Inject constructor(
                             if (serializedAssets.isNotBlank()) {
                                 this.remove(PortfolioWidget.ASSETS_DATA_KEY)
                                 this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
+                                this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = serializedAssets
                             }
                             this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
                             val total = allAssetsForVault.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }

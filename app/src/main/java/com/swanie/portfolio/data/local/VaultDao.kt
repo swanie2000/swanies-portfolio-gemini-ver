@@ -14,6 +14,12 @@ interface VaultDao {
     @Query("SELECT * FROM vaults WHERE id = :id")
     suspend fun getVaultById(id: Int): VaultEntity?
 
+    @Query("SELECT id FROM vaults WHERE isStarred = 1 LIMIT 1")
+    fun getStarredVaultIdFlow(): Flow<Int?>
+
+    @Query("SELECT id FROM vaults WHERE isStarred = 1 LIMIT 1")
+    suspend fun getStarredVaultId(): Int?
+
     @Upsert
     suspend fun upsertVault(vault: VaultEntity)
 
@@ -40,6 +46,18 @@ interface VaultDao {
 
     @Query("SELECT * FROM vaults WHERE appWidgetId = :appWidgetId LIMIT 1")
     suspend fun getVaultByAppWidgetId(appWidgetId: Int): VaultEntity?
+
+    @Query("UPDATE vaults SET isStarred = 0")
+    suspend fun clearStarredVaultFlag()
+
+    @Query("UPDATE vaults SET isStarred = 1 WHERE id = :vaultId")
+    suspend fun setStarredVaultFlag(vaultId: Int)
+
+    @Transaction
+    suspend fun setStarredVault(vaultId: Int) {
+        clearStarredVaultFlag()
+        setStarredVaultFlag(vaultId)
+    }
 
     @Delete
     suspend fun deleteVault(vault: VaultEntity)

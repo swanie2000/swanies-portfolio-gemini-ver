@@ -32,6 +32,8 @@ class AmountEntryViewModel @Inject constructor(
     private val _isValid = MutableStateFlow(true)
     val isValid: StateFlow<Boolean> = _isValid.asStateFlow()
 
+    suspend fun currentVaultId(): Int = themePreferences.currentVaultId.first()
+
     fun updateAmount(input: String) {
         val parsed = input.toFloatOrNull()
         if (parsed != null) {

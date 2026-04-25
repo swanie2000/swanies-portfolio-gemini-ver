@@ -220,6 +220,9 @@ class AssetRepository @Inject constructor(
 
                     // 🚀 ANTI-GHOSTING: Always update the state, even if empty, to ensure deleted assets are cleared from view
                     this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
+                    if (serializedAssets.isNotBlank()) {
+                        this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = serializedAssets
+                    }
                     
                     this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
                     val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }

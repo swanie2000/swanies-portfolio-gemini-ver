@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class VaultEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
+    val isStarred: Boolean = false,
     val baseCurrency: String = "USD",
     val vaultColor: String = "#000416",
     val selectedWidgetAssets: String = "",

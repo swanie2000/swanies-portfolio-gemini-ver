@@ -60,6 +60,7 @@ import kotlin.math.absoluteValue
 fun MyHoldingsScreen(
     mainViewModel: MainViewModel,
     navController: NavController,
+    requestedVaultId: Int? = null,
     modifier: Modifier = Modifier
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
@@ -101,6 +102,19 @@ fun MyHoldingsScreen(
     val pagerState = rememberPagerState(
         initialPage = resolvedVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
     ) { resolvedVaults.size.coerceAtLeast(1) }
+
+    LaunchedEffect(requestedVaultId, resolvedVaults) {
+        val targetVaultId = requestedVaultId ?: return@LaunchedEffect
+        val targetIndex = resolvedVaults.indexOfFirst { it.id == targetVaultId }
+        if (targetIndex >= 0) {
+            if (resolvedVaults[targetIndex].id != activeVault.id) {
+                mainViewModel.selectVault(targetVaultId)
+            }
+            if (targetIndex != pagerState.currentPage) {
+                pagerState.animateScrollToPage(targetIndex)
+            }
+        }
+    }
 
     LaunchedEffect(activeVault.id) {
         val targetIndex = resolvedVaults.indexOfFirst { it.id == activeVault.id }
@@ -156,7 +170,14 @@ fun MyHoldingsScreen(
                         ) { Icon(Icons.Default.Refresh, "Refresh", tint = textColor) }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
-                        IconButton(onClick = { isExiting = true; navController.navigate(Routes.ASSET_PICKER) }, modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)) { Icon(Icons.Default.Add, null, tint = Color.Black) }
+                        IconButton(
+                            onClick = {
+                                val activeVaultIdFromPager = resolvedVaults.getOrNull(pagerState.currentPage)?.id ?: activeVault.id
+                                isExiting = true
+                                navController.navigate(Routes.addAssetRoute(activeVaultIdFromPager))
+                            },
+                            modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)
+                        ) { Icon(Icons.Default.Add, null, tint = Color.Black) }
                     }
                 }
 
@@ -300,14 +321,32 @@ fun MyHoldingsScreen(
                                     )
                                 }
 
-                                LazyColumn(
-                                    state = pageLazyListState,
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentPadding = PaddingValues(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    items(items = filteredHoldingsForPage, key = { it.coinId }) { asset ->
-                                        ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
+                                if (filteredHoldingsForPage.isEmpty()) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 20.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "Your vault is empty. \n\n Tap the yellow '+' button in the top right to add your first Gold, Silver, or Crypto asset.",
+                                            color = textColor.copy(alpha = 0.68f),
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                    }
+                                } else {
+                                    LazyColumn(
+                                        state = pageLazyListState,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentPadding = PaddingValues(16.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        items(items = filteredHoldingsForPage, key = { it.coinId }) { asset ->
+                                            ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                             val hndl = Modifier.longPressDraggableHandle(
                                                 onDragStarted = {
                                                     draggingVaultId = vaultForPage.id
@@ -330,12 +369,12 @@ fun MyHoldingsScreen(
                                             val cardBgCol = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
                                             val cardTextCol = Color(cardTextColor.ifBlank { "#FFFFFF" }.toColorInt())
 
-                                            val isExpanded = expandedAssetId == asset.coinId
-                                            val showEdit = editingAssetId == asset.coinId
+                                                val isExpanded = expandedAssetId == asset.coinId
+                                                val showEdit = editingAssetId == asset.coinId
 
-                                            if (isCompactViewEnabled) {
-                                                if (isHighVisibilityMode) {
-                                                    HighDensityAssetCard(
+                                                if (isCompactViewEnabled) {
+                                                    if (isHighVisibilityMode) {
+                                                        HighDensityAssetCard(
                                                         asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
                                                         onExpandToggle = {
                                                             if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
@@ -344,21 +383,21 @@ fun MyHoldingsScreen(
                                                         },
                                                         onEditRequest = { assetBeingEdited = asset },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
-                                                    )
+                                                        )
+                                                    } else {
+                                                        PolishedAssetCard(
+                                                        asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
+                                                        onExpandToggle = {
+                                                            if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
+                                                            else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
+                                                            else { expandedAssetId = null; editingAssetId = null }
+                                                        },
+                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                        )
+                                                    }
                                                 } else {
-                                                    PolishedAssetCard(
-                                                        asset = asset, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
-                                                        onExpandToggle = {
-                                                            if (expandedAssetId != asset.coinId) { expandedAssetId = asset.coinId; editingAssetId = null }
-                                                            else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
-                                                            else { expandedAssetId = null; editingAssetId = null }
-                                                        },
-                                                        onEditRequest = { assetBeingEdited = asset },
-                                                        modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
-                                                    )
-                                                }
-                                            } else {
-                                                FullAssetCard(
+                                                    FullAssetCard(
                                                     asset = asset, isExpanded = true, isEditing = false, isDragging = isDragging, cardBg = cardBgCol, cardText = cardTextCol, baseCurrency = vaultForPage.baseCurrency,
                                                     onExpandToggle = {
                                                         if (editingAssetId != asset.coinId) editingAssetId = asset.coinId else editingAssetId = null
@@ -370,7 +409,8 @@ fun MyHoldingsScreen(
                                                     showEditButton = showEdit,
                                                     isHighVisibilityMode = isHighVisibilityMode,
                                                     modifier = hndl
-                                                )
+                                                    )
+                                                }
                                             }
                                         }
                                     }

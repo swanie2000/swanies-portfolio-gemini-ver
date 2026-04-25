@@ -71,8 +71,13 @@ fun SettingsScreen(
                 TextButton(
                     onClick = {
                         scope.launch {
-                            settingsViewModel.clearAllAssets(currentVaultId)
+                            settingsViewModel.factoryResetAllData()
                             showFactoryResetDialog = false
+                            isExiting = true
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
                     }
                 ) {

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -24,9 +25,11 @@ import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
+import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : FragmentActivity() {
@@ -94,7 +97,8 @@ class MainActivity : FragmentActivity() {
                     Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
                         NavGraph(
                             navController = navController,
-                            mainViewModel = viewModel
+                            mainViewModel = viewModel,
+                            startDestination = Routes.HOME
                         )
                     }
                 }
@@ -104,6 +108,13 @@ class MainActivity : FragmentActivity() {
 
     override fun onStop() {
         viewModel.cancelEmergencyDataReadyFallback()
+        lifecycleScope.launch {
+            try {
+                PortfolioWidget().updateAll(applicationContext)
+            } catch (_: Exception) {
+                // Best-effort heartbeat when app is backgrounded.
+            }
+        }
         super.onStop()
     }
 

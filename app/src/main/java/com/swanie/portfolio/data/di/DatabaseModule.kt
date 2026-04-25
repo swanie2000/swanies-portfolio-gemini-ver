@@ -54,6 +54,24 @@ object DatabaseModule {
 
     @Provides
     @Singleton
+    fun providePortfolioDao(database: AppDatabase): PortfolioDao {
+        return database.portfolioDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDao(database: AppDatabase): UserDao {
+        return database.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideWidgetSnapshotDao(database: AppDatabase): WidgetSnapshotDao {
+        return database.widgetSnapshotDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideAssetRepository(
         @ApplicationContext context: Context,
         assetDao: AssetDao,

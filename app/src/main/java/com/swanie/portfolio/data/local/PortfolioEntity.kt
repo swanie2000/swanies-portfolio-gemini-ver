@@ -9,5 +9,6 @@ data class PortfolioEntity(
     val name: String,
     val colorHex: String,
     val isDefault: Boolean,
+    val isStarred: Boolean = false,
     val vaultId: Int = 1
 )

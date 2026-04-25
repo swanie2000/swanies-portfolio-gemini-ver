@@ -59,7 +59,7 @@ fun PortfolioManagerScreen(
     val authViewModel: AuthViewModel = hiltViewModel()
     val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
-    val defaultVaultId by mainViewModel.defaultVaultId.collectAsStateWithLifecycle()
+    val starredVaultId by mainViewModel.starredVaultId.collectAsStateWithLifecycle()
 
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
     val safeThemeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
@@ -192,7 +192,7 @@ fun PortfolioManagerScreen(
                 itemsIndexed(localVaults, key = { _, vault -> vault.id }) { index, vault ->
                     ReorderableItem(reorderableState, key = vault.id) { isDragging ->
                         val isSelected = vault.id == activeVault.id
-                        val isDefault = vault.id == defaultVaultId
+                        val isDefault = vault.id == starredVaultId
 
                         Column(
                             modifier = Modifier

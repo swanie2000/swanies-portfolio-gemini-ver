@@ -47,6 +47,7 @@ fun BottomNavigationBar(
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val isHoldingsRoute = currentRoute == Routes.HOLDINGS || currentRoute == Routes.HOLDINGS_WITH_VAULT
                 val baseTextColor = Color(textColorInt)
 
                 IconButton(onClick = { 
@@ -58,12 +59,12 @@ fun BottomNavigationBar(
                     Icon(Icons.Default.Home, null, tint = if(currentRoute == Routes.HOME) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
                 IconButton(onClick = { 
-                    if (currentRoute != Routes.HOLDINGS) {
+                    if (!isHoldingsRoute) {
                         onNavigate()
                         navController.navigate(Routes.HOLDINGS) 
                     }
                 }) {
-                    Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(currentRoute == Routes.HOLDINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
+                    Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(isHoldingsRoute) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
                 IconButton(onClick = { 
                     if (currentRoute != Routes.ANALYTICS) {

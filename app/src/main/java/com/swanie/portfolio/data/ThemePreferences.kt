@@ -96,4 +96,8 @@ class ThemePreferences @Inject constructor(
     suspend fun saveWidgetBgTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] = color } }
     suspend fun saveWidgetCardColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_COLOR] = color } }
     suspend fun saveWidgetCardTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_TEXT_COLOR] = color } }
+
+    suspend fun clearAllPreferences() {
+        appContext.dataStore.edit { it.clear() }
+    }
 }

@@ -62,6 +62,7 @@ class PortfolioWidget : GlanceAppWidget() {
         val STATIC_TOTAL_BALANCE_KEY = stringPreferencesKey("static_total_balance")
         val SHOW_TOTAL_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("show_total")
         val ASSETS_DATA_KEY = stringPreferencesKey("pushed_assets_key")
+        val LAST_GOOD_ASSETS_DATA_KEY = stringPreferencesKey("last_good_assets_key")
 
         val WIDGET_ID_KEY = ActionParameters.Key<Int>("widgetId")
     }
@@ -79,7 +80,9 @@ class PortfolioWidget : GlanceAppWidget() {
 
             val boundId = prefs[VAULT_ID_KEY] ?: 0
             val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
+            val lastGoodAssetsData = prefs[LAST_GOOD_ASSETS_DATA_KEY] ?: ""
             Log.d("SWANIE_PIPE", "Widget Received Suitcase for Vault $boundId: $assetsData")
+            Log.d("SWANIE_WIDGET", "provideGlance id=$appWidgetId vault=$boundId payload=${assetsData.length} lastGood=${lastGoodAssetsData.length}")
 
             if (boundId == 0) {
                 UnlinkedContent(appWidgetId)
@@ -99,11 +102,24 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
 
                 // Order must match the packed "||" sequence from the repo (UI top → bottom). Do not re-sort.
-                val assets = parseAssetsData(assetsData)
+                val latestAssets = parseAssetsData(assetsData)
+                val fallbackAssets = parseAssetsData(lastGoodAssetsData)
+                val assets = if (latestAssets.isNotEmpty()) latestAssets else fallbackAssets
 
                 if (assets.isEmpty()) {
                     if (assetsData.isEmpty()) {
-                        EmptyWidgetContent(bgColor, bgTextColor, appWidgetId)
+                        if (totalValue.isNotBlank()) {
+                            ZombieFallbackContent(
+                                appWidgetId = appWidgetId,
+                                vaultName = vaultName,
+                                totalValue = totalValue,
+                                lastUpdated = prefs[LAST_UPDATED_KEY] ?: "--:--",
+                                bgColor = bgColor,
+                                textColor = bgTextColor
+                            )
+                        } else {
+                            EmptyWidgetContent(bgColor, bgTextColor, appWidgetId)
+                        }
                     } else {
                         SyncingContent(bgColor, bgTextColor)
                     }
@@ -172,6 +188,45 @@ class PortfolioWidget : GlanceAppWidget() {
                 Triple(asset, parts[4], parts[8])
             } else null
         }
+    }
+}
+
+@Composable
+fun ZombieFallbackContent(
+    appWidgetId: Int,
+    vaultName: String,
+    totalValue: String,
+    lastUpdated: String,
+    bgColor: Color,
+    textColor: Color
+) {
+    Column(
+        modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(12.dp).clickable(
+            actionRunCallback<WidgetClickCallback>(
+                actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId)
+            )
+        ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = vaultName.uppercase(),
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.8f)), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        )
+        Spacer(modifier = GlanceModifier.height(4.dp))
+        Text(
+            text = totalValue,
+            style = TextStyle(color = ColorProvider(textColor), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        )
+        Spacer(modifier = GlanceModifier.height(6.dp))
+        Text(
+            text = "Restoring cards...",
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.7f)), fontSize = 10.sp)
+        )
+        Text(
+            text = "Updated: $lastUpdated",
+            style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 9.sp)
+        )
     }
 }
 
