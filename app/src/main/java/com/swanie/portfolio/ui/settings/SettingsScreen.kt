@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
@@ -53,14 +59,32 @@ fun SettingsScreen(
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
 
-    val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
+    val cardBgColor by themeViewModel.cardBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
+    val safeBg = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
     val safeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
     var isExiting by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var confirmNewPassword by remember { mutableStateOf("") }
+    var currentPasswordVisible by remember { mutableStateOf(false) }
+    var newPasswordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var passwordChangeBusy by remember { mutableStateOf(false) }
+    var passwordChangeMessage by remember { mutableStateOf<String?>(null) }
+    var showPasswordResetDialog by remember { mutableStateOf(false) }
 
     var showFactoryResetDialog by remember { mutableStateOf(false) }
+
+    val cleanNewPassword = newPassword.trim().replace("\\s".toRegex(), "")
+    val hasMinLength = cleanNewPassword.length >= 8
+    val hasCapital = cleanNewPassword.any { it.isUpperCase() }
+    val hasNumber = cleanNewPassword.any { it.isDigit() }
+    val hasSymbol = cleanNewPassword.any { !it.isLetterOrDigit() }
+    val cleanConfirmNewPassword = confirmNewPassword.trim().replace("\\s".toRegex(), "")
+    val passwordsMatch = cleanNewPassword == cleanConfirmNewPassword && cleanNewPassword.isNotEmpty()
 
     if (showFactoryResetDialog) {
         AlertDialog(
@@ -76,7 +100,7 @@ fun SettingsScreen(
             text = {
                 Text(
                     text = "This will completely wipe the current vault, including all assets and history. This action is sovereign and permanent.",
-                    color = Color.White
+                    color = safeText
                 )
             },
             confirmButton = {
@@ -101,7 +125,203 @@ fun SettingsScreen(
                     Text("CANCEL", color = safeText.copy(alpha = 0.6f))
                 }
             },
-            containerColor = Color(0xFF1C1C1E)
+            containerColor = safeBg
+        )
+    }
+
+    if (showPasswordResetDialog) {
+        AlertDialog(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding(),
+            onDismissRequest = {
+                if (!passwordChangeBusy) {
+                    showPasswordResetDialog = false
+                    currentPassword = ""
+                    newPassword = ""
+                    confirmNewPassword = ""
+                    currentPasswordVisible = false
+                    newPasswordVisible = false
+                    confirmPasswordVisible = false
+                    passwordChangeMessage = null
+                }
+            },
+            title = { Text("Change Password") },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 340.dp)
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Requires current password and biometric confirmation.",
+                        fontSize = 13.sp
+                    )
+                    OutlinedTextField(
+                        value = currentPassword,
+                        onValueChange = {
+                            currentPassword = it
+                            passwordChangeMessage = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Current Password") },
+                        singleLine = true,
+                        visualTransformation = if (currentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { currentPasswordVisible = !currentPasswordVisible }) {
+                                Icon(
+                                    imageVector = if (currentPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                    OutlinedTextField(
+                        value = newPassword,
+                        onValueChange = {
+                            newPassword = it.replace("\\s".toRegex(), "")
+                            passwordChangeMessage = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("New Password") },
+                        singleLine = true,
+                        visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                                Icon(
+                                    imageVector = if (newPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val dim = safeText.copy(alpha = 0.3f)
+                        Text(text = "• 8+ Chars", color = if (hasMinLength) safeText else dim, fontSize = 9.sp)
+                        Text(text = "• Upper", color = if (hasCapital) safeText else dim, fontSize = 9.sp)
+                        Text(text = "• Number", color = if (hasNumber) safeText else dim, fontSize = 9.sp)
+                        Text(text = "• Special", color = if (hasSymbol) safeText else dim, fontSize = 9.sp)
+                    }
+                    OutlinedTextField(
+                        value = confirmNewPassword,
+                        onValueChange = {
+                            confirmNewPassword = it.replace("\\s".toRegex(), "")
+                            passwordChangeMessage = null
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Confirm New Password") },
+                        singleLine = true,
+                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                                Icon(
+                                    imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                    passwordChangeMessage?.let { message ->
+                        Text(
+                            text = message,
+                            color = safeText.copy(alpha = 0.85f),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = !passwordChangeBusy,
+                    onClick = {
+                        val activity = context as? FragmentActivity
+                        if (activity == null) {
+                            passwordChangeMessage = "Unable to open biometric prompt."
+                            return@TextButton
+                        }
+                        val normalizedCurrent = currentPassword.trim().replace("\\s".toRegex(), "")
+                        val normalizedNew = newPassword.trim().replace("\\s".toRegex(), "")
+                        val normalizedConfirm = confirmNewPassword.trim().replace("\\s".toRegex(), "")
+
+                        when {
+                            normalizedCurrent.isBlank() || normalizedNew.isBlank() || normalizedConfirm.isBlank() -> {
+                                passwordChangeMessage = "Please complete all password fields."
+                                return@TextButton
+                            }
+                            !hasMinLength || !hasCapital || !hasNumber || !hasSymbol -> {
+                                passwordChangeMessage = "New password must be 8+ chars with uppercase, number, and symbol."
+                                return@TextButton
+                            }
+                            normalizedNew != normalizedConfirm -> {
+                                passwordChangeMessage = "New password and confirmation do not match."
+                                return@TextButton
+                            }
+                        }
+
+                        passwordChangeBusy = true
+                        settingsViewModel.authenticateForSensitiveAction(
+                            activity = activity,
+                            onSuccess = {
+                                scope.launch {
+                                    try {
+                                        val changed = mainViewModel.changePassword(
+                                            currentPassword = normalizedCurrent,
+                                            newPassword = normalizedNew
+                                        )
+                                        if (changed) {
+                                            showPasswordResetDialog = false
+                                            currentPassword = ""
+                                            newPassword = ""
+                                            confirmNewPassword = ""
+                                            currentPasswordVisible = false
+                                            newPasswordVisible = false
+                                            confirmPasswordVisible = false
+                                            passwordChangeMessage = null
+                                            Toast.makeText(context, "Password updated successfully.", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            passwordChangeMessage = "Unable to update password. Check your current password."
+                                        }
+                                    } finally {
+                                        passwordChangeBusy = false
+                                    }
+                                }
+                            },
+                            onError = { message ->
+                                passwordChangeMessage = message
+                                passwordChangeBusy = false
+                            }
+                        )
+                    }
+                ) {
+                    Text(if (passwordChangeBusy) "UPDATING..." else "UPDATE")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !passwordChangeBusy,
+                    onClick = {
+                        showPasswordResetDialog = false
+                        currentPassword = ""
+                        newPassword = ""
+                        confirmNewPassword = ""
+                        currentPasswordVisible = false
+                        newPasswordVisible = false
+                        confirmPasswordVisible = false
+                        passwordChangeMessage = null
+                    }
+                ) {
+                    Text("CANCEL")
+                }
+            },
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
         )
     }
 
@@ -124,6 +344,20 @@ fun SettingsScreen(
 
                     // --- SECURITY ---
                     Text("SECURITY", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    TextButton(
+                        onClick = { showPasswordResetDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = "RESET PASSWORD",
+                            color = safeText,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                    }
 
                     SettingsCheckboxItem(
                         title = "LOGIN OPTION",
@@ -340,7 +574,7 @@ fun SettingsToggleItem(title: String, subtitle: String, checked: Boolean, onChec
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
                 checkedColor = Color.Yellow,
-                checkmarkColor = Color.Black
+                checkmarkColor = themeColor
             )
         )
     }
@@ -370,7 +604,7 @@ fun SettingsCheckboxItem(
             onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(
                 checkedColor = Color.Yellow,
-                checkmarkColor = Color.Black
+                checkmarkColor = themeColor
             )
         )
     }

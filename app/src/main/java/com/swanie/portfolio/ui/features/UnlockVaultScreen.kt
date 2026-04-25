@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
-import com.swanie.portfolio.security.SecurityManager
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
@@ -41,6 +40,7 @@ import androidx.navigation.NavController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,18 +52,29 @@ fun UnlockVaultScreen(
     val activity = LocalContext.current as FragmentActivity
     val mainViewModel: MainViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val themeViewModel: ThemeViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel(activity)
     val context = activity
     val scope = rememberCoroutineScope()
-    val siteBg = Color(0xFF000416)
-    val siteText = Color.White
-    val accentSilver = Color(0xFFC0C0C0)
+    val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+    val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
+    val siteBg = Color(siteBgHex.ifBlank { "#000416" }.toColorInt())
+    val siteText = Color(siteTextHex.ifBlank { "#FFFFFF" }.toColorInt())
+    val dialogBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
+    val accentSilver = siteText.copy(alpha = 0.82f)
     var nameInput by remember { mutableStateOf("") }
     var passwordInput by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var loginError by remember { mutableStateOf<String?>(null) }
     var isLoggingIn by remember { mutableStateOf(false) }
     var biometricLockedUntilPassword by remember { mutableStateOf(false) }
+    var showRecoveryDialog by remember { mutableStateOf(false) }
+    var recoveryUserName by remember { mutableStateOf("") }
+    var recoveryEmail by remember { mutableStateOf("") }
+    var recoveredHint by remember { mutableStateOf<String?>(null) }
+    var isRecovering by remember { mutableStateOf(false) }
+    var recoveryMessage by remember { mutableStateOf<String?>(null) }
 
     val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
     val requirePasswordAfterBiometricFailure by settingsViewModel
@@ -115,6 +126,7 @@ fun UnlockVaultScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -140,28 +152,22 @@ fun UnlockVaultScreen(
                 fontWeight = FontWeight.Black,
                 letterSpacing = 1.5.sp
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "IDENTITY VERIFICATION",
+                color = siteText.copy(alpha = 0.5f),
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp
+            )
+            Spacer(modifier = Modifier.height(14.dp))
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
                     .graphicsLayer { alpha = contentAlpha.value },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(40.dp))
-
-                Text(
-                    text = "IDENTITY VERIFICATION",
-                    color = siteText.copy(alpha = 0.5f),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-
-                Spacer(Modifier.height(40.dp))
                 OutlinedTextField(
                     value = nameInput,
                     onValueChange = {
@@ -209,6 +215,23 @@ fun UnlockVaultScreen(
                             )
                         }
                     },
+                    supportingText = {
+                        if (passwordInput.isBlank()) {
+                            TextButton(
+                                onClick = { showRecoveryDialog = true },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    "FORGOT PASSWORD?",
+                                    color = accentSilver,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                        }
+                    },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = accentSilver,
@@ -254,8 +277,6 @@ fun UnlockVaultScreen(
                                     }
                             } else {
                                 loginError = "Incorrect Name or Password"
-                                nameInput = ""
-                                passwordInput = ""
                             }
                          }
                     },
@@ -297,7 +318,6 @@ fun UnlockVaultScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
                     Text(
                         "CREATE ACCOUNT",
@@ -309,5 +329,100 @@ fun UnlockVaultScreen(
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
+    }
+
+    if (showRecoveryDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                if (!isRecovering) {
+                    showRecoveryDialog = false
+                    recoveryUserName = ""
+                    recoveryEmail = ""
+                    recoveredHint = null
+                    recoveryMessage = null
+                }
+            },
+            title = { Text("Recover Access") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Enter your username and email. Then verify biometrics to reveal your hint.",
+                        fontSize = 13.sp
+                    )
+                    OutlinedTextField(
+                        value = recoveryUserName,
+                        onValueChange = {
+                            recoveryUserName = it
+                            recoveryMessage = null
+                        },
+                        label = { Text("Username") },
+                        singleLine = true,
+                        enabled = !isRecovering && recoveredHint == null
+                    )
+                    OutlinedTextField(
+                        value = recoveryEmail,
+                        onValueChange = {
+                            recoveryEmail = it
+                            recoveryMessage = null
+                        },
+                        label = { Text("Email") },
+                        singleLine = true,
+                        enabled = !isRecovering && recoveredHint == null
+                    )
+                    recoveredHint?.let {
+                        Text("Hint: $it", fontWeight = FontWeight.SemiBold)
+                    }
+                    recoveryMessage?.let { Text(it, fontSize = 12.sp) }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = !isRecovering,
+                    onClick = {
+                        if (isRecovering) return@TextButton
+                        scope.launch {
+                            isRecovering = true
+                            try {
+                                if (recoveredHint == null) {
+                                    if (recoveryUserName.isBlank() || recoveryEmail.isBlank()) {
+                                        recoveryMessage = "Please enter both username and email."
+                                    } else {
+                                        authViewModel.authenticateForRecovery(
+                                            activity = activity,
+                                            onSuccess = {
+                                                scope.launch {
+                                                    val hint = mainViewModel.getPasswordHintForRecovery(
+                                                        userName = recoveryUserName,
+                                                        email = recoveryEmail
+                                                    )
+                                                    recoveryMessage = if (hint == null) {
+                                                        "Recovery verification failed."
+                                                    } else {
+                                                        recoveredHint = hint
+                                                        "Hint revealed."
+                                                    }
+                                                }
+                                            },
+                                            onError = { message ->
+                                                recoveryMessage = message
+                                            }
+                                        )
+                                    }
+                                } else {
+                                    showRecoveryDialog = false
+                                    recoveryMessage = null
+                                }
+                            } finally {
+                                isRecovering = false
+                            }
+                        }
+                    }
+                ) {
+                    Text(if (recoveredHint == null) "VERIFY & SHOW HINT" else "DONE")
+                }
+            },
+            containerColor = dialogBg,
+            dismissButton = null
+        )
     }
 }

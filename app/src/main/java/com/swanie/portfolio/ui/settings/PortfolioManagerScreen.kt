@@ -64,7 +64,9 @@ fun PortfolioManagerScreen(
     val starredVaultId by mainViewModel.starredVaultId.collectAsStateWithLifecycle()
 
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
+    val cardBgColor by themeViewModel.cardBackgroundColor.collectAsState()
     val safeThemeText = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
+    val dialogBg = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
     val goldPrimary = Color.Yellow
     val nightVaultColor = Color(0xFF121212)
 
@@ -295,9 +297,9 @@ fun PortfolioManagerScreen(
     vaultToDelete?.let { vault ->
         AlertDialog(
             onDismissRequest = { vaultToDelete = null },
-            containerColor = Color(0xFF1A1A1A),
+            containerColor = dialogBg,
             title = { Text("DELETE PORTFOLIO?", color = Color.Red, fontWeight = FontWeight.Black) },
-            text = { Text("Permanently wipe '${vault.name}'?", color = Color.White) },
+            text = { Text("Permanently wipe '${vault.name}'?", color = safeThemeText) },
             confirmButton = {
                 if (allVaults.size > 1) {
                     TextButton(onClick = { mainViewModel.deleteVault(vault); vaultToDelete = null }) {
@@ -307,7 +309,7 @@ fun PortfolioManagerScreen(
             },
             dismissButton = {
                 TextButton(onClick = { vaultToDelete = null }) {
-                    Text("CANCEL", color = Color.White)
+                    Text("CANCEL", color = safeThemeText)
                 }
             }
         )
@@ -324,7 +326,7 @@ fun PortfolioManagerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(nightVaultColor)
+                    .background(dialogBg)
                     .border(1.dp, safeThemeText.copy(alpha = 0.18f), RoundedCornerShape(16.dp))
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

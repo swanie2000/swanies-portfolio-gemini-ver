@@ -10,6 +10,7 @@ data class UserProfileEntity(
     val displayName: String = "",
     val email: String = "",
     val loginPassword: String = "",
+    val passwordHint: String = "",
     val hasAcceptedTOS: Boolean = false,
     val subscriptionTier: Int = 0,
     val languageCode: String = "en",

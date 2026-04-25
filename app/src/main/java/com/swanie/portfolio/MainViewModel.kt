@@ -172,7 +172,13 @@ class MainViewModel @Inject constructor(
         userDao.upsertUserProfile(next)
     }
 
-    fun updateUserProfileBasics(displayName: String, email: String, password: String, acceptedTOS: Boolean) = viewModelScope.launch {
+    fun updateUserProfileBasics(
+        displayName: String,
+        email: String,
+        password: String,
+        passwordHint: String = "",
+        acceptedTOS: Boolean
+    ) = viewModelScope.launch {
         val existing = userDao.getUserProfile()
         val normalizedUserName = displayName.trim().replace("\\s".toRegex(), "")
         val normalizedPassword = password.trim().replace("\\s".toRegex(), "")
@@ -181,6 +187,7 @@ class MainViewModel @Inject constructor(
             displayName = displayName.trim(),
             email = email.trim(),
             loginPassword = normalizedPassword,
+            passwordHint = passwordHint.trim(),
             hasAcceptedTOS = acceptedTOS
         )
         userDao.upsertUserProfile(next)
@@ -190,6 +197,7 @@ class MainViewModel @Inject constructor(
         displayName: String,
         email: String,
         password: String,
+        passwordHint: String,
         acceptedTOS: Boolean
     ): UserProfileEntity? {
         val existing = userDao.getFirstUser()
@@ -200,6 +208,7 @@ class MainViewModel @Inject constructor(
             displayName = displayName.trim(),
             email = email.trim(),
             loginPassword = normalizedPassword,
+            passwordHint = passwordHint.trim(),
             hasAcceptedTOS = acceptedTOS
         )
         userDao.upsertUserProfile(next)
@@ -227,6 +236,33 @@ class MainViewModel @Inject constructor(
         Log.d("VAULT_AUTH", "Comparison Result: $isMatch")
         _isVaultUnlocked.value = isMatch
         return isMatch
+    }
+
+    suspend fun getPasswordHintForRecovery(userName: String, email: String): String? {
+        val profile = userDao.getFirstUser() ?: return null
+        val normalizedUser = AuthPolicy.normalizeIdentity(userName)
+        val normalizedEmail = AuthPolicy.normalizeIdentity(email)
+        if (normalizedUser.isBlank() || normalizedEmail.isBlank()) return null
+
+        val storedUserName = AuthPolicy.normalizeIdentity(profile.userName)
+            .ifBlank { AuthPolicy.normalizeIdentity(profile.displayName) }
+        val storedEmail = AuthPolicy.normalizeIdentity(profile.email)
+        val isMatch = normalizedUser == storedUserName && normalizedEmail == storedEmail
+        if (!isMatch) return null
+
+        return profile.passwordHint.takeIf { it.isNotBlank() }
+    }
+
+    suspend fun changePassword(currentPassword: String, newPassword: String): Boolean {
+        val profile = userDao.getFirstUser() ?: return false
+        val normalizedCurrent = AuthPolicy.normalizePassword(currentPassword)
+        val normalizedNew = AuthPolicy.normalizePassword(newPassword)
+        if (normalizedCurrent.isBlank() || normalizedNew.isBlank()) return false
+        if (profile.loginPassword != normalizedCurrent) return false
+        if (profile.loginPassword == normalizedNew) return false
+
+        userDao.upsertUserProfile(profile.copy(loginPassword = normalizedNew))
+        return true
     }
 
     fun setResetToDefault(enabled: Boolean) = viewModelScope.launch {

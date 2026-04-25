@@ -77,6 +77,7 @@ fun MyHoldingsScreen(
 
     val textColor = Color(siteTextColor.ifBlank { "#FFFFFF" }.toColorInt())
     val siteBg = Color(siteBgColor.ifBlank { "#000416" }.toColorInt())
+    val dialogBg = Color(cardBgColor.ifBlank { "#121212" }.toColorInt())
     val nightVaultColor = lerp(siteBg, Color.Black, 0.25f)
 
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
@@ -461,9 +462,9 @@ fun MyHoldingsScreen(
         assetToDelete?.let { asset ->
             AlertDialog(
                 onDismissRequest = { viewModel.clearDeleteConfirmation() },
-                containerColor = Color(0xFF1A1A1A),
+                containerColor = dialogBg,
                 title = { Text("REMOVE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
-                text = { Text("Are you sure you want to remove ${asset.symbol} from your vault?", color = Color.White) },
+                text = { Text("Are you sure you want to remove ${asset.symbol} from your vault?", color = textColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.deleteAsset(asset)
@@ -474,7 +475,7 @@ fun MyHoldingsScreen(
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.clearDeleteConfirmation() }) {
-                        Text("CANCEL", color = Color.White)
+                        Text("CANCEL", color = textColor)
                     }
                 }
             )

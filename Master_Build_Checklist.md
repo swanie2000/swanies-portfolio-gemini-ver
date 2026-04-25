@@ -32,6 +32,7 @@
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
   - Execute cross-device biometric callback validation and capture OEM behavior notes.
+  - Revisit account recovery strategy (post-hint path, fallback options, and anti-lockout policy) after current auth hardening cycle.
 
 - [ ] V40.37 Localization + Billing Blueprint Track - PLANNED
   - Multi-language support foundation:

@@ -187,6 +187,22 @@ class SettingsViewModel @Inject constructor(
         toggleBiometricLock(activity, enabled, onError)
     }
 
+    fun authenticateForSensitiveAction(
+        activity: FragmentActivity,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (!securityManager.canAuthenticate()) {
+            onError("Biometric authentication is not available on this device.")
+            return
+        }
+        securityManager.authenticate(
+            activity = activity,
+            onSuccess = onSuccess,
+            onError = onError
+        )
+    }
+
     /**
      * 🛡️ THE SECURITY HANDSHAKE:
      * Requires the user to authenticate before enabling or disabling biometric security.

@@ -91,6 +91,18 @@ class AuthViewModel @Inject constructor(
         )
     }
 
+    fun authenticateForRecovery(
+        activity: androidx.fragment.app.FragmentActivity,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        securityManager.authenticate(
+            activity = activity,
+            onSuccess = onSuccess,
+            onError = onError
+        )
+    }
+
     fun setLocked() {
         _authState.value = AuthState.Locked
     }

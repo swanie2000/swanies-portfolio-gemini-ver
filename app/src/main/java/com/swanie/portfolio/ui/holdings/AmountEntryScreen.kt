@@ -53,9 +53,11 @@ fun AmountEntryScreen(
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+    val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
 
     val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" })) }
     val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
+    val dialogBg = remember(cardBgHex) { Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" })) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -247,11 +249,11 @@ fun AmountEntryScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            containerColor = Color(0xFF1A1A1A),
-            title = { Text("Discard Asset?", color = Color.White) },
-            text = { Text("Are you sure you want to discard this new asset?", color = Color.White.copy(alpha = 0.7f)) },
+            containerColor = dialogBg,
+            title = { Text("Discard Asset?", color = textColor) },
+            text = { Text("Are you sure you want to discard this new asset?", color = textColor.copy(alpha = 0.7f)) },
             confirmButton = { TextButton(onClick = onCancel) { Text("Yes", color = Color.Red, fontWeight = FontWeight.Bold) } },
-            dismissButton = { TextButton(onClick = { showExitDialog = false }) { Text("No", color = Color.White) } }
+            dismissButton = { TextButton(onClick = { showExitDialog = false }) { Text("No", color = textColor) } }
         )
     }
 

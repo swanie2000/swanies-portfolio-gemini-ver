@@ -85,6 +85,7 @@ fun ThemeStudioScreen(
     fun Color.toHexString(): String = String.format("#%06X", 0xFFFFFF and this.toArgb())
 
     val safeSiteTextColor = try { Color(siteTextColor.toColorInt()) } catch (e: Exception) { Color.White }
+    val safeCardBgColor = try { Color(cardBgColor.toColorInt()) } catch (e: Exception) { Color(0xFF1C1C1E) }
 
     // Pulse & Glow Animations
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -164,8 +165,8 @@ fun ThemeStudioScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("Reset to Default?", fontWeight = FontWeight.Bold, color = Color.White) },
-            text = { Text("This will override your custom HEX selection.", color = Color.White.copy(0.7f)) },
+            title = { Text("Reset to Default?", fontWeight = FontWeight.Bold, color = safeSiteTextColor) },
+            text = { Text("This will override your custom HEX selection.", color = safeSiteTextColor.copy(0.7f)) },
             confirmButton = {
                 TextButton(onClick = {
                     val defAppBg = ThemeDefaults.APP_BG.toHexString()
@@ -187,9 +188,9 @@ fun ThemeStudioScreen(
                 }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text("CANCEL", color = Color.White) }
+                TextButton(onClick = { showResetDialog = false }) { Text("CANCEL", color = safeSiteTextColor) }
             },
-            containerColor = Color(0xFF1C1C1E)
+            containerColor = safeCardBgColor
         )
     }
 

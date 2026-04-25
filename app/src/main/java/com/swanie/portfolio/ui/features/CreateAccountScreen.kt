@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
@@ -38,6 +39,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.UserProfileEntity
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,28 +49,33 @@ fun CreateAccountScreen(
 ) {
     val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
     val authViewModel: AuthViewModel = hiltViewModel(activity)
+    val themeViewModel: ThemeViewModel = hiltViewModel()
 
-    val siteBg = Color(0xFF000416)
-    val siteText = Color.White
-    val accentSilver = Color(0xFFC0C0C0)
+    val siteBgHex by themeViewModel.siteBackgroundColor.collectAsState()
+    val siteTextHex by themeViewModel.siteTextColor.collectAsState()
+    val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
+    val siteBg = Color(siteBgHex.ifBlank { "#000416" }.toColorInt())
+    val siteText = Color(siteTextHex.ifBlank { "#FFFFFF" }.toColorInt())
+    val dialogBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
+    val accentSilver = siteText.copy(alpha = 0.82f)
 
     val scope = rememberCoroutineScope()
 
     // --- FULL FORM STATE ---
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var passwordHint by remember { mutableStateOf("") }
-    var syncToDrive by remember { mutableStateOf(true) }
-    val isTosChecked = remember { mutableStateOf(false) }
+    var fullName by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var passwordHint by rememberSaveable { mutableStateOf("") }
+    var syncToDrive by rememberSaveable { mutableStateOf(true) }
+    var isTosChecked by rememberSaveable { mutableStateOf(false) }
 
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
-    var isCreatingAccount by remember { mutableStateOf(false) }
-    var showReceiptDialog by remember { mutableStateOf(false) }
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    var isCreatingAccount by rememberSaveable { mutableStateOf(false) }
+    var showReceiptDialog by rememberSaveable { mutableStateOf(false) }
     var receiptProfile by remember { mutableStateOf<UserProfileEntity?>(null) }
-    var receiptReadySignal by remember { mutableStateOf(0) }
+    var receiptReadySignal by rememberSaveable { mutableStateOf(0) }
 
     // --- VALIDATION ---
     val cleanPass = password.trim().replace("\\s".toRegex(), "")
@@ -221,8 +228,8 @@ fun CreateAccountScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Checkbox(
-                    checked = isTosChecked.value,
-                    onCheckedChange = { isTosChecked.value = it },
+                    checked = isTosChecked,
+                    onCheckedChange = { isTosChecked = it },
                     colors = CheckboxDefaults.colors(checkedColor = accentSilver, checkmarkColor = siteBg)
                 )
                 Text(
@@ -252,6 +259,7 @@ fun CreateAccountScreen(
                             displayName = fullName,
                             email = email,
                             password = cleanPass,
+                            passwordHint = passwordHint,
                             acceptedTOS = true
                         )
                         if (stored != null) {
@@ -265,7 +273,7 @@ fun CreateAccountScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = isFormValid && isTosChecked.value && !isCreatingAccount,
+                enabled = isFormValid && isTosChecked && !isCreatingAccount,
                 colors = ButtonDefaults.buttonColors(containerColor = siteText, contentColor = siteBg, disabledContainerColor = siteText.copy(alpha = 0.1f)),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -316,7 +324,8 @@ fun CreateAccountScreen(
                 ) {
                     Text("I've Verified It - Proceed to Login")
                 }
-            }
+            },
+            containerColor = dialogBg
         )
         }
     }
