@@ -85,7 +85,7 @@ class SettingsViewModel @Inject constructor(
     val loginResumeTimeoutSeconds: StateFlow<Int> = themePreferences.loginResumeTimeoutSeconds
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 60)
     val languageCode: StateFlow<String> = themePreferences.languageCode
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "system")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "en")
 
     val userConfig: StateFlow<UserConfigEntity?> = userConfigDao.getUserConfig()
         .onEach { config ->

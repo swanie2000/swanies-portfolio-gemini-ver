@@ -69,7 +69,7 @@ class ThemePreferences @Inject constructor(
     val loginResumeTimeoutSeconds: Flow<Int> =
         appContext.dataStore.data.map { it[PreferencesKeys.LOGIN_RESUME_TIMEOUT_SECONDS] ?: 60 }
     val languageCode: Flow<String> =
-        appContext.dataStore.data.map { it[PreferencesKeys.LANGUAGE_CODE] ?: "system" }
+        appContext.dataStore.data.map { it[PreferencesKeys.LANGUAGE_CODE] ?: "en" }
 
     // Default Vault Flows
     val defaultVaultId: Flow<Int> = appContext.dataStore.data.map { it[PreferencesKeys.DEFAULT_VAULT_ID] ?: 1 }

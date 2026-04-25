@@ -59,6 +59,7 @@ fun SettingsScreen(
         .collectAsState()
     val loginResumeTimeoutSeconds by settingsViewModel.loginResumeTimeoutSeconds.collectAsState()
     val languageCode by settingsViewModel.languageCode.collectAsState()
+    val effectiveLanguageCode = if (languageCode == "system") "en" else languageCode
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -465,12 +466,12 @@ fun SettingsScreen(
                     // --- INTERFACE ---
                     Text(stringResource(R.string.settings_interface), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    val languageOptions = listOf("system", "en", "es", "ko")
-                    val selectedLanguageLabel = when (languageCode) {
+                    val languageOptions = listOf("en", "es", "ko")
+                    val selectedLanguageLabel = when (effectiveLanguageCode) {
                         "en" -> stringResource(R.string.language_name_english_native)
                         "es" -> stringResource(R.string.language_name_spanish_native)
                         "ko" -> stringResource(R.string.language_name_korean_native)
-                        else -> stringResource(R.string.language_system_default)
+                        else -> stringResource(R.string.language_name_english_native)
                     }
                     ExposedDropdownMenuBox(
                         expanded = languageExpanded,

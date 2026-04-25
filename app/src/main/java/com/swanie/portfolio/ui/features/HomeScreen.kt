@@ -64,12 +64,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     val authState by authViewModel.authState.collectAsState()
     val languageCode by settingsViewModel.languageCode.collectAsState()
+    val effectiveLanguageCode = if (languageCode == "system") "en" else languageCode
     var languageMenuExpanded by remember { mutableStateOf(false) }
-    val selectedLanguageLabel = when (languageCode) {
+    val selectedLanguageLabel = when (effectiveLanguageCode) {
         "en" -> stringResource(R.string.language_name_english_native)
         "es" -> stringResource(R.string.language_name_spanish_native)
         "ko" -> stringResource(R.string.language_name_korean_native)
-        else -> stringResource(R.string.language_system_default)
+        else -> stringResource(R.string.language_name_english_native)
     }
 
     // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
@@ -159,7 +160,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 expanded = languageMenuExpanded,
                 onDismissRequest = { languageMenuExpanded = false }
             ) {
-                val languageOptions = listOf("system", "en", "es", "ko")
+                val languageOptions = listOf("en", "es", "ko")
                 languageOptions.forEach { option ->
                     val optionLabel = when (option) {
                         "en" -> stringResource(R.string.language_name_english_native)
@@ -176,6 +177,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         },
                         trailingIcon = {
                             if (option == languageCode) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = userThemeTextColor
+                                )
+                            } else if (languageCode == "system" && option == "en") {
                                 Icon(
                                     imageVector = Icons.Default.Check,
                                     contentDescription = null,
