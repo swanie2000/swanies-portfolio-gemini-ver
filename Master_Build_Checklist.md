@@ -32,3 +32,14 @@
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
   - Execute cross-device biometric callback validation and capture OEM behavior notes.
+
+- [ ] V40.37 Localization + Billing Blueprint Track - PLANNED
+  - Multi-language support foundation:
+    - Extract user-facing strings for localization.
+    - Add persisted language selection and apply locale on startup.
+  - Subscription tiers:
+    - Define and enforce `Trial`, `Paid`, and `Premium` feature access matrix.
+    - Add safe downgrade/entitlement fallback behavior.
+  - Profile/schema integration:
+    - Track `language_setting` and `user_tier` in user profile persistence model.
+    - Surface tier and language controls in Settings/account UX.

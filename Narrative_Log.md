@@ -89,3 +89,31 @@ Release recorded: V40.35 "Auth Reliability Harness".
 - Expand harness into instrumentation flow tests for `HOME -> UNLOCK_VAULT -> HOLDINGS` and biometric success/cancel/failure UI states.
 - Add a lightweight developer diagnostics panel for auth state transitions and timeout decisions (debug-only).
 - Run cross-device biometric callback verification matrix and log OEM-specific behavior notes.
+
+---
+
+## V40.36 - Blueprint Roadmap Track (Localization + Billing + Tiered Access)
+
+Release planning recorded: V40.36 "Blueprint Roadmap Track".
+
+- Added roadmap priority for multi-language support:
+  - externalized localized strings,
+  - persisted language selection,
+  - startup locale application path.
+- Added roadmap priority for billing and structured subscription tiers:
+  - `Trial` (limited entry),
+  - `Paid` (standard full-access),
+  - `Premium` (advanced/elite feature set).
+- Added roadmap priority for entitlement and profile persistence:
+  - plan to track `language_setting` and `user_tier` in profile/domain schema,
+  - enforce tier-gated feature behavior with safe downgrade handling.
+- Sequencing guidance:
+  1) localization infrastructure,
+  2) tier/entitlement matrix,
+  3) billing integration + persistence wiring.
+
+### Next Phase (Projected Path)
+
+- V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
+- V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
+- V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.

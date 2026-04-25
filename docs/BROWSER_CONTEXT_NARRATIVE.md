@@ -143,18 +143,37 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
     - CI enforcement:
       - `.github/workflows/android-auth-safety.yml` runs `testDebugUnitTest` and `:app:compileDebugKotlin` on push/PR to `main`.
 
-🚀 10. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🗺️ 10. V40.36 BLUEPRINT ROADMAP TRACK (LOCALIZATION + BILLING + TIERS)
+
+    - Localization objective:
+      - Externalize and localize user-facing strings.
+      - Persist user language preference and apply locale at app startup.
+    - Subscription objective:
+      - Define entitlement matrix for `Trial`, `Paid`, and `Premium`.
+      - Enforce tier-gated feature behavior with safe downgrade handling.
+    - Profile/schema objective:
+      - Track language and tier preferences (`language_setting`, `user_tier`) in the user profile model.
+      - Reflect entitlement + language controls in account/settings UX.
+    - Recommended sequence:
+      1) Localization foundation,
+      2) Tier/entitlement matrix,
+      3) Billing integration + profile persistence wiring.
+
+🚀 11. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
 Cross-Device Biometric Validation	Validate biometric callback consistency and prompt/error UX across major OEM devices.	HIGH
+Localization Foundation	Extract localized strings and add persisted runtime language selection.	HIGH
+Subscription Tier Matrix	Define and enforce Trial/Paid/Premium entitlement boundaries.	HIGH
+Billing + Profile Integration	Wire billing status into persisted `user_tier` and account UI.	MEDIUM
 Widget Contract Hardening	Keep planned widget regression coverage for reorder persistence and instance rebinding.	MEDIUM
 Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces for full app parity.	MEDIUM
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.35: Auth Reliability Harness.
+"The narrative is now V40.36: Blueprint Roadmap Track (Localization + Billing + Tiers).
 
-Current Objective: Build V40.36 Auth Flow Instrumentation Harness to validate end-to-end navigation and biometric UI outcomes.
+Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.35 auth safety net and existing non-regression constraints.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
