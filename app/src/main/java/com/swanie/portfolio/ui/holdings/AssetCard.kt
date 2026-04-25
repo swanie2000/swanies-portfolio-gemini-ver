@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.Density
  * Equivalent to wrapping the card root in:
  * `CompositionLocalProvider(LocalDensity provides Density(density = LocalDensity.current.density, fontScale = 1f))`
  * while capturing the parent density *before* overriding (see [base]).
+ *
+ * Dynamic totals and unit prices use [AutoResizingText] in `HoldingsUIComponents.kt` (full/compact cards).
  */
 @Composable
 fun AssetCardFontScaleScope(content: @Composable () -> Unit) {

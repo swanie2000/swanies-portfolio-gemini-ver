@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -28,13 +27,21 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -221,11 +228,124 @@ fun FunnelGrid(options: List<String>, selected: String, onSelect: (String) -> Un
     }
 }
 
+private fun measureSingleLineWidthPx(
+    textMeasurer: TextMeasurer,
+    text: String,
+    style: TextStyle,
+    fontSizeSp: Float,
+    maxLines: Int,
+    softWrap: Boolean,
+    overflow: TextOverflow,
+    layoutDirection: LayoutDirection,
+    density: Density,
+): Float {
+    val layout = textMeasurer.measure(
+        text = AnnotatedString(text),
+        style = style.copy(fontSize = fontSizeSp.sp),
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        constraints = Constraints(maxWidth = Constraints.Infinity),
+        layoutDirection = layoutDirection,
+        density = density,
+    )
+    return layout.size.width.toFloat()
+}
+
+private fun computeAutoResizeFontSizeSp(
+    textMeasurer: TextMeasurer,
+    text: String,
+    style: TextStyle,
+    maxWidthPx: Float,
+    maxSp: Float,
+    minSp: Float,
+    maxLines: Int,
+    softWrap: Boolean,
+    overflow: TextOverflow,
+    layoutDirection: LayoutDirection,
+    density: Density,
+): Float {
+    if (text.isEmpty() || !maxWidthPx.isFinite() || maxWidthPx <= 0f) return maxSp
+    val loBound = minOf(maxSp, minSp)
+    val hiBound = maxOf(maxSp, minSp)
+
+    fun widthAt(sp: Float): Float =
+        measureSingleLineWidthPx(textMeasurer, text, style, sp, maxLines, softWrap, overflow, layoutDirection, density)
+
+    val limit = maxWidthPx.coerceAtLeast(1f)
+    if (widthAt(hiBound) <= limit) return hiBound
+    if (widthAt(loBound) > limit) return loBound
+
+    var lo = loBound
+    var hi = hiBound
+    repeat(24) {
+        val mid = (lo + hi) / 2f
+        if (widthAt(mid) <= limit) lo = mid else hi = mid
+    }
+    return lo
+}
+
 @Composable
-fun AutoResizingText(text: String, style: TextStyle, modifier: Modifier = Modifier, maxLines: Int = 1) {
-    var fs by remember { mutableStateOf(style.fontSize) }
-    var rd by remember { mutableStateOf(false) }
-    Text(text = text, style = style.copy(fontSize = fs), modifier = modifier.drawWithContent { if (rd) drawContent() }, maxLines = maxLines, softWrap = false, overflow = TextOverflow.Clip, onTextLayout = { if (it.hasVisualOverflow && fs > 8.sp) { fs *= 0.95f } else { rd = true } })
+fun AutoResizingText(
+    text: String,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    maxLines: Int = 1,
+    softWrap: Boolean = false,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxFontSize: TextUnit = style.fontSize,
+    minFontSize: TextUnit = 10.sp,
+) {
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+
+    val resolvedMax = when {
+        maxFontSize != TextUnit.Unspecified -> maxFontSize
+        style.fontSize != TextUnit.Unspecified -> style.fontSize
+        else -> 16.sp
+    }
+    val resolvedMin = minFontSize
+
+    BoxWithConstraints(modifier = modifier) {
+        val maxWidthPx = with(density) { maxWidth.toPx() }
+        val fontSp = remember(
+            text,
+            maxWidthPx,
+            resolvedMax,
+            resolvedMin,
+            style,
+            maxLines,
+            softWrap,
+            overflow,
+            textMeasurer,
+            layoutDirection,
+            density,
+        ) {
+            computeAutoResizeFontSizeSp(
+                textMeasurer = textMeasurer,
+                text = text,
+                style = style,
+                maxWidthPx = maxWidthPx,
+                maxSp = resolvedMax.value,
+                minSp = resolvedMin.value,
+                maxLines = maxLines,
+                softWrap = softWrap,
+                overflow = overflow,
+                layoutDirection = layoutDirection,
+                density = density,
+            )
+        }
+
+        Text(
+            text = text,
+            style = style.copy(fontSize = fontSp.sp),
+            maxLines = maxLines,
+            softWrap = softWrap,
+            overflow = overflow,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
 
 fun getCurrencySymbol(code: String): String = when (code.uppercase()) {
@@ -572,7 +692,7 @@ fun FullAssetCard(
                 Spacer(Modifier.height(sectionGapV))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
-                    Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(modifier = Modifier.weight(0.35f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             priceLabel,
                             style = LocalTextStyle.current.merge(
@@ -596,9 +716,11 @@ fun FullAssetCard(
                                 platformStyle = platformCluster,
                             ),
                             modifier = Modifier.fillMaxWidth(),
+                            maxFontSize = priceValSize,
+                            minFontSize = 10.sp,
                         )
                     }
-                    Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(modifier = Modifier.weight(0.65f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             "TOTAL VALUE",
                             style = LocalTextStyle.current.merge(
@@ -622,6 +744,8 @@ fun FullAssetCard(
                                 platformStyle = platformCluster,
                             ),
                             modifier = Modifier.fillMaxWidth(),
+                            maxFontSize = totalValSize,
+                            minFontSize = 10.sp,
                         )
                     }
                 }
@@ -708,80 +832,91 @@ fun CompactAssetCard(
                     val sparklineOuterH = if (hi) 36.dp else 30.dp
                     val sparklineInnerH = if (hi) 34.dp else 28.dp
 
-                    Row(
+                    BoxWithConstraints(
                         modifier = Modifier
                             .padding(horizontal = collapsedPadH)
                             .heightIn(min = 64.dp)
-                            .height(rowHeight),
-                        verticalAlignment = Alignment.CenterVertically
+                            .height(rowHeight)
+                            .fillMaxWidth()
                     ) {
                         val titleText = if (asset.category == AssetCategory.METAL) {
                             asset.displayName.ifEmpty { asset.name }
                         } else {
                             asset.symbol
                         }
+                        val leftClusterCap = maxWidth * 0.40f
+                        val rightColumnCap = maxWidth * 0.28f
+                        val iconAndGap = 38.dp + iconTextGapW
+                        val subPriceColumnMax = (leftClusterCap - iconAndGap).coerceAtLeast(48.dp)
 
-                        // Left cluster: icon + ticker + sub-price (full-height, centered vs icon)
                         Row(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .fillMaxHeight(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
+                            modifier = Modifier.width(maxWidth),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
+                            // Left cluster: icon + ticker + sub-price (bounded width so sub-price can auto-shrink)
+                            Row(
                                 modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(CircleShape)
-                                    .background(cardText.copy(alpha = 0.08f))
-                                    .padding(3.dp),
-                                contentAlignment = Alignment.Center
+                                    .widthIn(max = leftClusterCap.coerceAtLeast(iconAndGap + 48.dp))
+                                    .fillMaxHeight(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
                             ) {
-                                MetalIcon(
-                                    name = asset.symbol,
-                                    weight = asset.weight,
-                                    unit = asset.weightUnit,
-                                    physicalForm = asset.physicalForm,
-                                    size = 30,
-                                    imageUrl = asset.imageUrl,
-                                    localPath = asset.localIconPath,
-                                    category = asset.category
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(cardText.copy(alpha = 0.08f))
+                                        .padding(3.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    MetalIcon(
+                                        name = asset.symbol,
+                                        weight = asset.weight,
+                                        unit = asset.weightUnit,
+                                        physicalForm = asset.physicalForm,
+                                        size = 30,
+                                        imageUrl = asset.imageUrl,
+                                        localPath = asset.localIconPath,
+                                        category = asset.category
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(iconTextGapW))
+                                Column(
+                                    modifier = Modifier
+                                        .widthIn(max = subPriceColumnMax)
+                                        .fillMaxHeight(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Text(
+                                        text = titleText.uppercase(),
+                                        style = LocalTextStyle.current.copy(
+                                            color = cardText,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = tickerSize,
+                                            lineHeight = lineCluster,
+                                            platformStyle = platformCluster
+                                        ),
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    AutoResizingText(
+                                        text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                                        style = LocalTextStyle.current.copy(
+                                            color = cardText.copy(alpha = 0.75f),
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = subPointSize,
+                                            lineHeight = lineCluster,
+                                            platformStyle = platformCluster,
+                                            textAlign = TextAlign.Start,
+                                        ),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        maxFontSize = subPointSize,
+                                        minFontSize = 10.sp,
+                                    )
+                                }
                             }
-                            Spacer(modifier = Modifier.width(iconTextGapW))
-                            Column(
-                                modifier = Modifier.fillMaxHeight(),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                Text(
-                                    text = titleText.uppercase(),
-                                    style = LocalTextStyle.current.copy(
-                                        color = cardText,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = tickerSize,
-                                        lineHeight = lineCluster,
-                                        platformStyle = platformCluster
-                                    ),
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
-                                    style = LocalTextStyle.current.copy(
-                                        color = cardText.copy(alpha = 0.75f),
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = subPointSize,
-                                        lineHeight = lineCluster,
-                                        platformStyle = platformCluster
-                                    ),
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
 
                         // Sparkline: immediately after price, height matches two-line text block
                         Box(
@@ -805,7 +940,7 @@ fun CompactAssetCard(
                         // Right cluster: mirror typography, snapped vertical pair
                         Column(
                             modifier = Modifier
-                                .wrapContentWidth()
+                                .widthIn(max = rightColumnCap.coerceAtLeast(64.dp))
                                 .fillMaxHeight(),
                             horizontalAlignment = Alignment.End,
                             verticalArrangement = Arrangement.Center
@@ -834,8 +969,10 @@ fun CompactAssetCard(
                                             platformStyle = platformCluster
                                         )
                                     ),
-                                    modifier = Modifier.wrapContentWidth(),
-                                    maxLines = 1
+                                    modifier = Modifier.fillMaxWidth(),
+                                    maxLines = 1,
+                                    maxFontSize = tickerSize,
+                                    minFontSize = 10.sp,
                                 )
                                 Text(
                                     text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.US, "%.1f", asset.priceChange24h)}%",
@@ -852,6 +989,7 @@ fun CompactAssetCard(
                                 )
                             }
                         }
+                    }
                     }
                 }
 
@@ -1006,7 +1144,7 @@ fun CompactAssetCard(
                         // Bottom Row: Price / Total Value parity
                         Row(modifier = Modifier.fillMaxWidth()) {
                             val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
-                            Column(modifier = Modifier.weight(0.4f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(modifier = Modifier.weight(0.35f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     priceLabel,
                                     style = LocalTextStyle.current.merge(
@@ -1030,9 +1168,11 @@ fun CompactAssetCard(
                                         platformStyle = expandedPlatform,
                                     ),
                                     modifier = Modifier.fillMaxWidth(),
+                                    maxFontSize = priceValSize,
+                                    minFontSize = 10.sp,
                                 )
                             }
-                            Column(modifier = Modifier.weight(0.6f), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Column(modifier = Modifier.weight(0.65f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     "TOTAL VALUE",
                                     style = LocalTextStyle.current.merge(
@@ -1056,6 +1196,8 @@ fun CompactAssetCard(
                                         platformStyle = expandedPlatform,
                                     ),
                                     modifier = Modifier.fillMaxWidth(),
+                                    maxFontSize = totalValSize,
+                                    minFontSize = 10.sp,
                                 )
                             }
                         }

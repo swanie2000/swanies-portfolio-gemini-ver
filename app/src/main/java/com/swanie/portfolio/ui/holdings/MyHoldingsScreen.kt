@@ -262,15 +262,20 @@ fun MyHoldingsScreen(
                                             }
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                                                val vaultTotalMaxSp = with(LocalDensity.current) {
+                                                    (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp()
+                                                }
                                                 AutoResizingText(
                                                     text = totalValueFormatted,
                                                     style = TextStyle(
                                                         color = textColor.copy(0.7f),
-                                                        fontSize = with(LocalDensity.current) { (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp() },
+                                                        fontSize = vaultTotalMaxSp,
                                                         fontWeight = FontWeight.Bold,
                                                         textAlign = TextAlign.Center
                                                     ),
-                                                    modifier = Modifier.fillMaxWidth()
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    maxFontSize = vaultTotalMaxSp,
+                                                    minFontSize = 10.sp,
                                                 )
                                             }
                                         }
