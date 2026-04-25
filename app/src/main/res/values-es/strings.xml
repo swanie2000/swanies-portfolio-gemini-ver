@@ -169,4 +169,18 @@
     <string name="crypto_quantity_held">CANTIDAD EN POSESION</string>
     <string name="crypto_price_decimals">DECIMALES DE PRECIO: %1$d</string>
     <string name="action_save_changes">GUARDAR CAMBIOS</string>
+    <string name="widget_manager_title">GESTOR DE WIDGET</string>
+    <string name="widget_action_save_exit">GUARDAR Y SALIR</string>
+    <string name="widget_link_portfolio_prompt">VINCULA ESTE WIDGET A UN PORTAFOLIO</string>
+    <string name="widget_selected_assets">ACTIVOS SELECCIONADOS</string>
+    <string name="widget_can_be_reordered">SE PUEDEN REORDENAR</string>
+    <string name="widget_portfolio_label">PORTAFOLIO</string>
+    <string name="widget_portfolio_for_widget_label">PORTAFOLIO PARA ESTE WIDGET</string>
+    <string name="widget_loading">Cargando...</string>
+    <string name="asset_price_label_price">PRECIO</string>
+    <string name="asset_price_label_value">VALOR</string>
+    <string name="asset_total_value_label">VALOR TOTAL</string>
+    <string name="holdings_tab_all">TODO</string>
+    <string name="holdings_tab_crypto">CRIPTO</string>
+    <string name="holdings_tab_metal">METAL</string>
 </resources>

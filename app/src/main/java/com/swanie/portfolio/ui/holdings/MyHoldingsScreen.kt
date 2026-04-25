@@ -84,7 +84,11 @@ fun MyHoldingsScreen(
     val isCompactViewEnabled by mainViewModel.isCompactViewEnabled.collectAsStateWithLifecycle()
     val isHighVisibilityMode by mainViewModel.isHighVisibilityMode.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("ALL", "CRYPTO", "METAL")
+    val tabs = listOf(
+        stringResource(R.string.holdings_tab_all),
+        stringResource(R.string.holdings_tab_crypto),
+        stringResource(R.string.holdings_tab_metal)
+    )
 
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
@@ -311,7 +315,7 @@ fun MyHoldingsScreen(
                                         Box(modifier = Modifier.weight(1f).height(40.dp).padding(horizontal = 4.dp).clip(CircleShape).background(if (sel) textColor.copy(0.15f) else Color.Transparent).border(1.dp, textColor.copy(if (sel) 0.3f else 0.1f), CircleShape).clickable { selectedTab = i }, contentAlignment = Alignment.Center) {
                                             Text(t, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (sel) textColor else textColor.copy(0.5f))
                                         }
-                                        if (t == "METAL" && sel) { IconButton(onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) }) { Icon(Icons.Default.Security, null, tint = Color(0xFFFFD700), modifier = Modifier.size(20.dp)) } }
+                                        if (t == stringResource(R.string.holdings_tab_metal) && sel) { IconButton(onClick = { isExiting = true; navController.navigate(Routes.METALS_AUDIT) }) { Icon(Icons.Default.Security, null, tint = Color(0xFFFFD700), modifier = Modifier.size(20.dp)) } }
                                     }
                                 }
 

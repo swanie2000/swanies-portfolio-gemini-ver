@@ -169,4 +169,18 @@
     <string name="crypto_quantity_held">보유 수량</string>
     <string name="crypto_price_decimals">가격 소수점: %1$d</string>
     <string name="action_save_changes">변경사항 저장</string>
+    <string name="widget_manager_title">위젯 관리자</string>
+    <string name="widget_action_save_exit">저장 후 종료</string>
+    <string name="widget_link_portfolio_prompt">이 위젯을 포트폴리오에 연결하세요</string>
+    <string name="widget_selected_assets">선택된 자산</string>
+    <string name="widget_can_be_reordered">순서 변경 가능</string>
+    <string name="widget_portfolio_label">포트폴리오</string>
+    <string name="widget_portfolio_for_widget_label">이 위젯의 포트폴리오</string>
+    <string name="widget_loading">불러오는 중...</string>
+    <string name="asset_price_label_price">가격</string>
+    <string name="asset_price_label_value">가치</string>
+    <string name="asset_total_value_label">총 가치</string>
+    <string name="holdings_tab_all">전체</string>
+    <string name="holdings_tab_crypto">암호화폐</string>
+    <string name="holdings_tab_metal">금속</string>
 </resources>

@@ -707,7 +707,7 @@ fun FullAssetCard(
                 HorizontalDivider(color = cardText.copy(alpha = 0.05f))
                 Spacer(Modifier.height(sectionGapV))
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
+                    val priceLabel = if (asset.baseSymbol == "CUSTOM") stringResource(R.string.asset_price_label_value) else stringResource(R.string.asset_price_label_price)
                     Column(modifier = Modifier.weight(0.35f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             priceLabel,
@@ -738,7 +738,7 @@ fun FullAssetCard(
                     }
                     Column(modifier = Modifier.weight(0.65f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            "TOTAL VALUE",
+                            stringResource(R.string.asset_total_value_label),
                             style = LocalTextStyle.current.merge(
                                 TextStyle(
                                     color = cardText.copy(0.6f),
@@ -1244,7 +1244,7 @@ fun CompactAssetCard(
 
                         // Bottom Row: Price / Total Value parity
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            val priceLabel = if (asset.baseSymbol == "CUSTOM") "VALUE" else "PRICE"
+                            val priceLabel = if (asset.baseSymbol == "CUSTOM") stringResource(R.string.asset_price_label_value) else stringResource(R.string.asset_price_label_price)
                             Column(modifier = Modifier.weight(0.3f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     priceLabel,
@@ -1275,7 +1275,7 @@ fun CompactAssetCard(
                             }
                             Column(modifier = Modifier.weight(0.7f), horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
-                                    "TOTAL VALUE",
+                                    stringResource(R.string.asset_total_value_label),
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             color = cardText.copy(0.6f),

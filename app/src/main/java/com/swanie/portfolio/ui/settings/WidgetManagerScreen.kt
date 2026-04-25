@@ -359,10 +359,10 @@ fun WidgetManagerScreen(
 
                 // --- 🦢 BOUTIQUE HEADER (pinned top on every page) ---
                 BoutiqueHeader(
-                    title = "WIDGET MANAGER",
+                    title = stringResource(R.string.widget_manager_title),
                     onBack = { onBack() },
                     actionIcon = if (canOfferSaveAndExit) Icons.Default.Save else Icons.Default.Undo,
-                    actionLabel = if (canOfferSaveAndExit) "SAVE & EXIT" else null,
+                    actionLabel = if (canOfferSaveAndExit) stringResource(R.string.widget_action_save_exit) else null,
                     textColor = safeThemeText,
                     belowBrandingContent = {
                         WidgetSubPageTabRow(
@@ -390,7 +390,7 @@ fun WidgetManagerScreen(
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = safeThemeText, strokeWidth = 2.dp)
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            "LINK THIS WIDGET TO A PORTFOLIO",
+                            stringResource(R.string.widget_link_portfolio_prompt),
                             color = safeThemeText,
                             fontSize = 10.5.sp,
                             fontWeight = FontWeight.Black,
@@ -412,7 +412,7 @@ fun WidgetManagerScreen(
                             ) {
                                 item("wm_setup_title") {
                                     Text(
-                                        "SETUP",
+                                        stringResource(R.string.widget_tab_setup),
                                         color = safeThemeText,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Black,
@@ -501,13 +501,13 @@ fun WidgetManagerScreen(
                                             horizontalAlignment = Alignment.Start,
                                         ) {
                                             Text(
-                                                "SELECTED ASSETS",
+                                                stringResource(R.string.widget_selected_assets),
                                                 color = safeThemeText.copy(alpha = 0.6f),
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Bold,
                                             )
                                             Text(
-                                                "CAN BE REORDERED",
+                                                stringResource(R.string.widget_can_be_reordered),
                                                 color = safeThemeText.copy(alpha = 0.6f),
                                                 fontSize = 11.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -871,7 +871,7 @@ private fun PortfolioSelectorDropdown(
             ),
             label = {
                 Text(
-                    if (isWidgetInstanceContext) "PORTFOLIO FOR THIS WIDGET" else "PORTFOLIO",
+                    if (isWidgetInstanceContext) stringResource(R.string.widget_portfolio_for_widget_label) else stringResource(R.string.widget_portfolio_label),
                     fontSize = labelSp,
                     fontWeight = FontWeight.Black,
                 )
@@ -985,7 +985,7 @@ private fun HeroWidgetPreview(
                             .background(cardColor.copy(alpha = 0.7f), RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text("Loading...", color = cardTextColor.copy(alpha = 0.7f), fontSize = 11.sp)
+                        Text(stringResource(R.string.widget_loading), color = cardTextColor.copy(alpha = 0.7f), fontSize = 11.sp)
                     }
                 } else {
                     Column(
