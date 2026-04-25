@@ -166,7 +166,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         "en" -> stringResource(R.string.language_name_english_native)
                         "es" -> stringResource(R.string.language_name_spanish_native)
                         "ko" -> stringResource(R.string.language_name_korean_native)
-                        else -> stringResource(R.string.language_system_default)
+                        else -> stringResource(R.string.language_name_english_native)
                     }
                     DropdownMenuItem(
                         text = { Text(optionLabel) },

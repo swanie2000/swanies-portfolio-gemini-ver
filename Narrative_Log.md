@@ -266,3 +266,18 @@ Release recorded: V40.44 "Localization Surface Expansion (Holdings + Widget + Te
 - Validation:
   - Lint checks stayed clean on touched files.
   - `:app:compileDebugKotlin` passed after integration.
+
+---
+
+## V40.45 - Language Picker Final Cleanup
+
+Release recorded: V40.45 "Language Picker Final Cleanup".
+
+- Removed `System default` from language picker option lists on both Home (globe menu) and Settings.
+- Kept behavior deterministic by using English (`en`) as the effective/default fallback label path where needed.
+- Removed unused `language_system_default` resource keys from:
+  - `app/src/main/res/values/strings.xml`,
+  - `app/src/main/res/values-es/strings.xml`,
+  - `app/src/main/res/values-ko/strings.xml`.
+- Validation:
+  - `:app:compileDebugKotlin` passed after cleanup.

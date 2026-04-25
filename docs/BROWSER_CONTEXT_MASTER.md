@@ -419,6 +419,22 @@ Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations
 Current Objective: Continue V40.36.1 by migrating remaining high-traffic user-facing literals to string resources while preserving V40.44 locale behavior and prior auth/security guardrails.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
+🧹 17. V40.45 — LANGUAGE PICKER FINAL CLEANUP
+
+    - Picker simplification:
+      - Removed `System default` as a visible option from Home and Settings language selectors.
+      - Effective fallback behavior now resolves to English (`en`) for display/selection safety.
+    - Resource hygiene:
+      - Removed unused `language_system_default` from default, Spanish, and Korean string bundles.
+    - Validation:
+      - Debug Kotlin compile passed after cleanup.
+
+🚀 NEXT AGENT COMMAND
+"The narrative is now V40.45: Language Picker Final Cleanup.
+
+Current Objective: Continue localization surface migration (V40.36.1) and translation parity while preserving V40.45 picker behavior and existing auth/session guardrails.
+
+Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE
 
 ============================================================

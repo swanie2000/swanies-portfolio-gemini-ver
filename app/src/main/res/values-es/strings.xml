@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">SwaniesPortfolio</string>
     <string name="language_selector_title">Idioma</string>
-    <string name="language_system_default">Predeterminado del sistema</string>
     <string name="language_english">Ingles</string>
     <string name="language_spanish">Espanol</string>
     <string name="language_korean">Coreano</string>

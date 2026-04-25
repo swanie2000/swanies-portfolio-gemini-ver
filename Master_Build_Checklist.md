@@ -72,6 +72,12 @@
   - Added matching English and Korean string resources for dialogs, button labels, and section/tab text.
   - Validation passed with lint clean and debug Kotlin compile success.
 
+- [x] V40.45 Language Picker Final Cleanup - COMPLETED
+  - Removed `System default` from Home and Settings language picker options.
+  - Set English (`en`) as the effective/default fallback for language-selection display logic.
+  - Removed unused `language_system_default` string keys from English, Spanish, and Korean resources.
+  - Validation passed with debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
