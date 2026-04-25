@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.swanie.portfolio.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -726,7 +727,7 @@ fun WidgetManagerScreen(
                                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = safeThemeText)
                                                     Spacer(Modifier.height(8.dp))
-                                                    Text("Loading preview...", color = safeThemeText.copy(alpha = 0.75f), fontSize = 11.sp)
+                                                    Text(stringResource(R.string.widget_loading_preview), color = safeThemeText.copy(alpha = 0.75f), fontSize = 11.sp)
                                                 }
                                             }
                                         }
@@ -742,7 +743,7 @@ fun WidgetManagerScreen(
                                                 shape = RoundedCornerShape(999.dp),
                                             ) {
                                                 Text(
-                                                    "FINISH & SAVE",
+                                                    stringResource(R.string.widget_finish_save),
                                                     color = Color.Black,
                                                     fontSize = 13.sp,
                                                     fontWeight = FontWeight.Black,
@@ -757,14 +758,14 @@ fun WidgetManagerScreen(
                                                     .height(48.dp),
                                                 shape = RoundedCornerShape(999.dp),
                                             ) {
-                                                Text("Back to setup", fontSize = 11.sp)
+                                                Text(stringResource(R.string.widget_back_to_setup), fontSize = 11.sp)
                                             }
                                         }
                                     }
                                 }
                             } else {
                                 Text(
-                                    "Preview Error",
+                                    stringResource(R.string.widget_preview_error),
                                     color = safeThemeText,
                                     modifier = Modifier
                                         .weight(1f)
@@ -803,10 +804,10 @@ private fun WidgetSubPageTabRow(
             pages.forEach { page ->
                 val selected = page == current
                 val label = when (page) {
-                    0 -> "SETUP"
-                    1 -> "ASSETS"
-                    2 -> "STYLE"
-                    else -> "PREVIEW"
+                    0 -> stringResource(R.string.widget_tab_setup)
+                    1 -> stringResource(R.string.widget_tab_assets)
+                    2 -> stringResource(R.string.widget_tab_style)
+                    else -> stringResource(R.string.widget_tab_preview)
                 }
                 Surface(
                     shape = RoundedCornerShape(999.dp),
@@ -1298,7 +1299,7 @@ fun WidgetPreviewSlim(
                     .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("No assets available", color = cardTextColor.copy(alpha = 0.7f), fontSize = 10.sp)
+                Text(stringResource(R.string.widget_no_assets_available), color = cardTextColor.copy(alpha = 0.7f), fontSize = 10.sp)
             }
         }
     }
@@ -1372,7 +1373,7 @@ fun WidgetStudioInlineCompact(
             isFlashing = true; scope.launch { delay(200); isFlashing = false }
             keyboardController?.hide(); focusManager.clearFocus()
         }, modifier = Modifier.fillMaxWidth().height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isFlashing) Color.White else Color.Yellow)) {
-            Text("SET DRAFT ${targets[activeTarget].uppercase()}", color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Black)
+            Text(stringResource(R.string.widget_set_draft_target, targets[activeTarget].uppercase()), color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Black)
         }
     }
 }

@@ -55,6 +55,23 @@
   - Added Korean resource bundle `values-ko/strings.xml` and extended English/Spanish bundles with `language_korean`.
   - Validation passed with lint clean and debug Kotlin compile success.
 
+- [x] V40.42 Localization Surface Expansion (Core Auth + Settings) - COMPLETED
+  - Migrated high-visibility Home, Unlock, Create Account, Restore, Settings, Portfolio Manager, and Theme Manager labels/messages to string resources.
+  - Expanded Korean translations for the new keys in `values-ko/strings.xml`.
+  - Added immediate language-switch refresh on Home and Settings selectors.
+  - Validation passed with lint clean and debug Kotlin compile success.
+
+- [x] V40.43 Locale Runtime Stabilization (Non-AppCompat Host) - COMPLETED
+  - Resolved startup crash from AppCompat theme mismatch by restoring `MainActivity` host compatibility.
+  - Applied selected locale via runtime resource configuration update path in `MainActivity`.
+  - Confirmed Korean text now renders on front/login flows after switch.
+  - Validation passed with debug Kotlin compile success.
+
+- [x] V40.44 Localization Surface Expansion (Holdings + Widget + Terms) - COMPLETED
+  - Localized additional user-facing strings in `TermsAndConditionsScreen`, `MyHoldingsScreen`, `AmountEntryScreen`, and `WidgetManagerScreen`.
+  - Added matching English and Korean string resources for dialogs, button labels, and section/tab text.
+  - Validation passed with lint clean and debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

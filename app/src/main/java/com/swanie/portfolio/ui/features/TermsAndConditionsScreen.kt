@@ -10,10 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.swanie.portfolio.R
 
 @Composable
 fun TermsAndConditionsScreen(navController: NavController) {
@@ -25,10 +27,10 @@ fun TermsAndConditionsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("PRIVACY & TERMS", fontSize = 16.sp, fontWeight = FontWeight.Black) },
+                title = { Text(stringResource(R.string.terms_title), fontSize = 16.sp, fontWeight = FontWeight.Black) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = siteText)
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.content_back), tint = siteText)
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = siteBg, titleContentColor = siteText)

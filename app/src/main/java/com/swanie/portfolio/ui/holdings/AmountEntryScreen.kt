@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 
@@ -191,7 +193,7 @@ fun AmountEntryScreen(
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         IconButton(onClick = { if (!isSaving) showExitDialog = true }, modifier = Modifier.align(Alignment.CenterStart)) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = textColor)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.amount_entry_back), tint = textColor)
                         }
                     }
                     Spacer(Modifier.height(32.dp))
@@ -203,7 +205,7 @@ fun AmountEntryScreen(
                         value = amountText,
                         onValueChange = { if (!isSaving) { amountText = it; errorMessage = null } },
                         modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                        label = { Text("Enter Amount for $symbol", color = textColor.copy(alpha = 0.6f)) },
+                        label = { Text(stringResource(R.string.amount_entry_label, symbol), color = textColor.copy(alpha = 0.6f)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = { if(amountText.isNotBlank()) isSaving = true }),
                         singleLine = true,
@@ -217,7 +219,7 @@ fun AmountEntryScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         enabled = amountText.isNotBlank() && !isSaving
                     ) {
-                        Text("Save Asset", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(stringResource(R.string.amount_entry_save_asset), fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
@@ -250,10 +252,10 @@ fun AmountEntryScreen(
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
             containerColor = dialogBg,
-            title = { Text("Discard Asset?", color = textColor) },
-            text = { Text("Are you sure you want to discard this new asset?", color = textColor.copy(alpha = 0.7f)) },
-            confirmButton = { TextButton(onClick = onCancel) { Text("Yes", color = Color.Red, fontWeight = FontWeight.Bold) } },
-            dismissButton = { TextButton(onClick = { showExitDialog = false }) { Text("No", color = textColor) } }
+            title = { Text(stringResource(R.string.amount_entry_discard_title), color = textColor) },
+            text = { Text(stringResource(R.string.amount_entry_discard_body), color = textColor.copy(alpha = 0.7f)) },
+            confirmButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.amount_entry_yes), color = Color.Red, fontWeight = FontWeight.Bold) } },
+            dismissButton = { TextButton(onClick = { showExitDialog = false }) { Text(stringResource(R.string.amount_entry_no), color = textColor) } }
         )
     }
 

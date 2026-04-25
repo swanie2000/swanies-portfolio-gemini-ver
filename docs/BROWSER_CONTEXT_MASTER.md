@@ -389,7 +389,19 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
     - Validation:
       - Lint clean and debug Kotlin compile successful after integration.
 
-🚀 15. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🧭 15. V40.42–V40.44 — LOCALIZATION SURFACE EXPANSION + LOCALE STABILIZATION
+
+    - V40.42:
+      - Migrated high-visibility Home/Unlock/Create/Restore/Settings/Portfolio Manager/Theme Manager literals to string resources.
+      - Expanded Korean resource coverage for those migrated keys.
+    - V40.43:
+      - Resolved locale host crash and stabilized runtime locale application path in `MainActivity` for non-AppCompat theme stack.
+    - V40.44:
+      - Continued migration across Terms, Holdings, Amount Entry, and Widget Manager visible labels/dialogs/tabs.
+    - Validation:
+      - Lint clean on touched files and debug Kotlin compile passed.
+
+🚀 16. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
@@ -402,9 +414,9 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.41: Korean Language Extension.
+"The narrative is now V40.44: Localization Surface Expansion (Holdings + Widget + Terms).
 
-Current Objective: Continue V40.36.1 by migrating high-visibility user-facing literals to string resources while preserving V40.41 locale-switching baseline (system/en/es/ko) and prior auth hardening constraints.
+Current Objective: Continue V40.36.1 by migrating remaining high-traffic user-facing literals to string resources while preserving V40.44 locale behavior and prior auth/security guardrails.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE

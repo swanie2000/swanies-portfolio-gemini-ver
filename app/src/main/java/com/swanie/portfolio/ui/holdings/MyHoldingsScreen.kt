@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -206,7 +207,7 @@ fun MyHoldingsScreen(
                                         navController.navigate(Routes.PORTFOLIO_MANAGER)
                                     }
                                 ) {
-                                    Text("Create Your First Portfolio")
+                                    Text(stringResource(R.string.holdings_create_first_portfolio))
                                 }
                             }
                         }
@@ -331,7 +332,7 @@ fun MyHoldingsScreen(
                                     ) {
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "Your vault is empty. \n\n Tap the yellow '+' button in the top right to add your first Gold, Silver, or Crypto asset.",
+                                            text = stringResource(R.string.holdings_vault_empty_hint),
                                             color = textColor.copy(alpha = 0.68f),
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.Medium,
@@ -463,19 +464,19 @@ fun MyHoldingsScreen(
             AlertDialog(
                 onDismissRequest = { viewModel.clearDeleteConfirmation() },
                 containerColor = dialogBg,
-                title = { Text("REMOVE ASSET?", color = Color.Red, fontWeight = FontWeight.Black) },
-                text = { Text("Are you sure you want to remove ${asset.symbol} from your vault?", color = textColor) },
+                title = { Text(stringResource(R.string.holdings_delete_asset_title), color = Color.Red, fontWeight = FontWeight.Black) },
+                text = { Text(stringResource(R.string.holdings_delete_asset_body, asset.symbol), color = textColor) },
                 confirmButton = {
                     TextButton(onClick = {
                         viewModel.deleteAsset(asset)
                         viewModel.clearDeleteConfirmation()
                     }) {
-                        Text("REMOVE", color = Color.Red)
+                        Text(stringResource(R.string.holdings_delete_asset_confirm), color = Color.Red)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.clearDeleteConfirmation() }) {
-                        Text("CANCEL", color = textColor)
+                        Text(stringResource(R.string.action_cancel), color = textColor)
                     }
                 }
             )

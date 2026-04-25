@@ -111,4 +111,27 @@
     <string name="portfolio_edit_title">EDIT PORTFOLIO</string>
     <string name="portfolio_fallback_name">PORTFOLIO</string>
     <string name="action_save">SAVE</string>
+    <string name="terms_title">PRIVACY &amp; TERMS</string>
+    <string name="holdings_create_first_portfolio">Create Your First Portfolio</string>
+    <string name="holdings_delete_asset_title">REMOVE ASSET?</string>
+    <string name="holdings_delete_asset_body">Are you sure you want to remove %1$s from your vault?</string>
+    <string name="holdings_delete_asset_confirm">REMOVE</string>
+    <string name="holdings_vault_empty_hint">Your vault is empty.\n\nTap the yellow \'+\' button in the top right to add your first Gold, Silver, or Crypto asset.</string>
+    <string name="amount_entry_back">Back</string>
+    <string name="amount_entry_label">Enter Amount for %1$s</string>
+    <string name="amount_entry_save_asset">Save Asset</string>
+    <string name="amount_entry_discard_title">Discard Asset?</string>
+    <string name="amount_entry_discard_body">Are you sure you want to discard this new asset?</string>
+    <string name="amount_entry_yes">Yes</string>
+    <string name="amount_entry_no">No</string>
+    <string name="widget_loading_preview">Loading preview...</string>
+    <string name="widget_finish_save">FINISH &amp; SAVE</string>
+    <string name="widget_back_to_setup">Back to setup</string>
+    <string name="widget_preview_error">Preview Error</string>
+    <string name="widget_tab_setup">SETUP</string>
+    <string name="widget_tab_assets">ASSETS</string>
+    <string name="widget_tab_style">STYLE</string>
+    <string name="widget_tab_preview">PREVIEW</string>
+    <string name="widget_no_assets_available">No assets available</string>
+    <string name="widget_set_draft_target">SET DRAFT %1$s</string>
 </resources>

@@ -224,3 +224,45 @@ Release recorded: V40.41 "Korean Language Extension".
 - V40.36.1 Localization Surface Expansion: migrate high-visibility auth/settings/home user-facing literals to string resources.
 - V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
 - V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.
+
+---
+
+## V40.42 - Localization Surface Expansion (Core Auth + Settings)
+
+Release recorded: V40.42 "Localization Surface Expansion (Core Auth + Settings)".
+
+- Migrated core auth/settings surfaces to string resources:
+  - Home, Unlock, Create Account, Restore, Settings, Portfolio Manager, and Theme Manager.
+- Expanded Korean resource coverage in `values-ko/strings.xml` for new labels/messages.
+- Added explicit refresh behavior after language selection to apply locale changes immediately in-session.
+- Validation:
+  - Lint checks stayed clean on touched files.
+  - `:app:compileDebugKotlin` passed after integration.
+
+---
+
+## V40.43 - Locale Runtime Stabilization (Non-AppCompat Host)
+
+Release recorded: V40.43 "Locale Runtime Stabilization (Non-AppCompat Host)".
+
+- Diagnosed and resolved startup crash caused by switching `MainActivity` host type without an AppCompat theme stack.
+- Restored compatible host activity and applied selected locale using runtime resource configuration updates in `MainActivity`.
+- Confirmed Korean strings now render on front/login flows when `ko` is selected.
+- Validation:
+  - `:app:compileDebugKotlin` passed after crash fix and locale-path update.
+
+---
+
+## V40.44 - Localization Surface Expansion (Holdings + Widget + Terms)
+
+Release recorded: V40.44 "Localization Surface Expansion (Holdings + Widget + Terms)".
+
+- Localized additional high-visibility UI surfaces:
+  - `TermsAndConditionsScreen` title/back label,
+  - `MyHoldingsScreen` onboarding empty-state + delete dialog,
+  - `AmountEntryScreen` amount input/save/discard dialog labels,
+  - `WidgetManagerScreen` preview/loading/tab/action labels.
+- Added aligned English + Korean string keys for all new migrated literals.
+- Validation:
+  - Lint checks stayed clean on touched files.
+  - `:app:compileDebugKotlin` passed after integration.
