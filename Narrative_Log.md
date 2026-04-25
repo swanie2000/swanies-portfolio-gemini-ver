@@ -300,3 +300,20 @@ Release recorded: V40.46 "Top-20 Language Expansion + Translation Feedback Intak
   - Non-English locales may be AI-translated and can contain wording differences.
 - Validation:
   - `:app:compileDebugKotlin` passed after integration.
+
+---
+
+## V40.47 - Localization Phase 2 (Top-20 Key Parity)
+
+Release recorded: V40.47 "Localization Phase 2 (Top-20 Key Parity)".
+
+- Added new locale bundles for Top-20 rollout:
+  - `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-id`, `values-it`, `values-ja`, `values-nl`, `values-pl`, `values-pt-rBR`, `values-ru`, `values-th`, `values-tr`, `values-uk`, `values-vi`, `values-zh-rCN`, `values-zh-rTW`.
+- Completed full key parity pass:
+  - Backfilled each new locale file to include every key from `values/strings.xml`.
+  - Preserved translated high-visibility strings from Phase 1 and safely inherited remaining keys for stability.
+- Runtime impact:
+  - Eliminates missing-key locale gaps across the Top-20 language selector paths.
+  - Keeps app behavior deterministic while enabling iterative translation quality upgrades over time.
+- Validation:
+  - `:app:compileDebugKotlin` passed after parity rollout.

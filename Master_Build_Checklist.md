@@ -85,6 +85,12 @@
   - Added supporting string resources for new language labels and translation feedback UI copy.
   - Validation passed with debug Kotlin compile success.
 
+- [x] V40.47 Localization Phase 2 - Top-20 Key Parity - COMPLETED
+  - Added 17 new locale resource directories for Top-20 coverage (`ar`, `de`, `fr`, `hi`, `id`, `it`, `ja`, `nl`, `pl`, `pt-BR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-CN`, `zh-TW`).
+  - Completed key parity across all new locale files against the English baseline to eliminate missing-key fallback gaps.
+  - Preserved translated high-visibility strings while safely backfilling remaining keys for runtime stability.
+  - Validation passed with debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

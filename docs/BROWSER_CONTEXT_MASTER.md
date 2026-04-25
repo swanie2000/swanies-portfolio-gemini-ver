@@ -455,6 +455,26 @@ Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'S
 Current Objective: Continue localization rollout by adding resource bundles for prioritized Top-20 locales and applying translation parity checks while preserving V40.46 picker/feedback and existing auth/session guardrails.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
+🌐 19. V40.47 — LOCALIZATION PHASE 2 (TOP-20 KEY PARITY)
+
+    - Locale bundle expansion:
+      - Added 17 new locale resource directories to complete Top-20 selection coverage:
+        `ar`, `de`, `fr`, `hi`, `id`, `it`, `ja`, `nl`, `pl`, `pt-BR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-CN`, `zh-TW`.
+    - Parity hardening:
+      - Per-locale `strings.xml` files were backfilled to include all keys present in base English bundle.
+      - Preserved Phase 1 translated high-visibility text while inheriting remaining keys for deterministic fallback behavior.
+    - Stability outcome:
+      - Prevents missing-key resource failures and hidden fallback drift in top-20 language paths.
+      - Establishes safe foundation for iterative translation-quality passes without runtime risk.
+    - Validation:
+      - Debug Kotlin compile passed after parity completion.
+
+🚀 NEXT AGENT COMMAND
+"The narrative is now V40.47: Localization Phase 2 (Top-20 Key Parity).
+
+Current Objective: Execute translation quality pass by replacing inherited English placeholders in new locale bundles, prioritize auth/home/settings/terms surfaces first, and preserve V40.47 parity guarantees.
+
+Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE
 
 ============================================================
