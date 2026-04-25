@@ -68,6 +68,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val selectedLanguageLabel = when (languageCode) {
         "en" -> stringResource(R.string.language_english)
         "es" -> stringResource(R.string.language_spanish)
+        "ko" -> stringResource(R.string.language_korean)
         else -> stringResource(R.string.language_system_default)
     }
 
@@ -158,11 +159,12 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 expanded = languageMenuExpanded,
                 onDismissRequest = { languageMenuExpanded = false }
             ) {
-                val languageOptions = listOf("system", "en", "es")
+                val languageOptions = listOf("system", "en", "es", "ko")
                 languageOptions.forEach { option ->
                     val optionLabel = when (option) {
                         "en" -> stringResource(R.string.language_english)
                         "es" -> stringResource(R.string.language_spanish)
+                        "ko" -> stringResource(R.string.language_korean)
                         else -> stringResource(R.string.language_system_default)
                     }
                     DropdownMenuItem(

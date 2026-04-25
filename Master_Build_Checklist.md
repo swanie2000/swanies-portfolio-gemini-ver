@@ -49,6 +49,12 @@
   - Added base localization string resources in `values/strings.xml` and `values-es/strings.xml`.
   - Validation passed with lint clean and debug Kotlin compile success.
 
+- [x] V40.41 Korean Language Extension - COMPLETED
+  - Added `Korean` (`ko`) option to both Settings language selector and Home-screen globe menu.
+  - Added localized display label mapping for Korean in language pickers.
+  - Added Korean resource bundle `values-ko/strings.xml` and extended English/Spanish bundles with `language_korean`.
+  - Validation passed with lint clean and debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

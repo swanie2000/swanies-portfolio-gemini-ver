@@ -201,3 +201,26 @@ Release recorded: V40.40 "Localization Foundation (Phase 1)".
 - V40.36.1 Localization Surface Expansion: migrate high-visibility auth/settings/home user-facing literals to string resources.
 - V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
 - V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.
+
+---
+
+## V40.41 - Korean Language Extension
+
+Release recorded: V40.41 "Korean Language Extension".
+
+- Expanded localization selector coverage:
+  - Added Korean (`ko`) as selectable locale in Settings language dropdown.
+  - Added Korean (`ko`) to Home-screen globe quick switcher for pre-login selection.
+- Added language label parity:
+  - Added `language_korean` in default and Spanish bundles so option labeling remains consistent across active locales.
+- Added Korean string resources:
+  - Introduced `app/src/main/res/values-ko/strings.xml` with language selector labels in Korean (`언어`, `시스템 기본값`, `영어`, `스페인어`, `한국어`).
+- Validation:
+  - Lint checks stayed clean on touched files.
+  - `:app:compileDebugKotlin` passed after integration.
+
+### Next Phase (Projected Path)
+
+- V40.36.1 Localization Surface Expansion: migrate high-visibility auth/settings/home user-facing literals to string resources.
+- V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
+- V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.

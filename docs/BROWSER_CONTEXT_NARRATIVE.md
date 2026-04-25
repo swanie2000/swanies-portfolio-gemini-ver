@@ -203,7 +203,18 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
       - Added localization strings in `values/strings.xml`.
       - Added Spanish resource file `values-es/strings.xml`.
 
-🚀 14. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🇰🇷 14. V40.41 — KOREAN LANGUAGE EXTENSION
+
+    - Locale expansion:
+      - Added Korean (`ko`) to Settings language selector.
+      - Added Korean (`ko`) to Home-screen globe quick switcher.
+    - Resource coverage:
+      - Added `values-ko/strings.xml` with Korean language selector strings.
+      - Added `language_korean` to default and Spanish bundles for option label consistency.
+    - Validation:
+      - Lint clean and debug Kotlin compile successful after integration.
+
+🚀 15. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
@@ -216,8 +227,8 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.40: Localization Foundation (Phase 1).
+"The narrative is now V40.41: Korean Language Extension.
 
-Current Objective: Continue V40.36.1 by migrating high-visibility user-facing literals to string resources while preserving V40.40 locale-switching baseline and prior auth hardening constraints.
+Current Objective: Continue V40.36.1 by migrating high-visibility user-facing literals to string resources while preserving V40.41 locale-switching baseline (system/en/es/ko) and prior auth hardening constraints.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."

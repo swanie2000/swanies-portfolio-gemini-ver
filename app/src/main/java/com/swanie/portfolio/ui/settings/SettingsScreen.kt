@@ -457,10 +457,11 @@ fun SettingsScreen(
                     // --- INTERFACE ---
                     Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    val languageOptions = listOf("system", "en", "es")
+                    val languageOptions = listOf("system", "en", "es", "ko")
                     val selectedLanguageLabel = when (languageCode) {
                         "en" -> stringResource(R.string.language_english)
                         "es" -> stringResource(R.string.language_spanish)
+                        "ko" -> stringResource(R.string.language_korean)
                         else -> stringResource(R.string.language_system_default)
                     }
                     ExposedDropdownMenuBox(
@@ -495,6 +496,7 @@ fun SettingsScreen(
                                 val optionLabel = when (option) {
                                     "en" -> stringResource(R.string.language_english)
                                     "es" -> stringResource(R.string.language_spanish)
+                                    "ko" -> stringResource(R.string.language_korean)
                                     else -> stringResource(R.string.language_system_default)
                                 }
                                 DropdownMenuItem(
