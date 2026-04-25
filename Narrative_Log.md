@@ -317,3 +317,24 @@ Release recorded: V40.47 "Localization Phase 2 (Top-20 Key Parity)".
   - Keeps app behavior deterministic while enabling iterative translation quality upgrades over time.
 - Validation:
   - `:app:compileDebugKotlin` passed after parity rollout.
+
+---
+
+## V40.48 - Localization Quality Pass (Batches A-D)
+
+Release recorded: V40.48 "Localization Quality Pass (Batches A-D)".
+
+- Executed iterative quality passes across all 17 new locale bundles to improve user-facing translation quality on high-impact paths.
+- Batch A (auth core):
+  - Updated `action_forgot_password`, `status_verifying`, and `action_done`.
+- Batch B (recovery/auth messaging):
+  - Updated `msg_auth_failed_try_again`, `msg_incorrect_name_or_password`, `recover_access_title`, `recover_access_description`, and `action_verify_show_hint`.
+- Batch C (create + security):
+  - Updated `create_account_title`, `label_email_address`, `label_confirm_password`, `settings_security`, `settings_login_option`, and `settings_login_option_subtitle`.
+- Batch D (terms + feedback intake):
+  - Updated `terms_title`, translation-feedback CTA/title/subtitle/submit/chooser/no-email strings.
+- Outcome:
+  - Top-20 locale experience now has stronger native phrasing across login, recovery, create-account, security settings, and translation-feedback surfaces.
+- Validation:
+  - `:app:compileDebugKotlin` passed after each batch.
+  - Lint remained clean on touched resource files.

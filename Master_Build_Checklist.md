@@ -91,6 +91,12 @@
   - Preserved translated high-visibility strings while safely backfilling remaining keys for runtime stability.
   - Validation passed with debug Kotlin compile success.
 
+- [x] V40.48 Localization Quality Pass (Batches A-D) - COMPLETED
+  - Improved auth-critical strings across all 17 new locale bundles (`FORGOT PASSWORD?`, `VERIFYING...`, `DONE`).
+  - Added translated recovery/auth error and hint-flow labels/messages for all 17 locale bundles.
+  - Improved Create Account + Settings Security copy and translated Terms/translation-feedback UI labels.
+  - Validation passed with debug Kotlin compile success and no lint issues.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

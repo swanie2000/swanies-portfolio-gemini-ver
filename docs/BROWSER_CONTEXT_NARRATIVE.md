@@ -303,3 +303,27 @@ Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'S
 Current Objective: Execute translation quality pass by replacing inherited English placeholders in new locale bundles, prioritize auth/home/settings/terms surfaces first, and preserve V40.47 parity guarantees.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
+
+🌍 20. V40.48 — LOCALIZATION QUALITY PASS (BATCHES A-D)
+
+    - Scope:
+      - Completed quality-focused translation passes across all 17 new locale bundles introduced in V40.47.
+    - Batch A:
+      - Auth core string upgrades (`FORGOT PASSWORD?`, `VERIFYING...`, `DONE`).
+    - Batch B:
+      - Recovery/auth error and hint-flow messaging upgrades.
+    - Batch C:
+      - Create-account and security settings copy upgrades.
+    - Batch D:
+      - Terms heading and translation-feedback UI copy upgrades (CTA/title/subtitle/submit/chooser/no-email).
+    - Result:
+      - Stronger native phrasing on high-traffic auth/settings/terms surfaces while retaining key parity guarantees.
+    - Validation:
+      - Debug Kotlin compile passed after batch rollout; lint remained clean on touched resource files.
+
+🚀 NEXT AGENT COMMAND
+"The narrative is now V40.48: Localization Quality Pass (Batches A-D).
+
+Current Objective: Continue translation refinement with placeholder/format safety checks and RTL visual verification (Arabic) while preserving V40.48 coverage and parity guardrails.
+
+Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
