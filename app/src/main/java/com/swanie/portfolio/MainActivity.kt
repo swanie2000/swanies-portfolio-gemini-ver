@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,8 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,10 +27,11 @@ import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.AndroidEntryPoint
 import android.os.SystemClock
 import java.io.File
+import java.util.Locale
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
@@ -67,8 +66,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             LaunchedEffect(languageCode) {
-                val languageTags = if (languageCode == "system") "" else languageCode
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageTags))
+                applySelectedLocale(languageCode)
             }
 
             SwaniesPortfolioTheme(
@@ -146,5 +144,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
         lastBackgroundedAtMs = null
+    }
+
+    @Suppress("DEPRECATION")
+    private fun applySelectedLocale(languageCode: String) {
+        val targetLocale = if (languageCode == "system") {
+            resources.configuration.locales[0]
+        } else {
+            Locale.forLanguageTag(languageCode)
+        }
+        Locale.setDefault(targetLocale)
+        val config = android.content.res.Configuration(resources.configuration)
+        config.setLocale(targetLocale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+        applicationContext.resources.updateConfiguration(config, applicationContext.resources.displayMetrics)
     }
 }
