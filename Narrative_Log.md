@@ -145,3 +145,30 @@ Release recorded: V40.38 "Recovery + Password Management + Theme Parity".
 - V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
 - V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
 - V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.
+
+---
+
+## V40.39 - Shared Password Policy + Auth Guardrail Tests
+
+Release recorded: V40.39 "Shared Password Policy + Auth Guardrail Tests".
+
+- Unified password validation policy:
+  - Added centralized `AuthPolicy.evaluatePasswordStrength(...)` and `PasswordStrength` contract.
+  - Replaced duplicated password-rule logic in Create Account and Settings password update with shared policy usage.
+- Expanded auth guardrail tests:
+  - Added coverage for display-name fallback when username is blank.
+  - Added coverage for whitespace normalization in password credential checks.
+  - Added coverage confirming resume-timeout lock never triggers for unauthenticated users.
+  - Added coverage for password strength validity/invalidity and normalization behavior.
+- Outcome:
+  - Reduced chance of behavior drift between account creation and password update flows.
+  - Strengthened regression detection for auth policy changes before runtime.
+- Validation:
+  - `AuthPolicyTest` targeted run passed.
+  - `:app:compileDebugKotlin` passed.
+
+### Next Phase (Projected Path)
+
+- V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
+- V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
+- V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.

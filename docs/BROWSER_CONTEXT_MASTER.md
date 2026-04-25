@@ -350,7 +350,21 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
     - Validation:
       - Iterative lint checks and Kotlin compile checks remained green through rollout.
 
-🚀 12. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🧪 12. V40.39 — SHARED PASSWORD POLICY + AUTH GUARDRAIL TESTS
+
+    - Policy unification:
+      - Added centralized `AuthPolicy.evaluatePasswordStrength(...)` and `PasswordStrength` contract.
+      - Create-account and settings password update now share one validation source of truth.
+    - Test hardening:
+      - Added `AuthPolicyTest` coverage for display-name fallback with blank username.
+      - Added password whitespace normalization verification.
+      - Added lock gating coverage for unauthenticated timeout path.
+      - Added strong/weak password validity and normalization coverage.
+    - Stability impact:
+      - Prevents silent drift between account creation and password update requirements.
+      - Tightens regression safety around auth and password policy changes.
+
+🚀 13. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
@@ -363,9 +377,9 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.38: Recovery + Password Management + Theme Parity.
+"The narrative is now V40.39: Shared Password Policy + Auth Guardrail Tests.
 
-Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.38 auth/recovery UX hardening and existing non-regression constraints.
+Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.39 auth and password-policy hardening constraints.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE

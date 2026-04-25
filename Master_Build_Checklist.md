@@ -35,6 +35,12 @@
   - Applied user-selected theme colors (including card background) to all touched popup/dialog surfaces for visual consistency.
   - Added follow-up UI polish in Security section (`RESET PASSWORD` placement/alignment) and validated with clean Kotlin compile.
 
+- [x] V40.39 Shared Password Policy + Auth Guardrail Tests - COMPLETED
+  - Centralized password strength requirements in `AuthPolicy.evaluatePasswordStrength` to prevent rule drift.
+  - Wired both Create Account and Settings password update flows to the same validation contract.
+  - Expanded `AuthPolicyTest` with coverage for display-name fallback, whitespace normalization, auth lock gating, and password strength validity.
+  - Validation passed via targeted unit test run and debug Kotlin compile.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
