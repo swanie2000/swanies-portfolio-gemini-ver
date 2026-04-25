@@ -9,6 +9,7 @@ import com.swanie.portfolio.data.local.UserProfileEntity
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.repository.AssetRepository
+import com.swanie.portfolio.security.AuthPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -206,41 +207,23 @@ class MainViewModel @Inject constructor(
     }
 
     suspend fun verifyCredentials(name: String, password: String): Boolean {
-        val normalizedName = name.trim().replace("\\s".toRegex(), "")
-        val normalizedPassword = password.trim().replace("\\s".toRegex(), "")
-        if (normalizedName.isBlank() || normalizedPassword.isBlank()) {
-            _isVaultUnlocked.value = false
-            return false
-        }
-
         val profile = userDao.getFirstUser()
         if (profile == null) {
             _isVaultUnlocked.value = false
             return false
         }
 
-        val storedUserName = profile.userName
-            .ifBlank { profile.displayName.trim().replace("\\s".toRegex(), "") }
-            .replace("\\s".toRegex(), "")
-            .lowercase()
-        val storedDisplayName = profile.displayName
-            .trim()
-            .replace("\\s".toRegex(), "")
-            .lowercase()
-        val storedEmail = profile.email
-            .trim()
-            .lowercase()
-        val inputUserName = normalizedName.lowercase()
+        val inputUserName = AuthPolicy.normalizeIdentity(name)
         Log.d(
             "VAULT_AUTH",
-            "Input Username: $inputUserName, DB Username: $storedUserName, DB Email: ${profile.email}, DB Password: ${profile.loginPassword}"
+            "Input Username: $inputUserName, DB Username: ${AuthPolicy.normalizeIdentity(profile.userName)}, DB Email: ${profile.email}, DB Password: ${profile.loginPassword}"
         )
 
-        val userMatch = inputUserName == storedUserName ||
-            inputUserName == storedDisplayName ||
-            inputUserName == storedEmail
-        val isMatch = userMatch &&
-            profile.loginPassword == normalizedPassword
+        val isMatch = AuthPolicy.matchesCredentials(
+            inputIdentity = name,
+            inputPassword = password,
+            profile = profile
+        )
         Log.d("VAULT_AUTH", "Comparison Result: $isMatch")
         _isVaultUnlocked.value = isMatch
         return isMatch

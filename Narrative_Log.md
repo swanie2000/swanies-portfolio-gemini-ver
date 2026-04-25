@@ -68,3 +68,24 @@ Release recorded: V40.34 "Auth Surface Unification + Session Control".
 - Add lightweight auth diagnostics mode (developer-only) to surface active auth state and session timeout decisions for faster field debugging.
 - Validate cross-device biometric behavior matrix (Pixel, Samsung, emulator) to confirm consistent callback handling and error wording.
 - Optional UX refinement: make timeout selector more explicit with labeled tick marks or chips while preserving current behavior.
+
+---
+
+## V40.35 - Auth Reliability Harness
+
+Release recorded: V40.35 "Auth Reliability Harness".
+
+- Added centralized auth policy module `AuthPolicy` for deterministic, reusable credential and timeout decision logic.
+- Refactored runtime auth checks to use shared policy methods in `MainViewModel` and `MainActivity` (reduced drift between production behavior and test expectations).
+- Added focused unit coverage in `AuthPolicyTest` for:
+  - username/displayName/email credential matching,
+  - password failure behavior,
+  - timeout boundary logic including `Never`.
+- Added GitHub CI workflow `.github/workflows/android-auth-safety.yml` to automatically run auth safety unit tests and debug Kotlin compile on push/PR to `main`.
+- Validation: local `testDebugUnitTest` and `:app:compileDebugKotlin` pass.
+
+### Next Phase (Projected Path)
+
+- Expand harness into instrumentation flow tests for `HOME -> UNLOCK_VAULT -> HOLDINGS` and biometric success/cancel/failure UI states.
+- Add a lightweight developer diagnostics panel for auth state transitions and timeout decisions (debug-only).
+- Run cross-device biometric callback verification matrix and log OEM-specific behavior notes.

@@ -129,9 +129,23 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
       - `app/src/main/java/com/swanie/portfolio/ui/settings/SettingsViewModel.kt`
       - `app/src/main/java/com/swanie/portfolio/ui/settings/SettingsScreen.kt`
 
-🚀 9. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🧪 9. V40.35 — AUTH RELIABILITY HARNESS (LATEST TEST SAFETY NET)
+
+    - Centralized policy module:
+      - [AuthPolicy] in `app/src/main/java/com/swanie/portfolio/security/AuthPolicy.kt`
+      - Encapsulates identity normalization, credential matching, and resume-timeout lock decision.
+    - Runtime integration:
+      - [MainViewModel.verifyCredentials] delegates to [AuthPolicy.matchesCredentials].
+      - [MainActivity.onResume] delegates timeout lock decision to [AuthPolicy.shouldLockAfterResume].
+    - Unit test harness:
+      - `app/src/test/java/com/swanie/portfolio/security/AuthPolicyTest.kt`
+      - Covers username/displayName/email matches, password failure, threshold behavior, and `Never`.
+    - CI enforcement:
+      - `.github/workflows/android-auth-safety.yml` runs `testDebugUnitTest` and `:app:compileDebugKotlin` on push/PR to `main`.
+
+🚀 10. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
-Auth Reliability Harness	Add regression coverage for credential success/failure, biometric success/cancel/failure, and timeout boundary behavior (`timeout-1s`, `timeout+1s`, `Never`).	IMMEDIATE
+Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
 Cross-Device Biometric Validation	Validate biometric callback consistency and prompt/error UX across major OEM devices.	HIGH
 Widget Contract Hardening	Keep planned widget regression coverage for reorder persistence and instance rebinding.	MEDIUM
@@ -139,8 +153,8 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.34: Auth Surface Unification + Session Control.
+"The narrative is now V40.35: Auth Reliability Harness.
 
-Current Objective: Build V40.35 Auth Reliability Harness with minimal-risk targeted coverage for login, biometrics, and timeout boundaries.
+Current Objective: Build V40.36 Auth Flow Instrumentation Harness to validate end-to-end navigation and biometric UI outcomes.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."

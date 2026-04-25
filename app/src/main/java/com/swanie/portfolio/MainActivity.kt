@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.swanie.portfolio.security.AuthPolicy
 import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.NavGraph
@@ -127,8 +128,12 @@ class MainActivity : FragmentActivity() {
 
         if (backgroundedAt != null && isAuthenticated && timeoutSeconds >= 0) {
             val elapsedMs = SystemClock.elapsedRealtime() - backgroundedAt
-            val timeoutMs = timeoutSeconds * 1000L
-            if (elapsedMs > timeoutMs) {
+            if (AuthPolicy.shouldLockAfterResume(
+                    timeoutSeconds = timeoutSeconds,
+                    elapsedMs = elapsedMs,
+                    isAuthenticated = isAuthenticated
+                )
+            ) {
                 authViewModel.setLocked()
             }
         }

@@ -22,7 +22,13 @@
     - Security verbiage simplification in Settings.
     - App orientation locked to portrait.
 
-- [ ] V40.35 Auth Reliability Harness - NEXT
-  - Add automated regression coverage for login success/failure, biometric success/cancel/fail, and timeout edge boundaries.
-  - Add optional developer diagnostics surface for auth state + timeout decision tracing.
-  - Validate biometric behavior consistency across representative OEM devices.
+- [x] V40.35 Auth Reliability Harness - COMPLETED
+  - Added centralized `AuthPolicy` module for credential matching and timeout lock decisions.
+  - Added `AuthPolicyTest` unit coverage for identity/password matching and timeout thresholds including `Never`.
+  - Wired runtime auth decision points (`MainViewModel`, `MainActivity`) to shared policy methods.
+  - Added automated GitHub workflow (`android-auth-safety.yml`) to run auth unit tests + Kotlin compile on push/PR.
+
+- [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
+  - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
+  - Add debug-only auth diagnostics surface for state transition tracing.
+  - Execute cross-device biometric callback validation and capture OEM behavior notes.
