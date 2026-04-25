@@ -171,6 +171,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                         text = { Text(optionLabel) },
                         onClick = {
                             settingsViewModel.saveLanguageCode(option)
+                            activity.recreate()
                             languageMenuExpanded = false
                         },
                         trailingIcon = {

@@ -511,6 +511,7 @@ fun SettingsScreen(
                                     text = { Text(optionLabel) },
                                     onClick = {
                                         settingsViewModel.saveLanguageCode(option)
+                                        (context as? FragmentActivity)?.recreate()
                                         languageExpanded = false
                                     }
                                 )
