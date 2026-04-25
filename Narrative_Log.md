@@ -117,3 +117,31 @@ Release planning recorded: V40.36 "Blueprint Roadmap Track".
 - V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
 - V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
 - V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.
+
+---
+
+## V40.38 - Recovery + Password Management + Theme Parity
+
+Release recorded: V40.38 "Recovery + Password Management + Theme Parity".
+
+- Hardened account recovery flow:
+  - `Forgot Password` now requires username + email + biometric verification to reveal stored hint.
+  - Recovery dialog completes cleanly via `DONE` back to login context without password reset bypass.
+- Added secure password management in Settings:
+  - New password update flow requires current password + biometric confirmation.
+  - Enforced same password policy as create-account (`8+`, uppercase, number, symbol, confirm match).
+  - Moved password flow into popup to keep Settings compact and improved keyboard handling/scroll behavior.
+- UX reliability improvements:
+  - Preserved login and create-account form input during correction/navigation.
+  - Tightened unlock screen layout and embedded compact `FORGOT PASSWORD?` affordance near password entry.
+- Theme fidelity pass across touched auth/settings surfaces:
+  - Replaced hardcoded colors with user-selected theme colors.
+  - Updated popup/dialog containers to use user-selected card background color for consistency.
+- Validation:
+  - Repeated lint checks and Kotlin compile checks passed during iterative updates.
+
+### Next Phase (Projected Path)
+
+- V40.36.1 Localization Foundation: extract UI strings, add language selector, persist and apply locale on launch.
+- V40.36.2 Subscription Tier Matrix: define trial/paid/premium feature boundaries and entitlement checks.
+- V40.36.3 Billing + Profile Integration: wire billing provider state into `user_tier` and account settings UX.

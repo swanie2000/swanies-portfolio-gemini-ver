@@ -334,7 +334,23 @@ To maintain a commercial-grade financial vault where user data is sovereign, bio
       2) Tier/entitlement matrix,
       3) Billing integration + profile persistence wiring.
 
-🚀 11. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
+🛡️ 11. V40.38 — RECOVERY + PASSWORD MANAGEMENT + THEME PARITY
+
+    - Recovery hardening:
+      - `Forgot Password` now requires username + email + biometric verification to reveal hint.
+      - Recovery flow returns cleanly to login context via `DONE` without password-reset bypass.
+    - Settings password management:
+      - Added biometric-gated password update flow requiring current password.
+      - Enforced create-account password standards (`8+`, uppercase, number, symbol, confirm match).
+      - Moved change-password UI into popup with keyboard-safe scrolling and action visibility fixes.
+    - UX and theme consistency:
+      - Preserved user input during login/create-account correction flows.
+      - Applied user-selected theme colors and card-background dialog surfaces across touched auth/settings/holdings popups.
+      - Security section action polish: `RESET PASSWORD` moved to top and left-aligned.
+    - Validation:
+      - Iterative lint checks and Kotlin compile checks remained green through rollout.
+
+🚀 12. THE FUTURE PATH (CURRENT WORK-IN-PROGRESS)
 Task	Description	Priority
 Auth Flow Instrumentation Harness	Add end-to-end instrumentation coverage for `HOME -> UNLOCK_VAULT -> HOLDINGS` plus biometric success/cancel/failure UI paths.	IMMEDIATE
 Auth Diagnostics Mode	Add a developer-only diagnostics pane to show auth state transitions and timeout decisions.	HIGH
@@ -347,9 +363,9 @@ Market Watch Rebuild	Apply Pin-Anchor architecture across Market/Price surfaces 
 Sovereign Bridge	Harden cloud sync behavior around vault-scoped widget mutations.	MEDIUM
 
 🚀 NEXT AGENT COMMAND
-"The narrative is now V40.36: Blueprint Roadmap Track (Localization + Billing + Tiers).
+"The narrative is now V40.38: Recovery + Password Management + Theme Parity.
 
-Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.35 auth safety net and existing non-regression constraints.
+Current Objective: Begin V40.36.1 Localization Foundation while preserving V40.38 auth/recovery UX hardening and existing non-regression constraints.
 
 Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'SOVEREIGN LOCK' before any architectural shift."
 ### END_NARRATIVE

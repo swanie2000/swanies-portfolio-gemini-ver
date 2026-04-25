@@ -28,6 +28,13 @@
   - Wired runtime auth decision points (`MainViewModel`, `MainActivity`) to shared policy methods.
   - Added automated GitHub workflow (`android-auth-safety.yml`) to run auth unit tests + Kotlin compile on push/PR.
 
+- [x] V40.38 Recovery + Password Management + Theme Parity - COMPLETED
+  - Shipped secure hint-recovery UX requiring username + email + biometric verification before revealing hint.
+  - Added biometric-gated password update flow in Settings with create-account password rules and keyboard-safe popup behavior.
+  - Preserved user input on login/create-account correction paths and tightened unlock-screen layout density.
+  - Applied user-selected theme colors (including card background) to all touched popup/dialog surfaces for visual consistency.
+  - Added follow-up UI polish in Security section (`RESET PASSWORD` placement/alignment) and validated with clean Kotlin compile.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
