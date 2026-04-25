@@ -35,6 +35,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -165,8 +166,8 @@ fun ThemeStudioScreen(
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
-            title = { Text("Reset to Default?", fontWeight = FontWeight.Bold, color = safeSiteTextColor) },
-            text = { Text("This will override your custom HEX selection.", color = safeSiteTextColor.copy(0.7f)) },
+            title = { Text(stringResource(R.string.theme_reset_title), fontWeight = FontWeight.Bold, color = safeSiteTextColor) },
+            text = { Text(stringResource(R.string.theme_reset_body), color = safeSiteTextColor.copy(0.7f)) },
             confirmButton = {
                 TextButton(onClick = {
                     val defAppBg = ThemeDefaults.APP_BG.toHexString()
@@ -185,10 +186,10 @@ fun ThemeStudioScreen(
                     android.graphics.Color.colorToHSV(android.graphics.Color.parseColor(defAppBg), hsv)
                     hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
                     showResetDialog = false
-                }) { Text("RESET", color = Color.Red, fontWeight = FontWeight.Black) }
+                }) { Text(stringResource(R.string.settings_reset_everything), color = Color.Red, fontWeight = FontWeight.Black) }
             },
             dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) { Text("CANCEL", color = safeSiteTextColor) }
+                TextButton(onClick = { showResetDialog = false }) { Text(stringResource(R.string.action_cancel), color = safeSiteTextColor) }
             },
             containerColor = safeCardBgColor
         )
@@ -210,7 +211,7 @@ fun ThemeStudioScreen(
         ) {
             // --- 🦢 BOUTIQUE HEADER ---
             BoutiqueHeader(
-                title = "THEME MANAGER",
+                title = stringResource(R.string.theme_manager_title),
                 onBack = { navController.popBackStack() },
                 actionIcon = Icons.Default.Refresh,
                 onAction = { showResetDialog = true },
@@ -289,7 +290,11 @@ fun ThemeStudioScreen(
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text("APPLY TO ${targets[activeTarget].uppercase()}", color = Color.Black, fontWeight = FontWeight.ExtraBold)
+                Text(
+                    stringResource(R.string.theme_apply_to_target, targets[activeTarget].uppercase()),
+                    color = Color.Black,
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
 
             // 🛡️ Added bottom clearance for the global navigation bar

@@ -11,12 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
 
 /**
@@ -55,14 +57,14 @@ fun RestoreVaultScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "VAULT RECOVERY",
+                text = stringResource(R.string.restore_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
                 color = Color.White
             )
 
             Text(
-                text = "Cloud restoration is being optimized for the Sovereign Shield. Please start with a fresh vault or setup your local security.",
+                text = stringResource(R.string.restore_description),
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
@@ -80,7 +82,7 @@ fun RestoreVaultScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("START FRESH VAULT", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.restore_start_fresh_vault), fontWeight = FontWeight.Bold)
             }
 
             TextButton(
@@ -91,7 +93,7 @@ fun RestoreVaultScreen(
                 },
                 modifier = Modifier.padding(top = 8.dp)
             ) {
-                Text("BACK TO START", color = Color.White.copy(alpha = 0.4f))
+                Text(stringResource(R.string.restore_back_to_start), color = Color.White.copy(alpha = 0.4f))
             }
         }
     }

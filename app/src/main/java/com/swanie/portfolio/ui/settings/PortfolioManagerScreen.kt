@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -149,7 +150,7 @@ fun PortfolioManagerScreen(
                         modifier = Modifier.height(80.dp)
                     )
                     Text(
-                        text = "PORTFOLIO MANAGER",
+                        text = stringResource(R.string.portfolio_manager_title),
                         color = safeThemeText,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -162,7 +163,7 @@ fun PortfolioManagerScreen(
                         .align(Alignment.TopEnd)
                         .clip(CircleShape)
                         .background(goldPrimary)
-                        .clickable { mainViewModel.createNewVault("NEW PORTFOLIO") },
+                        .clickable { mainViewModel.createNewVault(activity.getString(R.string.portfolio_new_default_name)) },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(Icons.Default.Add, null, tint = Color.Black)
@@ -177,7 +178,7 @@ fun PortfolioManagerScreen(
             ) {
                 Icon(Icons.Default.Star, null, tint = Color.Yellow, modifier = Modifier.size(30.dp))
                 Text(
-                    text = "Indicates Startup Portfolio",
+                    text = stringResource(R.string.portfolio_startup_indicator),
                     color = safeThemeText.copy(alpha = 0.6f),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -298,18 +299,18 @@ fun PortfolioManagerScreen(
         AlertDialog(
             onDismissRequest = { vaultToDelete = null },
             containerColor = dialogBg,
-            title = { Text("DELETE PORTFOLIO?", color = Color.Red, fontWeight = FontWeight.Black) },
-            text = { Text("Permanently wipe '${vault.name}'?", color = safeThemeText) },
+            title = { Text(stringResource(R.string.portfolio_delete_title), color = Color.Red, fontWeight = FontWeight.Black) },
+            text = { Text(stringResource(R.string.portfolio_delete_body, vault.name), color = safeThemeText) },
             confirmButton = {
                 if (allVaults.size > 1) {
                     TextButton(onClick = { mainViewModel.deleteVault(vault); vaultToDelete = null }) {
-                        Text("DELETE", color = Color.Red)
+                        Text(stringResource(R.string.action_delete), color = Color.Red)
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { vaultToDelete = null }) {
-                    Text("CANCEL", color = safeThemeText)
+                    Text(stringResource(R.string.action_cancel), color = safeThemeText)
                 }
             }
         )
@@ -333,7 +334,7 @@ fun PortfolioManagerScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Text(
-                    text = "EDIT PORTFOLIO",
+                    text = stringResource(R.string.portfolio_edit_title),
                     color = safeThemeText,
                     fontWeight = FontWeight.Black,
                     fontSize = 14.sp
@@ -356,7 +357,10 @@ fun PortfolioManagerScreen(
                 Button(
                     onClick = {
                         selectedVaultForEdit?.let { target ->
-                            mainViewModel.updateVaultName(target.id, editName.ifBlank { "PORTFOLIO" })
+                            mainViewModel.updateVaultName(
+                                target.id,
+                                editName.ifBlank { activity.getString(R.string.portfolio_fallback_name) }
+                            )
                         }
                         showEditDialog = false
                         selectedVaultForEdit = null
@@ -370,7 +374,7 @@ fun PortfolioManagerScreen(
                         contentColor = Color.Black
                     )
                 ) {
-                    Text("SAVE", fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.action_save), fontWeight = FontWeight.Black)
                 }
             }
         }

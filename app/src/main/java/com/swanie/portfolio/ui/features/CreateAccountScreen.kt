@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -116,13 +117,13 @@ fun CreateAccountScreen(
         ) {
             Box(modifier = Modifier.fillMaxWidth()) {
                 IconButton(onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentSilver)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.content_back), tint = accentSilver)
                 }
             }
             Spacer(modifier = Modifier.height(60.dp))
             Image(painter = painterResource(id = R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.size(60.dp))
             Spacer(modifier = Modifier.height(24.dp))
-            Text(text = "CREATE ACCOUNT", color = siteText, fontSize = 20.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+            Text(text = stringResource(R.string.create_account_title), color = siteText, fontSize = 20.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp)
             Spacer(Modifier.height(32.dp))
 
             val textFieldColors = OutlinedTextFieldDefaults.colors(
@@ -133,7 +134,7 @@ fun CreateAccountScreen(
                 cursorColor = siteText
             )
 
-            InputLabel("USERNAME", siteText)
+            InputLabel(stringResource(R.string.label_username).uppercase(), siteText)
             OutlinedTextField(
                 value = fullName,
                 onValueChange = { fullName = it.replace("\\s".toRegex(), "") },
@@ -147,15 +148,15 @@ fun CreateAccountScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = textFieldColors,
                 singleLine = true,
-                placeholder = { Text("Username", color = siteText.copy(alpha = 0.45f)) }
+                placeholder = { Text(stringResource(R.string.label_username), color = siteText.copy(alpha = 0.45f)) }
             )
 
             Spacer(Modifier.height(16.dp))
-            InputLabel("EMAIL ADDRESS", siteText)
+            InputLabel(stringResource(R.string.label_email_address), siteText)
             OutlinedTextField(value = email, onValueChange = { email = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true)
 
             Spacer(Modifier.height(16.dp))
-            InputLabel("PASSWORD", siteText)
+            InputLabel(stringResource(R.string.label_password).uppercase(), siteText)
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it.replace("\\s".toRegex(), "") },
@@ -182,14 +183,14 @@ fun CreateAccountScreen(
 
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 val dim = siteText.copy(alpha = 0.3f)
-                Text(text = "• 8+ Chars", color = if (hasMinLength) accentSilver else dim, fontSize = 9.sp)
-                Text(text = "• Upper", color = if (hasCapital) accentSilver else dim, fontSize = 9.sp)
-                Text(text = "• Number", color = if (hasNumber) accentSilver else dim, fontSize = 9.sp)
-                Text(text = "• Special", color = if (hasSymbol) accentSilver else dim, fontSize = 9.sp)
+                Text(text = stringResource(R.string.password_rule_min_chars), color = if (hasMinLength) accentSilver else dim, fontSize = 9.sp)
+                Text(text = stringResource(R.string.password_rule_upper), color = if (hasCapital) accentSilver else dim, fontSize = 9.sp)
+                Text(text = stringResource(R.string.password_rule_number), color = if (hasNumber) accentSilver else dim, fontSize = 9.sp)
+                Text(text = stringResource(R.string.password_rule_special), color = if (hasSymbol) accentSilver else dim, fontSize = 9.sp)
             }
 
             Spacer(Modifier.height(16.dp))
-            InputLabel("CONFIRM PASSWORD", siteText)
+            InputLabel(stringResource(R.string.label_confirm_password), siteText)
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it.replace("\\s".toRegex(), "") },
@@ -215,13 +216,13 @@ fun CreateAccountScreen(
             )
 
             Spacer(Modifier.height(20.dp))
-            InputLabel("RECOVERY HINT", siteText)
+            InputLabel(stringResource(R.string.label_recovery_hint), siteText)
             OutlinedTextField(value = passwordHint, onValueChange = { passwordHint = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true)
 
             Spacer(Modifier.height(24.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { syncToDrive = !syncToDrive }) {
                 Checkbox(checked = syncToDrive, onCheckedChange = { syncToDrive = it }, colors = CheckboxDefaults.colors(checkedColor = accentSilver, checkmarkColor = siteBg))
-                Text("Sync Vault to Google Drive", color = siteText.copy(0.7f), fontSize = 12.sp)
+                Text(stringResource(R.string.setting_sync_drive), color = siteText.copy(0.7f), fontSize = 12.sp)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -235,13 +236,13 @@ fun CreateAccountScreen(
                     colors = CheckboxDefaults.colors(checkedColor = accentSilver, checkmarkColor = siteBg)
                 )
                 Text(
-                    text = "I accept the ",
+                    text = stringResource(R.string.tos_accept_prefix),
                     color = siteText.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )
                 TextButton(onClick = { navController.navigate(Routes.TERMS_CONDITIONS) }) {
                     Text(
-                        "Terms and Conditions",
+                        stringResource(R.string.tos_terms),
                         color = accentSilver,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -256,7 +257,11 @@ fun CreateAccountScreen(
                     if (isCreatingAccount) return@Button
                     scope.launch {
                         isCreatingAccount = true
-                        val vaultName = if (fullName.isNotBlank()) "$fullName's Vault" else "Sovereign Vault"
+                        val vaultName = if (fullName.isNotBlank()) {
+                            activity.getString(R.string.vault_name_user, fullName)
+                        } else {
+                            activity.getString(R.string.vault_name_fallback)
+                        }
                         val stored = mainViewModel.createOrUpdateUserProfileAndFetchFirst(
                             displayName = fullName,
                             email = email,
@@ -280,14 +285,14 @@ fun CreateAccountScreen(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = if (isCreatingAccount) "CREATING..." else "CREATE ACCOUNT",
+                    text = if (isCreatingAccount) stringResource(R.string.status_creating) else stringResource(R.string.action_create_account),
                     fontWeight = FontWeight.Black,
                     fontSize = 15.sp
                 )
             }
             TextButton(onClick = { navController.navigate(Routes.UNLOCK_VAULT) }) {
                 Text(
-                    "LOGIN",
+                    stringResource(R.string.action_login),
                     color = accentSilver,
                     fontWeight = FontWeight.Medium,
                     textDecoration = TextDecoration.Underline
@@ -304,12 +309,15 @@ fun CreateAccountScreen(
         } else {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("Account Created Successfully") },
+            title = { Text(stringResource(R.string.account_created_title)) },
             text = {
                 Text(
-                    "Stored Username: ${profile.userName}\n\n" +
-                        "Stored Email: ${profile.email}\n\n" +
-                        "Stored Password: ${profile.loginPassword}"
+                    stringResource(
+                        R.string.account_created_receipt,
+                        profile.userName,
+                        profile.email,
+                        profile.loginPassword
+                    )
                 )
             },
             confirmButton = {
@@ -324,7 +332,7 @@ fun CreateAccountScreen(
                         }
                     }
                 ) {
-                    Text("I've Verified It - Proceed to Login")
+                    Text(stringResource(R.string.account_created_done))
                 }
             },
             containerColor = dialogBg

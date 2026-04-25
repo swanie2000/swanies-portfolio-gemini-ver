@@ -252,13 +252,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Swanie's Portfolio",
+                    text = stringResource(R.string.home_title),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Crypto & Precious Metals",
+                    text = stringResource(R.string.home_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.LightGray.copy(alpha = 0.8f)
                 )
@@ -284,13 +284,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     colors = ButtonDefaults.buttonColors(containerColor = userThemeTextColor, contentColor = userThemeBgColor),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("LOGIN", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
+                    Text(stringResource(R.string.action_login), fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
-                    Text("CREATE ACCOUNT", color = userThemeTextColor.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    Text(stringResource(R.string.action_create_account), color = userThemeTextColor.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                 }
             }
         }

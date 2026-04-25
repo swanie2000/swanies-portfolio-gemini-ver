@@ -42,14 +42,13 @@ fun SettingsScreen(
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
     val timeoutOptionsSeconds = listOf(-1, 15, 30, 60, 300, 900)
-    fun formatTimeoutLabel(seconds: Int): String = when {
-        seconds < 0 -> "Never"
-        seconds < 60 -> "$seconds seconds"
-        seconds % 60 == 0 -> "${seconds / 60} minutes"
-        else -> "$seconds seconds"
-    }
-
     val context = LocalContext.current
+    fun formatTimeoutLabel(seconds: Int): String = when {
+        seconds < 0 -> context.getString(R.string.settings_timeout_never)
+        seconds < 60 -> context.getString(R.string.settings_timeout_seconds, seconds)
+        seconds % 60 == 0 -> context.getString(R.string.settings_timeout_minutes, seconds / 60)
+        else -> context.getString(R.string.settings_timeout_seconds, seconds)
+    }
     val isCompactMode by settingsViewModel.isCompactViewEnabled.collectAsState()
     val isHighVisibilityMode by settingsViewModel.isHighVisibilityMode.collectAsState()
     val confirmDelete by mainViewModel.confirmDelete.collectAsState(initial = true)
@@ -98,7 +97,7 @@ fun SettingsScreen(
             onDismissRequest = { showFactoryResetDialog = false },
             title = {
                 Text(
-                    text = "RESET VAULT TO FACTORY?",
+                    text = stringResource(R.string.settings_factory_reset_title),
                     fontWeight = FontWeight.Black,
                     fontSize = 20.sp,
                     color = Color.Red
@@ -106,7 +105,7 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "This will completely wipe the current vault, including all assets and history. This action is sovereign and permanent.",
+                    text = stringResource(R.string.settings_factory_reset_body),
                     color = safeText
                 )
             },
@@ -124,12 +123,12 @@ fun SettingsScreen(
                         }
                     }
                 ) {
-                    Text("RESET EVERYTHING", color = Color.Red, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.settings_reset_everything), color = Color.Red, fontWeight = FontWeight.Black)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showFactoryResetDialog = false }) {
-                    Text("CANCEL", color = safeText.copy(alpha = 0.6f))
+                    Text(stringResource(R.string.action_cancel), color = safeText.copy(alpha = 0.6f))
                 }
             },
             containerColor = safeBg
@@ -153,7 +152,7 @@ fun SettingsScreen(
                     passwordChangeMessage = null
                 }
             },
-            title = { Text("Change Password") },
+            title = { Text(stringResource(R.string.settings_change_password_title)) },
             text = {
                 Column(
                     modifier = Modifier
@@ -164,7 +163,7 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Requires current password and biometric confirmation.",
+                        text = stringResource(R.string.settings_change_password_subtitle),
                         fontSize = 13.sp
                     )
                     OutlinedTextField(
@@ -174,7 +173,7 @@ fun SettingsScreen(
                             passwordChangeMessage = null
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Current Password") },
+                        label = { Text(stringResource(R.string.settings_current_password)) },
                         singleLine = true,
                         visualTransformation = if (currentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -193,7 +192,7 @@ fun SettingsScreen(
                             passwordChangeMessage = null
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("New Password") },
+                        label = { Text(stringResource(R.string.settings_new_password)) },
                         singleLine = true,
                         visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -210,10 +209,10 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val dim = safeText.copy(alpha = 0.3f)
-                        Text(text = "• 8+ Chars", color = if (hasMinLength) safeText else dim, fontSize = 9.sp)
-                        Text(text = "• Upper", color = if (hasCapital) safeText else dim, fontSize = 9.sp)
-                        Text(text = "• Number", color = if (hasNumber) safeText else dim, fontSize = 9.sp)
-                        Text(text = "• Special", color = if (hasSymbol) safeText else dim, fontSize = 9.sp)
+                        Text(text = stringResource(R.string.password_rule_min_chars), color = if (hasMinLength) safeText else dim, fontSize = 9.sp)
+                        Text(text = stringResource(R.string.password_rule_upper), color = if (hasCapital) safeText else dim, fontSize = 9.sp)
+                        Text(text = stringResource(R.string.password_rule_number), color = if (hasNumber) safeText else dim, fontSize = 9.sp)
+                        Text(text = stringResource(R.string.password_rule_special), color = if (hasSymbol) safeText else dim, fontSize = 9.sp)
                     }
                     OutlinedTextField(
                         value = confirmNewPassword,
@@ -222,7 +221,7 @@ fun SettingsScreen(
                             passwordChangeMessage = null
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Confirm New Password") },
+                        label = { Text(stringResource(R.string.settings_confirm_new_password)) },
                         singleLine = true,
                         visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
@@ -249,7 +248,7 @@ fun SettingsScreen(
                     onClick = {
                         val activity = context as? FragmentActivity
                         if (activity == null) {
-                            passwordChangeMessage = "Unable to open biometric prompt."
+                            passwordChangeMessage = context.getString(R.string.settings_password_bio_prompt_unavailable)
                             return@TextButton
                         }
                         val normalizedCurrent = currentPassword.trim().replace("\\s".toRegex(), "")
@@ -258,15 +257,15 @@ fun SettingsScreen(
 
                         when {
                             normalizedCurrent.isBlank() || normalizedNew.isBlank() || normalizedConfirm.isBlank() -> {
-                                passwordChangeMessage = "Please complete all password fields."
+                                passwordChangeMessage = context.getString(R.string.settings_password_complete_fields)
                                 return@TextButton
                             }
                             !passwordStrength.isValid -> {
-                                passwordChangeMessage = "New password must be 8+ chars with uppercase, number, and symbol."
+                                passwordChangeMessage = context.getString(R.string.settings_password_rule_error)
                                 return@TextButton
                             }
                             normalizedNew != normalizedConfirm -> {
-                                passwordChangeMessage = "New password and confirmation do not match."
+                                passwordChangeMessage = context.getString(R.string.settings_password_mismatch)
                                 return@TextButton
                             }
                         }
@@ -290,9 +289,9 @@ fun SettingsScreen(
                                             newPasswordVisible = false
                                             confirmPasswordVisible = false
                                             passwordChangeMessage = null
-                                            Toast.makeText(context, "Password updated successfully.", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.settings_password_updated), Toast.LENGTH_SHORT).show()
                                         } else {
-                                            passwordChangeMessage = "Unable to update password. Check your current password."
+                                            passwordChangeMessage = context.getString(R.string.settings_password_update_failed)
                                         }
                                     } finally {
                                         passwordChangeBusy = false
@@ -306,7 +305,10 @@ fun SettingsScreen(
                         )
                     }
                 ) {
-                    Text(if (passwordChangeBusy) "UPDATING..." else "UPDATE")
+                    Text(
+                        if (passwordChangeBusy) stringResource(R.string.settings_updating)
+                        else stringResource(R.string.settings_update)
+                    )
                 }
             },
             dismissButton = {
@@ -323,7 +325,7 @@ fun SettingsScreen(
                         passwordChangeMessage = null
                     }
                 ) {
-                    Text("CANCEL")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
             containerColor = safeBg,
@@ -344,13 +346,13 @@ fun SettingsScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 Box(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 48.dp, bottom = 24.dp)) {
-                    Text(text = "SETTINGS", color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
+                    Text(text = stringResource(R.string.settings_title), color = safeText, fontSize = 24.sp, fontWeight = FontWeight.Black)
                 }
 
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
 
                     // --- SECURITY ---
-                    Text("SECURITY", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(stringResource(R.string.settings_security), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     TextButton(
                         onClick = { showPasswordResetDialog = true },
@@ -358,7 +360,7 @@ fun SettingsScreen(
                         contentPadding = PaddingValues(0.dp)
                     ) {
                         Text(
-                            text = "RESET PASSWORD",
+                            text = stringResource(R.string.settings_reset_password),
                             color = safeText,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.fillMaxWidth(),
@@ -367,8 +369,8 @@ fun SettingsScreen(
                     }
 
                     SettingsCheckboxItem(
-                        title = "LOGIN OPTION",
-                        subtitle = "Allow biometrics for login.",
+                        title = stringResource(R.string.settings_login_option),
+                        subtitle = stringResource(R.string.settings_login_option_subtitle),
                         checked = isBiometricEnabled,
                         onCheckedChange = { enabled ->
                             val activity = context as? FragmentActivity
@@ -382,8 +384,8 @@ fun SettingsScreen(
                     )
 
                     SettingsToggleItem(
-                        title = "Require Password After Biometric Failure",
-                        subtitle = "After biometric failure, require password before retrying biometrics.",
+                        title = stringResource(R.string.settings_require_password_after_bio_fail),
+                        subtitle = stringResource(R.string.settings_require_password_after_bio_fail_subtitle),
                         checked = requirePasswordAfterBiometricFailure,
                         onCheckedChange = { settingsViewModel.saveRequirePasswordAfterBiometricFailure(it) },
                         themeColor = safeText
@@ -410,28 +412,34 @@ fun SettingsScreen(
                             .padding(vertical = 8.dp)
                     ) {
                         Text(
-                            text = "LOGIN TIMEOUT",
+                            text = stringResource(R.string.settings_login_timeout),
                             color = safeText,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
-                            text = "Current: ${formatTimeoutLabel(loginResumeTimeoutSeconds)}",
+                            text = stringResource(
+                                R.string.settings_current_timeout,
+                                formatTimeoutLabel(loginResumeTimeoutSeconds)
+                            ),
                             color = safeText.copy(alpha = 0.85f),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = if (loginResumeTimeoutSeconds < 0) {
-                                "Never require login again from background timeout."
+                                stringResource(R.string.settings_timeout_never_desc)
                             } else {
-                                "Require login again after ${formatTimeoutLabel(loginResumeTimeoutSeconds)} in background."
+                                stringResource(
+                                    R.string.settings_timeout_bg_desc,
+                                    formatTimeoutLabel(loginResumeTimeoutSeconds)
+                                )
                             },
                             color = safeText.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "Applies when returning to the app from background.",
+                            text = stringResource(R.string.settings_timeout_applies_desc),
                             color = safeText.copy(alpha = 0.5f),
                             fontSize = 12.sp
                         )
@@ -455,7 +463,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // --- INTERFACE ---
-                    Text("INTERFACE", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(stringResource(R.string.settings_interface), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     val languageOptions = listOf("system", "en", "es", "ko")
                     val selectedLanguageLabel = when (languageCode) {
@@ -511,8 +519,8 @@ fun SettingsScreen(
                     }
 
                     SettingsToggleItem(
-                        title = "Use Compact Cards",
-                        subtitle = "Shrink asset cards to show more on screen",
+                        title = stringResource(R.string.settings_compact_cards),
+                        subtitle = stringResource(R.string.settings_compact_cards_subtitle),
                         checked = isCompactMode,
                         onCheckedChange = { settingsViewModel.saveIsCompactViewEnabled(it) },
                         themeColor = safeText
@@ -520,16 +528,16 @@ fun SettingsScreen(
 
                     // Syncs to ThemePreferences + MainViewModel; holdings/widget previews read the same flow.
                     SettingsToggleItem(
-                        title = "High-Visibility Compact Cards",
-                        subtitle = "Makes compact cards easier to read with larger, clearer text.",
+                        title = stringResource(R.string.settings_high_visibility_cards),
+                        subtitle = stringResource(R.string.settings_high_visibility_cards_subtitle),
                         checked = isHighVisibilityMode,
                         onCheckedChange = { settingsViewModel.saveIsHighVisibilityMode(it) },
                         themeColor = safeText
                     )
 
                     SettingsToggleItem(
-                        title = "Confirm Deletion",
-                        subtitle = "Show confirmation before removing an asset",
+                        title = stringResource(R.string.settings_confirm_deletion),
+                        subtitle = stringResource(R.string.settings_confirm_deletion_subtitle),
                         checked = confirmDelete,
                         onCheckedChange = { mainViewModel.setConfirmDelete(it) },
                         themeColor = safeText
@@ -538,11 +546,11 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // --- THEME & DEPTH ---
-                    Text("THEME & DEPTH", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(stringResource(R.string.settings_theme_depth), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     SettingsToggleItem(
-                        title = "Background Gradient",
-                        subtitle = "Enable dynamic color shifting",
+                        title = stringResource(R.string.settings_background_gradient),
+                        subtitle = stringResource(R.string.settings_background_gradient_subtitle),
                         checked = useGradient,
                         onCheckedChange = { mainViewModel.setUseGradient(it) },
                         themeColor = safeText
@@ -550,7 +558,7 @@ fun SettingsScreen(
 
                     if (useGradient) {
                         Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)) {
-                            Text(text = "Gradient Intensity", color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(text = stringResource(R.string.settings_gradient_intensity), color = safeText, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                             Slider(
                                 value = gradientAmount,
                                 onValueChange = { mainViewModel.setGradientAmount(it) },
@@ -567,7 +575,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // --- MANAGEMENT ---
-                    Text("MANAGEMENT", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(stringResource(R.string.settings_management), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
                         onClick = {
@@ -578,7 +586,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("PORTFOLIO MANAGER", color = safeText, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_portfolio_manager), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -592,13 +600,13 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.1f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("THEME MANAGER", color = safeText, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_theme_manager), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(48.dp))
 
                     // --- SYSTEM ACTIONS ---
-                    Text("SYSTEM ACTIONS", color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+                    Text(stringResource(R.string.settings_system_actions), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
                         onClick = { showFactoryResetDialog = true },
@@ -606,7 +614,7 @@ fun SettingsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.05f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("FACTORY DEFAULT", color = safeText, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_factory_default), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(120.dp))

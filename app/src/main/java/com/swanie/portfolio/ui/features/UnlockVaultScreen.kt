@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -135,7 +136,7 @@ fun UnlockVaultScreen(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier.align(Alignment.CenterStart)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = accentSilver)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.content_back), tint = accentSilver)
                 }
             }
 
@@ -147,14 +148,14 @@ fun UnlockVaultScreen(
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = "PORTFOLIO LOCKED",
+                text = stringResource(R.string.unlock_title),
                 color = siteText,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 1.5.sp
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "IDENTITY VERIFICATION",
+                text = stringResource(R.string.unlock_subtitle),
                 color = siteText.copy(alpha = 0.5f),
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold,
@@ -175,8 +176,8 @@ fun UnlockVaultScreen(
                         loginError = null
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Username", color = siteText.copy(alpha = 0.7f)) },
-                    placeholder = { Text("Username", color = siteText.copy(alpha = 0.45f)) },
+                    label = { Text(stringResource(R.string.label_username), color = siteText.copy(alpha = 0.7f)) },
+                    placeholder = { Text(stringResource(R.string.label_username), color = siteText.copy(alpha = 0.45f)) },
                     textStyle = LocalTextStyle.current.copy(color = siteText),
                     keyboardOptions = KeyboardOptions(
                         autoCorrectEnabled = false,
@@ -198,7 +199,7 @@ fun UnlockVaultScreen(
                     value = passwordInput,
                     onValueChange = { passwordInput = it.replace("\\s".toRegex(), ""); loginError = null },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Password", color = siteText.copy(alpha = 0.7f)) },
+                    label = { Text(stringResource(R.string.label_password), color = siteText.copy(alpha = 0.7f)) },
                     textStyle = LocalTextStyle.current.copy(color = siteText),
                     keyboardOptions = KeyboardOptions(
                         autoCorrectEnabled = false,
@@ -222,7 +223,7 @@ fun UnlockVaultScreen(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(
-                                    "FORGOT PASSWORD?",
+                                    stringResource(R.string.action_forgot_password),
                                     color = accentSilver,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Medium,
@@ -262,7 +263,7 @@ fun UnlockVaultScreen(
                                 val normalizedPassword = passwordInput.trim().replace("\\s".toRegex(), "")
                                 success = mainViewModel.verifyCredentials(normalizedUserName, normalizedPassword)
                             } catch (_: Exception) {
-                                loginError = "Authentication failed. Please try again."
+                                loginError = context.getString(R.string.msg_auth_failed_try_again)
                             } finally {
                                 delay(2000)
                                 isLoggingIn = false
@@ -276,7 +277,7 @@ fun UnlockVaultScreen(
                                         launchSingleTop = true
                                     }
                             } else {
-                                loginError = "Incorrect Name or Password"
+                                loginError = context.getString(R.string.msg_incorrect_name_or_password)
                             }
                          }
                     },
@@ -286,9 +287,9 @@ fun UnlockVaultScreen(
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     if (isLoggingIn) {
-                        Text("VERIFYING...", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        Text(stringResource(R.string.status_verifying), fontWeight = FontWeight.Black, fontSize = 14.sp)
                     } else {
-                        Text("LOGIN", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        Text(stringResource(R.string.action_login), fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
                 }
 
@@ -308,11 +309,11 @@ fun UnlockVaultScreen(
                     ) {
                         Icon(Icons.Default.Fingerprint, null, modifier = Modifier.size(24.dp))
                         Spacer(Modifier.width(12.dp))
-                        Text("USE BIOMETRICS", fontWeight = FontWeight.Black, fontSize = 14.sp)
+                        Text(stringResource(R.string.action_use_biometrics), fontWeight = FontWeight.Black, fontSize = 14.sp)
                     }
                 } else if (isBiometricEnabled && biometricLockedUntilPassword) {
                     Text(
-                        text = "Use password to continue before trying biometrics again.",
+                        text = stringResource(R.string.msg_biometric_retry_requires_password),
                         color = siteText.copy(alpha = 0.7f),
                         fontSize = 12.sp
                     )
@@ -320,7 +321,7 @@ fun UnlockVaultScreen(
 
                 TextButton(onClick = { navController.navigate(Routes.CREATE_ACCOUNT) }) {
                     Text(
-                        "CREATE ACCOUNT",
+                        stringResource(R.string.action_create_account),
                         color = accentSilver,
                         fontWeight = FontWeight.Medium
                     )
@@ -342,11 +343,11 @@ fun UnlockVaultScreen(
                     recoveryMessage = null
                 }
             },
-            title = { Text("Recover Access") },
+            title = { Text(stringResource(R.string.recover_access_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Enter your username and email. Then verify biometrics to reveal your hint.",
+                        stringResource(R.string.recover_access_description),
                         fontSize = 13.sp
                     )
                     OutlinedTextField(
@@ -355,7 +356,7 @@ fun UnlockVaultScreen(
                             recoveryUserName = it
                             recoveryMessage = null
                         },
-                        label = { Text("Username") },
+                        label = { Text(stringResource(R.string.label_username)) },
                         singleLine = true,
                         enabled = !isRecovering && recoveredHint == null
                     )
@@ -365,12 +366,12 @@ fun UnlockVaultScreen(
                             recoveryEmail = it
                             recoveryMessage = null
                         },
-                        label = { Text("Email") },
+                        label = { Text(stringResource(R.string.label_email)) },
                         singleLine = true,
                         enabled = !isRecovering && recoveredHint == null
                     )
                     recoveredHint?.let {
-                        Text("Hint: $it", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.label_hint, it), fontWeight = FontWeight.SemiBold)
                     }
                     recoveryMessage?.let { Text(it, fontSize = 12.sp) }
                 }
@@ -385,7 +386,7 @@ fun UnlockVaultScreen(
                             try {
                                 if (recoveredHint == null) {
                                     if (recoveryUserName.isBlank() || recoveryEmail.isBlank()) {
-                                        recoveryMessage = "Please enter both username and email."
+                                        recoveryMessage = context.getString(R.string.msg_recovery_enter_both)
                                     } else {
                                         authViewModel.authenticateForRecovery(
                                             activity = activity,
@@ -396,10 +397,10 @@ fun UnlockVaultScreen(
                                                         email = recoveryEmail
                                                     )
                                                     recoveryMessage = if (hint == null) {
-                                                        "Recovery verification failed."
+                                                        context.getString(R.string.msg_recovery_verification_failed)
                                                     } else {
                                                         recoveredHint = hint
-                                                        "Hint revealed."
+                                                        context.getString(R.string.msg_recovery_hint_revealed)
                                                     }
                                                 }
                                             },
@@ -418,7 +419,10 @@ fun UnlockVaultScreen(
                         }
                     }
                 ) {
-                    Text(if (recoveredHint == null) "VERIFY & SHOW HINT" else "DONE")
+                    Text(
+                        if (recoveredHint == null) stringResource(R.string.action_verify_show_hint)
+                        else stringResource(R.string.action_done)
+                    )
                 }
             },
             containerColor = dialogBg,
