@@ -60,6 +60,33 @@ class AuthPolicyTest {
     }
 
     @Test
+    fun `matchesCredentials falls back to display name when username is blank`() {
+        val profileWithBlankUsername = profile.copy(
+            userName = "",
+            displayName = "Swanie Prime"
+        )
+
+        val result = AuthPolicy.matchesCredentials(
+            inputIdentity = "swanieprime",
+            inputPassword = "SecurePass1!",
+            profile = profileWithBlankUsername
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
+    fun `matchesCredentials normalizes whitespace in password input`() {
+        val result = AuthPolicy.matchesCredentials(
+            inputIdentity = "swanieprime",
+            inputPassword = " Secure Pass1! ",
+            profile = profile
+        )
+
+        assertTrue(result)
+    }
+
+    @Test
     fun `shouldLockAfterResume respects Never timeout`() {
         val shouldLock = AuthPolicy.shouldLockAfterResume(
             timeoutSeconds = -1,
@@ -85,5 +112,46 @@ class AuthPolicyTest {
 
         assertFalse(shouldNotLock)
         assertTrue(shouldLock)
+    }
+
+    @Test
+    fun `shouldLockAfterResume never locks when user is not authenticated`() {
+        val shouldLock = AuthPolicy.shouldLockAfterResume(
+            timeoutSeconds = 15,
+            elapsedMs = 1_000_000L,
+            isAuthenticated = false
+        )
+
+        assertFalse(shouldLock)
+    }
+
+    @Test
+    fun `evaluatePasswordStrength returns valid for strong password`() {
+        val strength = AuthPolicy.evaluatePasswordStrength("StrongPass1!")
+
+        assertTrue(strength.hasMinLength)
+        assertTrue(strength.hasCapital)
+        assertTrue(strength.hasNumber)
+        assertTrue(strength.hasSymbol)
+        assertTrue(strength.isValid)
+    }
+
+    @Test
+    fun `evaluatePasswordStrength returns invalid when requirements missing`() {
+        val strength = AuthPolicy.evaluatePasswordStrength("weakpass")
+
+        assertTrue(strength.hasMinLength)
+        assertFalse(strength.hasCapital)
+        assertFalse(strength.hasNumber)
+        assertFalse(strength.hasSymbol)
+        assertFalse(strength.isValid)
+    }
+
+    @Test
+    fun `evaluatePasswordStrength normalizes whitespace before evaluation`() {
+        val strength = AuthPolicy.evaluatePasswordStrength(" Strong Pass 1! ")
+
+        assertTrue(strength.isValid)
+        assertTrue(strength.normalized == "StrongPass1!")
     }
 }

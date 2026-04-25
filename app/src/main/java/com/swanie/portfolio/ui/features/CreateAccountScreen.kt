@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.UserProfileEntity
+import com.swanie.portfolio.security.AuthPolicy
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.launch
@@ -78,16 +79,17 @@ fun CreateAccountScreen(
     var receiptReadySignal by rememberSaveable { mutableStateOf(0) }
 
     // --- VALIDATION ---
-    val cleanPass = password.trim().replace("\\s".toRegex(), "")
-    val hasMinLength = cleanPass.length >= 8
-    val hasCapital = cleanPass.any { it.isUpperCase() }
-    val hasNumber = cleanPass.any { it.isDigit() }
-    val hasSymbol = cleanPass.any { !it.isLetterOrDigit() }
+    val passwordStrength = AuthPolicy.evaluatePasswordStrength(password)
+    val cleanPass = passwordStrength.normalized
+    val hasMinLength = passwordStrength.hasMinLength
+    val hasCapital = passwordStrength.hasCapital
+    val hasNumber = passwordStrength.hasNumber
+    val hasSymbol = passwordStrength.hasSymbol
     val cleanConfirmPass = confirmPassword.trim().replace("\\s".toRegex(), "")
     val passwordsMatch = cleanPass == cleanConfirmPass && cleanPass.isNotEmpty()
 
     val isFormValid = fullName.length > 2 && email.contains("@") &&
-            hasMinLength && hasCapital && hasNumber && hasSymbol &&
+            passwordStrength.isValid &&
             passwordsMatch
 
     LaunchedEffect(receiptReadySignal) {

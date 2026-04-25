@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
+import com.swanie.portfolio.security.AuthPolicy
 import com.swanie.portfolio.ui.navigation.Routes
 import kotlinx.coroutines.launch
 
@@ -78,11 +79,12 @@ fun SettingsScreen(
 
     var showFactoryResetDialog by remember { mutableStateOf(false) }
 
-    val cleanNewPassword = newPassword.trim().replace("\\s".toRegex(), "")
-    val hasMinLength = cleanNewPassword.length >= 8
-    val hasCapital = cleanNewPassword.any { it.isUpperCase() }
-    val hasNumber = cleanNewPassword.any { it.isDigit() }
-    val hasSymbol = cleanNewPassword.any { !it.isLetterOrDigit() }
+    val passwordStrength = AuthPolicy.evaluatePasswordStrength(newPassword)
+    val cleanNewPassword = passwordStrength.normalized
+    val hasMinLength = passwordStrength.hasMinLength
+    val hasCapital = passwordStrength.hasCapital
+    val hasNumber = passwordStrength.hasNumber
+    val hasSymbol = passwordStrength.hasSymbol
     val cleanConfirmNewPassword = confirmNewPassword.trim().replace("\\s".toRegex(), "")
     val passwordsMatch = cleanNewPassword == cleanConfirmNewPassword && cleanNewPassword.isNotEmpty()
 
@@ -254,7 +256,7 @@ fun SettingsScreen(
                                 passwordChangeMessage = "Please complete all password fields."
                                 return@TextButton
                             }
-                            !hasMinLength || !hasCapital || !hasNumber || !hasSymbol -> {
+                            !passwordStrength.isValid -> {
                                 passwordChangeMessage = "New password must be 8+ chars with uppercase, number, and symbol."
                                 return@TextButton
                             }
