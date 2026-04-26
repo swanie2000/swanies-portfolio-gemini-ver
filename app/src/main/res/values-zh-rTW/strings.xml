@@ -1,76 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SwaniesPortfolio</string>
-    <string name="language_selector_title">ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚ÂªÃƒâ€¦Ã‚Â¾ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â¨ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬</string>
+    <string name="language_selector_title">Language</string>
     <string name="language_english">English</string>
-    <string name="language_spanish">Espanol</string>
+    <string name="language_spanish">Spanish</string>
     <string name="language_korean">Korean</string>
     <string name="language_name_english_native">English</string>
-    <string name="language_name_spanish_native">EspaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ol</string>
-    <string name="language_name_korean_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â´</string>
-    <string name="language_name_portuguese_brazil_native">PortuguÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âªs (Brasil)</string>
-    <string name="language_name_french_native">FranÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ais</string>
+    <string name="language_name_spanish_native">Español</string>
+    <string name="language_name_korean_native">한국어</string>
+    <string name="language_name_portuguese_brazil_native">Português (Brasil)</string>
+    <string name="language_name_french_native">Français</string>
     <string name="language_name_german_native">Deutsch</string>
-    <string name="language_name_japanese_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂªÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¾</string>
-    <string name="language_name_chinese_simplified_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â®ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¡</string>
-    <string name="language_name_hindi_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬</string>
-    <string name="language_name_arabic_native">ÃƒÆ’Ã†â€™Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ÃƒÆ’Ã†â€™Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€¹Ã…â€œÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©</string>
-    <string name="language_name_chinese_traditional_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â«ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¡</string>
+    <string name="language_name_japanese_native">日本語</string>
+    <string name="language_name_chinese_simplified_native">简体中文</string>
+    <string name="language_name_hindi_native">हिन्दी</string>
+    <string name="language_name_arabic_native">العربية</string>
+    <string name="language_name_chinese_traditional_native">繁體中文</string>
     <string name="language_name_italian_native">Italiano</string>
-    <string name="language_name_russian_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹</string>
-    <string name="language_name_turkish_native">TÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼rkÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â§e</string>
+    <string name="language_name_russian_native">Русский</string>
+    <string name="language_name_turkish_native">Türkçe</string>
     <string name="language_name_indonesian_native">Bahasa Indonesia</string>
-    <string name="language_name_vietnamese_native">TiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ng ViÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¡t</string>
-    <string name="language_name_thai_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢</string>
+    <string name="language_name_vietnamese_native">Tiếng Việt</string>
+    <string name="language_name_thai_native">ไทย</string>
     <string name="language_name_polish_native">Polski</string>
     <string name="language_name_dutch_native">Nederlands</string>
-    <string name="language_name_ukrainian_native">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â£ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°</string>
-    <string name="action_login">ÃƒÆ’Ã‚Â§ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢Ãƒâ€šÃ‚Â»ÃƒÆ’Ã‚Â¥ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦Ãƒâ€šÃ‚Â¥</string>
-    <string name="action_create_account">ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â»Ãƒâ€šÃ‚ÂºÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚Â«ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¸Ãƒâ€šÃ‚Â³ÃƒÆ’Ã‚Â¦Ãƒâ€¹Ã¢â‚¬Â Ãƒâ€šÃ‚Â¶</string>
-    <string name="home_title">Swanie ÃƒÆ’Ã‚Â¦Ãƒâ€¦Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â³ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚ÂµÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚ÂÃƒâ€¹Ã¢â‚¬Â </string>
-    <string name="home_subtitle">ÃƒÆ’Ã‚Â¥Ãƒâ€¦Ã‚Â Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¯ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â²Ãƒâ€šÃ‚Â¨ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¹Ãƒâ€šÃ‚Â£ÃƒÆ’Ã‚Â¨Ãƒâ€¹Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â²Ãƒâ€šÃ‚Â´ÃƒÆ’Ã‚Â©ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â±Ãƒâ€šÃ‚Â¬</string>
+    <string name="language_name_ukrainian_native">Українська</string>
+
+    <string name="action_login">LOGIN</string>
+    <string name="action_create_account">CREATE ACCOUNT</string>
+    <string name="home_title">Swanie\'s Portfolio</string>
+    <string name="home_subtitle">Crypto &amp; Precious Metals</string>
     <string name="content_back">Back</string>
-    <string name="unlock_title">ÃƒÆ’Ã‚Â¦Ãƒâ€¦Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â³ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚ÂµÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚ÂÃƒâ€¹Ã¢â‚¬Â ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â·Ãƒâ€šÃ‚Â²ÃƒÆ’Ã‚Â©Ãƒâ€¦Ã‚Â½ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â®Ãƒâ€¦Ã‚Â¡</string>
+    <string name="unlock_title">PORTFOLIO LOCKED</string>
     <string name="unlock_subtitle">IDENTITY VERIFICATION</string>
-    <string name="label_username">ÃƒÆ’Ã‚Â¤Ãƒâ€šÃ‚Â½Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã‚Â§ÃƒÂ¢Ã¢â€šÂ¬Ã‚ÂÃƒâ€šÃ‚Â¨ÃƒÆ’Ã‚Â¨ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚ÂÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚Â¨Ãƒâ€šÃ‚Â±</string>
-    <string name="label_password">ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â¯ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â§Ãƒâ€šÃ‚Â¢Ãƒâ€šÃ‚Â¼</string>
-    <string name="action_forgot_password">ÃƒÂ¥Ã‚Â¿Ã‹Å“ÃƒÂ¨Ã‚Â¨Ã‹Å“ÃƒÂ¥Ã‚Â¯Ã¢â‚¬Â ÃƒÂ§Ã‚Â¢Ã‚Â¼ÃƒÂ¯Ã‚Â¼Ã…Â¸</string>
-    <string name="status_verifying">ÃƒÂ©Ã‚Â©Ã¢â‚¬â€ÃƒÂ¨Ã‚Â­Ã¢â‚¬Â°ÃƒÂ¤Ã‚Â¸Ã‚Â­...</string>
+    <string name="label_username">Username</string>
+    <string name="label_password">Password</string>
+    <string name="action_forgot_password">FORGOT PASSWORD?</string>
+    <string name="status_verifying">VERIFYING...</string>
     <string name="action_use_biometrics">USE BIOMETRICS</string>
     <string name="msg_biometric_retry_requires_password">Use password to continue before trying biometrics again.</string>
-    <string name="msg_auth_failed_try_again">Ã©Â©â€”Ã¨Â­â€°Ã¥Â¤Â±Ã¦â€¢â€”Ã£â‚¬â€šÃ¨Â«â€¹Ã¥â€ ÂÃ¨Â©Â¦Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã£â‚¬â€š</string>
-    <string name="msg_incorrect_name_or_password">Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥ÂÂÃ§Â¨Â±Ã¦Ë†â€“Ã¥Â¯â€ Ã§Â¢Â¼Ã©Å’Â¯Ã¨ÂªÂ¤</string>
-    <string name="recover_access_title">Ã¦ÂÂ¢Ã¥Â¾Â©Ã¥Â­ËœÃ¥Ââ€“</string>
-    <string name="recover_access_description">Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥ÂÂÃ§Â¨Â±Ã¨Ë†â€¡Ã©â€ºÂ»Ã¥Â­ÂÃ©Æ’ÂµÃ¤Â»Â¶Ã¯Â¼Å’Ã§â€žÂ¶Ã¥Â¾Å’Ã¤Â»Â¥Ã§â€Å¸Ã§â€°Â©Ã¨Â¾Â¨Ã¨Â­ËœÃ©Â©â€”Ã¨Â­â€°Ã¤Â»Â¥Ã©Â¡Â¯Ã§Â¤ÂºÃ¦ÂÂÃ§Â¤ÂºÃ£â‚¬â€š</string>
+    <string name="msg_auth_failed_try_again">Authentication failed. Please try again.</string>
+    <string name="msg_incorrect_name_or_password">Incorrect Name or Password</string>
+    <string name="recover_access_title">Recover Access</string>
+    <string name="recover_access_description">Enter your username and email. Then verify biometrics to reveal your hint.</string>
     <string name="label_email">Email</string>
     <string name="label_hint">Hint: %1$s</string>
     <string name="msg_recovery_enter_both">Please enter both username and email.</string>
     <string name="msg_recovery_verification_failed">Recovery verification failed.</string>
     <string name="msg_recovery_hint_revealed">Hint revealed.</string>
-    <string name="action_verify_show_hint">Ã©Â©â€”Ã¨Â­â€°Ã¤Â¸Â¦Ã©Â¡Â¯Ã§Â¤ÂºÃ¦ÂÂÃ§Â¤Âº</string>
-    <string name="action_done">ÃƒÂ¥Ã‚Â®Ã…â€™ÃƒÂ¦Ã‹â€ Ã‚Â</string>
-    <string name="create_account_title">å»ºç«‹å¸³æˆ¶</string>
-    <string name="label_email_address">é›»å­éƒµä»¶åœ°å€</string>
-    <string name="label_confirm_password">ç¢ºèªå¯†ç¢¼</string>
+    <string name="action_verify_show_hint">VERIFY &amp; SHOW HINT</string>
+    <string name="action_done">DONE</string>
+    <string name="create_account_title">CREATE ACCOUNT</string>
+    <string name="label_email_address">EMAIL ADDRESS</string>
+    <string name="label_confirm_password">CONFIRM PASSWORD</string>
     <string name="label_recovery_hint">RECOVERY HINT</string>
     <string name="setting_sync_drive">Sync Vault to Google Drive</string>
     <string name="tos_accept_prefix">I accept the </string>
     <string name="tos_terms">Terms and Conditions</string>
     <string name="status_creating">CREATING...</string>
-    <string name="password_rule_min_chars">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ 8+ Chars</string>
-    <string name="password_rule_upper">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ Upper</string>
-    <string name="password_rule_number">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ Number</string>
-    <string name="password_rule_special">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ Special</string>
+    <string name="password_rule_min_chars">• 8+ Chars</string>
+    <string name="password_rule_upper">• Upper</string>
+    <string name="password_rule_number">• Number</string>
+    <string name="password_rule_special">• Special</string>
     <string name="vault_name_fallback">Sovereign Vault</string>
     <string name="vault_name_user">%1$s\'s Vault</string>
     <string name="account_created_title">Account Created Successfully</string>
     <string name="account_created_receipt">Stored Username: %1$s\n\nStored Email: %2$s\n\nStored Password: %3$s</string>
     <string name="account_created_done">I\'ve Verified It - Proceed to Login</string>
-    <string name="settings_title">ÃƒÆ’Ã‚Â¨Ãƒâ€šÃ‚Â¨Ãƒâ€šÃ‚Â­ÃƒÆ’Ã‚Â¥Ãƒâ€šÃ‚Â®Ãƒâ€¦Ã‚Â¡</string>
-    <string name="settings_security">å®‰å…¨æ€§</string>
+
+    <string name="settings_title">SETTINGS</string>
+    <string name="settings_security">SECURITY</string>
     <string name="settings_reset_password">RESET PASSWORD</string>
-    <string name="settings_login_option">ç™»å…¥é¸é …</string>
-    <string name="settings_login_option_subtitle">å…è¨±ä½¿ç”¨ç”Ÿç‰©è¾¨è­˜ç™»å…¥ã€‚</string>
+    <string name="settings_login_option">LOGIN OPTION</string>
+    <string name="settings_login_option_subtitle">Allow biometrics for login.</string>
     <string name="settings_require_password_after_bio_fail">Require Password After Biometric Failure</string>
     <string name="settings_require_password_after_bio_fail_subtitle">After biometric failure, require password before retrying biometrics.</string>
     <string name="settings_login_timeout">LOGIN TIMEOUT</string>
@@ -82,32 +84,37 @@
     <string name="settings_timeout_bg_desc">Require login again after %1$s in background.</string>
     <string name="settings_timeout_applies_desc">Applies when returning to the app from background.</string>
     <string name="settings_interface">INTERFACE</string>
-    <string name="settings_translation_feedback_button">回報翻譯問題</string>
+
+    <string name="settings_translation_feedback_button">REPORT TRANSLATION ISSUE</string>
     <string name="settings_translation_feedback_hint">Spotted a bad translation? Send the text and your suggested correction.</string>
-    <string name="settings_translation_feedback_title">翻譯回饋</string>
-    <string name="settings_translation_feedback_subtitle">這會開啟郵件應用並帶入預填回報內容。</string>
+    <string name="settings_translation_feedback_title">Translation Feedback</string>
+    <string name="settings_translation_feedback_subtitle">This opens your email app with a prefilled report.</string>
     <string name="settings_translation_feedback_screen">Screen or feature</string>
     <string name="settings_translation_feedback_current_text">Current text</string>
     <string name="settings_translation_feedback_suggested_text">Suggested translation</string>
     <string name="settings_translation_feedback_notes">Notes (optional)</string>
-    <string name="settings_translation_feedback_submit">傳送回報</string>
+    <string name="settings_translation_feedback_submit">SEND REPORT</string>
     <string name="settings_translation_feedback_required">Please enter your suggested translation.</string>
-    <string name="settings_translation_feedback_chooser_title">傳送翻譯回饋</string>
-    <string name="settings_translation_feedback_no_email_app">此裝置上找不到郵件應用。</string>
+    <string name="settings_translation_feedback_chooser_title">Send translation feedback</string>
+    <string name="settings_translation_feedback_no_email_app">No email app found on this device.</string>
     <string name="settings_translation_feedback_email_subject">Translation Feedback (%1$s)</string>
     <string name="settings_translation_feedback_email_body">Language: %1$s\nScreen: %2$s\nCurrent text: %3$s\nSuggested translation: %4$s\nNotes: %5$s</string>
+
     <string name="settings_theme_depth">THEME &amp; DEPTH</string>
     <string name="settings_management">MANAGEMENT</string>
     <string name="settings_system_actions">SYSTEM ACTIONS</string>
     <string name="settings_factory_default">FACTORY DEFAULT</string>
+
     <string name="restore_title">VAULT RECOVERY</string>
     <string name="restore_description">Cloud restoration is being optimized for the Sovereign Shield. Please start with a fresh vault or setup your local security.</string>
     <string name="restore_start_fresh_vault">START FRESH VAULT</string>
     <string name="restore_back_to_start">BACK TO START</string>
+
     <string name="settings_factory_reset_title">RESET VAULT TO FACTORY?</string>
     <string name="settings_factory_reset_body">This will completely wipe the current vault, including all assets and history. This action is sovereign and permanent.</string>
     <string name="settings_reset_everything">RESET EVERYTHING</string>
     <string name="action_cancel">CANCEL</string>
+
     <string name="settings_change_password_title">Change Password</string>
     <string name="settings_change_password_subtitle">Requires current password and biometric confirmation.</string>
     <string name="settings_current_password">Current Password</string>
@@ -121,6 +128,7 @@
     <string name="settings_password_update_failed">Unable to update password. Check your current password.</string>
     <string name="settings_updating">UPDATING...</string>
     <string name="settings_update">UPDATE</string>
+
     <string name="settings_compact_cards">Use Compact Cards</string>
     <string name="settings_compact_cards_subtitle">Shrink asset cards to show more on screen</string>
     <string name="settings_high_visibility_cards">High-Visibility Compact Cards</string>
@@ -130,8 +138,10 @@
     <string name="settings_background_gradient">Background Gradient</string>
     <string name="settings_background_gradient_subtitle">Enable dynamic color shifting</string>
     <string name="settings_gradient_intensity">Gradient Intensity</string>
+
     <string name="settings_portfolio_manager">PORTFOLIO MANAGER</string>
     <string name="settings_theme_manager">THEME MANAGER</string>
+
     <string name="theme_reset_title">Reset to Default?</string>
     <string name="theme_reset_body">This will override your custom HEX selection.</string>
     <string name="theme_apply_to_target">APPLY TO %1$s</string>
@@ -145,12 +155,28 @@
     <string name="portfolio_edit_title">EDIT PORTFOLIO</string>
     <string name="portfolio_fallback_name">PORTFOLIO</string>
     <string name="action_save">SAVE</string>
-    <string name="terms_title">隱私與條款</string>
+
+    <string name="terms_title">PRIVACY &amp; TERMS</string>
+    <string name="terms_last_updated">Last Updated: April 2026</string>
+    <string name="terms_section_1_title">1. ZERO-KNOWLEDGE ARCHITECTURE</string>
+    <string name="terms_section_1_body">We do not store your data. Swanie Portfolio bridges your assets and your private Google Drive. We have no servers and no access to your vault.</string>
+    <string name="terms_section_2_title">2. DATA RECOVERY LIMITATIONS</string>
+    <string name="terms_section_2_body">Because of our encryption model, the creator cannot recover your password. If you lose your Vault Password and Recovery Hint, your data is gone. This is the cost of absolute privacy.</string>
+    <string name="terms_section_3_title">3. GOOGLE DRIVE INTEGRATION</string>
+    <string name="terms_section_3_body">The app uses a hidden App Data folder in your personal Google Drive. The app can read and write only in that folder. We cannot see your personal photos or documents.</string>
+    <string name="terms_section_4_title">4. SUBSCRIPTION SURVIVABILITY</string>
+    <string name="terms_section_4_body">Lifetime and monthly subscriptions are tied to your Google Play identity. Your asset data stays private, and your Pro Status is recoverable on devices signed into your Google account.</string>
+    <string name="terms_section_5_title">5. NO FINANCIAL ADVICE</string>
+    <string name="terms_section_5_body">This app is a tracking tool. Price data comes from third-party APIs such as CoinGecko. We are not responsible for market fluctuations or external data accuracy.</string>
+    <string name="terms_section_6_title">6. LANGUAGE TRANSLATION DISCLAIMER</string>
+    <string name="terms_section_6_body">English is the master legal and product language for this app. Non-English translations may be AI-generated and can contain wording differences. If there is any conflict or ambiguity, the English text controls.</string>
+
     <string name="holdings_create_first_portfolio">Create Your First Portfolio</string>
     <string name="holdings_delete_asset_title">REMOVE ASSET?</string>
     <string name="holdings_delete_asset_body">Are you sure you want to remove %1$s from your vault?</string>
     <string name="holdings_delete_asset_confirm">REMOVE</string>
     <string name="holdings_vault_empty_hint">Your vault is empty.\n\nTap the yellow \'+\' button in the top right to add your first Gold, Silver, or Crypto asset.</string>
+
     <string name="amount_entry_back">Back</string>
     <string name="amount_entry_label">Enter Amount for %1$s</string>
     <string name="amount_entry_save_asset">Save Asset</string>
@@ -158,6 +184,7 @@
     <string name="amount_entry_discard_body">Are you sure you want to discard this new asset?</string>
     <string name="amount_entry_yes">Yes</string>
     <string name="amount_entry_no">No</string>
+
     <string name="widget_loading_preview">Loading preview...</string>
     <string name="widget_finish_save">FINISH &amp; SAVE</string>
     <string name="widget_back_to_setup">Back to setup</string>
@@ -168,6 +195,7 @@
     <string name="widget_tab_preview">PREVIEW</string>
     <string name="widget_no_assets_available">No assets available</string>
     <string name="widget_set_draft_target">SET DRAFT %1$s</string>
+
     <string name="architect_stage_blueprint">STAGE 1: BLUEPRINT</string>
     <string name="architect_stage_live_card">STAGE 2: LIVE CARD</string>
     <string name="architect_select_metal">SELECT METAL</string>
@@ -180,7 +208,9 @@
     <string name="architect_estimated_value">ESTIMATED VALUE</string>
     <string name="architect_finalize_vault">FINALIZE &amp; VAULT</string>
     <string name="architect_back_to_blueprint">BACK TO BLUEPRINT</string>
+
     <string name="sparkline_gathering_data">Gathering Data...</string>
+
     <string name="funnel_select_type">SELECT TYPE</string>
     <string name="funnel_name">NAME</string>
     <string name="funnel_icon">ICON</string>
@@ -199,10 +229,12 @@
     <string name="action_finalize">FINALIZE</string>
     <string name="funnel_enter_quantity">Enter Quantity...</string>
     <string name="action_back">BACK</string>
+
     <string name="crypto_settings_title">%1$s SETTINGS</string>
     <string name="crypto_quantity_held">QUANTITY HELD</string>
     <string name="crypto_price_decimals">PRICE DECIMALS: %1$d</string>
     <string name="action_save_changes">SAVE CHANGES</string>
+
     <string name="widget_manager_title">WIDGET MANAGER</string>
     <string name="widget_action_save_exit">SAVE &amp; EXIT</string>
     <string name="widget_link_portfolio_prompt">LINK THIS WIDGET TO A PORTFOLIO</string>
@@ -211,9 +243,11 @@
     <string name="widget_portfolio_label">PORTFOLIO</string>
     <string name="widget_portfolio_for_widget_label">PORTFOLIO FOR THIS WIDGET</string>
     <string name="widget_loading">Loading...</string>
+
     <string name="asset_price_label_price">PRICE</string>
     <string name="asset_price_label_value">VALUE</string>
     <string name="asset_total_value_label">TOTAL VALUE</string>
+
     <string name="holdings_tab_all">ALL</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">METAL</string>

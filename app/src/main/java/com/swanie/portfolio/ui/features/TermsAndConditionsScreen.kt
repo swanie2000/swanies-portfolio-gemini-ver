@@ -45,28 +45,40 @@ fun TermsAndConditionsScreen(navController: NavController) {
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            TermSection("1. ZERO-KNOWLEDGE ARCHITECTURE",
-                "We do not store your data. Period. Swanie's Portfolio is a bridge between your assets and your private Google Drive. We have no servers and no access to your vault.")
+            TermSection(
+                stringResource(R.string.terms_section_1_title),
+                stringResource(R.string.terms_section_1_body)
+            )
 
-            TermSection("2. DATA RECOVERY LIMITATIONS",
-                "Because of our encryption model, the creator CANNOT recover your password. If you lose your 'Vault Password' and your 'Recovery Hint,' your data is gone. This is the cost of absolute privacy.")
+            TermSection(
+                stringResource(R.string.terms_section_2_title),
+                stringResource(R.string.terms_section_2_body)
+            )
 
-            TermSection("3. GOOGLE DRIVE INTEGRATION",
-                "The app utilizes a hidden 'App Data' folder on your personal Google Drive. You grant the app permission to read/write only to this specific folder. We cannot see your personal photos or documents.")
+            TermSection(
+                stringResource(R.string.terms_section_3_title),
+                stringResource(R.string.terms_section_3_body)
+            )
 
-            TermSection("4. SUBSCRIPTION SURVIVABILITY",
-                "Lifetime and monthly subscriptions are tied to your Google Play Identity. While your asset data is private, your 'Pro Status' is recoverable via any device signed into your Google Account.")
+            TermSection(
+                stringResource(R.string.terms_section_4_title),
+                stringResource(R.string.terms_section_4_body)
+            )
 
-            TermSection("5. NO FINANCIAL ADVICE",
-                "This app is a tracking tool. Price data is pulled from third-party APIs (CoinGecko, etc). We are not responsible for market fluctuations or the accuracy of external data providers.")
+            TermSection(
+                stringResource(R.string.terms_section_5_title),
+                stringResource(R.string.terms_section_5_body)
+            )
 
-            TermSection("6. LANGUAGE TRANSLATION DISCLAIMER",
-                "English is the master legal and product language for this app. Non-English translations may be AI-generated and can contain wording differences. If there is any conflict, ambiguity, or legal interpretation issue, the English text controls.")
+            TermSection(
+                stringResource(R.string.terms_section_6_title),
+                stringResource(R.string.terms_section_6_body)
+            )
 
             Spacer(modifier = Modifier.height(50.dp))
 
             Text(
-                text = "Last Updated: April 2026",
+                text = stringResource(R.string.terms_last_updated),
                 color = siteText.copy(alpha = 0.4f),
                 fontSize = 10.sp
             )
