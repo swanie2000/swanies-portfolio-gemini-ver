@@ -13,6 +13,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.R
+import com.swanie.portfolio.BuildConfig
+import com.swanie.portfolio.billing.AccessTier
+import com.swanie.portfolio.billing.MonetizationManager
+import com.swanie.portfolio.billing.MonetizationPackage
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.security.SecurityManager
@@ -28,6 +32,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,16 +53,22 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val themePreferences: ThemePreferences,
     private val database: AppDatabase,
-    private val securityManager: SecurityManager
+    private val securityManager: SecurityManager,
+    private val monetizationManager: MonetizationManager
 ) : ViewModel() {
 
     private val userConfigDao = database.userConfigDao()
     private val assetDao = database.assetDao()
     private val vaultDao = database.vaultDao()
 
-    // 🎯 PRO PLACEHOLDER: State for subscription logic
+    // Monetization access state (backed by RevenueCat when configured).
     private val _isProUser = MutableStateFlow(false)
     val isProUser: StateFlow<Boolean> = _isProUser.asStateFlow()
+    private val _availableProPackages = MutableStateFlow<List<MonetizationPackage>>(emptyList())
+    val availableProPackages: StateFlow<List<MonetizationPackage>> = _availableProPackages.asStateFlow()
+    val isRevenueCatConfigured: Boolean = BuildConfig.REVENUECAT_API_KEY.isNotBlank()
+    val revenueCatEntitlementId: String = BuildConfig.REVENUECAT_PRO_ENTITLEMENT
+    val revenueCatOfferingId: String = BuildConfig.REVENUECAT_OFFERING_ID
 
     // 🎯 THE REGISTRY: Track the currently targeted vault for widget configuration
     private val _targetVaultId = MutableStateFlow<Int>(-1)
@@ -116,6 +127,20 @@ class SettingsViewModel @Inject constructor(
             else assetDao.getAssetsByVault(id)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init {
+        viewModelScope.launch {
+            monetizationManager.entitlement.collect { snapshot ->
+                _isProUser.value = snapshot.tier == AccessTier.PRO && snapshot.isActive
+            }
+        }
+        viewModelScope.launch {
+            monetizationManager.refreshEntitlement()
+        }
+        viewModelScope.launch {
+            refreshProPackages()
+        }
+    }
 
     fun setTargetVaultId(id: Int) {
         _targetVaultId.value = id
@@ -185,6 +210,38 @@ class SettingsViewModel @Inject constructor(
 
     suspend fun saveLanguageCodeNow(languageCode: String) {
         themePreferences.saveLanguageCode(languageCode)
+    }
+
+    fun restorePurchases(onComplete: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val restored = monetizationManager.restorePurchases().isSuccess
+            if (restored) {
+                monetizationManager.refreshEntitlement()
+            }
+            onComplete(restored)
+        }
+    }
+
+    fun refreshProPackages(onComplete: ((Boolean) -> Unit)? = null) {
+        viewModelScope.launch {
+            val result = monetizationManager.fetchPackages()
+            result.getOrNull()?.let { _availableProPackages.value = it }
+            onComplete?.invoke(result.isSuccess)
+        }
+    }
+
+    fun purchaseProPackage(
+        activity: Activity,
+        packageIdentifier: String,
+        onComplete: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = monetizationManager.purchasePackage(activity, packageIdentifier)
+            if (result.isSuccess) {
+                monetizationManager.refreshEntitlement()
+            }
+            onComplete(result.isSuccess)
+        }
     }
 
     /**

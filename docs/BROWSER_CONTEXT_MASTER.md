@@ -175,6 +175,21 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ### BEGIN_NARRATIVE
 SWANIES PORTFOLIO: MASTER NARRATIVE (V40.52: SETTINGS TYPOGRAPHY + TRANSLATION UX POLISH)
 
+V40.56 UPDATE (RevenueCat Monetization Wiring + Pro Gating)
+- Integrated RevenueCat Android SDK and app startup initialization with safe no-key fallback behavior.
+- Added a centralized monetization layer (`MonetizationManager`) with entitlement refresh, restore, offerings fetch, and purchase methods.
+- Gated paid surfaces behind Pro entitlement: Theme Manager, Multiple Portfolios, Analytics, and Widget Manager configuration flow.
+- Built a reusable Pro gate screen with package selection, upgrade action, restore purchases, retry plan load, and manage subscription deep link.
+- Added Settings monetization diagnostics: Pro status, RevenueCat configured flag, loaded plan count, expected entitlement/offering IDs, and checklist copy action.
+- Hardened configuration targeting with explicit `REVENUECAT_PRO_ENTITLEMENT` and `REVENUECAT_OFFERING_ID` build fields.
+
+V40.55 UPDATE (RevenueCat Monetization Plan + Execution Start)
+- Locked monetization direction to RevenueCat with a staged rollout path that protects current app stability.
+- Defined product model: one `pro` entitlement, monthly/yearly subscriptions, and a future one-time lifetime SKU path.
+- Planned implementation sequence: SDK bootstrap -> entitlement state layer -> gated Pro surfaces -> purchase/restore UX -> telemetry + staged release checks.
+- Added launch guardrails: no hard paywall before restore/account edge-case validation, and centralized billing logic behind one repository boundary.
+- Started execution by introducing an in-app monetization boundary layer so RevenueCat wiring can be added safely without touching feature logic.
+
 V40.52 UPDATE (Settings UX Stabilization)
 - Shifted app-wide font scaling from hard lock to capped scaling (`coerceAtMost(1.40f)`) to preserve readability while limiting overshoot.
 - Fixed language-picker first-selection race by persisting language code before activity recreation.

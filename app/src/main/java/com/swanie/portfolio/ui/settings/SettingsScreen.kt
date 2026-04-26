@@ -2,6 +2,8 @@ package com.swanie.portfolio.ui.settings
 
 import android.content.Intent
 import android.net.Uri
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -85,7 +87,12 @@ fun SettingsScreen(
         .collectAsState()
     val loginResumeTimeoutSeconds by settingsViewModel.loginResumeTimeoutSeconds.collectAsState()
     val languageCode by settingsViewModel.languageCode.collectAsState()
+    val isProUser by settingsViewModel.isProUser.collectAsState()
+    val proPackages by settingsViewModel.availableProPackages.collectAsState()
     val effectiveLanguageCode = if (languageCode == "system") "en" else languageCode
+    val isRevenueCatConfigured = settingsViewModel.isRevenueCatConfigured
+    val entitlementId = settingsViewModel.revenueCatEntitlementId
+    val offeringId = settingsViewModel.revenueCatOfferingId
 
     val useGradient by mainViewModel.useGradient.collectAsState()
     val gradientAmount by mainViewModel.gradientAmount.collectAsState()
@@ -108,6 +115,7 @@ fun SettingsScreen(
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
     var showFactoryResetDialog by remember { mutableStateOf(false) }
+    var isRestoringPurchases by remember { mutableStateOf(false) }
     var languageExpanded by remember { mutableStateOf(false) }
     var showTranslationFeedbackDialog by remember { mutableStateOf(false) }
     var translationScreenInput by remember { mutableStateOf("") }
@@ -743,6 +751,172 @@ fun SettingsScreen(
 
                     // --- MANAGEMENT ---
                     Text(stringResource(R.string.settings_management), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_pro_status_label),
+                            color = safeText.copy(alpha = 0.7f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (isProUser) {
+                                stringResource(R.string.settings_pro_status_active)
+                            } else {
+                                stringResource(R.string.settings_pro_status_inactive)
+                            },
+                            color = if (isProUser) Color(0xFF4CAF50) else safeText.copy(alpha = 0.7f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_revenuecat_status_label),
+                            color = safeText.copy(alpha = 0.7f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (isRevenueCatConfigured) {
+                                stringResource(R.string.settings_revenuecat_status_configured)
+                            } else {
+                                stringResource(R.string.settings_revenuecat_status_missing)
+                            },
+                            color = if (isRevenueCatConfigured) Color(0xFF4CAF50) else Color(0xFFFFA000),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_revenuecat_packages_label),
+                            color = safeText.copy(alpha = 0.7f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = proPackages.size.toString(),
+                            color = safeText.copy(alpha = 0.85f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(
+                            R.string.settings_revenuecat_checklist_line_1,
+                            entitlementId
+                        ),
+                        color = safeText.copy(alpha = 0.6f),
+                        fontSize = 12.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.settings_revenuecat_checklist_line_2,
+                            offeringId
+                        ),
+                        color = safeText.copy(alpha = 0.6f),
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                    )
+
+                    if (isRevenueCatConfigured && proPackages.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.settings_revenuecat_warning_no_packages),
+                            color = Color(0xFFFFA000),
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            val clipboard = context.getSystemService(ClipboardManager::class.java)
+                            val checklist = context.getString(
+                                R.string.settings_revenuecat_copy_payload,
+                                entitlementId,
+                                offeringId
+                            )
+                            clipboard?.setPrimaryClip(
+                                ClipData.newPlainText("RevenueCat checklist", checklist)
+                            )
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.settings_revenuecat_copied),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_revenuecat_copy_button),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            if (isRestoringPurchases) return@OutlinedButton
+                            isRestoringPurchases = true
+                            settingsViewModel.restorePurchases { restored ->
+                                isRestoringPurchases = false
+                                val msgRes = if (restored) {
+                                    R.string.settings_restore_purchases_success
+                                } else {
+                                    R.string.settings_restore_purchases_failed
+                                }
+                                Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
+                    ) {
+                        Text(
+                            text = if (isRestoringPurchases) {
+                                stringResource(R.string.settings_restore_purchases_working)
+                            } else {
+                                stringResource(R.string.settings_restore_purchases_button)
+                            },
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(
                         onClick = {

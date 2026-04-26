@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -98,14 +99,34 @@ fun NavGraph(
             }
 
             composable(Routes.THEME_STUDIO) {
-                ThemeStudioScreen(navController)
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                val isProUser = settingsViewModel.isProUser.collectAsStateWithLifecycle().value
+                if (isProUser) {
+                    ThemeStudioScreen(navController)
+                } else {
+                    ProFeatureGateScreen(
+                        featureName = stringResource(com.swanie.portfolio.R.string.pro_feature_theme_manager),
+                        settingsViewModel = settingsViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
 
             composable(Routes.PORTFOLIO_MANAGER) {
-                PortfolioManagerScreen(
-                    navController = navController,
-                    mainViewModel = mainViewModel
-                )
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                val isProUser = settingsViewModel.isProUser.collectAsStateWithLifecycle().value
+                if (isProUser) {
+                    PortfolioManagerScreen(
+                        navController = navController,
+                        mainViewModel = mainViewModel
+                    )
+                } else {
+                    ProFeatureGateScreen(
+                        featureName = stringResource(com.swanie.portfolio.R.string.pro_feature_portfolio_manager),
+                        settingsViewModel = settingsViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
 
             composable(Routes.HOLDINGS) {
@@ -150,7 +171,17 @@ fun NavGraph(
             }
 
             composable(Routes.ANALYTICS) {
-                AnalyticsScreen(navController = navController)
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                val isProUser = settingsViewModel.isProUser.collectAsStateWithLifecycle().value
+                if (isProUser) {
+                    AnalyticsScreen(navController = navController)
+                } else {
+                    ProFeatureGateScreen(
+                        featureName = stringResource(com.swanie.portfolio.R.string.pro_feature_analytics),
+                        settingsViewModel = settingsViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
 
             composable(Routes.METALS_AUDIT) {

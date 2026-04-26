@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
+import com.swanie.portfolio.ui.settings.ProFeatureGateScreen
 import com.swanie.portfolio.ui.settings.WidgetManagerScreen
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,6 +51,8 @@ class WidgetConfigActivity : ComponentActivity() {
 
         setContent {
             val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsState()
+            val siteTextColorHex by themeViewModel.siteTextColor.collectAsState()
+            val isProUser by settingsViewModel.isProUser.collectAsState()
             val siteBgColor = try {
                 Color(siteBgColorHex.toColorInt())
             } catch (e: Exception) {
@@ -58,30 +61,40 @@ class WidgetConfigActivity : ComponentActivity() {
 
             SwaniesPortfolioTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = siteBgColor) {
-                    WidgetManagerScreen(
-                        isConfigMode = true,
-                        configAppWidgetId = appWidgetId,
-                        onConfigComplete = {
-                            val resultValue = Intent().apply {
-                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
-                            }
-                            setResult(Activity.RESULT_OK, resultValue)
+                    if (isProUser) {
+                        WidgetManagerScreen(
+                            isConfigMode = true,
+                            configAppWidgetId = appWidgetId,
+                            onConfigComplete = {
+                                val resultValue = Intent().apply {
+                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                                    data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
+                                }
+                                setResult(Activity.RESULT_OK, resultValue)
 
-                            AppWidgetManager.getInstance(this@WidgetConfigActivity)
-                                .notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_root)
+                                AppWidgetManager.getInstance(this@WidgetConfigActivity)
+                                    .notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_root)
 
-                            sendBroadcast(
-                                Intent(this@WidgetConfigActivity, PortfolioWidgetReceiver::class.java).apply {
-                                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
-                                },
-                            )
+                                sendBroadcast(
+                                    Intent(this@WidgetConfigActivity, PortfolioWidgetReceiver::class.java).apply {
+                                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+                                    },
+                                )
 
-                            finishAndRemoveTask()
-                        },
-                        onBack = { finishAndRemoveTask() },
-                    )
+                                finishAndRemoveTask()
+                            },
+                            onBack = { finishAndRemoveTask() },
+                        )
+                    } else {
+                        ProFeatureGateScreen(
+                            featureName = getString(R.string.pro_feature_widget_manager),
+                            settingsViewModel = settingsViewModel,
+                            onBack = { finishAndRemoveTask() },
+                            backgroundHex = siteBgColorHex,
+                            textHex = siteTextColorHex
+                        )
+                    }
                 }
             }
         }

@@ -1,7 +1,9 @@
 package com.swanie.portfolio
 
 import android.app.Application
+import com.swanie.portfolio.billing.RevenueCatInitializer
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 /**
  * This class is the "generator" for Hilt's dependency graph.
@@ -10,8 +12,11 @@ import dagger.hilt.android.HiltAndroidApp
  */
 @HiltAndroidApp
 class PortfolioApplication : Application() {
+    @Inject
+    lateinit var revenueCatInitializer: RevenueCatInitializer
+
     override fun onCreate() {
         super.onCreate()
-        // Initialize global libraries here if needed
+        revenueCatInitializer.initialize(this)
     }
 }

@@ -27,14 +27,26 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"\"")
+            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"pro\"")
+            buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"\"")
+            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"pro\"")
+            buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     packaging {
@@ -103,6 +115,9 @@ dependencies {
 
     // WORK MANAGER
     implementation(libs.androidx.work.runtime.ktx)
+
+    // BILLING (RevenueCat)
+    implementation(libs.revenuecat.purchases)
 
     // Testing
     testImplementation(libs.junit)
