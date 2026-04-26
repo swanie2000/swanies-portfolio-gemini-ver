@@ -38,7 +38,7 @@ fun SwaniesPortfolioTheme(
     val baseDensity = LocalDensity.current
     val lockedDensity = Density(
         density = baseDensity.density,
-        fontScale = 1f
+        fontScale = baseDensity.fontScale.coerceAtMost(1.40f)
     )
 
     val seedColor = try {

@@ -1,4 +1,10 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.50: FINAL LOCALE CLEAN PASS + BUILD SANITY VERIFIED)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.52: SETTINGS TYPOGRAPHY + TRANSLATION UX POLISH)
+
+V40.52 UPDATE (Settings UX Stabilization)
+- Shifted app-wide font scaling from hard lock to capped scaling (`coerceAtMost(1.40f)`) to preserve readability while limiting overshoot.
+- Fixed language-picker first-selection race by persisting language code before activity recreation.
+- Normalized key Settings labels to all-caps for visual consistency and changed `REPORT TRANSLATION ISSUE` to `REPORT TRANSLATION`.
+- Resolved two-line clipping for the translation call-to-action area by replacing button chrome with full-width clickable text and explicit line-height handling.
 
 V40.50 UPDATE (Localization Finalization)
 - Completed direct, new-data translation cleanup for `values-hi`, `values-th`, `values-uk`, and `values-zh-rTW`.

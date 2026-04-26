@@ -660,15 +660,17 @@ fun SettingsScreen(
                             }
                         }
                     }
-                    TextButton(
-                        onClick = { showTranslationFeedbackDialog = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(0.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showTranslationFeedbackDialog = true }
+                            .padding(vertical = 4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.settings_translation_feedback_button),
                             color = safeText,
                             fontWeight = FontWeight.SemiBold,
+                            lineHeight = 22.sp,
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Start
                         )
@@ -677,7 +679,10 @@ fun SettingsScreen(
                         text = stringResource(R.string.settings_translation_feedback_hint),
                         color = safeText.copy(alpha = 0.6f),
                         fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 4.dp)
+                        lineHeight = 18.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp)
                     )
 
                     SettingsToggleItem(
