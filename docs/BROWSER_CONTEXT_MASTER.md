@@ -173,7 +173,13 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.49: LOCALIZATION REPAIR + MASTER TEXT STABILIZATION)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.50: FINAL LOCALE CLEAN PASS + BUILD SANITY VERIFIED)
+
+V40.50 UPDATE (Localization Finalization)
+- Completed direct, new-data translation cleanup for `values-hi`, `values-th`, `values-uk`, and `values-zh-rTW`.
+- Resolved remaining English fallback blocks on auth/settings/terms/holdings surfaces for those locales.
+- Preserved formatting tokens (`%1$s`, `%1$d`) and validated UTF-8 readability.
+- Verified compile sanity with `:app:compileDebugKotlin` (BUILD SUCCESSFUL).
 
 ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â°ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â½ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ THE CORE MISSION
 To maintain a commercial-grade financial vault where user data is sovereign, biometrics are hardware-enforced, and the UI is a cinematic, high-precision experience that survives high-density settings and real-world widget workflows.
