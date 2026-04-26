@@ -219,7 +219,7 @@
     <string name="language_name_italian_native">Italiano</string>
     <string name="language_name_ukrainian_native">Українська</string>
     <string name="language_name_french_native">Français</string>
-    <string name="settings_translation_feedback_button">번역 문제 신고</string>
+    <string name="settings_translation_feedback_button">번역 신고</string>
     <string name="terms_last_updated">최종 업데이트: 2026년 4월</string>
     <string name="settings_translation_feedback_current_text">현재 문구</string>
     <string name="language_name_german_native">Deutsch</string>

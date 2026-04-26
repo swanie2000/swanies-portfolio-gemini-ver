@@ -82,7 +82,7 @@
     <string name="settings_timeout_bg_desc">ให้เข้าสู่ระบบอีกครั้งหลังอยู่พื้นหลัง %1$s</string>
     <string name="settings_timeout_applies_desc">มีผลเมื่อกลับเข้าแอปจากพื้นหลัง</string>
     <string name="settings_interface">อินเทอร์เฟซ</string>
-    <string name="settings_translation_feedback_button">รายงานปัญหาการแปล</string>
+    <string name="settings_translation_feedback_button">รายงานการแปล</string>
     <string name="settings_translation_feedback_hint">พบคำแปลผิด? ส่งข้อความปัจจุบันและคำแปลที่แนะนำ</string>
     <string name="settings_translation_feedback_title">ข้อเสนอแนะการแปล</string>
     <string name="settings_translation_feedback_subtitle">จะเปิดแอปอีเมลพร้อมรายงานที่กรอกไว้</string>

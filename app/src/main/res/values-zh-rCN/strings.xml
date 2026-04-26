@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">从后台返回应用时生效。</string>
     <string name="settings_interface">界面</string>
 
-    <string name="settings_translation_feedback_button">报告翻译问题</string>
+    <string name="settings_translation_feedback_button">报告翻译</string>
     <string name="settings_translation_feedback_hint">发现翻译错误？请发送文本及您的修改建议。</string>
     <string name="settings_translation_feedback_title">翻译反馈</string>
     <string name="settings_translation_feedback_subtitle">这将打开邮件应用并附带预填写的报告。</string>

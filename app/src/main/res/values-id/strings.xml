@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Berlaku saat kembali ke aplikasi dari latar belakang.</string>
     <string name="settings_interface">ANTARMUKA</string>
 
-    <string name="settings_translation_feedback_button">LAPORKAN MASALAH TERJEMAHAN</string>
+    <string name="settings_translation_feedback_button">LAPORKAN TERJEMAHAN</string>
     <string name="settings_translation_feedback_hint">Melihat terjemahan yang buruk? Kirim teks dan saran koreksi Anda.</string>
     <string name="settings_translation_feedback_title">Umpan Balik Terjemahan</string>
     <string name="settings_translation_feedback_subtitle">Ini akan membuka aplikasi email Anda dengan laporan yang sudah terisi.</string>

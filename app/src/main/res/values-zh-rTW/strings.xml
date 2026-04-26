@@ -82,7 +82,7 @@
     <string name="settings_timeout_bg_desc">背景停留 %1$s 後要求再次登入。</string>
     <string name="settings_timeout_applies_desc">從背景返回應用程式時套用。</string>
     <string name="settings_interface">介面</string>
-    <string name="settings_translation_feedback_button">回報翻譯問題</string>
+    <string name="settings_translation_feedback_button">回報翻譯</string>
     <string name="settings_translation_feedback_hint">發現翻譯不佳？請傳送目前文字與你建議的修正。</string>
     <string name="settings_translation_feedback_title">翻譯回饋</string>
     <string name="settings_translation_feedback_subtitle">這會開啟電子郵件應用程式並預先填入回報內容。</string>

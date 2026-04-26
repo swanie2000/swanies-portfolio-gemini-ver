@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Áp dụng khi quay lại ứng dụng từ chế độ nền.</string>
     <string name="settings_interface">GIAO DIỆN</string>
 
-    <string name="settings_translation_feedback_button">BÁO LỖI DỊCH THUẬT</string>
+    <string name="settings_translation_feedback_button">BÁO CÁO DỊCH THUẬT</string>
     <string name="settings_translation_feedback_hint">Phát hiện bản dịch chưa tốt? Hãy gửi văn bản và gợi ý chỉnh sửa của bạn.</string>
     <string name="settings_translation_feedback_title">Phản hồi bản dịch</string>
     <string name="settings_translation_feedback_subtitle">Ứng dụng email sẽ mở với báo cáo được điền sẵn.</string>

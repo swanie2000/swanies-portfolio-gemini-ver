@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">S\'applique au retour dans l\'application depuis l\'arrière-plan.</string>
     <string name="settings_interface">INTERFACE</string>
 
-    <string name="settings_translation_feedback_button">SIGNALER UN PROBLÈME DE TRADUCTION</string>
+    <string name="settings_translation_feedback_button">SIGNALER LA TRADUCTION</string>
     <string name="settings_translation_feedback_hint">Vous avez repéré une mauvaise traduction ? Envoyez le texte et votre correction.</string>
     <string name="settings_translation_feedback_title">Retour sur la traduction</string>
     <string name="settings_translation_feedback_subtitle">Cela ouvre votre application e-mail avec un rapport pré-rempli.</string>

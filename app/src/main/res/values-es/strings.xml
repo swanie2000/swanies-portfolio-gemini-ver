@@ -86,7 +86,7 @@
     <string name="settings_interface">INTERFAZ</string>
     <string name="settings_theme_depth">TEMA Y PROFUNDIDAD</string>
 
-    <string name="settings_translation_feedback_button">REPORTAR PROBLEMA DE TRADUCCIÓN</string>
+    <string name="settings_translation_feedback_button">REPORTAR TRADUCCIÓN</string>
     <string name="settings_translation_feedback_hint">¿Ves una mala traducción? Envía el texto y tu corrección sugerida.</string>
     <string name="settings_translation_feedback_title">Comentarios de traducción</string>
     <string name="settings_translation_feedback_subtitle">Se abrirá tu app de correo con un informe prellenado.</string>

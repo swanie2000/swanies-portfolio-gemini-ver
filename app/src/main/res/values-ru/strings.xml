@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Применяется при возвращении в приложение из фона.</string>
     <string name="settings_interface">ИНТЕРФЕЙС</string>
 
-    <string name="settings_translation_feedback_button">СООБЩИТЬ О ПРОБЛЕМЕ ПЕРЕВОДА</string>
+    <string name="settings_translation_feedback_button">СООБЩИТЬ О ПЕРЕВОДЕ</string>
     <string name="settings_translation_feedback_hint">Заметили неточный перевод? Отправьте текст и ваш вариант исправления.</string>
     <string name="settings_translation_feedback_title">Отзыв о переводе</string>
     <string name="settings_translation_feedback_subtitle">Откроется почтовое приложение с готовым отчетом.</string>

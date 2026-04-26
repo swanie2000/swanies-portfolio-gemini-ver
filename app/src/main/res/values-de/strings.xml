@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Gilt bei Rückkehr zur App aus dem Hintergrund.</string>
     <string name="settings_interface">OBERFLÄCHE</string>
 
-    <string name="settings_translation_feedback_button">ÜBERSETZUNGSPROBLEM MELDEN</string>
+    <string name="settings_translation_feedback_button">ÜBERSETZUNG MELDEN</string>
     <string name="settings_translation_feedback_hint">Einen Fehler gefunden? Senden Sie uns den Text und Ihren Korrekturvorschlag.</string>
     <string name="settings_translation_feedback_title">Übersetzungs-Feedback</string>
     <string name="settings_translation_feedback_subtitle">Dies öffnet Ihre E-Mail-App mit einem vorausgefüllten Bericht.</string>

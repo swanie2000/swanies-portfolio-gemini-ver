@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Uygulamaya arka plandan dönüldüğünde uygulanır.</string>
     <string name="settings_interface">ARAYÜZ</string>
 
-    <string name="settings_translation_feedback_button">ÇEVİRİ SORUNU BİLDİR</string>
+    <string name="settings_translation_feedback_button">ÇEVİRİ BİLDİR</string>
     <string name="settings_translation_feedback_hint">Hatalı bir çeviri mi gördünüz? Metni ve önerdiğiniz düzeltmeyi gönderin.</string>
     <string name="settings_translation_feedback_title">Çeviri Geri Bildirimi</string>
     <string name="settings_translation_feedback_subtitle">Bu, e-posta uygulamanızı önceden doldurulmuş bir raporla açar.</string>

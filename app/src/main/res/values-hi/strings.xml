@@ -82,7 +82,7 @@
     <string name="settings_timeout_bg_desc">बैकग्राउंड में %1$s के बाद दोबारा लॉगिन आवश्यक करें।</string>
     <string name="settings_timeout_applies_desc">जब ऐप बैकग्राउंड से वापस आए तब लागू होता है।</string>
     <string name="settings_interface">इंटरफ़ेस</string>
-    <string name="settings_translation_feedback_button">अनुवाद समस्या रिपोर्ट करें</string>
+    <string name="settings_translation_feedback_button">अनुवाद रिपोर्ट करें</string>
     <string name="settings_translation_feedback_hint">खराब अनुवाद मिला? मौजूदा पाठ और अपना सुझाव भेजें।</string>
     <string name="settings_translation_feedback_title">अनुवाद प्रतिक्रिया</string>
     <string name="settings_translation_feedback_subtitle">यह पूर्व-भरे हुए रिपोर्ट के साथ ईमेल ऐप खोलता है।</string>

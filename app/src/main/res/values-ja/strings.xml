@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">バックグラウンドからアプリに戻る際に適用されます。</string>
     <string name="settings_interface">インターフェース</string>
 
-    <string name="settings_translation_feedback_button">翻訳の問題を報告</string>
+    <string name="settings_translation_feedback_button">翻訳を報告</string>
     <string name="settings_translation_feedback_hint">誤翻訳を見つけましたか？原文と修正案を送信してください。</string>
     <string name="settings_translation_feedback_title">翻訳フィードバック</string>
     <string name="settings_translation_feedback_subtitle">メールアプリを起動し、作成済みのレポートを表示します。</string>

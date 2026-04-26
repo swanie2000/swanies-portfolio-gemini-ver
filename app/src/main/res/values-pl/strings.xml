@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Dotyczy powrotu do aplikacji z tła.</string>
     <string name="settings_interface">INTERFEJS</string>
 
-    <string name="settings_translation_feedback_button">ZGŁOŚ PROBLEM Z TŁUMACZENIEM</string>
+    <string name="settings_translation_feedback_button">ZGŁOŚ TŁUMACZENIE</string>
     <string name="settings_translation_feedback_hint">Zauważyłeś błędne tłumaczenie? Wyślij tekst i swoją propozycję poprawki.</string>
     <string name="settings_translation_feedback_title">Opinie o tłumaczeniu</string>
     <string name="settings_translation_feedback_subtitle">Otworzy to aplikację e-mail z wypełnionym raportem.</string>

@@ -85,7 +85,7 @@
     <string name="settings_timeout_applies_desc">Van toepassing bij terugkeer naar de app vanuit de achtergrond.</string>
     <string name="settings_interface">INTERFACE</string>
 
-    <string name="settings_translation_feedback_button">VERTAALPROBLEEM MELDEN</string>
+    <string name="settings_translation_feedback_button">VERTALING MELDEN</string>
     <string name="settings_translation_feedback_hint">Een foutieve vertaling gezien? Stuur de tekst en uw verbetersuggestie.</string>
     <string name="settings_translation_feedback_title">Vertaalfeedback</string>
     <string name="settings_translation_feedback_subtitle">Dit opent uw e-mailapp met een vooraf ingevuld rapport.</string>

@@ -84,7 +84,7 @@
     <string name="settings_timeout_bg_desc">طلب تسجيل الدخول مجدداً بعد %1$s في الخلفية.</string>
     <string name="settings_timeout_applies_desc">يطبق عند العودة إلى التطبيق من الخلفية.</string>
     <string name="settings_interface">الواجهة</string>
-    <string name="settings_translation_feedback_button">الإبلاغ عن مشكلة ترجمة</string>
+    <string name="settings_translation_feedback_button">الإبلاغ عن الترجمة</string>
     <string name="settings_translation_feedback_hint">هل وجدت ترجمة سيئة؟ أرسل النص واقتراحك للتصحيح.</string>
     <string name="settings_translation_feedback_title">ملاحظات الترجمة</string>
     <string name="settings_translation_feedback_subtitle">سيتم فتح تطبيق البريد مع تقرير جاهز.</string>
