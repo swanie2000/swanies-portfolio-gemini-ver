@@ -650,9 +650,11 @@ fun SettingsScreen(
                                 DropdownMenuItem(
                                     text = { Text(optionLabel) },
                                     onClick = {
-                                        settingsViewModel.saveLanguageCode(option)
-                                        (context as? FragmentActivity)?.recreate()
                                         languageExpanded = false
+                                        scope.launch {
+                                            settingsViewModel.saveLanguageCodeNow(option)
+                                            (context as? FragmentActivity)?.recreate()
+                                        }
                                     }
                                 )
                             }

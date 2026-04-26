@@ -183,6 +183,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    suspend fun saveLanguageCodeNow(languageCode: String) {
+        themePreferences.saveLanguageCode(languageCode)
+    }
+
     /**
      * UI-facing entrypoint for the login option toggle.
      * Enforces biometric hardware/auth readiness before persisting enabled state.

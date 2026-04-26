@@ -7,6 +7,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,12 @@ fun SwaniesPortfolioTheme(
     gradientAmount: Float = 0.5f,
     content: @Composable () -> Unit
 ) {
+    val baseDensity = LocalDensity.current
+    val lockedDensity = Density(
+        density = baseDensity.density,
+        fontScale = 1f
+    )
+
     val seedColor = try {
         Color(seedColorHex.toColorInt())
     } catch (e: Exception) {
@@ -66,7 +74,10 @@ fun SwaniesPortfolioTheme(
         SolidColor(seedColor)
     }
 
-    CompositionLocalProvider(LocalBackgroundBrush provides backgroundBrush) {
+    CompositionLocalProvider(
+        LocalBackgroundBrush provides backgroundBrush,
+        LocalDensity provides lockedDensity
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,

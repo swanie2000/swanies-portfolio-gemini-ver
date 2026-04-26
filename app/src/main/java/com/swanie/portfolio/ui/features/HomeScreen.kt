@@ -35,6 +35,7 @@ import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.min
 
 private fun languageLabel(code: String): String = when (code) {
@@ -188,9 +189,11 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     DropdownMenuItem(
                         text = { Text(optionLabel) },
                         onClick = {
-                            settingsViewModel.saveLanguageCode(option)
-                            activity.recreate()
                             languageMenuExpanded = false
+                            scope.launch {
+                                settingsViewModel.saveLanguageCodeNow(option)
+                                activity.recreate()
+                            }
                         },
                         trailingIcon = {
                             if (option == languageCode) {
