@@ -113,11 +113,30 @@
   - Added Settings scroll-position persistence across sub-page navigation.
   - Validation passed via repeated debug Kotlin compile checks.
 
+- [x] V40.58 Analytics Premium Experience + Upgrade Flow UX - COMPLETED
+  - Re-architected Analytics into mixed-access pages:
+    - Free pages: `START`, `PIE`, `DONUT`, `BAR`.
+    - Premium teaser pages: `RISK`, `ATTRIBUTION`, `REBALANCE` with upgrade paths.
+  - Added swipe-first analytics flow and compact chart/list presentation for better vertical fit and interaction clarity.
+  - Added premium visual system consistency:
+    - Shared `ProPalette` token usage.
+    - Reusable `ProLockBadge` treatment across locked surfaces.
+  - Upgraded Pro preview content to larger in-page ad panels for clearer premium value presentation.
+  - Improved Upgrade screen usability by moving back action to immediate visibility under primary upgrade CTA.
+  - Finalized premium panel CTA behavior to single full-width `UPGRADE TO PRO` action (temporary `MAYBE LATER` removed).
+  - Validation passed with repeated debug Kotlin compile success during iterative UI refinements.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
   - Execute cross-device biometric callback validation and capture OEM behavior notes.
   - Revisit account recovery strategy (post-hint path, fallback options, and anti-lockout policy) after current auth hardening cycle.
+
+- [ ] V40.59 Monetization Conversion + Trust Polish - NEXT
+  - Add lightweight event tracking for paywall and analytics premium funnel (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
+  - Run end-to-end on-device validation for Free, Active Pro, and Expired Pro states across Analytics, Holdings, Theme Manager, Portfolio Manager, and Widget pathways.
+  - Tighten remaining monetization copy and button wording for clarity/consistency.
+  - Confirm navigation return paths preserve user context and avoid dead-end loops.
 
 - [ ] V40.37 Localization + Billing Blueprint Track - PLANNED
   - Multi-language support foundation:

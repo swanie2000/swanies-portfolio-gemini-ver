@@ -187,17 +187,7 @@ fun NavGraph(
             }
 
             composable(Routes.ANALYTICS) {
-                val settingsViewModel: SettingsViewModel = hiltViewModel()
-                val isProUser = settingsViewModel.isProUser.collectAsStateWithLifecycle().value
-                if (isProUser) {
-                    AnalyticsScreen(navController = navController)
-                } else {
-                    ProFeatureGateScreen(
-                        featureName = stringResource(com.swanie.portfolio.R.string.pro_feature_analytics),
-                        settingsViewModel = settingsViewModel,
-                        onBack = { navController.popBackStack() }
-                    )
-                }
+                AnalyticsScreen(navController = navController)
             }
 
             composable(Routes.METALS_AUDIT) {

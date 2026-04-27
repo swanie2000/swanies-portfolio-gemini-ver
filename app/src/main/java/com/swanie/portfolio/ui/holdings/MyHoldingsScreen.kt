@@ -54,6 +54,7 @@ import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
+import com.swanie.portfolio.ui.theme.ProPalette
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import kotlin.math.absoluteValue
@@ -338,43 +339,6 @@ fun MyHoldingsScreen(
                                     )
                                 }
 
-                                if (!isProUser) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp, vertical = 8.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(dialogBg.copy(alpha = 0.22f))
-                                            .border(1.dp, textColor.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
-                                            .padding(horizontal = 12.dp, vertical = 10.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Multi-portfolio swipe is a Pro feature.",
-                                            color = textColor.copy(alpha = 0.9f),
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                        Spacer(modifier = Modifier.width(10.dp))
-                                        OutlinedButton(
-                                            onClick = {
-                                                isExiting = true
-                                                navController.navigate(Routes.UPGRADE_TO_PRO)
-                                            },
-                                            colors = ButtonDefaults.outlinedButtonColors(
-                                                contentColor = Color(0xFFFFD54F)
-                                            )
-                                        ) {
-                                            Text(
-                                                text = "UPGRADE NOW",
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Black
-                                            )
-                                        }
-                                    }
-                                }
-
                                 if (filteredHoldingsForPage.isEmpty()) {
                                     Column(
                                         modifier = Modifier
@@ -399,6 +363,69 @@ fun MyHoldingsScreen(
                                         contentPadding = PaddingValues(16.dp),
                                         verticalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
+                                        if (!isProUser) {
+                                            item(key = "pro_upsell_banner") {
+                                                val proBannerBg = ProPalette.Background
+                                                val proBannerText = ProPalette.TextPrimary
+                                                val proBannerAccent = ProPalette.Accent
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .height(64.dp)
+                                                        .clip(RoundedCornerShape(ProPalette.ButtonRadius))
+                                                        .background(proBannerBg)
+                                                        .border(1.dp, proBannerAccent.copy(alpha = 0.5f), RoundedCornerShape(ProPalette.ButtonRadius))
+                                                        .padding(horizontal = 14.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Column(modifier = Modifier.weight(1f)) {
+                                                        Row(
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = Icons.Default.Lock,
+                                                                contentDescription = null,
+                                                                tint = proBannerAccent,
+                                                                modifier = Modifier.size(12.dp)
+                                                            )
+                                                            Spacer(modifier = Modifier.width(4.dp))
+                                                            Text(
+                                                                text = "PRO FEATURE",
+                                                                color = proBannerAccent,
+                                                                fontSize = 9.sp,
+                                                                fontWeight = FontWeight.Black,
+                                                                letterSpacing = 0.8.sp
+                                                            )
+                                                        }
+                                                        Text(
+                                                            text = "Multi-portfolio swipe is a Pro feature.",
+                                                            color = proBannerText,
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.SemiBold
+                                                        )
+                                                    }
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    OutlinedButton(
+                                                        onClick = {
+                                                            isExiting = true
+                                                            navController.navigate(Routes.UPGRADE_TO_PRO)
+                                                        },
+                                                        modifier = Modifier.height(38.dp),
+                                                        shape = RoundedCornerShape(ProPalette.ButtonRadius),
+                                                        colors = ButtonDefaults.outlinedButtonColors(
+                                                            contentColor = proBannerAccent
+                                                        ),
+                                                        border = BorderStroke(1.dp, proBannerAccent.copy(alpha = 0.8f))
+                                                    ) {
+                                                        Text(
+                                                            text = "UPGRADE NOW",
+                                                            fontSize = 10.sp,
+                                                            fontWeight = FontWeight.Black
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
                                         items(items = filteredHoldingsForPage, key = { it.coinId }) { asset ->
                                             ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
                                             val hndl = Modifier.longPressDraggableHandle(

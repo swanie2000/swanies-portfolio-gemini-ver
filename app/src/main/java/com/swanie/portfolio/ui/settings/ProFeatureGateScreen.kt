@@ -32,8 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.theme.ProLockBadge
+import com.swanie.portfolio.ui.theme.ProPalette
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 fun ProFeatureGateScreen(
@@ -41,13 +43,14 @@ fun ProFeatureGateScreen(
     settingsViewModel: SettingsViewModel,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundHex: String = "#121212",
+    backgroundHex: String = "#000000",
     textHex: String = "#FFFFFF",
 ) {
     val context = LocalContext.current
     val activity = context as? FragmentActivity
-    val safeBg = Color(runCatching { backgroundHex.toColorInt() }.getOrDefault("#121212".toColorInt()))
-    val safeText = Color(runCatching { textHex.toColorInt() }.getOrDefault("#FFFFFF".toColorInt()))
+    val safeBg = ProPalette.Background
+    val safeText = ProPalette.TextPrimary
+    val accent = ProPalette.Accent
     var isRestoring by remember { mutableStateOf(false) }
     var selectedPackageId by remember { mutableStateOf<String?>(null) }
     var isPurchasing by remember { mutableStateOf(false) }
@@ -68,6 +71,11 @@ fun ProFeatureGateScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        ProLockBadge(
+            label = stringResource(R.string.analytics_premium_badge),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.pro_gate_title),
             color = safeText,
@@ -99,9 +107,10 @@ fun ProFeatureGateScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
+                    shape = RoundedCornerShape(ProPalette.ButtonRadius),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = if (selectedPackageId == proPackage.identifier) {
-                            Color(0xFFFFD54F)
+                            accent
                         } else {
                             safeText
                         }
@@ -132,6 +141,7 @@ fun ProFeatureGateScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
+                shape = RoundedCornerShape(ProPalette.ButtonRadius),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
             ) {
                 Text(
@@ -161,7 +171,8 @@ fun ProFeatureGateScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F))
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
+            colors = ButtonDefaults.buttonColors(containerColor = accent)
         ) {
             Text(
                 text = if (isPurchasing) {
@@ -169,12 +180,29 @@ fun ProFeatureGateScreen(
                 } else {
                     stringResource(R.string.pro_gate_upgrade_button)
                 },
-                color = Color.Black,
+                color = ProPalette.AccentOn,
                 fontWeight = FontWeight.Black
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText),
+            border = androidx.compose.foundation.BorderStroke(1.dp, ProPalette.NeutralBorder)
+        ) {
+            Text(
+                text = stringResource(R.string.pro_gate_go_back),
+                fontWeight = FontWeight.Black
+            )
+        }
+
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
 
         OutlinedButton(
             onClick = {
@@ -193,7 +221,9 @@ fun ProFeatureGateScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText),
+            border = androidx.compose.foundation.BorderStroke(1.dp, ProPalette.NeutralBorder)
         ) {
             Text(
                 text = stringResource(R.string.pro_gate_manage_subscription),
@@ -201,7 +231,7 @@ fun ProFeatureGateScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
 
         OutlinedButton(
             onClick = {
@@ -225,7 +255,9 @@ fun ProFeatureGateScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText),
+            border = androidx.compose.foundation.BorderStroke(1.dp, ProPalette.NeutralBorder)
         ) {
             Text(
                 text = if (isRestoring) {
@@ -237,21 +269,7 @@ fun ProFeatureGateScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = onBack,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f))
-        ) {
-            Text(
-                text = stringResource(R.string.pro_gate_go_back),
-                color = safeText,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
     }
 }
 

@@ -143,6 +143,10 @@
     <string name="pro_feature_analytics">ANALYTICS</string>
     <string name="pro_feature_widget_manager">WIDGET MANAGER</string>
     <string name="pro_feature_upgrade_now">PRO ACCESS</string>
+    <string name="analytics_premium_title">PREMIUM INSIGHTS PREVIEW</string>
+    <string name="analytics_premium_badge">PRO LOCKED</string>
+    <string name="analytics_view_details_cta">VIEW DETAILS</string>
+    <string name="analytics_upgrade_cta">UNLOCK WITH PRO</string>
     <string name="settings_system_actions">SYSTEM ACTIONS</string>
     <string name="settings_factory_default">FACTORY DEFAULT</string>
     <string name="restore_title">VAULT RECOVERY</string>

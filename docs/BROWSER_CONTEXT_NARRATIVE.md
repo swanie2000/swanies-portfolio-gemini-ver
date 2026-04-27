@@ -1,4 +1,18 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.52: SETTINGS TYPOGRAPHY + TRANSLATION UX POLISH)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.58: ANALYTICS PREMIUM EXPERIENCE + UPGRADE FLOW UX)
+
+V40.58 UPDATE (Analytics Premium Experience + Upgrade Flow UX)
+- Reworked Analytics into a mixed-access model: free chart pages remain available, while Pro insights are presented as premium teaser pages with upgrade entry points.
+- Added swipe-first analytics page flow with compact chart/list layout and a dedicated `START` instructional page for clearer onboarding.
+- Standardized premium visuals across monetization surfaces via shared `ProPalette` tokens and reusable `ProLockBadge` treatment.
+- Upgraded Pro analytics content into larger in-page ad panels and finalized CTA behavior to a single full-width `UPGRADE TO PRO` action.
+- Improved `UPGRADE TO PRO` page usability by surfacing an immediate back action near the primary purchase action.
+- Verified stability through repeated `:app:compileDebugKotlin` successes during iterative UI refinement.
+
+V40.57 UPDATE (RevenueCat Stabilization + Access Enforcement)
+- Added RevenueCat app-user identity synchronization before restore/purchase/offering calls to reduce anonymous entitlement drift.
+- Upgraded restore outcomes to deterministic user-facing statuses (`already active`, `restored`, `no entitlement`, `failed`).
+- Split monetization into dedicated routes (`UPGRADE TO PRO NOW`, `TEST INFO`) and improved settings flow clarity.
+- Enforced Free-tier holdings restrictions to prevent multi-vault swipe access without Pro and added contextual upgrade upsell entry.
 
 V40.56 UPDATE (RevenueCat Monetization Wiring + Pro Gating)
 - Integrated RevenueCat Android SDK and app startup initialization with safe no-key fallback behavior.

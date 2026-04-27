@@ -369,3 +369,43 @@ Release recorded: V40.57 "RevenueCat Stabilization + Access Enforcement".
   - Replace any remaining test-oriented copy with release-safe language.
   - Add lightweight analytics hooks for paywall views/select/purchase/restore outcomes.
   - Finalize production key rotation/secret handling checklist before store release.
+
+---
+
+## V40.58 - Analytics Premium Experience + Upgrade Flow UX
+
+Release recorded: V40.58 "Analytics Premium Experience + Upgrade Flow UX".
+
+- Expanded Analytics into a mixed free + premium model instead of hard-locking the entire screen:
+  - Free users can access core chart pages (`START`, `PIE`, `DONUT`, `BAR`).
+  - Premium pages (`RISK`, `ATTRIBUTION`, `REBALANCE`) now act as large in-context Pro previews with upgrade paths.
+- Reworked Analytics navigation and readability:
+  - Added swipe-first page architecture with synchronized top labeling and compacted chart/list density for smaller screens.
+  - Added dedicated `START` instruction page and shortened attribution header naming to avoid title overflow.
+- Standardized monetization UI styling under a shared Pro visual system:
+  - Added `ProPalette` design tokens and `ProLockBadge` reusable component.
+  - Applied black/white/yellow Pro treatment across paywall/test/pro-preview surfaces for consistent premium branding.
+- Improved upgrade flow continuity and back navigation behavior:
+  - Added immediate back action visibility on `UPGRADE TO PRO` screen so users can safely return without dead-end feel.
+  - Finalized Pro analytics ad panels to show a single full-width `UPGRADE TO PRO` CTA (removed temporary `MAYBE LATER` variant).
+- Stabilized monetization interaction details:
+  - Kept plan-selection-required purchase behavior.
+  - Preserved prior restore/status reliability and compile stability while iterating UI.
+- Validation:
+  - Repeated `:app:compileDebugKotlin` checks remained successful after each major analytics/paywall iteration.
+
+### Current Status (End of Session)
+
+- RevenueCat wiring and Pro gating are operational.
+- Settings now routes cleanly to dedicated upgrade/test pages.
+- Analytics free/premium split is live with premium teaser pages and direct upgrade CTA.
+- Upgrade screen now includes prominent back navigation for safer user flow.
+- Codebase is in a compile-green state after latest UI adjustments.
+
+### Next Phase (Projected Path)
+
+- V40.59 Monetization Conversion + Trust Polish:
+  - Add lightweight funnel telemetry for Analytics Pro panels and Upgrade screen (`view`, `cta tap`, `purchase success/fail`, `restore result`).
+  - Run final copy pass for all monetization CTAs/dialogs (reduce ambiguity, keep tone consistent).
+  - Add small UX safeguards for upgrade return paths (preserve source context where applicable).
+  - Perform on-device pass for free user journey, expired Pro journey, and restore journey.

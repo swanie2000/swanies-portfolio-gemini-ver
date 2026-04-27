@@ -29,44 +29,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.theme.ProPalette
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 fun UpgradeToProScreen(
     settingsViewModel: SettingsViewModel,
-    themeViewModel: ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
-    val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsStateWithLifecycle(initialValue = "#000416")
-    val siteTextColorHex by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
     ProFeatureGateScreen(
         featureName = stringResource(R.string.pro_feature_upgrade_now),
         settingsViewModel = settingsViewModel,
-        onBack = onBack,
-        backgroundHex = siteBgColorHex,
-        textHex = siteTextColorHex
+        onBack = onBack
     )
 }
 
 @Composable
 fun RevenueCatTestInfoScreen(
     settingsViewModel: SettingsViewModel,
-    themeViewModel: ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsStateWithLifecycle(initialValue = "#000416")
-    val siteTextColorHex by themeViewModel.siteTextColor.collectAsStateWithLifecycle(initialValue = "#FFFFFF")
     val isProUser by settingsViewModel.isProUser.collectAsStateWithLifecycle()
     val proPackages by settingsViewModel.availableProPackages.collectAsStateWithLifecycle()
     val isRevenueCatConfigured = settingsViewModel.isRevenueCatConfigured
     val entitlementId = settingsViewModel.revenueCatEntitlementId
     val offeringId = settingsViewModel.revenueCatOfferingId
-    val safeBg = Color(runCatching { siteBgColorHex.toColorInt() }.getOrDefault("#000416".toColorInt()))
-    val safeText = Color(runCatching { siteTextColorHex.toColorInt() }.getOrDefault("#FFFFFF".toColorInt()))
+    val safeBg = ProPalette.Background
+    val safeText = ProPalette.TextPrimary
+    val highlight = ProPalette.Accent
     var isRestoring by remember { mutableStateOf(false) }
 
     Column(
@@ -96,7 +89,7 @@ fun RevenueCatTestInfoScreen(
             } else {
                 stringResource(R.string.settings_pro_status_inactive)
             },
-            color = if (isProUser) Color(0xFF4CAF50) else safeText.copy(alpha = 0.8f),
+            color = if (isProUser) highlight else safeText.copy(alpha = 0.8f),
             fontWeight = FontWeight.Black
         )
 
@@ -112,7 +105,7 @@ fun RevenueCatTestInfoScreen(
             } else {
                 stringResource(R.string.settings_revenuecat_status_missing)
             },
-            color = if (isRevenueCatConfigured) Color(0xFF4CAF50) else Color(0xFFFFA000),
+            color = if (isRevenueCatConfigured) highlight else ProPalette.TextSecondary,
             fontWeight = FontWeight.Black
         )
 
@@ -144,7 +137,7 @@ fun RevenueCatTestInfoScreen(
             Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = stringResource(R.string.settings_revenuecat_warning_no_packages),
-                color = Color(0xFFFFA000),
+                color = highlight,
                 fontSize = 12.sp
             )
         }
@@ -168,7 +161,9 @@ fun RevenueCatTestInfoScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText),
+            border = androidx.compose.foundation.BorderStroke(1.dp, ProPalette.NeutralBorder)
         ) {
             Text(
                 text = stringResource(R.string.settings_revenuecat_copy_button),
@@ -176,7 +171,7 @@ fun RevenueCatTestInfoScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
         OutlinedButton(
             onClick = {
                 if (isRestoring) return@OutlinedButton
@@ -199,7 +194,9 @@ fun RevenueCatTestInfoScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText),
+            border = androidx.compose.foundation.BorderStroke(1.dp, ProPalette.NeutralBorder)
         ) {
             Text(
                 text = if (isRestoring) {
@@ -250,18 +247,19 @@ fun RevenueCatTestInfoScreen(
             fontSize = 12.sp
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
         Button(
             onClick = onBack,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f))
+            shape = RoundedCornerShape(ProPalette.ButtonRadius),
+            colors = ButtonDefaults.buttonColors(containerColor = highlight)
         ) {
             Text(
                 text = stringResource(R.string.pro_gate_go_back),
-                color = safeText,
-                fontWeight = FontWeight.Bold
+                color = ProPalette.AccentOn,
+                fontWeight = FontWeight.Black
             )
         }
     }
