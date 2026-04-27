@@ -137,6 +137,20 @@
   - Performed hardening pass to preserve visual fidelity after split (shared spacing/typography details restored).
   - Validation passed with clean lint and repeated debug Kotlin compile success.
 
+- [x] V40.59.1 Analytics Hub Navigation Polish + Free Widget Upsell Flow - COMPLETED
+  - Added actionable Analytics hub quick-jump navigation and removed `START` from quick-jump options.
+  - Reworked Analytics header behavior on hub page to fixed swan + fixed one-line hub title; removed duplicate scrolling swan/title.
+  - Increased pager fade intensity for more noticeable transition feedback during horizontal swipes.
+  - Added context-aware Analytics back navigation:
+    - sub-pages -> Analytics hub page,
+    - hub page -> Holdings list.
+  - Added small in-widget Pro upsell banner for free users and centered upsell text.
+  - Replaced free widget edit fast-pass with a Pro-styled stop screen offering:
+    - `UPGRADE TO PRO`,
+    - `CONTINUE WITH FREE WIDGET`.
+  - Preserved free default widget path (3 assets, default style, no customization) behind explicit continue action.
+  - Validation passed with repeated debug Kotlin compile checks and clean lints on touched files.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

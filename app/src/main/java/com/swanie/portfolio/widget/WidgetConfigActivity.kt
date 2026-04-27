@@ -10,21 +10,43 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Surface
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.graphics.toColorInt
+import com.swanie.portfolio.MainActivity
+import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
-import com.swanie.portfolio.ui.settings.ProFeatureGateScreen
 import com.swanie.portfolio.ui.settings.WidgetManagerScreen
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 /**
  * Opens only from the home widget (pencil) with a valid [AppWidgetManager.EXTRA_APPWIDGET_ID].
@@ -35,6 +57,7 @@ class WidgetConfigActivity : ComponentActivity() {
 
     private val settingsViewModel: SettingsViewModel by viewModels()
     private val themeViewModel: ThemeViewModel by viewModels()
+    private val assetViewModel: AssetViewModel by viewModels()
 
     private var appWidgetId by mutableIntStateOf(AppWidgetManager.INVALID_APPWIDGET_ID)
 
@@ -50,9 +73,12 @@ class WidgetConfigActivity : ComponentActivity() {
         }
 
         setContent {
+            val scope = rememberCoroutineScope()
             val siteBgColorHex by themeViewModel.siteBackgroundColor.collectAsState()
             val siteTextColorHex by themeViewModel.siteTextColor.collectAsState()
             val isProUser by settingsViewModel.isProUser.collectAsState()
+            val targetVaultId by settingsViewModel.targetVaultId.collectAsState()
+            val targetVaultAssets by settingsViewModel.targetVaultAssets.collectAsState()
             val siteBgColor = try {
                 Color(siteBgColorHex.toColorInt())
             } catch (e: Exception) {
@@ -87,13 +113,115 @@ class WidgetConfigActivity : ComponentActivity() {
                             onBack = { finishAndRemoveTask() },
                         )
                     } else {
-                        ProFeatureGateScreen(
-                            featureName = getString(R.string.pro_feature_widget_manager),
-                            settingsViewModel = settingsViewModel,
-                            onBack = { finishAndRemoveTask() },
-                            backgroundHex = siteBgColorHex,
-                            textHex = siteTextColorHex
-                        )
+                        val textColor = try {
+                            Color(siteTextColorHex.toColorInt())
+                        } catch (e: Exception) {
+                            Color.White
+                        }
+                        var isApplyingFree by remember { mutableStateOf(false) }
+                        if (isApplyingFree) {
+                            androidx.compose.runtime.LaunchedEffect(targetVaultId, targetVaultAssets) {
+                                val currentVaultId = targetVaultId
+                                if (currentVaultId <= 0) return@LaunchedEffect
+                                val selectedIds = targetVaultAssets.take(3).map { it.coinId }
+                                assetViewModel.saveWidgetConfiguration(
+                                    portfolioVaultId = currentVaultId,
+                                    appWidgetId = appWidgetId,
+                                    selectedIds = selectedIds
+                                ) {
+                                    scope.launch {
+                                        settingsViewModel.saveWidgetAppearance(
+                                            currentVaultId,
+                                            "#1C1C1E",
+                                            "#FFFFFF",
+                                            "#2C2C2E",
+                                            "#FFFFFF"
+                                        )
+                                        settingsViewModel.updateShowWidgetTotal(currentVaultId, true)
+                                        settingsViewModel.getVaultById(currentVaultId)
+                                        if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                                            settingsViewModel.forceImmediateRemoteViewsUpdate(currentVaultId, appWidgetId)
+                                        }
+                                        setWidgetResultOk()
+                                        finishAndRemoveTask()
+                                    }
+                                }
+                            }
+                            androidx.compose.foundation.layout.Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 20.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(color = textColor, strokeWidth = 2.dp)
+                                    Text(
+                                        text = "Setting up free widget...",
+                                        color = textColor,
+                                        modifier = Modifier.padding(top = 10.dp)
+                                    )
+                                }
+                            }
+                        } else {
+                            androidx.compose.foundation.layout.Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 20.dp, vertical = 22.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Spacer(modifier = Modifier.weight(1f))
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Color.Black,
+                                    border = BorderStroke(1.dp, Color(0x55FFD54F)),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    androidx.compose.foundation.layout.Column(
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "PRO CUSTOMIZATION",
+                                            color = Color(0xFFFFD54F),
+                                            fontWeight = FontWeight.Black,
+                                            fontSize = 13.sp
+                                        )
+                                        Text(
+                                            text = "Free widget uses default style (up to 3 assets). Upgrade to Pro to edit colors, ordering, and layout.",
+                                            color = Color.White.copy(alpha = 0.9f),
+                                            modifier = Modifier.padding(top = 8.dp),
+                                            fontSize = 12.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(14.dp))
+                                        Button(
+                                            onClick = {
+                                                startActivity(Intent(this@WidgetConfigActivity, MainActivity::class.java).apply {
+                                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                                })
+                                                finishAndRemoveTask()
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(50.dp),
+                                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F), contentColor = Color.Black)
+                                        ) {
+                                            Text("UPGRADE TO PRO", fontWeight = FontWeight.Black)
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        OutlinedButton(
+                                            onClick = { isApplyingFree = true },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(46.dp),
+                                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.4f))
+                                        ) {
+                                            Text("CONTINUE WITH FREE WIDGET", color = Color.White)
+                                        }
+                                    }
+                                }
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
             }
@@ -134,5 +262,13 @@ class WidgetConfigActivity : ComponentActivity() {
 
     private companion object {
         private const val TAG = "WidgetConfigActivity"
+    }
+
+    private fun setWidgetResultOk() {
+        val resultValue = Intent().apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
+        }
+        setResult(Activity.RESULT_OK, resultValue)
     }
 }

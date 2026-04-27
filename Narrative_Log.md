@@ -448,3 +448,41 @@ Release recorded: V40.59 "Analytics Premium Live Engines + Modular Refactor".
   - Complete end-to-end on-device journey validation for Free, Active Pro, and Expired Pro states.
   - Tighten monetization copy consistency across paywall, analytics upsell, and restore messaging.
   - Add/verify regression checks for analytics tab behavior under both entitlement states.
+
+---
+
+## V40.59.1 - Analytics Hub Navigation Polish + Free Widget Upsell Flow
+
+Release recorded: V40.59.1 "Analytics Hub Navigation Polish + Free Widget Upsell Flow".
+
+- Refined Analytics hub navigation and presentation:
+  - Added `QUICK JUMP` page links on hub page with direct pager navigation.
+  - Removed `START` from quick-jump list and replaced the top `START` title state with a fixed swan + fixed one-line title (`ANALYTICS HUB`).
+  - Simplified hub instruction copy to a single line (`Swipe left or right to move.`).
+  - Added stronger pager fade transitions while swiping for clearer page-to-page motion feedback.
+- Updated Analytics back-arrow behavior:
+  - Sub-pages now return to Analytics main hub page.
+  - Hub-page back arrow returns to Holdings list.
+- Reworked free widget UX to improve conversion clarity:
+  - Added a small in-widget Pro banner for free users (`PRO: Customize widget colors and layout`) and centered its text.
+  - Replaced the fast free-edit auto-pass-through with a deliberate black/white/yellow Pro-styled stop screen.
+  - Added explicit choices on free edit path:
+    - `UPGRADE TO PRO`
+    - `CONTINUE WITH FREE WIDGET` (default 3-asset, non-customizable setup).
+- Validation:
+  - Iterative `:app:compileDebugKotlin` passes remained green after each UX/navigation/widget adjustment.
+  - Lint stayed clean on touched files.
+
+### Current Status (End of Session)
+
+- Analytics hub navigation is now faster and clearer (fixed header identity, quick page jumps, context-aware back behavior).
+- Free widget flow now communicates Pro customization value without blocking free default setup.
+- Widget and analytics UI adjustments are compile-stable and ready for on-device entitlement-expiry verification.
+
+### Next Phase (Projected Path)
+
+- V40.60 Monetization Conversion + Trust Polish:
+  - Add funnel telemetry (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
+  - Execute end-to-end on-device matrix for Free, Active Pro, and Expired Pro journeys (including widget edit entry).
+  - Finalize monetization copy consistency pass across paywall, analytics upsell, and widget-upgrade surfaces.
+  - Add regression checks for analytics hub navigation rules and widget free-vs-pro behavior.

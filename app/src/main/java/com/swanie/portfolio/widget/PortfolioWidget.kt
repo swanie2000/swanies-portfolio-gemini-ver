@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -30,6 +31,7 @@ import androidx.glance.layout.*
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
+import androidx.glance.text.TextAlign
 import com.swanie.portfolio.MainActivity
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
@@ -63,6 +65,7 @@ class PortfolioWidget : GlanceAppWidget() {
         val SHOW_TOTAL_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("show_total")
         val ASSETS_DATA_KEY = stringPreferencesKey("pushed_assets_key")
         val LAST_GOOD_ASSETS_DATA_KEY = stringPreferencesKey("last_good_assets_key")
+        val IS_PRO_USER_KEY = booleanPreferencesKey("is_pro_user")
 
         val WIDGET_ID_KEY = ActionParameters.Key<Int>("widgetId")
     }
@@ -100,6 +103,7 @@ class PortfolioWidget : GlanceAppWidget() {
                 val bgTextColor = try { Color(android.graphics.Color.parseColor(bgTextColorHex)) } catch (e: Exception) { Color.White }
                 val cardColor = try { Color(android.graphics.Color.parseColor(cardColorHex)) } catch (e: Exception) { Color(0xFF1C1C1E) }
                 val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
+                val isProUser = prefs[IS_PRO_USER_KEY] ?: false
 
                 // Order must match the packed "||" sequence from the repo (UI top → bottom). Do not re-sort.
                 val latestAssets = parseAssetsData(assetsData)
@@ -135,7 +139,8 @@ class PortfolioWidget : GlanceAppWidget() {
                         bgTextColor = bgTextColor,
                         cardColor = cardColor,
                         cardTextColor = cardTextColor,
-                        vaultName = vaultName
+                        vaultName = vaultName,
+                        showUpgradeBanner = !isProUser
                     )
                 }
             }
@@ -257,7 +262,8 @@ fun WidgetContent(
     bgTextColor: Color,
     cardColor: Color,
     cardTextColor: Color,
-    vaultName: String
+    vaultName: String,
+    showUpgradeBanner: Boolean
 ) {
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -290,6 +296,28 @@ fun WidgetContent(
                 AssetCardOriginal(context, asset, priceStr, totalStr, cardColor, cardTextColor)
                 Spacer(modifier = GlanceModifier.defaultWeight())
             }
+        }
+        if (showUpgradeBanner) {
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .cornerRadius(8.dp)
+                    .background(Color(0x22FFD54F))
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "PRO: Customize widget colors and layout",
+                    style = TextStyle(
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(Color(0xFFFFD54F)),
+                        textAlign = TextAlign.Center
+                    ),
+                    maxLines = 1,
+                    modifier = GlanceModifier.fillMaxWidth()
+                )
+            }
+            Spacer(modifier = GlanceModifier.height(2.dp))
         }
         Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.5f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp))
     }

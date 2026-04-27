@@ -498,6 +498,7 @@ class SettingsViewModel @Inject constructor(
                             this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = vSafe.widgetCardColor
                             this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
                             this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
+                            this[PortfolioWidget.IS_PRO_USER_KEY] = _isProUser.value
                             val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
                             val selectedIds = vSafe.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
                             val filteredAssets = if (selectedIds.isEmpty()) {

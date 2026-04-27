@@ -11,9 +11,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -49,6 +52,8 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.absoluteValue
+import kotlinx.coroutines.launch
 
 @Composable
 fun AnalyticsScreen(navController: NavController) {
@@ -101,7 +106,9 @@ fun AnalyticsScreen(navController: NavController) {
         "REBALANCE COACH",
         "SCENARIOS"
     )
+    val quickJumpPages = pageTitles.withIndex().filter { it.index != 0 }
     val contentPagerState = rememberPagerState(pageCount = { pageTitles.size })
+    val pagerScope = rememberCoroutineScope()
 
     LaunchedEffect(contentPagerState.currentPage) {
         if (modeTabIndex != contentPagerState.currentPage) {
@@ -124,18 +131,54 @@ fun AnalyticsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                        .padding(horizontal = 20.dp, vertical = if (modeTabIndex == 0) 6.dp else 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = pageTitles[modeTabIndex],
-                        color = safeText,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    IconButton(
+                        onClick = {
+                            if (modeTabIndex == 0) {
+                                navController.popBackStack()
+                            } else {
+                                pagerScope.launch {
+                                    contentPagerState.animateScrollToPage(0)
+                                }
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = safeText
+                        )
+                    }
+                    if (modeTabIndex == 0) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painter = painterResource(R.drawable.swanie_foreground),
+                                contentDescription = null,
+                                modifier = Modifier.size(96.dp)
+                            )
+                            Text(
+                                text = "ANALYTICS HUB",
+                                color = safeText,
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.Black,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = pageTitles[modeTabIndex],
+                            color = safeText,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Black,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
                 HorizontalPager(
@@ -144,9 +187,15 @@ fun AnalyticsScreen(navController: NavController) {
                         .fillMaxWidth()
                         .weight(1f)
                 ) { page ->
+                    val pageOffset = (
+                        (contentPagerState.currentPage - page) + contentPagerState.currentPageOffsetFraction
+                        ).absoluteValue
+                    // Stronger fade while swiping between analytics pages.
+                    val pageAlpha = (1f - (pageOffset * 0.85f)).coerceIn(0.2f, 1f)
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .alpha(pageAlpha)
                             .verticalScroll(rememberScrollState())
                     ) {
                         if (page == 0) {
@@ -156,22 +205,62 @@ fun AnalyticsScreen(navController: NavController) {
                                     .padding(horizontal = 24.dp, vertical = 20.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(R.drawable.swanie_foreground),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(96.dp)
-                                )
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = "PORTFOLIO INTELLIGENCE",
-                                    color = safeText,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Black,
-                                    textAlign = TextAlign.Center
-                                )
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = safeCardBg.copy(alpha = 0.55f),
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = BorderStroke(1.dp, safeText.copy(alpha = 0.18f))
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+                                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Text(
+                                            text = "QUICK JUMP",
+                                            color = safeText.copy(alpha = 0.72f),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            letterSpacing = 0.4.sp,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.Center
+                                        )
+                                        quickJumpPages.forEach { entry ->
+                                            val index = entry.index
+                                            val title = entry.value
+                                            val isSelected = modeTabIndex == index
+                                            Surface(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .clickable {
+                                                        pagerScope.launch {
+                                                            contentPagerState.animateScrollToPage(index)
+                                                        }
+                                                    },
+                                                color = if (isSelected) safeText.copy(alpha = 0.12f) else Color.Transparent,
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    if (isSelected) safeText.copy(alpha = 0.35f) else safeText.copy(alpha = 0.15f)
+                                                ),
+                                                shape = RoundedCornerShape(10.dp)
+                                            ) {
+                                                Text(
+                                                    text = title,
+                                                    color = if (isSelected) safeText else safeText.copy(alpha = 0.85f),
+                                                    fontSize = 12.sp,
+                                                    fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                                                    textAlign = TextAlign.Center,
+                                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                                 Spacer(modifier = Modifier.height(14.dp))
                                 Text(
-                                text = "Swipe left or right to move between analytics pages.\n\nPIE, DONUT, and BAR are live chart views.\nTap any asset in the list to highlight it in the active chart.\n\nRISK, ATTRIBUTION, REBALANCE, and SCENARIOS are premium insight pages.",
+                                    text = "Swipe left or right to move.",
                                     color = safeText.copy(alpha = 0.85f),
                                     fontSize = 14.sp,
                                     textAlign = TextAlign.Center,
