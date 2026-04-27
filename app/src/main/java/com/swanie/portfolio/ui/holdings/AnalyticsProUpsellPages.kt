@@ -139,25 +139,25 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
     }
     LargeProAdPanel(
         preview = PremiumInsightPreview(
-            title = "RISK EXPOSURE MAP",
-            description = "Measure concentration, volatility pressure, and category balance in one view.",
+            title = stringResource(R.string.analytics_pro_risk_title),
+            description = stringResource(R.string.analytics_pro_risk_description),
             highlights = listOf(
-                "Top position currently represents ${String.format("%.1f", topShare)}% of your portfolio.",
-                "Concentration risk score preview: $concentrationScore ($concentrationLabel).",
-                "Unlock full heatmap and risk alerts before concentration drifts too far."
+                stringResource(R.string.analytics_pro_risk_highlight_top_position, String.format("%.1f", topShare)),
+                stringResource(R.string.analytics_pro_risk_highlight_score, concentrationScore, concentrationLabel),
+                stringResource(R.string.analytics_pro_risk_highlight_unlock)
             )
         ),
         textColor = textColor,
         onUpgradeClick = onUpgradeClick
     )
     Spacer(modifier = Modifier.height(12.dp))
-    ProInsightMiniCard(title = "RISK SNAPSHOT", textColor = textColor) {
+    ProInsightMiniCard(title = stringResource(R.string.analytics_pro_risk_snapshot_title), textColor = textColor) {
         val markerColor = when (concentrationLabel) {
             "HIGH" -> Color(0xFFFF6B6B)
             "MEDIUM" -> Color(0xFFFFD54F)
             else -> Color(0xFF66BB6A)
         }
-        Text(text = "Concentration Score", color = textColor.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.analytics_pro_risk_concentration_label), color = textColor.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(6.dp))
         androidx.compose.material3.LinearProgressIndicator(
             progress = { concentrationScore / 100f },
@@ -179,22 +179,22 @@ fun AttributionProScreen(textColor: Color, segments: List<AssetSegment>, totalVa
     val currency = NumberFormat.getCurrencyInstance(Locale.US)
     LargeProAdPanel(
         preview = PremiumInsightPreview(
-            title = "PERFORMANCE ATTRIBUTION",
-            description = "See exactly which assets and categories are driving your returns.",
+            title = stringResource(R.string.analytics_pro_attribution_title),
+            description = stringResource(R.string.analytics_pro_attribution_description),
             highlights = listOf(
-                "$leadName is currently leading with ${currency.format(leadValue)} of value.",
-                "Top 3 assets account for ${String.format("%.1f", combinedShare)}% of portfolio exposure.",
-                "Unlock attribution timelines and contribution breakdowns by position size."
+                stringResource(R.string.analytics_pro_attribution_highlight_lead, leadName, currency.format(leadValue)),
+                stringResource(R.string.analytics_pro_attribution_highlight_top3, String.format("%.1f", combinedShare)),
+                stringResource(R.string.analytics_pro_attribution_highlight_unlock)
             )
         ),
         textColor = textColor,
         onUpgradeClick = onUpgradeClick
     )
     Spacer(modifier = Modifier.height(12.dp))
-    ProInsightMiniCard(title = "ATTRIBUTION TIMELINE (LOCKED)", textColor = textColor) {
-        Text(text = "Unlock day/week/month contribution timelines and gain/drag decomposition.", color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+    ProInsightMiniCard(title = stringResource(R.string.analytics_pro_attribution_timeline_title), textColor = textColor) {
+        Text(text = stringResource(R.string.analytics_pro_attribution_timeline_description), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Portfolio base value: ${currency.format(totalValue)}", color = textColor.copy(alpha = 0.62f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.analytics_pro_attribution_base_value, currency.format(totalValue)), color = textColor.copy(alpha = 0.62f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -203,15 +203,19 @@ fun RebalanceCoachProScreen(textColor: Color, segments: List<AssetSegment>, onUp
     val targetPerAsset = if (segments.isNotEmpty()) (100f / segments.take(4).size) else 25f
     val largest = segments.firstOrNull()?.ratio?.times(100f) ?: 0f
     val drift = (largest - targetPerAsset).coerceAtLeast(0f)
-    val driftLabel = if (drift >= 8f) "ACTION SUGGESTED" else "WITHIN RANGE"
+    val driftLabel = if (drift >= 8f) {
+        stringResource(R.string.analytics_pro_rebalance_drift_action)
+    } else {
+        stringResource(R.string.analytics_pro_rebalance_drift_range)
+    }
     LargeProAdPanel(
         preview = PremiumInsightPreview(
-            title = "REBALANCE COACH",
-            description = "Track drift from targets and get guided rebalance suggestions.",
+            title = stringResource(R.string.analytics_pro_rebalance_title),
+            description = stringResource(R.string.analytics_pro_rebalance_description),
             highlights = listOf(
-                "Largest holding drift preview: ${String.format("%.1f", drift)}% from target.",
-                "Status right now: $driftLabel.",
-                "Unlock one-tap rebalance plans with target bands and alert thresholds."
+                stringResource(R.string.analytics_pro_rebalance_highlight_drift, String.format("%.1f", drift)),
+                stringResource(R.string.analytics_pro_rebalance_highlight_status, driftLabel),
+                stringResource(R.string.analytics_pro_rebalance_highlight_unlock)
             )
         ),
         textColor = textColor,
@@ -226,24 +230,24 @@ fun ScenariosProScreen(textColor: Color, segments: List<AssetSegment>, totalValu
     val currency = NumberFormat.getCurrencyInstance(Locale.US)
     LargeProAdPanel(
         preview = PremiumInsightPreview(
-            title = "SCENARIOS LAB",
-            description = "Stress test your portfolio with one-tap market shock and recovery simulations.",
+            title = stringResource(R.string.analytics_pro_scenarios_title),
+            description = stringResource(R.string.analytics_pro_scenarios_description),
             highlights = listOf(
-                "Run instant what-if events (market drop, crypto rally, metals surge).",
-                "Preview drawdown and rebound impact before taking action.",
-                "Current worst-case quick preview: ${currency.format(shockPreview)} move."
+                stringResource(R.string.analytics_pro_scenarios_highlight_run),
+                stringResource(R.string.analytics_pro_scenarios_highlight_preview),
+                stringResource(R.string.analytics_pro_scenarios_highlight_worst_case, currency.format(shockPreview))
             )
         ),
         textColor = textColor,
         onUpgradeClick = onUpgradeClick
     )
     Spacer(modifier = Modifier.height(12.dp))
-    ProInsightMiniCard(title = "SCENARIO PRESETS (LOCKED)", textColor = textColor) {
-        Text(text = "• Crypto -15% overnight shock", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    ProInsightMiniCard(title = stringResource(R.string.analytics_pro_scenarios_presets_title), textColor = textColor) {
+        Text(text = stringResource(R.string.analytics_pro_scenarios_preset_crypto), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "• Metals +10% inflation hedge run", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.analytics_pro_scenarios_preset_metals), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "• $topAsset event-driven volatility expansion", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.analytics_pro_scenarios_preset_top_asset, topAsset), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 

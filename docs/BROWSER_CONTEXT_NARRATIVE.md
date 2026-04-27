@@ -1,4 +1,21 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.59: ANALYTICS PREMIUM LIVE ENGINES + MODULAR REFACTOR)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.60: I18N + HOLDINGS REORDER + STORE READINESS CLARITY)
+
+V40.60 UPDATE (Localization, Holdings Crash Fix, Auth/Lint Hygiene, Launch Path)
+- **Pro analytics live strings (`analytics_live_*`):** Completed real translations for **`values-vi`** (including model-line labels and risk-engine wording), **`values-zh-rCN`**, and **`values-zh-rTW`**; aligned copy with `AnalyticsProLivePages.kt` string keys. (Earlier milestone locales such as `ar`, `hi`, `id`, `uk` remain part of the same wave.)
+- **Holdings reorder crash (free + Pro verified):** Fixed `MyHoldingsScreen` drag-and-drop when a **non-reorderable Pro upsell `item`** precedes holdings in the `LazyColumn`. `sh.calvin.reorderable` reports **absolute** lazy indices; `onMove` now subtracts **`holdingsLazyListStartIndex`** (`0` if Pro, else `1`) and guards out-of-range indices before mutating `localHoldingsForPage`.
+- **`CreateAccountScreen`:** Replaced `LocalContext.current as FragmentActivity` with **`LocalActivity.current as FragmentActivity`** for `hiltViewModel` ownership (aligns with AndroidX `ContextCastToActivity` guidance; compiles clean).
+- **Build sanity:** `:app:mergeDebugResources` and `:app:compileDebugKotlin` succeed after the above. **`lintDebug`** still reports broader pre-existing issues (e.g. `MissingTranslation` across settings/monetization keys); treat as a **separate** hardening track, not a regression from this drop.
+
+CURRENT CONDITION (END OF SESSION)
+- Holdings card reorder is **stable** for free-tier (banner + rows) and Pro-tier (rows only).
+- Premium live analytics copy is **localized** for Vietnamese and both Chinese script variants alongside the existing locale set.
+- RevenueCat remains the **entitlement and subscription orchestration** layer; **Google Play Console** (account, in-app products, Play Billing) is the **next prerequisite** for public sale—not a replacement for RevenueCat.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- **Play + monetization:** Register Play Developer account when ready; create subscription base plans; wire SKUs to **RevenueCat offerings**; validate on **internal/closed** tracks before production. Optional **Play-managed free trial** reads through RC as today’s entitlements do.
+- **Compliance prep (first-ship quality):** Privacy policy URL, accurate **Data safety** form, content rating, and store listing assets in parallel with technical testing.
+- **V40.61 candidate — Monetization conversion + trust:** Funnel telemetry (`view`, `package select`, `upgrade tap`, `purchase` / `restore` outcomes), on-device matrix passes (Free / Active Pro / Expired), paywall copy polish, small regression tests for entitlement-driven UI.
+- **Lint / i18n debt (optional batch):** Address or baseline `MissingTranslation` and remaining lint errors so CI can enforce regressions.
 
 V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
 - Completed/refined live premium analytics engines across `RISK`, `ATTRIBUTION`, `REBALANCE`, and `SCENARIOS`.
@@ -9,19 +26,6 @@ V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
 - Removed legacy combined premium file to reduce complexity and improve change safety.
 - Preserved visual parity after split by restoring shared spacing/typography details and fixing a subtle post-split spacing regression.
 - Stability confirmation: repeated `:app:compileDebugKotlin` runs pass; lints clean on newly split files.
-
-CURRENT CONDITION (END OF TODAY)
-- RevenueCat entitlement and Pro gating flows are operational and compile-stable.
-- Analytics now has production-usable premium logic plus maintainable file boundaries for faster iteration.
-- Upgrade-to-Pro flow includes clear user return path and consistent CTA behavior.
-- Repository is in a clean compile-green state after refactor hardening.
-
-FUTURE PATH (NEXT IMPLEMENTATION TRACK)
-- V40.60 Monetization Conversion + Trust Polish:
-  - Add funnel telemetry (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
-  - Execute on-device state matrix validation (Free, Active Pro, Expired Pro).
-  - Final copy tightening for monetization clarity across analytics upsell/paywall/restore outcomes.
-  - Add regression checks to protect analytics entitlement rendering behavior.
 
 V40.58 UPDATE (Analytics Premium Experience + Upgrade Flow UX)
 - Reworked Analytics into a mixed-access model: free chart pages remain available, while Pro insights are presented as premium teaser pages with upgrade entry points.

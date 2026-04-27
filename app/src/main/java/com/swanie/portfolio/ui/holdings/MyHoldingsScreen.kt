@@ -268,11 +268,22 @@ fun MyHoldingsScreen(
                                 }
                             }
 
+                            // sh.calvin.reorderable onMove uses absolute LazyColumn indices; free users have a
+                            // non-reorderable Pro banner item before the holdings rows.
+                            val holdingsLazyListStartIndex = if (isProUser) 0 else 1
+
                             val reorderableLazyListState = rememberReorderableLazyListState(
                                 lazyListState = pageLazyListState,
                                 onMove = { from, to ->
-                                    val fromItem = filteredHoldingsForPage[from.index]
-                                    val toItem = filteredHoldingsForPage[to.index]
+                                    val fromListIdx = from.index - holdingsLazyListStartIndex
+                                    val toListIdx = to.index - holdingsLazyListStartIndex
+                                    if (fromListIdx !in filteredHoldingsForPage.indices ||
+                                        toListIdx !in filteredHoldingsForPage.indices
+                                    ) {
+                                        return@rememberReorderableLazyListState
+                                    }
+                                    val fromItem = filteredHoldingsForPage[fromListIdx]
+                                    val toItem = filteredHoldingsForPage[toListIdx]
                                     localHoldingsForPage = localHoldingsForPage.toMutableList().apply {
                                         val fromIdx = indexOfFirst { it.coinId == fromItem.coinId }
                                         val toIdx = indexOfFirst { it.coinId == toItem.coinId }

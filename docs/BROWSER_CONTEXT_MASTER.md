@@ -173,7 +173,21 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.58: ANALYTICS PREMIUM EXPERIENCE + UPGRADE FLOW UX)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.60: I18N + HOLDINGS REORDER + STORE READINESS CLARITY)
+
+V40.60 UPDATE (Localization, Holdings Reorder Fix, Auth/Lint Hygiene, Launch Path)
+- **Pro analytics live strings (`analytics_live_*`):** Real translations for **`values-vi`**, **`values-zh-rCN`**, **`values-zh-rTW`** aligned to `AnalyticsProLivePages.kt` keys (plus ongoing locale wave).
+- **Holdings reorder crash:** `MyHoldingsScreen` — `onMove` now applies **`holdingsLazyListStartIndex`** (`0` Pro / `1` free with upsell banner) because `sh.calvin.reorderable` uses absolute `LazyColumn` indices; bounds-checked before list mutation. Verified free + Pro.
+- **`CreateAccountScreen`:** `LocalActivity.current as FragmentActivity` for `hiltViewModel` (AndroidX guidance).
+- **Build:** `:app:mergeDebugResources` + `:app:compileDebugKotlin` green. **`lintDebug`** still has broader legacy issues (`MissingTranslation`, etc.) — separate track.
+- **Product clarity:** RevenueCat = entitlements + orchestration; **Google Play** = store checkout when distributing on Play — keep both.
+
+FUTURE PATH (NEXT TRACK)
+- Play Developer registration → subscription SKUs → RC offerings → internal/closed testing; Data safety + privacy policy + listing prep in parallel.
+- V40.61 candidate: monetization telemetry, Free/Pro/expired matrix validation, paywall copy polish, optional lint baseline for CI.
+
+V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
+- Live premium engines for `RISK`, `ATTRIBUTION`, `REBALANCE`, `SCENARIOS`; split `AnalyticsProUpsellPages.kt` / `AnalyticsProLivePages.kt` / `AnalyticsProUiComponents.kt`; compile-stable.
 
 V40.58 UPDATE (Analytics Premium Experience + Upgrade Flow UX)
 - Reworked Analytics into a mixed-access model: free chart pages remain available, while Pro insights are presented as premium teaser pages with upgrade entry points.

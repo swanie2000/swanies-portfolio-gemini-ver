@@ -3,6 +3,7 @@
 package com.swanie.portfolio.ui.features
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,7 +49,7 @@ fun CreateAccountScreen(
     navController: NavController,
     mainViewModel: MainViewModel
 ) {
-    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val activity = LocalActivity.current as androidx.fragment.app.FragmentActivity
     val authViewModel: AuthViewModel = hiltViewModel(activity)
     val themeViewModel: ThemeViewModel = hiltViewModel()
 
