@@ -237,4 +237,12 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALL</string>
+    <string name="analytics_hub_title">ANALYTICS-HUB</string>
+    <string name="analytics_quick_jump_title">SCHNELLSPRUNG</string>
+    <string name="analytics_swipe_instruction_short">Wische nach links oder rechts, um zu wechseln.</string>
+    <string name="widget_pro_customization_title">PRO-ANPASSUNG</string>
+    <string name="widget_pro_customization_body">Das kostenlose Widget verwendet den Standardstil (bis zu 3 Assets). Upgrade auf Pro, um Farben, Reihenfolge und Layout zu bearbeiten.</string>
+    <string name="widget_upgrade_to_pro">AUF PRO UPGRADEN</string>
+    <string name="widget_continue_with_free">MIT KOSTENLOSEM WIDGET FORTFAHREN</string>
+    <string name="widget_free_pro_banner">PRO: Widget-Farben und Layout anpassen</string>
 </resources>

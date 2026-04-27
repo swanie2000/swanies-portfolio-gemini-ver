@@ -151,13 +151,20 @@
   - Preserved free default widget path (3 assets, default style, no customization) behind explicit continue action.
   - Validation passed with repeated debug Kotlin compile checks and clean lints on touched files.
 
+- [x] V40.60 Localization Completion for New Monetization + Analytics Strings - COMPLETED
+  - Performed full manual (no-script) update across all 20 locale files for newly introduced analytics/widget/upgrade strings.
+  - Added and localized new keys for analytics hub labels, quick-jump title, swipe instruction, widget Pro customization banner, and free-flow CTA labels.
+  - Replaced newly introduced hardcoded literals in analytics and widget flows with string resources.
+  - Fixed locale-specific XML escaping issues found during compile validation (French/Turkish apostrophe cases).
+  - Validation passed with clean lint and successful debug Kotlin compile after localization pass.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
   - Execute cross-device biometric callback validation and capture OEM behavior notes.
   - Revisit account recovery strategy (post-hint path, fallback options, and anti-lockout policy) after current auth hardening cycle.
 
-- [ ] V40.60 Monetization Conversion + Trust Polish - NEXT
+- [ ] V40.61 Monetization Conversion + Trust Polish - NEXT
   - Add lightweight event tracking for paywall and analytics premium funnel (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
   - Run end-to-end on-device validation for Free, Active Pro, and Expired Pro states across Analytics, Holdings, Theme Manager, Portfolio Manager, and Widget pathways.
   - Tighten remaining monetization copy and button wording for clarity/consistency.

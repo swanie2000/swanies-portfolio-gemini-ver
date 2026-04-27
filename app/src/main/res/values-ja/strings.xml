@@ -237,4 +237,12 @@
     <string name="holdings_tab_all">すべて</string>
     <string name="holdings_tab_crypto">仮想通貨</string>
     <string name="holdings_tab_metal">貴金属</string>
+    <string name="analytics_hub_title">分析ハブ</string>
+    <string name="analytics_quick_jump_title">クイックジャンプ</string>
+    <string name="analytics_swipe_instruction_short">左右にスワイプして移動します。</string>
+    <string name="widget_pro_customization_title">PROカスタマイズ</string>
+    <string name="widget_pro_customization_body">無料ウィジェットはデフォルトスタイル（最大3資産）を使用します。色、並び順、レイアウトを編集するにはProにアップグレードしてください。</string>
+    <string name="widget_upgrade_to_pro">PROにアップグレード</string>
+    <string name="widget_continue_with_free">無料ウィジェットで続行</string>
+    <string name="widget_free_pro_banner">PRO: ウィジェットの色とレイアウトをカスタマイズ</string>
 </resources>

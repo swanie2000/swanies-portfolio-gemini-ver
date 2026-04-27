@@ -237,4 +237,12 @@
     <string name="holdings_tab_all">TOUT</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">MÉTAL</string>
+    <string name="analytics_hub_title">CENTRE ANALYTIQUE</string>
+    <string name="analytics_quick_jump_title">ACCÈS RAPIDE</string>
+    <string name="analytics_swipe_instruction_short">Balayez à gauche ou à droite pour naviguer.</string>
+    <string name="widget_pro_customization_title">PERSONNALISATION PRO</string>
+    <string name="widget_pro_customization_body">Le widget gratuit utilise le style par défaut (jusqu\'à 3 actifs). Passez à Pro pour modifier les couleurs, l\'ordre et la mise en page.</string>
+    <string name="widget_upgrade_to_pro">PASSER À PRO</string>
+    <string name="widget_continue_with_free">CONTINUER AVEC LE WIDGET GRATUIT</string>
+    <string name="widget_free_pro_banner">PRO : Personnalisez les couleurs et la mise en page du widget</string>
 </resources>

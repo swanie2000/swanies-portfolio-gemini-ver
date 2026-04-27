@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
@@ -181,13 +182,13 @@ class WidgetConfigActivity : ComponentActivity() {
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "PRO CUSTOMIZATION",
+                                            text = stringResource(R.string.widget_pro_customization_title),
                                             color = Color(0xFFFFD54F),
                                             fontWeight = FontWeight.Black,
                                             fontSize = 13.sp
                                         )
                                         Text(
-                                            text = "Free widget uses default style (up to 3 assets). Upgrade to Pro to edit colors, ordering, and layout.",
+                                            text = stringResource(R.string.widget_pro_customization_body),
                                             color = Color.White.copy(alpha = 0.9f),
                                             modifier = Modifier.padding(top = 8.dp),
                                             fontSize = 12.sp
@@ -205,7 +206,7 @@ class WidgetConfigActivity : ComponentActivity() {
                                                 .height(50.dp),
                                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD54F), contentColor = Color.Black)
                                         ) {
-                                            Text("UPGRADE TO PRO", fontWeight = FontWeight.Black)
+                                            Text(stringResource(R.string.widget_upgrade_to_pro), fontWeight = FontWeight.Black)
                                         }
                                         Spacer(modifier = Modifier.height(8.dp))
                                         OutlinedButton(
@@ -215,7 +216,7 @@ class WidgetConfigActivity : ComponentActivity() {
                                                 .height(46.dp),
                                             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.4f))
                                         ) {
-                                            Text("CONTINUE WITH FREE WIDGET", color = Color.White)
+                                            Text(stringResource(R.string.widget_continue_with_free), color = Color.White)
                                         }
                                     }
                                 }

@@ -231,4 +231,12 @@
     <string name="holdings_tab_all">الكل</string>
     <string name="holdings_tab_crypto">عملات رقمية</string>
     <string name="holdings_tab_metal">معادن</string>
+    <string name="analytics_hub_title">مركز التحليلات</string>
+    <string name="analytics_quick_jump_title">انتقال سريع</string>
+    <string name="analytics_swipe_instruction_short">اسحب يسارًا أو يمينًا للتنقل.</string>
+    <string name="widget_pro_customization_title">تخصيص برو</string>
+    <string name="widget_pro_customization_body">تستخدم الأداة المجانية النمط الافتراضي (حتى 3 أصول). قم بالترقية إلى Pro لتعديل الألوان والترتيب والتخطيط.</string>
+    <string name="widget_upgrade_to_pro">الترقية إلى برو</string>
+    <string name="widget_continue_with_free">المتابعة بالأداة المجانية</string>
+    <string name="widget_free_pro_banner">برو: خصّص ألوان الأداة وتخطيطها</string>
 </resources>

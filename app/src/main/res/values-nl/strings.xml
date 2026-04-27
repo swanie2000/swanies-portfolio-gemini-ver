@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">METAAL</string>
+    <string name="analytics_hub_title">ANALYSEHUB</string>
+    <string name="analytics_quick_jump_title">SNELSPRONG</string>
+    <string name="analytics_swipe_instruction_short">Veeg naar links of rechts om te bewegen.</string>
+    <string name="widget_pro_customization_title">PRO-AANPASSING</string>
+    <string name="widget_pro_customization_body">De gratis widget gebruikt de standaardstijl (maximaal 3 assets). Upgrade naar Pro om kleuren, volgorde en lay-out te bewerken.</string>
+    <string name="widget_upgrade_to_pro">UPGRADE NAAR PRO</string>
+    <string name="widget_continue_with_free">DOORGAAN MET GRATIS WIDGET</string>
+    <string name="widget_free_pro_banner">PRO: Pas widgetkleuren en lay-out aan</string>
 </resources>

@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">SEMUA</string>
     <string name="holdings_tab_crypto">KRIPTO</string>
     <string name="holdings_tab_metal">LOGAM</string>
+    <string name="analytics_hub_title">PUSAT ANALITIK</string>
+    <string name="analytics_quick_jump_title">LOMPAT CEPAT</string>
+    <string name="analytics_swipe_instruction_short">Geser ke kiri atau kanan untuk berpindah.</string>
+    <string name="widget_pro_customization_title">KUSTOMISASI PRO</string>
+    <string name="widget_pro_customization_body">Widget gratis menggunakan gaya default (hingga 3 aset). Upgrade ke Pro untuk mengubah warna, urutan, dan tata letak.</string>
+    <string name="widget_upgrade_to_pro">UPGRADE KE PRO</string>
+    <string name="widget_continue_with_free">LANJUTKAN DENGAN WIDGET GRATIS</string>
+    <string name="widget_free_pro_banner">PRO: Sesuaikan warna dan tata letak widget</string>
 </resources>

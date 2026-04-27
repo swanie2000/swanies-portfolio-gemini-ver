@@ -230,4 +230,12 @@
     <string name="holdings_tab_all">ทั้งหมด</string>
     <string name="holdings_tab_crypto">คริปโต</string>
     <string name="holdings_tab_metal">โลหะ</string>
+    <string name="analytics_hub_title">ศูนย์วิเคราะห์</string>
+    <string name="analytics_quick_jump_title">ไปด่วน</string>
+    <string name="analytics_swipe_instruction_short">ปัดซ้ายหรือขวาเพื่อเลื่อนไปมา</string>
+    <string name="widget_pro_customization_title">การปรับแต่ง PRO</string>
+    <string name="widget_pro_customization_body">วิดเจ็ตฟรีใช้สไตล์เริ่มต้น (สูงสุด 3 สินทรัพย์) อัปเกรดเป็น Pro เพื่อแก้ไขสี ลำดับ และเลย์เอาต์</string>
+    <string name="widget_upgrade_to_pro">อัปเกรดเป็น PRO</string>
+    <string name="widget_continue_with_free">ใช้วิดเจ็ตฟรีต่อ</string>
+    <string name="widget_free_pro_banner">PRO: ปรับแต่งสีและเลย์เอาต์วิดเจ็ต</string>
 </resources>

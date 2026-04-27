@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">ВСЁ</string>
     <string name="holdings_tab_crypto">КРИПТО</string>
     <string name="holdings_tab_metal">МЕТАЛЛЫ</string>
+    <string name="analytics_hub_title">ЦЕНТР АНАЛИТИКИ</string>
+    <string name="analytics_quick_jump_title">БЫСТРЫЙ ПЕРЕХОД</string>
+    <string name="analytics_swipe_instruction_short">Смахните влево или вправо для перехода.</string>
+    <string name="widget_pro_customization_title">НАСТРОЙКА PRO</string>
+    <string name="widget_pro_customization_body">Бесплатный виджет использует стиль по умолчанию (до 3 активов). Обновитесь до Pro, чтобы изменить цвета, порядок и макет.</string>
+    <string name="widget_upgrade_to_pro">ОБНОВИТЬ ДО PRO</string>
+    <string name="widget_continue_with_free">ПРОДОЛЖИТЬ С БЕСПЛАТНЫМ ВИДЖЕТОМ</string>
+    <string name="widget_free_pro_banner">PRO: Настройте цвета и макет виджета</string>
 </resources>

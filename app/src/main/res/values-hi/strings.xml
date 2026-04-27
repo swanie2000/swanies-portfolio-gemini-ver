@@ -230,4 +230,12 @@
     <string name="holdings_tab_all">सभी</string>
     <string name="holdings_tab_crypto">क्रिप्टो</string>
     <string name="holdings_tab_metal">धातु</string>
+    <string name="analytics_hub_title">एनालिटिक्स हब</string>
+    <string name="analytics_quick_jump_title">क्विक जंप</string>
+    <string name="analytics_swipe_instruction_short">आगे बढ़ने के लिए बाएं या दाएं स्वाइप करें।</string>
+    <string name="widget_pro_customization_title">प्रो कस्टमाइज़ेशन</string>
+    <string name="widget_pro_customization_body">फ्री विजेट डिफ़ॉल्ट स्टाइल (अधिकतम 3 एसेट) उपयोग करता है। रंग, क्रम और लेआउट बदलने के लिए Pro में अपग्रेड करें।</string>
+    <string name="widget_upgrade_to_pro">प्रो में अपग्रेड करें</string>
+    <string name="widget_continue_with_free">फ्री विजेट जारी रखें</string>
+    <string name="widget_free_pro_banner">PRO: विजेट के रंग और लेआउट कस्टमाइज़ करें</string>
 </resources>

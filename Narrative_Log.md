@@ -486,3 +486,42 @@ Release recorded: V40.59.1 "Analytics Hub Navigation Polish + Free Widget Upsell
   - Execute end-to-end on-device matrix for Free, Active Pro, and Expired Pro journeys (including widget edit entry).
   - Finalize monetization copy consistency pass across paywall, analytics upsell, and widget-upgrade surfaces.
   - Add regression checks for analytics hub navigation rules and widget free-vs-pro behavior.
+
+---
+
+## V40.60 - Localization Completion for New Monetization + Analytics Strings
+
+Release recorded: V40.60 "Localization Completion for New Monetization + Analytics Strings".
+
+- Completed full manual i18n pass (no scripts) for all 20 locale files after latest monetization/analytics/widget UX changes.
+- Added and propagated new string keys introduced by the recent UX updates:
+  - `analytics_hub_title`
+  - `analytics_quick_jump_title`
+  - `analytics_swipe_instruction_short`
+  - `widget_pro_customization_title`
+  - `widget_pro_customization_body`
+  - `widget_upgrade_to_pro`
+  - `widget_continue_with_free`
+  - `widget_free_pro_banner`
+- Replaced hardcoded literals in code paths so UI text now consistently resolves through resources:
+  - Analytics hub header + quick jump labels/instruction.
+  - Widget free/pro stop-banner CTA and body copy.
+  - Small free-widget in-widget Pro upsell banner.
+- Completed one-by-one locale translation updates across all non-default language bundles and fixed XML escaping issues found during validation.
+- Validation:
+  - `:app:compileDebugKotlin` passed after translation/escape fixes.
+  - Lint remained clean on touched files/resources.
+
+### Current Status (End of Session)
+
+- New monetization/analytics/widget UX surfaces are now localization-complete for all supported languages.
+- No remaining hardcoded strings for the newly added upgrade banners/hub labels in the touched flows.
+- Codebase is compile-green and ready for final release-hardening checks.
+
+### Next Phase (Projected Path)
+
+- V40.61 Monetization Conversion + Trust Polish:
+  - Add funnel telemetry (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
+  - Run full on-device matrix for Free, Active Pro, and Expired Pro (including widget edit and analytics hub paths).
+  - Finalize copy consistency review across paywall, analytics upsell, and widget upgrade prompts.
+  - Add focused regression checks for analytics back-navigation rules and free-vs-pro widget behavior.

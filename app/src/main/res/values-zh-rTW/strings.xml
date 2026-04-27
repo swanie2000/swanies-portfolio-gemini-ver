@@ -230,4 +230,12 @@
     <string name="holdings_tab_all">全部</string>
     <string name="holdings_tab_crypto">加密</string>
     <string name="holdings_tab_metal">金屬</string>
+    <string name="analytics_hub_title">分析中心</string>
+    <string name="analytics_quick_jump_title">快速跳轉</string>
+    <string name="analytics_swipe_instruction_short">向左或向右滑動即可切換。</string>
+    <string name="widget_pro_customization_title">PRO 自訂</string>
+    <string name="widget_pro_customization_body">免費小工具使用預設樣式（最多 3 個資產）。升級到 Pro 可編輯顏色、順序與版面配置。</string>
+    <string name="widget_upgrade_to_pro">升級到 PRO</string>
+    <string name="widget_continue_with_free">繼續使用免費小工具</string>
+    <string name="widget_free_pro_banner">PRO：自訂小工具顏色與版面配置</string>
 </resources>

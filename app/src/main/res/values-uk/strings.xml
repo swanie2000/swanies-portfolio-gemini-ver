@@ -230,4 +230,12 @@
     <string name="holdings_tab_all">УСІ</string>
     <string name="holdings_tab_crypto">КРИПТО</string>
     <string name="holdings_tab_metal">МЕТАЛИ</string>
+    <string name="analytics_hub_title">ЦЕНТР АНАЛІТИКИ</string>
+    <string name="analytics_quick_jump_title">ШВИДКИЙ ПЕРЕХІД</string>
+    <string name="analytics_swipe_instruction_short">Проведіть ліворуч або праворуч, щоб перейти.</string>
+    <string name="widget_pro_customization_title">НАЛАШТУВАННЯ PRO</string>
+    <string name="widget_pro_customization_body">Безкоштовний віджет використовує стиль за замовчуванням (до 3 активів). Оновіться до Pro, щоб змінювати кольори, порядок і макет.</string>
+    <string name="widget_upgrade_to_pro">ОНОВИТИ ДО PRO</string>
+    <string name="widget_continue_with_free">ПРОДОВЖИТИ З БЕЗКОШТОВНИМ ВІДЖЕТОМ</string>
+    <string name="widget_free_pro_banner">PRO: Налаштуйте кольори та макет віджета</string>
 </resources>

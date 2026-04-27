@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">全部</string>
     <string name="holdings_tab_crypto">加密货币</string>
     <string name="holdings_tab_metal">贵金属</string>
+    <string name="analytics_hub_title">分析中心</string>
+    <string name="analytics_quick_jump_title">快速跳转</string>
+    <string name="analytics_swipe_instruction_short">左右滑动即可切换。</string>
+    <string name="widget_pro_customization_title">PRO 自定义</string>
+    <string name="widget_pro_customization_body">免费小组件使用默认样式（最多 3 个资产）。升级到 Pro 可编辑颜色、顺序和布局。</string>
+    <string name="widget_upgrade_to_pro">升级到 PRO</string>
+    <string name="widget_continue_with_free">继续使用免费小组件</string>
+    <string name="widget_free_pro_banner">PRO：自定义小组件颜色和布局</string>
 </resources>

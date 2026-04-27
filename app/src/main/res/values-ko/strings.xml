@@ -230,4 +230,12 @@
     <string name="settings_translation_feedback_screen">화면 또는 기능</string>
     <string name="settings_translation_feedback_subtitle">미리 작성된 내용으로 메일 앱이 열립니다.</string>
     <string name="terms_section_3_title">3. GOOGLE DRIVE 연동</string>
+    <string name="analytics_hub_title">분석 허브</string>
+    <string name="analytics_quick_jump_title">빠른 이동</string>
+    <string name="analytics_swipe_instruction_short">좌우로 스와이프하여 이동하세요.</string>
+    <string name="widget_pro_customization_title">프로 커스터마이징</string>
+    <string name="widget_pro_customization_body">무료 위젯은 기본 스타일(최대 3개 자산)을 사용합니다. 색상, 순서, 레이아웃을 편집하려면 Pro로 업그레이드하세요.</string>
+    <string name="widget_upgrade_to_pro">프로로 업그레이드</string>
+    <string name="widget_continue_with_free">무료 위젯으로 계속</string>
+    <string name="widget_free_pro_banner">PRO: 위젯 색상과 레이아웃 맞춤설정</string>
 </resources>

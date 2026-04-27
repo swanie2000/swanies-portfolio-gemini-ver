@@ -306,7 +306,7 @@ fun WidgetContent(
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = "PRO: Customize widget colors and layout",
+                    text = context.getString(R.string.widget_free_pro_banner),
                     style = TextStyle(
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,

@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">TÜMÜ</string>
     <string name="holdings_tab_crypto">KRİPTO</string>
     <string name="holdings_tab_metal">METAL</string>
+    <string name="analytics_hub_title">ANALİTİK MERKEZİ</string>
+    <string name="analytics_quick_jump_title">HIZLI GEÇİŞ</string>
+    <string name="analytics_swipe_instruction_short">Geçiş yapmak için sola veya sağa kaydırın.</string>
+    <string name="widget_pro_customization_title">PRO ÖZELLEŞTİRME</string>
+    <string name="widget_pro_customization_body">Ücretsiz widget varsayılan stili kullanır (en fazla 3 varlık). Renkleri, sıralamayı ve düzeni düzenlemek için Pro\'ya yükseltin.</string>
+    <string name="widget_upgrade_to_pro">PRO\'YA YÜKSELT</string>
+    <string name="widget_continue_with_free">ÜCRETSİZ WIDGET İLE DEVAM ET</string>
+    <string name="widget_free_pro_banner">PRO: Widget renklerini ve düzenini özelleştir</string>
 </resources>

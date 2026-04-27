@@ -279,4 +279,12 @@
     <string name="holdings_tab_all">ALL</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">METAL</string>
+    <string name="analytics_hub_title">ANALYTICS HUB</string>
+    <string name="analytics_quick_jump_title">QUICK JUMP</string>
+    <string name="analytics_swipe_instruction_short">Swipe left or right to move.</string>
+    <string name="widget_pro_customization_title">PRO CUSTOMIZATION</string>
+    <string name="widget_pro_customization_body">Free widget uses default style (up to 3 assets). Upgrade to Pro to edit colors, ordering, and layout.</string>
+    <string name="widget_upgrade_to_pro">UPGRADE TO PRO</string>
+    <string name="widget_continue_with_free">CONTINUE WITH FREE WIDGET</string>
+    <string name="widget_free_pro_banner">PRO: Customize widget colors and layout</string>
 </resources>

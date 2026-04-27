@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">TẤT CẢ</string>
     <string name="holdings_tab_crypto">TIỀN ĐIỆN TỬ</string>
     <string name="holdings_tab_metal">KIM LOẠI</string>
+    <string name="analytics_hub_title">TRUNG TÂM PHÂN TÍCH</string>
+    <string name="analytics_quick_jump_title">TRUY CẬP NHANH</string>
+    <string name="analytics_swipe_instruction_short">Vuốt sang trái hoặc phải để di chuyển.</string>
+    <string name="widget_pro_customization_title">TÙY CHỈNH PRO</string>
+    <string name="widget_pro_customization_body">Widget miễn phí dùng kiểu mặc định (tối đa 3 tài sản). Nâng cấp Pro để chỉnh màu sắc, thứ tự và bố cục.</string>
+    <string name="widget_upgrade_to_pro">NÂNG CẤP LÊN PRO</string>
+    <string name="widget_continue_with_free">TIẾP TỤC VỚI WIDGET MIỄN PHÍ</string>
+    <string name="widget_free_pro_banner">PRO: Tùy chỉnh màu sắc và bố cục widget</string>
 </resources>

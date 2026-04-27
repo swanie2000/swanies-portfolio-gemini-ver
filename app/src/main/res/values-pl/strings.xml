@@ -251,4 +251,12 @@
     <string name="holdings_tab_all">WSZYSTKO</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALE</string>
+    <string name="analytics_hub_title">CENTRUM ANALITYKI</string>
+    <string name="analytics_quick_jump_title">SZYBKI SKOK</string>
+    <string name="analytics_swipe_instruction_short">Przesuń w lewo lub w prawo, aby przejść dalej.</string>
+    <string name="widget_pro_customization_title">DOSTOSOWANIE PRO</string>
+    <string name="widget_pro_customization_body">Darmowy widżet używa domyślnego stylu (maks. 3 aktywa). Ulepsz do Pro, aby edytować kolory, kolejność i układ.</string>
+    <string name="widget_upgrade_to_pro">PRZEJDŹ NA PRO</string>
+    <string name="widget_continue_with_free">KONTYNUUJ Z DARMOWYM WIDŻETEM</string>
+    <string name="widget_free_pro_banner">PRO: Dostosuj kolory i układ widżetu</string>
 </resources>

@@ -160,7 +160,7 @@ fun AnalyticsScreen(navController: NavController) {
                                 modifier = Modifier.size(96.dp)
                             )
                             Text(
-                                text = "ANALYTICS HUB",
+                                text = stringResource(R.string.analytics_hub_title),
                                 color = safeText,
                                 fontSize = 19.sp,
                                 fontWeight = FontWeight.Black,
@@ -216,7 +216,7 @@ fun AnalyticsScreen(navController: NavController) {
                                         verticalArrangement = Arrangement.spacedBy(6.dp)
                                     ) {
                                         Text(
-                                            text = "QUICK JUMP",
+                                            text = stringResource(R.string.analytics_quick_jump_title),
                                             color = safeText.copy(alpha = 0.72f),
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.ExtraBold,
@@ -260,7 +260,7 @@ fun AnalyticsScreen(navController: NavController) {
                                 }
                                 Spacer(modifier = Modifier.height(14.dp))
                                 Text(
-                                    text = "Swipe left or right to move.",
+                                    text = stringResource(R.string.analytics_swipe_instruction_short),
                                     color = safeText.copy(alpha = 0.85f),
                                     fontSize = 14.sp,
                                     textAlign = TextAlign.Center,
