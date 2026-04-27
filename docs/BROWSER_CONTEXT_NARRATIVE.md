@@ -15,7 +15,16 @@ FUTURE PATH (NEXT IMPLEMENTATION TRACK)
 - **Play + monetization:** Register Play Developer account when ready; create subscription base plans; wire SKUs to **RevenueCat offerings**; validate on **internal/closed** tracks before production. Optional **Play-managed free trial** reads through RC as today’s entitlements do.
 - **Compliance prep (first-ship quality):** Privacy policy URL, accurate **Data safety** form, content rating, and store listing assets in parallel with technical testing.
 - **V40.61 candidate — Monetization conversion + trust:** Funnel telemetry (`view`, `package select`, `upgrade tap`, `purchase` / `restore` outcomes), on-device matrix passes (Free / Active Pro / Expired), paywall copy polish, small regression tests for entitlement-driven UI.
-- **Lint / i18n debt (optional batch):** Address or baseline `MissingTranslation` and remaining lint errors so CI can enforce regressions.
+
+NEXT SESSION START — LINT / TRANSLATIONS (START HERE TOMORROW)
+- **Facts:** `:app:lintDebug` reports on the order of **~69 errors** and **~350 warnings** (counts drift as code changes). A large share of **errors** is **`MissingTranslation`**: English keys added for **Settings / RevenueCat test / Pro gate** (`values/strings.xml` ~line 100+) not yet present in every `values-xx/strings.xml`. **Google Play does not require lint-all-green** to publish; this is your own quality / CI bar.
+- **You do not need** to clear every lint item before Play signup or internal testing. Choose a **policy**, then execute.
+- **Pick one lane (or combine A + D):**
+  - **(A) `lint.xml` (module):** Set **`MissingTranslation`** severity to **`warning`** so builds/CI can still fail on remaining **errors** while locales catch up.
+  - **(B) `lint-baseline.xml`:** In `app/build.gradle.kts`, `lint { baseline = file("lint-baseline.xml") }`, run **`./gradlew :app:updateLintBaseline`**, commit baseline — freezes known debt; CI only flags **new** issues.
+  - **(C) i18n sweep:** Script or batch-add the new keys to each locale file (English placeholder acceptable until translated).
+  - **(D) Code fixes first:** Same pattern as `CreateAccountScreen` — **`HomeScreen.kt`** still uses `LocalContext.current as FragmentActivity` (**`ContextCastToActivity`**); fix with **`LocalActivity.current as FragmentActivity`**. Address **`UnusedBoxWithConstraintsScope`** in `HoldingsUIComponents.kt` (replace with `Box` if constraints unused). Re-run **`./gradlew :app:lintDebug`** and open **`app/build/reports/lint-results-debug.html`** for the live list.
+- **Report path:** `app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt` (text) and HTML report under `app/build/reports/`.
 
 V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
 - Completed/refined live premium analytics engines across `RISK`, `ATTRIBUTION`, `REBALANCE`, and `SCENARIOS`.

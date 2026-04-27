@@ -184,7 +184,12 @@ V40.60 UPDATE (Localization, Holdings Reorder Fix, Auth/Lint Hygiene, Launch Pat
 
 FUTURE PATH (NEXT TRACK)
 - Play Developer registration → subscription SKUs → RC offerings → internal/closed testing; Data safety + privacy policy + listing prep in parallel.
-- V40.61 candidate: monetization telemetry, Free/Pro/expired matrix validation, paywall copy polish, optional lint baseline for CI.
+- V40.61 candidate: monetization telemetry, Free/Pro/expired matrix validation, paywall copy polish.
+
+NEXT SESSION START — LINT / TRANSLATIONS (SOURCE: `docs/BROWSER_CONTEXT_NARRATIVE.md`)
+- `:app:lintDebug` ~**69 errors** / ~**350 warnings**; many errors = **`MissingTranslation`** (new monetization/settings strings in default `values/strings.xml` not in every locale). **Play does not require lint-all-green.**
+- **Policy choices:** (A) `lint.xml` → `MissingTranslation` = **warning**; (B) **`lint-baseline.xml`** + `updateLintBaseline` for CI on deltas only; (C) batch keys into locales; (D) fix **code** issues first: **`HomeScreen.kt`** `LocalActivity` (same as CreateAccount), **`HoldingsUIComponents.kt`** `UnusedBoxWithConstraintsScope`.
+- Re-run lint; read **`app/build/reports/lint-results-debug.html`**.
 
 V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
 - Live premium engines for `RISK`, `ATTRIBUTION`, `REBALANCE`, `SCENARIOS`; split `AnalyticsProUpsellPages.kt` / `AnalyticsProLivePages.kt` / `AnalyticsProUiComponents.kt`; compile-stable.
