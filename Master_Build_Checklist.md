@@ -126,13 +126,24 @@
   - Finalized premium panel CTA behavior to single full-width `UPGRADE TO PRO` action (temporary `MAYBE LATER` removed).
   - Validation passed with repeated debug Kotlin compile success during iterative UI refinements.
 
+- [x] V40.59 Analytics Premium Live Engines + Modular Refactor - COMPLETED
+  - Completed/refined live premium analytics engines for `RISK`, `ATTRIBUTION`, `REBALANCE`, and `SCENARIOS`.
+  - Added/retained premium interaction polish: animated number transitions, scenario presets, and small-device overflow hardening.
+  - Fully modularized premium analytics code by splitting into:
+    - `AnalyticsProUpsellPages.kt`
+    - `AnalyticsProLivePages.kt`
+    - `AnalyticsProUiComponents.kt`
+  - Removed legacy monolithic premium file (`AnalyticsPremiumSections.kt`) after migration.
+  - Performed hardening pass to preserve visual fidelity after split (shared spacing/typography details restored).
+  - Validation passed with clean lint and repeated debug Kotlin compile success.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.
   - Execute cross-device biometric callback validation and capture OEM behavior notes.
   - Revisit account recovery strategy (post-hint path, fallback options, and anti-lockout policy) after current auth hardening cycle.
 
-- [ ] V40.59 Monetization Conversion + Trust Polish - NEXT
+- [ ] V40.60 Monetization Conversion + Trust Polish - NEXT
   - Add lightweight event tracking for paywall and analytics premium funnel (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
   - Run end-to-end on-device validation for Free, Active Pro, and Expired Pro states across Analytics, Holdings, Theme Manager, Portfolio Manager, and Widget pathways.
   - Tighten remaining monetization copy and button wording for clarity/consistency.

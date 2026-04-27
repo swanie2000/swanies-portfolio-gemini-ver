@@ -409,3 +409,42 @@ Release recorded: V40.58 "Analytics Premium Experience + Upgrade Flow UX".
   - Run final copy pass for all monetization CTAs/dialogs (reduce ambiguity, keep tone consistent).
   - Add small UX safeguards for upgrade return paths (preserve source context where applicable).
   - Perform on-device pass for free user journey, expired Pro journey, and restore journey.
+
+---
+
+## V40.59 - Analytics Premium Live Engines + Modular Refactor
+
+Release recorded: V40.59 "Analytics Premium Live Engines + Modular Refactor".
+
+- Completed premium analytics feature depth and production polish:
+  - Added/refined live Pro engines for `RISK`, `ATTRIBUTION`, `REBALANCE`, and `SCENARIOS`.
+  - Included scenario presets, animated metric transitions, and stronger small-screen overflow protection.
+- Finalized free vs Pro analytics architecture:
+  - Free users remain on `START`, `PIE`, `DONUT`, `BAR`.
+  - Pro users receive live premium engines; non-Pro users see actionable teaser pages with direct upgrade paths.
+- Completed structural refactor of analytics premium code:
+  - Split premium content into focused files:
+    - `AnalyticsProUpsellPages.kt`
+    - `AnalyticsProLivePages.kt`
+    - `AnalyticsProUiComponents.kt`
+  - Removed the old combined premium file to reduce maintenance risk and improve iteration speed.
+- Preserved UI fidelity during split:
+  - Restored shared-card spacing/typography details (`divider`, `lineHeight`, `chip letter spacing`) and fixed a subtle spacing regression found during hardening pass.
+- Validation:
+  - `:app:compileDebugKotlin` passed after each refactor phase and final polish.
+  - Lint checks remained clean on newly split premium files.
+
+### Current Status (End of Session)
+
+- RevenueCat monetization and entitlement gating are stable.
+- Analytics premium stack is now both feature-rich and modularized for safer future changes.
+- Upgrade flows remain consistent with clear return paths and no dead-end behavior.
+- Project is compile-green with no lint issues on touched premium analytics files.
+
+### Next Phase (Projected Path)
+
+- V40.60 Monetization Conversion + Trust Polish:
+  - Add lightweight funnel telemetry (`view`, `select package`, `cta tap`, `purchase outcome`, `restore outcome`).
+  - Complete end-to-end on-device journey validation for Free, Active Pro, and Expired Pro states.
+  - Tighten monetization copy consistency across paywall, analytics upsell, and restore messaging.
+  - Add/verify regression checks for analytics tab behavior under both entitlement states.

@@ -1,4 +1,27 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.58: ANALYTICS PREMIUM EXPERIENCE + UPGRADE FLOW UX)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.59: ANALYTICS PREMIUM LIVE ENGINES + MODULAR REFACTOR)
+
+V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
+- Completed/refined live premium analytics engines across `RISK`, `ATTRIBUTION`, `REBALANCE`, and `SCENARIOS`.
+- Finalized split architecture for premium analytics:
+  - `AnalyticsProUpsellPages.kt`
+  - `AnalyticsProLivePages.kt`
+  - `AnalyticsProUiComponents.kt`
+- Removed legacy combined premium file to reduce complexity and improve change safety.
+- Preserved visual parity after split by restoring shared spacing/typography details and fixing a subtle post-split spacing regression.
+- Stability confirmation: repeated `:app:compileDebugKotlin` runs pass; lints clean on newly split files.
+
+CURRENT CONDITION (END OF TODAY)
+- RevenueCat entitlement and Pro gating flows are operational and compile-stable.
+- Analytics now has production-usable premium logic plus maintainable file boundaries for faster iteration.
+- Upgrade-to-Pro flow includes clear user return path and consistent CTA behavior.
+- Repository is in a clean compile-green state after refactor hardening.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- V40.60 Monetization Conversion + Trust Polish:
+  - Add funnel telemetry (`view`, `select package`, `upgrade tap`, `purchase outcome`, `restore outcome`).
+  - Execute on-device state matrix validation (Free, Active Pro, Expired Pro).
+  - Final copy tightening for monetization clarity across analytics upsell/paywall/restore outcomes.
+  - Add regression checks to protect analytics entitlement rendering behavior.
 
 V40.58 UPDATE (Analytics Premium Experience + Upgrade Flow UX)
 - Reworked Analytics into a mixed-access model: free chart pages remain available, while Pro insights are presented as premium teaser pages with upgrade entry points.
