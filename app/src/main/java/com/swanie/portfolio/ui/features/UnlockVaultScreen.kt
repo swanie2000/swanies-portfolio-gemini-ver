@@ -76,6 +76,7 @@ fun UnlockVaultScreen(
     var recoveredHint by remember { mutableStateOf<String?>(null) }
     var isRecovering by remember { mutableStateOf(false) }
     var recoveryMessage by remember { mutableStateOf<String?>(null) }
+    var hasAutoPromptedBiometric by remember { mutableStateOf(false) }
 
     val isBiometricEnabled by settingsViewModel.isBiometricEnabled.collectAsState()
     val requirePasswordAfterBiometricFailure by settingsViewModel
@@ -88,6 +89,18 @@ fun UnlockVaultScreen(
     // UI-only intro fade; authentication is explicit via password or biometric button tap.
     LaunchedEffect(Unit) {
         contentAlpha.animateTo(1f, tween(800))
+    }
+
+    // Auto-open biometric prompt once when login screen is shown and biometrics are enabled.
+    LaunchedEffect(isBiometricEnabled, biometricLockedUntilPassword, hasAutoPromptedBiometric) {
+        if (!isBiometricEnabled) return@LaunchedEffect
+        if (biometricLockedUntilPassword) return@LaunchedEffect
+        if (hasAutoPromptedBiometric) return@LaunchedEffect
+        if (authState is AuthViewModel.AuthState.Authenticated) return@LaunchedEffect
+
+        hasAutoPromptedBiometric = true
+        delay(250)
+        authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
     }
 
     // Navigate immediately after a successful biometric authentication.

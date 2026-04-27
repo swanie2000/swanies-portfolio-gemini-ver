@@ -52,6 +52,7 @@ import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.holdings.formatAmount
 import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -66,10 +67,12 @@ fun MyHoldingsScreen(
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val haptic = LocalHapticFeedback.current
 
     val allVaults by viewModel.allVaults.collectAsStateWithLifecycle(initialValue = null)
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
+    val isProUser by settingsViewModel.isProUser.collectAsStateWithLifecycle()
 
     val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
@@ -105,15 +108,23 @@ fun MyHoldingsScreen(
     val assetToDelete by viewModel.confirmDelete.collectAsStateWithLifecycle()
 
     val resolvedVaults = allVaults ?: emptyList()
+    val accessibleVaults = remember(resolvedVaults, activeVault.id, isProUser) {
+        if (isProUser) {
+            resolvedVaults
+        } else {
+            resolvedVaults.firstOrNull { it.id == activeVault.id }?.let { listOf(it) }
+                ?: resolvedVaults.take(1)
+        }
+    }
     val pagerState = rememberPagerState(
-        initialPage = resolvedVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
-    ) { resolvedVaults.size.coerceAtLeast(1) }
+        initialPage = accessibleVaults.indexOfFirst { it.id == activeVault.id }.coerceAtLeast(0)
+    ) { accessibleVaults.size.coerceAtLeast(1) }
 
-    LaunchedEffect(requestedVaultId, resolvedVaults) {
+    LaunchedEffect(requestedVaultId, accessibleVaults) {
         val targetVaultId = requestedVaultId ?: return@LaunchedEffect
-        val targetIndex = resolvedVaults.indexOfFirst { it.id == targetVaultId }
+        val targetIndex = accessibleVaults.indexOfFirst { it.id == targetVaultId }
         if (targetIndex >= 0) {
-            if (resolvedVaults[targetIndex].id != activeVault.id) {
+            if (accessibleVaults[targetIndex].id != activeVault.id) {
                 mainViewModel.selectVault(targetVaultId)
             }
             if (targetIndex != pagerState.currentPage) {
@@ -122,16 +133,16 @@ fun MyHoldingsScreen(
         }
     }
 
-    LaunchedEffect(activeVault.id) {
-        val targetIndex = resolvedVaults.indexOfFirst { it.id == activeVault.id }
+    LaunchedEffect(activeVault.id, accessibleVaults) {
+        val targetIndex = accessibleVaults.indexOfFirst { it.id == activeVault.id }
         if (targetIndex != -1 && targetIndex != pagerState.currentPage) {
             pagerState.animateScrollToPage(targetIndex)
         }
     }
 
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress && resolvedVaults.isNotEmpty()) {
-            val targetVault = resolvedVaults[pagerState.currentPage]
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress, accessibleVaults) {
+        if (!pagerState.isScrollInProgress && accessibleVaults.isNotEmpty()) {
+            val targetVault = accessibleVaults[pagerState.currentPage]
             if (targetVault.id != activeVault.id) mainViewModel.selectVault(targetVault.id)
         }
     }
@@ -178,7 +189,7 @@ fun MyHoldingsScreen(
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
                         IconButton(
                             onClick = {
-                                val activeVaultIdFromPager = resolvedVaults.getOrNull(pagerState.currentPage)?.id ?: activeVault.id
+                                val activeVaultIdFromPager = accessibleVaults.getOrNull(pagerState.currentPage)?.id ?: activeVault.id
                                 isExiting = true
                                 navController.navigate(Routes.addAssetRoute(activeVaultIdFromPager))
                             },
@@ -215,15 +226,15 @@ fun MyHoldingsScreen(
                                 }
                             }
                         }
-                    } else if (resolvedVaults.isNotEmpty()) {
+                    } else if (accessibleVaults.isNotEmpty()) {
                         HorizontalPager(
                             state = pagerState,
                             modifier = Modifier.fillMaxSize(),
                             beyondViewportPageCount = 1,
                             userScrollEnabled = !isDraggingActive.value,
-                            key = { page -> resolvedVaults[page].id }
+                            key = { page -> accessibleVaults[page].id }
                         ) { page ->
-                            val vaultForPage = resolvedVaults[page]
+                            val vaultForPage = accessibleVaults[page]
                             val pageOffset = pagerState.getOffsetDistanceInPages(page)
                             val absOffset = kotlin.math.abs(pageOffset).coerceIn(0f, 1f)
                             val rawAlpha = (1f - absOffset) * (1f - absOffset)
@@ -325,6 +336,43 @@ fun MyHoldingsScreen(
                                         color = Color.Yellow,
                                         trackColor = Color.Transparent
                                     )
+                                }
+
+                                if (!isProUser) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp, vertical = 8.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(dialogBg.copy(alpha = 0.22f))
+                                            .border(1.dp, textColor.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
+                                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Multi-portfolio swipe is a Pro feature.",
+                                            color = textColor.copy(alpha = 0.9f),
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        OutlinedButton(
+                                            onClick = {
+                                                isExiting = true
+                                                navController.navigate(Routes.UPGRADE_TO_PRO)
+                                            },
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                contentColor = Color(0xFFFFD54F)
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "UPGRADE NOW",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Black
+                                            )
+                                        }
+                                    }
                                 }
 
                                 if (filteredHoldingsForPage.isEmpty()) {

@@ -97,6 +97,22 @@
   - Improved Create Account + Settings Security copy and translated Terms/translation-feedback UI labels.
   - Validation passed with debug Kotlin compile success and no lint issues.
 
+- [x] V40.56 RevenueCat Monetization Wiring + Pro Gating - COMPLETED
+  - Integrated RevenueCat SDK bootstrap with safe no-key fallback behavior.
+  - Added centralized monetization boundary (`MonetizationManager`) for entitlement refresh, offerings fetch, purchase, and restore.
+  - Gated Theme Manager, Portfolio Manager, Analytics, and Widget configuration behind Pro entitlement.
+  - Added reusable Pro paywall flow and Settings monetization diagnostics surface.
+
+- [x] V40.57 RevenueCat Stabilization + Access Enforcement - COMPLETED
+  - Added app-user identity synchronization before restore/purchase/offerings flows to reduce anonymous entitlement drift.
+  - Upgraded restore UX to deterministic result states (`already active`, `restored`, `no entitlement`, `failed`).
+  - Split monetization UX into dedicated routes/screens (`UPGRADE TO PRO NOW`, `TEST INFO`) with Settings entry actions.
+  - Enforced Pro gating on holdings multi-portfolio swipe access while preserving single-vault access for Free users.
+  - Added Free-user Holdings upsell banner linking directly to upgrade flow.
+  - Added Home/Unlock biometric auto-prompt sequencing when biometric login is enabled.
+  - Added Settings scroll-position persistence across sub-page navigation.
+  - Validation passed via repeated debug Kotlin compile checks.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

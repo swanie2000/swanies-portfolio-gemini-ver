@@ -86,8 +86,11 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animationStarted by remember { mutableStateOf(false) }
     var animateText by remember { mutableStateOf(false) }
     var showSparkles by remember { mutableStateOf(false) }
+    var loginControlsRevealed by remember { mutableStateOf(false) }
+    var hasAutoPromptedBiometric by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
+    val isBiometricEnabled by authViewModel.isBiometricEnabled.collectAsState()
     val languageCode by settingsViewModel.languageCode.collectAsState()
     val effectiveLanguageCode = if (languageCode == "system") "en" else languageCode
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -131,7 +134,21 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             // ⚡ SNAPPY REVEAL: Sparkle delay 1100ms -> 880ms (20% reduction)
             delay(880)
             showSparkles = true
+            // Login controls slide in with a delayed enter animation; trigger biometric after they are visible.
+            delay(900)
+            loginControlsRevealed = true
         }
+    }
+
+    // Auto-open biometric prompt after login controls are fully revealed when enabled.
+    LaunchedEffect(loginControlsRevealed, isBiometricEnabled, authState, hasAutoPromptedBiometric) {
+        if (!loginControlsRevealed) return@LaunchedEffect
+        if (!isBiometricEnabled) return@LaunchedEffect
+        if (hasAutoPromptedBiometric) return@LaunchedEffect
+        if (authState is AuthViewModel.AuthState.Authenticated) return@LaunchedEffect
+
+        hasAutoPromptedBiometric = true
+        authViewModel.triggerBiometricUnlock(activity, forcePrompt = true)
     }
 
     // --- 🛡️ SUCCESS NAVIGATION: Graceful Fade into Holdings ---

@@ -98,6 +98,22 @@ fun NavGraph(
                 )
             }
 
+            composable(Routes.UPGRADE_TO_PRO) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                UpgradeToProScreen(
+                    settingsViewModel = settingsViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Routes.REVENUECAT_TEST_INFO) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                RevenueCatTestInfoScreen(
+                    settingsViewModel = settingsViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
             composable(Routes.THEME_STUDIO) {
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 val isProUser = settingsViewModel.isProUser.collectAsStateWithLifecycle().value

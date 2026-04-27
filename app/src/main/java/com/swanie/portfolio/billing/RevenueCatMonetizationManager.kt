@@ -6,6 +6,7 @@ import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.awaitCustomerInfo
+import com.revenuecat.purchases.awaitLogIn
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
 import com.revenuecat.purchases.awaitRestore
@@ -25,6 +26,7 @@ class RevenueCatMonetizationManager @Inject constructor() : MonetizationManager 
     private val _entitlement = MutableStateFlow(EntitlementSnapshot())
     override val entitlement: StateFlow<EntitlementSnapshot> = _entitlement.asStateFlow()
     private val packageCache = mutableMapOf<String, Package>()
+    private var currentAppUserId: String? = null
 
     init {
         purchasesOrNull()?.updatedCustomerInfoListener =
@@ -33,6 +35,18 @@ class RevenueCatMonetizationManager @Inject constructor() : MonetizationManager 
                     _entitlement.value = customerInfo.toEntitlementSnapshot(entitlementId)
                 }
             }
+    }
+
+    override suspend fun setAppUser(appUserId: String?) {
+        val purchases = purchasesOrNull() ?: return
+        val normalized = appUserId?.trim().orEmpty()
+        if (normalized.isBlank() || normalized == currentAppUserId) return
+
+        runCatching {
+            val loginResult = purchases.awaitLogIn(normalized)
+            currentAppUserId = normalized
+            _entitlement.value = loginResult.customerInfo.toEntitlementSnapshot(entitlementId)
+        }
     }
 
     override suspend fun refreshEntitlement() {

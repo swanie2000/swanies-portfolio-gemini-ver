@@ -338,3 +338,34 @@ Release recorded: V40.48 "Localization Quality Pass (Batches A-D)".
 - Validation:
   - `:app:compileDebugKotlin` passed after each batch.
   - Lint remained clean on touched resource files.
+
+---
+
+## V40.57 - RevenueCat Stabilization + Access Enforcement
+
+Release recorded: V40.57 "RevenueCat Stabilization + Access Enforcement".
+
+- Hardened RevenueCat identity and restore reliability:
+  - Added app-user sync hooks so entitlement checks/restore/purchase paths align to a stable profile identity.
+  - Updated restore outcome handling to surface deterministic user-facing results (`already active`, `restored`, `no entitlement`, `failed`) instead of ambiguous success states.
+- Improved monetization UX architecture:
+  - Moved paywall and diagnostics into dedicated routes/screens (`UPGRADE TO PRO NOW`, `TEST INFO`) and simplified Settings entry points.
+  - Added a lifecycle test checklist to the in-app `TEST INFO` page for rapid sandbox validation loops.
+- Enforced Pro boundaries more strictly:
+  - Blocked Free/expired users from side-to-side multi-portfolio swipe access in Holdings while preserving single-vault access.
+  - Added contextual Holdings upsell banner with direct upgrade route.
+- Refined auth surface behavior:
+  - Added automatic biometric prompt sequencing after Home animation/login reveal and on Unlock screen when biometric login is enabled.
+  - Preserved password-first behavior when biometric login is disabled.
+- Quality/flow polish:
+  - Required explicit plan selection before enabling `UPGRADE TO PRO`.
+  - Preserved Settings scroll position when navigating to/from sub-pages.
+- Validation:
+  - Repeated `:app:compileDebugKotlin` passes after each integration cluster.
+
+### Next Phase (Projected Path)
+
+- V40.58 Monetization Release Hardening:
+  - Replace any remaining test-oriented copy with release-safe language.
+  - Add lightweight analytics hooks for paywall views/select/purchase/restore outcomes.
+  - Finalize production key rotation/secret handling checklist before store release.

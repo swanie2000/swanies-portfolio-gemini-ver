@@ -97,6 +97,16 @@
     <string name="settings_translation_feedback_email_body">Language: %1$s\nScreen: %2$s\nCurrent text: %3$s\nSuggested translation: %4$s\nNotes: %5$s</string>
     <string name="settings_theme_depth">THEME &amp; DEPTH</string>
     <string name="settings_management">MANAGEMENT</string>
+    <string name="settings_upgrade_to_pro_now">UPGRADE TO PRO NOW</string>
+    <string name="settings_test_info_button">TEST INFO</string>
+    <string name="settings_test_info_title">REVENUECAT TEST INFO</string>
+    <string name="settings_test_plan_title">SUBSCRIPTION LIFECYCLE TEST PLAN</string>
+    <string name="settings_test_plan_step_1">1) Purchase Monthly from UPGRADE TO PRO NOW.</string>
+    <string name="settings_test_plan_step_2">2) Confirm PRO STATUS changes to ACTIVE.</string>
+    <string name="settings_test_plan_step_3">3) Wait for accelerated sandbox renewal/expiry cycle.</string>
+    <string name="settings_test_plan_step_4">4) Reopen app and verify paywall appears when entitlement expires.</string>
+    <string name="settings_test_plan_step_5">5) Tap RESTORE PURCHASES and verify resulting status message.</string>
+    <string name="settings_test_plan_step_6">6) Reinstall app, log in same account, confirm entitlement re-sync behavior.</string>
     <string name="settings_pro_status_label">PRO STATUS</string>
     <string name="settings_pro_status_active">ACTIVE</string>
     <string name="settings_pro_status_inactive">FREE</string>
@@ -113,6 +123,8 @@
     <string name="settings_restore_purchases_button">RESTORE PURCHASES</string>
     <string name="settings_restore_purchases_working">RESTORING...</string>
     <string name="settings_restore_purchases_success">Purchases restored.</string>
+    <string name="settings_restore_purchases_already_active">Pro is already active on this account.</string>
+    <string name="settings_restore_purchases_no_entitlement">No previous Pro purchase found for this account.</string>
     <string name="settings_restore_purchases_failed">Unable to restore purchases right now.</string>
     <string name="pro_gate_title">PRO FEATURE</string>
     <string name="pro_gate_subtitle">%1$s is available on Pro.</string>
@@ -130,6 +142,7 @@
     <string name="pro_feature_portfolio_manager">MULTIPLE PORTFOLIOS</string>
     <string name="pro_feature_analytics">ANALYTICS</string>
     <string name="pro_feature_widget_manager">WIDGET MANAGER</string>
+    <string name="pro_feature_upgrade_now">PRO ACCESS</string>
     <string name="settings_system_actions">SYSTEM ACTIONS</string>
     <string name="settings_factory_default">FACTORY DEFAULT</string>
     <string name="restore_title">VAULT RECOVERY</string>

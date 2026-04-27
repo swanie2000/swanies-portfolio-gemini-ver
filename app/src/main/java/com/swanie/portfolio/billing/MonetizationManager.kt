@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 interface MonetizationManager {
     val entitlement: StateFlow<EntitlementSnapshot>
 
+    suspend fun setAppUser(appUserId: String?)
+
     suspend fun refreshEntitlement()
 
     suspend fun restorePurchases(): Result<Unit>

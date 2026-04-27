@@ -11,6 +11,8 @@ object Routes {
     const val ANALYTICS = "analytics"
     const val SETTINGS = "settings"
     const val THEME_STUDIO = "theme_studio"
+    const val UPGRADE_TO_PRO = "upgrade_to_pro"
+    const val REVENUECAT_TEST_INFO = "revenuecat_test_info"
     const val WIDGET_MANAGER = "widget_manager"
     const val ASSET_PICKER = "add_asset/{vaultId}"
     const val AMOUNT_ENTRY = "amount_entry/{coinId}/{symbol}/{apiId}/{iconUrl}/{category}/{price}/{priceSource}/{vaultId}"

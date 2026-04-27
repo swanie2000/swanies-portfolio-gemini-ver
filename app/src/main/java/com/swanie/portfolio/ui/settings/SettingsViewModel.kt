@@ -44,6 +44,13 @@ import java.text.NumberFormat
 import java.util.*
 import javax.inject.Inject
 
+enum class RestorePurchasesResult {
+    ALREADY_ACTIVE,
+    RESTORED,
+    NO_ENTITLEMENT_FOUND,
+    FAILED
+}
+
 /**
  * Settings and widget-registry flows. Assets-versus-appearance sub-navigation in the widget manager
  * is local compose state in [WidgetManagerScreen]; this class continues to own vault targeting and sync.
@@ -58,6 +65,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val userConfigDao = database.userConfigDao()
+    private val userDao = database.userDao()
     private val assetDao = database.assetDao()
     private val vaultDao = database.vaultDao()
 
@@ -135,6 +143,7 @@ class SettingsViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
+            syncMonetizationUserFromProfile()
             monetizationManager.refreshEntitlement()
         }
         viewModelScope.launch {
@@ -212,18 +221,39 @@ class SettingsViewModel @Inject constructor(
         themePreferences.saveLanguageCode(languageCode)
     }
 
-    fun restorePurchases(onComplete: (Boolean) -> Unit) {
+    fun restorePurchases(onComplete: (RestorePurchasesResult) -> Unit) {
         viewModelScope.launch {
-            val restored = monetizationManager.restorePurchases().isSuccess
-            if (restored) {
-                monetizationManager.refreshEntitlement()
+            syncMonetizationUserFromProfile()
+            monetizationManager.refreshEntitlement()
+            val beforeSnapshot = monetizationManager.entitlement.value
+            val isProBeforeRestore = beforeSnapshot.tier == AccessTier.PRO && beforeSnapshot.isActive
+            if (isProBeforeRestore) {
+                onComplete(RestorePurchasesResult.ALREADY_ACTIVE)
+                return@launch
             }
-            onComplete(restored)
+
+            val restoreCallSucceeded = monetizationManager.restorePurchases().isSuccess
+            if (!restoreCallSucceeded) {
+                onComplete(RestorePurchasesResult.FAILED)
+                return@launch
+            }
+
+            monetizationManager.refreshEntitlement()
+            val afterSnapshot = monetizationManager.entitlement.value
+            val isProAfterRestore = afterSnapshot.tier == AccessTier.PRO && afterSnapshot.isActive
+            onComplete(
+                if (isProAfterRestore) {
+                    RestorePurchasesResult.RESTORED
+                } else {
+                    RestorePurchasesResult.NO_ENTITLEMENT_FOUND
+                }
+            )
         }
     }
 
     fun refreshProPackages(onComplete: ((Boolean) -> Unit)? = null) {
         viewModelScope.launch {
+            syncMonetizationUserFromProfile()
             val result = monetizationManager.fetchPackages()
             result.getOrNull()?.let { _availableProPackages.value = it }
             onComplete?.invoke(result.isSuccess)
@@ -236,12 +266,22 @@ class SettingsViewModel @Inject constructor(
         onComplete: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
+            syncMonetizationUserFromProfile()
             val result = monetizationManager.purchasePackage(activity, packageIdentifier)
             if (result.isSuccess) {
                 monetizationManager.refreshEntitlement()
             }
             onComplete(result.isSuccess)
         }
+    }
+
+    private suspend fun syncMonetizationUserFromProfile() {
+        val profile = userDao.getFirstUser()
+        val appUserId = profile?.email?.trim()?.lowercase()
+            ?.takeIf { it.isNotBlank() }
+            ?: profile?.userName?.trim()
+                ?.takeIf { it.isNotBlank() }
+        monetizationManager.setAppUser(appUserId)
     }
 
     /**

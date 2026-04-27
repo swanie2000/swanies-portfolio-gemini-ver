@@ -3,6 +3,7 @@ package com.swanie.portfolio
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.UserDao
 import com.swanie.portfolio.data.local.UserProfileEntity
@@ -24,7 +25,8 @@ class MainViewModel @Inject constructor(
     private val repository: AssetRepository,
     private val themePreferences: ThemePreferences,
     private val vaultDao: VaultDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val monetizationManager: MonetizationManager
 ) : ViewModel() {
 
     private val _isDataReady = MutableStateFlow(false)
@@ -196,6 +198,7 @@ class MainViewModel @Inject constructor(
             hasAcceptedTOS = acceptedTOS
         )
         userDao.upsertUserProfile(next)
+        syncMonetizationUser(next)
     }
 
     suspend fun createOrUpdateUserProfileAndFetchFirst(
@@ -217,6 +220,7 @@ class MainViewModel @Inject constructor(
             hasAcceptedTOS = acceptedTOS
         )
         userDao.upsertUserProfile(next)
+        syncMonetizationUser(next)
         return userDao.getFirstUser()
     }
 
@@ -240,6 +244,9 @@ class MainViewModel @Inject constructor(
         )
         Log.d("VAULT_AUTH", "Comparison Result: $isMatch")
         _isVaultUnlocked.value = isMatch
+        if (isMatch) {
+            syncMonetizationUser(profile)
+        }
         return isMatch
     }
 
@@ -268,6 +275,15 @@ class MainViewModel @Inject constructor(
 
         userDao.upsertUserProfile(profile.copy(loginPassword = normalizedNew))
         return true
+    }
+
+    private suspend fun syncMonetizationUser(profile: UserProfileEntity?) {
+        val appUserId = profile?.email?.trim()?.lowercase()
+            ?.takeIf { it.isNotBlank() }
+            ?: profile?.userName?.trim()
+                ?.takeIf { it.isNotBlank() }
+        monetizationManager.setAppUser(appUserId)
+        monetizationManager.refreshEntitlement()
     }
 
     fun setResetToDefault(enabled: Boolean) = viewModelScope.launch {

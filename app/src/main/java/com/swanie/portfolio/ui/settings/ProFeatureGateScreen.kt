@@ -144,7 +144,7 @@ fun ProFeatureGateScreen(
 
         Button(
             onClick = {
-                val targetPackage = selectedPackageId ?: availablePackages.firstOrNull()?.identifier
+                val targetPackage = selectedPackageId
                 if (activity == null || targetPackage == null || isPurchasing) return@Button
                 isPurchasing = true
                 settingsViewModel.purchaseProPackage(activity, targetPackage) { success ->
@@ -157,7 +157,7 @@ fun ProFeatureGateScreen(
                     Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
                 }
             },
-            enabled = activity != null && availablePackages.isNotEmpty(),
+            enabled = activity != null && selectedPackageId != null && availablePackages.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -207,12 +207,17 @@ fun ProFeatureGateScreen(
             onClick = {
                 if (isRestoring) return@OutlinedButton
                 isRestoring = true
-                settingsViewModel.restorePurchases { restored ->
+                settingsViewModel.restorePurchases { result ->
                     isRestoring = false
-                    val msgRes = if (restored) {
-                        R.string.settings_restore_purchases_success
-                    } else {
-                        R.string.settings_restore_purchases_failed
+                    val msgRes = when (result) {
+                        RestorePurchasesResult.ALREADY_ACTIVE ->
+                            R.string.settings_restore_purchases_already_active
+                        RestorePurchasesResult.RESTORED ->
+                            R.string.settings_restore_purchases_success
+                        RestorePurchasesResult.NO_ENTITLEMENT_FOUND ->
+                            R.string.settings_restore_purchases_no_entitlement
+                        RestorePurchasesResult.FAILED ->
+                            R.string.settings_restore_purchases_failed
                     }
                     Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
                 }

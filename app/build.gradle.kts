@@ -6,11 +6,27 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+import java.util.Properties
+
 // 🛡️ Force Metadata Resolution to fix Kotlin 2.1 Compatibility
 configurations.all {
     resolutionStrategy {
         force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
     }
+}
+
+val localProperties = Properties().apply {
+    val localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) {
+        localPropsFile.inputStream().use(::load)
+    }
+}
+
+fun resolveLocalSecret(name: String): String {
+    val fromLocalProperties = localProperties.getProperty(name)
+    val fromGradleProperty = project.findProperty(name) as? String
+    val fromEnv = System.getenv(name)
+    return fromLocalProperties ?: fromGradleProperty ?: fromEnv ?: ""
 }
 
 android {
@@ -28,15 +44,23 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"\"")
-            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"pro\"")
+            buildConfigField(
+                "String",
+                "REVENUECAT_API_KEY",
+                "\"${resolveLocalSecret("REVENUECAT_API_KEY")}\""
+            )
+            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"\"")
-            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"pro\"")
+            buildConfigField(
+                "String",
+                "REVENUECAT_API_KEY",
+                "\"${resolveLocalSecret("REVENUECAT_API_KEY")}\""
+            )
+            buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
         }
     }

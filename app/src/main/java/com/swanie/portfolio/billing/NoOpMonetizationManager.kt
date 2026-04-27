@@ -13,6 +13,10 @@ class NoOpMonetizationManager @Inject constructor() : MonetizationManager {
     private val _entitlement = MutableStateFlow(EntitlementSnapshot())
     override val entitlement: StateFlow<EntitlementSnapshot> = _entitlement.asStateFlow()
 
+    override suspend fun setAppUser(appUserId: String?) {
+        // Intentionally no-op.
+    }
+
     override suspend fun refreshEntitlement() {
         // Intentionally no-op while RevenueCat wiring is in progress.
     }
