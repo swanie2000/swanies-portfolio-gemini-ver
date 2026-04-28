@@ -1,4 +1,19 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.63: RELEASE READINESS CHECKLIST + LAUNCH TRACK)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.64: WIDGET/THEME STUDIO UX PARITY + LIVE PREVIEW)
+
+V40.64 UPDATE (Widget Style + Theme Manager UX Alignment)
+- **Unified edit workflow:** Both Widget Style and Theme Manager now use the same top-row interaction model: target dropdown -> unsaved state switches to red `CANCEL` + pulsing `SAVE`.
+- **Target naming normalization:** Updated style targets to `APP Background`, `App Text`, `Card Background`, `Card Text` in Theme Manager; widget style keeps matching terminology for card/background/text choices.
+- **Header action correction:** Theme Manager reverted to refresh icon action to avoid text overlap with branding.
+- **Live preview upgrade:** Theme Manager sample now renders a real live asset card + live total from holdings data (same visual language as widget preview) instead of static mock content.
+- **Small-screen usability:** Style controls remain pinned near top to reduce scrolling friction on smaller devices.
+
+CURRENT CONDITION (END OF SESSION)
+- Theme and Widget style tabs now feel behaviorally consistent and easier to understand.
+- Live visual feedback is immediate on both surfaces, including real portfolio preview in Theme Manager.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- Optional polish: Replace deprecated `Icons.Filled.Undo` with `Icons.AutoMirrored.Filled.Undo`.
+- Device QA pass on smaller screens for touch targets, dropdown behavior, and save/cancel discoverability.
 
 V40.63 PLAN (Play Console + RevenueCat Release Readiness)
 - **Account + console setup**

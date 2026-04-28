@@ -1321,18 +1321,60 @@ fun WidgetStudioInlineCompact(
 ) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
     var activeTarget by rememberSaveable { mutableIntStateOf(0) }
-    val targets = listOf("Widget BG", "BG Text", "Card BG", "Card Text")
+    val targets = listOf(
+        "Widget Background",
+        "Widget Text",
+        "Card Background",
+        "Card Text",
+    )
+    var targetMenuExpanded by remember { mutableStateOf(false) }
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
     var value by remember { mutableFloatStateOf(1f) }
     var hexInput by remember { mutableStateOf("") }
-    var isFlashing by remember { mutableStateOf(false) }
 
     val liveColor = remember(hexInput, hue, saturation, value) {
         try { if (hexInput.length == 6) Color("#$hexInput".toColorInt()) else Color.hsv(hue, saturation, value) }
         catch (e: Exception) { Color.hsv(hue, saturation, value) }
+    }
+    val currentTargetHex = when (activeTarget) {
+        0 -> draftBg
+        1 -> draftBgTxt
+        2 -> draftCrd
+        else -> draftCrdTxt
+    }.uppercase()
+    val normalizedInput = hexInput.uppercase()
+    val hasValidHex = normalizedInput.length == 6 && normalizedInput.all { it.isDigit() || it in 'A'..'F' }
+    val pendingHex = if (hasValidHex) "#$normalizedInput" else null
+    val hasUnsavedChanges = pendingHex != null && !pendingHex.equals(currentTargetHex, ignoreCase = true)
+    val pulseTransition = rememberInfiniteTransition(label = "widgetStyleSavePulse")
+    val savePulseAlpha by pulseTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = EaseInOut),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "widgetStyleSavePulseAlpha",
+    )
+    val saveButtonColor = when {
+        !hasUnsavedChanges -> Color(0xFF6A6A6A)
+        else -> Color(0xFFFFD54F).copy(alpha = savePulseAlpha)
+    }
+    fun resetPendingEditToCurrentTarget() {
+        val cur = when (activeTarget) {
+            0 -> draftBg
+            1 -> draftBgTxt
+            2 -> draftCrd
+            else -> draftCrdTxt
+        }
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(try { Color(cur.toColorInt()).toArgb() } catch (e: Exception) { 0 }, hsv)
+        hue = hsv[0]
+        saturation = hsv[1]
+        value = hsv[2]
+        hexInput = cur.replace("#", "").uppercase()
     }
 
     LaunchedEffect(activeTarget) {
@@ -1343,11 +1385,97 @@ fun WidgetStudioInlineCompact(
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(bottom = 16.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            targets.forEachIndexed { i, label ->
-                val isSel = activeTarget == i
-                Box(Modifier.weight(1f).height(64.dp).background(if(isSel) Color.White.copy(0.08f) else Color.Transparent, RoundedCornerShape(12.dp)).border(1.dp, if(isSel) Color.White.copy(0.45f) else Color.Gray.copy(0.3f), RoundedCornerShape(12.dp)).clickable { activeTarget = i }, contentAlignment = Alignment.Center) {
-                    Text(label, color = if(isSel) Color.Yellow else Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (hasUnsavedChanges) {
+                Button(
+                    onClick = {
+                        resetPendingEditToCurrentTarget()
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFD32F2F),
+                        contentColor = Color.White,
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Text("CANCEL", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                }
+            } else {
+                ExposedDropdownMenuBox(
+                    expanded = targetMenuExpanded,
+                    onExpandedChange = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        targetMenuExpanded = !targetMenuExpanded
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    OutlinedTextField(
+                        value = targets[activeTarget],
+                        onValueChange = {},
+                        readOnly = true,
+                        singleLine = true,
+                        textStyle = TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = targetMenuExpanded)
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Yellow.copy(alpha = 0.9f),
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.35f),
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = targetMenuExpanded,
+                        onDismissRequest = { targetMenuExpanded = false },
+                    ) {
+                        targets.forEachIndexed { index, label ->
+                            DropdownMenuItem(
+                                text = { Text(label, fontSize = 12.sp) },
+                                onClick = {
+                                    activeTarget = index
+                                    targetMenuExpanded = false
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier.height(56.dp).width(106.dp),
+            ) {
+                Button(
+                    onClick = {
+                        val nextHex = pendingHex ?: return@Button
+                        onColorChanged(activeTarget, nextHex)
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                    },
+                    enabled = hasUnsavedChanges,
+                    modifier = Modifier.fillMaxSize(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = saveButtonColor,
+                        contentColor = Color.Black,
+                        disabledContainerColor = Color(0xFF6A6A6A),
+                        disabledContentColor = Color.White.copy(alpha = 0.7f),
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Text("SAVE", fontSize = 11.sp, fontWeight = FontWeight.Black)
                 }
             }
         }
@@ -1368,13 +1496,6 @@ fun WidgetStudioInlineCompact(
             val w = constraints.maxWidth.toFloat(); val colors = (0..360).map { Color.hsv(it.toFloat(), 1f, 1f) }
             Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(colors)))
             Box(Modifier.fillMaxSize().pointerInput(Unit) { detectDragGestures { change, _ -> hue = (change.position.x / w * 360f).coerceIn(0f, 360f); hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(hue, saturation, value).toArgb()) } })
-        }
-        Button(onClick = {
-            onColorChanged(activeTarget, "#$hexInput")
-            isFlashing = true; scope.launch { delay(200); isFlashing = false }
-            keyboardController?.hide(); focusManager.clearFocus()
-        }, modifier = Modifier.fillMaxWidth().height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = if(isFlashing) Color.White else Color.Yellow)) {
-            Text(stringResource(R.string.widget_set_draft_target, targets[activeTarget].uppercase()), color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Black)
         }
     }
 }

@@ -44,19 +44,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import com.swanie.portfolio.data.local.AssetEntity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.components.BoutiqueHeader
+import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.theme.ThemeDefaults
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun ThemeStudioScreen(
     navController: NavHostController,
     viewModel: ThemeViewModel = hiltViewModel()
 ) {
+    val assetViewModel: AssetViewModel = hiltViewModel()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
@@ -66,17 +71,25 @@ fun ThemeStudioScreen(
     val cardTextColor by viewModel.cardTextColor.collectAsState()
     val siteBgColor by viewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by viewModel.siteTextColor.collectAsState()
+    val liveHoldings by assetViewModel.holdings.collectAsState()
+    val liveSampleAsset = liveHoldings?.firstOrNull()
+    val liveTotalValue = remember(liveHoldings) {
+        (liveHoldings ?: emptyList()).sumOf { (it.officialSpotPrice * it.amountHeld) + it.premium }
+    }
+    val liveTotalValueText = remember(liveTotalValue) {
+        NumberFormat.getCurrencyInstance(Locale.US).format(liveTotalValue)
+    }
 
     // Local UI State
     var activeTarget by remember { mutableIntStateOf(0) }
-    val targets = listOf("Card Background", "Card Text", "App Background", "App Text")
+    val targets = listOf("APP Background", "App Text", "Card Background", "Card Text")
+    var targetMenuExpanded by remember { mutableStateOf(false) }
 
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
     var value by remember { mutableFloatStateOf(1f) }
     var hexInput by remember { mutableStateOf("") }
     var isFlashing by remember { mutableStateOf(false) }
-    var hasUnsavedChanges by remember { mutableStateOf(false) }
 
     var errorMessage by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -90,23 +103,27 @@ fun ThemeStudioScreen(
 
     // Pulse & Glow Animations
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = if (hasUnsavedChanges) 1.05f else 1f,
+    val savePulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
+            animation = tween(900, easing = EaseInOut),
             repeatMode = RepeatMode.Reverse
-        ), label = "scale"
+        ), label = "savePulse"
     )
-
-    val borderAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = if (hasUnsavedChanges) 1f else 0.3f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = "alpha"
-    )
+    val currentTargetHex = when (activeTarget) {
+        0 -> siteBgColor
+        1 -> siteTextColor
+        2 -> cardBgColor
+        else -> cardTextColor
+    }.replace("#", "").uppercase()
+    val normalizedInput = hexInput.uppercase()
+    val hasValidHex = normalizedInput.length == 6 && normalizedInput.all { it.isDigit() || it in 'A'..'F' }
+    val hasUnsavedChanges = normalizedInput != currentTargetHex
+    val saveButtonColor = when {
+        !hasUnsavedChanges -> Color(0xFF6A6A6A)
+        else -> Color(0xFFFFD54F).copy(alpha = savePulseAlpha)
+    }
 
     val livePreviewColor = remember(hexInput, hue, saturation, value) {
         try {
@@ -133,13 +150,12 @@ fun ThemeStudioScreen(
         try {
             val finalHex = "#$hexInput"
             when (activeTarget) {
-                0 -> viewModel.saveCardBackgroundColor(finalHex)
-                1 -> viewModel.saveCardTextColor(finalHex)
-                2 -> viewModel.saveSiteBackgroundColor(finalHex)
-                3 -> viewModel.saveSiteTextColor(finalHex)
+                0 -> viewModel.saveSiteBackgroundColor(finalHex)
+                1 -> viewModel.saveSiteTextColor(finalHex)
+                2 -> viewModel.saveCardBackgroundColor(finalHex)
+                3 -> viewModel.saveCardTextColor(finalHex)
             }
             isFlashing = true
-            hasUnsavedChanges = false
             keyboardController?.hide()
             focusManager.clearFocus()
             scope.launch { delay(300); isFlashing = false }
@@ -152,15 +168,28 @@ fun ThemeStudioScreen(
 
     LaunchedEffect(activeTarget) {
         val currentHex = when (activeTarget) {
-            0 -> cardBgColor; 1 -> cardTextColor; 2 -> siteBgColor; else -> siteTextColor
+            0 -> siteBgColor; 1 -> siteTextColor; 2 -> cardBgColor; else -> cardTextColor
         }
         try {
             val hsv = FloatArray(3)
             android.graphics.Color.colorToHSV(Color(currentHex.toColorInt()).toArgb(), hsv)
             hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
             hexInput = currentHex.replace("#", "").uppercase()
-            hasUnsavedChanges = false
         } catch (e: Exception) {}
+    }
+    fun resetPendingEditToCurrentTarget() {
+        val currentHex = when (activeTarget) {
+            0 -> siteBgColor
+            1 -> siteTextColor
+            2 -> cardBgColor
+            else -> cardTextColor
+        }
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(Color(currentHex.toColorInt()).toArgb(), hsv)
+        hue = hsv[0]
+        saturation = hsv[1]
+        value = hsv[2]
+        hexInput = currentHex.replace("#", "").uppercase()
     }
 
     if (showResetDialog) {
@@ -180,7 +209,6 @@ fun ThemeStudioScreen(
                     viewModel.saveCardBackgroundColor(defCardBg)
                     viewModel.saveCardTextColor(defCardText)
 
-                    hasUnsavedChanges = false
                     hexInput = defAppBg.replace("#", "")
                     val hsv = FloatArray(3)
                     android.graphics.Color.colorToHSV(defAppBg.toColorInt(), hsv)
@@ -226,6 +254,101 @@ fun ThemeStudioScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (hasUnsavedChanges) {
+                    Button(
+                        onClick = {
+                            resetPendingEditToCurrentTarget()
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFD32F2F),
+                            contentColor = Color.White,
+                        ),
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Text("CANCEL", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                    }
+                } else {
+                    ExposedDropdownMenuBox(
+                        expanded = targetMenuExpanded,
+                        onExpandedChange = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            targetMenuExpanded = !targetMenuExpanded
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        OutlinedTextField(
+                            value = targets[activeTarget],
+                            onValueChange = {},
+                            readOnly = true,
+                            singleLine = true,
+                            textStyle = TextStyle(color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = targetMenuExpanded)
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.Yellow.copy(alpha = 0.9f),
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.35f),
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                        )
+                        ExposedDropdownMenu(
+                            expanded = targetMenuExpanded,
+                            onDismissRequest = { targetMenuExpanded = false },
+                        ) {
+                            targets.forEachIndexed { index, label ->
+                                DropdownMenuItem(
+                                    text = { Text(label, fontSize = 12.sp) },
+                                    onClick = {
+                                        activeTarget = index
+                                        targetMenuExpanded = false
+                                        keyboardController?.hide()
+                                        focusManager.clearFocus()
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+                Button(
+                    onClick = { applyColor() },
+                    enabled = hasUnsavedChanges && hasValidHex,
+                    modifier = Modifier.height(56.dp).width(106.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = saveButtonColor,
+                        contentColor = Color.Black,
+                        disabledContainerColor = Color(0xFF6A6A6A),
+                        disabledContentColor = Color.White.copy(alpha = 0.7f),
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                ) {
+                    Text("SAVE", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                }
+            }
+
+            ThemeStudioSamplePreview(
+                sampleAsset = liveSampleAsset,
+                totalValue = liveTotalValueText,
+                appBgHex = siteBgColor,
+                appTextHex = siteTextColor,
+                cardBgHex = cardBgColor,
+                cardTextHex = cardTextColor,
+            )
+
             Row(modifier = Modifier.fillMaxWidth().height(54.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().background(livePreviewColor, RoundedCornerShape(8.dp)).border(2.dp, Color.White, RoundedCornerShape(8.dp)))
                 Spacer(modifier = Modifier.width(10.dp))
@@ -237,7 +360,6 @@ fun ThemeStudioScreen(
                             onValueChange = { input ->
                                 if (input.length <= 6) {
                                     hexInput = input.uppercase()
-                                    hasUnsavedChanges = true
                                     if (input.length == 6 && input.all { it.isDigit() || it.uppercaseChar() in 'A'..'F' }) {
                                         val hsv = FloatArray(3)
                                         android.graphics.Color.colorToHSV("#$input".toColorInt(), hsv)
@@ -262,60 +384,39 @@ fun ThemeStudioScreen(
                 }
             }
 
-            StudioSaturationBox(hue, saturation, value, modifier = Modifier.fillMaxWidth().weight(1f)) { s, v ->
-                saturation = s; value = v; hasUnsavedChanges = true
+            StudioSaturationBox(hue, saturation, value, modifier = Modifier.fillMaxWidth().height(88.dp)) { s, v ->
+                saturation = s; value = v
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(hue, s, v).toArgb())
             }
 
-            StudioHueSlider(hue, modifier = Modifier.fillMaxWidth().height(36.dp)) { h ->
-                hue = h; hasUnsavedChanges = true
+            StudioHueSlider(hue, modifier = Modifier.fillMaxWidth().height(18.dp)) { h ->
+                hue = h
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(h, saturation, value).toArgb())
             }
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StudioTargetItem(targets[0], cardBgColor, cardTextColor, activeTarget == 0, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 0 }
-                    StudioTargetItem(targets[2], siteBgColor, siteTextColor, activeTarget == 2, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 2 }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StudioTargetItem(targets[1], cardBgColor, cardTextColor, activeTarget == 1, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 1 }
-                    StudioTargetItem(targets[3], siteBgColor, siteTextColor, activeTarget == 3, hasUnsavedChanges, borderAlpha, Modifier.weight(1f)) { activeTarget = 3 }
-                }
-            }
-
-            Button(
-                onClick = { applyColor() },
-                modifier = Modifier.fillMaxWidth().height(50.dp).scale(pulseScale),
-                colors = ButtonDefaults.buttonColors(containerColor = if (isFlashing) Color.White else Color.Yellow),
-                shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text(
-                    stringResource(R.string.theme_apply_to_target, targets[activeTarget].uppercase()),
-                    color = Color.Black,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            }
-
-            // 🛡️ Added bottom clearance for the global navigation bar
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
 
-// Custom Studio Components (Kept for package scope)
 @Composable
-private fun StudioTargetItem(label: String, bg: String, txt: String, isSelected: Boolean, hasChanges: Boolean, alpha: Float, modifier: Modifier, onClick: () -> Unit) {
-    val borderThickness = if (isSelected && hasChanges) 4.dp else if (isSelected) 2.dp else 1.dp
-    val borderColor = if (isSelected && hasChanges) Color.White.copy(alpha = alpha) else if (isSelected) Color.White else Color.Gray
-
-    Box(
-        modifier = modifier.height(50.dp).background(Color(bg.toColorInt()), RoundedCornerShape(8.dp))
-            .border(borderThickness, borderColor, RoundedCornerShape(8.dp)).clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(label, color = Color(txt.toColorInt()), fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
-    }
+private fun ThemeStudioSamplePreview(
+    sampleAsset: AssetEntity?,
+    totalValue: String,
+    appBgHex: String,
+    appTextHex: String,
+    cardBgHex: String,
+    cardTextHex: String,
+) {
+    WidgetPreviewSlim(
+        sampleAsset = sampleAsset,
+        vaultName = "LIVE PREVIEW",
+        totalValue = totalValue,
+        bgHex = appBgHex,
+        bgTxtHex = appTextHex,
+        cardHex = cardBgHex,
+        cardTxtHex = cardTextHex,
+        showTotal = true,
+        isHighVisibilityMode = false,
+    )
 }
 
 @Composable

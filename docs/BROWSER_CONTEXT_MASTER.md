@@ -173,7 +173,17 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.63: RELEASE READINESS CHECKLIST + LAUNCH TRACK)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.64: WIDGET/THEME STUDIO UX PARITY + LIVE PREVIEW)
+
+V40.64 UPDATE (Widget Style + Theme Manager UX Alignment)
+- Unified style-edit UX on both surfaces: dropdown target selector, red `CANCEL` state on unsaved edits, pulsing `SAVE`.
+- Theme Manager target labels normalized (`APP Background`, `App Text`, `Card Background`, `Card Text`) and style controls kept near top for small-screen ergonomics.
+- Restored Theme Manager refresh icon action to avoid label overlap with swan branding.
+- Replaced Theme Manager static sample with a live holdings-backed preview card + live total using real asset data.
+
+FUTURE PATH (NEXT TRACK)
+- Run device QA on compact phones for control visibility and touch comfort.
+- Optional cleanup: migrate deprecated `Icons.Filled.Undo` to auto-mirrored variant.
 
 V40.63 PLAN (Play Console + RevenueCat Release Readiness)
 - Account setup: Activate Play Developer profile; finalize package/app record; complete contact + policy fields.
