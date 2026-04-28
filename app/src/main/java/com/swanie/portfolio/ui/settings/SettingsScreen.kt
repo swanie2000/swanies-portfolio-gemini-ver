@@ -502,6 +502,54 @@ fun SettingsScreen(
                 }
 
                 Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                    val languageOptions = listOf(
+                        "en", "es", "pt-BR", "fr", "de", "ja", "ko", "zh-CN", "hi", "ar",
+                        "zh-TW", "it", "ru", "tr", "id", "vi", "th", "pl", "nl", "uk"
+                    )
+                    val selectedLanguageLabel = languageLabel(effectiveLanguageCode)
+                    ExposedDropdownMenuBox(
+                        expanded = languageExpanded,
+                        onExpandedChange = { languageExpanded = !languageExpanded },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedLanguageLabel,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(),
+                            label = { Text(stringResource(R.string.language_selector_title)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = safeText,
+                                unfocusedTextColor = safeText,
+                                focusedBorderColor = safeText.copy(alpha = 0.6f),
+                                unfocusedBorderColor = safeText.copy(alpha = 0.3f),
+                                cursorColor = safeText
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = languageExpanded,
+                            onDismissRequest = { languageExpanded = false }
+                        ) {
+                            languageOptions.forEach { option ->
+                                val optionLabel = languageLabel(option)
+                                DropdownMenuItem(
+                                    text = { Text(optionLabel) },
+                                    onClick = {
+                                        languageExpanded = false
+                                        scope.launch {
+                                            settingsViewModel.saveLanguageCodeNow(option)
+                                            (context as? FragmentActivity)?.recreate()
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     // --- SECURITY ---
                     Text(stringResource(R.string.settings_security), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
@@ -617,54 +665,6 @@ fun SettingsScreen(
                     // --- INTERFACE ---
                     Text(stringResource(R.string.settings_interface), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
-                    val languageOptions = listOf(
-                        "en", "es", "pt-BR", "fr", "de", "ja", "ko", "zh-CN", "hi", "ar",
-                        "zh-TW", "it", "ru", "tr", "id", "vi", "th", "pl", "nl", "uk"
-                    )
-                    val selectedLanguageLabel = languageLabel(effectiveLanguageCode)
-                    ExposedDropdownMenuBox(
-                        expanded = languageExpanded,
-                        onExpandedChange = { languageExpanded = !languageExpanded },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = selectedLanguageLabel,
-                            onValueChange = {},
-                            readOnly = true,
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth(),
-                            label = { Text(stringResource(R.string.language_selector_title)) },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = safeText,
-                                unfocusedTextColor = safeText,
-                                focusedBorderColor = safeText.copy(alpha = 0.6f),
-                                unfocusedBorderColor = safeText.copy(alpha = 0.3f),
-                                cursorColor = safeText
-                            )
-                        )
-                        ExposedDropdownMenu(
-                            expanded = languageExpanded,
-                            onDismissRequest = { languageExpanded = false }
-                        ) {
-                            languageOptions.forEach { option ->
-                                val optionLabel = languageLabel(option)
-                                DropdownMenuItem(
-                                    text = { Text(optionLabel) },
-                                    onClick = {
-                                        languageExpanded = false
-                                        scope.launch {
-                                            settingsViewModel.saveLanguageCodeNow(option)
-                                            (context as? FragmentActivity)?.recreate()
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
