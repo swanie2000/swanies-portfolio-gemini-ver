@@ -33,10 +33,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.R
+import java.util.Locale
 import com.swanie.portfolio.ui.theme.ProLockBadge
 import com.swanie.portfolio.ui.theme.ProPalette
 import java.text.NumberFormat
-import java.util.Locale
 
 private data class PremiumInsightPreview(
     val title: String,
@@ -142,7 +142,7 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
             title = stringResource(R.string.analytics_pro_risk_title),
             description = stringResource(R.string.analytics_pro_risk_description),
             highlights = listOf(
-                stringResource(R.string.analytics_pro_risk_highlight_top_position, String.format("%.1f", topShare)),
+                stringResource(R.string.analytics_pro_risk_highlight_top_position, String.format(Locale.getDefault(), "%.1f", topShare)),
                 stringResource(R.string.analytics_pro_risk_highlight_score, concentrationScore, concentrationLabel),
                 stringResource(R.string.analytics_pro_risk_highlight_unlock)
             )
@@ -183,7 +183,7 @@ fun AttributionProScreen(textColor: Color, segments: List<AssetSegment>, totalVa
             description = stringResource(R.string.analytics_pro_attribution_description),
             highlights = listOf(
                 stringResource(R.string.analytics_pro_attribution_highlight_lead, leadName, currency.format(leadValue)),
-                stringResource(R.string.analytics_pro_attribution_highlight_top3, String.format("%.1f", combinedShare)),
+                stringResource(R.string.analytics_pro_attribution_highlight_top3, String.format(Locale.getDefault(), "%.1f", combinedShare)),
                 stringResource(R.string.analytics_pro_attribution_highlight_unlock)
             )
         ),
@@ -213,7 +213,7 @@ fun RebalanceCoachProScreen(textColor: Color, segments: List<AssetSegment>, onUp
             title = stringResource(R.string.analytics_pro_rebalance_title),
             description = stringResource(R.string.analytics_pro_rebalance_description),
             highlights = listOf(
-                stringResource(R.string.analytics_pro_rebalance_highlight_drift, String.format("%.1f", drift)),
+                stringResource(R.string.analytics_pro_rebalance_highlight_drift, String.format(Locale.getDefault(), "%.1f", drift)),
                 stringResource(R.string.analytics_pro_rebalance_highlight_status, driftLabel),
                 stringResource(R.string.analytics_pro_rebalance_highlight_unlock)
             )

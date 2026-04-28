@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -99,10 +100,10 @@ class PortfolioWidget : GlanceAppWidget() {
                 val cardColorHex = prefs[WIDGET_CARD_COLOR_KEY] ?: "#1C1C1E"
                 val cardTextColorHex = prefs[WIDGET_CARD_TEXT_COLOR_KEY] ?: "#FFFFFF"
 
-                val bgColor = try { Color(android.graphics.Color.parseColor(bgColorHex)) } catch (e: Exception) { Color.Black }
-                val bgTextColor = try { Color(android.graphics.Color.parseColor(bgTextColorHex)) } catch (e: Exception) { Color.White }
-                val cardColor = try { Color(android.graphics.Color.parseColor(cardColorHex)) } catch (e: Exception) { Color(0xFF1C1C1E) }
-                val cardTextColor = try { Color(android.graphics.Color.parseColor(cardTextColorHex)) } catch (e: Exception) { Color.White }
+                val bgColor = try { Color(bgColorHex.toColorInt()) } catch (e: Exception) { Color.Black }
+                val bgTextColor = try { Color(bgTextColorHex.toColorInt()) } catch (e: Exception) { Color.White }
+                val cardColor = try { Color(cardColorHex.toColorInt()) } catch (e: Exception) { Color(0xFF1C1C1E) }
+                val cardTextColor = try { Color(cardTextColorHex.toColorInt()) } catch (e: Exception) { Color.White }
                 val isProUser = prefs[IS_PRO_USER_KEY] ?: false
 
                 // Order must match the packed "||" sequence from the repo (UI top → bottom). Do not re-sort.
@@ -395,7 +396,7 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                 maxLines = 1
             )
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF4444)
-            Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format("%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
+            Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.getDefault(), "%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
         }
     }
 }

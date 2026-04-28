@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -59,10 +60,10 @@ fun AssetPickerScreen(
     val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
     val cardTextHex by themeViewModel.cardTextColor.collectAsState()
 
-    val bgColor = Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" }))
-    val textColor = Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" }))
-    val cardBg = Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" }))
-    val cardText = Color(android.graphics.Color.parseColor(cardTextHex.ifBlank { "#FFFFFF" }))
+    val bgColor = Color(siteBgHex.ifBlank { "#000416" }.toColorInt())
+    val textColor = Color(siteTextHex.ifBlank { "#FFFFFF" }.toColorInt())
+    val cardBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
+    val cardText = Color(cardTextHex.ifBlank { "#FFFFFF" }.toColorInt())
 
     var searchQuery by remember { mutableStateOf("") }
     val searchResults by viewModel.searchResults.collectAsState()

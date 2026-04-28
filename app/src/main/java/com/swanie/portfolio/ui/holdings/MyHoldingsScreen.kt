@@ -63,8 +63,8 @@ import kotlin.math.absoluteValue
 fun MyHoldingsScreen(
     mainViewModel: MainViewModel,
     navController: NavController,
-    requestedVaultId: Int? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    requestedVaultId: Int? = null
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()

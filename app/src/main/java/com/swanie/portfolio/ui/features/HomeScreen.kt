@@ -23,9 +23,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -75,11 +77,11 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
     val navyColor = Color(0xFF000416)
     val userThemeBgColor = remember(siteBgHex) {
-        try { Color(android.graphics.Color.parseColor(siteBgHex)) }
+        try { Color(siteBgHex.toColorInt()) }
         catch (e: Exception) { navyColor }
     }
     val userThemeTextColor = remember(siteTextHex) {
-        try { Color(android.graphics.Color.parseColor(siteTextHex)) }
+        try { Color(siteTextHex.toColorInt()) }
         catch (e: Exception) { Color.White }
     }
 
@@ -259,7 +261,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
         Box(
             modifier = Modifier
                 .size(logoSize)
-                .offset(y = swanYOffset)
+                .offset { IntOffset(x = 0, y = swanYOffset.roundToPx()) }
                 .zIndex(2f),
             contentAlignment = Alignment.Center
         ) {

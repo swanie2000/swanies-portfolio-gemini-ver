@@ -34,6 +34,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.app.Activity
 import androidx.fragment.app.FragmentActivity
+import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.NonCancellable
@@ -567,7 +568,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun generateSparklineBitmap(history: List<Double>, isPositive: Boolean): Bitmap {
         val width = 140; val height = 60
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val paint = Paint().apply {
             color = if (isPositive) android.graphics.Color.GREEN else android.graphics.Color.RED

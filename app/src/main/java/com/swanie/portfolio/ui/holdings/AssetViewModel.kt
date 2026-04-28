@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
@@ -417,7 +418,7 @@ class AssetViewModel @Inject constructor(
     }
 
     fun saveMetalDisplayOrder(symbols: List<String>) {
-        sharedPrefs.edit().putString("metals_order", symbols.joinToString(",")).apply()
+        sharedPrefs.edit { putString("metals_order", symbols.joinToString(",")) }
         viewModelScope.launch {
             val currentHoldings = holdings.value ?: emptyList()
             val updatedList =

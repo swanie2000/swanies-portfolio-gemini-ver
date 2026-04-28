@@ -3,7 +3,7 @@ package com.swanie.portfolio.widget
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
@@ -21,7 +21,7 @@ class WidgetClickCallback : ActionCallback {
         if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
             val intent = Intent(context, WidgetConfigActivity::class.java).apply {
                 // 🛡️ THE RELAY SHIELD: Unique URI prevents Intent conflation at the OS level
-                data = Uri.parse("swanie://relayed/id/$widgetId/${System.currentTimeMillis()}")
+                data = "swanie://relayed/id/$widgetId/${System.currentTimeMillis()}".toUri()
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }

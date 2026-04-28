@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -57,9 +58,9 @@ fun AmountEntryScreen(
     val siteTextHex by themeViewModel.siteTextColor.collectAsState()
     val cardBgHex by themeViewModel.cardBackgroundColor.collectAsState()
 
-    val bgColor = remember(siteBgHex) { Color(android.graphics.Color.parseColor(siteBgHex.ifBlank { "#000416" })) }
-    val textColor = remember(siteTextHex) { Color(android.graphics.Color.parseColor(siteTextHex.ifBlank { "#FFFFFF" })) }
-    val dialogBg = remember(cardBgHex) { Color(android.graphics.Color.parseColor(cardBgHex.ifBlank { "#121212" })) }
+    val bgColor = remember(siteBgHex) { Color(siteBgHex.ifBlank { "#000416" }.toColorInt()) }
+    val textColor = remember(siteTextHex) { Color(siteTextHex.ifBlank { "#FFFFFF" }.toColorInt()) }
+    val dialogBg = remember(cardBgHex) { Color(cardBgHex.ifBlank { "#121212" }.toColorInt()) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
     val keyboardController = LocalSoftwareKeyboardController.current

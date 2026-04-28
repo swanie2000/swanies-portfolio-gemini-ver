@@ -87,8 +87,8 @@ fun RiskExposureLiveScreen(
         Spacer(modifier = Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ModelChip(stringResource(R.string.analytics_live_model_hhi_vol_mix), textColor, accentColor)
-            MetricPill(stringResource(R.string.analytics_live_metric_top), "${String.format("%.1f", topShare)}%", textColor, accentColor)
-            MetricPill(stringResource(R.string.analytics_live_metric_diversified), "${String.format("%.1f", diversification)}%", textColor, accentColor)
+            MetricPill(stringResource(R.string.analytics_live_metric_top), "${String.format(Locale.getDefault(), "%.1f", topShare)}%", textColor, accentColor)
+            MetricPill(stringResource(R.string.analytics_live_metric_diversified), "${String.format(Locale.getDefault(), "%.1f", diversification)}%", textColor, accentColor)
         }
     }
     Spacer(modifier = Modifier.height(10.dp))
@@ -102,15 +102,15 @@ fun RiskExposureLiveScreen(
         Spacer(modifier = Modifier.height(6.dp))
         Text("${animatedScore.toInt()} / 100", color = riskTone, fontSize = 13.sp, fontWeight = FontWeight.Black)
         Text(stringResource(R.string.analytics_live_risk_regime_label, riskRegime), color = riskTone, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.analytics_live_risk_top_position_share, String.format("%.1f", topShare)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
-        Text(stringResource(R.string.analytics_live_risk_hhi_concentration, String.format("%.1f", hhi)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
-        Text(stringResource(R.string.analytics_live_risk_volatility_pressure, String.format("%.1f", volatilityPressure)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
-        Text(stringResource(R.string.analytics_live_risk_category_imbalance, String.format("%.1f", categoryImbalance)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
-        Text(stringResource(R.string.analytics_live_risk_diversification_reserve, String.format("%.1f", diversification)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_risk_top_position_share, String.format(Locale.getDefault(), "%.1f", topShare)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_risk_hhi_concentration, String.format(Locale.getDefault(), "%.1f", hhi)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_risk_volatility_pressure, String.format(Locale.getDefault(), "%.1f", volatilityPressure)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_risk_category_imbalance, String.format(Locale.getDefault(), "%.1f", categoryImbalance)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_risk_diversification_reserve, String.format(Locale.getDefault(), "%.1f", diversification)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_category_balance_title), textColor, surfaceColor, accentColor, borderColor) {
-        Text(stringResource(R.string.analytics_live_category_balance_line, String.format("%.1f", cryptoShare), String.format("%.1f", metalShare)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analytics_live_category_balance_line, String.format(Locale.getDefault(), "%.1f", cryptoShare), String.format(Locale.getDefault(), "%.1f", metalShare)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(6.dp))
         LinearProgressIndicator(
             progress = { (cryptoShare / 100.0).toFloat() },
@@ -161,7 +161,7 @@ fun AttributionLiveScreen(textColor: Color, segments: List<AssetSegment>, surfac
         Spacer(modifier = Modifier.height(4.dp))
         Text(stringResource(R.string.analytics_live_portfolio_24h_contribution, currency.format(animatedNetContribution.toDouble())), color = netColor, fontSize = 13.sp, fontWeight = FontWeight.Black)
         Text(stringResource(R.string.analytics_live_momentum_breadth, positiveCount, negativeCount), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
-        Text(stringResource(R.string.analytics_live_signal_confidence, String.format("%.1f", signalConfidence), signalLabel), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_signal_confidence, String.format(Locale.getDefault(), "%.1f", signalConfidence), signalLabel), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(6.dp))
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ModelChip(stringResource(R.string.analytics_live_model_weighted_24h), textColor, accentColor)
@@ -178,14 +178,14 @@ fun AttributionLiveScreen(textColor: Color, segments: List<AssetSegment>, surfac
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_top_drivers_title), textColor, surfaceColor, accentColor, borderColor) {
         top.forEach { row ->
-            Text("${row.symbol}  ${currency.format(row.contribution)}  (${String.format("%.2f", row.momentum)}%)", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("${row.symbol}  ${currency.format(row.contribution)}  (${String.format(Locale.getDefault(), "%.2f", row.momentum)}%)", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_drag_positions_title), textColor, surfaceColor, accentColor, borderColor) {
         drag.forEach { row ->
-            Text("${row.symbol}  ${currency.format(row.contribution)}  (${String.format("%.2f", row.momentum)}%)", color = if (row.contribution < 0) Color(0xFFFF8A80) else textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("${row.symbol}  ${currency.format(row.contribution)}  (${String.format(Locale.getDefault(), "%.2f", row.momentum)}%)", color = if (row.contribution < 0) Color(0xFFFF8A80) else textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
@@ -235,7 +235,7 @@ fun RebalanceLiveScreen(textColor: Color, segments: List<AssetSegment>, totalVal
         Text(stringResource(R.string.analytics_live_rebalance_model_active, targetMode, workingSet.size.coerceAtLeast(1)), color = textColor.copy(alpha = 0.75f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Text(stringResource(R.string.analytics_live_rebalance_primary_target_band), color = ProPalette.Accent, fontSize = 13.sp, fontWeight = FontWeight.Black)
-        Text(stringResource(R.string.analytics_live_rebalance_band_threshold, String.format("%.1f", threshold * 100f), animatedOutOfBandCount), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
+        Text(stringResource(R.string.analytics_live_rebalance_band_threshold, String.format(Locale.getDefault(), "%.1f", threshold * 100f), animatedOutOfBandCount), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Text(stringResource(R.string.analytics_live_rebalance_estimated_turnover, currency.format(estimatedTurnover)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(6.dp))
         ModelChip(stringResource(R.string.analytics_live_model_dynamic, targetMode), textColor, accentColor)
@@ -247,7 +247,7 @@ fun RebalanceLiveScreen(textColor: Color, segments: List<AssetSegment>, totalVal
         driftRows.take(4).forEach { row ->
             val action = if (row.second > 0) stringResource(R.string.analytics_live_action_trim) else stringResource(R.string.analytics_live_action_add)
             val bandTone = if (abs(row.second) >= threshold) Color(0xFFFFD54F) else textColor
-            Text("$action ${row.first}  ${currency.format(abs(row.third))}  (${String.format("%.1f", abs(row.second) * 100f)}%)", color = bandTone, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text("$action ${row.first}  ${currency.format(abs(row.third))}  (${String.format(Locale.getDefault(), "%.1f", abs(row.second) * 100f)}%)", color = bandTone, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
         }
     }
@@ -347,10 +347,10 @@ fun ScenariosLiveScreen(textColor: Color, segments: List<AssetSegment>, totalVal
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_preset_events_title), textColor, surfaceColor, accentColor, borderColor) {
-        Text(stringResource(R.string.analytics_live_preset_event_market_shock, String.format("%.0f", scenarioDropPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analytics_live_preset_event_market_shock, String.format(Locale.getDefault(), "%.0f", scenarioDropPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(stringResource(R.string.analytics_live_preset_event_crypto_rally, String.format("%.0f", scenarioRallyPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analytics_live_preset_event_crypto_rally, String.format(Locale.getDefault(), "%.0f", scenarioRallyPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(stringResource(R.string.analytics_live_preset_event_inflation_hedge, String.format("%.0f", scenarioInflationPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.analytics_live_preset_event_inflation_hedge, String.format(Locale.getDefault(), "%.0f", scenarioInflationPct * 100)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }

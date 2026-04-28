@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Keep branded uppercase copy as-authored; do not force typographic ellipsis. -->
+    <issue id="TypographyEllipsis" severity="ignore" />
+    <!-- Project decision: keep current locale folder naming and dynamic locale flow. -->
+    <issue id="LocaleFolder" severity="ignore" />
+    <issue id="AppBundleLocaleChanges" severity="ignore" />
+    <!-- SDK/dependency update advisories tracked separately from code-quality lint. -->
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="UseTomlInstead" severity="ignore" />
+    <!-- UI heuristics intentionally preserved for current app behavior/design. -->
+    <issue id="ConfigurationScreenWidthHeight" severity="ignore" />
+    <issue id="DiscouragedApi" severity="ignore" />
+    <issue id="PluralsCandidate" severity="ignore" />
+    <issue id="ButtonCase" severity="ignore" />
+    <issue id="IconLocation" severity="ignore" />
+    <!-- Localization resources are kept intentionally for roadmap use. -->
+    <issue id="UnusedResources" severity="ignore" />
+</lint>

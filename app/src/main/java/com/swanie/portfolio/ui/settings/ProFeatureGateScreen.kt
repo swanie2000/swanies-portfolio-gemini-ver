@@ -1,7 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.background
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.theme.ProLockBadge
 import com.swanie.portfolio.ui.theme.ProPalette
@@ -207,7 +207,7 @@ fun ProFeatureGateScreen(
         OutlinedButton(
             onClick = {
                 val packageName = context.packageName
-                val uri = Uri.parse("https://play.google.com/store/account/subscriptions?package=$packageName")
+                val uri = "https://play.google.com/store/account/subscriptions?package=$packageName".toUri()
                 runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                 }.onFailure {

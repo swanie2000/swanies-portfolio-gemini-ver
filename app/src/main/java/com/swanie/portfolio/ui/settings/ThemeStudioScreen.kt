@@ -110,7 +110,7 @@ fun ThemeStudioScreen(
 
     val livePreviewColor = remember(hexInput, hue, saturation, value) {
         try {
-            if (hexInput.length == 6) Color(android.graphics.Color.parseColor("#$hexInput"))
+            if (hexInput.length == 6) Color("#$hexInput".toColorInt())
             else Color.hsv(hue, saturation, value)
         } catch (e: Exception) { Color.hsv(hue, saturation, value) }
     }
@@ -183,7 +183,7 @@ fun ThemeStudioScreen(
                     hasUnsavedChanges = false
                     hexInput = defAppBg.replace("#", "")
                     val hsv = FloatArray(3)
-                    android.graphics.Color.colorToHSV(android.graphics.Color.parseColor(defAppBg), hsv)
+                    android.graphics.Color.colorToHSV(defAppBg.toColorInt(), hsv)
                     hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
                     showResetDialog = false
                 }) { Text(stringResource(R.string.settings_reset_everything), color = Color.Red, fontWeight = FontWeight.Black) }
@@ -240,7 +240,7 @@ fun ThemeStudioScreen(
                                     hasUnsavedChanges = true
                                     if (input.length == 6 && input.all { it.isDigit() || it.uppercaseChar() in 'A'..'F' }) {
                                         val hsv = FloatArray(3)
-                                        android.graphics.Color.colorToHSV(android.graphics.Color.parseColor("#$input"), hsv)
+                                        android.graphics.Color.colorToHSV("#$input".toColorInt(), hsv)
                                         hue = hsv[0]; saturation = hsv[1]; value = hsv[2]
                                     }
                                 }

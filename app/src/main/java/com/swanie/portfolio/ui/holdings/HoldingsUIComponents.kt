@@ -519,13 +519,13 @@ fun FullAssetCard(
     showEditButton: Boolean,
     cardBg: Color,
     cardText: Color,
+    modifier: Modifier = Modifier,
     baseCurrency: String = "USD",
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit,
     onSave: (newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) -> Unit,
     onCancel: () -> Unit = {},
-    isHighVisibilityMode: Boolean = false,
-    modifier: Modifier = Modifier
+    isHighVisibilityMode: Boolean = false
 ) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "grabScale")
@@ -782,10 +782,10 @@ fun PolishedAssetCard(
     isDragging: Boolean,
     cardBg: Color,
     cardText: Color,
+    modifier: Modifier = Modifier,
     baseCurrency: String = "USD",
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit = {},
-    modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     showEditButton: Boolean = false
 ) {
@@ -811,10 +811,10 @@ fun HighDensityAssetCard(
     isDragging: Boolean,
     cardBg: Color,
     cardText: Color,
+    modifier: Modifier = Modifier,
     baseCurrency: String = "USD",
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit = {},
-    modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     showEditButton: Boolean = false
 ) {
@@ -845,10 +845,10 @@ fun CompactAssetCard(
     isDragging: Boolean,
     cardBg: Color,
     cardText: Color,
+    modifier: Modifier = Modifier,
     baseCurrency: String = "USD",
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit = {},
-    modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     showEditButton: Boolean = false,
     /** Dense dashboard typography vs airy boutique row. */
@@ -1329,8 +1329,8 @@ fun MetalMarketCard(
     isOwned: Boolean,
     cardBg: Color,
     cardText: Color,
+    modifier: Modifier = Modifier,
     baseCurrency: String = "USD",
-    modifier: Modifier = Modifier
 ) {
     val trendColor = if (changePercent >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     AssetCardFontScaleScope {

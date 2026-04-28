@@ -4,7 +4,6 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import com.swanie.portfolio.R
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -40,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
 import com.swanie.portfolio.MainActivity
 import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.settings.SettingsViewModel
@@ -95,7 +95,7 @@ class WidgetConfigActivity : ComponentActivity() {
                             onConfigComplete = {
                                 val resultValue = Intent().apply {
                                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                    data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
+                                    data = "swanie://widget/$appWidgetId/${System.currentTimeMillis()}".toUri()
                                 }
                                 setResult(Activity.RESULT_OK, resultValue)
 
@@ -268,7 +268,7 @@ class WidgetConfigActivity : ComponentActivity() {
     private fun setWidgetResultOk() {
         val resultValue = Intent().apply {
             putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            data = Uri.parse("swanie://widget/$appWidgetId/${System.currentTimeMillis()}")
+            data = "swanie://widget/$appWidgetId/${System.currentTimeMillis()}".toUri()
         }
         setResult(Activity.RESULT_OK, resultValue)
     }

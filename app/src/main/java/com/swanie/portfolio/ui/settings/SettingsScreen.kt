@@ -1,7 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
 import android.content.Intent
-import android.net.Uri
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -451,7 +451,7 @@ fun SettingsScreen(
                             translationNotesInput.ifBlank { "-" }
                         )
                         val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:")
+                            data = "mailto:".toUri()
                             putExtra(Intent.EXTRA_EMAIL, arrayOf("support@swaniesportfolio.app"))
                             putExtra(Intent.EXTRA_SUBJECT, emailSubject)
                             putExtra(Intent.EXTRA_TEXT, emailBody)

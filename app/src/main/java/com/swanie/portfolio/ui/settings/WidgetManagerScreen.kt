@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -342,7 +343,7 @@ fun WidgetManagerScreen(
                                         settingsViewModel.forceImmediateRemoteViewsUpdate(portfolioId, currentWidgetId)
                                     }
 
-                                    sharedPrefs.edit().putLong("last_widget_save_time", System.currentTimeMillis()).apply()
+                                    sharedPrefs.edit { putLong("last_widget_save_time", System.currentTimeMillis()) }
 
                                     if (isConfigMode) {
                                         onConfigComplete()
@@ -1202,10 +1203,10 @@ fun WidgetReorderVisibilityItem(
     cardBg: Color,
     cardText: Color,
     baseCurrency: String,
+    modifier: Modifier = Modifier,
     isHighVisibilityMode: Boolean = false,
     animatePlacement: Boolean = false,
-    onToggleChecked: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    onToggleChecked: (Boolean) -> Unit
 ) {
     val placementModifier = if (animatePlacement) {
         Modifier.animateContentSize(animationSpec = WidgetReorderItemAnimationSpec)
@@ -1330,7 +1331,7 @@ fun WidgetStudioInlineCompact(
     var isFlashing by remember { mutableStateOf(false) }
 
     val liveColor = remember(hexInput, hue, saturation, value) {
-        try { if (hexInput.length == 6) Color(android.graphics.Color.parseColor("#$hexInput")) else Color.hsv(hue, saturation, value) }
+        try { if (hexInput.length == 6) Color("#$hexInput".toColorInt()) else Color.hsv(hue, saturation, value) }
         catch (e: Exception) { Color.hsv(hue, saturation, value) }
     }
 

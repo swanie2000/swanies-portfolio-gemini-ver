@@ -577,7 +577,7 @@ fun AssetLegendRow(segment: AssetSegment, textColor: Color, isSelected: Boolean,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "${String.format("%.1f", segment.ratio * 100)}%",
+                text = "${String.format(Locale.getDefault(), "%.1f", segment.ratio * 100)}%",
                 color = segment.color,
                 fontSize = with(density) { (10.sp.toPx() / fontScale.coerceAtMost(1.1f)).toSp() },
                 fontWeight = FontWeight.Black,
