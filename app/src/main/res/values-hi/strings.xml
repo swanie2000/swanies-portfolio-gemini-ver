@@ -283,6 +283,10 @@
     <string name="analytics_hub_title">एनालिटिक्स हब</string>
     <string name="analytics_quick_jump_title">क्विक जंप</string>
     <string name="analytics_swipe_instruction_short">आगे बढ़ने के लिए बाएं या दाएं स्वाइप करें।</string>
+    <string name="analytics_page_start">प्रारंभ</string>
+    <string name="analytics_page_pie_chart">पाई चार्ट</string>
+    <string name="analytics_page_donut_chart">डोनट चार्ट</string>
+    <string name="analytics_page_bar_chart">बार चार्ट</string>
     <string name="widget_pro_customization_title">प्रो कस्टमाइज़ेशन</string>
     <string name="widget_pro_customization_body">फ्री विजेट डिफ़ॉल्ट स्टाइल (अधिकतम 3 एसेट) उपयोग करता है। रंग, क्रम और लेआउट बदलने के लिए Pro में अपग्रेड करें।</string>
     <string name="widget_upgrade_to_pro">प्रो में अपग्रेड करें</string>

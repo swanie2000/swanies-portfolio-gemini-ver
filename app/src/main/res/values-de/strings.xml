@@ -303,6 +303,10 @@
     <string name="analytics_hub_title">ANALYTICS-HUB</string>
     <string name="analytics_quick_jump_title">SCHNELLSPRUNG</string>
     <string name="analytics_swipe_instruction_short">Wische nach links oder rechts, um zu wechseln.</string>
+    <string name="analytics_page_start">START</string>
+    <string name="analytics_page_pie_chart">KREISDIAGRAMM</string>
+    <string name="analytics_page_donut_chart">RINGDIAGRAMM</string>
+    <string name="analytics_page_bar_chart">BALKENDIAGRAMM</string>
     <string name="widget_pro_customization_title">PRO-ANPASSUNG</string>
     <string name="widget_pro_customization_body">Das kostenlose Widget verwendet den Standardstil (bis zu 3 Assets). Upgrade auf Pro, um Farben, Reihenfolge und Layout zu bearbeiten.</string>
     <string name="widget_upgrade_to_pro">AUF PRO UPGRADEN</string>

@@ -97,14 +97,14 @@ fun AnalyticsScreen(navController: NavController) {
     val focusedSegment = assetSegments.find { it.asset.coinId == selectedAssetId }
     var modeTabIndex by remember { mutableIntStateOf(0) }
     val pageTitles = listOf(
-        "START",
-        "PIE CHART",
-        "DONUT CHART",
-        "BAR CHART",
-        "RISK EXPOSURE MAP",
-        "ATTRIBUTION",
-        "REBALANCE COACH",
-        "SCENARIOS"
+        stringResource(R.string.analytics_page_start),
+        stringResource(R.string.analytics_page_pie_chart),
+        stringResource(R.string.analytics_page_donut_chart),
+        stringResource(R.string.analytics_page_bar_chart),
+        stringResource(R.string.analytics_pro_risk_title),
+        stringResource(R.string.analytics_live_attribution_engine_title),
+        stringResource(R.string.analytics_pro_rebalance_title),
+        stringResource(R.string.analytics_pro_scenarios_title),
     )
     val quickJumpPages = pageTitles.withIndex().filter { it.index != 0 }
     val contentPagerState = rememberPagerState(pageCount = { pageTitles.size })

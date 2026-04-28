@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">CENTRUM ANALITYKI</string>
     <string name="analytics_quick_jump_title">SZYBKI SKOK</string>
     <string name="analytics_swipe_instruction_short">Przesuń w lewo lub w prawo, aby przejść dalej.</string>
+    <string name="analytics_page_start">START</string>
+    <string name="analytics_page_pie_chart">WYKRES KOŁOWY</string>
+    <string name="analytics_page_donut_chart">WYKRES PĄCZKOWY</string>
+    <string name="analytics_page_bar_chart">WYKRES SŁUPKOWY</string>
     <string name="widget_pro_customization_title">DOSTOSOWANIE PRO</string>
     <string name="widget_pro_customization_body">Darmowy widżet używa domyślnego stylu (maks. 3 aktywa). Ulepsz do Pro, aby edytować kolory, kolejność i układ.</string>
     <string name="widget_upgrade_to_pro">PRZEJDŹ NA PRO</string>

@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">ANALYSEHUB</string>
     <string name="analytics_quick_jump_title">SNELSPRONG</string>
     <string name="analytics_swipe_instruction_short">Veeg naar links of rechts om te bewegen.</string>
+    <string name="analytics_page_start">START</string>
+    <string name="analytics_page_pie_chart">CIRKELDIAGRAM</string>
+    <string name="analytics_page_donut_chart">DONUTDIAGRAM</string>
+    <string name="analytics_page_bar_chart">STAAFDIAGRAM</string>
     <string name="widget_pro_customization_title">PRO-AANPASSING</string>
     <string name="widget_pro_customization_body">De gratis widget gebruikt de standaardstijl (maximaal 3 assets). Upgrade naar Pro om kleuren, volgorde en lay-out te bewerken.</string>
     <string name="widget_upgrade_to_pro">UPGRADE NAAR PRO</string>

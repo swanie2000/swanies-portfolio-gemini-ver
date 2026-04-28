@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">PUSAT ANALITIK</string>
     <string name="analytics_quick_jump_title">LOMPAT CEPAT</string>
     <string name="analytics_swipe_instruction_short">Geser ke kiri atau kanan untuk berpindah.</string>
+    <string name="analytics_page_start">MULAI</string>
+    <string name="analytics_page_pie_chart">DIAGRAM PIE</string>
+    <string name="analytics_page_donut_chart">DIAGRAM DONAT</string>
+    <string name="analytics_page_bar_chart">DIAGRAM BATANG</string>
     <string name="widget_pro_customization_title">KUSTOMISASI PRO</string>
     <string name="widget_pro_customization_body">Widget gratis menggunakan gaya default (hingga 3 aset). Upgrade ke Pro untuk mengubah warna, urutan, dan tata letak.</string>
     <string name="widget_upgrade_to_pro">UPGRADE KE PRO</string>

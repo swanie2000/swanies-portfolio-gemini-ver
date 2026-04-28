@@ -283,6 +283,10 @@
     <string name="analytics_hub_title">ЦЕНТР АНАЛІТИКИ</string>
     <string name="analytics_quick_jump_title">ШВИДКИЙ ПЕРЕХІД</string>
     <string name="analytics_swipe_instruction_short">Проведіть ліворуч або праворуч, щоб перейти.</string>
+    <string name="analytics_page_start">ПОЧАТОК</string>
+    <string name="analytics_page_pie_chart">КРУГОВА ДІАГРАМА</string>
+    <string name="analytics_page_donut_chart">КІЛЬЦЕВА ДІАГРАМА</string>
+    <string name="analytics_page_bar_chart">СТОВПЧАСТА ДІАГРАМА</string>
     <string name="widget_pro_customization_title">НАЛАШТУВАННЯ PRO</string>
     <string name="widget_pro_customization_body">Безкоштовний віджет використовує стиль за замовчуванням (до 3 активів). Оновіться до Pro, щоб змінювати кольори, порядок і макет.</string>
     <string name="widget_upgrade_to_pro">ОНОВИТИ ДО PRO</string>

@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">TRUNG TÂM PHÂN TÍCH</string>
     <string name="analytics_quick_jump_title">TRUY CẬP NHANH</string>
     <string name="analytics_swipe_instruction_short">Vuốt sang trái hoặc phải để di chuyển.</string>
+    <string name="analytics_page_start">BẮT ĐẦU</string>
+    <string name="analytics_page_pie_chart">BIỂU ĐỒ TRÒN</string>
+    <string name="analytics_page_donut_chart">BIỂU ĐỒ VÀNH KHUYÊN</string>
+    <string name="analytics_page_bar_chart">BIỂU ĐỒ CỘT</string>
     <string name="widget_pro_customization_title">TÙY CHỈNH PRO</string>
     <string name="widget_pro_customization_body">Widget miễn phí dùng kiểu mặc định (tối đa 3 tài sản). Nâng cấp Pro để chỉnh màu sắc, thứ tự và bố cục.</string>
     <string name="widget_upgrade_to_pro">NÂNG CẤP LÊN PRO</string>

@@ -297,6 +297,10 @@
     <string name="analytics_hub_title">مركز التحليلات</string>
     <string name="analytics_quick_jump_title">انتقال سريع</string>
     <string name="analytics_swipe_instruction_short">اسحب يسارًا أو يمينًا للتنقل.</string>
+    <string name="analytics_page_start">البداية</string>
+    <string name="analytics_page_pie_chart">مخطط دائري</string>
+    <string name="analytics_page_donut_chart">مخطط حلقي</string>
+    <string name="analytics_page_bar_chart">مخطط شريطي</string>
     <string name="widget_pro_customization_title">تخصيص برو</string>
     <string name="widget_pro_customization_body">تستخدم الأداة المجانية النمط الافتراضي (حتى 3 أصول). قم بالترقية إلى Pro لتعديل الألوان والترتيب والتخطيط.</string>
     <string name="widget_upgrade_to_pro">الترقية إلى برو</string>

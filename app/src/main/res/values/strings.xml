@@ -282,6 +282,10 @@
     <string name="analytics_hub_title">ANALYTICS HUB</string>
     <string name="analytics_quick_jump_title">QUICK JUMP</string>
     <string name="analytics_swipe_instruction_short">Swipe left or right to move.</string>
+    <string name="analytics_page_start">START</string>
+    <string name="analytics_page_pie_chart">PIE CHART</string>
+    <string name="analytics_page_donut_chart">DONUT CHART</string>
+    <string name="analytics_page_bar_chart">BAR CHART</string>
     <string name="widget_pro_customization_title">PRO CUSTOMIZATION</string>
     <string name="widget_pro_customization_body">Free widget uses default style (up to 3 assets). Upgrade to Pro to edit colors, ordering, and layout.</string>
     <string name="widget_upgrade_to_pro">UPGRADE TO PRO</string>

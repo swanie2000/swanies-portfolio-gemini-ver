@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">HUB ANALYTICS</string>
     <string name="analytics_quick_jump_title">SALTO RAPIDO</string>
     <string name="analytics_swipe_instruction_short">Scorri a sinistra o a destra per spostarti.</string>
+    <string name="analytics_page_start">INIZIO</string>
+    <string name="analytics_page_pie_chart">GRAFICO A TORTA</string>
+    <string name="analytics_page_donut_chart">GRAFICO AD ANELLO</string>
+    <string name="analytics_page_bar_chart">GRAFICO A BARRE</string>
     <string name="widget_pro_customization_title">PERSONALIZZAZIONE PRO</string>
     <string name="widget_pro_customization_body">Il widget gratuito usa lo stile predefinito (fino a 3 asset). Passa a Pro per modificare colori, ordine e layout.</string>
     <string name="widget_upgrade_to_pro">PASSA A PRO</string>

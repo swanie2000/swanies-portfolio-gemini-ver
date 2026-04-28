@@ -283,6 +283,10 @@
     <string name="analytics_hub_title">ศูนย์วิเคราะห์</string>
     <string name="analytics_quick_jump_title">ไปด่วน</string>
     <string name="analytics_swipe_instruction_short">ปัดซ้ายหรือขวาเพื่อเลื่อนไปมา</string>
+    <string name="analytics_page_start">เริ่มต้น</string>
+    <string name="analytics_page_pie_chart">แผนภูมิวงกลม</string>
+    <string name="analytics_page_donut_chart">แผนภูมิวงแหวน</string>
+    <string name="analytics_page_bar_chart">แผนภูมิแท่ง</string>
     <string name="widget_pro_customization_title">การปรับแต่ง PRO</string>
     <string name="widget_pro_customization_body">วิดเจ็ตฟรีใช้สไตล์เริ่มต้น (สูงสุด 3 สินทรัพย์) อัปเกรดเป็น Pro เพื่อแก้ไขสี ลำดับ และเลย์เอาต์</string>
     <string name="widget_upgrade_to_pro">อัปเกรดเป็น PRO</string>

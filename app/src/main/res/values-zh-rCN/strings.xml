@@ -304,6 +304,10 @@
     <string name="analytics_hub_title">分析中心</string>
     <string name="analytics_quick_jump_title">快速跳转</string>
     <string name="analytics_swipe_instruction_short">左右滑动即可切换。</string>
+    <string name="analytics_page_start">开始</string>
+    <string name="analytics_page_pie_chart">饼图</string>
+    <string name="analytics_page_donut_chart">环形图</string>
+    <string name="analytics_page_bar_chart">柱状图</string>
     <string name="widget_pro_customization_title">PRO 自定义</string>
     <string name="widget_pro_customization_body">免费小组件使用默认样式（最多 3 个资产）。升级到 Pro 可编辑颜色、顺序和布局。</string>
     <string name="widget_upgrade_to_pro">升级到 PRO</string>

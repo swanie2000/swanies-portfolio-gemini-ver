@@ -283,6 +283,10 @@
     <string name="analytics_hub_title">分析中心</string>
     <string name="analytics_quick_jump_title">快速跳轉</string>
     <string name="analytics_swipe_instruction_short">向左或向右滑動即可切換。</string>
+    <string name="analytics_page_start">開始</string>
+    <string name="analytics_page_pie_chart">圓餅圖</string>
+    <string name="analytics_page_donut_chart">環形圖</string>
+    <string name="analytics_page_bar_chart">長條圖</string>
     <string name="widget_pro_customization_title">PRO 自訂</string>
     <string name="widget_pro_customization_body">免費小工具使用預設樣式（最多 3 個資產）。升級到 Pro 可編輯顏色、順序與版面配置。</string>
     <string name="widget_upgrade_to_pro">升級到 PRO</string>

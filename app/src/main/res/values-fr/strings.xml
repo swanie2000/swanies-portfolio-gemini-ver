@@ -303,6 +303,10 @@
     <string name="analytics_hub_title">CENTRE ANALYTIQUE</string>
     <string name="analytics_quick_jump_title">ACCÈS RAPIDE</string>
     <string name="analytics_swipe_instruction_short">Balayez à gauche ou à droite pour naviguer.</string>
+    <string name="analytics_page_start">ACCUEIL</string>
+    <string name="analytics_page_pie_chart">GRAPHIQUE CIRCULAIRE</string>
+    <string name="analytics_page_donut_chart">GRAPHIQUE EN ANNEAU</string>
+    <string name="analytics_page_bar_chart">GRAPHIQUE EN BARRES</string>
     <string name="widget_pro_customization_title">PERSONNALISATION PRO</string>
     <string name="widget_pro_customization_body">Le widget gratuit utilise le style par défaut (jusqu\'à 3 actifs). Passez à Pro pour modifier les couleurs, l\'ordre et la mise en page.</string>
     <string name="widget_upgrade_to_pro">PASSER À PRO</string>

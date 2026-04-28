@@ -303,6 +303,10 @@
     <string name="analytics_hub_title">分析ハブ</string>
     <string name="analytics_quick_jump_title">クイックジャンプ</string>
     <string name="analytics_swipe_instruction_short">左右にスワイプして移動します。</string>
+    <string name="analytics_page_start">開始</string>
+    <string name="analytics_page_pie_chart">円グラフ</string>
+    <string name="analytics_page_donut_chart">ドーナツグラフ</string>
+    <string name="analytics_page_bar_chart">棒グラフ</string>
     <string name="widget_pro_customization_title">PROカスタマイズ</string>
     <string name="widget_pro_customization_body">無料ウィジェットはデフォルトスタイル（最大3資産）を使用します。色、並び順、レイアウトを編集するにはProにアップグレードしてください。</string>
     <string name="widget_upgrade_to_pro">PROにアップグレード</string>
