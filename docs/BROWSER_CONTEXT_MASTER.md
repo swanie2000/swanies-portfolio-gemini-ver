@@ -173,7 +173,17 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.64: WIDGET/THEME STUDIO UX PARITY + LIVE PREVIEW)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.65: GLOBAL GRADIENT + NAV BAR SEAM FIX)
+
+V40.65 UPDATE (Bottom Nav Gradient Sync + Content Safety)
+- Consolidated to one global gradient source at app root; removed duplicate/padded-local gradient layers that caused sync seams.
+- Bottom navigation now blends with the shared gradient path without local solid or offset gradient repainting.
+- Holdings screen local background override removed so it follows the same global gradient as Settings/Analytics.
+- Preserved scaffold content insets so scrolling content remains above nav icons for readability and access.
+
+FUTURE PATH (NEXT TRACK)
+- Optional contrast polish for nav icon legibility across extreme gradient intensities.
+- Device QA pass on compact/large phones to verify seam-free continuity and scroll safety.
 
 V40.64 UPDATE (Widget Style + Theme Manager UX Alignment)
 - Unified style-edit UX on both surfaces: dropdown target selector, red `CANCEL` state on unsaved edits, pulsing `SAVE`.

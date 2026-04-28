@@ -1,6 +1,5 @@
 package com.swanie.portfolio.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
@@ -26,22 +25,19 @@ fun BottomNavigationBar(
     onNavigate: () -> Unit = {}
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
-    val siteBgColor by themeViewModel.siteBackgroundColor.collectAsState()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
 
-    val bgColorInt = siteBgColor.ifBlank { "#000416" }.toColorInt()
     val textColorInt = siteTextColor.ifBlank { "#FFFFFF" }.toColorInt()
 
     // Match MyHoldingsScreen structure exactly to prevent jumping
-    Column(modifier = Modifier.background(Color(bgColorInt))) {
-        Surface(
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
-                .background(Color(bgColorInt))
         ) {
             Row(
-                modifier = Modifier.fillMaxSize().background(Color(bgColorInt)),
+                modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -89,7 +85,6 @@ fun BottomNavigationBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsBottomHeight(WindowInsets.navigationBars)
-                .background(Color(bgColorInt))
         )
     }
 }

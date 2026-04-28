@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,7 @@ import com.swanie.portfolio.ui.components.BottomNavigationBar
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import com.swanie.portfolio.ui.theme.SwaniesPortfolioTheme
 import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.AndroidEntryPoint
@@ -87,20 +89,31 @@ class MainActivity : FragmentActivity() {
                 )
                 val shouldShowBottomBar = currentRoute !in hideBottomBarRoutes
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (shouldShowBottomBar) {
-                            BottomNavigationBar(navController = navController)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(brush = LocalBackgroundBrush.current)
+                ) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        containerColor = Color.Transparent,
+                        bottomBar = {
+                            if (shouldShowBottomBar) {
+                                BottomNavigationBar(navController = navController)
+                            }
                         }
-                    }
-                ) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                        NavGraph(
-                            navController = navController,
-                            mainViewModel = viewModel,
-                            startDestination = Routes.HOME
-                        )
+                    ) { innerPadding ->
+                        Box(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                        ) {
+                            NavGraph(
+                                navController = navController,
+                                mainViewModel = viewModel,
+                                startDestination = Routes.HOME
+                            )
+                        }
                     }
                 }
             }

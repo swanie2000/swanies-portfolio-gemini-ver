@@ -1,4 +1,19 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.64: WIDGET/THEME STUDIO UX PARITY + LIVE PREVIEW)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.65: GLOBAL GRADIENT + NAV BAR SEAM FIX)
+
+V40.65 UPDATE (Bottom Nav Gradient Sync + Content Safety)
+- **Single gradient source restored:** Moved to one authoritative background render path at app root (`MainActivity`) and removed duplicate gradient layers from `NavGraph`/screen roots that caused visual seams.
+- **Bottom bar blend fix:** Updated bottom navigation container to avoid local solid/independent gradient painting so it inherits the same global gradient without offset artifacts.
+- **Holdings parity:** Removed local holdings root background override that was still forcing a mismatch against the shared gradient pipeline.
+- **Scroll/readability protection:** Kept full scaffold content insets so list content stops above nav icons (no text sliding under icons).
+- **Outcome:** Settings, Analytics, and Holdings now share consistent gradient continuity while preserving readable, reachable scroll content.
+
+CURRENT CONDITION (END OF SESSION)
+- Gradient/nav integration is stable with one shared background path and compile-green status.
+- Bottom menu no longer appears as a separate block while content remains safely above icon row.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- Optional visual polish: add subtle nav icon glow/contrast compensation for low-contrast gradient segments.
+- Run device spot-check matrix (small/large phones, dark/light text themes, gradient intensity extremes).
 
 V40.64 UPDATE (Widget Style + Theme Manager UX Alignment)
 - **Unified edit workflow:** Both Widget Style and Theme Manager now use the same top-row interaction model: target dropdown -> unsaved state switches to red `CANCEL` + pulsing `SAVE`.

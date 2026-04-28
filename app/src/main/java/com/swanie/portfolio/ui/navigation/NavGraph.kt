@@ -5,7 +5,6 @@ package com.swanie.portfolio.ui.navigation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.activity.compose.LocalActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen // ✅ Fixed: Added missing import
 import com.swanie.portfolio.ui.settings.*
-import com.swanie.portfolio.ui.theme.LocalBackgroundBrush
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -58,7 +56,7 @@ fun NavGraph(
         currentRoute != Routes.UNLOCK_VAULT &&
         currentRoute != Routes.CREATE_ACCOUNT
 
-    Box(modifier = Modifier.fillMaxSize().background(brush = LocalBackgroundBrush.current)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
             navController = navController,
             startDestination = startDestination,

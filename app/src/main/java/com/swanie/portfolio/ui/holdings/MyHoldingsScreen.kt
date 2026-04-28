@@ -162,7 +162,7 @@ fun MyHoldingsScreen(
         label = "curtain"
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(siteBg).pointerInput(Unit) {
+    Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) {
         awaitPointerEventScope {
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
