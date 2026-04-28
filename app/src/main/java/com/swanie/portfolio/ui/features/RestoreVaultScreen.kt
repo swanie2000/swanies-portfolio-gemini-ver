@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.features
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,7 +29,7 @@ import com.swanie.portfolio.ui.navigation.Routes
 fun RestoreVaultScreen(
     navController: NavHostController
 ) {
-    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val activity = LocalActivity.current as androidx.fragment.app.FragmentActivity
     val authViewModel: AuthViewModel = hiltViewModel(activity)
     val authState by authViewModel.authState.collectAsState()
 

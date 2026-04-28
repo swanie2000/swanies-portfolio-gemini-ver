@@ -18,8 +18,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +64,7 @@ private fun languageLabel(code: String): String = when (code) {
 
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
-    val activity = LocalContext.current as FragmentActivity
+    val activity = LocalActivity.current as FragmentActivity
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel(activity)

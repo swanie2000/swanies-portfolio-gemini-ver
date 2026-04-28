@@ -173,7 +173,19 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.60: I18N + HOLDINGS REORDER + STORE READINESS CLARITY)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.61: LINT ERROR CLEAR + FULL I18N COVERAGE)
+
+V40.61 UPDATE (Lint Error Burn-Down + Translation Completion)
+- `:app:lintDebug` reduced from ~69 errors to **0 errors** (`BUILD SUCCESSFUL`), while warnings remain visible for future cleanup.
+- Fixed `ContextCastToActivity` pattern by switching to `LocalActivity.current as FragmentActivity` in `HomeScreen`, `NavGraph`, `UnlockVaultScreen`, `RestoreVaultScreen`, and `PortfolioManagerScreen`.
+- Resolved `UnusedBoxWithConstraintsScope` in `HoldingsUIComponents` by replacing unused `BoxWithConstraints` with `Box`.
+- Completed real translations for new monetization/pro-gate/settings + `analytics_premium_*` keys across all maintained locale files.
+- Added missing `terms_section_*` + `terms_last_updated` translations for locales flagged by lint (`de`, `fr`, `ar`, `ja`).
+
+FUTURE PATH (NEXT TRACK)
+- Play Developer registration → subscription SKUs → RC offerings → internal/closed testing; Data safety + privacy policy + listing prep in parallel.
+- V40.62 candidate: monetization telemetry, Free/Pro/expired matrix validation, paywall copy polish.
+- Choose warning strategy: gradual cleanup vs lint baseline for CI-on-regressions.
 
 V40.60 UPDATE (Localization, Holdings Reorder Fix, Auth/Lint Hygiene, Launch Path)
 - **Pro analytics live strings (`analytics_live_*`):** Real translations for **`values-vi`**, **`values-zh-rCN`**, **`values-zh-rTW`** aligned to `AnalyticsProLivePages.kt` keys (plus ongoing locale wave).
@@ -181,15 +193,6 @@ V40.60 UPDATE (Localization, Holdings Reorder Fix, Auth/Lint Hygiene, Launch Pat
 - **`CreateAccountScreen`:** `LocalActivity.current as FragmentActivity` for `hiltViewModel` (AndroidX guidance).
 - **Build:** `:app:mergeDebugResources` + `:app:compileDebugKotlin` green. **`lintDebug`** still has broader legacy issues (`MissingTranslation`, etc.) — separate track.
 - **Product clarity:** RevenueCat = entitlements + orchestration; **Google Play** = store checkout when distributing on Play — keep both.
-
-FUTURE PATH (NEXT TRACK)
-- Play Developer registration → subscription SKUs → RC offerings → internal/closed testing; Data safety + privacy policy + listing prep in parallel.
-- V40.61 candidate: monetization telemetry, Free/Pro/expired matrix validation, paywall copy polish.
-
-NEXT SESSION START — LINT / TRANSLATIONS (SOURCE: `docs/BROWSER_CONTEXT_NARRATIVE.md`)
-- `:app:lintDebug` ~**69 errors** / ~**350 warnings**; many errors = **`MissingTranslation`** (new monetization/settings strings in default `values/strings.xml` not in every locale). **Play does not require lint-all-green.**
-- **Policy choices:** (A) `lint.xml` → `MissingTranslation` = **warning**; (B) **`lint-baseline.xml`** + `updateLintBaseline` for CI on deltas only; (C) batch keys into locales; (D) fix **code** issues first: **`HomeScreen.kt`** `LocalActivity` (same as CreateAccount), **`HoldingsUIComponents.kt`** `UnusedBoxWithConstraintsScope`.
-- Re-run lint; read **`app/build/reports/lint-results-debug.html`**.
 
 V40.59 UPDATE (Analytics Premium Live Engines + Modular Refactor)
 - Live premium engines for `RISK`, `ATTRIBUTION`, `REBALANCE`, `SCENARIOS`; split `AnalyticsProUpsellPages.kt` / `AnalyticsProLivePages.kt` / `AnalyticsProUiComponents.kt`; compile-stable.

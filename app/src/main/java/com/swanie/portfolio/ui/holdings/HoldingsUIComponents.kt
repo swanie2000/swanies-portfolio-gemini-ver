@@ -1160,7 +1160,7 @@ fun CompactAssetCard(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
-                                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                                Box(modifier = Modifier.fillMaxWidth()) {
                                     AutoResizingText(
                                         text = formatAmount(asset.amountHeld),
                                         style = LocalTextStyle.current.merge(

@@ -3,6 +3,7 @@
 package com.swanie.portfolio.ui.features
 
 import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -30,7 +31,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
@@ -50,7 +50,7 @@ import kotlinx.coroutines.launch
 fun UnlockVaultScreen(
     navController: NavController
 ) {
-    val activity = LocalContext.current as FragmentActivity
+    val activity = LocalActivity.current as FragmentActivity
     val mainViewModel: MainViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()

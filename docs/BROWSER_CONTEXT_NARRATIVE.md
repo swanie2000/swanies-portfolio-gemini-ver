@@ -1,4 +1,21 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.60: I18N + HOLDINGS REORDER + STORE READINESS CLARITY)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.61: LINT ERROR CLEAR + FULL I18N COVERAGE)
+
+V40.61 UPDATE (Lint Error Burn-Down + Translation Completion)
+- **`lintDebug` status:** Reduced from ~69 errors to **0 errors** (`BUILD SUCCESSFUL`) while keeping existing warnings/hints visible for later cleanup.
+- **Compose lint error fixes:** Replaced `LocalContext.current as FragmentActivity` with `LocalActivity.current as FragmentActivity` in `HomeScreen`, `NavGraph`, `UnlockVaultScreen`, `RestoreVaultScreen`, and `PortfolioManagerScreen` (matching AndroidX guidance for `ContextCastToActivity`).
+- **Holdings UI lint fix:** Replaced unused-scope `BoxWithConstraints` with `Box` in `HoldingsUIComponents` to resolve `UnusedBoxWithConstraintsScope`.
+- **Localization completion (monetization + analytics premium):** Added real locale translations for the new Settings/RevenueCat/Pro-gate block and the `analytics_premium_*` CTA/badge/title keys across all shipped locale files (`values-ar`, `de`, `es`, `fr`, `hi`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt-rBR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-rCN`, `zh-rTW`).
+- **Terms coverage parity:** Filled missing `terms_section_*` + `terms_last_updated` entries for locales previously flagged by lint (`de`, `fr`, `ar`, `ja`).
+
+CURRENT CONDITION (END OF SESSION)
+- `:app:lintDebug` is **passing** (errors cleared).
+- RevenueCat monetization copy and analytics premium copy are now localized across all maintained locales.
+- Codebase is compile-green and lint-error-green, suitable for continued product polish and Play readiness work.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- **Play + monetization:** Register Play Developer account; create subscription SKUs/base plans; bind SKUs to RevenueCat offerings; validate on internal/closed track.
+- **Conversion hardening (V40.62 candidate):** Add purchase/restore funnel telemetry and run Free/Active Pro/Expired Pro end-to-end state checks on device.
+- **Lint warnings strategy:** Decide whether to incrementally clean warnings (DefaultLocale, UnusedResources, etc.) or freeze with a baseline for CI signal-only on regressions.
 
 V40.60 UPDATE (Localization, Holdings Crash Fix, Auth/Lint Hygiene, Launch Path)
 - **Pro analytics live strings (`analytics_live_*`):** Completed real translations for **`values-vi`** (including model-line labels and risk-engine wording), **`values-zh-rCN`**, and **`values-zh-rTW`**; aligned copy with `AnalyticsProLivePages.kt` string keys. (Earlier milestone locales such as `ar`, `hi`, `id`, `uk` remain part of the same wave.)

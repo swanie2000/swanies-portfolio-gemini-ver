@@ -2,6 +2,7 @@
 
 package com.swanie.portfolio.ui.settings
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +32,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,7 +58,7 @@ fun PortfolioManagerScreen(
     mainViewModel: MainViewModel,
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
-    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val activity = LocalActivity.current as androidx.fragment.app.FragmentActivity
     val authViewModel: AuthViewModel = hiltViewModel(activity)
     val allVaults by mainViewModel.allVaults.collectAsStateWithLifecycle()
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()

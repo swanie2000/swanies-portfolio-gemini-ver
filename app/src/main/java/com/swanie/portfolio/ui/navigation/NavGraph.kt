@@ -4,6 +4,7 @@ package com.swanie.portfolio.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +13,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -45,7 +45,7 @@ fun NavGraph(
     mainViewModel: MainViewModel,
     startDestination: String = Routes.HOME
 ) {
-    val activity = LocalContext.current as androidx.fragment.app.FragmentActivity
+    val activity = LocalActivity.current as androidx.fragment.app.FragmentActivity
     val assetViewModel: AssetViewModel = hiltViewModel()
     val amountEntryViewModel: AmountEntryViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel(activity)
