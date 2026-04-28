@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- uCrop dialog: min width as fraction of the shorter screen axis (no platform attr for min height). -->
+    <fraction name="ucrop_window_width">88%</fraction>
+</resources>

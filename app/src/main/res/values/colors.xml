@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="launcher_navy">#000416</color>
+    <color name="ucrop_surface">#2A2A2A</color>
+    <color name="ucrop_toolbar">#323232</color>
+    <color name="ucrop_status_bar">#282828</color>
 </resources>

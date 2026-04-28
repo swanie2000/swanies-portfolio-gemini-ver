@@ -1,4 +1,20 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.65: GLOBAL GRADIENT + NAV BAR SEAM FIX)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.66: AZBIT + CUSTOM CRYPTO ICONS)
+
+V40.66 UPDATE (Azbit Search, Live Data, Custom Icons + uCrop)
+- **Azbit exchange search:** New `AzbitSearchProvider` + `AzbitApiService` (Retrofit) wired in `SearchEngineRegistry` and DI. OHLC requests use an explicit UTC window (e.g. 72h) so sparklines populate; quote preference includes `MUSDT` where applicable.
+- **Icons + picker:** Search-time icons for Azbit-sourced assets improved (Jupiter token metadata, batching, CoinCap fallback, IPFS gateway handling). `AssetRepository` / live refresh now merge `imageUrl` / `iconUrl` so list rows and pickers update when URLs arrive.
+- **Custom crypto icon:** `IconManager` persists user photos under `filesDir/custom_icons/`. Crypto edit sheet (`CryptoEditFunnel`) supports pick → **uCrop** (JitPack) → save; `FileProvider` + cache paths; `UCrop.Theme` as floating dialog with opaque colors and min-width fraction; `AndroidManifest` declares `UCropActivity`.
+- **Holdings UI:** `MetalIcon` uses Coil `ImageRequest` with disk-busting cache keys (`lastModified` + length) for local files. `MyHoldingsScreen` merges **optimistic** post-save `AssetEntity` into vault holdings until Room Flow matches (reduces lag after async `updateAssetEntity`).
+
+**WORK IN PROGRESS (do not mark done):** After saving a **new custom photo** and exiting the editor, the **expanded** card may still show the **previous** icon until the user **collapses** the card. **Use default icon** and save refreshes the icon immediately—so the bug is specific to the **local file / expanded-row** path. Next session: trace expanded `CompactAssetCard` / `FullAssetCard` icon slot vs Coil composition order; consider `key(coinId, localPath, fileStamp)` or explicit image-loader invalidate on save.
+
+CURRENT CONDITION (END OF SESSION)
+- `assembleDebug` is green; Azbit + custom icon pipeline is in mainline code.
+- Custom photo refresh while expanded is **unresolved** (tracked above).
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- Fix custom-photo icon refresh on exit from crypto editor without requiring card collapse.
+- Optional: tighten uCrop height constraint via small `UCropActivity` wrapper if theme-only sizing is insufficient on some devices.
 
 V40.65 UPDATE (Bottom Nav Gradient Sync + Content Safety)
 - **Single gradient source restored:** Moved to one authoritative background render path at app root (`MainActivity`) and removed duplicate gradient layers from `NavGraph`/screen roots that caused visual seams.

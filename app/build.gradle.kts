@@ -117,6 +117,7 @@ dependencies {
     implementation(libs.retrofit.main)
     implementation(libs.retrofit.gson)
     implementation(libs.coil.compose)
+    implementation("com.github.yalantis:ucrop:2.2.8")
 
     // Room Database (Using KSP)
     implementation(libs.androidx.room.runtime)

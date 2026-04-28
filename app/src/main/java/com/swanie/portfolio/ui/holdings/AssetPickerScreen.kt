@@ -344,11 +344,33 @@ fun AssetPickerItem(asset: AssetEntity, textColor: Color, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            model = asset.imageUrl,
-            contentDescription = null,
-            modifier = Modifier.size(38.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.05f))
-        )
+        val iconKey = "${asset.coinId}|${asset.imageUrl}"
+        var imageFailed by remember(iconKey) { mutableStateOf(false) }
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.05f)),
+            contentAlignment = Alignment.Center
+        ) {
+            if (asset.imageUrl.isNotBlank() && !imageFailed) {
+                AsyncImage(
+                    model = asset.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    onError = { imageFailed = true }
+                )
+            } else {
+                val letter = asset.symbol.trim().take(1).ifBlank { "?" }.uppercase()
+                Text(
+                    text = letter,
+                    color = Color.Yellow,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 16.sp
+                )
+            }
+        }
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(asset.name, fontWeight = FontWeight.Bold, color = textColor, fontSize = 15.sp)

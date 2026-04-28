@@ -4,6 +4,26 @@
         <item name="android:statusBarColor">#000416</item>
     </style>
 
+    <!-- uCrop: AppCompat dialog so it is not edge-to-edge full screen; opaque surfaces so controls read clearly. -->
+    <style name="UCrop.Theme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">@drawable/ucrop_dialog_window_bg</item>
+        <item name="android:colorBackground">@color/ucrop_surface</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/ucrop_status_bar</item>
+        <item name="android:navigationBarColor">@color/ucrop_surface</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.55</item>
+        <item name="android:windowMinWidthMajor">@fraction/ucrop_window_width</item>
+    </style>
+
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Lock the background to Swanie Navy for a consistent cold start. -->
         <item name="windowSplashScreenBackground">#000416</item>

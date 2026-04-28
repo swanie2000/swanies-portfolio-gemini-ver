@@ -1,6 +1,7 @@
 package com.swanie.portfolio.data.local
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -44,5 +45,37 @@ class IconManager @Inject constructor(
             Log.e("ICON_MANAGER", "Failed to download icon for $symbol: ${e.message}")
         }
         null
+    }
+
+    private fun customIconFile(coinId: String): File {
+        val safeId = coinId.replace(Regex("[^a-zA-Z0-9_-]"), "_")
+        val dir = File(context.filesDir, "custom_icons")
+        if (!dir.exists()) dir.mkdirs()
+        return File(dir, "$safeId.png")
+    }
+
+    suspend fun persistCustomIconFromUri(coinId: String, sourceUri: Uri): String? = withContext(Dispatchers.IO) {
+        try {
+            val dest = customIconFile(coinId)
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                FileOutputStream(dest).use { output -> input.copyTo(output) }
+            } ?: return@withContext null
+            Log.d("ICON_MANAGER", "Custom icon saved for $coinId -> ${dest.absolutePath}")
+            dest.absolutePath
+        } catch (e: Exception) {
+            Log.e("ICON_MANAGER", "persistCustomIconFromUri failed: ${e.message}")
+            null
+        }
+    }
+
+    suspend fun deleteCustomAssetIcon(coinId: String) = withContext(Dispatchers.IO) {
+        try {
+            val f = customIconFile(coinId)
+            if (f.exists() && f.delete()) {
+                Log.d("ICON_MANAGER", "Removed custom icon for $coinId")
+            }
+        } catch (e: Exception) {
+            Log.e("ICON_MANAGER", "deleteCustomAssetIcon failed: ${e.message}")
+        }
     }
 }

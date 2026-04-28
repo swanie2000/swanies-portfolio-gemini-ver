@@ -525,3 +525,20 @@ Release recorded: V40.60 "Localization Completion for New Monetization + Analyti
   - Run full on-device matrix for Free, Active Pro, and Expired Pro (including widget edit and analytics hub paths).
   - Finalize copy consistency review across paywall, analytics upsell, and widget upgrade prompts.
   - Add focused regression checks for analytics back-navigation rules and free-vs-pro widget behavior.
+
+---
+
+## V40.66 - Azbit + Custom Crypto Icons (uCrop Lab)
+
+Release recorded: V40.66 "Azbit + Custom Crypto Icons".
+
+- **Azbit / TEKI and search quality:** `AzbitSearchProvider` and `AzbitApiService` integrated; OHLC uses an explicit UTC time range so sparklines are not empty; `MUSDT` considered in quote ordering where applicable.
+- **Icons in search and list:** Asset icon resolution improved for exchange-backed assets (Jupiter, batch search, CoinCap fallback, IPFS via `cf-ipfs.com` where needed). `AssetRepository` and live fetches now merge `imageUrl` and `iconUrl` so UI can show icons when URLs were previously dropped.
+- **User-chosen crypto icons:** `IconManager` stores files under `files/custom_icons/`. Crypto edit funnel supports gallery pick, **uCrop** crop step, and save; `FileProvider` and `file_paths.xml` for cache and custom icons; manifest registers `UCropActivity` and theme; Gradle uses JitPack for uCrop 2.2.8.
+- **UX:** uCrop uses a dialog-style `UCrop.Theme` (AppCompat, floating window, opaque surfaces, min width fraction where supported). `MetalIcon` uses Coil `ImageRequest` with cache-busting keys for on-disk files. `MyHoldingsScreen` applies an optimistic held asset row after crypto save to reduce stale list rows behind async `updateAssetEntity`.
+- **Known issue (WIP):** After saving a **new custom photo** and leaving the editor, the icon on an **expanded** card may not update until the user **collapses** the card. **Restore default icon** and save **does** refresh immediately—suggests remaining work is on the expanded-row / same-file / Coil path, not the optimistic entity merge alone.
+
+### Next Phase (Projected Path)
+
+- V40.66.1: Fix custom photo refresh on the expanded holdings card (investigate `CompactAssetCard` / `AnimatedVisibility` icon slot, Coil identity, and/or explicit `key` or loader invalidate after save).
+- Optional: uCrop max height on very tall phones via thin `UCropActivity` subclass if theme attrs are insufficient.

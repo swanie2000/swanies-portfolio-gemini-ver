@@ -1,15 +1,27 @@
 package com.swanie.portfolio.ui.holdings
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.graphics.Color as AndroidColor
 import android.net.Uri
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -47,15 +59,106 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.yalantis.ucrop.UCrop
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import java.io.File
 import java.text.DecimalFormat
 import java.util.Locale
+import java.util.UUID
+import kotlinx.coroutines.launch
+
+private const val CROP_TAG = "ICON_CROP"
+private const val MAX_CROP_SOURCE_BYTES = 8 * 1024 * 1024
+
+private fun Context.findComponentActivity(): ComponentActivity? {
+    var ctx: Context? = this
+    while (ctx != null) {
+        if (ctx is ComponentActivity) return ctx
+        ctx = (ctx as? ContextWrapper)?.baseContext
+    }
+    return null
+}
+
+private fun newCropDestinationUri(context: Context): Uri {
+    val dir = File(context.cacheDir, "icon_crop")
+    if (!dir.exists()) dir.mkdirs()
+    val file = File(dir, "crop_${UUID.randomUUID()}.png")
+    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+}
+
+/**
+ * Copy gallery/picker [Uri] into app cache and expose a [FileProvider] uri.
+ * uCrop and cross-app [content] URIs often need this + [Intent] URI flags to open reliably.
+ */
+private fun copyPickerUriToCacheForCrop(context: Context, source: Uri): Uri? {
+    val importDir = File(context.cacheDir, "icon_crop/imports")
+    if (!importDir.exists()) importDir.mkdirs()
+    val outFile = File(importDir, "in_${UUID.randomUUID()}.png")
+    return try {
+        var total = 0L
+        context.contentResolver.openInputStream(source)?.use { ins ->
+            java.io.FileOutputStream(outFile).use { outs ->
+                val buf = ByteArray(8192)
+                while (true) {
+                    val n = ins.read(buf)
+                    if (n == -1) break
+                    total += n
+                    if (total > MAX_CROP_SOURCE_BYTES) {
+                        outFile.delete()
+                        Log.w(CROP_TAG, "Picked image too large, skipping local copy")
+                        return null
+                    }
+                    outs.write(buf, 0, n)
+                }
+            }
+        } ?: return null
+        if (!outFile.exists() || outFile.length() == 0L) {
+            outFile.delete()
+            return null
+        }
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", outFile)
+    } catch (e: Exception) {
+        Log.e(CROP_TAG, "copyPickerUriToCacheForCrop failed: ${e.message}", e)
+        outFile.delete()
+        null
+    }
+}
+
+private fun buildIconCropIntent(context: Context, source: Uri, destination: Uri? = null): Intent {
+    val dest = destination ?: newCropDestinationUri(context)
+    val surface = ContextCompat.getColor(context, R.color.ucrop_surface)
+    val toolbar = ContextCompat.getColor(context, R.color.ucrop_toolbar)
+    val status = ContextCompat.getColor(context, R.color.ucrop_status_bar)
+    val accent = AndroidColor.parseColor("#FFEB3B")
+    val opts = UCrop.Options().apply {
+        setCompressionQuality(92)
+        setToolbarColor(toolbar)
+        setStatusBarColor(status)
+        setActiveControlsWidgetColor(accent)
+        setToolbarWidgetColor(accent)
+        setRootViewBackgroundColor(surface)
+        setDimmedLayerColor(AndroidColor.parseColor("#E6161616"))
+        setShowCropFrame(true)
+        setShowCropGrid(true)
+    }
+    return UCrop.of(source, dest)
+        .withOptions(opts)
+        .withAspectRatio(1f, 1f)
+        .withMaxResultSize(1024, 1024)
+        .getIntent(context)
+        .apply {
+            // Let uCrop (same app) read the picker/source URI and write the target FileProvider URI.
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }
+}
 
 @Composable
 fun MetalIcon(
@@ -68,12 +171,21 @@ fun MetalIcon(
     localPath: String? = null,
     category: AssetCategory = AssetCategory.METAL
 ) {
+    val context = LocalContext.current
     var isError by remember { mutableStateOf(false) }
     val localFile = localPath?.let { File(it) }
 
     if (localFile != null && localFile.exists() && !isError) {
+        val diskKey = "${localFile.lastModified()}_${localFile.length()}"
+        val imageModel = remember(localPath, diskKey) {
+            ImageRequest.Builder(context)
+                .data(localFile)
+                .memoryCacheKey("${localFile.absolutePath}#$diskKey")
+                .diskCacheKey("${localFile.absolutePath}#$diskKey")
+                .build()
+        }
         AsyncImage(
-            model = localFile,
+            model = imageModel,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(size.dp).clip(CircleShape),
@@ -491,18 +603,188 @@ fun MetalSelectionFunnel(
     }
 }
 
+data class CryptoEditSave(
+    val amountHeld: Double,
+    val decimalPreference: Int,
+    val localIconPath: String?
+)
+
 @Composable
-fun CryptoEditFunnel(asset: AssetEntity, onDismiss: () -> Unit, onSave: (String, Double, Int) -> Unit) {
-    var amt by remember { mutableStateOf(asset.amountHeld.toString()) }
-    var dec by remember { mutableFloatStateOf(asset.decimalPreference.toFloat()) }
+fun CryptoEditFunnel(
+    asset: AssetEntity,
+    onDismiss: () -> Unit,
+    onSave: (CryptoEditSave) -> Unit,
+    persistCustomIcon: suspend (String, Uri) -> String?,
+    deleteCustomIcon: suspend (String) -> Unit
+) {
+    var amt by remember(asset.coinId) { mutableStateOf(asset.amountHeld.toString()) }
+    var dec by remember(asset.coinId) { mutableFloatStateOf(asset.decimalPreference.toFloat()) }
+    var pendingIconUri by remember(asset.coinId) { mutableStateOf<Uri?>(null) }
+    var userClearedCustom by remember(asset.coinId) { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val focus = remember { FocusRequester() }
+    val scroll = rememberScrollState()
+    val context = LocalContext.current
+
+    val cropLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            UCrop.getOutput(result.data!!)?.let { out ->
+                pendingIconUri = out
+                userClearedCustom = false
+            }
+        }
+    }
+
+    val pickLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val act = context.findComponentActivity()
+        if (act == null) {
+            Log.w(CROP_TAG, "No ComponentActivity; using uncropped image")
+            pendingIconUri = uri
+            userClearedCustom = false
+            return@rememberLauncherForActivityResult
+        }
+        try {
+            val sourceForCrop = copyPickerUriToCacheForCrop(act, uri) ?: uri
+            cropLauncher.launch(buildIconCropIntent(act, sourceForCrop))
+        } catch (e: Exception) {
+            Log.e(CROP_TAG, "Failed to start crop: ${e.message}", e)
+            pendingIconUri = uri
+            userClearedCustom = false
+        }
+    }
+
+    val previewModel: Any? = when {
+        userClearedCustom -> asset.imageUrl.takeIf { it.isNotBlank() }
+        pendingIconUri != null -> pendingIconUri
+        else -> asset.localIconPath?.let { path -> File(path).takeIf { it.exists() } }
+            ?: asset.imageUrl.takeIf { it.isNotBlank() }
+    }
+
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
-            Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.crypto_settings_title, asset.symbol.uppercase()), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp); Spacer(Modifier.height(24.dp))
-                Text(stringResource(R.string.crypto_quantity_held), color = Color.White.copy(0.6f), fontSize = 10.sp); BasicTextField(value = amt, onValueChange = { amt = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 28.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().focusRequester(focus))
-                Spacer(Modifier.height(20.dp)); Text(stringResource(R.string.crypto_price_decimals, dec.toInt()), color = Color.White.copy(0.6f), fontSize = 10.sp); Slider(value = dec, onValueChange = { dec = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
-                Button(onClick = { onSave(asset.name, amt.toDoubleOrNull() ?: asset.amountHeld, dec.toInt()) }, modifier = Modifier.fillMaxWidth().padding(top = 30.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_save_changes), fontWeight = FontWeight.Black) }
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scroll)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(stringResource(R.string.crypto_settings_title, asset.symbol.uppercase()), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Spacer(Modifier.height(20.dp))
+                Text(stringResource(R.string.asset_custom_icon_section), color = Color.White.copy(0.6f), fontSize = 10.sp)
+                Text(stringResource(R.string.asset_custom_icon_hint), color = Color.White.copy(0.35f), fontSize = 9.sp, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(0.06f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (previewModel != null) {
+                        AsyncImage(
+                            model = previewModel,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            text = asset.symbol.trim().take(1).ifBlank { "?" }.uppercase(Locale.US),
+                            color = Color.Yellow,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 28.sp
+                        )
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            pickLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Yellow),
+                        border = BorderStroke(1.dp, Color.Yellow.copy(0.5f))
+                    ) {
+                        Text(stringResource(R.string.asset_custom_icon_choose), fontSize = 11.sp, fontWeight = FontWeight.Black)
+                    }
+                }
+                val canRecrop = pendingIconUri != null && !userClearedCustom
+                OutlinedButton(
+                    onClick = {
+                        val act = context.findComponentActivity() ?: return@OutlinedButton
+                        val src = pendingIconUri ?: return@OutlinedButton
+                        try {
+                            cropLauncher.launch(buildIconCropIntent(act, src))
+                        } catch (e: Exception) {
+                            Log.e(CROP_TAG, "Re-crop failed: ${e.message}")
+                        }
+                    },
+                    enabled = canRecrop,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White.copy(0.85f),
+                        disabledContentColor = Color.Gray.copy(0.35f)
+                    ),
+                    border = BorderStroke(1.dp, Color.White.copy(if (canRecrop) 0.25f else 0.08f))
+                ) {
+                    Text(stringResource(R.string.asset_custom_icon_recrop), fontSize = 11.sp, fontWeight = FontWeight.Black)
+                }
+                val canRemoveCustom = asset.localIconPath != null || pendingIconUri != null
+                TextButton(
+                    onClick = {
+                        pendingIconUri = null
+                        userClearedCustom = true
+                    },
+                    enabled = canRemoveCustom
+                ) {
+                    Text(
+                        stringResource(R.string.asset_custom_icon_remove),
+                        color = if (canRemoveCustom) Color.White.copy(0.7f) else Color.Gray.copy(0.4f),
+                        fontSize = 12.sp
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(stringResource(R.string.crypto_quantity_held), color = Color.White.copy(0.6f), fontSize = 10.sp)
+                BasicTextField(value = amt, onValueChange = { amt = it }, textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 28.sp, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.fillMaxWidth().focusRequester(focus))
+                Spacer(Modifier.height(20.dp))
+                Text(stringResource(R.string.crypto_price_decimals, dec.toInt()), color = Color.White.copy(0.6f), fontSize = 10.sp)
+                Slider(value = dec, onValueChange = { dec = it }, valueRange = 0f..8f, steps = 7, colors = SliderDefaults.colors(thumbColor = Color.Yellow, activeTrackColor = Color.Yellow))
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val finalLocal = when {
+                                userClearedCustom -> {
+                                    deleteCustomIcon(asset.coinId)
+                                    null
+                                }
+                                pendingIconUri != null -> {
+                                    persistCustomIcon(asset.coinId, pendingIconUri!!) ?: asset.localIconPath
+                                }
+                                else -> asset.localIconPath
+                            }
+                            onSave(
+                                CryptoEditSave(
+                                    amountHeld = amt.toDoubleOrNull() ?: asset.amountHeld,
+                                    decimalPreference = dec.toInt(),
+                                    localIconPath = finalLocal
+                                )
+                            )
+                            onDismiss()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(stringResource(R.string.action_save_changes), fontWeight = FontWeight.Black)
+                }
                 TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = Color.Gray) }
             }
         }

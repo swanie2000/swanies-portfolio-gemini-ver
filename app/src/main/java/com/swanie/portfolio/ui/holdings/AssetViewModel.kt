@@ -13,9 +13,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.api.SearchEngineRegistry
+import android.net.Uri
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.IconManager
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.local.VaultDao
@@ -47,6 +49,7 @@ class AssetViewModel @Inject constructor(
     private val vaultDao: VaultDao,
     private val priceHistoryDao: PriceHistoryDao,
     private val googleDriveService: GoogleDriveService, // 🛰️ Cloud Service
+    private val iconManager: IconManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -441,6 +444,13 @@ class AssetViewModel @Inject constructor(
             repository.updateAssetEntity(asset)
             triggerCloudSync() // 🛰️ Sync Update
         }
+    }
+
+    suspend fun persistCustomIconFromUri(coinId: String, uri: Uri): String? =
+        iconManager.persistCustomIconFromUri(coinId, uri)
+
+    suspend fun deleteCustomAssetIcon(coinId: String) {
+        iconManager.deleteCustomAssetIcon(coinId)
     }
 
     fun updateAsset(asset: AssetEntity, newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) {

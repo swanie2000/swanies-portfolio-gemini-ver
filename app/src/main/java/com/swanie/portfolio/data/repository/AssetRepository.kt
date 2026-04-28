@@ -20,6 +20,7 @@ import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
+import com.swanie.portfolio.data.local.IconManager
 import com.swanie.portfolio.widget.SparklineDrawUtils
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,7 +43,8 @@ class AssetRepository @Inject constructor(
     private val userConfigDao: UserConfigDao,
     private val vaultDao: VaultDao,
     private val searchRegistry: SearchEngineRegistry,
-    private val syncCoordinator: DataSyncCoordinator
+    private val syncCoordinator: DataSyncCoordinator,
+    private val iconManager: IconManager
 ) {
     val allAssets: Flow<List<AssetEntity>> = assetDao.getAllAssetsFlow()
 
@@ -119,6 +121,8 @@ class AssetRepository @Inject constructor(
                             officialSpotPrice = update.officialSpotPrice,
                             priceChange24h = update.priceChange24h,
                             sparklineData = if (update.sparklineData.isNotEmpty()) update.sparklineData else existing.sparklineData,
+                            imageUrl = update.imageUrl.ifBlank { existing.imageUrl },
+                            iconUrl = (update.iconUrl ?: update.imageUrl ?: "").ifBlank { existing.iconUrl },
                             lastUpdated = System.currentTimeMillis()
                         ).also { allUpdatedAssets.add(it) }
                     } else {
@@ -278,7 +282,9 @@ class AssetRepository @Inject constructor(
                 asset.copy(
                     officialSpotPrice = liveMatch.officialSpotPrice,
                     priceChange24h = liveMatch.priceChange24h,
-                    sparklineData = liveMatch.sparklineData,
+                    sparklineData = if (liveMatch.sparklineData.isNotEmpty()) liveMatch.sparklineData else asset.sparklineData,
+                    imageUrl = liveMatch.imageUrl.ifBlank { asset.imageUrl },
+                    iconUrl = (liveMatch.iconUrl ?: liveMatch.imageUrl ?: "").ifBlank { asset.iconUrl },
                     lastUpdated = System.currentTimeMillis()
                 )
             } else asset
@@ -286,6 +292,7 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun deleteAsset(asset: AssetEntity) {
+        iconManager.deleteCustomAssetIcon(asset.coinId)
         assetDao.deleteAssetById(asset.coinId)
         // 🧹 CASCADE CLEANUP: Remove from Widget Selection across all vaults
         cleanAssetFromWidgetSelection(asset.coinId)
@@ -298,6 +305,7 @@ class AssetRepository @Inject constructor(
         val allAssets = assetDao.getAllAssetsGlobal()
         val asset = allAssets.find { it.coinId == id }
 
+        iconManager.deleteCustomAssetIcon(id)
         assetDao.deleteAssetById(id)
         // 🧹 CASCADE CLEANUP: Remove from Widget Selection across all vaults
         cleanAssetFromWidgetSelection(id)

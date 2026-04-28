@@ -96,6 +96,8 @@ fun MyHoldingsScreen(
 
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
+    /** Until Room Flow catches up after crypto edit save; avoids stale list + Coil same-path cache. */
+    var optimisticCryptoEdit by remember { mutableStateOf<AssetEntity?>(null) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var editingAssetId by remember { mutableStateOf<String?>(null) }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
@@ -246,10 +248,26 @@ fun MyHoldingsScreen(
                             var localHoldingsForPage by remember(vaultForPage.id) { mutableStateOf(emptyList<AssetEntity>()) }
                             val pageLazyListState = rememberLazyListState()
 
-                            LaunchedEffect(holdingsForPage, vaultForPage.id, assetBeingEdited) {
+                            val holdingsMergedOptimistic = remember(holdingsForPage, optimisticCryptoEdit) {
+                                val opt = optimisticCryptoEdit ?: return@remember holdingsForPage
+                                holdingsForPage.map { if (it.coinId == opt.coinId) opt else it }
+                            }
+
+                            LaunchedEffect(holdingsForPage, optimisticCryptoEdit) {
+                                val opt = optimisticCryptoEdit ?: return@LaunchedEffect
+                                val fromFlow = holdingsForPage.find { it.coinId == opt.coinId } ?: return@LaunchedEffect
+                                if (fromFlow.amountHeld == opt.amountHeld &&
+                                    fromFlow.decimalPreference == opt.decimalPreference &&
+                                    fromFlow.localIconPath == opt.localIconPath
+                                ) {
+                                    optimisticCryptoEdit = null
+                                }
+                            }
+
+                            LaunchedEffect(holdingsMergedOptimistic, vaultForPage.id, assetBeingEdited) {
                                 val isDraggingThisPage = isDraggingActive.value && draggingVaultId == vaultForPage.id
                                 if (!isDraggingThisPage && assetBeingEdited == null) {
-                                    localHoldingsForPage = holdingsForPage
+                                    localHoldingsForPage = holdingsMergedOptimistic
                                 }
                             }
 
@@ -539,9 +557,21 @@ fun MyHoldingsScreen(
                 )
             } else {
                 CryptoEditFunnel(
-                    asset = asset, onDismiss = { assetBeingEdited = null },
-                    onSave = { name, amt, dec ->
-                        viewModel.updateAssetEntity(asset.copy(amountHeld = amt, decimalPreference = dec))
+                    asset = asset,
+                    onDismiss = {
+                        assetBeingEdited = null
+                        optimisticCryptoEdit = null
+                    },
+                    persistCustomIcon = { id, uri -> viewModel.persistCustomIconFromUri(id, uri) },
+                    deleteCustomIcon = { id -> viewModel.deleteCustomAssetIcon(id) },
+                    onSave = { save ->
+                        val updated = asset.copy(
+                            amountHeld = save.amountHeld,
+                            decimalPreference = save.decimalPreference,
+                            localIconPath = save.localIconPath
+                        )
+                        optimisticCryptoEdit = updated
+                        viewModel.updateAssetEntity(updated)
                         assetBeingEdited = null
                         editingAssetId = null
                     }

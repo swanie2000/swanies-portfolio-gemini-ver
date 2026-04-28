@@ -79,8 +79,9 @@ object DatabaseModule {
         userConfigDao: UserConfigDao,
         vaultDao: VaultDao,
         searchRegistry: SearchEngineRegistry,
-        syncCoordinator: DataSyncCoordinator
+        syncCoordinator: DataSyncCoordinator,
+        iconManager: IconManager
     ): AssetRepository {
-        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, vaultDao, searchRegistry, syncCoordinator)
+        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, vaultDao, searchRegistry, syncCoordinator, iconManager)
     }
 }

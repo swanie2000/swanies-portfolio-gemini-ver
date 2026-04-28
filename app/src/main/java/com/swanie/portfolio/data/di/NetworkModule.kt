@@ -52,6 +52,16 @@ object NetworkModule {
         .baseUrl("https://min-api.cryptocompare.com/").client(client)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
+    @Provides @Singleton @Named("Azbit")
+    fun provideAzbitRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("https://data.azbit.com/").client(client)
+        .addConverterFactory(GsonConverterFactory.create()).build()
+
+    @Provides @Singleton @Named("Jupiter")
+    fun provideJupiterLiteRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("https://lite-api.jup.ag/").client(client)
+        .addConverterFactory(GsonConverterFactory.create()).build()
+
     // --- API Service Providers ---
 
     @Provides
@@ -78,4 +88,14 @@ object NetworkModule {
     @Singleton
     fun provideCryptoCompareApiService(@Named("CryptoCompare") r: Retrofit): CryptoCompareApiService =
         r.create(CryptoCompareApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAzbitApiService(@Named("Azbit") r: Retrofit): AzbitApiService =
+        r.create(AzbitApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideJupiterTokenApiService(@Named("Jupiter") r: Retrofit): JupiterTokenApiService =
+        r.create(JupiterTokenApiService::class.java)
 }

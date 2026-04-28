@@ -264,6 +264,11 @@
     <string name="crypto_settings_title">%1$s SETTINGS</string>
     <string name="crypto_quantity_held">QUANTITY HELD</string>
     <string name="crypto_price_decimals">PRICE DECIMALS: %1$d</string>
+    <string name="asset_custom_icon_section">ICON</string>
+    <string name="asset_custom_icon_hint">Choose a photo, crop to a square, then save. Use when the exchange has no artwork.</string>
+    <string name="asset_custom_icon_choose">CHOOSE PHOTO</string>
+    <string name="asset_custom_icon_recrop">ADJUST CROP</string>
+    <string name="asset_custom_icon_remove">USE DEFAULT ICON</string>
     <string name="action_save_changes">SAVE CHANGES</string>
     <string name="widget_manager_title">WIDGET MANAGER</string>
     <string name="widget_action_save_exit">SAVE &amp; EXIT</string>

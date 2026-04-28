@@ -173,7 +173,17 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.65: GLOBAL GRADIENT + NAV BAR SEAM FIX)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.66: AZBIT + CUSTOM CRYPTO ICONS)
+
+V40.66 UPDATE (Azbit Search, Live Data, Custom Icons + uCrop)
+- Azbit: `AzbitSearchProvider` + `AzbitApiService`, OHLC windowed for sparklines; registry/DI wiring.
+- Icons: Jupiter/CoinCap/IPFS improvements; `AssetRepository` merges image/icon URLs on refresh.
+- Custom icon: `IconManager`, `CryptoEditFunnel` with uCrop + FileProvider; manifest + dialog theme.
+- Holdings: optimistic merge after crypto save; `MetalIcon` Coil cache keys for local files.
+- WIP: custom photo may not refresh on expanded card until collapse; "use default" path updates immediately. Next: expanded-row vs Coil/keys.
+
+FUTURE PATH
+- Fix expanded-card custom icon refresh. Optional uCrop height via activity wrapper.
 
 V40.65 UPDATE (Bottom Nav Gradient Sync + Content Safety)
 - Consolidated to one global gradient source at app root; removed duplicate/padded-local gradient layers that caused sync seams.
