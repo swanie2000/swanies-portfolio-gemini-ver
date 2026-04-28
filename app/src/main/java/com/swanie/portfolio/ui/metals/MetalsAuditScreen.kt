@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,14 +58,23 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
     val cardText = Color(cardTextHex.ifHexBlank("#FFFFFF").toColorInt())
 
-    var metalsOrder by remember { mutableStateOf(listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")) }
+    var metalsOrder by remember {
+        mutableStateOf(
+            listOf(
+                "XAU" to "XAU",
+                "XAG" to "XAG",
+                "XPT" to "XPT",
+                "XPD" to "XPD"
+            )
+        )
+    }
     val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         val savedOrder = viewModel.getMetalDisplayOrder()
         if (savedOrder != null) {
-            val defaultList = listOf("Gold" to "XAU", "Silver" to "XAG", "Platinum" to "XPT", "Palladium" to "XPD")
+            val defaultList = listOf("XAU" to "XAU", "XAG" to "XAG", "XPT" to "XPT", "XPD" to "XPD")
             metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
         }
 
@@ -109,14 +119,14 @@ fun MetalsAuditScreen(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = textColor)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.content_back), tint = textColor)
                     }
                 }
             }
 
             val density = LocalDensity.current
             Text(
-                text = "METALS MARKET WATCH",
+                text = stringResource(R.string.holdings_tab_metal),
                 color = textColor,
                 fontSize = with(density) { (20.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
                 fontWeight = FontWeight.Black,

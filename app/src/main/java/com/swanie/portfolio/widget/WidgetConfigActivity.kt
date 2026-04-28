@@ -64,7 +64,7 @@ class WidgetConfigActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = "Widget Manager"
+        title = getString(R.string.widget_manager_title)
         setResult(Activity.RESULT_CANCELED)
 
         if (!applyIntent(intent)) {
@@ -157,7 +157,7 @@ class WidgetConfigActivity : ComponentActivity() {
                                 androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     CircularProgressIndicator(color = textColor, strokeWidth = 2.dp)
                                     Text(
-                                        text = "Setting up free widget...",
+                                        text = stringResource(R.string.widget_loading),
                                         color = textColor,
                                         modifier = Modifier.padding(top = 10.dp)
                                     )

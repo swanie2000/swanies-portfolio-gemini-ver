@@ -32,7 +32,7 @@ fun CustomToast(message: String) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.swan_launcher_icon),
-                contentDescription = "Swan Icon",
+                contentDescription = null,
                 contentScale = ContentScale.Fit, // Ensure the icon fits without cropping
                 modifier = Modifier.padding(end = 8.dp) // Added end padding
             )

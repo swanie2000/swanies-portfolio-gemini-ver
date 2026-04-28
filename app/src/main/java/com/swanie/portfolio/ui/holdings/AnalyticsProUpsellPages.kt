@@ -133,9 +133,14 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
     val topShare = ((segments.firstOrNull()?.ratio ?: 0f) * 100f).coerceAtLeast(0f)
     val concentrationScore = (topShare * 1.6f).coerceAtMost(100f).toInt()
     val concentrationLabel = when {
-        concentrationScore >= 70 -> "HIGH"
-        concentrationScore >= 40 -> "MEDIUM"
-        else -> "LOW"
+        concentrationScore >= 70 -> stringResource(R.string.analytics_live_signal_high)
+        concentrationScore >= 40 -> stringResource(R.string.analytics_live_signal_medium)
+        else -> stringResource(R.string.analytics_live_signal_low)
+    }
+    val concentrationTone = when {
+        concentrationScore >= 70 -> Color(0xFFFF6B6B)
+        concentrationScore >= 40 -> Color(0xFFFFD54F)
+        else -> Color(0xFF66BB6A)
     }
     LargeProAdPanel(
         preview = PremiumInsightPreview(
@@ -152,21 +157,16 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
     )
     Spacer(modifier = Modifier.height(12.dp))
     ProInsightMiniCard(title = stringResource(R.string.analytics_pro_risk_snapshot_title), textColor = textColor) {
-        val markerColor = when (concentrationLabel) {
-            "HIGH" -> Color(0xFFFF6B6B)
-            "MEDIUM" -> Color(0xFFFFD54F)
-            else -> Color(0xFF66BB6A)
-        }
         Text(text = stringResource(R.string.analytics_pro_risk_concentration_label), color = textColor.copy(alpha = 0.7f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(6.dp))
         androidx.compose.material3.LinearProgressIndicator(
             progress = { concentrationScore / 100f },
             modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(999.dp)),
-            color = markerColor,
+            color = concentrationTone,
             trackColor = Color.White.copy(alpha = 0.08f)
         )
         Spacer(modifier = Modifier.height(6.dp))
-        Text(text = "$concentrationScore / 100  •  $concentrationLabel", color = markerColor, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+        Text(text = "$concentrationScore / 100  •  $concentrationLabel", color = concentrationTone, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
 
@@ -174,7 +174,7 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
 fun AttributionProScreen(textColor: Color, segments: List<AssetSegment>, totalValue: Double, onUpgradeClick: () -> Unit) {
     val topThree = segments.take(3)
     val combinedShare = topThree.sumOf { it.ratio.toDouble() } * 100.0
-    val leadName = topThree.firstOrNull()?.asset?.symbol?.uppercase() ?: "TOP ASSET"
+    val leadName = topThree.firstOrNull()?.asset?.symbol?.uppercase() ?: stringResource(R.string.analytics_live_metric_top)
     val leadValue = topThree.firstOrNull()?.value ?: 0.0
     val currency = NumberFormat.getCurrencyInstance(Locale.US)
     LargeProAdPanel(
@@ -225,7 +225,7 @@ fun RebalanceCoachProScreen(textColor: Color, segments: List<AssetSegment>, onUp
 
 @Composable
 fun ScenariosProScreen(textColor: Color, segments: List<AssetSegment>, totalValue: Double, onUpgradeClick: () -> Unit) {
-    val topAsset = segments.firstOrNull()?.asset?.symbol?.uppercase() ?: "TOP"
+    val topAsset = segments.firstOrNull()?.asset?.symbol?.uppercase() ?: stringResource(R.string.analytics_live_metric_top)
     val shockPreview = (totalValue * 0.12).coerceAtLeast(0.0)
     val currency = NumberFormat.getCurrencyInstance(Locale.US)
     LargeProAdPanel(

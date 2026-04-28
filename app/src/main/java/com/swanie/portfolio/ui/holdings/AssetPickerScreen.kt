@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -96,7 +97,7 @@ fun AssetPickerScreen(
             
             // --- 🦢 BOUTIQUE HEADER ---
             BoutiqueHeader(
-                title = "VAULT SELECTOR",
+                title = stringResource(R.string.portfolio_manager_title),
                 onBack = { navController.popBackStack() },
                 textColor = textColor
             )
@@ -107,7 +108,7 @@ fun AssetPickerScreen(
                     // 🚀 METAL MODE: The selection area appears directly
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         UnifiedSourceHeader(
-                            displayLabel = "PRECIOUS METALS",
+                            displayLabel = stringResource(R.string.holdings_tab_metal),
                             icon = Icons.Default.Security,
                             onClick = { menuExpanded = true },
                             bgColor = cardBg,
@@ -117,7 +118,7 @@ fun AssetPickerScreen(
                         Spacer(Modifier.height(24.dp))
                         
                         Text(
-                            "SELECT METAL TYPE",
+                            stringResource(R.string.architect_select_metal),
                             color = textColor.copy(alpha = 0.5f),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Black,
@@ -126,7 +127,7 @@ fun AssetPickerScreen(
                         )
                         
                         // 🛠️ 2x2 Grid for standard metals
-                        val metals = listOf("Gold", "Silver", "Platinum", "Palladium")
+                        val metals = listOf("XAU", "XAG", "XPT", "XPD")
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             metals.chunked(2).forEach { rowItems ->
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -139,17 +140,11 @@ fun AssetPickerScreen(
                                                 .background(Color.White.copy(0.05f))
                                                 .border(1.dp, Color.White.copy(0.1f), RoundedCornerShape(12.dp))
                                                 .clickable {
-                                                    val ticker = when (choice) {
-                                                        "Gold" -> "XAU"
-                                                        "Silver" -> "XAG"
-                                                        "Platinum" -> "XPT"
-                                                        "Palladium" -> "XPD"
-                                                        else -> choice.uppercase()
-                                                    }
+                                                    val ticker = choice.uppercase()
                                                     onAssetSelected(AssetEntity(
                                                         coinId = ticker,
                                                         symbol = ticker,
-                                                        name = choice.uppercase(),
+                                                        name = ticker,
                                                         category = AssetCategory.METAL,
                                                         priceSource = "YahooFinance",
                                                         baseSymbol = ticker,
@@ -184,7 +179,7 @@ fun AssetPickerScreen(
                                 Icon(Icons.Default.Add, null, tint = Color.White, modifier = Modifier.size(16.dp))
                                 Spacer(Modifier.width(8.dp))
                                 Text(
-                                    "BUILD A CUSTOM ASSET CARD", 
+                                    stringResource(R.string.architect_stage_blueprint),
                                     color = Color.White, 
                                     fontWeight = FontWeight.Black, 
                                     fontSize = 10.sp,
@@ -225,7 +220,7 @@ fun AssetPickerScreen(
                                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                                     if (searchQuery.isEmpty()) {
                                         Text(
-                                            text = "Search Crypto...",
+                                            text = stringResource(R.string.holdings_tab_crypto),
                                             color = cardText.copy(alpha = 0.4f),
                                             fontSize = 10.5.sp,
                                             letterSpacing = (-0.3).sp,
@@ -247,7 +242,7 @@ fun AssetPickerScreen(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.Center
                                         ) {
-                                            Text(text = (selectedProvider ?: "SOURCE").uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
+                                            Text(text = (selectedProvider ?: stringResource(R.string.settings_system_actions)).uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
                                             Icon(Icons.Default.ArrowDropDown, null, tint = cardText.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
                                         }
                                     }
@@ -263,7 +258,7 @@ fun AssetPickerScreen(
                     modifier = Modifier.background(Color(0xFF1A1A1A)).border(1.dp, Color.White.copy(0.1f))
                 ) {
                     providers.forEach { provider ->
-                        val menuLabel = if (provider == "YahooFinance") "PRECIOUS METALS" else provider
+                        val menuLabel = if (provider == "YahooFinance") stringResource(R.string.holdings_tab_metal) else provider
                         DropdownMenuItem(
                             text = { Text(menuLabel.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp) },
                             onClick = {

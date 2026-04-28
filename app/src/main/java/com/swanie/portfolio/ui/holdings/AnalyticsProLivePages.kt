@@ -73,6 +73,8 @@ fun RiskExposureLiveScreen(
     val animatedScore by animateFloatAsState(score.toFloat(), tween(650, easing = FastOutSlowInEasing), label = "riskScoreAnim")
     val cryptoShare = cryptoShareRatio * 100.0
     val metalShare = 100.0 - cryptoShare
+    val cryptoLabel = stringResource(R.string.holdings_tab_crypto)
+    val metalLabel = stringResource(R.string.holdings_tab_metal)
 
     PremiumHeroStripe(
         stringResource(R.string.analytics_live_risk_hero_title),
@@ -86,7 +88,7 @@ fun RiskExposureLiveScreen(
         Text(stringResource(R.string.analytics_live_risk_engine_description), color = textColor.copy(alpha = 0.75f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ModelChip(stringResource(R.string.analytics_live_model_hhi_vol_mix), textColor, accentColor)
+            ModelChip("HHI + VOL + MIX", textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_top), "${String.format(Locale.getDefault(), "%.1f", topShare)}%", textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_diversified), "${String.format(Locale.getDefault(), "%.1f", diversification)}%", textColor, accentColor)
         }
@@ -110,7 +112,12 @@ fun RiskExposureLiveScreen(
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_category_balance_title), textColor, surfaceColor, accentColor, borderColor) {
-        Text(stringResource(R.string.analytics_live_category_balance_line, String.format(Locale.getDefault(), "%.1f", cryptoShare), String.format(Locale.getDefault(), "%.1f", metalShare)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "$cryptoLabel ${String.format(Locale.getDefault(), "%.1f", cryptoShare)}%  •  $metalLabel ${String.format(Locale.getDefault(), "%.1f", metalShare)}%",
+            color = textColor,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(6.dp))
         LinearProgressIndicator(
             progress = { (cryptoShare / 100.0).toFloat() },
@@ -124,6 +131,8 @@ fun RiskExposureLiveScreen(
 @Composable
 fun AttributionLiveScreen(textColor: Color, segments: List<AssetSegment>, surfaceColor: Color, accentColor: Color, borderColor: Color) {
     val currency = NumberFormat.getCurrencyInstance(Locale.US)
+    val cryptoLabel = stringResource(R.string.holdings_tab_crypto)
+    val metalLabel = stringResource(R.string.holdings_tab_metal)
     val contributions = segments.map {
         ContributionRow(
             symbol = it.asset.symbol.uppercase(),
@@ -164,16 +173,16 @@ fun AttributionLiveScreen(textColor: Color, segments: List<AssetSegment>, surfac
         Text(stringResource(R.string.analytics_live_signal_confidence, String.format(Locale.getDefault(), "%.1f", signalConfidence), signalLabel), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(6.dp))
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ModelChip(stringResource(R.string.analytics_live_model_weighted_24h), textColor, accentColor)
+            ModelChip("24H", textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_positive), positiveCount.toString(), textColor, Color(0xFF66BB6A))
             MetricPill(stringResource(R.string.analytics_live_metric_negative), negativeCount.toString(), textColor, Color(0xFFFF8A80))
         }
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_category_contribution_title), textColor, surfaceColor, accentColor, borderColor) {
-        Text(stringResource(R.string.analytics_live_category_crypto_contribution, currency.format(cryptoContribution)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text("$cryptoLabel  ${currency.format(cryptoContribution)}", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(stringResource(R.string.analytics_live_category_metal_contribution, currency.format(metalContribution)), color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text("$metalLabel   ${currency.format(metalContribution)}", color = textColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_top_drivers_title), textColor, surfaceColor, accentColor, borderColor) {
@@ -238,7 +247,7 @@ fun RebalanceLiveScreen(textColor: Color, segments: List<AssetSegment>, totalVal
         Text(stringResource(R.string.analytics_live_rebalance_band_threshold, String.format(Locale.getDefault(), "%.1f", threshold * 100f), animatedOutOfBandCount), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Text(stringResource(R.string.analytics_live_rebalance_estimated_turnover, currency.format(estimatedTurnover)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(6.dp))
-        ModelChip(stringResource(R.string.analytics_live_model_dynamic, targetMode), textColor, accentColor)
+        ModelChip(targetMode, textColor, accentColor)
         Spacer(modifier = Modifier.height(6.dp))
         MetricPill(stringResource(R.string.analytics_live_metric_out_of_band), animatedOutOfBandCount.toString(), textColor, if (animatedOutOfBandCount > 0) Color(0xFFFFD54F) else accentColor)
     }
@@ -328,7 +337,7 @@ fun ScenariosLiveScreen(textColor: Color, segments: List<AssetSegment>, totalVal
     Spacer(modifier = Modifier.height(10.dp))
     ProInsightMiniCard(stringResource(R.string.analytics_live_scenario_model_title), textColor, surfaceColor, accentColor, borderColor) {
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ModelChip(stringResource(R.string.analytics_live_model_shock_matrix), textColor, accentColor)
+            ModelChip(selectedScenario, textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_base), currency.format(totalValue), textColor, accentColor)
         }
         Spacer(modifier = Modifier.height(6.dp))

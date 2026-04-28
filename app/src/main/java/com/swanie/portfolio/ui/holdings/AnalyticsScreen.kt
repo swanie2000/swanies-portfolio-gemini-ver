@@ -101,10 +101,10 @@ fun AnalyticsScreen(navController: NavController) {
         stringResource(R.string.analytics_page_pie_chart),
         stringResource(R.string.analytics_page_donut_chart),
         stringResource(R.string.analytics_page_bar_chart),
-        stringResource(R.string.analytics_pro_risk_title),
-        stringResource(R.string.analytics_live_attribution_engine_title),
-        stringResource(R.string.analytics_pro_rebalance_title),
-        stringResource(R.string.analytics_pro_scenarios_title),
+        stringResource(R.string.analytics_live_risk_hero_title),
+        stringResource(R.string.analytics_live_attribution_hero_title),
+        stringResource(R.string.analytics_live_rebalance_hero_title),
+        stringResource(R.string.analytics_live_scenarios_hero_title),
     )
     val quickJumpPages = pageTitles.withIndex().filter { it.index != 0 }
     val contentPagerState = rememberPagerState(pageCount = { pageTitles.size })
@@ -148,7 +148,7 @@ fun AnalyticsScreen(navController: NavController) {
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.content_back),
                             tint = safeText
                         )
                     }
@@ -315,7 +315,7 @@ fun AnalyticsScreen(navController: NavController) {
                                                     )
                                                 } else {
                                                     Text(
-                                                        text = "TOTAL PORTFOLIO VALUE",
+                                                        text = stringResource(R.string.asset_total_value_label),
                                                         color = safeText.copy(0.45f),
                                                         fontSize = 10.sp,
                                                         fontWeight = FontWeight.Bold
@@ -334,7 +334,7 @@ fun AnalyticsScreen(navController: NavController) {
                                 }
                             }
                             Text(
-                                text = "HOLDINGS KEY",
+                                text = stringResource(R.string.widget_selected_assets),
                                 color = safeText.copy(0.5f),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.ExtraBold,
@@ -482,7 +482,13 @@ fun InteractiveDonutChart(segments: List<AssetSegment>, selectedId: String?, bas
                 currentStartAngle += sweepAngle
             }
         }
-        Text(text = focusedSegment?.asset?.symbol?.uppercase() ?: "TOTAL", color = baseColor.copy(0.55f), fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(
+            text = focusedSegment?.asset?.symbol?.uppercase() ?: stringResource(R.string.asset_total_value_label),
+            color = baseColor.copy(0.55f),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
     }
 }
 

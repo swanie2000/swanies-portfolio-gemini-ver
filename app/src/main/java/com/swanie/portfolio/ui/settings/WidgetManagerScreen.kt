@@ -1406,7 +1406,7 @@ fun WidgetStudioInlineCompact(
                     ),
                     shape = RoundedCornerShape(8.dp),
                 ) {
-                    Text("CANCEL", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.action_cancel), fontSize = 11.sp, fontWeight = FontWeight.Black)
                 }
             } else {
                 ExposedDropdownMenuBox(
@@ -1475,7 +1475,7 @@ fun WidgetStudioInlineCompact(
                     ),
                     shape = RoundedCornerShape(8.dp),
                 ) {
-                    Text("SAVE", fontSize = 11.sp, fontWeight = FontWeight.Black)
+                    Text(stringResource(R.string.action_save), fontSize = 11.sp, fontWeight = FontWeight.Black)
                 }
             }
         }

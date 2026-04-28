@@ -185,7 +185,7 @@ fun MyHoldingsScreen(
                                     viewModel.refreshAssets()
                                 }
                             },
-                        ) { Icon(Icons.Default.Refresh, "Refresh", tint = textColor) }
+                        ) { Icon(Icons.Default.Refresh, null, tint = textColor) }
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
                         IconButton(
@@ -211,7 +211,7 @@ fun MyHoldingsScreen(
                                 verticalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 Text(
-                                    text = "Welcome to Swanies Portfolio",
+                                            text = stringResource(R.string.app_name),
                                     color = textColor,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
@@ -401,7 +401,7 @@ fun MyHoldingsScreen(
                                                             )
                                                             Spacer(modifier = Modifier.width(4.dp))
                                                             Text(
-                                                                text = "PRO FEATURE",
+                                                                text = stringResource(R.string.pro_gate_title),
                                                                 color = proBannerAccent,
                                                                 fontSize = 9.sp,
                                                                 fontWeight = FontWeight.Black,
@@ -409,7 +409,7 @@ fun MyHoldingsScreen(
                                                             )
                                                         }
                                                         Text(
-                                                            text = "Multi-portfolio swipe is a Pro feature.",
+                                                            text = stringResource(R.string.pro_feature_portfolio_manager),
                                                             color = proBannerText,
                                                             fontSize = 12.sp,
                                                             fontWeight = FontWeight.SemiBold
@@ -429,7 +429,7 @@ fun MyHoldingsScreen(
                                                         border = BorderStroke(1.dp, proBannerAccent.copy(alpha = 0.8f))
                                                     ) {
                                                         Text(
-                                                            text = "UPGRADE NOW",
+                                                            text = stringResource(R.string.settings_upgrade_to_pro_now),
                                                             fontSize = 10.sp,
                                                             fontWeight = FontWeight.Black
                                                         )

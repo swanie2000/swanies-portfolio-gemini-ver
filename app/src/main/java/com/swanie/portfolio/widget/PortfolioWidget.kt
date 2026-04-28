@@ -89,7 +89,7 @@ class PortfolioWidget : GlanceAppWidget() {
             Log.d("SWANIE_WIDGET", "provideGlance id=$appWidgetId vault=$boundId payload=${assetsData.length} lastGood=${lastGoodAssetsData.length}")
 
             if (boundId == 0) {
-                UnlinkedContent(appWidgetId)
+                UnlinkedContent(context = context, appWidgetId = appWidgetId)
             } else {
                 val vaultName = prefs[STATIC_VAULT_NAME_KEY] ?: "PORTFOLIO"
                 val totalValue = prefs[STATIC_TOTAL_BALANCE_KEY] ?: ""
@@ -115,6 +115,7 @@ class PortfolioWidget : GlanceAppWidget() {
                     if (assetsData.isEmpty()) {
                         if (totalValue.isNotBlank()) {
                             ZombieFallbackContent(
+                                context = context,
                                 appWidgetId = appWidgetId,
                                 vaultName = vaultName,
                                 totalValue = totalValue,
@@ -123,10 +124,10 @@ class PortfolioWidget : GlanceAppWidget() {
                                 textColor = bgTextColor
                             )
                         } else {
-                            EmptyWidgetContent(bgColor, bgTextColor, appWidgetId)
+                            EmptyWidgetContent(context = context, bgColor = bgColor, textColor = bgTextColor, appWidgetId = appWidgetId)
                         }
                     } else {
-                        SyncingContent(bgColor, bgTextColor)
+                        SyncingContent(context = context, bgColor = bgColor, textColor = bgTextColor)
                     }
                 } else {
                     WidgetContent(
@@ -199,6 +200,7 @@ class PortfolioWidget : GlanceAppWidget() {
 
 @Composable
 fun ZombieFallbackContent(
+    context: Context,
     appWidgetId: Int,
     vaultName: String,
     totalValue: String,
@@ -226,7 +228,7 @@ fun ZombieFallbackContent(
         )
         Spacer(modifier = GlanceModifier.height(6.dp))
         Text(
-            text = "Restoring cards...",
+            text = context.getString(R.string.widget_loading),
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.7f)), fontSize = 10.sp)
         )
         Text(
@@ -237,7 +239,7 @@ fun ZombieFallbackContent(
 }
 
 @Composable
-fun UnlinkedContent(appWidgetId: Int) {
+fun UnlinkedContent(context: Context, appWidgetId: Int) {
     Column(
         modifier = GlanceModifier.fillMaxSize().background(Color(0xFF000416)).padding(16.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -245,9 +247,9 @@ fun UnlinkedContent(appWidgetId: Int) {
     ) {
         Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = null, modifier = GlanceModifier.size(48.dp))
         Spacer(modifier = GlanceModifier.height(12.dp))
-        Text(text = "Swanie's Portfolio", style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold))
+        Text(text = context.getString(R.string.app_name), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold))
         Spacer(modifier = GlanceModifier.height(4.dp))
-        Text(text = "Tap to setup widget", style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.6f)), fontSize = 12.sp))
+        Text(text = context.getString(R.string.widget_manager_title), style = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.6f)), fontSize = 12.sp))
     }
 }
 
@@ -270,18 +272,18 @@ fun WidgetContent(
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
                 Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
-                    Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = "Home", modifier = GlanceModifier.size(28.dp))
+                    Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = null, modifier = GlanceModifier.size(28.dp))
                 }
             }
             Text(text = vaultName.uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
             Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))), contentAlignment = Alignment.Center) {
-                        Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = "Edit", modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
+                        Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = null, modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
                     }
                     Spacer(modifier = GlanceModifier.width(4.dp))
                     Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<RefreshCallback>()), contentAlignment = Alignment.Center) {
-                        Image(provider = ImageProvider(android.R.drawable.ic_popup_sync), contentDescription = "Refresh", modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.White)))
+                        Image(provider = ImageProvider(android.R.drawable.ic_popup_sync), contentDescription = null, modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.White)))
                     }
                 }
             }
@@ -372,7 +374,7 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                 if (bitmap != null) {
                     Image(
                         provider = ImageProvider(bitmap),
-                        contentDescription = "Trend",
+                        contentDescription = null,
                         modifier = GlanceModifier.fillMaxSize(),
                         contentScale = ContentScale.FillBounds
                     )
@@ -402,7 +404,7 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
 }
 
 @Composable
-fun SyncingContent(bgColor: Color, textColor: Color) {
+fun SyncingContent(context: Context, bgColor: Color, textColor: Color) {
     Column(
         modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -416,14 +418,14 @@ fun SyncingContent(bgColor: Color, textColor: Color) {
         )
         Spacer(modifier = GlanceModifier.height(12.dp))
         Text(
-            text = "Syncing Assets...",
+            text = context.getString(R.string.widget_loading),
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 14.sp, fontWeight = FontWeight.Medium)
         )
     }
 }
 
 @Composable
-fun EmptyWidgetContent(bgColor: Color, textColor: Color, appWidgetId: Int) {
+fun EmptyWidgetContent(context: Context, bgColor: Color, textColor: Color, appWidgetId: Int) {
     Column(
         modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(16.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -437,11 +439,11 @@ fun EmptyWidgetContent(bgColor: Color, textColor: Color, appWidgetId: Int) {
         )
         Spacer(modifier = GlanceModifier.height(12.dp))
         Text(
-            text = "No Assets Selected",
+            text = context.getString(R.string.widget_no_assets_available),
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.8f)), fontSize = 14.sp, fontWeight = FontWeight.Bold)
         )
         Text(
-            text = "Tap Swan or Pencil to setup",
+            text = context.getString(R.string.widget_manager_title),
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 11.sp)
         )
     }
