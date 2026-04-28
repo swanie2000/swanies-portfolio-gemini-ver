@@ -1,4 +1,30 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.62: LINT ZERO LOCK + STABILITY SWEEP)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.63: RELEASE READINESS CHECKLIST + LAUNCH TRACK)
+
+V40.63 PLAN (Play Console + RevenueCat Release Readiness)
+- **Account + console setup**
+  - Confirm Play Developer account is active and app record/package name are finalized.
+  - Complete Play app profile basics (app category, contact email, privacy policy URL, support URL).
+- **Billing + RevenueCat mapping**
+  - Create Google Play subscriptions/base plans (monthly/yearly, optional trial).
+  - Link Play products to RevenueCat offerings/packages and verify entitlement mapping (`pro` unlock path).
+  - Validate purchase/restore/cancel/expiry behavior in sandbox/internal track.
+- **Testing matrix before production**
+  - Run full state passes: Free, Active Pro, Grace Period, Expired Pro, Restored Pro.
+  - Validate gated surfaces: Theme Manager, Multiple Portfolios, Analytics Pro, Widget Manager.
+  - Confirm widget config/edit flow remains stable after entitlement transitions.
+- **Store + compliance gates**
+  - Complete Data safety form accurately.
+  - Complete content rating and target audience.
+  - Verify screenshots, short/full description, feature graphic, app icon, and release notes.
+- **Go-live controls**
+  - Start with Internal -> Closed track rollout.
+  - Watch crash-free sessions, ANR, purchase conversion, restore success, and refund signals for 48-72h.
+  - Promote only after metrics are stable and no entitlement regressions are observed.
+
+NEXT SESSION START (V40.63 EXECUTION ORDER)
+- 1) Play subscriptions/base plans + RC offering/package link validation.
+- 2) Internal track build upload and tester matrix execution.
+- 3) Store listing/compliance completion and final go/no-go review.
 
 V40.62 UPDATE (Warnings Burn-Down + Lint Zero Lock)
 - **`lintDebug` status:** `:app:lintDebug` now reports **0 errors / 0 warnings** (`BUILD SUCCESSFUL`).

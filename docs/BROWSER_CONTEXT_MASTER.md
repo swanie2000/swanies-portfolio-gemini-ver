@@ -173,7 +173,19 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.62: LINT ZERO LOCK + STABILITY SWEEP)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.63: RELEASE READINESS CHECKLIST + LAUNCH TRACK)
+
+V40.63 PLAN (Play Console + RevenueCat Release Readiness)
+- Account setup: Activate Play Developer profile; finalize package/app record; complete contact + policy fields.
+- Billing wiring: Create Play subscription base plans and map them to RevenueCat offerings/packages; verify `pro` entitlement mapping.
+- Validation matrix: Test Free/Active Pro/Grace/Expired/Restored states and verify all gated surfaces + widget behavior.
+- Compliance readiness: Data safety, content rating, audience declarations, listing assets, and release notes.
+- Rollout control: Internal -> Closed track progression with 48-72h monitoring for crashes/ANRs/purchase/restore health before wider rollout.
+
+NEXT SESSION START (EXECUTION ORDER)
+- 1) Play product setup + RevenueCat mapping verification.
+- 2) Internal track upload + tester matrix run.
+- 3) Store/compliance completion + launch readiness decision.
 
 V40.62 UPDATE (Warnings Burn-Down + Lint Zero Lock)
 - `:app:lintDebug` now reports **0 errors / 0 warnings** (`BUILD SUCCESSFUL`).
