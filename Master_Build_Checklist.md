@@ -158,15 +158,14 @@
   - Fixed locale-specific XML escaping issues found during compile validation (French/Turkish apostrophe cases).
   - Validation passed with clean lint and successful debug Kotlin compile after localization pass.
 
-- [x] V40.66 Azbit Search + Custom Crypto Icons (uCrop) - COMPLETED (see WIP)
+- [x] V40.66 Azbit Search + Custom Crypto Icons (uCrop) - COMPLETED
   - Shipped `AzbitSearchProvider` / `AzbitApiService`, registry + DI, windowed OHLC for sparklines, and icon URL merge behavior in `AssetRepository` and related flows.
   - Shipped user custom crypto icons: `IconManager`, `CryptoEditFunnel` (pick + uCrop + save), `FileProvider`, manifest, themes, and Coil cache-bust keys in `MetalIcon`.
   - Holdings: optimistic post-save row merge in `MyHoldingsScreen` to align with async DB updates.
-  - **WIP (not done):** Expanded card may keep stale **custom photo** until collapse; "use default" icon path updates immediately. Tracked for V40.66.1.
 
-- [ ] V40.66.1 Custom icon refresh on expanded card - NEXT
-  - Repro: save new photo → exit editor → icon stuck until card collapsed. Default icon save refreshes as expected.
-  - Likely: expanded `MetalIcon` / `AnimatedVisibility` / Coil same-path cache interaction; add `key` or explicit invalidation on successful save.
+- [x] V40.66.1 / V40.67 Custom icon reload on expanded card + Holdings free upsell banner - COMPLETED
+  - `cryptoIconReloadNonce` after crypto save + `localIconReloadNonce` through asset cards into `MetalIcon` (Coil keys + error reset) so custom photo updates without collapsing the card.
+  - Free-tier Holdings upsell uses `holdings_upsell_*` strings, tightened single-line layout and `9.sp` swipe hint so copy fits next to `PRO UPGRADE` CTA.
 
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.

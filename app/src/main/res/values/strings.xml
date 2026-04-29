@@ -143,6 +143,9 @@
     <string name="pro_feature_analytics">ANALYTICS</string>
     <string name="pro_feature_widget_manager">WIDGET MANAGER</string>
     <string name="pro_feature_upgrade_now">PRO ACCESS</string>
+    <string name="holdings_upsell_badge">MULTI PORTFOLIO</string>
+    <string name="holdings_upsell_message">SWIPE LEFT &amp; RIGHT</string>
+    <string name="holdings_upsell_cta">PRO UPGRADE</string>
     <string name="analytics_premium_title">PREMIUM INSIGHTS PREVIEW</string>
     <string name="analytics_premium_badge">PRO LOCKED</string>
     <string name="analytics_view_details_cta">VIEW DETAILS</string>

@@ -173,17 +173,23 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.66: AZBIT + CUSTOM CRYPTO ICONS)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.67: HOLDINGS PRO BANNER + ICON RELOAD)
+
+V40.67 UPDATE
+- Holdings free-tier upsell: `holdings_upsell_*` strings, swipe/multi-portfolio copy, short CTA; single-line + 9.sp subtitle layout.
+- Custom icon: `cryptoIconReloadNonce` + `localIconReloadNonce` through cards into `MetalIcon` for reload when path unchanged.
+
+FUTURE PATH
+- Localize holdings upsell strings; optional uCrop activity height wrapper.
 
 V40.66 UPDATE (Azbit Search, Live Data, Custom Icons + uCrop)
 - Azbit: `AzbitSearchProvider` + `AzbitApiService`, OHLC windowed for sparklines; registry/DI wiring.
 - Icons: Jupiter/CoinCap/IPFS improvements; `AssetRepository` merges image/icon URLs on refresh.
 - Custom icon: `IconManager`, `CryptoEditFunnel` with uCrop + FileProvider; manifest + dialog theme.
-- Holdings: optimistic merge after crypto save; `MetalIcon` Coil cache keys for local files.
-- WIP: custom photo may not refresh on expanded card until collapse; "use default" path updates immediately. Next: expanded-row vs Coil/keys.
+- Holdings: optimistic merge after crypto save; `MetalIcon` Coil cache keys for local files; V40.67 adds reload nonce for expanded-row same-path refresh.
 
 FUTURE PATH
-- Fix expanded-card custom icon refresh. Optional uCrop height via activity wrapper.
+- Optional uCrop height via activity wrapper.
 
 V40.65 UPDATE (Bottom Nav Gradient Sync + Content Safety)
 - Consolidated to one global gradient source at app root; removed duplicate/padded-local gradient layers that caused sync seams.

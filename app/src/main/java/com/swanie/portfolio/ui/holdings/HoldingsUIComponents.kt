@@ -169,7 +169,9 @@ fun MetalIcon(
     size: Int = 44,
     imageUrl: String = "",
     localPath: String? = null,
-    category: AssetCategory = AssetCategory.METAL
+    category: AssetCategory = AssetCategory.METAL,
+    /** Incremented by parent after custom icon save so the row reloads even when [localPath] string is unchanged. */
+    localIconReloadNonce: Int = 0,
 ) {
     val context = LocalContext.current
     var isError by remember { mutableStateOf(false) }
@@ -177,11 +179,14 @@ fun MetalIcon(
 
     if (localFile != null && localFile.exists() && !isError) {
         val diskKey = "${localFile.lastModified()}_${localFile.length()}"
-        val imageModel = remember(localPath, diskKey) {
+        LaunchedEffect(localPath, diskKey, localIconReloadNonce) {
+            isError = false
+        }
+        val imageModel = remember(localPath, diskKey, localIconReloadNonce) {
             ImageRequest.Builder(context)
                 .data(localFile)
-                .memoryCacheKey("${localFile.absolutePath}#$diskKey")
-                .diskCacheKey("${localFile.absolutePath}#$diskKey")
+                .memoryCacheKey("${localFile.absolutePath}#$diskKey#$localIconReloadNonce")
+                .diskCacheKey("${localFile.absolutePath}#$diskKey#$localIconReloadNonce")
                 .build()
         }
         AsyncImage(
@@ -807,7 +812,8 @@ fun FullAssetCard(
     onEditRequest: () -> Unit,
     onSave: (newName: String, newAmount: Double, newWeight: Double, weightUnit: String, decimals: Int) -> Unit,
     onCancel: () -> Unit = {},
-    isHighVisibilityMode: Boolean = false
+    isHighVisibilityMode: Boolean = false,
+    localIconReloadNonce: Int = 0,
 ) {
     val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00C853) else Color(0xFFD32F2F)
     val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "grabScale")
@@ -867,7 +873,8 @@ fun FullAssetCard(
                             imageUrl = asset.imageUrl,
                             localPath = asset.localIconPath,
                             category = asset.category,
-                            size = 44 // Master Icon Scale
+                            size = 44, // Master Icon Scale
+                            localIconReloadNonce = localIconReloadNonce,
                         )
                         Spacer(Modifier.height(iconSymbolGap))
                         Text(
@@ -1069,7 +1076,8 @@ fun PolishedAssetCard(
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit = {},
     isExpanded: Boolean = false,
-    showEditButton: Boolean = false
+    showEditButton: Boolean = false,
+    localIconReloadNonce: Int = 0,
 ) {
     CompactAssetCard(
         asset = asset,
@@ -1084,6 +1092,7 @@ fun PolishedAssetCard(
         showEditButton = showEditButton,
         isHighVisibilityMode = false,
         variant = CompactCardVariant.Polished,
+        localIconReloadNonce = localIconReloadNonce,
     )
 }
 
@@ -1098,7 +1107,8 @@ fun HighDensityAssetCard(
     onExpandToggle: () -> Unit,
     onEditRequest: () -> Unit = {},
     isExpanded: Boolean = false,
-    showEditButton: Boolean = false
+    showEditButton: Boolean = false,
+    localIconReloadNonce: Int = 0,
 ) {
     CompactAssetCard(
         asset = asset,
@@ -1113,6 +1123,7 @@ fun HighDensityAssetCard(
         showEditButton = showEditButton,
         isHighVisibilityMode = true,
         variant = CompactCardVariant.HighDensity,
+        localIconReloadNonce = localIconReloadNonce,
     )
 }
 
@@ -1136,6 +1147,7 @@ fun CompactAssetCard(
     /** Dense dashboard typography vs airy boutique row. */
     isHighVisibilityMode: Boolean = false,
     variant: CompactCardVariant? = null,
+    localIconReloadNonce: Int = 0,
 ) {
     val scale by animateFloatAsState(if (isDragging) 1.03f else 1f, label = "compactGrabScale")
     val elevation by animateDpAsState(if (isDragging) 8.dp else 0.dp, label = "compactGrabElevation")
@@ -1242,7 +1254,8 @@ fun CompactAssetCard(
                                         size = 30,
                                         imageUrl = asset.imageUrl,
                                         localPath = asset.localIconPath,
-                                        category = asset.category
+                                        category = asset.category,
+                                        localIconReloadNonce = localIconReloadNonce,
                                     )
                                 }
                                 Spacer(modifier = Modifier.width(iconTextGapW))
@@ -1398,7 +1411,8 @@ fun CompactAssetCard(
                                     size = 44, // Master Icon Scale Parity
                                     imageUrl = asset.imageUrl,
                                     localPath = asset.localIconPath,
-                                    category = asset.category
+                                    category = asset.category,
+                                    localIconReloadNonce = localIconReloadNonce,
                                 )
                                 Spacer(Modifier.height(expandedIconSymbolGap))
                                 Text(

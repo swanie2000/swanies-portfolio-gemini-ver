@@ -536,9 +536,23 @@ Release recorded: V40.66 "Azbit + Custom Crypto Icons".
 - **Icons in search and list:** Asset icon resolution improved for exchange-backed assets (Jupiter, batch search, CoinCap fallback, IPFS via `cf-ipfs.com` where needed). `AssetRepository` and live fetches now merge `imageUrl` and `iconUrl` so UI can show icons when URLs were previously dropped.
 - **User-chosen crypto icons:** `IconManager` stores files under `files/custom_icons/`. Crypto edit funnel supports gallery pick, **uCrop** crop step, and save; `FileProvider` and `file_paths.xml` for cache and custom icons; manifest registers `UCropActivity` and theme; Gradle uses JitPack for uCrop 2.2.8.
 - **UX:** uCrop uses a dialog-style `UCrop.Theme` (AppCompat, floating window, opaque surfaces, min width fraction where supported). `MetalIcon` uses Coil `ImageRequest` with cache-busting keys for on-disk files. `MyHoldingsScreen` applies an optimistic held asset row after crypto save to reduce stale list rows behind async `updateAssetEntity`.
-- **Known issue (WIP):** After saving a **new custom photo** and leaving the editor, the icon on an **expanded** card may not update until the user **collapses** the card. **Restore default icon** and save **does** refresh immediately—suggests remaining work is on the expanded-row / same-file / Coil path, not the optimistic entity merge alone.
+- **Follow-up (V40.67):** Expanded-card stale custom icon when `AssetEntity` was unchanged is fixed via `cryptoIconReloadNonce` / `localIconReloadNonce` (see V40.67 below).
 
 ### Next Phase (Projected Path)
 
-- V40.66.1: Fix custom photo refresh on the expanded holdings card (investigate `CompactAssetCard` / `AnimatedVisibility` icon slot, Coil identity, and/or explicit `key` or loader invalidate after save).
 - Optional: uCrop max height on very tall phones via thin `UCropActivity` subclass if theme attrs are insufficient.
+
+---
+
+## V40.67 - Holdings Pro Banner + Custom Icon Reload
+
+Release recorded: V40.67 "Holdings Pro Banner + Custom Icon Reload".
+
+- **Expanded custom icon refresh:** When the saved `AssetEntity` matched the previous row (same `localIconPath` after overwriting the file), Compose skipped recomposing `MetalIcon`. Added `cryptoIconReloadNonce` on successful crypto edit save in `MyHoldingsScreen`, threaded through `FullAssetCard` / `CompactAssetCard` / `PolishedAssetCard` / `HighDensityAssetCard` into `MetalIcon` as `localIconReloadNonce`, and folded it into Coil cache keys plus `LaunchedEffect` to clear `isError` on bump.
+- **Free-tier Holdings upsell card:** Dedicated strings `holdings_upsell_badge`, `holdings_upsell_message`, `holdings_upsell_cta` so copy does not reuse global Settings CTAs. Banner emphasizes multi-portfolio swipe; CTA shortened to `PRO UPGRADE`. Layout: single-line badge and subtitle (`maxLines = 1`, `fillMaxWidth`, `9.sp` swipe line) so text does not wrap under the lock row or clip beside the button.
+- **Code hygiene:** Short comment above the upsell `LazyColumn` item documents string ownership and the reload nonce.
+
+### Next Phase (Projected Path)
+
+- Optional: localize `holdings_upsell_*` in non-English bundles when you want parity on that banner.
+- Continue Play / monetization readiness tracks from prior milestones.

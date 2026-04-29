@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -98,6 +99,8 @@ fun MyHoldingsScreen(
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
     /** Until Room Flow catches up after crypto edit save; avoids stale list + Coil same-path cache. */
     var optimisticCryptoEdit by remember { mutableStateOf<AssetEntity?>(null) }
+    /** Bumps on crypto icon save so expanded rows reload when [AssetEntity] is unchanged (same file path, new bytes). */
+    var cryptoIconReloadNonce by remember { mutableIntStateOf(0) }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var editingAssetId by remember { mutableStateOf<String?>(null) }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
@@ -392,6 +395,9 @@ fun MyHoldingsScreen(
                                         contentPadding = PaddingValues(16.dp),
                                         verticalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
+                                        // Free-tier upsell: copy lives in holdings_* strings (not shared Settings keys).
+                                        // Keep badge + subtitle single-line with tight sp so the CTA fits; bump
+                                        // cryptoIconReloadNonce on crypto save so MetalIcon reloads (see HoldingsUIComponents).
                                         if (!isProUser) {
                                             item(key = "pro_upsell_banner") {
                                                 val proBannerBg = ProPalette.Background
@@ -409,6 +415,7 @@ fun MyHoldingsScreen(
                                                 ) {
                                                     Column(modifier = Modifier.weight(1f)) {
                                                         Row(
+                                                            modifier = Modifier.fillMaxWidth(),
                                                             verticalAlignment = Alignment.CenterVertically
                                                         ) {
                                                             Icon(
@@ -419,18 +426,26 @@ fun MyHoldingsScreen(
                                                             )
                                                             Spacer(modifier = Modifier.width(4.dp))
                                                             Text(
-                                                                text = stringResource(R.string.pro_gate_title),
+                                                                text = stringResource(R.string.holdings_upsell_badge),
                                                                 color = proBannerAccent,
                                                                 fontSize = 9.sp,
                                                                 fontWeight = FontWeight.Black,
-                                                                letterSpacing = 0.8.sp
+                                                                letterSpacing = 0.8.sp,
+                                                                maxLines = 1,
+                                                                softWrap = false,
+                                                                overflow = TextOverflow.Ellipsis,
+                                                                modifier = Modifier.weight(1f, fill = false),
                                                             )
                                                         }
                                                         Text(
-                                                            text = stringResource(R.string.pro_feature_portfolio_manager),
+                                                            text = stringResource(R.string.holdings_upsell_message),
                                                             color = proBannerText,
-                                                            fontSize = 12.sp,
-                                                            fontWeight = FontWeight.SemiBold
+                                                            fontSize = 9.sp,
+                                                            fontWeight = FontWeight.SemiBold,
+                                                            maxLines = 1,
+                                                            softWrap = false,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier.fillMaxWidth(),
                                                         )
                                                     }
                                                     Spacer(modifier = Modifier.width(8.dp))
@@ -447,7 +462,7 @@ fun MyHoldingsScreen(
                                                         border = BorderStroke(1.dp, proBannerAccent.copy(alpha = 0.8f))
                                                     ) {
                                                         Text(
-                                                            text = stringResource(R.string.settings_upgrade_to_pro_now),
+                                                            text = stringResource(R.string.holdings_upsell_cta),
                                                             fontSize = 10.sp,
                                                             fontWeight = FontWeight.Black
                                                         )
@@ -493,6 +508,7 @@ fun MyHoldingsScreen(
                                                         },
                                                         onEditRequest = { assetBeingEdited = asset },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                        localIconReloadNonce = cryptoIconReloadNonce,
                                                         )
                                                     } else {
                                                         PolishedAssetCard(
@@ -504,6 +520,7 @@ fun MyHoldingsScreen(
                                                         },
                                                         onEditRequest = { assetBeingEdited = asset },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
+                                                        localIconReloadNonce = cryptoIconReloadNonce,
                                                         )
                                                     }
                                                 } else {
@@ -518,6 +535,7 @@ fun MyHoldingsScreen(
                                                     },
                                                     showEditButton = showEdit,
                                                     isHighVisibilityMode = isHighVisibilityMode,
+                                                    localIconReloadNonce = cryptoIconReloadNonce,
                                                     modifier = hndl
                                                     )
                                                 }
@@ -571,6 +589,7 @@ fun MyHoldingsScreen(
                             localIconPath = save.localIconPath
                         )
                         optimisticCryptoEdit = updated
+                        cryptoIconReloadNonce++
                         viewModel.updateAssetEntity(updated)
                         assetBeingEdited = null
                         editingAssetId = null
