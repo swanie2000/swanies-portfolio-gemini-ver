@@ -810,7 +810,7 @@ app/src/main/res/values-de
 app/src/main/res/values-es
 app/src/main/res/values-fr
 app/src/main/res/values-hi
-app/src/main/res/values-id
+app/src/main/res/values-in
 app/src/main/res/values-it
 app/src/main/res/values-ja
 app/src/main/res/values-ko
@@ -857,7 +857,7 @@ app/src/main/res/values-de/strings.xml
 app/src/main/res/values-es/strings.xml
 app/src/main/res/values-fr/strings.xml
 app/src/main/res/values-hi/strings.xml
-app/src/main/res/values-id/strings.xml
+app/src/main/res/values-in/strings.xml
 app/src/main/res/values-it/strings.xml
 app/src/main/res/values-ja/strings.xml
 app/src/main/res/values-ko/strings.xml

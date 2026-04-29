@@ -211,7 +211,6 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                             languageMenuExpanded = false
                             scope.launch {
                                 settingsViewModel.saveLanguageCodeNow(option)
-                                activity.recreate()
                             }
                         },
                         trailingIcon = {

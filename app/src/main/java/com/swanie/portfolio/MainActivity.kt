@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -29,11 +31,10 @@ import com.swanie.portfolio.widget.PortfolioWidget
 import dagger.hilt.android.AndroidEntryPoint
 import android.os.SystemClock
 import java.io.File
-import java.util.Locale
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
@@ -159,17 +160,12 @@ class MainActivity : FragmentActivity() {
         lastBackgroundedAtMs = null
     }
 
-    @Suppress("DEPRECATION")
     private fun applySelectedLocale(languageCode: String) {
-        val targetLocale = if (languageCode == "system") {
-            resources.configuration.locales[0]
+        val locales = if (languageCode == "system") {
+            LocaleListCompat.getEmptyLocaleList()
         } else {
-            Locale.forLanguageTag(languageCode)
+            LocaleListCompat.forLanguageTags(languageCode)
         }
-        Locale.setDefault(targetLocale)
-        val config = android.content.res.Configuration(resources.configuration)
-        config.setLocale(targetLocale)
-        resources.updateConfiguration(config, resources.displayMetrics)
-        applicationContext.resources.updateConfiguration(config, applicationContext.resources.displayMetrics)
+        AppCompatDelegate.setApplicationLocales(locales)
     }
 }

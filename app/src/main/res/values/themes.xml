@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.SwaniesPortfolio" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.SwaniesPortfolio" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">#000416</item>
+        <item name="android:navigationBarColor">#000416</item>
+        <item name="android:windowBackground">#000416</item>
     </style>
 
     <!-- uCrop: AppCompat dialog so it is not edge-to-edge full screen; opaque surfaces so controls read clearly. -->

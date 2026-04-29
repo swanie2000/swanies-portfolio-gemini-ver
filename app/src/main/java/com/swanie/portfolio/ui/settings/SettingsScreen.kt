@@ -543,7 +543,6 @@ fun SettingsScreen(
                                         languageExpanded = false
                                         scope.launch {
                                             settingsViewModel.saveLanguageCodeNow(option)
-                                            (context as? FragmentActivity)?.recreate()
                                         }
                                     }
                                 )

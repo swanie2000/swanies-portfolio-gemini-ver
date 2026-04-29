@@ -308,7 +308,7 @@ Release recorded: V40.46 "Top-20 Language Expansion + Translation Feedback Intak
 Release recorded: V40.47 "Localization Phase 2 (Top-20 Key Parity)".
 
 - Added new locale bundles for Top-20 rollout:
-  - `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-id`, `values-it`, `values-ja`, `values-nl`, `values-pl`, `values-pt-rBR`, `values-ru`, `values-th`, `values-tr`, `values-uk`, `values-vi`, `values-zh-rCN`, `values-zh-rTW`.
+  - `values-ar`, `values-de`, `values-fr`, `values-hi`, `values-in` (Bahasa Indonesia), `values-it`, `values-ja`, `values-nl`, `values-pl`, `values-pt-rBR`, `values-ru`, `values-th`, `values-tr`, `values-uk`, `values-vi`, `values-zh-rCN`, `values-zh-rTW`.
 - Completed full key parity pass:
   - Backfilled each new locale file to include every key from `values/strings.xml`.
   - Preserved translated high-visibility strings from Phase 1 and safely inherited remaining keys for stability.
@@ -563,7 +563,7 @@ Release recorded: V40.67 "Holdings Pro Banner + Custom Icon Reload".
 
 Release recorded: V40.68 "Paywall banner i18n (Holdings upsell)".
 
-- **Holdings free-tier upsell:** `holdings_upsell_badge`, `holdings_upsell_message`, and `holdings_upsell_cta` were previously defined only in `values/strings.xml`, so non-English users saw English fallback. Added translated entries for all shipped locale bundles (`ar`, `de`, `es`, `fr`, `hi`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt-rBR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-rCN`, `zh-rTW`).
+- **Holdings free-tier upsell:** `holdings_upsell_badge`, `holdings_upsell_message`, and `holdings_upsell_cta` were previously defined only in `values/strings.xml`, so non-English users saw English fallback. Added translated entries for all shipped locale bundles (`ar`, `de`, `es`, `fr`, `hi`, `in`, `it`, `ja`, `ko`, `nl`, `pl`, `pt-rBR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-rCN`, `zh-rTW`).
 - **Other upsell surfaces:** Analytics premium teasers, `ProFeatureGateScreen`, widget Pro stop screen, and in-widget banner already use shared `pro_gate_*`, `analytics_*`, and `widget_*` keys that were localized in earlier parity passes; this drop closes the last obvious English-only paywall strip on Holdings.
 
 ### Next Phase (Projected Path)
@@ -583,3 +583,19 @@ Release recorded: V40.68.1 "Full locale string parity sweep".
 ### Next Phase (Projected Path)
 
 - Keep parity script in CI or pre-release checklist when adding new `values/strings.xml` keys.
+
+---
+
+## V40.68.2 - Indonesian resources + locale plumbing
+
+Release recorded: V40.68.2 "Indonesian resources + locale plumbing".
+
+- **Indonesian (`id` in-app):** Alternate resources lived under `values-id/`, but Android resolves Bahasa Indonesia using the ISO 639-1 legacy code **`in`**, so the framework never matched those strings and fell back to English. Renamed the bundle to **`values-in/`** (same `strings.xml`); the language picker still saves `id`; `AppCompatDelegate.setApplicationLocales("id")` continues to apply the correct locale.
+- **Locale / layout stability:** `MainActivity` now extends `AppCompatActivity`, uses `AppCompatDelegate.setApplicationLocales` instead of deprecated `Resources.updateConfiguration`, theme parent is `Theme.AppCompat.Light.NoActionBar`, and redundant `recreate()` after language save was removed from Settings and Home so layout direction stays in sync (fixes intermittent LTR/RTL mirroring).
+- **Analytics Pro paywall copy:** Translated the full `analytics_pro_*` block across all shipped locale `strings.xml` files (previously English placeholders despite key parity).
+- **Docs:** `docs/BROWSER_CONTEXT_MASTER.md` and `Narrative_Log.md` updated so inventory lists `values-in` instead of `values-id`.
+- **Verification:** `:app:mergeDebugResources` and `:app:compileDebugKotlin` succeed.
+
+### Next Phase (Projected Path)
+
+- When adding locales, confirm resource folder qualifiers match Android’s expected language codes (e.g. Indonesian → `values-in`, not `values-id`).
