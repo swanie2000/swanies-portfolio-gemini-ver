@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANÁLISES</string>
     <string name="pro_feature_widget_manager">GERENCIADOR DE WIDGETS</string>
     <string name="pro_feature_upgrade_now">ACESSO PRO</string>
+    <string name="holdings_upsell_badge">MÚLTIPLOS PORTFÓLIOS</string>
+    <string name="holdings_upsell_message">DESLIZE ESQUERDA E DIREITA</string>
+    <string name="holdings_upsell_cta">UPGRADE PRO</string>
     <string name="analytics_premium_title">PRÉVIA DE INSIGHTS PREMIUM</string>
     <string name="analytics_premium_badge">PRO BLOQUEADO</string>
     <string name="analytics_view_details_cta">VER DETALHES</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">TUDO</string>
     <string name="holdings_tab_crypto">CRIPTO</string>
     <string name="holdings_tab_metal">METAL</string>
+    <string name="asset_custom_icon_section">ÍCONE</string>
+    <string name="asset_custom_icon_hint">Escolha uma foto, recorte em quadrado e salve. Use quando a corretora não tiver arte.</string>
+    <string name="asset_custom_icon_choose">ESCOLHER FOTO</string>
+    <string name="asset_custom_icon_recrop">AJUSTAR RECORTE</string>
+    <string name="asset_custom_icon_remove">USAR ÍCONE PADRÃO</string>
     <string name="analytics_hub_title">CENTRAL DE ANÁLISES</string>
     <string name="analytics_quick_jump_title">ACESSO RÁPIDO</string>
     <string name="analytics_swipe_instruction_short">Deslize para a esquerda ou direita para navegar.</string>

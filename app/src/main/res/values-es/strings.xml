@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALÍTICAS</string>
     <string name="pro_feature_widget_manager">GESTOR DE WIDGETS</string>
     <string name="pro_feature_upgrade_now">ACCESO PRO</string>
+    <string name="holdings_upsell_badge">MÚLTIPLES CARTERAS</string>
+    <string name="holdings_upsell_message">DESLIZA IZQUIERDA Y DERECHA</string>
+    <string name="holdings_upsell_cta">MEJORAR A PRO</string>
     <string name="analytics_premium_title">VISTA PREVIA DE INSIGHTS PREMIUM</string>
     <string name="analytics_premium_badge">PRO BLOQUEADO</string>
     <string name="analytics_view_details_cta">VER DETALLES</string>
@@ -298,6 +301,11 @@
     <string name="holdings_tab_all">TODO</string>
     <string name="holdings_tab_crypto">CRIPTO</string>
     <string name="holdings_tab_metal">METALES</string>
+    <string name="asset_custom_icon_section">ICONO</string>
+    <string name="asset_custom_icon_hint">Elige una foto, recorta a un cuadrado y guarda. Úsalo cuando el exchange no tenga imagen.</string>
+    <string name="asset_custom_icon_choose">ELEGIR FOTO</string>
+    <string name="asset_custom_icon_recrop">AJUSTAR RECORTE</string>
+    <string name="asset_custom_icon_remove">USAR ICONO POR DEFECTO</string>
     <string name="analytics_hub_title">CENTRO DE ANALÍTICAS</string>
     <string name="analytics_quick_jump_title">ACCESO RÁPIDO</string>
     <string name="analytics_swipe_instruction_short">Desliza a la izquierda o a la derecha para moverte.</string>

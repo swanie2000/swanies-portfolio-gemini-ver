@@ -556,3 +556,30 @@ Release recorded: V40.67 "Holdings Pro Banner + Custom Icon Reload".
 
 - Optional: localize `holdings_upsell_*` in non-English bundles when you want parity on that banner.
 - Continue Play / monetization readiness tracks from prior milestones.
+
+---
+
+## V40.68 - Paywall banner i18n (Holdings upsell)
+
+Release recorded: V40.68 "Paywall banner i18n (Holdings upsell)".
+
+- **Holdings free-tier upsell:** `holdings_upsell_badge`, `holdings_upsell_message`, and `holdings_upsell_cta` were previously defined only in `values/strings.xml`, so non-English users saw English fallback. Added translated entries for all shipped locale bundles (`ar`, `de`, `es`, `fr`, `hi`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt-rBR`, `ru`, `th`, `tr`, `uk`, `vi`, `zh-rCN`, `zh-rTW`).
+- **Other upsell surfaces:** Analytics premium teasers, `ProFeatureGateScreen`, widget Pro stop screen, and in-widget banner already use shared `pro_gate_*`, `analytics_*`, and `widget_*` keys that were localized in earlier parity passes; this drop closes the last obvious English-only paywall strip on Holdings.
+
+### Next Phase (Projected Path)
+
+- Audit any remaining hardcoded English in monetization-only debug copy if you want 100% locale coverage on test screens.
+
+---
+
+## V40.68.1 - Full locale string parity sweep
+
+Release recorded: V40.68.1 "Full locale string parity sweep".
+
+- **Automated parity check:** Compared every translatable `<string name="…">` in `values/strings.xml` against each `values-*/strings.xml` (PowerShell key diff; `scripts/check_string_parity.py` added for the same check when Python is available).
+- **Gap closed:** The only missing keys across all 19 non-default locales were five crypto custom-icon strings (`asset_custom_icon_*`). Added professionally translated entries per locale (Korean block inserted after `holdings_tab_metal` before `terms_section_3_body` where file order differs).
+- **Verification:** Parity script reports **PARITY OK**; `:app:lintDebug` completes with exit code 0; `mergeDebugResources` + `compileDebugKotlin` succeed.
+
+### Next Phase (Projected Path)
+
+- Keep parity script in CI or pre-release checklist when adding new `values/strings.xml` keys.

@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALYSE</string>
     <string name="pro_feature_widget_manager">WIDGETBEHEER</string>
     <string name="pro_feature_upgrade_now">PRO-TOEGANG</string>
+    <string name="holdings_upsell_badge">MEERDERE PORTEFEUILLES</string>
+    <string name="holdings_upsell_message">LINKS EN RECHTS VEGEN</string>
+    <string name="holdings_upsell_cta">PRO-UPGRADE</string>
     <string name="analytics_premium_title">PREMIUM INZICHTEN VOORBEELD</string>
     <string name="analytics_premium_badge">PRO VERGRENDELD</string>
     <string name="analytics_view_details_cta">DETAILS BEKIJKEN</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">METAAL</string>
+    <string name="asset_custom_icon_section">PICTOGRAM</string>
+    <string name="asset_custom_icon_hint">Kies een foto, snijd vierkant bij en sla op. Gebruik dit als de beurs geen afbeelding heeft.</string>
+    <string name="asset_custom_icon_choose">FOTO KIEZEN</string>
+    <string name="asset_custom_icon_recrop">BIJSNIJDEN AANPASSEN</string>
+    <string name="asset_custom_icon_remove">STANDAARDPICTOGRAM</string>
     <string name="analytics_hub_title">ANALYSEHUB</string>
     <string name="analytics_quick_jump_title">SNELSPRONG</string>
     <string name="analytics_swipe_instruction_short">Veeg naar links of rechts om te bewegen.</string>

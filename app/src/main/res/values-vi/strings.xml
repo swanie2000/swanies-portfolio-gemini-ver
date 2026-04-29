@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">PHÂN TÍCH</string>
     <string name="pro_feature_widget_manager">QUẢN LÝ WIDGET</string>
     <string name="pro_feature_upgrade_now">TRUY CẬP PRO</string>
+    <string name="holdings_upsell_badge">NHIỀU DANH MỤC ĐẦU TƯ</string>
+    <string name="holdings_upsell_message">VUỐT TRÁI &amp; PHẢI</string>
+    <string name="holdings_upsell_cta">NÂNG CẤP PRO</string>
     <string name="analytics_premium_title">XEM TRƯỚC INSIGHT PREMIUM</string>
     <string name="analytics_premium_badge">PRO ĐANG KHÓA</string>
     <string name="analytics_view_details_cta">XEM CHI TIẾT</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">TẤT CẢ</string>
     <string name="holdings_tab_crypto">TIỀN ĐIỆN TỬ</string>
     <string name="holdings_tab_metal">KIM LOẠI</string>
+    <string name="asset_custom_icon_section">BIỂU TƯỢNG</string>
+    <string name="asset_custom_icon_hint">Chọn ảnh, cắt vuông rồi lưu. Dùng khi sàn không có hình minh họa.</string>
+    <string name="asset_custom_icon_choose">CHỌN ẢNH</string>
+    <string name="asset_custom_icon_recrop">CHỈNH CẮT</string>
+    <string name="asset_custom_icon_remove">DÙNG BIỂU TƯỢNG MẶC ĐỊNH</string>
     <string name="analytics_hub_title">TRUNG TÂM PHÂN TÍCH</string>
     <string name="analytics_quick_jump_title">TRUY CẬP NHANH</string>
     <string name="analytics_swipe_instruction_short">Vuốt sang trái hoặc phải để di chuyển.</string>

@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALITIK</string>
     <string name="pro_feature_widget_manager">MANAJER WIDGET</string>
     <string name="pro_feature_upgrade_now">AKSES PRO</string>
+    <string name="holdings_upsell_badge">BEBERAPA PORTOFOLIO</string>
+    <string name="holdings_upsell_message">GESER KIRI &amp; KANAN</string>
+    <string name="holdings_upsell_cta">UPGRADE PRO</string>
     <string name="analytics_premium_title">PRATINJAU WAWASAN PREMIUM</string>
     <string name="analytics_premium_badge">PRO TERKUNCI</string>
     <string name="analytics_view_details_cta">LIHAT DETAIL</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">SEMUA</string>
     <string name="holdings_tab_crypto">KRIPTO</string>
     <string name="holdings_tab_metal">LOGAM</string>
+    <string name="asset_custom_icon_section">IKON</string>
+    <string name="asset_custom_icon_hint">Pilih foto, pangkas persegi, lalu simpan. Gunakan jika bursa tidak menyediakan gambar.</string>
+    <string name="asset_custom_icon_choose">PILIH FOTO</string>
+    <string name="asset_custom_icon_recrop">SESUAIKAN PANGKASAN</string>
+    <string name="asset_custom_icon_remove">GUNAKAN IKON DEFAULT</string>
     <string name="analytics_hub_title">PUSAT ANALITIK</string>
     <string name="analytics_quick_jump_title">LOMPAT CEPAT</string>
     <string name="analytics_swipe_instruction_short">Geser ke kiri atau kanan untuk berpindah.</string>

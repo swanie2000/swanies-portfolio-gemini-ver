@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALYTIK</string>
     <string name="pro_feature_widget_manager">WIDGET-MANAGER</string>
     <string name="pro_feature_upgrade_now">PRO-ZUGANG</string>
+    <string name="holdings_upsell_badge">MEHRERE PORTFOLIOS</string>
+    <string name="holdings_upsell_message">LINKS &amp; RECHTS WISCHEN</string>
+    <string name="holdings_upsell_cta">PRO-UPGRADE</string>
     <string name="analytics_premium_title">PREMIUM-EINBLICKE VORSCHAU</string>
     <string name="analytics_premium_badge">PRO GESPERRT</string>
     <string name="analytics_view_details_cta">DETAILS ANZEIGEN</string>
@@ -300,6 +303,11 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALL</string>
+    <string name="asset_custom_icon_section">SYMBOL</string>
+    <string name="asset_custom_icon_hint">Foto wählen, quadratisch zuschneiden und speichern. Nutzen, wenn die Börse kein Artwork bereitstellt.</string>
+    <string name="asset_custom_icon_choose">FOTO WÄHLEN</string>
+    <string name="asset_custom_icon_recrop">ZUSCHNITT ANPASSEN</string>
+    <string name="asset_custom_icon_remove">STANDARD-SYMBOL</string>
     <string name="analytics_hub_title">ANALYTICS-HUB</string>
     <string name="analytics_quick_jump_title">SCHNELLSPRUNG</string>
     <string name="analytics_swipe_instruction_short">Wische nach links oder rechts, um zu wechseln.</string>

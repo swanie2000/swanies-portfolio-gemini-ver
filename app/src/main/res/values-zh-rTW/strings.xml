@@ -144,6 +144,9 @@
     <string name="pro_feature_analytics">分析</string>
     <string name="pro_feature_widget_manager">小工具管理員</string>
     <string name="pro_feature_upgrade_now">PRO 存取權</string>
+    <string name="holdings_upsell_badge">多個投資組合</string>
+    <string name="holdings_upsell_message">左右滑動</string>
+    <string name="holdings_upsell_cta">升級 Pro</string>
     <string name="analytics_premium_title">進階洞察預覽</string>
     <string name="analytics_premium_badge">PRO 已鎖定</string>
     <string name="analytics_view_details_cta">查看詳情</string>
@@ -280,6 +283,11 @@
     <string name="holdings_tab_all">全部</string>
     <string name="holdings_tab_crypto">加密</string>
     <string name="holdings_tab_metal">金屬</string>
+    <string name="asset_custom_icon_section">圖示</string>
+    <string name="asset_custom_icon_hint">選擇照片，裁切成正方形後儲存。交易所沒有圖示時使用。</string>
+    <string name="asset_custom_icon_choose">選擇照片</string>
+    <string name="asset_custom_icon_recrop">調整裁剪</string>
+    <string name="asset_custom_icon_remove">使用預設圖示</string>
     <string name="analytics_hub_title">分析中心</string>
     <string name="analytics_quick_jump_title">快速跳轉</string>
     <string name="analytics_swipe_instruction_short">向左或向右滑動即可切換。</string>

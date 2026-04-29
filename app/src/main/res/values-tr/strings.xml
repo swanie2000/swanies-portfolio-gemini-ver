@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALİTİK</string>
     <string name="pro_feature_widget_manager">WIDGET YÖNETİCİSİ</string>
     <string name="pro_feature_upgrade_now">PRO ERİŞİMİ</string>
+    <string name="holdings_upsell_badge">ÇOKLU PORTFÖY</string>
+    <string name="holdings_upsell_message">SAĞA VE SOLA KAYDIR</string>
+    <string name="holdings_upsell_cta">PRO YÜKSELT</string>
     <string name="analytics_premium_title">PREMIUM İÇGÖRÜ ÖNİZLEMESİ</string>
     <string name="analytics_premium_badge">PRO KİLİTLİ</string>
     <string name="analytics_view_details_cta">DETAYLARI GÖR</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">TÜMÜ</string>
     <string name="holdings_tab_crypto">KRİPTO</string>
     <string name="holdings_tab_metal">METAL</string>
+    <string name="asset_custom_icon_section">İKON</string>
+    <string name="asset_custom_icon_hint">Fotoğraf seçin, kareye kırpın ve kaydedin. Borsanın görseli yokken kullanın.</string>
+    <string name="asset_custom_icon_choose">FOTOĞRAF SEÇ</string>
+    <string name="asset_custom_icon_recrop">KIRPMAYI AYARLA</string>
+    <string name="asset_custom_icon_remove">VARSAYILAN İKON</string>
     <string name="analytics_hub_title">ANALİTİK MERKEZİ</string>
     <string name="analytics_quick_jump_title">HIZLI GEÇİŞ</string>
     <string name="analytics_swipe_instruction_short">Geçiş yapmak için sola veya sağa kaydırın.</string>

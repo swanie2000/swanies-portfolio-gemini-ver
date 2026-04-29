@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALYTICS</string>
     <string name="pro_feature_widget_manager">GESTORE WIDGET</string>
     <string name="pro_feature_upgrade_now">ACCESSO PRO</string>
+    <string name="holdings_upsell_badge">PORTAFOGLI MULTIPLI</string>
+    <string name="holdings_upsell_message">SCORRI A SINISTRA E A DESTRA</string>
+    <string name="holdings_upsell_cta">UPGRADE PRO</string>
     <string name="analytics_premium_title">ANTEPRIMA INSIGHT PREMIUM</string>
     <string name="analytics_premium_badge">PRO BLOCCATO</string>
     <string name="analytics_view_details_cta">VEDI DETTAGLI</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">TUTTO</string>
     <string name="holdings_tab_crypto">CRIPTO</string>
     <string name="holdings_tab_metal">METALLO</string>
+    <string name="asset_custom_icon_section">ICONA</string>
+    <string name="asset_custom_icon_hint">Scegli una foto, ritaglia a quadrato e salva. Usa quando l’exchange non ha artwork.</string>
+    <string name="asset_custom_icon_choose">SCEGLI FOTO</string>
+    <string name="asset_custom_icon_recrop">MODIFICA RITAGLIO</string>
+    <string name="asset_custom_icon_remove">ICONA PREDEFINITA</string>
     <string name="analytics_hub_title">HUB ANALYTICS</string>
     <string name="analytics_quick_jump_title">SALTO RAPIDO</string>
     <string name="analytics_swipe_instruction_short">Scorri a sinistra o a destra per spostarti.</string>

@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALITYKA</string>
     <string name="pro_feature_widget_manager">MENEDŻER WIDŻETÓW</string>
     <string name="pro_feature_upgrade_now">DOSTĘP PRO</string>
+    <string name="holdings_upsell_badge">WIELE PORTFELI</string>
+    <string name="holdings_upsell_message">PRZESUŃ W LEWO I W PRAWO</string>
+    <string name="holdings_upsell_cta">UPGRADE DO PRO</string>
     <string name="analytics_premium_title">PODGLĄD PREMIUM INSIGHTÓW</string>
     <string name="analytics_premium_badge">PRO ZABLOKOWANE</string>
     <string name="analytics_view_details_cta">ZOBACZ SZCZEGÓŁY</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">WSZYSTKO</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALE</string>
+    <string name="asset_custom_icon_section">IKONA</string>
+    <string name="asset_custom_icon_hint">Wybierz zdjęcie, przytnij do kwadratu i zapisz. Użyj, gdy giełda nie ma grafiki.</string>
+    <string name="asset_custom_icon_choose">WYBIERZ ZDJĘCIE</string>
+    <string name="asset_custom_icon_recrop">DOSTOSUJ KADROWANIE</string>
+    <string name="asset_custom_icon_remove">DOMYŚLNA IKONA</string>
     <string name="analytics_hub_title">CENTRUM ANALITYKI</string>
     <string name="analytics_quick_jump_title">SZYBKI SKOK</string>
     <string name="analytics_swipe_instruction_short">Przesuń w lewo lub w prawo, aby przejść dalej.</string>

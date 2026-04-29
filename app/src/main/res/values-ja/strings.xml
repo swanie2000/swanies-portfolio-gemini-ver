@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">分析</string>
     <string name="pro_feature_widget_manager">ウィジェットマネージャー</string>
     <string name="pro_feature_upgrade_now">PRO アクセス</string>
+    <string name="holdings_upsell_badge">複数ポートフォリオ</string>
+    <string name="holdings_upsell_message">左右にスワイプ</string>
+    <string name="holdings_upsell_cta">Proにアップグレード</string>
     <string name="analytics_premium_title">プレミアムインサイト プレビュー</string>
     <string name="analytics_premium_badge">PRO ロック中</string>
     <string name="analytics_view_details_cta">詳細を見る</string>
@@ -300,6 +303,11 @@
     <string name="holdings_tab_all">すべて</string>
     <string name="holdings_tab_crypto">仮想通貨</string>
     <string name="holdings_tab_metal">貴金属</string>
+    <string name="asset_custom_icon_section">アイコン</string>
+    <string name="asset_custom_icon_hint">写真を選び、正方形にトリミングして保存。取引所に画像がないときに使います。</string>
+    <string name="asset_custom_icon_choose">写真を選ぶ</string>
+    <string name="asset_custom_icon_recrop">トリミング調整</string>
+    <string name="asset_custom_icon_remove">デフォルトのアイコンを使う</string>
     <string name="analytics_hub_title">分析ハブ</string>
     <string name="analytics_quick_jump_title">クイックジャンプ</string>
     <string name="analytics_swipe_instruction_short">左右にスワイプして移動します。</string>

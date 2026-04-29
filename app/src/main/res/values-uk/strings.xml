@@ -144,6 +144,9 @@
     <string name="pro_feature_analytics">АНАЛІТИКА</string>
     <string name="pro_feature_widget_manager">МЕНЕДЖЕР ВІДЖЕТІВ</string>
     <string name="pro_feature_upgrade_now">ДОСТУП PRO</string>
+    <string name="holdings_upsell_badge">КІЛЬКА ПОРТФЕЛІВ</string>
+    <string name="holdings_upsell_message">СВАЙП ВЛІВО І ВПРАВО</string>
+    <string name="holdings_upsell_cta">ПЕРЕХІД НА PRO</string>
     <string name="analytics_premium_title">ПЕРЕГЛЯД ПРЕМІУМ-ІНСАЙТІВ</string>
     <string name="analytics_premium_badge">PRO ЗАБЛОКОВАНО</string>
     <string name="analytics_view_details_cta">ПЕРЕГЛЯНУТИ ДЕТАЛІ</string>
@@ -280,6 +283,11 @@
     <string name="holdings_tab_all">УСІ</string>
     <string name="holdings_tab_crypto">КРИПТО</string>
     <string name="holdings_tab_metal">МЕТАЛИ</string>
+    <string name="asset_custom_icon_section">ІКОНКА</string>
+    <string name="asset_custom_icon_hint">Оберіть фото, обріть до квадрата й збережіть. Якщо на біржі немає зображення.</string>
+    <string name="asset_custom_icon_choose">ОБРАТИ ФОТО</string>
+    <string name="asset_custom_icon_recrop">НАЛАШТУВАТИ ОБРІЗКУ</string>
+    <string name="asset_custom_icon_remove">ІКОНКА ЗА ЗАМОВЧУВАННЯМ</string>
     <string name="analytics_hub_title">ЦЕНТР АНАЛІТИКИ</string>
     <string name="analytics_quick_jump_title">ШВИДКИЙ ПЕРЕХІД</string>
     <string name="analytics_swipe_instruction_short">Проведіть ліворуч або праворуч, щоб перейти.</string>

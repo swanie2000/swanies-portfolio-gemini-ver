@@ -146,6 +146,9 @@
     <string name="pro_feature_analytics">التحليلات</string>
     <string name="pro_feature_widget_manager">إدارة الويدجت</string>
     <string name="pro_feature_upgrade_now">وصول برو</string>
+    <string name="holdings_upsell_badge">محافظ متعددة</string>
+    <string name="holdings_upsell_message">مرّر يمينًا ويسارًا</string>
+    <string name="holdings_upsell_cta">ترقية Pro</string>
     <string name="analytics_premium_title">معاينة رؤى بريميوم</string>
     <string name="analytics_premium_badge">PRO مقفل</string>
     <string name="analytics_view_details_cta">عرض التفاصيل</string>
@@ -294,6 +297,11 @@
     <string name="holdings_tab_all">الكل</string>
     <string name="holdings_tab_crypto">عملات رقمية</string>
     <string name="holdings_tab_metal">معادن</string>
+    <string name="asset_custom_icon_section">أيقونة</string>
+    <string name="asset_custom_icon_hint">اختر صورة، قصّها إلى مربع، ثم احفظ. استخدمها عندما لا يوفّر السوق صورة رسمية.</string>
+    <string name="asset_custom_icon_choose">اختر صورة</string>
+    <string name="asset_custom_icon_recrop">تعديل القص</string>
+    <string name="asset_custom_icon_remove">استخدام الأيقونة الافتراضية</string>
     <string name="analytics_hub_title">مركز التحليلات</string>
     <string name="analytics_quick_jump_title">انتقال سريع</string>
     <string name="analytics_swipe_instruction_short">اسحب يسارًا أو يمينًا للتنقل.</string>

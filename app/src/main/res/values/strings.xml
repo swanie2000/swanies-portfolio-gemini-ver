@@ -143,6 +143,7 @@
     <string name="pro_feature_analytics">ANALYTICS</string>
     <string name="pro_feature_widget_manager">WIDGET MANAGER</string>
     <string name="pro_feature_upgrade_now">PRO ACCESS</string>
+    <!-- Free-tier Holdings list upsell row (MyHoldingsScreen). Translate in every values-*/strings.xml. -->
     <string name="holdings_upsell_badge">MULTI PORTFOLIO</string>
     <string name="holdings_upsell_message">SWIPE LEFT &amp; RIGHT</string>
     <string name="holdings_upsell_cta">PRO UPGRADE</string>

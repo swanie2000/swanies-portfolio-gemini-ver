@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">分析</string>
     <string name="pro_feature_widget_manager">小组件管理</string>
     <string name="pro_feature_upgrade_now">PRO 访问权限</string>
+    <string name="holdings_upsell_badge">多投资组合</string>
+    <string name="holdings_upsell_message">左右滑动</string>
+    <string name="holdings_upsell_cta">升级 Pro</string>
     <string name="analytics_premium_title">高级洞察预览</string>
     <string name="analytics_premium_badge">PRO 已锁定</string>
     <string name="analytics_view_details_cta">查看详情</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">全部</string>
     <string name="holdings_tab_crypto">加密货币</string>
     <string name="holdings_tab_metal">贵金属</string>
+    <string name="asset_custom_icon_section">图标</string>
+    <string name="asset_custom_icon_hint">选择照片，裁剪为正方形后保存。交易对无官方图标时使用。</string>
+    <string name="asset_custom_icon_choose">选择照片</string>
+    <string name="asset_custom_icon_recrop">调整裁剪</string>
+    <string name="asset_custom_icon_remove">使用默认图标</string>
     <string name="analytics_hub_title">分析中心</string>
     <string name="analytics_quick_jump_title">快速跳转</string>
     <string name="analytics_swipe_instruction_short">左右滑动即可切换。</string>

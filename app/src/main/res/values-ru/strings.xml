@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">АНАЛИТИКА</string>
     <string name="pro_feature_widget_manager">МЕНЕДЖЕР ВИДЖЕТОВ</string>
     <string name="pro_feature_upgrade_now">ДОСТУП PRO</string>
+    <string name="holdings_upsell_badge">НЕСКОЛЬКО ПОРТФЕЛЕЙ</string>
+    <string name="holdings_upsell_message">СВАЙП ВЛЕВО И ВПРАВО</string>
+    <string name="holdings_upsell_cta">ОФОРМИТЬ PRO</string>
     <string name="analytics_premium_title">ПРЕВЬЮ ПРЕМИУМ-ИНСАЙТОВ</string>
     <string name="analytics_premium_badge">PRO ЗАБЛОКИРОВАНО</string>
     <string name="analytics_view_details_cta">СМОТРЕТЬ ДЕТАЛИ</string>
@@ -301,6 +304,11 @@
     <string name="holdings_tab_all">ВСЁ</string>
     <string name="holdings_tab_crypto">КРИПТО</string>
     <string name="holdings_tab_metal">МЕТАЛЛЫ</string>
+    <string name="asset_custom_icon_section">ИКОНКА</string>
+    <string name="asset_custom_icon_hint">Выберите фото, обрежьте до квадрата и сохраните. Используйте, если у биржи нет изображения.</string>
+    <string name="asset_custom_icon_choose">ВЫБРАТЬ ФОТО</string>
+    <string name="asset_custom_icon_recrop">НАСТРОИТЬ ОБРЕЗКУ</string>
+    <string name="asset_custom_icon_remove">ИКОНКА ПО УМОЛЧАНИЮ</string>
     <string name="analytics_hub_title">ЦЕНТР АНАЛИТИКИ</string>
     <string name="analytics_quick_jump_title">БЫСТРЫЙ ПЕРЕХОД</string>
     <string name="analytics_swipe_instruction_short">Смахните влево или вправо для перехода.</string>

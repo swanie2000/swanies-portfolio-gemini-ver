@@ -144,6 +144,9 @@
     <string name="pro_feature_analytics">การวิเคราะห์</string>
     <string name="pro_feature_widget_manager">ตัวจัดการวิดเจ็ต</string>
     <string name="pro_feature_upgrade_now">การเข้าถึง PRO</string>
+    <string name="holdings_upsell_badge">หลายพอร์ตโฟลิโอ</string>
+    <string name="holdings_upsell_message">ปัดซ้ายและขวา</string>
+    <string name="holdings_upsell_cta">อัปเกรด Pro</string>
     <string name="analytics_premium_title">พรีวิวข้อมูลเชิงลึกพรีเมียม</string>
     <string name="analytics_premium_badge">PRO ถูกล็อก</string>
     <string name="analytics_view_details_cta">ดูรายละเอียด</string>
@@ -280,6 +283,11 @@
     <string name="holdings_tab_all">ทั้งหมด</string>
     <string name="holdings_tab_crypto">คริปโต</string>
     <string name="holdings_tab_metal">โลหะ</string>
+    <string name="asset_custom_icon_section">ไอคอน</string>
+    <string name="asset_custom_icon_hint">เลือกรูป ครอปเป็นสี่เหลี่ยมจัตุรัส แล้วบันทึก ใช้เมื่อตลาดไม่มีรูปประกอบ</string>
+    <string name="asset_custom_icon_choose">เลือกรูป</string>
+    <string name="asset_custom_icon_recrop">ปรับการครอป</string>
+    <string name="asset_custom_icon_remove">ใช้ไอคอนเริ่มต้น</string>
     <string name="analytics_hub_title">ศูนย์วิเคราะห์</string>
     <string name="analytics_quick_jump_title">ไปด่วน</string>
     <string name="analytics_swipe_instruction_short">ปัดซ้ายหรือขวาเพื่อเลื่อนไปมา</string>

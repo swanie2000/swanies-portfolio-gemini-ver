@@ -163,6 +163,9 @@
   - Shipped user custom crypto icons: `IconManager`, `CryptoEditFunnel` (pick + uCrop + save), `FileProvider`, manifest, themes, and Coil cache-bust keys in `MetalIcon`.
   - Holdings: optimistic post-save row merge in `MyHoldingsScreen` to align with async DB updates.
 
+- [x] V40.68.1 Full locale string parity (holdings upsell + asset custom icon keys) - COMPLETED
+  - Scripted diff of `values/strings.xml` vs all `values-*/strings.xml`; added missing `asset_custom_icon_*` translations to every shipped locale; confirmed `holdings_upsell_*` present everywhere; `lintDebug` green.
+
 - [x] V40.66.1 / V40.67 Custom icon reload on expanded card + Holdings free upsell banner - COMPLETED
   - `cryptoIconReloadNonce` after crypto save + `localIconReloadNonce` through asset cards into `MetalIcon` (Coil keys + error reset) so custom photo updates without collapsing the card.
   - Free-tier Holdings upsell uses `holdings_upsell_*` strings, tightened single-line layout and `9.sp` swipe hint so copy fits next to `PRO UPGRADE` CTA.

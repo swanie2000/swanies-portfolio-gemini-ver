@@ -148,6 +148,9 @@
     <string name="pro_feature_analytics">ANALYSES</string>
     <string name="pro_feature_widget_manager">GESTIONNAIRE DE WIDGETS</string>
     <string name="pro_feature_upgrade_now">ACCÈS PRO</string>
+    <string name="holdings_upsell_badge">PORTEFEUILLES MULTIPLES</string>
+    <string name="holdings_upsell_message">GLISSER À GAUCHE ET À DROITE</string>
+    <string name="holdings_upsell_cta">PASSER À PRO</string>
     <string name="analytics_premium_title">APERÇU DES INSIGHTS PREMIUM</string>
     <string name="analytics_premium_badge">PRO VERROUILLÉ</string>
     <string name="analytics_view_details_cta">VOIR LES DÉTAILS</string>
@@ -300,6 +303,11 @@
     <string name="holdings_tab_all">TOUT</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">MÉTAL</string>
+    <string name="asset_custom_icon_section">ICÔNE</string>
+    <string name="asset_custom_icon_hint">Choisissez une photo, découpez-la en carré puis enregistrez. À utiliser lorsque la plateforme ne fournit pas d’illustration.</string>
+    <string name="asset_custom_icon_choose">CHOISIR UNE PHOTO</string>
+    <string name="asset_custom_icon_recrop">AJUSTER LE RECADRAGE</string>
+    <string name="asset_custom_icon_remove">ICÔNE PAR DÉFAUT</string>
     <string name="analytics_hub_title">CENTRE ANALYTIQUE</string>
     <string name="analytics_quick_jump_title">ACCÈS RAPIDE</string>
     <string name="analytics_swipe_instruction_short">Balayez à gauche ou à droite pour naviguer.</string>
