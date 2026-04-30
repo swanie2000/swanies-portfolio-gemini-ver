@@ -334,7 +334,7 @@
     <string name="analytics_live_risk_regime_defensive">방어 모드 권장</string>
     <string name="analytics_live_risk_regime_monitor">면밀히 모니터링</string>
     <string name="analytics_live_risk_regime_balanced">균형적</string>
-    <string name="analytics_live_risk_hero_title">실시간 리스크 인텔리전스</string>
+    <string name="analytics_live_risk_hero_title">리스크 인텔리전스</string>
     <string name="analytics_live_risk_hero_subtitle">Premium 리스크 엔진이 집중도, 변동성 압력, 카테고리 불균형을 실시간으로 추적합니다.</string>
     <string name="analytics_live_risk_engine_title">리스크 노출 엔진</string>
     <string name="analytics_live_risk_engine_description">현재 보유 구성에 따라 집중도 점수를 실시간으로 갱신합니다.</string>
@@ -353,7 +353,7 @@
     <string name="analytics_live_signal_high">높음</string>
     <string name="analytics_live_signal_medium">중간</string>
     <string name="analytics_live_signal_low">낮음</string>
-    <string name="analytics_live_attribution_hero_title">실시간 기여도 엔진</string>
+    <string name="analytics_live_attribution_hero_title">기여도 엔진</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium 기여도 분석은 모멘텀 신뢰도와 카테고리 기여를 바탕으로 수익·손실 요인을 분해합니다.</string>
     <string name="analytics_live_attribution_engine_title">기여도 엔진</string>
     <string name="analytics_live_attribution_engine_description">실시간 비중과 24시간 변동률을 사용해 포지션별 24시간 기여도를 추정합니다.</string>
@@ -370,7 +370,7 @@
     <string name="analytics_live_drag_positions_title">하방 압력 포지션</string>
     <string name="analytics_live_target_mode_category_balanced">카테고리 균형형</string>
     <string name="analytics_live_target_mode_equal_weight">동일 비중</string>
-    <string name="analytics_live_rebalance_hero_title">실시간 리밸런스 코치</string>
+    <string name="analytics_live_rebalance_hero_title">리밸런스 코치</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium 리밸런서는 실행 전 괴리, 임계치 이탈, 예상 회전율을 평가합니다.</string>
     <string name="analytics_live_rebalance_engine_title">리밸런스 엔진</string>
     <string name="analytics_live_rebalance_model_active">%1$s 모델이 상위 %2$d개 보유 자산에 적용 중입니다.</string>
@@ -385,7 +385,7 @@
     <string name="analytics_live_scenario_market_shock">시장 충격</string>
     <string name="analytics_live_scenario_crypto_winter">크립토 윈터</string>
     <string name="analytics_live_scenario_rate_spike">금리 급등</string>
-    <string name="analytics_live_scenarios_hero_title">실시간 시나리오 랩</string>
+    <string name="analytics_live_scenarios_hero_title">시나리오 랩</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium 시나리오 엔진이 현재 보유 구성에 대해 원터치 충격/랠리를 실행합니다.</string>
     <string name="analytics_live_scenario_preset_title">시나리오 프리셋</string>
     <string name="analytics_live_active_preset">활성 프리셋: %1$s</string>

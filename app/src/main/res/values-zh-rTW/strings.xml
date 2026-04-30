@@ -334,7 +334,7 @@
     <string name="analytics_live_risk_regime_defensive">建議防禦模式</string>
     <string name="analytics_live_risk_regime_monitor">建議密切監控</string>
     <string name="analytics_live_risk_regime_balanced">均衡</string>
-    <string name="analytics_live_risk_hero_title">即時風險洞察</string>
+    <string name="analytics_live_risk_hero_title">風險洞察</string>
     <string name="analytics_live_risk_hero_subtitle">Premium 風險引擎即時追蹤集中度、波動壓力與類別失衡。</string>
     <string name="analytics_live_risk_engine_title">風險曝險引擎</string>
     <string name="analytics_live_risk_engine_description">集中度分數依您目前持倉組成即時更新。</string>
@@ -353,7 +353,7 @@
     <string name="analytics_live_signal_high">高</string>
     <string name="analytics_live_signal_medium">中</string>
     <string name="analytics_live_signal_low">低</string>
-    <string name="analytics_live_attribution_hero_title">即時歸因引擎</string>
+    <string name="analytics_live_attribution_hero_title">歸因引擎</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium 歸因拆解漲勢與拖累因子，並結合動量信心度與類別歸因。</string>
     <string name="analytics_live_attribution_engine_title">歸因引擎</string>
     <string name="analytics_live_attribution_engine_description">依部位估算 24 小時貢獻，使用即時權重與 24 小時漲跌。</string>
@@ -370,7 +370,7 @@
     <string name="analytics_live_drag_positions_title">拖累部位</string>
     <string name="analytics_live_target_mode_category_balanced">類別平衡</string>
     <string name="analytics_live_target_mode_equal_weight">等權重</string>
-    <string name="analytics_live_rebalance_hero_title">即時再平衡教練</string>
+    <string name="analytics_live_rebalance_hero_title">再平衡教練</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium 再平衡工具在行動前評估漂移、閾值突破與預估換手率。</string>
     <string name="analytics_live_rebalance_engine_title">再平衡引擎</string>
     <string name="analytics_live_rebalance_model_active">%1$s 模型已在前 %2$d 個持倉上運作。</string>
@@ -385,7 +385,7 @@
     <string name="analytics_live_scenario_market_shock">市場衝擊</string>
     <string name="analytics_live_scenario_crypto_winter">加密寒冬</string>
     <string name="analytics_live_scenario_rate_spike">利率急升</string>
-    <string name="analytics_live_scenarios_hero_title">即時情境實驗室</string>
+    <string name="analytics_live_scenarios_hero_title">情境實驗室</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium 情境引擎針對您目前持倉一鍵模擬衝擊與反彈。</string>
     <string name="analytics_live_scenario_preset_title">情境預設</string>
     <string name="analytics_live_active_preset">使用中預設：%1$s</string>

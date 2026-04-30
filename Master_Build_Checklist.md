@@ -170,6 +170,11 @@
   - `cryptoIconReloadNonce` after crypto save + `localIconReloadNonce` through asset cards into `MetalIcon` (Coil keys + error reset) so custom photo updates without collapsing the card.
   - Free-tier Holdings upsell uses `holdings_upsell_*` strings, tightened single-line layout and `9.sp` swipe hint so copy fits next to `PRO UPGRADE` CTA.
 
+- [x] V40.69 Metals funnel + holdings card display truth - COMPLETED
+  - `AssetRepository`: preserve metal `displayName` on upsert/refresh; `cleanMetalName` recognizes `XAU`/`XAG`/`XPT`/`XPD`; avoid overwriting user labels with generic clean names when `displayName` is set.
+  - `HoldingsUIComponents`: `underIconTickerText` for icon + under-icon text; metal duplicate middle title removed on expanded compact + full card; two-line under-icon + collapsed two-line title for metals; flexible icon column height; `expandedMinHeight` nudged for expanded compact.
+  - Architect / amount entry / metals audit / asset picker / analytics strings updated per session diff; compile verified with `:app:compileDebugKotlin`.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

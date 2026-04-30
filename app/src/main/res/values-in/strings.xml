@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">MODE PERTAHANAN DISARANKAN</string>
     <string name="analytics_live_risk_regime_monitor">PANTAU DEKAT</string>
     <string name="analytics_live_risk_regime_balanced">SEIMBANG</string>
-    <string name="analytics_live_risk_hero_title">INTELIJENSI RISIKO LANGSUNG</string>
+    <string name="analytics_live_risk_hero_title">INTELIJENSI RISIKO</string>
     <string name="analytics_live_risk_hero_subtitle">Mesin risiko Premium melacak konsentrasi, tekanan volatilitas, dan ketidakseimbangan kategori secara real time.</string>
     <string name="analytics_live_risk_engine_title">MESIN EKSPOSUR RISIKO</string>
     <string name="analytics_live_risk_engine_description">Skor konsentrasi langsung diperbarui dari campuran kepemilikan Anda saat ini.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">TINGGI</string>
     <string name="analytics_live_signal_medium">SEDANG</string>
     <string name="analytics_live_signal_low">RENDAH</string>
-    <string name="analytics_live_attribution_hero_title">MESIN ATRIBUSI LANGSUNG</string>
+    <string name="analytics_live_attribution_hero_title">MESIN ATRIBUSI</string>
     <string name="analytics_live_attribution_hero_subtitle">Atribusi Premium memecah pendorong untung dan tekanan dengan kepercayaan momentum dan atribusi per kategori.</string>
     <string name="analytics_live_attribution_engine_title">MESIN ATRIBUSI</string>
     <string name="analytics_live_attribution_engine_description">Kontribusi 24 jam estimasi per posisi memakai bobot langsung dan perubahan 24 jam.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">POSISI PENARIK</string>
     <string name="analytics_live_target_mode_category_balanced">SEIMBANG PER KATEGORI</string>
     <string name="analytics_live_target_mode_equal_weight">BOBOT SAMA</string>
-    <string name="analytics_live_rebalance_hero_title">PELATIH REBALANS LANGSUNG</string>
+    <string name="analytics_live_rebalance_hero_title">PELATIH REBALANS</string>
     <string name="analytics_live_rebalance_hero_subtitle">Perebalans Premium menilai drift, pelanggaran ambang, dan omset estimasi sebelum tindakan.</string>
     <string name="analytics_live_rebalance_engine_title">MESIN REBALANS</string>
     <string name="analytics_live_rebalance_model_active">Model %1$s aktif pada %2$d kepemilikan teratas.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">GEJOLAK PASAR</string>
     <string name="analytics_live_scenario_crypto_winter">MUSIM DINGIN KRIPTO</string>
     <string name="analytics_live_scenario_rate_spike">LONJAKAN SUKU BUNGA</string>
-    <string name="analytics_live_scenarios_hero_title">LAB SKENARIO LANGSUNG</string>
+    <string name="analytics_live_scenarios_hero_title">LAB SKENARIO</string>
     <string name="analytics_live_scenarios_hero_subtitle">Mesin skenario Premium menjalankan gejolak dan reli sekali ketuk terhadap campuran kepemilikan langsung Anda.</string>
     <string name="analytics_live_scenario_preset_title">PRASETEL SKENARIO</string>
     <string name="analytics_live_active_preset">Prasetel aktif: %1$s</string>

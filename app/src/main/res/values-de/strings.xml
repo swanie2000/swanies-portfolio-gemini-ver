@@ -354,7 +354,7 @@
     <string name="analytics_live_risk_regime_defensive">DEFENSIVER MODUS EMPFOHLEN</string>
     <string name="analytics_live_risk_regime_monitor">ENGMASCHIG ÜBERWACHEN</string>
     <string name="analytics_live_risk_regime_balanced">AUSGEWOGEN</string>
-    <string name="analytics_live_risk_hero_title">LIVE-RISIKO-INTELLIGENZ</string>
+    <string name="analytics_live_risk_hero_title">RISIKO-INTELLIGENZ</string>
     <string name="analytics_live_risk_hero_subtitle">Die Premium-Risiko-Engine verfolgt Konzentration, Volatilitätsdruck und Kategorie-Ungleichgewicht in Echtzeit.</string>
     <string name="analytics_live_risk_engine_title">RISIKO-EXPOSITIONS-ENGINE</string>
     <string name="analytics_live_risk_engine_description">Der Live-Konzentrationsscore wird aus Ihrem aktuellen Holdings-Mix aktualisiert.</string>
@@ -373,7 +373,7 @@
     <string name="analytics_live_signal_high">HOCH</string>
     <string name="analytics_live_signal_medium">MITTEL</string>
     <string name="analytics_live_signal_low">NIEDRIG</string>
-    <string name="analytics_live_attribution_hero_title">LIVE-ATTRIBUTIONS-ENGINE</string>
+    <string name="analytics_live_attribution_hero_title">ATTRIBUTIONS-ENGINE</string>
     <string name="analytics_live_attribution_hero_subtitle">Die Premium-Attribution zerlegt Gewinn- und Verlusttreiber mit Momentum-Konfidenz und Kategoriezuordnung.</string>
     <string name="analytics_live_attribution_engine_title">ATTRIBUTIONS-ENGINE</string>
     <string name="analytics_live_attribution_engine_description">Geschätzter 24h-Beitrag je Position auf Basis von Live-Gewichten und 24h-Änderung.</string>
@@ -390,7 +390,7 @@
     <string name="analytics_live_drag_positions_title">BELASTENDE POSITIONEN</string>
     <string name="analytics_live_target_mode_category_balanced">KATEGORIE-AUSGEWOGEN</string>
     <string name="analytics_live_target_mode_equal_weight">GLEICHGEWICHTET</string>
-    <string name="analytics_live_rebalance_hero_title">LIVE-REBALANCE-COACH</string>
+    <string name="analytics_live_rebalance_hero_title">REBALANCE-COACH</string>
     <string name="analytics_live_rebalance_hero_subtitle">Der Premium-Rebalancer bewertet Drift, Schwellenüberschreitungen und geschätzten Turnover vor einer Aktion.</string>
     <string name="analytics_live_rebalance_engine_title">REBALANCE-ENGINE</string>
     <string name="analytics_live_rebalance_model_active">Modell %1$s aktiv über die Top-%2$d-Positionen.</string>
@@ -405,7 +405,7 @@
     <string name="analytics_live_scenario_market_shock">MARKTSCHOCK</string>
     <string name="analytics_live_scenario_crypto_winter">KRYPTO-WINTER</string>
     <string name="analytics_live_scenario_rate_spike">ZINSSPITZE</string>
-    <string name="analytics_live_scenarios_hero_title">LIVE-SZENARIO-LAB</string>
+    <string name="analytics_live_scenarios_hero_title">SZENARIO-LAB</string>
     <string name="analytics_live_scenarios_hero_subtitle">Die Premium-Szenario-Engine führt Ein-Tipp-Schocks und Rallyes gegen Ihren Live-Holdings-Mix aus.</string>
     <string name="analytics_live_scenario_preset_title">SZENARIO-VOREINSTELLUNG</string>
     <string name="analytics_live_active_preset">Aktive Voreinstellung: %1$s</string>

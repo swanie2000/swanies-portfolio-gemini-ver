@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -330,14 +331,23 @@ fun WatermarkBadge(source: String, color: Color, modifier: Modifier = Modifier) 
 }
 
 @Composable
-fun FunnelGrid(options: List<String>, selected: String, onSelect: (String) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+fun FunnelGrid(
+    options: List<String>,
+    selected: String,
+    compact: Boolean = false,
+    onSelect: (String) -> Unit,
+) {
+    val rowGap = if (compact) 6.dp else 10.dp
+    val colGap = if (compact) 6.dp else 10.dp
+    val cellHeight = if (compact) 42.dp else 55.dp
+    val fontSize = if (compact) 10.sp else 11.sp
+    Column(verticalArrangement = Arrangement.spacedBy(rowGap)) {
         options.chunked(2).forEach { rowItems ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(colGap)) {
                 rowItems.forEach { option ->
                     val isSelected = option.equals(selected, ignoreCase = true)
-                    Box(modifier = Modifier.weight(1f).height(55.dp).clip(RoundedCornerShape(12.dp)).background(if (isSelected) Color.Yellow else Color.White.copy(0.05f)).clickable { onSelect(option) }.border(1.dp, if (isSelected) Color.Transparent else Color.White.copy(0.1f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                        Text(text = option.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = 11.sp)
+                    Box(modifier = Modifier.weight(1f).height(cellHeight).clip(RoundedCornerShape(12.dp)).background(if (isSelected) Color.Yellow else Color.White.copy(0.05f)).clickable { onSelect(option) }.border(1.dp, if (isSelected) Color.Transparent else Color.White.copy(0.1f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                        Text(text = option.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = fontSize)
                     }
                 }
                 if (rowItems.size == 1) Spacer(Modifier.weight(1f))
@@ -496,117 +506,12 @@ fun formatCurrency(v: Double, d: Int = 2, currencyCode: String = "USD"): String 
 
 fun formatAmount(v: Double): String = DecimalFormat("#,###.########").format(v)
 
-@Composable
-fun MetalSelectionFunnel(
-    initialMetal: String, initialForm: String, initialWeight: Double, initialQty: String, initialPrem: String, initialManualPrice: String,
-    onDismiss: () -> Unit,
-    onConfirmed: (String, String, Double, String, String, String, String?, Boolean, String) -> Unit,
-    onNavigateToArchitect: (() -> Unit)? = null
-) {
-    var step by remember { mutableIntStateOf(1) }
-    val startMetal = when {
-        initialMetal.contains("XAU", true) -> "Gold"
-        initialMetal.contains("XAG", true) -> "Silver"
-        initialMetal.contains("XPT", true) -> "Platinum"
-        initialMetal.contains("XPD", true) -> "Palladium"
-        else -> initialMetal
+/** Under-icon label: architect / vault metals use display name; crypto stays on symbol. */
+private fun underIconTickerText(asset: AssetEntity): String =
+    when (asset.category) {
+        AssetCategory.METAL -> asset.displayName.ifBlank { asset.name }.ifBlank { asset.symbol }
+        AssetCategory.CRYPTO -> asset.symbol
     }
-    var selectedMetal by remember { mutableStateOf(startMetal) }
-    var l1 by remember { mutableStateOf(initialForm) }
-    var l2 by remember { mutableStateOf("") }
-    var selectedWeight by remember { mutableDoubleStateOf(initialWeight) }
-    var selectedUnit by remember { mutableStateOf("OZ") }
-    var qtyInput by remember { mutableStateOf(initialQty) }
-    var premInput by remember { mutableStateOf(initialPrem) }
-    var manualPriceInput by remember { mutableStateOf(initialManualPrice) }
-    var customIconUri by remember { mutableStateOf<String?>(null) }
-    var isTrueManualFlag by remember { mutableStateOf(false) }
-    val focus = remember { FocusRequester() }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> customIconUri = uri?.toString() }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
-            Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = when(step) {
-                    1 -> stringResource(R.string.funnel_select_type)
-                    10 -> stringResource(R.string.funnel_name)
-                    11 -> stringResource(R.string.funnel_icon)
-                    12 -> stringResource(R.string.funnel_labels)
-                    13 -> stringResource(R.string.funnel_value)
-                    4 -> stringResource(R.string.funnel_quantity)
-                    else -> stringResource(R.string.funnel_premium)
-                }, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                Spacer(Modifier.height(20.dp))
-                when (step) {
-                    1 -> FunnelGrid(listOf("Gold", "Silver", "Platinum", "Palladium", "Custom"), selectedMetal) {
-                        if (it == "Custom") {
-                            if (onNavigateToArchitect != null) {
-                                onNavigateToArchitect()
-                            } else {
-                                isTrueManualFlag = true; selectedMetal = ""; step = 10
-                            }
-                        }
-                        else { isTrueManualFlag = false; selectedMetal = it; step = 2 }
-                    }
-                    10 -> {
-                        LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text(stringResource(R.string.funnel_label_under_icon), color = Color.White.copy(0.5f), fontSize = 10.sp)
-                        OutlinedTextField(value = selectedMetal, onValueChange = { if(it.length <= 8) selectedMetal = it }, placeholder = { Text(stringResource(R.string.funnel_enter_name), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(selectedMetal.isNotBlank()) step = 11 } , modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
-                    }
-                    11 -> {
-                        Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Color.White.copy(0.05f)).clickable { launcher.launch("image/*") }, contentAlignment = Alignment.Center) {
-                            if (customIconUri != null) {
-                                AsyncImage(model = customIconUri, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                            } else {
-                                Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
-                            }
-                        }
-                        Text(stringResource(R.string.funnel_tap_photo), color = Color.White.copy(0.5f), fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp)); Button(onClick = { step = 12 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
-                    }
-                    12 -> {
-                        LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text(stringResource(R.string.funnel_description_lines), color = Color.White.copy(0.5f), fontSize = 10.sp)
-                        OutlinedTextField(value = l1, onValueChange = { l1 = it }, placeholder = { Text(stringResource(R.string.funnel_line_1), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Spacer(Modifier.height(8.dp)); OutlinedTextField(value = l2, onValueChange = { l2 = it }, placeholder = { Text(stringResource(R.string.funnel_line_2), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth(), textStyle = TextStyle(color = Color.Yellow, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { step = 4 }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
-                    }
-                    13 -> {
-                        LaunchedEffect(Unit) { focus.requestFocus() }
-                        Text(stringResource(R.string.funnel_unit_value), color = Color.White.copy(0.5f), fontSize = 10.sp); OutlinedTextField(value = manualPriceInput, onValueChange = { manualPriceInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, "$l1\n$l2".trim(), 1.0, "OZ", qtyInput, "0.0", customIconUri, true, manualPriceInput) }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_finalize)) }
-                    }
-                    2 -> FunnelGrid(listOf("Bars", "Coins", "Rounds", "Custom"), l1) { l1 = it; step = 3 }
-                    3 -> FunnelGrid(listOf("1/10 OZ", "1 OZ", "10 OZ", "100 OZ", "1 KILO", "1 GRAM", "Custom"), "") { label ->
-                        val common = mapOf(
-                            "1/10 OZ" to (0.1 to "OZ"),
-                            "1 OZ" to (1.0 to "OZ"),
-                            "10 OZ" to (10.0 to "OZ"),
-                            "100 OZ" to (100.0 to "OZ"),
-                            "1 KILO" to (32.1507 to "KILO"),
-                            "1 GRAM" to (0.0321507 to "GRAM")
-                        )
-                        val data = common[label] ?: (1.0 to "OZ")
-                        selectedWeight = data.first
-                        selectedUnit = data.second
-                        step = 4
-                    }
-                    4 -> {
-                        LaunchedEffect(Unit) { focus.requestFocus() }
-                        OutlinedTextField(value = qtyInput, onValueChange = { qtyInput = it }, placeholder = { Text(stringResource(R.string.funnel_enter_quantity), color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 24.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { if(qtyInput.isNotBlank()) { if(isTrueManualFlag) step = 13 else step = 5 } }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_next)) }
-                    }
-                    else -> {
-                        LaunchedEffect(Unit) { focus.requestFocus() }
-                        OutlinedTextField(value = premInput, onValueChange = { premInput = it }, placeholder = { Text("0.00", color = Color.White.copy(0.4f)) }, modifier = Modifier.fillMaxWidth().focusRequester(focus), textStyle = TextStyle(color = Color.Yellow, fontSize = 32.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Yellow))
-                        Button(onClick = { onConfirmed(selectedMetal, l1, selectedWeight, selectedUnit, qtyInput, premInput.ifBlank { "0.0" }, null, false, "0.0") }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black), shape = RoundedCornerShape(16.dp)) { Text(stringResource(R.string.action_finalize)) }
-                    }
-                }
-                if (step > 1) { val prev = when(step) { 10 -> 1; 11 -> 10; 12 -> 11; 13 -> 4; else -> step - 1 }; TextButton(onClick = { step = prev }) { Text(stringResource(R.string.action_back), color = Color.Gray) } }
-            }
-        }
-    }
-}
 
 data class CryptoEditSave(
     val amountHeld: Double,
@@ -797,6 +702,254 @@ fun CryptoEditFunnel(
     LaunchedEffect(Unit) { focus.requestFocus() }
 }
 
+/**
+ * Step 3 — same pick → crop → preview flow as [CryptoEditFunnel] icon section, plus explicit default icon.
+ */
+@Composable
+fun ArchitectIconSelectionStep(
+    displayName: String,
+    weight: Double,
+    weightUnit: String,
+    physicalForm: String,
+    coinId: String,
+    existingLocalIconPath: String?,
+    imageUrl: String,
+    isEditingExisting: Boolean,
+    onBack: () -> Unit,
+    persistCustomIcon: suspend (String, Uri) -> String?,
+    deleteCustomIcon: suspend (String) -> Unit,
+    onFinished: (localIconPath: String?) -> Unit,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var pendingIconUri by remember(coinId) { mutableStateOf<Uri?>(null) }
+    var userClearedCustom by remember(coinId) { mutableStateOf(false) }
+    var isSaving by remember { mutableStateOf(false) }
+    val scroll = rememberScrollState()
+    val overlayInteraction = remember { MutableInteractionSource() }
+
+    val cropLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            UCrop.getOutput(result.data!!)?.let { out ->
+                pendingIconUri = out
+                userClearedCustom = false
+            }
+        }
+    }
+
+    val pickLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val act = context.findComponentActivity()
+        if (act == null) {
+            Log.w(CROP_TAG, "No ComponentActivity; using uncropped image")
+            pendingIconUri = uri
+            userClearedCustom = false
+            return@rememberLauncherForActivityResult
+        }
+        try {
+            val sourceForCrop = copyPickerUriToCacheForCrop(act, uri) ?: uri
+            cropLauncher.launch(buildIconCropIntent(act, sourceForCrop))
+        } catch (e: Exception) {
+            Log.e(CROP_TAG, "Failed to start crop: ${e.message}", e)
+            pendingIconUri = uri
+            userClearedCustom = false
+        }
+    }
+
+    val previewModel: Any? = when {
+        pendingIconUri != null -> pendingIconUri
+        userClearedCustom -> null
+        else -> existingLocalIconPath?.let { path -> File(path).takeIf { it.exists() } }
+            ?: imageUrl.takeIf { it.isNotBlank() }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scroll, enabled = !isSaving)
+            .padding(horizontal = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(stringResource(R.string.asset_custom_icon_section), color = Color.White.copy(0.6f), fontSize = 10.sp)
+        Text(
+            stringResource(R.string.asset_custom_icon_hint),
+            color = Color.White.copy(0.35f),
+            fontSize = 9.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(10.dp))
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(0.06f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (previewModel != null) {
+                AsyncImage(
+                    model = previewModel,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                MetalIcon(
+                    name = displayName,
+                    weight = weight,
+                    unit = weightUnit,
+                    physicalForm = physicalForm,
+                    category = AssetCategory.METAL,
+                    size = 72,
+                )
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            OutlinedButton(
+                onClick = {
+                    pickLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                },
+                enabled = !isSaving,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Yellow),
+                border = BorderStroke(1.dp, Color.Yellow.copy(0.5f)),
+            ) {
+                Text(stringResource(R.string.asset_custom_icon_choose), fontSize = 11.sp, fontWeight = FontWeight.Black)
+            }
+        }
+        val canRecrop = pendingIconUri != null && !userClearedCustom
+        OutlinedButton(
+            onClick = {
+                val act = context.findComponentActivity() ?: return@OutlinedButton
+                val src = pendingIconUri ?: return@OutlinedButton
+                try {
+                    cropLauncher.launch(buildIconCropIntent(act, src))
+                } catch (e: Exception) {
+                    Log.e(CROP_TAG, "Re-crop failed: ${e.message}")
+                }
+            },
+            enabled = canRecrop,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White.copy(0.85f),
+                disabledContentColor = Color.Gray.copy(0.35f),
+            ),
+            border = BorderStroke(1.dp, Color.White.copy(if (canRecrop) 0.25f else 0.08f)),
+        ) {
+            Text(stringResource(R.string.asset_custom_icon_recrop), fontSize = 11.sp, fontWeight = FontWeight.Black)
+        }
+        val canUseDefault = existingLocalIconPath != null || pendingIconUri != null
+        OutlinedButton(
+            onClick = {
+                scope.launch {
+                    deleteCustomIcon(coinId)
+                    pendingIconUri = null
+                    userClearedCustom = true
+                }
+            },
+            enabled = canUseDefault,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White,
+                disabledContentColor = Color.Gray.copy(0.4f),
+            ),
+            border = BorderStroke(1.dp, Color.White.copy(if (canUseDefault) 0.35f else 0.12f)),
+        ) {
+            Text(stringResource(R.string.asset_custom_icon_remove), fontSize = 11.sp, fontWeight = FontWeight.Black)
+        }
+        Spacer(Modifier.height(24.dp))
+        TextButton(onClick = onBack, enabled = !isSaving) {
+            Text(
+                stringResource(R.string.action_back),
+                color = if (isSaving) Color.Gray.copy(0.35f) else Color.Gray,
+                fontSize = 12.sp,
+            )
+        }
+        Spacer(Modifier.height(12.dp))
+        Button(
+            onClick = {
+                scope.launch {
+                    isSaving = true
+                    try {
+                        val finalLocal = when {
+                            userClearedCustom -> {
+                                deleteCustomIcon(coinId)
+                                null
+                            }
+                            pendingIconUri != null ->
+                                persistCustomIcon(coinId, pendingIconUri!!) ?: existingLocalIconPath
+                            else -> existingLocalIconPath
+                        }
+                        onFinished(finalLocal)
+                    } catch (e: Exception) {
+                        Log.e(CROP_TAG, "Architect icon save failed: ${e.message}", e)
+                        isSaving = false
+                    }
+                }
+            },
+            enabled = !isSaving,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Text(
+                stringResource(
+                    if (isEditingExisting) R.string.architect_icon_cta_update
+                    else R.string.architect_icon_cta_add
+                ),
+                fontWeight = FontWeight.Black,
+                fontSize = 16.sp,
+            )
+        }
+        Spacer(Modifier.height(24.dp))
+    }
+        if (isSaving) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(
+                        indication = null,
+                        interactionSource = overlayInteraction,
+                        onClick = {},
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(5.dp),
+                        color = Color.Yellow,
+                        trackColor = Color.White.copy(alpha = 0.18f),
+                    )
+                    Spacer(Modifier.height(18.dp))
+                    Text(
+                        stringResource(R.string.architect_saving_in_progress),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 14.sp,
+                        letterSpacing = 1.sp,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun FullAssetCard(
     asset: AssetEntity,
@@ -856,17 +1009,15 @@ fun FullAssetCard(
             border = BorderStroke(1.dp, cardText.copy(alpha = 0.2f))
         ) {
             Column(modifier = Modifier.padding(horizontal = cardPaddingH, vertical = cardPaddingH)) {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    // Anchor Left: Icon Slot (80dp)
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                    // Anchor Left: Icon Slot (80dp); height grows for two-line metal names.
                     Column(
-                        modifier = Modifier
-                            .width(80.dp)
-                            .height(95.dp),
+                        modifier = Modifier.width(80.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Top
                     ) {
                         MetalIcon(
-                            name = asset.symbol,
+                            name = underIconTickerText(asset),
                             weight = asset.weight,
                             unit = asset.weightUnit,
                             physicalForm = asset.physicalForm,
@@ -878,7 +1029,7 @@ fun FullAssetCard(
                         )
                         Spacer(Modifier.height(iconSymbolGap))
                         Text(
-                            text = asset.symbol.uppercase(),
+                            text = underIconTickerText(asset).uppercase(),
                             modifier = Modifier.fillMaxWidth(),
                             style = LocalTextStyle.current.merge(
                                 TextStyle(
@@ -890,7 +1041,8 @@ fun FullAssetCard(
                                     platformStyle = platformCluster,
                                 )
                             ),
-                            maxLines = 1,
+                            maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
+                            softWrap = asset.category == AssetCategory.METAL,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -899,26 +1051,28 @@ fun FullAssetCard(
                     Column(
                         modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Top
                     ) {
                         val nameToUse = asset.displayName.ifEmpty { asset.name }
 
-                        Text(
-                            text = nameToUse.uppercase(),
-                            modifier = Modifier.fillMaxWidth(),
-                            style = LocalTextStyle.current.merge(
-                                TextStyle(
-                                    color = cardText.copy(alpha = 0.5f),
-                                    fontSize = nameLabelSize,
-                                    fontWeight = FontWeight.Black,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = lineTight,
-                                    platformStyle = platformCluster,
-                                )
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        if (asset.category != AssetCategory.METAL) {
+                            Text(
+                                text = nameToUse.uppercase(),
+                                modifier = Modifier.fillMaxWidth(),
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        color = cardText.copy(alpha = 0.5f),
+                                        fontSize = nameLabelSize,
+                                        fontWeight = FontWeight.Black,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = lineTight,
+                                        platformStyle = platformCluster,
+                                    )
+                                ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         // Amount held: measure wall = 85% of middle column; shrink floor 12.sp.
                         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                             AutoResizingText(
@@ -1174,7 +1328,8 @@ fun CompactAssetCard(
         val iconTextGapW = if (hi) 4.dp else 8.dp
         val sparklineStartPad = if (hi) 4.dp else 8.dp
         val expandedPad = if (hi) 10.dp else 14.dp
-        val expandedMinHeight = if (hi) 152.dp else 172.dp
+        // Extra vertical room when metals show a two-line label under the icon.
+        val expandedMinHeight = if (hi) 168.dp else 188.dp
         val expandedDividerGapV = if (hi) 6.dp else 10.dp
         val expandedIconSymbolGap = if (hi) 4.dp else 8.dp
 
@@ -1247,7 +1402,7 @@ fun CompactAssetCard(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     MetalIcon(
-                                        name = asset.symbol,
+                                        name = underIconTickerText(asset),
                                         weight = asset.weight,
                                         unit = asset.weightUnit,
                                         physicalForm = asset.physicalForm,
@@ -1283,6 +1438,9 @@ fun CompactAssetCard(
                                         modifier = Modifier.fillMaxWidth(),
                                         maxFontSize = tickerSize,
                                         minFontSize = 12.sp,
+                                        maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
+                                        softWrap = asset.category == AssetCategory.METAL,
+                                        overflow = TextOverflow.Ellipsis,
                                     )
                                     AutoResizingText(
                                         text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
@@ -1394,17 +1552,15 @@ fun CompactAssetCard(
                             .padding(expandedPad)
                     ) {
                         // The One-Card Header (Strict structural twin of FullAssetCard)
-                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            // Anchor Left: Icon/Symbol Slot (80dp)
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                            // Anchor Left: Icon/Symbol Slot (80dp); height grows for two-line metal names.
                             Column(
-                                modifier = Modifier
-                                    .width(80.dp)
-                                    .height(95.dp),
+                                modifier = Modifier.width(80.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Top
                             ) {
                                 MetalIcon(
-                                    name = asset.symbol,
+                                    name = underIconTickerText(asset),
                                     weight = asset.weight,
                                     unit = asset.weightUnit,
                                     physicalForm = asset.physicalForm,
@@ -1416,7 +1572,7 @@ fun CompactAssetCard(
                                 )
                                 Spacer(Modifier.height(expandedIconSymbolGap))
                                 Text(
-                                    text = asset.symbol.uppercase(),
+                                    text = underIconTickerText(asset).uppercase(),
                                     modifier = Modifier.fillMaxWidth(),
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
@@ -1428,7 +1584,8 @@ fun CompactAssetCard(
                                             platformStyle = expandedPlatform,
                                         )
                                     ),
-                                    maxLines = 1,
+                                    maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
+                                    softWrap = asset.category == AssetCategory.METAL,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }
@@ -1437,25 +1594,27 @@ fun CompactAssetCard(
                             Column(
                                 modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
+                                verticalArrangement = Arrangement.Top
                             ) {
                                 val nameToUse = asset.displayName.ifEmpty { asset.name }
-                                Text(
-                                    text = nameToUse.uppercase(),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    style = LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            color = cardText.copy(alpha = 0.5f),
-                                            fontSize = nameLabelSize,
-                                            fontWeight = FontWeight.Black,
-                                            textAlign = TextAlign.Center,
-                                            lineHeight = expandedLine,
-                                            platformStyle = expandedPlatform,
-                                        )
-                                    ),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                if (asset.category != AssetCategory.METAL) {
+                                    Text(
+                                        text = nameToUse.uppercase(),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        style = LocalTextStyle.current.merge(
+                                            TextStyle(
+                                                color = cardText.copy(alpha = 0.5f),
+                                                fontSize = nameLabelSize,
+                                                fontWeight = FontWeight.Black,
+                                                textAlign = TextAlign.Center,
+                                                lineHeight = expandedLine,
+                                                platformStyle = expandedPlatform,
+                                            )
+                                        ),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                                 Box(modifier = Modifier.fillMaxWidth()) {
                                     AutoResizingText(
                                         text = formatAmount(asset.amountHeld),

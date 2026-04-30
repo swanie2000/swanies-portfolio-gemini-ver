@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">建议启用防御模式</string>
     <string name="analytics_live_risk_regime_monitor">建议密切关注</string>
     <string name="analytics_live_risk_regime_balanced">均衡</string>
-    <string name="analytics_live_risk_hero_title">实时风险洞察</string>
+    <string name="analytics_live_risk_hero_title">风险洞察</string>
     <string name="analytics_live_risk_hero_subtitle">Premium 风险引擎实时追踪集中度、波动压力与类别失衡。</string>
     <string name="analytics_live_risk_engine_title">风险敞口引擎</string>
     <string name="analytics_live_risk_engine_description">集中度评分根据您当前持仓构成实时更新。</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">高</string>
     <string name="analytics_live_signal_medium">中</string>
     <string name="analytics_live_signal_low">低</string>
-    <string name="analytics_live_attribution_hero_title">实时归因引擎</string>
+    <string name="analytics_live_attribution_hero_title">归因引擎</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium 归因拆解收益与拖累因素，并结合动量置信度与类别归因。</string>
     <string name="analytics_live_attribution_engine_title">归因引擎</string>
     <string name="analytics_live_attribution_engine_description">按头寸估算 24 小时贡献，使用实时权重与 24 小时涨跌。</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">拖累头寸</string>
     <string name="analytics_live_target_mode_category_balanced">按类别平衡</string>
     <string name="analytics_live_target_mode_equal_weight">等权重</string>
-    <string name="analytics_live_rebalance_hero_title">实时再平衡教练</string>
+    <string name="analytics_live_rebalance_hero_title">再平衡教练</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium 再平衡器在操作前评估漂移、阈值突破与预估换手率。</string>
     <string name="analytics_live_rebalance_engine_title">再平衡引擎</string>
     <string name="analytics_live_rebalance_model_active">%1$s 模型已在居前 %2$d 个持仓上运行。</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">市场冲击</string>
     <string name="analytics_live_scenario_crypto_winter">加密寒冬</string>
     <string name="analytics_live_scenario_rate_spike">利率飙升</string>
-    <string name="analytics_live_scenarios_hero_title">实时情景实验室</string>
+    <string name="analytics_live_scenarios_hero_title">情景实验室</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium 情景引擎针对您当前持仓一键模拟冲击与反弹。</string>
     <string name="analytics_live_scenario_preset_title">情景预设</string>
     <string name="analytics_live_active_preset">当前预设：%1$s</string>

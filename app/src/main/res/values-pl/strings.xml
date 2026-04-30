@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">ZALECANY TRYB DEFENSYWNY</string>
     <string name="analytics_live_risk_regime_monitor">MONITORUJ UWAŻNIE</string>
     <string name="analytics_live_risk_regime_balanced">ZRÓWNOWAŻONY</string>
-    <string name="analytics_live_risk_hero_title">INTELIGENCJA RYZYKA NA ŻYWO</string>
+    <string name="analytics_live_risk_hero_title">INTELIGENCJA RYZYKA</string>
     <string name="analytics_live_risk_hero_subtitle">Silnik ryzyka Premium śledzi koncentrację, presję zmienności i nierównowagę kategorii w czasie rzeczywistym.</string>
     <string name="analytics_live_risk_engine_title">SILNIK EKSPOZYCJI RYZYKA</string>
     <string name="analytics_live_risk_engine_description">Wynik koncentracji aktualizowany na żywo na podstawie bieżącej struktury portfela.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">WYSOKI</string>
     <string name="analytics_live_signal_medium">ŚREDNI</string>
     <string name="analytics_live_signal_low">NISKI</string>
-    <string name="analytics_live_attribution_hero_title">SILNIK ATRYBUCJI NA ŻYWO</string>
+    <string name="analytics_live_attribution_hero_title">SILNIK ATRYBUCJI</string>
     <string name="analytics_live_attribution_hero_subtitle">Atrybucja Premium rozkłada czynniki wzrostu i spadku z uwzględnieniem pewności momentum i atrybucji kategorii.</string>
     <string name="analytics_live_attribution_engine_title">SILNIK ATRYBUCJI</string>
     <string name="analytics_live_attribution_engine_description">Szacowany wkład 24h na pozycję z użyciem wag live i zmiany 24h.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">POZYCJE OBCIĄŻAJĄCE</string>
     <string name="analytics_live_target_mode_category_balanced">ZRÓWNOWAŻONY KATEGORIAMI</string>
     <string name="analytics_live_target_mode_equal_weight">RÓWNA WAGA</string>
-    <string name="analytics_live_rebalance_hero_title">COACH REBALANSU NA ŻYWO</string>
+    <string name="analytics_live_rebalance_hero_title">COACH REBALANSU</string>
     <string name="analytics_live_rebalance_hero_subtitle">Rebalanser Premium ocenia odchylenie, przekroczenia progów i szacowany obrót przed działaniem.</string>
     <string name="analytics_live_rebalance_engine_title">SILNIK REBALANSU</string>
     <string name="analytics_live_rebalance_model_active">Model %1$s aktywny dla top %2$d pozycji.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">SZOK RYNKOWY</string>
     <string name="analytics_live_scenario_crypto_winter">KRYPTOZIMA</string>
     <string name="analytics_live_scenario_rate_spike">SKOK STÓP</string>
-    <string name="analytics_live_scenarios_hero_title">LAB SCENARIUSZY NA ŻYWO</string>
+    <string name="analytics_live_scenarios_hero_title">LAB SCENARIUSZY</string>
     <string name="analytics_live_scenarios_hero_subtitle">Silnik scenariuszy Premium uruchamia jednym dotknięciem szoki i rajdy dla bieżącej struktury holdingsów.</string>
     <string name="analytics_live_scenario_preset_title">PRESET SCENARIUSZA</string>
     <string name="analytics_live_active_preset">Aktywny preset: %1$s</string>

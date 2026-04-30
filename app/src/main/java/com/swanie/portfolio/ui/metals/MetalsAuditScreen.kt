@@ -18,9 +18,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,6 +34,7 @@ import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.repository.MarketPriceData
 import com.swanie.portfolio.ui.holdings.AssetViewModel
+import com.swanie.portfolio.ui.holdings.AutoResizingText
 import com.swanie.portfolio.ui.holdings.MetalMarketCard
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
@@ -58,29 +59,24 @@ fun MetalsAuditScreen(navController: NavController) {
     val cardBg = Color(cardBgHex.ifBlank { "#121212" }.toColorInt())
     val cardText = Color(cardTextHex.ifHexBlank("#FFFFFF").toColorInt())
 
-    var metalsOrder by remember {
-        mutableStateOf(
-            listOf(
-                "XAU" to "XAU",
-                "XAG" to "XAG",
-                "XPT" to "XPT",
-                "XPD" to "XPD"
-            )
-        )
-    }
+    val defaultSymbolOrder = listOf("XAU", "XAG", "XPT", "XPD")
+    var symbolsOrder by remember { mutableStateOf(defaultSymbolOrder) }
     val marketDataMap = remember { mutableStateMapOf<String, MarketPriceData>() }
     val lazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         val savedOrder = viewModel.getMetalDisplayOrder()
         if (savedOrder != null) {
-            val defaultList = listOf("XAU" to "XAU", "XAG" to "XAG", "XPT" to "XPT", "XPD" to "XPD")
-            metalsOrder = savedOrder.mapNotNull { sym -> defaultList.find { it.second == sym } }
+            val allowed = defaultSymbolOrder.toSet()
+            val filtered = savedOrder.filter { it in allowed }
+            if (filtered.size == 4 && filtered.toSet().size == 4) {
+                symbolsOrder = filtered
+            }
         }
 
         viewModel.refreshMarketWatch()
 
-        metalsOrder.forEach { (_, sym) ->
+        symbolsOrder.forEach { sym ->
             launch {
                 val data = viewModel.fetchMarketPriceData(sym)
                 if (data.officialSpotPrice > 0.0) marketDataMap[sym] = data
@@ -91,7 +87,7 @@ fun MetalsAuditScreen(navController: NavController) {
     }
 
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        metalsOrder = metalsOrder.toMutableList().apply { add(to.index, removeAt(from.index)) }
+        symbolsOrder = symbolsOrder.toMutableList().apply { add(to.index, removeAt(from.index)) }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
@@ -124,16 +120,21 @@ fun MetalsAuditScreen(navController: NavController) {
                 }
             }
 
-            val density = LocalDensity.current
-            Text(
-                text = stringResource(R.string.holdings_tab_metal),
-                color = textColor,
-                fontSize = with(density) { (20.sp.toPx() / fontScale.coerceAtMost(1.2f)).toSp() },
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            AutoResizingText(
+                text = stringResource(R.string.metals_market_screen_title),
+                style = TextStyle(
+                    color = textColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                ),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                minFontSize = 10.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, start = 16.dp, end = 16.dp),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -146,8 +147,8 @@ fun MetalsAuditScreen(navController: NavController) {
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(metalsOrder, key = { it.second }) { item ->
-                    val (name, sym) = item
+                items(symbolsOrder, key = { it }) { sym ->
+                    val name = metalDisplayName(sym)
                     ReorderableItem(reorderableLazyListState, key = sym) { isDragging ->
                         val safeHoldings = holdings ?: emptyList()
                         val isOwned = safeHoldings.any { it.baseSymbol == sym && it.category == AssetCategory.METAL }
@@ -176,7 +177,7 @@ fun MetalsAuditScreen(navController: NavController) {
                                 .then(
                                     Modifier.longPressDraggableHandle(
                                         onDragStarted = { haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
-                                        onDragStopped = { viewModel.saveMetalDisplayOrder(metalsOrder.map { it.second }) }
+                                        onDragStopped = { viewModel.saveMetalDisplayOrder(symbolsOrder) }
                                     )
                                 )
                         )
@@ -188,6 +189,15 @@ fun MetalsAuditScreen(navController: NavController) {
             // The LazyColumn contentPadding handles the scrollable gap now.
         }
     }
+}
+
+@Composable
+private fun metalDisplayName(symbol: String): String = when (symbol) {
+    "XAU" -> stringResource(R.string.metal_name_gold)
+    "XAG" -> stringResource(R.string.metal_name_silver)
+    "XPT" -> stringResource(R.string.metal_name_platinum)
+    "XPD" -> stringResource(R.string.metal_name_palladium)
+    else -> symbol
 }
 
 private fun String.ifHexBlank(default: String): String = if (this.isBlank() || !this.startsWith("#")) default else this

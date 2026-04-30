@@ -52,6 +52,7 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.holdings.formatAmount
 import com.swanie.portfolio.ui.holdings.formatCurrency
+import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -564,15 +565,25 @@ fun MyHoldingsScreen(
         // Selection Funnels
         assetBeingEdited?.let { asset ->
             if (asset.category == AssetCategory.METAL) {
-                MetalSelectionFunnel(
-                    initialMetal = asset.name, initialForm = asset.physicalForm, initialWeight = asset.weight, initialQty = asset.amountHeld.toString(), initialPrem = asset.premium.toString(), initialManualPrice = asset.officialSpotPrice.toString(),
-                    onDismiss = { assetBeingEdited = null },
-                    onConfirmed = { name, form, w, unit, qty, prem, icon, manual, price ->
-                        viewModel.updateAssetEntity(asset.copy(name = name, physicalForm = form, weight = w, weightUnit = unit, amountHeld = qty.toDoubleOrNull() ?: 0.0, premium = prem.toDoubleOrNull() ?: 0.0, imageUrl = icon ?: asset.imageUrl, officialSpotPrice = price.toDoubleOrNull() ?: asset.officialSpotPrice))
-                        assetBeingEdited = null
-                        editingAssetId = null
-                    }
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(45f)
+                ) {
+                    AssetArchitectScreen(
+                        existingAsset = asset,
+                        initialSymbol = asset.symbol,
+                        initialPrice = asset.officialSpotPrice,
+                        initialSource = asset.priceSource,
+                        onSave = { updated ->
+                            viewModel.updateAssetEntity(updated)
+                            cryptoIconReloadNonce++
+                            assetBeingEdited = null
+                            editingAssetId = null
+                        },
+                        onCancel = { assetBeingEdited = null },
+                    )
+                }
             } else {
                 CryptoEditFunnel(
                     asset = asset,

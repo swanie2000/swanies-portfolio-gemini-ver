@@ -334,7 +334,7 @@
     <string name="analytics_live_risk_regime_defensive">रक्षात्मक मोड सुझाया गया</string>
     <string name="analytics_live_risk_regime_monitor">बारीकी से निगरानी करें</string>
     <string name="analytics_live_risk_regime_balanced">संतुलित</string>
-    <string name="analytics_live_risk_hero_title">लाइव जोखिम बुद्धिमत्ता</string>
+    <string name="analytics_live_risk_hero_title">जोखिम बुद्धिमत्ता</string>
     <string name="analytics_live_risk_hero_subtitle">Premium जोखिम इंजन एक समय में एकाग्रता, अस्थिरता दबाव और श्रेणी असंतुलन को ट्रैक करता है।</string>
     <string name="analytics_live_risk_engine_title">जोखिम एक्सपोज़र इंजन</string>
     <string name="analytics_live_risk_engine_description">आपके वर्तमान होल्डिंग मिश्रण से लाइव एकाग्रता स्कोर अपडेट होता है।</string>
@@ -353,7 +353,7 @@
     <string name="analytics_live_signal_high">उच्च</string>
     <string name="analytics_live_signal_medium">मध्यम</string>
     <string name="analytics_live_signal_low">निम्न</string>
-    <string name="analytics_live_attribution_hero_title">लाइव योगदान इंजन</string>
+    <string name="analytics_live_attribution_hero_title">योगदान इंजन</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium योगदान लाभ और घर्षण चालकों को गति विश्वास और श्रेणी योगदान के साथ विभाजित करता है।</string>
     <string name="analytics_live_attribution_engine_title">योगदान इंजन</string>
     <string name="analytics_live_attribution_engine_description">लाइव वजन और 24 घंटे परिवर्तन से प्रति स्थान अनुमानित 24 घंटे योगदान।</string>
@@ -370,7 +370,7 @@
     <string name="analytics_live_drag_positions_title">खिंचाव स्थान</string>
     <string name="analytics_live_target_mode_category_balanced">श्रेणी-संतुलित</string>
     <string name="analytics_live_target_mode_equal_weight">समान वजन</string>
-    <string name="analytics_live_rebalance_hero_title">लाइव रीबैलेंस कोच</string>
+    <string name="analytics_live_rebalance_hero_title">रीबैलेंस कोच</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium रीबैलेंसर कार्रवाई से पहले ड्रिफ्ट, थ्रेशोल्ड उल्लंघन और अनुमानित टर्नओवर मूल्यांकन करता है।</string>
     <string name="analytics_live_rebalance_engine_title">रीबैलेंस इंजन</string>
     <string name="analytics_live_rebalance_model_active">%1$s मॉडल शीर्ष %2$d होल्डिंग पर सक्रिय।</string>
@@ -385,7 +385,7 @@
     <string name="analytics_live_scenario_market_shock">बाजार झटका</string>
     <string name="analytics_live_scenario_crypto_winter">क्रिप्टो सर्दी</string>
     <string name="analytics_live_scenario_rate_spike">दर में उछाल</string>
-    <string name="analytics_live_scenarios_hero_title">लाइव परिदृश्य प्रयोगशाला</string>
+    <string name="analytics_live_scenarios_hero_title">परिदृश्य प्रयोगशाला</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium परिदृश्य इंजन आपके लाइव होल्डिंग मिश्रण पर एक-टैप झटके और रैली चलाता है।</string>
     <string name="analytics_live_scenario_preset_title">परिदृश्य प्रीसेट</string>
     <string name="analytics_live_active_preset">सक्रिय प्रीसेट: %1$s</string>

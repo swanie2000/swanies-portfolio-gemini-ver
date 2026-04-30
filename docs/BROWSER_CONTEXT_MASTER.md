@@ -173,7 +173,15 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.67: HOLDINGS PRO BANNER + ICON RELOAD)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.69: METALS FUNNEL + HOLDINGS CARD TRUTH)
+
+V40.69 UPDATE
+- Metal `displayName` preserved in `AssetRepository` on upsert/refresh; `cleanMetalName` handles `XAU`/`XAG`/`XPT`/`XPD`.
+- Holdings: `underIconTickerText`; expanded compact + full card — no duplicate middle title for metals; two-line under-icon label; collapsed two-line metal title; top-aligned header; taller expanded min height.
+- Architect / amount entry / metals audit / picker + locale strings updated (see repo).
+
+FUTURE PATH
+- Device QA metal cards at small width + large font; optional two-line parity on other metal lists.
 
 V40.67 UPDATE
 - Holdings free-tier upsell: `holdings_upsell_*` strings, swipe/multi-portfolio copy, short CTA; single-line + 9.sp subtitle layout.

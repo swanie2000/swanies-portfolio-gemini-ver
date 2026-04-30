@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">MODO DEFENSIVO SUGERIDO</string>
     <string name="analytics_live_risk_regime_monitor">MONITORE DE PERTO</string>
     <string name="analytics_live_risk_regime_balanced">EQUILIBRADO</string>
-    <string name="analytics_live_risk_hero_title">INTELIGÊNCIA DE RISCO AO VIVO</string>
+    <string name="analytics_live_risk_hero_title">INTELIGÊNCIA DE RISCO</string>
     <string name="analytics_live_risk_hero_subtitle">O motor de risco Premium acompanha concentração, pressão de volatilidade e desequilíbrio de categoria em tempo real.</string>
     <string name="analytics_live_risk_engine_title">MOTOR DE EXPOSIÇÃO A RISCO</string>
     <string name="analytics_live_risk_engine_description">Atualizações ao vivo da pontuação de concentração com base no mix atual da sua carteira.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">ALTA</string>
     <string name="analytics_live_signal_medium">MÉDIA</string>
     <string name="analytics_live_signal_low">BAIXA</string>
-    <string name="analytics_live_attribution_hero_title">MOTOR DE ATRIBUIÇÃO AO VIVO</string>
+    <string name="analytics_live_attribution_hero_title">MOTOR DE ATRIBUIÇÃO</string>
     <string name="analytics_live_attribution_hero_subtitle">A atribuição Premium decompõe drivers de ganho e perda com confiança de momentum e atribuição por categoria.</string>
     <string name="analytics_live_attribution_engine_title">MOTOR DE ATRIBUIÇÃO</string>
     <string name="analytics_live_attribution_engine_description">Contribuição estimada em 24h por posição usando pesos ao vivo e variação de 24h.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">POSIÇÕES DE ARRASTO</string>
     <string name="analytics_live_target_mode_category_balanced">BALANCEADO POR CATEGORIA</string>
     <string name="analytics_live_target_mode_equal_weight">PESO IGUAL</string>
-    <string name="analytics_live_rebalance_hero_title">COACH DE REBALANCEAMENTO AO VIVO</string>
+    <string name="analytics_live_rebalance_hero_title">COACH DE REBALANCEAMENTO</string>
     <string name="analytics_live_rebalance_hero_subtitle">O rebalanceador Premium avalia desvio, rompimentos de limite e giro estimado antes de agir.</string>
     <string name="analytics_live_rebalance_engine_title">MOTOR DE REBALANCEAMENTO</string>
     <string name="analytics_live_rebalance_model_active">Modelo %1$s ativo entre as %2$d principais posições.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">CHOQUE DE MERCADO</string>
     <string name="analytics_live_scenario_crypto_winter">INVERNO CRIPTO</string>
     <string name="analytics_live_scenario_rate_spike">PICO DE JUROS</string>
-    <string name="analytics_live_scenarios_hero_title">LABORATÓRIO DE CENÁRIOS AO VIVO</string>
+    <string name="analytics_live_scenarios_hero_title">LABORATÓRIO DE CENÁRIOS</string>
     <string name="analytics_live_scenarios_hero_subtitle">O motor de cenários Premium executa choques e ralis com um toque sobre seu mix de posições ao vivo.</string>
     <string name="analytics_live_scenario_preset_title">PRESET DE CENÁRIO</string>
     <string name="analytics_live_active_preset">Preset ativo: %1$s</string>

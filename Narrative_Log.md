@@ -599,3 +599,27 @@ Release recorded: V40.68.2 "Indonesian resources + locale plumbing".
 ### Next Phase (Projected Path)
 
 - When adding locales, confirm resource folder qualifiers match Android’s expected language codes (e.g. Indonesian → `values-in`, not `values-id`).
+
+---
+
+## V40.69 - Metals Funnel + Holdings Card Truth (Architect / Picker / Cards)
+
+Release recorded: V40.69 "Metals Funnel + Holdings Card Truth".
+
+- **Data / repository:** `AssetRepository` preserves user-authored **`displayName`** for metals on `upsertAsset` and refresh/update paths so `cleanMetalName()` no longer overwrites architect or vault labels. **`cleanMetalName`** mapping extended for spot tickers **`XAU` / `XAG` / `XPT` / `XPD`** (alongside futures-style symbols) so classification stays correct without clobbering custom titles.
+- **Add / edit metals UX:** `AssetArchitectScreen`, `AmountEntryScreen` / `AmountEntryViewModel`, `MetalsAuditScreen`, and `NavGraph` carry the multi-step metals funnel improvements (including multi-line display naming where the funnel allows it).
+- **Holdings presentation:** `HoldingsUIComponents` — shared **`underIconTickerText(asset)`** drives under-icon label and `MetalIcon` name key (display name for metals, symbol for crypto). Expanded **compact** and **`FullAssetCard`** hide the redundant middle gray title for **METAL** only; under-icon label supports **up to two lines** with flexible column height (no fixed `95.dp` clip), slightly higher expanded card min height, top-aligned header row; collapsed compact title uses **two-line** `AutoResizingText` for metals where space allows.
+- **Picker / analytics touch-ups:** `AssetPickerScreen` refactor; small adjustments in `AnalyticsScreen` / `AnalyticsProUiComponents`; `MyHoldingsScreen` wiring as needed for the above.
+- **Strings:** New/changed user-facing keys propagated in **`values/strings.xml`** and all shipped **`values-*/strings.xml`** bundles touched in this session.
+- **Verification:** `:app:compileDebugKotlin` succeeded after the holdings card layout changes.
+
+### Current Status (End of Session)
+
+- Metals added through the architect funnel keep their chosen display text through DB refresh and show consistently on compact (collapsed + expanded) and full asset cards, including two-line labels without clipping on expanded layouts.
+- Branch `main` carries the full code + resource diff; narrative and master browser context files updated in the same commit as this log entry.
+
+### Next Phase (Projected Path)
+
+- On-device pass: long metal names, smallest-width buckets, and large font scales on compact vs full cards.
+- Optional: extend the same two-line treatment to any remaining metal-specific rows (e.g. audit list) if product wants parity everywhere.
+- Resume prior roadmap items (monetization matrix, auth instrumentation) when you switch focus away from metals polish.

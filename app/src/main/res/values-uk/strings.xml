@@ -334,7 +334,7 @@
     <string name="analytics_live_risk_regime_defensive">РЕКОМЕНДОВАНО ОБОРОННИЙ РЕЖИМ</string>
     <string name="analytics_live_risk_regime_monitor">УВАЖНО СТЕЖИТИ</string>
     <string name="analytics_live_risk_regime_balanced">ЗБАЛАНСОВАНО</string>
-    <string name="analytics_live_risk_hero_title">РИЗИК-ІНТЕЛЕКТ У РЕАЛЬНОМУ ЧАСІ</string>
+    <string name="analytics_live_risk_hero_title">РИЗИК-ІНТЕЛЕКТ</string>
     <string name="analytics_live_risk_hero_subtitle">Ризик-двигун Premium відстежує концентрацію, тиск волатильності та дисбаланс категорій у реальному часі.</string>
     <string name="analytics_live_risk_engine_title">ДВИГУН РИЗИКОВОЇ ЕКСПОЗИЦІЇ</string>
     <string name="analytics_live_risk_engine_description">Оцінка концентрації в реальному часі оновлюється за поточним складом портфеля.</string>
@@ -353,7 +353,7 @@
     <string name="analytics_live_signal_high">ВИСОКА</string>
     <string name="analytics_live_signal_medium">СЕРЕДНЯ</string>
     <string name="analytics_live_signal_low">НИЗЬКА</string>
-    <string name="analytics_live_attribution_hero_title">ДВИГУН АТРИБУЦІЇ У РЕАЛЬНОМУ ЧАСІ</string>
+    <string name="analytics_live_attribution_hero_title">ДВИГУН АТРИБУЦІЇ</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium-атрибуція розкладає драйвери прибутку та просадки з упевненістю за моментумом і за категоріями.</string>
     <string name="analytics_live_attribution_engine_title">ДВИГУН АТРИБУЦІЇ</string>
     <string name="analytics_live_attribution_engine_description">Оцінка внеску за 24 год на позицію на основі живих ваг і зміни за 24 год.</string>
@@ -370,7 +370,7 @@
     <string name="analytics_live_drag_positions_title">ПОЗИЦІЇ З ПРОСАДКОЮ</string>
     <string name="analytics_live_target_mode_category_balanced">ЗБАЛАНСОВАНО ЗА КАТЕГОРІЯМИ</string>
     <string name="analytics_live_target_mode_equal_weight">РІВНІ ВАГИ</string>
-    <string name="analytics_live_rebalance_hero_title">КОУЧ З РЕБАЛАНСУ В РЕАЛЬНОМУ ЧАСІ</string>
+    <string name="analytics_live_rebalance_hero_title">КОУЧ З РЕБАЛАНСУ</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium-ребалансувальник оцінює дрейф, порушення порогів і оцінковий оборот перед дією.</string>
     <string name="analytics_live_rebalance_engine_title">ДВИГУН РЕБАЛАНСУ</string>
     <string name="analytics_live_rebalance_model_active">Модель %1$s активна для топ-%2$d позицій.</string>
@@ -385,7 +385,7 @@
     <string name="analytics_live_scenario_market_shock">РИНКОВИЙ ШОК</string>
     <string name="analytics_live_scenario_crypto_winter">КРИПТОЗИМА</string>
     <string name="analytics_live_scenario_rate_spike">СТРИБОК СТАВОК</string>
-    <string name="analytics_live_scenarios_hero_title">ЛАБОРАТОРІЯ СЦЕНАРІЇВ У РЕАЛЬНОМУ ЧАСІ</string>
+    <string name="analytics_live_scenarios_hero_title">ЛАБОРАТОРІЯ СЦЕНАРІЇВ</string>
     <string name="analytics_live_scenarios_hero_subtitle">Двигун сценаріїв Premium запускає шоки та ралі одним дотиком для вашого поточного складу.</string>
     <string name="analytics_live_scenario_preset_title">ПРЕСЕТ СЦЕНАРІЮ</string>
     <string name="analytics_live_active_preset">Активний пресет: %1$s</string>

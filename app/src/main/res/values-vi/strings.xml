@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">ĐỀ XUẤT CHẾ ĐỘ PHÒNG THỦ</string>
     <string name="analytics_live_risk_regime_monitor">THEO DÕI SÁT</string>
     <string name="analytics_live_risk_regime_balanced">CÂN BẰNG</string>
-    <string name="analytics_live_risk_hero_title">THÔNG MINH RỦI RO TRỰC TIẾP</string>
+    <string name="analytics_live_risk_hero_title">THÔNG MINH RỦI RO</string>
     <string name="analytics_live_risk_hero_subtitle">Động cơ rủi ro Premium theo dõi mức tập trung, áp lực biến động và mất cân bằng danh mục theo thời gian thực.</string>
     <string name="analytics_live_risk_engine_title">ĐỘNG CƠ TIẾP XÚC RỦI RO</string>
     <string name="analytics_live_risk_engine_description">Điểm tập trung cập nhật trực tiếp theo tỷ trọng nắm giữ hiện tại của bạn.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">CAO</string>
     <string name="analytics_live_signal_medium">TRUNG BÌNH</string>
     <string name="analytics_live_signal_low">THẤP</string>
-    <string name="analytics_live_attribution_hero_title">ĐỘNG CƠ PHÂN BỔ TRỰC TIẾP</string>
+    <string name="analytics_live_attribution_hero_title">ĐỘNG CƠ PHÂN BỔ</string>
     <string name="analytics_live_attribution_hero_subtitle">Phân bổ Premium tách các nhân tố đóng góp lãi và kéo xuống với độ tin cậy đà và phân bổ theo danh mục.</string>
     <string name="analytics_live_attribution_engine_title">ĐỘNG CƠ PHÂN BỔ</string>
     <string name="analytics_live_attribution_engine_description">Ước tính đóng góp 24 giờ theo từng vị thế, dùng trọng số trực tiếp và thay đổi 24 giờ.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">VỊ THẾ KÉO XUỐNG</string>
     <string name="analytics_live_target_mode_category_balanced">CÂN BẰNG THEO DANH MỤC</string>
     <string name="analytics_live_target_mode_equal_weight">TRỌNG SỐ ĐỀU</string>
-    <string name="analytics_live_rebalance_hero_title">HUẤN LUYỆN CÂN BẰNG TRỰC TIẾP</string>
+    <string name="analytics_live_rebalance_hero_title">HUẤN LUYỆN CÂN BẰNG</string>
     <string name="analytics_live_rebalance_hero_subtitle">Công cụ cân bằng Premium đánh giá trôi dạt, vượt ngưỡng và doanh thu ước tính trước khi hành động.</string>
     <string name="analytics_live_rebalance_engine_title">ĐỘNG CƠ CÂN BẰNG</string>
     <string name="analytics_live_rebalance_model_active">Mô hình %1$s đang hoạt động trên %2$d vị thế hàng đầu.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">CÚ SỐC THỊ TRƯỜNG</string>
     <string name="analytics_live_scenario_crypto_winter">MÙA ĐÔNG TIỀN MÃ HÓA</string>
     <string name="analytics_live_scenario_rate_spike">LÃI SUẤT TĂNG VỌT</string>
-    <string name="analytics_live_scenarios_hero_title">PHÒNG THÍ NGHIỆM KỊCH BẢN TRỰC TIẾP</string>
+    <string name="analytics_live_scenarios_hero_title">PHÒNG THÍ NGHIỆM KỊCH BẢN</string>
     <string name="analytics_live_scenarios_hero_subtitle">Động cơ kịch bản Premium chạy cú sốc và phục hồi một chạm trên tỷ trọng nắm giữ trực tiếp của bạn.</string>
     <string name="analytics_live_scenario_preset_title">CÀI SẴN KỊCH BẢN</string>
     <string name="analytics_live_active_preset">Cài sẵn đang dùng: %1$s</string>

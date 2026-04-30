@@ -354,7 +354,7 @@
     <string name="analytics_live_risk_regime_defensive">防御モード推奨</string>
     <string name="analytics_live_risk_regime_monitor">要注意</string>
     <string name="analytics_live_risk_regime_balanced">バランス良好</string>
-    <string name="analytics_live_risk_hero_title">ライブリスクインテリジェンス</string>
+    <string name="analytics_live_risk_hero_title">リスクインテリジェンス</string>
     <string name="analytics_live_risk_hero_subtitle">Premiumリスクエンジンが、集中度・ボラティリティ圧力・カテゴリ不均衡をリアルタイムで追跡します。</string>
     <string name="analytics_live_risk_engine_title">リスクエクスポージャーエンジン</string>
     <string name="analytics_live_risk_engine_description">現在の保有構成に基づき、集中度スコアをライブ更新します。</string>
@@ -373,7 +373,7 @@
     <string name="analytics_live_signal_high">高</string>
     <string name="analytics_live_signal_medium">中</string>
     <string name="analytics_live_signal_low">低</string>
-    <string name="analytics_live_attribution_hero_title">ライブ帰属分析エンジン</string>
+    <string name="analytics_live_attribution_hero_title">帰属分析エンジン</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium帰属分析は、勢いの信頼度とカテゴリ別内訳で、上昇・下落要因を分解します。</string>
     <string name="analytics_live_attribution_engine_title">帰属分析エンジン</string>
     <string name="analytics_live_attribution_engine_description">ライブ比率と24時間変動を使って、ポジション別24時間寄与を推定します。</string>
@@ -390,7 +390,7 @@
     <string name="analytics_live_drag_positions_title">下押しポジション</string>
     <string name="analytics_live_target_mode_category_balanced">カテゴリバランス型</string>
     <string name="analytics_live_target_mode_equal_weight">等ウェイト</string>
-    <string name="analytics_live_rebalance_hero_title">ライブリバランスコーチ</string>
+    <string name="analytics_live_rebalance_hero_title">リバランスコーチ</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premiumリバランサーは、実行前に乖離・閾値超過・想定回転率を評価します。</string>
     <string name="analytics_live_rebalance_engine_title">リバランスエンジン</string>
     <string name="analytics_live_rebalance_model_active">%1$sモデルが上位%2$d保有に適用中。</string>
@@ -405,7 +405,7 @@
     <string name="analytics_live_scenario_market_shock">市場ショック</string>
     <string name="analytics_live_scenario_crypto_winter">クリプト冬の時代</string>
     <string name="analytics_live_scenario_rate_spike">金利急騰</string>
-    <string name="analytics_live_scenarios_hero_title">ライブシナリオラボ</string>
+    <string name="analytics_live_scenarios_hero_title">シナリオラボ</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premiumシナリオエンジンが、現在の保有構成に対してワンタップでショックとラリーを実行します。</string>
     <string name="analytics_live_scenario_preset_title">シナリオプリセット</string>
     <string name="analytics_live_active_preset">有効プリセット: %1$s</string>

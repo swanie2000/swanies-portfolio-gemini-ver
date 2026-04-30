@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -169,14 +170,23 @@ fun AnalyticsScreen(navController: NavController) {
                             )
                         }
                     } else {
-                        Text(
+                        // Reserve horizontal space for the start-aligned back affordance (symmetric for RTL).
+                        val titleBarReserve = 56.dp
+                        AutoResizingText(
                             text = pageTitles[modeTabIndex],
-                            color = safeText,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Black,
-                            textAlign = TextAlign.Center,
+                            style = TextStyle(
+                                color = safeText,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Black,
+                                textAlign = TextAlign.Center,
+                            ),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            softWrap = false,
+                            overflow = TextOverflow.Clip,
+                            minFontSize = 9.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = titleBarReserve),
                         )
                     }
                 }

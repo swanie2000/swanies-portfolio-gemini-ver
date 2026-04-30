@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">DEFENSIEVE MODUS AANBEVOLEN</string>
     <string name="analytics_live_risk_regime_monitor">NAUWGEZET VOLGEN</string>
     <string name="analytics_live_risk_regime_balanced">IN BALANS</string>
-    <string name="analytics_live_risk_hero_title">LIVE RISICO-INTELLIGENTIE</string>
+    <string name="analytics_live_risk_hero_title">RISICO-INTELLIGENTIE</string>
     <string name="analytics_live_risk_hero_subtitle">De Premium-risicomotor volgt concentratie, volatiliteitsdruk en categorie-onbalans in realtime.</string>
     <string name="analytics_live_risk_engine_title">RISICOBLOOTSTELLINGSMOTOR</string>
     <string name="analytics_live_risk_engine_description">Live concentratiescore-updates op basis van je huidige holdingsmix.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">HOOG</string>
     <string name="analytics_live_signal_medium">GEMIDDELD</string>
     <string name="analytics_live_signal_low">LAAG</string>
-    <string name="analytics_live_attribution_hero_title">LIVE ATTRIBUTIEMOTOR</string>
+    <string name="analytics_live_attribution_hero_title">ATTRIBUTIEMOTOR</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium-attributie splitst winst- en verliesdrivers met momentumvertrouwen en categorie-attributie.</string>
     <string name="analytics_live_attribution_engine_title">ATTRIBUTIEMOTOR</string>
     <string name="analytics_live_attribution_engine_description">Geschatte 24u-bijdrage per positie op basis van live gewichten en 24u-verandering.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">REM-POSITIES</string>
     <string name="analytics_live_target_mode_category_balanced">CATEGORIE-GEBALANCEERD</string>
     <string name="analytics_live_target_mode_equal_weight">GELIJK GEWOGEN</string>
-    <string name="analytics_live_rebalance_hero_title">LIVE HERBALANCEERCOACH</string>
+    <string name="analytics_live_rebalance_hero_title">HERBALANCEERCOACH</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium-herbalancering beoordeelt afwijking, drempeloverschrijdingen en geschatte omloop voor actie.</string>
     <string name="analytics_live_rebalance_engine_title">HERBALANCERINGSMOTOR</string>
     <string name="analytics_live_rebalance_model_active">%1$s-model actief over de top %2$d holdings.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">MARKTSCHOK</string>
     <string name="analytics_live_scenario_crypto_winter">CRYPTO-WINTER</string>
     <string name="analytics_live_scenario_rate_spike">RENTEPIEK</string>
-    <string name="analytics_live_scenarios_hero_title">LIVE SCENARIOLAB</string>
+    <string name="analytics_live_scenarios_hero_title">SCENARIOLAB</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium-scenariomotor voert met één tik schokken en rally\'s uit op je live holdingsmix.</string>
     <string name="analytics_live_scenario_preset_title">SCENARIOPRESET</string>
     <string name="analytics_live_active_preset">Actieve preset: %1$s</string>

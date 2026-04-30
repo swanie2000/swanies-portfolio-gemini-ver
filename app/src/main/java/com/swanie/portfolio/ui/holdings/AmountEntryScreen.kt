@@ -72,7 +72,6 @@ fun AmountEntryScreen(
     var showCheckmark by remember { mutableStateOf(false) }
 
     var amountText by remember { mutableStateOf("") }
-    var metalEntityBuffer by remember { mutableStateOf<AssetEntity?>(null) }
     
     val focusRequester = remember { FocusRequester() }
     var showExitDialog by remember { mutableStateOf(false) }
@@ -125,14 +124,6 @@ fun AmountEntryScreen(
                     priceSource = priceSource
                 )
                 viewModel.performSurgicalAdd(asset) { isActualWorkDone = true }
-            } else {
-                metalEntityBuffer?.let { buffer ->
-                    val refinedAsset = buffer.copy(
-                        coinId = uniqueId,
-                        lastUpdated = timestamp
-                    )
-                    viewModel.performSurgicalAdd(refinedAsset) { isActualWorkDone = true }
-                }
             }
 
             showCheckmark = true
@@ -150,38 +141,11 @@ fun AmountEntryScreen(
         label = "scale"
     )
 
-    if (category == AssetCategory.METAL && !isSaving) {
-        MetalSelectionFunnel(
-            initialMetal = symbol,
-            initialForm = "",
-            initialWeight = 1.0,
-            initialQty = "",
-            initialPrem = "",
-            initialManualPrice = officialSpotPrice.toString(),
-            onDismiss = onCancel,
-            onConfirmed = { type, desc, weight, unit, qty, prem, icon, isManual, manualPrice ->
-                metalEntityBuffer = AssetEntity(
-                    coinId = coinId,
-                    symbol = type,
-                    name = desc,
-                    category = AssetCategory.METAL,
-                    weight = weight,
-                    weightUnit = unit, // 🛠️ V18: Explicit Unit Capture
-                    physicalForm = desc.split("\n").firstOrNull() ?: "Coin", // 🛡️ V18: Explicit Form Capture from Funnel
-                    amountHeld = qty.toDoubleOrNull() ?: 0.0,
-                    premium = prem.toDoubleOrNull() ?: 0.0,
-                    imageUrl = icon ?: "",
-                    officialSpotPrice = if(isManual) (manualPrice.toDoubleOrNull() ?: 0.0) else officialSpotPrice,
-                    priceSource = priceSource,
-                    apiId = apiId,
-                    baseSymbol = symbol
-                )
-                isSaving = true 
-            },
-            onNavigateToArchitect = {
-                onNavigateToArchitect(symbol, officialSpotPrice, priceSource)
-            }
-        )
+    LaunchedEffect(category, symbol, officialSpotPrice, priceSource) {
+        if (category == AssetCategory.METAL) {
+            onNavigateToArchitect(symbol, officialSpotPrice, priceSource)
+            onCancel()
+        }
     }
 
     Scaffold(containerColor = Color.Transparent) { padding ->

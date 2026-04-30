@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -55,10 +56,21 @@ class AmountEntryViewModel @Inject constructor(
             // 🌐 GLOBAL VISTA: Dynamically fetch currentVaultId from ThemePreferences
             val activeVaultId = themePreferences.currentVaultId.first()
 
-            // 1. Download Icon On-Demand
-            val localPath = iconManager.downloadIcon(asset.symbol, asset.imageUrl)
-            if (localPath != null) {
-                Log.d("IconManager", "Saved icon to: $localPath")
+            // 1. Icon: keep an existing custom file, otherwise download default artwork.
+            val localPath = if (!asset.localIconPath.isNullOrBlank()) {
+                val f = File(asset.localIconPath!!)
+                if (f.exists()) {
+                    Log.d("IconManager", "Using custom icon already on disk: ${f.absolutePath}")
+                    asset.localIconPath
+                } else {
+                    iconManager.downloadIcon(asset.symbol, asset.imageUrl).also { p ->
+                        if (p != null) Log.d("IconManager", "Saved icon to: $p")
+                    }
+                }
+            } else {
+                iconManager.downloadIcon(asset.symbol, asset.imageUrl).also { p ->
+                    if (p != null) Log.d("IconManager", "Saved icon to: $p")
+                }
             }
 
             // 2. Fetch live data and apply correct vaultId + local icon path

@@ -334,7 +334,7 @@
     <string name="analytics_live_risk_regime_defensive">แนะนำโหมดป้องกันความเสี่ยง</string>
     <string name="analytics_live_risk_regime_monitor">ติดตามอย่างใกล้ชิด</string>
     <string name="analytics_live_risk_regime_balanced">สมดุล</string>
-    <string name="analytics_live_risk_hero_title">ข้อมูลความเสี่ยงแบบเรียลไทม์</string>
+    <string name="analytics_live_risk_hero_title">ข้อมูลความเสี่ยง</string>
     <string name="analytics_live_risk_hero_subtitle">เครื่องมือความเสี่ยง Premium ติดตามความเข้มข้น แรงกดดันจากความผันผวน และความไม่สมดุลของหมวดสินทรัพย์แบบเรียลไทม์</string>
     <string name="analytics_live_risk_engine_title">เครื่องมือวัดความเสี่ยงจากการถือครอง</string>
     <string name="analytics_live_risk_engine_description">อัปเดตคะแนนความเข้มข้นแบบสดจากสัดส่วนการถือครองปัจจุบันของคุณ</string>
@@ -353,7 +353,7 @@
     <string name="analytics_live_signal_high">สูง</string>
     <string name="analytics_live_signal_medium">ปานกลาง</string>
     <string name="analytics_live_signal_low">ต่ำ</string>
-    <string name="analytics_live_attribution_hero_title">เครื่องมือแยกผลตอบแทนแบบเรียลไทม์</string>
+    <string name="analytics_live_attribution_hero_title">เครื่องมือแยกผลตอบแทน</string>
     <string name="analytics_live_attribution_hero_subtitle">การแยกผลแบบ Premium แตกย่อยปัจจัยบวกและลบด้วยความเชื่อมั่นของโมเมนตัมและการแยกตามหมวด</string>
     <string name="analytics_live_attribution_engine_title">เครื่องมือแยกผลตอบแทน</string>
     <string name="analytics_live_attribution_engine_description">ประมาณการมีส่วนร่วม 24 ชม. ต่อตำแหน่งโดยใช้น้ำหนักสดและการเปลี่ยนแปลง 24 ชม.</string>
@@ -370,7 +370,7 @@
     <string name="analytics_live_drag_positions_title">ตำแหน่งที่ดึงลง</string>
     <string name="analytics_live_target_mode_category_balanced">สมดุลตามหมวด</string>
     <string name="analytics_live_target_mode_equal_weight">น้ำหนักเท่ากัน</string>
-    <string name="analytics_live_rebalance_hero_title">โค้ชปรับสมดุลแบบเรียลไทม์</string>
+    <string name="analytics_live_rebalance_hero_title">โค้ชปรับสมดุล</string>
     <string name="analytics_live_rebalance_hero_subtitle">ตัวปรับสมดุล Premium ประเมินการเบี่ยงเบน การทะลุเกณฑ์ และการหมุนเวียนโดยประมาณก่อนดำเนินการ</string>
     <string name="analytics_live_rebalance_engine_title">เครื่องมือปรับสมดุล</string>
     <string name="analytics_live_rebalance_model_active">โมเดล %1$s ใช้งานกับ %2$d ตำแหน่งอันดับต้น</string>
@@ -385,7 +385,7 @@
     <string name="analytics_live_scenario_market_shock">แรงกระแทกตลาด</string>
     <string name="analytics_live_scenario_crypto_winter">ฤดูหนาวคริปโต</string>
     <string name="analytics_live_scenario_rate_spike">อัตราดอกเบี้ยพุ่ง</string>
-    <string name="analytics_live_scenarios_hero_title">ห้องทดลองสถานการณ์แบบสด</string>
+    <string name="analytics_live_scenarios_hero_title">ห้องทดลองสถานการณ์</string>
     <string name="analytics_live_scenarios_hero_subtitle">เครื่องมือสถานการณ์ Premium จำลองแรงกระแทกและการฟื้นตัวแบบแตะเดียวกับสัดส่วนการถือครองสดของคุณ</string>
     <string name="analytics_live_scenario_preset_title">พรีเซ็ตสถานการณ์</string>
     <string name="analytics_live_active_preset">พรีเซ็ตที่ใช้งาน: %1$s</string>

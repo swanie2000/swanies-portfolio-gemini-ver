@@ -204,6 +204,7 @@ fun NavGraph(
                 val vaultId = backStackEntry.arguments?.getInt("vaultId") ?: Routes.PRIMARY_VAULT_ID
                 AssetPickerScreen(
                     navController = navController,
+                    vaultId = vaultId,
                     onAssetSelected = { asset ->
                         scope.launch {
                             val healedAsset = assetViewModel.healMetadata(asset)

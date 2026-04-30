@@ -55,11 +55,11 @@ class AssetRepository @Inject constructor(
         val upperName = rawName.uppercase(Locale.ROOT)
 
         val metalType = when {
-            upperSymbol.contains("GC=F") || upperName.contains("GOLD") -> "Gold"
-            upperSymbol.contains("SI=F") || upperSymbol == "SILVER" || upperName.contains("SILVER") -> "Silver"
-            upperSymbol.contains("PL=F") || upperName.contains("PLATINUM") -> "Platinum"
-            upperSymbol.contains("PA=F") || upperName.contains("PALLADIUM") -> "Palladium"
-            else -> symbol.replace("=F", "")
+            upperSymbol == "XAU" || upperSymbol.contains("GC=F") || upperName.contains("GOLD") -> "Gold"
+            upperSymbol == "XAG" || upperSymbol.contains("SI=F") || upperSymbol == "SILVER" || upperName.contains("SILVER") -> "Silver"
+            upperSymbol == "XPT" || upperSymbol.contains("PL=F") || upperName.contains("PLATINUM") -> "Platinum"
+            upperSymbol == "XPD" || upperSymbol.contains("PA=F") || upperName.contains("PALLADIUM") -> "Palladium"
+            else -> symbol.replace("=F", "").trim().ifBlank { "Metal" }
         }
 
         val unitLabel = when (unit.uppercase(Locale.ROOT)) {
@@ -109,13 +109,21 @@ class AssetRepository @Inject constructor(
                     if (update != null) {
                         val isMetal = existing.category == AssetCategory.METAL
                         val finalDisplayName = if (isMetal) {
-                            cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight, existing.weightUnit)
+                            if (existing.displayName.isNotBlank()) {
+                                existing.displayName.trim()
+                            } else {
+                                cleanMetalName(update.name.ifEmpty { existing.name }, existing.symbol, existing.weight, existing.weightUnit)
+                            }
                         } else {
                             update.name.ifEmpty { existing.name }
                         }
 
                         existing.copy(
-                            name = update.name.ifEmpty { existing.name },
+                            name = if (isMetal && existing.displayName.isNotBlank()) {
+                                existing.name.ifBlank { update.name.ifEmpty { existing.name } }
+                            } else {
+                                update.name.ifEmpty { existing.name }
+                            },
                             displayName = finalDisplayName,
                             isMetal = isMetal,
                             officialSpotPrice = update.officialSpotPrice,
@@ -244,8 +252,23 @@ class AssetRepository @Inject constructor(
 
     suspend fun upsertAsset(asset: AssetEntity) {
         val isMetal = asset.category == AssetCategory.METAL
+        // Architect / funnel set a human label on displayName — do not replace it with cleanMetalName().
         val finalDisplayName = if (isMetal) {
-            cleanMetalName(asset.name, asset.symbol, asset.weight, asset.weightUnit)
+            if (asset.displayName.isNotBlank()) {
+                asset.displayName.trim()
+            } else {
+                cleanMetalName(asset.name, asset.symbol, asset.weight, asset.weightUnit)
+            }
+        } else {
+            asset.name
+        }
+
+        val finalName = if (isMetal) {
+            when {
+                asset.displayName.isNotBlank() -> asset.displayName.trim()
+                asset.name.isNotBlank() -> asset.name.trim()
+                else -> finalDisplayName
+            }
         } else {
             asset.name
         }
@@ -253,6 +276,7 @@ class AssetRepository @Inject constructor(
         val finalForm = if (asset.physicalForm.contains("Bar", true)) "Bar" else asset.physicalForm
 
         val sanitizedAsset = asset.copy(
+            name = finalName,
             displayName = finalDisplayName,
             isMetal = isMetal,
             physicalForm = finalForm,

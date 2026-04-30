@@ -348,7 +348,7 @@
     <string name="analytics_live_risk_regime_defensive">يُنصح بالوضع الدفاعي</string>
     <string name="analytics_live_risk_regime_monitor">راقب عن كثب</string>
     <string name="analytics_live_risk_regime_balanced">متوازن</string>
-    <string name="analytics_live_risk_hero_title">ذكاء المخاطر المباشر</string>
+    <string name="analytics_live_risk_hero_title">ذكاء المخاطر</string>
     <string name="analytics_live_risk_hero_subtitle">محرك المخاطر Premium يتتبع التركيز وضغط التقلبات وعدم توازن الفئات في الوقت الفعلي.</string>
     <string name="analytics_live_risk_engine_title">محرك التعرض للمخاطر</string>
     <string name="analytics_live_risk_engine_description">تحديثات مباشرة لنتيجة التركيز وفق تكوين محفظتك الحالي.</string>
@@ -367,7 +367,7 @@
     <string name="analytics_live_signal_high">مرتفع</string>
     <string name="analytics_live_signal_medium">متوسط</string>
     <string name="analytics_live_signal_low">منخفض</string>
-    <string name="analytics_live_attribution_hero_title">محرك الإسناد المباشر</string>
+    <string name="analytics_live_attribution_hero_title">محرك الإسناد</string>
     <string name="analytics_live_attribution_hero_subtitle">إسناد Premium يفكك عوامل الربح والضغط مع ثقة الزخم والإسناد حسب الفئة.</string>
     <string name="analytics_live_attribution_engine_title">محرك الإسناد</string>
     <string name="analytics_live_attribution_engine_description">مساهمة تقديرية لمدة 24 ساعة لكل مركز باستخدام الأوزان المباشرة وتغير 24 ساعة.</string>
@@ -384,7 +384,7 @@
     <string name="analytics_live_drag_positions_title">مراكز الضغط السلبي</string>
     <string name="analytics_live_target_mode_category_balanced">متوازن حسب الفئة</string>
     <string name="analytics_live_target_mode_equal_weight">أوزان متساوية</string>
-    <string name="analytics_live_rebalance_hero_title">مدرب إعادة التوازن المباشر</string>
+    <string name="analytics_live_rebalance_hero_title">مدرب إعادة التوازن</string>
     <string name="analytics_live_rebalance_hero_subtitle">أداة إعادة التوازن Premium تقيّم الانحراف وخرق العتبات ودوران الأصول التقديري قبل التنفيذ.</string>
     <string name="analytics_live_rebalance_engine_title">محرك إعادة التوازن</string>
     <string name="analytics_live_rebalance_model_active">نموذج %1$s نشط على أعلى %2$d مراكز.</string>
@@ -399,7 +399,7 @@
     <string name="analytics_live_scenario_market_shock">صدمة السوق</string>
     <string name="analytics_live_scenario_crypto_winter">شتاء العملات المشفرة</string>
     <string name="analytics_live_scenario_rate_spike">قفزة في الفائدة</string>
-    <string name="analytics_live_scenarios_hero_title">مختبر السيناريوهات المباشر</string>
+    <string name="analytics_live_scenarios_hero_title">مختبر السيناريوهات</string>
     <string name="analytics_live_scenarios_hero_subtitle">محرك السيناريوهات Premium يشغّل صدمات وارتدادات بلمسة واحدة على تكوين محفظتك المباشر.</string>
     <string name="analytics_live_scenario_preset_title">إعداد مسبق للسيناريو</string>
     <string name="analytics_live_active_preset">الإعداد النشط: %1$s</string>

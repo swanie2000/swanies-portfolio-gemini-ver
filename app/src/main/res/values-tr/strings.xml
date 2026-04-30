@@ -355,7 +355,7 @@
     <string name="analytics_live_risk_regime_defensive">SAVUNMACI MOD ÖNERİLİR</string>
     <string name="analytics_live_risk_regime_monitor">YAKINDAN İZLE</string>
     <string name="analytics_live_risk_regime_balanced">DENGELİ</string>
-    <string name="analytics_live_risk_hero_title">CANLI RİSK ZEKÂSI</string>
+    <string name="analytics_live_risk_hero_title">RİSK ZEKÂSI</string>
     <string name="analytics_live_risk_hero_subtitle">Premium risk motoru konsantrasyonu, volatilite baskısını ve kategori dengesizliğini gerçek zamanlı izler.</string>
     <string name="analytics_live_risk_engine_title">RİSK MARUZİYET MOTORU</string>
     <string name="analytics_live_risk_engine_description">Konsantrasyon skoru, mevcut varlık karışımınıza göre canlı güncellenir.</string>
@@ -374,7 +374,7 @@
     <string name="analytics_live_signal_high">YÜKSEK</string>
     <string name="analytics_live_signal_medium">ORTA</string>
     <string name="analytics_live_signal_low">DÜŞÜK</string>
-    <string name="analytics_live_attribution_hero_title">CANLI KATKI MOTORU</string>
+    <string name="analytics_live_attribution_hero_title">KATKI MOTORU</string>
     <string name="analytics_live_attribution_hero_subtitle">Premium katkı analizi, momentum güveni ve kategori bazlı katkı ile kazanç ve sürükleyici faktörleri ayırır.</string>
     <string name="analytics_live_attribution_engine_title">KATKI MOTORU</string>
     <string name="analytics_live_attribution_engine_description">Canlı ağırlıklar ve 24 saatlik değişime göre pozisyon başına tahmini 24 saatlik katkı.</string>
@@ -391,7 +391,7 @@
     <string name="analytics_live_drag_positions_title">AŞAĞI ÇEKEN POZİSYONLAR</string>
     <string name="analytics_live_target_mode_category_balanced">KATEGORİ DENGELİ</string>
     <string name="analytics_live_target_mode_equal_weight">EŞİT AĞIRLIK</string>
-    <string name="analytics_live_rebalance_hero_title">CANLI YENİDEN DENGE KOÇU</string>
+    <string name="analytics_live_rebalance_hero_title">YENİDEN DENGE KOÇU</string>
     <string name="analytics_live_rebalance_hero_subtitle">Premium yeniden dengeleyici, işlem öncesi sapma, eşik aşımları ve tahmini ciroyu değerlendirir.</string>
     <string name="analytics_live_rebalance_engine_title">YENİDEN DENGE MOTORU</string>
     <string name="analytics_live_rebalance_model_active">%1$s modeli en üst %2$d varlıkta etkin.</string>
@@ -406,7 +406,7 @@
     <string name="analytics_live_scenario_market_shock">PİYASA ŞOKU</string>
     <string name="analytics_live_scenario_crypto_winter">KRİPTO KIŞI</string>
     <string name="analytics_live_scenario_rate_spike">FAİZ SICRAMASI</string>
-    <string name="analytics_live_scenarios_hero_title">CANLI SENARYO LABORATUVARI</string>
+    <string name="analytics_live_scenarios_hero_title">SENARYO LABORATUVARI</string>
     <string name="analytics_live_scenarios_hero_subtitle">Premium senaryo motoru, canlı varlık karışımınıza karşı tek dokunuşla şok ve ralli çalıştırır.</string>
     <string name="analytics_live_scenario_preset_title">SENARYO ÖN AYARI</string>
     <string name="analytics_live_active_preset">Etkin ön ayar: %1$s</string>

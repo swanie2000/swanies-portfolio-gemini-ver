@@ -352,7 +352,7 @@
     <string name="analytics_live_risk_regime_defensive">SE SUGIERE MODO DEFENSIVO</string>
     <string name="analytics_live_risk_regime_monitor">MONITOREAR DE CERCA</string>
     <string name="analytics_live_risk_regime_balanced">EQUILIBRADO</string>
-    <string name="analytics_live_risk_hero_title">INTELIGENCIA DE RIESGO EN VIVO</string>
+    <string name="analytics_live_risk_hero_title">INTELIGENCIA DE RIESGO</string>
     <string name="analytics_live_risk_hero_subtitle">El motor de riesgo Premium rastrea concentración, presión de volatilidad y desequilibrio por categoría en tiempo real.</string>
     <string name="analytics_live_risk_engine_title">MOTOR DE EXPOSICIÓN AL RIESGO</string>
     <string name="analytics_live_risk_engine_description">Las actualizaciones del puntaje de concentración en vivo se basan en tu combinación actual de activos.</string>
@@ -371,7 +371,7 @@
     <string name="analytics_live_signal_high">ALTA</string>
     <string name="analytics_live_signal_medium">MEDIA</string>
     <string name="analytics_live_signal_low">BAJA</string>
-    <string name="analytics_live_attribution_hero_title">MOTOR DE ATRIBUCIÓN EN VIVO</string>
+    <string name="analytics_live_attribution_hero_title">MOTOR DE ATRIBUCIÓN</string>
     <string name="analytics_live_attribution_hero_subtitle">La atribución Premium descompone impulsores de ganancias y pérdidas con confianza de momentum y atribución por categoría.</string>
     <string name="analytics_live_attribution_engine_title">MOTOR DE ATRIBUCIÓN</string>
     <string name="analytics_live_attribution_engine_description">Contribución estimada de 24 h por posición usando pesos en vivo y variación de 24 h.</string>
@@ -388,7 +388,7 @@
     <string name="analytics_live_drag_positions_title">POSICIONES DE LASTRE</string>
     <string name="analytics_live_target_mode_category_balanced">BALANCEADO POR CATEGORÍA</string>
     <string name="analytics_live_target_mode_equal_weight">PESO EQUITATIVO</string>
-    <string name="analytics_live_rebalance_hero_title">ASISTENTE DE REBALANCEO EN VIVO</string>
+    <string name="analytics_live_rebalance_hero_title">ASISTENTE DE REBALANCEO</string>
     <string name="analytics_live_rebalance_hero_subtitle">El reequilibrador Premium evalúa deriva, rupturas de umbral y rotación estimada antes de actuar.</string>
     <string name="analytics_live_rebalance_engine_title">MOTOR DE REBALANCEO</string>
     <string name="analytics_live_rebalance_model_active">Modelo %1$s activo en las %2$d posiciones principales.</string>
@@ -403,7 +403,7 @@
     <string name="analytics_live_scenario_market_shock">CHOQUE DE MERCADO</string>
     <string name="analytics_live_scenario_crypto_winter">INVIERNO CRIPTO</string>
     <string name="analytics_live_scenario_rate_spike">SALTO DE TASAS</string>
-    <string name="analytics_live_scenarios_hero_title">LABORATORIO DE ESCENARIOS EN VIVO</string>
+    <string name="analytics_live_scenarios_hero_title">LABORATORIO DE ESCENARIOS</string>
     <string name="analytics_live_scenarios_hero_subtitle">El motor Premium de escenarios ejecuta choques y rallies de un toque sobre tu mezcla de activos en vivo.</string>
     <string name="analytics_live_scenario_preset_title">PREAJUSTE DE ESCENARIO</string>
     <string name="analytics_live_active_preset">Preajuste activo: %1$s</string>

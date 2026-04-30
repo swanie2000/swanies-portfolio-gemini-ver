@@ -24,7 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.ui.theme.ProPalette
@@ -135,11 +137,18 @@ fun PremiumHeroStripe(
                 vertical = if (compact) 9.dp else 12.dp
             )
         ) {
-            Text(
+            AutoResizingText(
                 text = title,
-                color = accentColor,
-                fontSize = if (compact) 11.sp else 12.sp,
-                fontWeight = FontWeight.Black
+                style = TextStyle(
+                    color = accentColor,
+                    fontSize = if (compact) 11.sp else 12.sp,
+                    fontWeight = FontWeight.Black,
+                ),
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                minFontSize = 8.sp,
+                modifier = Modifier.fillMaxWidth(),
             )
             Text(
                 text = subtitle,

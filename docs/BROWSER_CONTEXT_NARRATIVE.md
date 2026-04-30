@@ -1,4 +1,16 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.67: HOLDINGS PRO BANNER + ICON RELOAD)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.69: METALS FUNNEL + HOLDINGS CARD TRUTH)
+
+V40.69 UPDATE (Metals architect / repository / holdings cards)
+- **Repository:** Metal `displayName` from architect/funnel is preserved on `upsertAsset` and live refresh; `cleanMetalName` extended for `XAU`/`XAG`/`XPT`/`XPD` so spot tickers map without replacing user text.
+- **Holdings UI:** `underIconTickerText(asset)` for `MetalIcon` + under-icon label (metal = display name path, crypto = symbol). Expanded compact + `FullAssetCard`: no duplicate gray middle title for metals; under-icon label up to **two lines** (removed fixed `95.dp` clip); collapsed compact metal title can show two lines via `AutoResizingText`; slightly taller expanded compact min height; header row top-aligned.
+- **Funnel surfaces:** `AssetArchitectScreen`, amount entry, metals audit, asset picker, and related strings/locales updated in this drop (see git history for file-level detail).
+
+CURRENT CONDITION (END OF SESSION)
+- Metal holdings show user-authored names consistently; expanded cards no longer clip the second line of a two-line metal name.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- Device QA: small screens + large font scale on metal cards.
+- Optional parity: two-line labels on other metal lists if desired.
 
 V40.67 UPDATE (Free-tier upsell copy + expanded custom icon refresh)
 - **Holdings free-tier banner:** Uses holdings-only string keys (`holdings_upsell_*`), multi-portfolio / swipe messaging, short `PRO UPGRADE` CTA; single-line layout and smaller subtitle font so nothing wraps under the lock row or clips beside the button.
