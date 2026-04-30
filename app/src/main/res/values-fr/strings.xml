@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">SUPPRIMER LE PORTFOLIO ?</string>
     <string name="portfolio_delete_body">Supprimer définitivement \'%1$s\' ?</string>
     <string name="action_delete">SUPPRIMER</string>
+    <string name="action_clear">EFFACER</string>
     <string name="portfolio_edit_title">MODIFIER LE PORTFOLIO</string>
     <string name="portfolio_fallback_name">PORTFOLIO</string>
     <string name="action_save">ENREGISTRER</string>
@@ -249,15 +250,27 @@
     <string name="widget_set_draft_target">DÉFINIR BROUILLON %1$s</string>
 
     <string name="architect_stage_blueprint">ÉTAPE 1 : CONCEPTION</string>
+    <string name="architect_step_1_of_3">Étape 1 sur 3</string>
     <string name="architect_stage_live_card">ÉTAPE 2 : CARTE ACTIVE</string>
+    <string name="architect_step_2_of_3">Étape 2 sur 3</string>
+    <string name="architect_step_3_of_3">Étape 3 sur 3</string>
     <string name="architect_select_metal">CHOISIR LE MÉTAL</string>
     <string name="architect_select_shape">CHOISIR LA FORME</string>
     <string name="architect_select_unit">CHOISIR L\'UNITÉ</string>
+    <string name="architect_next_to_step">SUIVANT : étape %1$d sur 3</string>
+    <string name="architect_saving_in_progress">Enregistrement…</string>
     <string name="architect_proceed_to_card">CONTINUAR VERS LA CARTE</string>
     <string name="architect_quantity">QUANTITÉ</string>
     <string name="architect_spot_price">PRIX SPOT</string>
     <string name="architect_premium">PRIME ($)</string>
+    <string name="architect_premium_per_unit">PRIME / CHAQUE ($)</string>
+    <string name="architect_premium_once">UNIQUE ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Par unité</string>
+    <string name="architect_premium_mode_once">Une fois</string>
     <string name="architect_estimated_value">VALEUR ESTIMÉE</string>
+    <string name="architect_icon_cta_add">AJOUTER L\'ACTIF</string>
+    <string name="architect_icon_cta_update">METTRE À JOUR</string>
     <string name="architect_finalize_vault">FINALISER ET COFFRE</string>
     <string name="architect_back_to_blueprint">RETOUR À LA CONCEPTION</string>
 
@@ -303,6 +316,13 @@
     <string name="holdings_tab_all">TOUT</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">MÉTAL</string>
+    <string name="metals_market_screen_title">MARCHÉ DES MÉTAUX</string>
+    <string name="metal_name_gold">OR</string>
+    <string name="metal_name_silver">ARGENT</string>
+    <string name="metal_name_platinum">PLATINE</string>
+    <string name="metal_name_palladium">PALLADIUM</string>
+    <string name="add_asset_screen_title">AJOUTER UN ACTIF</string>
+    <string name="asset_picker_custom_metal">PERSONNALISÉ</string>
     <string name="asset_custom_icon_section">ICÔNE</string>
     <string name="asset_custom_icon_hint">Choisissez une photo, découpez-la en carré puis enregistrez. À utiliser lorsque la plateforme ne fournit pas d’illustration.</string>
     <string name="asset_custom_icon_choose">CHOISIR UNE PHOTO</string>

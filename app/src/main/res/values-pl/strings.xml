@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">USUNĄĆ PORTFEL?</string>
     <string name="portfolio_delete_body">Trwale usunąć „%1$s”?</string>
     <string name="action_delete">USUŃ</string>
+    <string name="action_clear">WYCZYŚĆ</string>
     <string name="portfolio_edit_title">EDYTUJ PORTFEL</string>
     <string name="portfolio_fallback_name">PORTFEL</string>
     <string name="action_save">ZAPISZ</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">USTAW SZKIC %1$s</string>
 
     <string name="architect_stage_blueprint">ETAP 1: PROJEKT</string>
+    <string name="architect_step_1_of_3">Krok 1 z 3</string>
     <string name="architect_stage_live_card">ETAP 2: KARTA LIVE</string>
+    <string name="architect_step_2_of_3">Krok 2 z 3</string>
+    <string name="architect_step_3_of_3">Krok 3 z 3</string>
     <string name="architect_select_metal">WYBIERZ METAL</string>
     <string name="architect_select_shape">WYBIERZ KSZTAŁT</string>
     <string name="architect_select_unit">WYBIERZ JEDNOSTKĘ</string>
+    <string name="architect_next_to_step">DALEJ: krok %1$d z 3</string>
+    <string name="architect_saving_in_progress">Zapisywanie…</string>
     <string name="architect_proceed_to_card">PRZEJDŹ DO KARTY</string>
     <string name="architect_quantity">ILOŚĆ</string>
     <string name="architect_spot_price">CENA SPOT</string>
     <string name="architect_premium">PREMIA ($)</string>
+    <string name="architect_premium_per_unit">PREMIA / ZA SZT. ($)</string>
+    <string name="architect_premium_once">JEDNORAZOWO ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Za sztukę</string>
+    <string name="architect_premium_mode_once">Jednorazowo</string>
     <string name="architect_estimated_value">SZACOWANA WARTOŚĆ</string>
+    <string name="architect_icon_cta_add">DODAJ AKTYW</string>
+    <string name="architect_icon_cta_update">AKTUALIZUJ</string>
     <string name="architect_finalize_vault">ZAKOŃCZ I ZAPISZ</string>
     <string name="architect_back_to_blueprint">WRÓĆ DO PROJEKTU</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">WSZYSTKO</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALE</string>
+    <string name="metals_market_screen_title">RYNEK METALI</string>
+    <string name="metal_name_gold">ZŁOTO</string>
+    <string name="metal_name_silver">SREBRO</string>
+    <string name="metal_name_platinum">PLATYNA</string>
+    <string name="metal_name_palladium">PALLAD</string>
+    <string name="add_asset_screen_title">DODAJ AKTYW</string>
+    <string name="asset_picker_custom_metal">NIESTANDARDOWY</string>
     <string name="asset_custom_icon_section">IKONA</string>
     <string name="asset_custom_icon_hint">Wybierz zdjęcie, przytnij do kwadratu i zapisz. Użyj, gdy giełda nie ma grafiki.</string>
     <string name="asset_custom_icon_choose">WYBIERZ ZDJĘCIE</string>

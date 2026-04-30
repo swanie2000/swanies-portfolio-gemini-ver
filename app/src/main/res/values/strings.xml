@@ -287,7 +287,6 @@
     <string name="metal_name_silver">SILVER</string>
     <string name="metal_name_platinum">PLATINUM</string>
     <string name="metal_name_palladium">PALLADIUM</string>
-    <!-- i18n backlog: batch-translate add_asset_screen_title, asset_picker_custom_metal, metals_market_screen_title, metal_name_*, architect_step_1_of_3, architect_step_2_of_3, architect_step_3_of_3, architect_next_to_step, architect_saving_in_progress, architect_premium_*, architect_icon_cta_add, architect_icon_cta_update into values-* locales. -->
     <string name="add_asset_screen_title">ADD ASSET</string>
     <string name="asset_picker_custom_metal">CUSTOM</string>
     <string name="analytics_hub_title">ANALYTICS HUB</string>

@@ -202,6 +202,7 @@
     <string name="portfolio_delete_title">¿ELIMINAR PORTAFOLIO?</string>
     <string name="portfolio_delete_body">¿Borrar permanentemente \'%1$s\'?</string>
     <string name="action_delete">ELIMINAR</string>
+    <string name="action_clear">LIMPIAR</string>
     <string name="portfolio_edit_title">EDITAR PORTAFOLIO</string>
     <string name="portfolio_fallback_name">PORTAFOLIO</string>
     <string name="action_save">GUARDAR</string>
@@ -247,15 +248,27 @@
     <string name="widget_set_draft_target">ESTABLECER BORRADOR %1$s</string>
 
     <string name="architect_stage_blueprint">ETAPA 1: PLANO</string>
+    <string name="architect_step_1_of_3">Paso 1 de 3</string>
     <string name="architect_stage_live_card">ETAPA 2: TARJETA ACTIVA</string>
+    <string name="architect_step_2_of_3">Paso 2 de 3</string>
+    <string name="architect_step_3_of_3">Paso 3 de 3</string>
     <string name="architect_select_metal">SELECCIONAR METAL</string>
     <string name="architect_select_shape">SELECCIONAR FORMA</string>
     <string name="architect_select_unit">SELECCIONAR UNIDAD</string>
+    <string name="architect_next_to_step">SIGUIENTE: paso %1$d de 3</string>
+    <string name="architect_saving_in_progress">Guardando…</string>
     <string name="architect_proceed_to_card">CONTINUAR A TARJETA</string>
     <string name="architect_quantity">CANTIDAD</string>
     <string name="architect_spot_price">PRECIO SPOT</string>
     <string name="architect_premium">PREMIO ($)</string>
+    <string name="architect_premium_per_unit">PRIMA / CADA UNO ($)</string>
+    <string name="architect_premium_once">ÚNICA VEZ ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Por cada uno</string>
+    <string name="architect_premium_mode_once">Una vez</string>
     <string name="architect_estimated_value">VALOR ESTIMADO</string>
+    <string name="architect_icon_cta_add">AÑADIR ACTIVO</string>
+    <string name="architect_icon_cta_update">ACTUALIZAR</string>
     <string name="architect_finalize_vault">FINALIZAR Y BÓVEDA</string>
     <string name="architect_back_to_blueprint">VOLVER AL PLANO</string>
 
@@ -301,6 +314,13 @@
     <string name="holdings_tab_all">TODO</string>
     <string name="holdings_tab_crypto">CRIPTO</string>
     <string name="holdings_tab_metal">METALES</string>
+    <string name="metals_market_screen_title">MERCADO DE METALES</string>
+    <string name="metal_name_gold">ORO</string>
+    <string name="metal_name_silver">PLATA</string>
+    <string name="metal_name_platinum">PLATINO</string>
+    <string name="metal_name_palladium">PALADIO</string>
+    <string name="add_asset_screen_title">AÑADIR ACTIVO</string>
+    <string name="asset_picker_custom_metal">PERSONALIZADO</string>
     <string name="asset_custom_icon_section">ICONO</string>
     <string name="asset_custom_icon_hint">Elige una foto, recorta a un cuadrado y guarda. Úsalo cuando el exchange no tenga imagen.</string>
     <string name="asset_custom_icon_choose">ELEGIR FOTO</string>

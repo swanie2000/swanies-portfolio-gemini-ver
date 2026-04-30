@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">УДАЛИТЬ ПОРТФЕЛЬ?</string>
     <string name="portfolio_delete_body">Навсегда удалить «%1$s»?</string>
     <string name="action_delete">УДАЛИТЬ</string>
+    <string name="action_clear">ОЧИСТИТЬ</string>
     <string name="portfolio_edit_title">РЕДАКТИРОВАТЬ ПОРТФЕЛЬ</string>
     <string name="portfolio_fallback_name">ПОРТФЕЛЬ</string>
     <string name="action_save">СОХРАНИТЬ</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">УСТАНОВИТЬ %1$s</string>
 
     <string name="architect_stage_blueprint">ЭТАП 1: ЧЕРТЕЖ</string>
+    <string name="architect_step_1_of_3">Шаг 1 из 3</string>
     <string name="architect_stage_live_card">ЭТАП 2: ЖИВАЯ КАРТОЧКА</string>
+    <string name="architect_step_2_of_3">Шаг 2 из 3</string>
+    <string name="architect_step_3_of_3">Шаг 3 из 3</string>
     <string name="architect_select_metal">ВЫБРАТЬ МЕТАЛЛ</string>
     <string name="architect_select_shape">ВЫБРАТЬ ФОРМУ</string>
     <string name="architect_select_unit">ВЫБРАТЬ ЕДИНИЦУ</string>
+    <string name="architect_next_to_step">ДАЛЕЕ: шаг %1$d из 3</string>
+    <string name="architect_saving_in_progress">Сохранение…</string>
     <string name="architect_proceed_to_card">ПЕРЕЙТИ К КАРТОЧКЕ</string>
     <string name="architect_quantity">КОЛИЧЕСТВО</string>
     <string name="architect_spot_price">СПОТ-ЦЕНА</string>
     <string name="architect_premium">ПРЕМИЯ ($)</string>
+    <string name="architect_premium_per_unit">ПРЕМИЯ / ЗА ЕД. ($)</string>
+    <string name="architect_premium_once">РАЗОВО ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">За каждую</string>
+    <string name="architect_premium_mode_once">Один раз</string>
     <string name="architect_estimated_value">ОЦЕНОЧНАЯ СТОИМОСТЬ</string>
+    <string name="architect_icon_cta_add">ДОБАВИТЬ АКТИВ</string>
+    <string name="architect_icon_cta_update">ОБНОВИТЬ</string>
     <string name="architect_finalize_vault">ЗАВЕРШИТЬ И СОХРАНИТЬ</string>
     <string name="architect_back_to_blueprint">ВЕРНУТЬСЯ К ЧЕРТЕЖУ</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">ВСЁ</string>
     <string name="holdings_tab_crypto">КРИПТО</string>
     <string name="holdings_tab_metal">МЕТАЛЛЫ</string>
+    <string name="metals_market_screen_title">РЫНОК МЕТАЛЛОВ</string>
+    <string name="metal_name_gold">ЗОЛОТО</string>
+    <string name="metal_name_silver">СЕРЕБРО</string>
+    <string name="metal_name_platinum">ПЛАТИНА</string>
+    <string name="metal_name_palladium">ПАЛЛАДИЙ</string>
+    <string name="add_asset_screen_title">ДОБАВИТЬ АКТИВ</string>
+    <string name="asset_picker_custom_metal">СВОЙ</string>
     <string name="asset_custom_icon_section">ИКОНКА</string>
     <string name="asset_custom_icon_hint">Выберите фото, обрежьте до квадрата и сохраните. Используйте, если у биржи нет изображения.</string>
     <string name="asset_custom_icon_choose">ВЫБРАТЬ ФОТО</string>

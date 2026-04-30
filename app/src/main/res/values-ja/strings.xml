@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">ポートフォリオを削除しますか？</string>
     <string name="portfolio_delete_body">「%1$s」を完全に削除しますか？</string>
     <string name="action_delete">削除</string>
+    <string name="action_clear">クリア</string>
     <string name="portfolio_edit_title">ポートフォリオを編集</string>
     <string name="portfolio_fallback_name">ポートフォリオ</string>
     <string name="action_save">保存</string>
@@ -249,15 +250,27 @@
     <string name="widget_set_draft_target">%1$s を設定</string>
 
     <string name="architect_stage_blueprint">ステージ 1: 設計</string>
+    <string name="architect_step_1_of_3">ステップ1/3</string>
     <string name="architect_stage_live_card">ステージ 2: ライブカード</string>
+    <string name="architect_step_2_of_3">ステップ2/3</string>
+    <string name="architect_step_3_of_3">ステップ3/3</string>
     <string name="architect_select_metal">貴金属を選択</string>
     <string name="architect_select_shape">形状を選択</string>
     <string name="architect_select_unit">単位を選択</string>
+    <string name="architect_next_to_step">次：ステップ%1$d/3</string>
+    <string name="architect_saving_in_progress">保存中…</string>
     <string name="architect_proceed_to_card">カードへ進む</string>
     <string name="architect_quantity">数量</string>
     <string name="architect_spot_price">スポット価格</string>
     <string name="architect_premium">プレミアム ($)</string>
+    <string name="architect_premium_per_unit">プレミアム/各 ($)</string>
+    <string name="architect_premium_once">一回限り ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">各単位ごと</string>
+    <string name="architect_premium_mode_once">一度だけ</string>
     <string name="architect_estimated_value">推定価値</string>
+    <string name="architect_icon_cta_add">資産を追加</string>
+    <string name="architect_icon_cta_update">更新</string>
     <string name="architect_finalize_vault">確定して保管庫へ</string>
     <string name="architect_back_to_blueprint">設計に戻る</string>
 
@@ -303,6 +316,13 @@
     <string name="holdings_tab_all">すべて</string>
     <string name="holdings_tab_crypto">仮想通貨</string>
     <string name="holdings_tab_metal">貴金属</string>
+    <string name="metals_market_screen_title">貴金属マーケット</string>
+    <string name="metal_name_gold">金</string>
+    <string name="metal_name_silver">銀</string>
+    <string name="metal_name_platinum">プラチナ</string>
+    <string name="metal_name_palladium">パラジウム</string>
+    <string name="add_asset_screen_title">資産を追加</string>
+    <string name="asset_picker_custom_metal">カスタム</string>
     <string name="asset_custom_icon_section">アイコン</string>
     <string name="asset_custom_icon_hint">写真を選び、正方形にトリミングして保存。取引所に画像がないときに使います。</string>
     <string name="asset_custom_icon_choose">写真を選ぶ</string>

@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">PORTFOLIO LÖSCHEN?</string>
     <string name="portfolio_delete_body">%1$s dauerhaft löschen?</string>
     <string name="action_delete">LÖSCHEN</string>
+    <string name="action_clear">LEEREN</string>
     <string name="portfolio_edit_title">PORTFOLIO BEARBEITEN</string>
     <string name="portfolio_fallback_name">PORTFOLIO</string>
     <string name="action_save">SPEICHERN</string>
@@ -249,15 +250,27 @@
     <string name="widget_set_draft_target">ENTWURF %1$s SETZEN</string>
 
     <string name="architect_stage_blueprint">STUFE 1: ENTWURF</string>
+    <string name="architect_step_1_of_3">Schritt 1 von 3</string>
     <string name="architect_stage_live_card">STUFE 2: LIVE-KARTE</string>
+    <string name="architect_step_2_of_3">Schritt 2 von 3</string>
+    <string name="architect_step_3_of_3">Schritt 3 von 3</string>
     <string name="architect_select_metal">METALL WÄHLEN</string>
     <string name="architect_select_shape">FORM WÄHLEN</string>
     <string name="architect_select_unit">EINHEIT WÄHLEN</string>
+    <string name="architect_next_to_step">WEITER: Schritt %1$d von 3</string>
+    <string name="architect_saving_in_progress">Wird gespeichert…</string>
     <string name="architect_proceed_to_card">WEITER ZUR KARTE</string>
     <string name="architect_quantity">MENGE</string>
     <string name="architect_spot_price">SPOTPREIS</string>
     <string name="architect_premium">AUFGELD ($)</string>
+    <string name="architect_premium_per_unit">AUFGELD / STÜCK ($)</string>
+    <string name="architect_premium_once">EINMALIG ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Pro Stück</string>
+    <string name="architect_premium_mode_once">Einmalig</string>
     <string name="architect_estimated_value">GESCHÄTZTER WERT</string>
+    <string name="architect_icon_cta_add">ANLAGE HINZUFÜGEN</string>
+    <string name="architect_icon_cta_update">AKTUALISIEREN</string>
     <string name="architect_finalize_vault">ABSCHLIESSEN UND VAULT</string>
     <string name="architect_back_to_blueprint">Zurück zum Entwurf</string>
 
@@ -303,6 +316,13 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">KRYPTO</string>
     <string name="holdings_tab_metal">METALL</string>
+    <string name="metals_market_screen_title">METALLMARKT</string>
+    <string name="metal_name_gold">GOLD</string>
+    <string name="metal_name_silver">SILBER</string>
+    <string name="metal_name_platinum">PLATIN</string>
+    <string name="metal_name_palladium">PALLADIUM</string>
+    <string name="add_asset_screen_title">ANLAGE HINZUFÜGEN</string>
+    <string name="asset_picker_custom_metal">INDIVIDUELL</string>
     <string name="asset_custom_icon_section">SYMBOL</string>
     <string name="asset_custom_icon_hint">Foto wählen, quadratisch zuschneiden und speichern. Nutzen, wenn die Börse kein Artwork bereitstellt.</string>
     <string name="asset_custom_icon_choose">FOTO WÄHLEN</string>

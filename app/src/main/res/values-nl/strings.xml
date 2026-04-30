@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">PORTFOLIO VERWIJDEREN?</string>
     <string name="portfolio_delete_body">\'%1$s\' permanent wissen?</string>
     <string name="action_delete">WISSEN</string>
+    <string name="action_clear">WISSEN</string>
     <string name="portfolio_edit_title">PORTFOLIO BEWERKEN</string>
     <string name="portfolio_fallback_name">PORTFOLIO</string>
     <string name="action_save">OPSLAAN</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">CONCEPT %1$s INSTELLEN</string>
 
     <string name="architect_stage_blueprint">FASE 1: ONTWERP</string>
+    <string name="architect_step_1_of_3">Stap 1 van 3</string>
     <string name="architect_stage_live_card">FASE 2: LIVE KAART</string>
+    <string name="architect_step_2_of_3">Stap 2 van 3</string>
+    <string name="architect_step_3_of_3">Stap 3 van 3</string>
     <string name="architect_select_metal">KIES METAAL</string>
     <string name="architect_select_shape">KIES VORM</string>
     <string name="architect_select_unit">KIES EENHEID</string>
+    <string name="architect_next_to_step">VOLGENDE: stap %1$d van 3</string>
+    <string name="architect_saving_in_progress">Opslaan…</string>
     <string name="architect_proceed_to_card">DOOR NAAR KAART</string>
     <string name="architect_quantity">HOEVEELHEID</string>
     <string name="architect_spot_price">SPOTPRIJS</string>
     <string name="architect_premium">PREMIE ($)</string>
+    <string name="architect_premium_per_unit">PREMIE / STUK ($)</string>
+    <string name="architect_premium_once">EENMALIG ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Per stuk</string>
+    <string name="architect_premium_mode_once">Eenmalig</string>
     <string name="architect_estimated_value">GESCHATTE WAARDE</string>
+    <string name="architect_icon_cta_add">ACTIVA TOEVOEGEN</string>
+    <string name="architect_icon_cta_update">BIJWERKEN</string>
     <string name="architect_finalize_vault">AFRONDEN EN KLUIS</string>
     <string name="architect_back_to_blueprint">TERUG NAAR ONTWERP</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">ALLE</string>
     <string name="holdings_tab_crypto">CRYPTO</string>
     <string name="holdings_tab_metal">METAAL</string>
+    <string name="metals_market_screen_title">METALENMARKT</string>
+    <string name="metal_name_gold">GOUD</string>
+    <string name="metal_name_silver">ZILVER</string>
+    <string name="metal_name_platinum">PLATINA</string>
+    <string name="metal_name_palladium">PALLADIUM</string>
+    <string name="add_asset_screen_title">ACTIVA TOEVOEGEN</string>
+    <string name="asset_picker_custom_metal">AANGEPAST</string>
     <string name="asset_custom_icon_section">PICTOGRAM</string>
     <string name="asset_custom_icon_hint">Kies een foto, snijd vierkant bij en sla op. Gebruik dit als de beurs geen afbeelding heeft.</string>
     <string name="asset_custom_icon_choose">FOTO KIEZEN</string>

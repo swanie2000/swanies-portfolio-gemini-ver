@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">XÓA DANH MỤC?</string>
     <string name="portfolio_delete_body">Xóa vĩnh viễn \'%1$s\'?</string>
     <string name="action_delete">XÓA</string>
+    <string name="action_clear">XÓA</string>
     <string name="portfolio_edit_title">SỬA DANH MỤC</string>
     <string name="portfolio_fallback_name">DANH MỤC</string>
     <string name="action_save">LƯU</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">THIẾT LẬP BẢN NHÁP %1$s</string>
 
     <string name="architect_stage_blueprint">GIAI ĐOẠN 1: BẢN THIẾT KẾ</string>
+    <string name="architect_step_1_of_3">Bước 1/3</string>
     <string name="architect_stage_live_card">GIAI ĐOẠN 2: THẺ TRỰC TIẾP</string>
+    <string name="architect_step_2_of_3">Bước 2/3</string>
+    <string name="architect_step_3_of_3">Bước 3/3</string>
     <string name="architect_select_metal">CHỌN KIM LOẠI</string>
     <string name="architect_select_shape">CHỌN HÌNH DẠNG</string>
     <string name="architect_select_unit">CHỌN ĐƠN VỊ</string>
+    <string name="architect_next_to_step">TIẾP: Bước %1$d/3</string>
+    <string name="architect_saving_in_progress">Đang lưu…</string>
     <string name="architect_proceed_to_card">TIẾP TỤC ĐẾN THẺ</string>
     <string name="architect_quantity">SỐ LƯỢNG</string>
     <string name="architect_spot_price">GIÁ GIAO NGAY</string>
     <string name="architect_premium">MỨC CHÊNH LỆCH ($)</string>
+    <string name="architect_premium_per_unit">PHỤ PHÍ / MỖI CÁI ($)</string>
+    <string name="architect_premium_once">MỘT LẦN ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Mỗi cái</string>
+    <string name="architect_premium_mode_once">Một lần</string>
     <string name="architect_estimated_value">GIÁ TRỊ ƯỚC TÍNH</string>
+    <string name="architect_icon_cta_add">THÊM TÀI SẢN</string>
+    <string name="architect_icon_cta_update">CẬP NHẬT</string>
     <string name="architect_finalize_vault">HOÀN TẤT &amp; LƯU KHO</string>
     <string name="architect_back_to_blueprint">QUAY LẠI THIẾT KẾ</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">TẤT CẢ</string>
     <string name="holdings_tab_crypto">TIỀN ĐIỆN TỬ</string>
     <string name="holdings_tab_metal">KIM LOẠI</string>
+    <string name="metals_market_screen_title">THỊ TRƯỜNG KIM LOẠI</string>
+    <string name="metal_name_gold">VÀNG</string>
+    <string name="metal_name_silver">BẠC</string>
+    <string name="metal_name_platinum">BẠCH KIM</string>
+    <string name="metal_name_palladium">PALADI</string>
+    <string name="add_asset_screen_title">THÊM TÀI SẢN</string>
+    <string name="asset_picker_custom_metal">TÙY CHỈNH</string>
     <string name="asset_custom_icon_section">BIỂU TƯỢNG</string>
     <string name="asset_custom_icon_hint">Chọn ảnh, cắt vuông rồi lưu. Dùng khi sàn không có hình minh họa.</string>
     <string name="asset_custom_icon_choose">CHỌN ẢNH</string>

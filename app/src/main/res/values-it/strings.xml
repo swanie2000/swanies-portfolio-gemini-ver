@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">ELIMINARE PORTAFOGLIO?</string>
     <string name="portfolio_delete_body">Vuoi eliminare definitivamente \'%1$s\'?</string>
     <string name="action_delete">ELIMINA</string>
+    <string name="action_clear">CANCELLA</string>
     <string name="portfolio_edit_title">MODIFICA PORTAFOGLIO</string>
     <string name="portfolio_fallback_name">PORTAFOGLIO</string>
     <string name="action_save">SALVA</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">IMPOSTA BOZZA %1$s</string>
 
     <string name="architect_stage_blueprint">FASE 1: PROGETTO</string>
+    <string name="architect_step_1_of_3">Passaggio 1 di 3</string>
     <string name="architect_stage_live_card">FASE 2: SCHEDA LIVE</string>
+    <string name="architect_step_2_of_3">Passaggio 2 di 3</string>
+    <string name="architect_step_3_of_3">Passaggio 3 di 3</string>
     <string name="architect_select_metal">SCEGLI METALLO</string>
     <string name="architect_select_shape">SCEGLI FORMA</string>
     <string name="architect_select_unit">SCEGLI UNITÀ</string>
+    <string name="architect_next_to_step">AVANTI: passaggio %1$d di 3</string>
+    <string name="architect_saving_in_progress">Salvataggio…</string>
     <string name="architect_proceed_to_card">VAI ALLA SCHEDA</string>
     <string name="architect_quantity">QUANTITÀ</string>
     <string name="architect_spot_price">PREZZO SPOT</string>
     <string name="architect_premium">PREMIO ($)</string>
+    <string name="architect_premium_per_unit">PREMIO / CAD. ($)</string>
+    <string name="architect_premium_once">UNA TANTUM ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Per ciascuno</string>
+    <string name="architect_premium_mode_once">Una volta</string>
     <string name="architect_estimated_value">VALORE STIMATO</string>
+    <string name="architect_icon_cta_add">AGGIUNGI ASSET</string>
+    <string name="architect_icon_cta_update">AGGIORNA</string>
     <string name="architect_finalize_vault">FINALIZZA E VAULT</string>
     <string name="architect_back_to_blueprint">Torna al progetto</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">TUTTO</string>
     <string name="holdings_tab_crypto">CRIPTO</string>
     <string name="holdings_tab_metal">METALLO</string>
+    <string name="metals_market_screen_title">MERCATO METALLI</string>
+    <string name="metal_name_gold">ORO</string>
+    <string name="metal_name_silver">ARGENTO</string>
+    <string name="metal_name_platinum">PLATINO</string>
+    <string name="metal_name_palladium">PALLADIO</string>
+    <string name="add_asset_screen_title">AGGIUNGI ASSET</string>
+    <string name="asset_picker_custom_metal">PERSONALIZZATO</string>
     <string name="asset_custom_icon_section">ICONA</string>
     <string name="asset_custom_icon_hint">Scegli una foto, ritaglia a quadrato e salva. Usa quando l’exchange non ha artwork.</string>
     <string name="asset_custom_icon_choose">SCEGLI FOTO</string>

@@ -199,6 +199,7 @@
     <string name="portfolio_delete_title">حذف المحفظة؟</string>
     <string name="portfolio_delete_body">حذف %1$s نهائياً؟</string>
     <string name="action_delete">حذف</string>
+    <string name="action_clear">مسح</string>
     <string name="portfolio_edit_title">تعديل المحفظة</string>
     <string name="portfolio_fallback_name">محفظة</string>
     <string name="action_save">حفظ</string>
@@ -243,15 +244,27 @@
     <string name="widget_set_draft_target">تعيين مسودة %1$s</string>
 
     <string name="architect_stage_blueprint">المرحلة 1: المخطط</string>
+    <string name="architect_step_1_of_3">الخطوة 1 من 3</string>
     <string name="architect_stage_live_card">المرحلة 2: البطاقة الحية</string>
+    <string name="architect_step_2_of_3">الخطوة 2 من 3</string>
+    <string name="architect_step_3_of_3">الخطوة 3 من 3</string>
     <string name="architect_select_metal">اختر المعدن</string>
     <string name="architect_select_shape">اختر الشكل</string>
     <string name="architect_select_unit">اختر الوحدة</string>
+    <string name="architect_next_to_step">التالي: الخطوة %1$d من 3</string>
+    <string name="architect_saving_in_progress">جاري الحفظ…</string>
     <string name="architect_proceed_to_card">متابعة إلى البطاقة</string>
     <string name="architect_quantity">الكمية</string>
     <string name="architect_spot_price">سعر السبوت</string>
     <string name="architect_premium">العلاوة ($)</string>
+    <string name="architect_premium_per_unit">العلاوة / لكل ($)</string>
+    <string name="architect_premium_once">للمرة الواحدة ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">لكل وحدة</string>
+    <string name="architect_premium_mode_once">مرة واحدة</string>
     <string name="architect_estimated_value">القيمة المقدرة</string>
+    <string name="architect_icon_cta_add">إضافة أصل</string>
+    <string name="architect_icon_cta_update">تحديث</string>
     <string name="architect_finalize_vault">إنهاء الخزينة</string>
     <string name="architect_back_to_blueprint">العودة للمخطط</string>
 
@@ -297,6 +310,13 @@
     <string name="holdings_tab_all">الكل</string>
     <string name="holdings_tab_crypto">عملات رقمية</string>
     <string name="holdings_tab_metal">معادن</string>
+    <string name="metals_market_screen_title">سوق المعادن</string>
+    <string name="metal_name_gold">ذهب</string>
+    <string name="metal_name_silver">فضة</string>
+    <string name="metal_name_platinum">بلاتين</string>
+    <string name="metal_name_palladium">بالاديوم</string>
+    <string name="add_asset_screen_title">إضافة أصل</string>
+    <string name="asset_picker_custom_metal">مخصص</string>
     <string name="asset_custom_icon_section">أيقونة</string>
     <string name="asset_custom_icon_hint">اختر صورة، قصّها إلى مربع، ثم احفظ. استخدمها عندما لا يوفّر السوق صورة رسمية.</string>
     <string name="asset_custom_icon_choose">اختر صورة</string>

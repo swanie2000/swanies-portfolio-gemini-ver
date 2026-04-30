@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">PORTFÖYÜ SİL?</string>
     <string name="portfolio_delete_body">\'%1$s\' kalıcı olarak silinsin mi?</string>
     <string name="action_delete">SİL</string>
+    <string name="action_clear">TEMİZLE</string>
     <string name="portfolio_edit_title">PORTFÖYÜ DÜZENLE</string>
     <string name="portfolio_fallback_name">PORTFÖY</string>
     <string name="action_save">KAYDET</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">TASLAK %1$s AYARLA</string>
 
     <string name="architect_stage_blueprint">AŞAMA 1: PLAN</string>
+    <string name="architect_step_1_of_3">1/3. adım</string>
     <string name="architect_stage_live_card">AŞAMA 2: CANLI KART</string>
+    <string name="architect_step_2_of_3">2/3. adım</string>
+    <string name="architect_step_3_of_3">3/3. adım</string>
     <string name="architect_select_metal">METAL SEÇ</string>
     <string name="architect_select_shape">ŞEKİL SEÇ</string>
     <string name="architect_select_unit">BİRİM SEÇ</string>
+    <string name="architect_next_to_step">İLERİ: %1$d/3. adım</string>
+    <string name="architect_saving_in_progress">Kaydediliyor…</string>
     <string name="architect_proceed_to_card">KARTA DEVAM ET</string>
     <string name="architect_quantity">MİKTAR</string>
     <string name="architect_spot_price">SPOT FİYAT</string>
     <string name="architect_premium">PRİM ($)</string>
+    <string name="architect_premium_per_unit">PRİM / ADET ($)</string>
+    <string name="architect_premium_once">TEK SEFER ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">Her biri için</string>
+    <string name="architect_premium_mode_once">Bir kez</string>
     <string name="architect_estimated_value">TAHMİNİ DEĞER</string>
+    <string name="architect_icon_cta_add">VARLIK EKLE</string>
+    <string name="architect_icon_cta_update">GÜNCELLE</string>
     <string name="architect_finalize_vault">TAMAMLA VE KASA</string>
     <string name="architect_back_to_blueprint">PLANA DÖN</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">TÜMÜ</string>
     <string name="holdings_tab_crypto">KRİPTO</string>
     <string name="holdings_tab_metal">METAL</string>
+    <string name="metals_market_screen_title">METAL PİYASASI</string>
+    <string name="metal_name_gold">ALTIN</string>
+    <string name="metal_name_silver">GÜMÜŞ</string>
+    <string name="metal_name_platinum">PLATİN</string>
+    <string name="metal_name_palladium">PALADYUM</string>
+    <string name="add_asset_screen_title">VARLIK EKLE</string>
+    <string name="asset_picker_custom_metal">ÖZEL</string>
     <string name="asset_custom_icon_section">İKON</string>
     <string name="asset_custom_icon_hint">Fotoğraf seçin, kareye kırpın ve kaydedin. Borsanın görseli yokken kullanın.</string>
     <string name="asset_custom_icon_choose">FOTOĞRAF SEÇ</string>

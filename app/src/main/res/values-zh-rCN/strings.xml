@@ -205,6 +205,7 @@
     <string name="portfolio_delete_title">删除投资组合？</string>
     <string name="portfolio_delete_body">永久抹除“%1$s”？</string>
     <string name="action_delete">删除</string>
+    <string name="action_clear">清除</string>
     <string name="portfolio_edit_title">编辑投资组合</string>
     <string name="portfolio_fallback_name">投资组合</string>
     <string name="action_save">保存</string>
@@ -250,15 +251,27 @@
     <string name="widget_set_draft_target">设置草稿 %1$s</string>
 
     <string name="architect_stage_blueprint">阶段 1: 蓝图</string>
+    <string name="architect_step_1_of_3">第 1 步，共 3 步</string>
     <string name="architect_stage_live_card">阶段 2: 实时卡片</string>
+    <string name="architect_step_2_of_3">第 2 步，共 3 步</string>
+    <string name="architect_step_3_of_3">第 3 步，共 3 步</string>
     <string name="architect_select_metal">选择金属</string>
     <string name="architect_select_shape">选择形状</string>
     <string name="architect_select_unit">选择单位</string>
+    <string name="architect_next_to_step">下一步：第 %1$d 步，共 3 步</string>
+    <string name="architect_saving_in_progress">正在保存…</string>
     <string name="architect_proceed_to_card">进入卡片</string>
     <string name="architect_quantity">数量</string>
     <string name="architect_spot_price">现货价格</string>
     <string name="architect_premium">溢价 ($)</string>
+    <string name="architect_premium_per_unit">溢价/每件 ($)</string>
+    <string name="architect_premium_once">一次性 ($)</string>
+    <string name="architect_premium_placeholder">(+-) $0.00</string>
+    <string name="architect_premium_mode_per">每件</string>
+    <string name="architect_premium_mode_once">一次</string>
     <string name="architect_estimated_value">估算价值</string>
+    <string name="architect_icon_cta_add">添加资产</string>
+    <string name="architect_icon_cta_update">更新</string>
     <string name="architect_finalize_vault">完成并存入保管库</string>
     <string name="architect_back_to_blueprint">返回蓝图</string>
 
@@ -304,6 +317,13 @@
     <string name="holdings_tab_all">全部</string>
     <string name="holdings_tab_crypto">加密货币</string>
     <string name="holdings_tab_metal">贵金属</string>
+    <string name="metals_market_screen_title">贵金属市场</string>
+    <string name="metal_name_gold">黄金</string>
+    <string name="metal_name_silver">白银</string>
+    <string name="metal_name_platinum">铂金</string>
+    <string name="metal_name_palladium">钯金</string>
+    <string name="add_asset_screen_title">添加资产</string>
+    <string name="asset_picker_custom_metal">自定义</string>
     <string name="asset_custom_icon_section">图标</string>
     <string name="asset_custom_icon_hint">选择照片，裁剪为正方形后保存。交易对无官方图标时使用。</string>
     <string name="asset_custom_icon_choose">选择照片</string>
