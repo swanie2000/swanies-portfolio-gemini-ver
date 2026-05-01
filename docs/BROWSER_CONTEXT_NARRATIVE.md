@@ -1,5 +1,39 @@
 SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READINESS)
 
+---
+
+## AI AGENT HANDOFF (READ FIRST)
+
+**Why this file exists:** Continuity for Cursor/Studio agents and browser-side advisors across days and sessions. **Keep this section accurate** when milestones or priorities change so the next agent does not infer “today” from older `CURRENT CONDITION` blocks further down (those belong to past drops only).
+
+**Canonical vs excerpt:** This file (`docs/BROWSER_CONTEXT_NARRATIVE.md`) is the **canonical** product timeline + handoff. `docs/BROWSER_CONTEXT_MASTER.md` embeds a copy under `BEGIN_NARRATIVE` for paste bundles; if the two diverge, **update this file first**, then refresh the MASTER excerpt.
+
+**Last handoff update:** 2026-04-30 — after encrypted vault backup VER1 hardened + device round-trip verified; Play-track checklist captured in `Master_Build_Checklist.md`.
+
+### Where we left off (engineering truth)
+
+- **Stack:** Android (Kotlin, Compose, Hilt, Room). Pro monetization via **RevenueCat** + Play billing when distributed on Play; gated surfaces include Theme Manager, multi-portfolio holdings swipe, full Analytics experience, widget customization (see monetization package and `SettingsScreen` Pro flows).
+- **Vault backup / restore (VER1):** **Working on device** — Settings → `EXPORT ENCRYPTED BACKUP` / `IMPORT ENCRYPTED BACKUP` (SAF), passphrase, `.swpb` format (magic `SWPB`). Zip contains Room DB, `theme_settings.preferences_pb`, `icons/` and `custom_icons/`. **Critical:** WAL checkpoint uses `writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))`, not `execSQL`. Import prefers `openFileDescriptor` + full read, strips UTF-8 BOM, then decrypts. Successful import → cold process restart. Code: `app/src/main/java/com/swanie/portfolio/data/backup/VaultBackupEngine.kt`; UI + VM: `SettingsScreen.kt`, `SettingsViewModel.kt`.
+- **Recent product (before backup):** Metals funnel + holdings cards — `AssetRepository` preserves metal `displayName`; `HoldingsUIComponents` / `MyHoldingsScreen` two-line metal labels, no duplicate middle title on expanded cards (`underIconTickerText`). See **V40.69** below for detail.
+- **Quality gates:** Use `:app:compileDebugKotlin` and `:app:lintDebug` before declaring a drop done; lint policy lives in `app/lint.xml`.
+
+### What to do next (owner intent, priority order)
+
+1. **Play Store:** Execute items under **Play Store path forward** in `Master_Build_Checklist.md` (Console, Data safety, ratings, SKUs ↔ RevenueCat, internal/closed AAB, listing assets, device matrix including **vault backup round-trip**).
+2. **QA:** Post-restore spot checks — widgets, multi-vault, custom crypto icons, Pro-gated analytics.
+3. **Backlog:** Auth instrumentation (`Master_Build_Checklist` V40.36), monetization funnel telemetry (V40.61), small-screen / large-font metal card pass (V40.69 follow-up).
+
+### Quick file map
+
+| Area | Start here |
+|------|------------|
+| Encrypted backup | `VaultBackupEngine.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt` |
+| Pro / billing | `billing/` package, `MonetizationManager.kt` |
+| Holdings / metals UI | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` |
+| Nav / routes | `NavGraph.kt`, `Routes.kt` |
+
+---
+
 V40.70 UPDATE (Vault backup / restore VER1 — engine hardening + device-verified round-trip)
 - **Export:** `VaultBackupEngine` checkpoints WAL with `writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))` (cursor closed); Android SQLite forbids `execSQL` for pragmas that return rows, which previously broke export at zip time.
 - **Import:** Reads encrypted payload via `ContentResolver.openFileDescriptor` + capped stream (falls back to `openInputStream`); strips leading UTF-8 BOM before `SWPB` magic check; detects UTF-16 LE “text save” and surfaces a clear error; magic parsed with `String(bytes, offset, length, US_ASCII)`.

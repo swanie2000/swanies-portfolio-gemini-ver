@@ -3,9 +3,10 @@
 For every completed milestone, the agent must automatically execute:
 
 1. Narrative Update: Log the version number, specific technical wins (logic and UI), and any ghosts or bugs resolved.
-2. Checklist Maintenance: Update `Master_Build_Checklist.md` to reflect the latest Golden Vault state.
-3. Projected Path: Update the Next Phase section based on current conversation intent.
-4. Terminal Handover: Provide a formatted git command block with `git add .`, `git commit -m "[Version]: [Summary]"`, and `git push`.
+2. **AI handoff accuracy:** Update **`AI AGENT HANDOFF (READ FIRST)`** at the top of `docs/BROWSER_CONTEXT_NARRATIVE.md` (where we left off, next priorities, file map). Refresh the matching **`BEGIN_NARRATIVE`** excerpt in `docs/BROWSER_CONTEXT_MASTER.md` so paste-only workflows stay aligned.
+3. Checklist Maintenance: Update `Master_Build_Checklist.md` to reflect the latest Golden Vault state.
+4. Projected Path: Update the Next Phase section based on current conversation intent.
+5. Terminal Handover: Provide a formatted git command block with `git add .`, `git commit -m "[Version]: [Summary]"`, and `git push`.
 
 ---
 

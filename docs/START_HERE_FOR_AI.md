@@ -3,6 +3,11 @@
 ## Purpose
 This repo uses an AI-safe context system so browser AIs and Studio agents stay in sync.
 
+## Where we left off (read first)
+1. Open **`docs/BROWSER_CONTEXT_NARRATIVE.md`** and read **`AI AGENT HANDOFF (READ FIRST)`** at the top. That block is the **canonical** “current engineering + product + next steps” summary for any new agent.
+2. **`docs/BROWSER_CONTEXT_MASTER.md`** — Level-4 process rules plus a **synced excerpt** of the narrative for paste-only workflows. If MASTER and NARRATIVE disagree, **fix NARRATIVE first**, then refresh the `BEGIN_NARRATIVE` section in MASTER.
+3. **`Master_Build_Checklist.md`** — Shipped milestones and the **Play Store path forward** checklist.
+
 ## Files
 - `docs/BROWSER_CONTEXT_HEADER.txt`  
   Level-4 rules. Do not change unless intentionally updating behavior rules.

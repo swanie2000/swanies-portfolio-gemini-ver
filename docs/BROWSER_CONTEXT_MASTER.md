@@ -2,10 +2,12 @@
 LEVEL 4 AI CONTROL HEADER — SWANIE'S PORTFOLIO
 ============================================================
 
-THIS DOCUMENT IS THE SINGLE SOURCE OF TRUTH.
+THIS DOCUMENT IS THE SINGLE SOURCE OF TRUTH **for Level-4 process rules and this embedded excerpt**.
+
+**Product state / milestone changelog:** The **canonical** narrative lives in `docs/BROWSER_CONTEXT_NARRATIVE.md` (read the **AI AGENT HANDOFF** section first). The `BEGIN_NARRATIVE` block below is a **synced excerpt** for workflows that paste MASTER without opening the repo; if anything disagrees, **trust the narrative file** and then update this excerpt.
 
 The browser AI does NOT have file access.
-All decisions must be based ONLY on this document.
+All decisions must be based ONLY on this document **plus any files the user pastes or the workflow attaches**.
 
 ------------------------------------------------------------
 ROLE ASSIGNMENT
@@ -174,6 +176,21 @@ NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
 SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READINESS)
+
+## AI AGENT HANDOFF (READ FIRST) — keep in sync with `docs/BROWSER_CONTEXT_NARRATIVE.md`
+
+**Purpose:** Onboarding for any AI joining mid-stream. Update when milestones change. **Do not** treat older `CURRENT CONDITION` blocks lower in this excerpt as “today”; they are historical.
+
+**Last handoff update:** 2026-04-30 — vault backup VER1 hardened + round-trip verified; Play checklist in `Master_Build_Checklist.md`.
+
+### Where we left off
+- Android Kotlin/Compose app; RevenueCat Pro gating on theme, multi-portfolio, analytics, widget customization.
+- **Vault backup VER1:** Device-verified — `VaultBackupEngine.kt` (magic `SWPB`, WAL checkpoint via `query` not `execSQL`, import prefers `openFileDescriptor`, BOM strip), `SettingsScreen` / `SettingsViewModel` SAF export-import, cold restart after restore.
+- **Metals/holdings:** `AssetRepository` metal `displayName`; `HoldingsUIComponents` / `MyHoldingsScreen` card layout fixes (V40.69).
+- **Next:** Play Store path items in `Master_Build_Checklist.md`; post-restore QA; backlog V40.36 / V40.61.
+
+### Quick file map
+`VaultBackupEngine.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `NavGraph.kt`
 
 V40.70 UPDATE
 - `VaultBackupEngine` VER1: WAL checkpoint via `query` (not `execSQL`); import via `openFileDescriptor` stream with BOM strip + robust magic parse; export/import wired from Settings (SAF) with cold restart after successful restore.
