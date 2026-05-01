@@ -18,6 +18,7 @@ import com.swanie.portfolio.billing.AccessTier
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.billing.MonetizationPackage
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.widget.PortfolioWidget
@@ -33,6 +34,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.app.Activity
+import android.net.Uri
 import androidx.fragment.app.FragmentActivity
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +64,8 @@ class SettingsViewModel @Inject constructor(
     private val themePreferences: ThemePreferences,
     private val database: AppDatabase,
     private val securityManager: SecurityManager,
-    private val monetizationManager: MonetizationManager
+    private val monetizationManager: MonetizationManager,
+    private val vaultBackupEngine: VaultBackupEngine,
 ) : ViewModel() {
 
     private val userConfigDao = database.userConfigDao()
@@ -386,6 +389,45 @@ class SettingsViewModel @Inject constructor(
             userConfigDao.updateLastSync(0L)
             triggerWidgetUpdate(vaultId)
         }
+    }
+
+    /**
+     * VER1: Encrypted vault file (Room + theme DataStore + icons). Runs on IO; [passphrase] is zeroed after use.
+     */
+    fun exportVaultBackup(outputUri: Uri, passphrase: CharArray, onFinished: (Result<Unit>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = vaultBackupEngine.exportToUri(outputUri, passphrase)
+            passphrase.fill('\u0000')
+            withContext(Dispatchers.Main) { onFinished(result) }
+        }
+    }
+
+    /**
+     * VER1: Restores from encrypted backup then cold-restarts the process so Room/DataStore reload.
+     */
+    fun importVaultBackup(inputUri: Uri, passphrase: CharArray, onFinished: (Result<Unit>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = vaultBackupEngine.importFromUri(inputUri, passphrase)
+            passphrase.fill('\u0000')
+            withContext(Dispatchers.Main) {
+                onFinished(result)
+                if (result.isSuccess) {
+                    delay(600L)
+                    restartApplicationCold()
+                }
+            }
+        }
+    }
+
+    private fun restartApplicationCold() {
+        val ctx = context.applicationContext
+        val intent = ctx.packageManager.getLaunchIntentForPackage(ctx.packageName)?.apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        if (intent != null) {
+            ctx.startActivity(intent)
+        }
+        android.os.Process.killProcess(android.os.Process.myPid())
     }
 
     suspend fun factoryResetAllData() {

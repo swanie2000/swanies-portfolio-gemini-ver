@@ -70,5 +70,13 @@ abstract class AppDatabase : RoomDatabase() {
                 instance
             }
         }
+
+        /** Closes the singleton Room instance so DB files can be replaced; next [getDatabase] builds fresh. */
+        fun closeAndClearInstance() {
+            synchronized(this) {
+                INSTANCE?.close()
+                INSTANCE = null
+            }
+        }
     }
 }

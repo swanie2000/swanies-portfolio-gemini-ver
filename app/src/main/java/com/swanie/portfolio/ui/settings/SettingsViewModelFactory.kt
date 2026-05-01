@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.ThemePreferences
+import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.data.local.AppDatabase
 import com.swanie.portfolio.security.SecurityManager
 
@@ -13,7 +14,8 @@ class SettingsViewModelFactory(
     private val themePreferences: ThemePreferences,
     private val database: AppDatabase,
     private val securityManager: SecurityManager,
-    private val monetizationManager: MonetizationManager
+    private val monetizationManager: MonetizationManager,
+    private val vaultBackupEngine: VaultBackupEngine,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
@@ -23,7 +25,8 @@ class SettingsViewModelFactory(
                 themePreferences,
                 database,
                 securityManager,
-                monetizationManager
+                monetizationManager,
+                vaultBackupEngine,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

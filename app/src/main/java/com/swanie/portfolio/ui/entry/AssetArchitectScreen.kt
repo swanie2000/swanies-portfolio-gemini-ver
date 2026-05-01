@@ -296,7 +296,9 @@ fun AssetArchitectScreen(
                                             draftAsset = draftAsset.copy(amountHeld = 0.0)
                                         }
                                         ArchitectEditorField.NAME -> {
-                                            draftAsset = draftAsset.copy(displayName = "", name = "")
+                                            val metal = metalNameFromTicker(draftAsset.symbol)
+                                            val fallback = buildMetalDisplayName(metal, draftAsset.physicalForm)
+                                            draftAsset = draftAsset.copy(displayName = fallback, name = fallback)
                                         }
                                         ArchitectEditorField.WEIGHT -> {
                                             draftAsset = draftAsset.copy(weight = 0.0)
@@ -543,7 +545,20 @@ fun AssetArchitectScreen(
                     onBack = { architectStage = ArchitectStage.LIVE_CARD },
                     persistCustomIcon = { id, uri -> viewModel.persistCustomIconFromUri(id, uri) },
                     deleteCustomIcon = { id -> viewModel.deleteCustomAssetIcon(id) },
-                    onFinished = { path -> onSave(draftAsset.copy(localIconPath = path)) },
+                    onFinished = { path ->
+                        val metal = metalNameFromTicker(draftAsset.symbol)
+                        val fallback = buildMetalDisplayName(metal, draftAsset.physicalForm)
+                        val label = draftAsset.displayName.trim()
+                            .ifBlank { draftAsset.name.trim() }
+                            .ifBlank { fallback }
+                        onSave(
+                            draftAsset.copy(
+                                displayName = label,
+                                name = label,
+                                localIconPath = path,
+                            ),
+                        )
+                    },
                 )
             }
             }

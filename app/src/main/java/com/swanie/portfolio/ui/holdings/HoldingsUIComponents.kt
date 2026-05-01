@@ -513,6 +513,109 @@ private fun underIconTickerText(asset: AssetEntity): String =
         AssetCategory.CRYPTO -> asset.symbol
     }
 
+/** User-facing title for metal cards: prefer funnel / vault text over bare symbol. */
+private fun metalCardPrimaryLabel(asset: AssetEntity): String =
+    asset.displayName.trim().ifBlank { asset.name.trim() }.ifBlank { asset.symbol.trim() }
+
+/** Second-line spot ticker (e.g. XAG) when it is not already spelled out in the user title. */
+private fun metalShouldShowSymbolSubtitle(asset: AssetEntity, primary: String): Boolean {
+    if (asset.category != AssetCategory.METAL) return false
+    val sym = asset.symbol.trim()
+    if (sym.isEmpty()) return false
+    val p = primary.trim()
+    if (p.isEmpty()) return false
+    if (p.equals(sym, ignoreCase = true)) return false
+    if (p.contains(sym, ignoreCase = true)) return false
+    return true
+}
+
+/** MetalIcon tint logic: keep symbol in the string so gradients match even if the user title omits \"Silver\". */
+private fun metalIconLookupName(asset: AssetEntity): String =
+    when (asset.category) {
+        AssetCategory.METAL -> {
+            val seen = mutableSetOf<String>()
+            val parts = mutableListOf<String>()
+            for (s in listOf(asset.symbol, asset.displayName, asset.name)) {
+                val t = s.trim()
+                if (t.isEmpty()) continue
+                val key = t.lowercase(Locale.US)
+                if (seen.add(key)) parts.add(t)
+            }
+            parts.joinToString(" ").ifBlank { asset.symbol }
+        }
+        AssetCategory.CRYPTO -> asset.symbol
+    }
+
+@Composable
+private fun AssetUnderIconNameBlock(
+    asset: AssetEntity,
+    cardText: Color,
+    symSize: TextUnit,
+    lineHeight: TextUnit,
+    platform: PlatformTextStyle,
+) {
+    if (asset.category != AssetCategory.METAL) {
+        Text(
+            text = underIconTickerText(asset).uppercase(Locale.US),
+            modifier = Modifier.fillMaxWidth(),
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    color = cardText,
+                    fontWeight = FontWeight.Black,
+                    fontSize = symSize,
+                    textAlign = TextAlign.Center,
+                    lineHeight = lineHeight,
+                    platformStyle = platform,
+                )
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        return
+    }
+    val primary = metalCardPrimaryLabel(asset)
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = primary.uppercase(Locale.US),
+            modifier = Modifier.fillMaxWidth(),
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    color = cardText,
+                    fontWeight = FontWeight.Black,
+                    fontSize = symSize,
+                    textAlign = TextAlign.Center,
+                    lineHeight = lineHeight,
+                    platformStyle = platform,
+                )
+            ),
+            maxLines = 2,
+            softWrap = true,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (metalShouldShowSymbolSubtitle(asset, primary)) {
+            Text(
+                text = asset.symbol.trim().uppercase(Locale.US),
+                modifier = Modifier.fillMaxWidth(),
+                style = LocalTextStyle.current.merge(
+                    TextStyle(
+                        color = cardText.copy(alpha = 0.55f),
+                        fontWeight = FontWeight.Black,
+                        fontSize = symSize * 0.82f,
+                        textAlign = TextAlign.Center,
+                        lineHeight = lineHeight,
+                        platformStyle = platform,
+                    )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
 data class CryptoEditSave(
     val amountHeld: Double,
     val decimalPreference: Int,
@@ -1017,7 +1120,7 @@ fun FullAssetCard(
                         verticalArrangement = Arrangement.Top
                     ) {
                         MetalIcon(
-                            name = underIconTickerText(asset),
+                            name = metalIconLookupName(asset),
                             weight = asset.weight,
                             unit = asset.weightUnit,
                             physicalForm = asset.physicalForm,
@@ -1028,22 +1131,12 @@ fun FullAssetCard(
                             localIconReloadNonce = localIconReloadNonce,
                         )
                         Spacer(Modifier.height(iconSymbolGap))
-                        Text(
-                            text = underIconTickerText(asset).uppercase(),
-                            modifier = Modifier.fillMaxWidth(),
-                            style = LocalTextStyle.current.merge(
-                                TextStyle(
-                                    color = cardText,
-                                    fontWeight = FontWeight.Black,
-                                    fontSize = symSize,
-                                    textAlign = TextAlign.Center,
-                                    lineHeight = lineTight,
-                                    platformStyle = platformCluster,
-                                )
-                            ),
-                            maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
-                            softWrap = asset.category == AssetCategory.METAL,
-                            overflow = TextOverflow.Ellipsis
+                        AssetUnderIconNameBlock(
+                            asset = asset,
+                            cardText = cardText,
+                            symSize = symSize,
+                            lineHeight = lineTight,
+                            platform = platformCluster,
                         )
                     }
 
@@ -1328,8 +1421,8 @@ fun CompactAssetCard(
         val iconTextGapW = if (hi) 4.dp else 8.dp
         val sparklineStartPad = if (hi) 4.dp else 8.dp
         val expandedPad = if (hi) 10.dp else 14.dp
-        // Extra vertical room when metals show a two-line label under the icon.
-        val expandedMinHeight = if (hi) 168.dp else 188.dp
+        // Room for two-line user title plus optional spot ticker (e.g. XAG) under the icon.
+        val expandedMinHeight = if (hi) 180.dp else 202.dp
         val expandedDividerGapV = if (hi) 6.dp else 10.dp
         val expandedIconSymbolGap = if (hi) 4.dp else 8.dp
 
@@ -1372,7 +1465,7 @@ fun CompactAssetCard(
                             .fillMaxWidth()
                     ) {
                         val titleText = if (asset.category == AssetCategory.METAL) {
-                            asset.displayName.ifEmpty { asset.name }
+                            metalCardPrimaryLabel(asset)
                         } else {
                             asset.symbol
                         }
@@ -1402,7 +1495,7 @@ fun CompactAssetCard(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     MetalIcon(
-                                        name = underIconTickerText(asset),
+                                        name = metalIconLookupName(asset),
                                         weight = asset.weight,
                                         unit = asset.weightUnit,
                                         physicalForm = asset.physicalForm,
@@ -1560,7 +1653,7 @@ fun CompactAssetCard(
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 MetalIcon(
-                                    name = underIconTickerText(asset),
+                                    name = metalIconLookupName(asset),
                                     weight = asset.weight,
                                     unit = asset.weightUnit,
                                     physicalForm = asset.physicalForm,
@@ -1571,22 +1664,12 @@ fun CompactAssetCard(
                                     localIconReloadNonce = localIconReloadNonce,
                                 )
                                 Spacer(Modifier.height(expandedIconSymbolGap))
-                                Text(
-                                    text = underIconTickerText(asset).uppercase(),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    style = LocalTextStyle.current.merge(
-                                        TextStyle(
-                                            color = cardText,
-                                            fontWeight = FontWeight.Black,
-                                            fontSize = symSize,
-                                            textAlign = TextAlign.Center,
-                                            lineHeight = expandedLine,
-                                            platformStyle = expandedPlatform,
-                                        )
-                                    ),
-                                    maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
-                                    softWrap = asset.category == AssetCategory.METAL,
-                                    overflow = TextOverflow.Ellipsis
+                                AssetUnderIconNameBlock(
+                                    asset = asset,
+                                    cardText = cardText,
+                                    symSize = symSize,
+                                    lineHeight = expandedLine,
+                                    platform = expandedPlatform,
                                 )
                             }
 

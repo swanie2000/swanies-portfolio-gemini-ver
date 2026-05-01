@@ -1,4 +1,17 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.69: METALS FUNNEL + HOLDINGS CARD TRUTH)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READINESS)
+
+V40.70 UPDATE (Vault backup / restore VER1 — engine hardening + device-verified round-trip)
+- **Export:** `VaultBackupEngine` checkpoints WAL with `writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))` (cursor closed); Android SQLite forbids `execSQL` for pragmas that return rows, which previously broke export at zip time.
+- **Import:** Reads encrypted payload via `ContentResolver.openFileDescriptor` + capped stream (falls back to `openInputStream`); strips leading UTF-8 BOM before `SWPB` magic check; detects UTF-16 LE “text save” and surfaces a clear error; magic parsed with `String(bytes, offset, length, US_ASCII)`.
+- **User verification:** Export → SAF save → import with passphrase → success toast → cold process restart; holdings/theme/icons load from restored snapshot.
+
+CURRENT CONDITION (END OF SESSION)
+- VER1 encrypted local backup (Room DB + `theme_settings.preferences_pb` + `icons` / `custom_icons`) is credible for sovereign moves and disaster-recovery drills ahead of store listing.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- **Play Store (priority order):** Play Console record complete (category, contact, privacy policy URL, support); Data safety + content rating + target audience; subscription SKUs / base plans + RevenueCat offering ↔ `pro` entitlement mapping; internal then closed track AAB; 48–72h monitoring (crashes, ANRs, purchases, subscription restore); screenshots, feature graphic, short/long description; promote to production when matrix is green.
+- **QA:** Post-restore passes on widgets, multi-portfolio swipe, custom crypto icons, and Analytics gated states.
+- **Backlog when prioritized:** Auth instrumentation (V40.36), monetization funnel telemetry (V40.61), optional locale parity for any new backup strings.
 
 V40.69 UPDATE (Metals architect / repository / holdings cards)
 - **Repository:** Metal `displayName` from architect/funnel is preserved on `upsertAsset` and live refresh; `cleanMetalName` extended for `XAU`/`XAG`/`XPT`/`XPD` so spot tickers map without replacing user text.

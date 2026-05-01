@@ -175,6 +175,21 @@
   - `HoldingsUIComponents`: `underIconTickerText` for icon + under-icon text; metal duplicate middle title removed on expanded compact + full card; two-line under-icon + collapsed two-line title for metals; flexible icon column height; `expandedMinHeight` nudged for expanded compact.
   - Architect / amount entry / metals audit / asset picker / analytics strings updated per session diff; compile verified with `:app:compileDebugKotlin`.
 
+- [x] V40.70 Encrypted vault backup (VER1) export/import + engine hardening - COMPLETED
+  - `VaultBackupEngine` (`data/backup/`): encrypted `.swpb` payload (magic `SWPB`, format v1, PBKDF2 + AES-GCM) wrapping a zip of Room DB, theme DataStore file, and icon trees; Settings SAF create/open + `SettingsViewModel` export/import; cold `killProcess` restart after successful import so Room/DataStore reload.
+  - **WAL checkpoint:** `PRAGMA wal_checkpoint(FULL)` executed with `SupportSQLiteDatabase.query(SimpleSQLiteQuery(...))` + cursor `use {}` — required on Android because `execSQL` cannot run result-set pragmas (fixed export-time and pre-replace DB import-time crashes).
+  - **Import robustness:** Prefer `openFileDescriptor` + capped byte read; fallback `openInputStream`; strip UTF-8 BOM before header; explicit ASCII magic decode; friendly error if file looks UTF-16 re-saved from an editor.
+  - **Verification:** On-device round-trip (save backup → restore → app restart) succeeds; `:app:compileDebugKotlin` green.
+
+### Play Store path forward (as of 2026-04-30)
+
+- [ ] Play Console: store listing live draft (package locked), privacy policy URL, support email/URL, default language, category.
+- [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.
+- [ ] Monetization: Google Play subscription products + base plans (monthly/yearly, trials if any); map SKUs to RevenueCat offerings/packages; confirm `pro` entitlement behavior with license testers.
+- [ ] Tracks & quality: Upload signed AAB to **internal testing** → **closed testing**; crash/ANR dashboards; purchase + **Play restore purchases** + **local vault backup restore** matrix on physical devices.
+- [ ] Listing assets: phone (and 7-inch if required) screenshots, feature graphic, icon, short description, full description, release notes per track.
+- [ ] Go / no-go: 48–72h stable metrics on internal/closed before staged **production** rollout; watch refunds and entitlement edge cases.
+
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
   - Add debug-only auth diagnostics surface for state transition tracing.

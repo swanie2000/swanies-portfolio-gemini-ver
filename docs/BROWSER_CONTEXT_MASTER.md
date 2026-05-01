@@ -173,7 +173,14 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.69: METALS FUNNEL + HOLDINGS CARD TRUTH)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READINESS)
+
+V40.70 UPDATE
+- `VaultBackupEngine` VER1: WAL checkpoint via `query` (not `execSQL`); import via `openFileDescriptor` stream with BOM strip + robust magic parse; export/import wired from Settings (SAF) with cold restart after successful restore.
+- Device-verified encrypted backup round-trip (save → restore → reboot) completes successfully.
+
+FUTURE PATH
+- Play Console + compliance + RevenueCat/Play billing + internal/closed tracks + listing assets + device entitlement matrix (see `Master_Build_Checklist.md` Play section); post-restore QA on widgets and Pro-gated surfaces.
 
 V40.69 UPDATE
 - Metal `displayName` preserved in `AssetRepository` on upsert/refresh; `cleanMetalName` handles `XAU`/`XAG`/`XPT`/`XPD`.

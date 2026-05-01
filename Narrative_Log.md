@@ -623,3 +623,23 @@ Release recorded: V40.69 "Metals Funnel + Holdings Card Truth".
 - On-device pass: long metal names, smallest-width buckets, and large font scales on compact vs full cards.
 - Optional: extend the same two-line treatment to any remaining metal-specific rows (e.g. audit list) if product wants parity everywhere.
 - Resume prior roadmap items (monetization matrix, auth instrumentation) when you switch focus away from metals polish.
+
+---
+
+## V40.70 - Encrypted vault backup VER1 (export/import + Android SQLite correctness)
+
+Release recorded: V40.70 "Encrypted vault backup VER1".
+
+- **Problem:** Encrypted vault **export** could fail on device with `SQLiteException: Queries can be performed using SQLiteDatabase query or rawQuery methods only` because `PRAGMA wal_checkpoint(FULL)` returns a result set and must not run through `execSQL`. **Import** could report `Not a Swanie vault backup file.` (magic `SWPB` mismatch) when the `ContentProvider` path returned bytes that were not byte-identical to what was written (e.g. stream vs FD behavior, or a leading UTF-8 BOM).
+- **Fix — `VaultBackupEngine`:** Shared `checkpointWalFull()` using `database.openHelper.writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))` with the cursor closed; used from `buildZip` and before DB replace on import. Import path reads via `openFileDescriptor` when possible, shared capped stream reader, UTF-8 BOM strip, UTF-16 LE mis-save detection, and explicit `String(..., US_ASCII)` for the four-byte magic.
+- **Product surface:** Settings **BACKUP & RESTORE** — `CreateDocument` / `OpenDocument` + passphrase dialogs; `SettingsViewModel` `exportVaultBackup` / `importVaultBackup`; successful import triggers cold restart (`killProcess`) so Room and DataStore reload from restored files.
+- **Verification:** User-confirmed restore success after reboot; `:app:compileDebugKotlin` succeeds.
+
+### Current Status (End of Session)
+
+- VER1 local encrypted backup is a viable pre-Play **disaster recovery** and **device migration** tool; narrative + master browser context + `Master_Build_Checklist.md` Play forward section updated to reflect store-track priorities.
+
+### Next Phase (Projected Path)
+
+- Execute **Play Store path forward** checklist: Console completeness, Data safety + ratings, Play ↔ RevenueCat SKU wiring, internal/closed AAB, device matrix (Free/Pro + purchases + **vault backup round-trip**), listing assets, then staged production.
+- Optional QA: widgets and custom icons after a full restore on a second device.

@@ -275,19 +275,19 @@ fun MyHoldingsScreen(
                                 }
                             }
 
-                            val totalValueFormatted = remember(localHoldingsForPage, vaultForPage.baseCurrency) {
-                                val total = localHoldingsForPage.sumOf {
-                                    (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium
-                                }
-                                formatCurrency(total, 2, vaultForPage.baseCurrency)
-                            }
-
                             val filteredHoldingsForPage = remember(localHoldingsForPage, selectedTab) {
                                 when (selectedTab) {
                                     1 -> localHoldingsForPage.filter { it.category == AssetCategory.CRYPTO }
                                     2 -> localHoldingsForPage.filter { it.category == AssetCategory.METAL }
                                     else -> localHoldingsForPage
                                 }
+                            }
+
+                            val totalValueFormatted = remember(filteredHoldingsForPage, vaultForPage.baseCurrency) {
+                                val total = filteredHoldingsForPage.sumOf {
+                                    (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium
+                                }
+                                formatCurrency(total, 2, vaultForPage.baseCurrency)
                             }
 
                             // sh.calvin.reorderable onMove uses absolute LazyColumn indices; free users have a

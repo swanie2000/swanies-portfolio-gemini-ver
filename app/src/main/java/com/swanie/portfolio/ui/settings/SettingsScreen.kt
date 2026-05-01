@@ -1,5 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
+import android.net.Uri
 import android.content.Intent
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -28,6 +29,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
@@ -119,6 +122,36 @@ fun SettingsScreen(
     var translationSuggestedTextInput by remember { mutableStateOf("") }
     var translationNotesInput by remember { mutableStateOf("") }
     val settingsScrollState = rememberSaveable(saver = ScrollState.Saver) { ScrollState(0) }
+
+    var pendingExportUri by remember { mutableStateOf<Uri?>(null) }
+    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
+    var showBackupExportPassphraseDialog by remember { mutableStateOf(false) }
+    var showBackupImportPassphraseDialog by remember { mutableStateOf(false) }
+    var backupPassphraseField by remember { mutableStateOf("") }
+    var backupPassphraseVisible by remember { mutableStateOf(false) }
+    var backupOperationBusy by remember { mutableStateOf(false) }
+
+    val exportDocLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+        if (uri != null) {
+            pendingExportUri = uri
+            backupPassphraseField = ""
+            backupPassphraseVisible = false
+            showBackupExportPassphraseDialog = true
+        }
+    }
+
+    val importDocLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingImportUri = uri
+            backupPassphraseField = ""
+            backupPassphraseVisible = false
+            showBackupImportPassphraseDialog = true
+        }
+    }
 
     val passwordStrength = AuthPolicy.evaluatePasswordStrength(newPassword)
     val cleanNewPassword = passwordStrength.normalized
@@ -486,6 +519,180 @@ fun SettingsScreen(
         )
     }
 
+    if (showBackupExportPassphraseDialog && pendingExportUri != null) {
+        AlertDialog(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding(),
+            onDismissRequest = {
+                if (!backupOperationBusy) {
+                    showBackupExportPassphraseDialog = false
+                    pendingExportUri = null
+                    backupPassphraseField = ""
+                }
+            },
+            title = { Text(stringResource(R.string.settings_backup_passphrase_title_export)) },
+            text = {
+                OutlinedTextField(
+                    value = backupPassphraseField,
+                    onValueChange = { backupPassphraseField = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.settings_backup_passphrase_label)) },
+                    singleLine = true,
+                    enabled = !backupOperationBusy,
+                    visualTransformation = if (backupPassphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { backupPassphraseVisible = !backupPassphraseVisible }) {
+                            Icon(
+                                imageVector = if (backupPassphraseVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = !backupOperationBusy,
+                    onClick = {
+                        val trimmed = backupPassphraseField.trim()
+                        if (trimmed.isEmpty()) {
+                            Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
+                            return@TextButton
+                        }
+                        val uri = pendingExportUri ?: return@TextButton
+                        val pass = trimmed.toCharArray()
+                        backupOperationBusy = true
+                        settingsViewModel.exportVaultBackup(uri, pass) { result ->
+                            backupOperationBusy = false
+                            showBackupExportPassphraseDialog = false
+                            pendingExportUri = null
+                            backupPassphraseField = ""
+                            result.fold(
+                                onSuccess = {
+                                    Toast.makeText(context, context.getString(R.string.settings_backup_export_ok), Toast.LENGTH_SHORT).show()
+                                },
+                                onFailure = {
+                                    Toast.makeText(
+                                        context,
+                                        it.message ?: context.getString(R.string.settings_backup_error_generic),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text(if (backupOperationBusy) stringResource(R.string.settings_updating) else stringResource(R.string.settings_backup_confirm_export))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !backupOperationBusy,
+                    onClick = {
+                        showBackupExportPassphraseDialog = false
+                        pendingExportUri = null
+                        backupPassphraseField = ""
+                    }
+                ) { Text(stringResource(R.string.action_cancel)) }
+            },
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
+        )
+    }
+
+    if (showBackupImportPassphraseDialog && pendingImportUri != null) {
+        AlertDialog(
+            modifier = Modifier
+                .imePadding()
+                .navigationBarsPadding(),
+            onDismissRequest = {
+                if (!backupOperationBusy) {
+                    showBackupImportPassphraseDialog = false
+                    pendingImportUri = null
+                    backupPassphraseField = ""
+                }
+            },
+            title = { Text(stringResource(R.string.settings_backup_passphrase_title_import)) },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_backup_import_subtitle),
+                        fontSize = 13.sp,
+                        color = safeText.copy(alpha = 0.75f),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    OutlinedTextField(
+                        value = backupPassphraseField,
+                        onValueChange = { backupPassphraseField = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.settings_backup_passphrase_label)) },
+                        singleLine = true,
+                        enabled = !backupOperationBusy,
+                        visualTransformation = if (backupPassphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { backupPassphraseVisible = !backupPassphraseVisible }) {
+                                Icon(
+                                    imageVector = if (backupPassphraseVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = !backupOperationBusy,
+                    onClick = {
+                        val trimmed = backupPassphraseField.trim()
+                        if (trimmed.isEmpty()) {
+                            Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
+                            return@TextButton
+                        }
+                        val uri = pendingImportUri ?: return@TextButton
+                        val pass = trimmed.toCharArray()
+                        backupOperationBusy = true
+                        settingsViewModel.importVaultBackup(uri, pass) { result ->
+                            backupOperationBusy = false
+                            showBackupImportPassphraseDialog = false
+                            pendingImportUri = null
+                            backupPassphraseField = ""
+                            result.fold(
+                                onSuccess = {
+                                    Toast.makeText(context, context.getString(R.string.settings_backup_import_ok), Toast.LENGTH_SHORT).show()
+                                },
+                                onFailure = {
+                                    Toast.makeText(
+                                        context,
+                                        it.message ?: context.getString(R.string.settings_backup_error_generic),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+                        }
+                    }
+                ) {
+                    Text(if (backupOperationBusy) stringResource(R.string.settings_updating) else stringResource(R.string.settings_backup_confirm_import))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = !backupOperationBusy,
+                    onClick = {
+                        showBackupImportPassphraseDialog = false
+                        pendingImportUri = null
+                        backupPassphraseField = ""
+                    }
+                ) { Text(stringResource(R.string.action_cancel)) }
+            },
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -790,6 +997,49 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(stringResource(R.string.settings_theme_manager), color = safeText, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // --- BACKUP & RESTORE (VER1: local encrypted file) ---
+                    Text(stringResource(R.string.settings_backup_restore), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
+                    Text(
+                        text = stringResource(R.string.settings_backup_export_subtitle),
+                        color = safeText.copy(alpha = 0.6f),
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Button(
+                        onClick = {
+                            exportDocLauncher.launch("swanie_vault_backup.swpb")
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(stringResource(R.string.settings_backup_export), color = safeText, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.settings_backup_import_subtitle),
+                        color = safeText.copy(alpha = 0.6f),
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Button(
+                        onClick = {
+                            importDocLauncher.launch(arrayOf("*/*"))
+                        },
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(stringResource(R.string.settings_backup_import), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(48.dp))
