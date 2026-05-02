@@ -1,0 +1,18 @@
+---
+description: When the user says "Update the Handoff", refresh AI continuity docs and push to GitHub.
+alwaysApply: true
+---
+
+# Update the Handoff (user trigger)
+
+When the user says **"Update the Handoff"** (or clear variants like "handoff update", "refresh the handoff"), treat it as an explicit request to:
+
+1. **Canonical narrative** — Edit `docs/BROWSER_CONTEXT_NARRATIVE.md`: keep **`AI AGENT HANDOFF (READ FIRST)`** accurate (where we left off, engineering truth, next priorities, quick file map, last handoff date). Fold in whatever the **current session** established; if the session outcome is ambiguous, ask one short clarifying question before writing fiction.
+
+2. **MASTER excerpt** — Edit `docs/BROWSER_CONTEXT_MASTER.md`: sync the **`### BEGIN_NARRATIVE`** block so it matches the handoff + latest milestone intent (browser/paste workflows rely on this; narrative file wins on detail).
+
+3. **Optional same pass** — If the session closed a milestone: bump `Narrative_Log.md`, tick/shift `Master_Build_Checklist.md`, and adjust `docs/START_HERE_FOR_AI.md` only when those need to change.
+
+4. **Git** — Stage the doc(s) you touched, commit with a message like `Docs: handoff — [one-line summary]`, and **`git push`** to the branch the user is on (default `main` unless they specify otherwise).
+
+Do **not** use this trigger to change application code unless the user also asked for implementation in the same message.
