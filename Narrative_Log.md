@@ -10,6 +10,10 @@ For every completed milestone, the agent must automatically execute:
 
 ---
 
+## [2026-02-25 ~23:30] Owner EOD — session closed; resume Play ship track next time
+
+---
+
 ## [2026-05-02] V40.72 — Feature-complete stance; i18n parity; ship-only handoff
 
 - **Owner intent:** No further features planned; **finish line** = Google Play (verification, AAB, Data safety, listing, RevenueCat/Play SKUs) + targeted QA only.

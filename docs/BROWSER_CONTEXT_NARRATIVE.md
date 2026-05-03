@@ -8,7 +8,7 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / 
 
 **Canonical vs excerpt:** This file (`docs/BROWSER_CONTEXT_NARRATIVE.md`) is the **canonical** product timeline + handoff. `docs/BROWSER_CONTEXT_MASTER.md` embeds a copy under `BEGIN_NARRATIVE` for paste bundles; if the two diverge, **update this file first**, then refresh the MASTER excerpt.
 
-**Last handoff update:** 2026-05-02 — **Product:** Owner considers the **app feature-complete**; no further feature roadmap—**only shipping** (Play Console, compliance, listing, AAB, purchase/restore QA). **Repo:** V40.71 product stack + **i18n parity** (64 keys × 19 locales, hand-edited). **Play:** Account fee paid; identity verification submitted (await Google).
+**Last handoff update:** 2026-02-25 (~23:30 local, owner EOD) — **Product:** Owner considers the **app feature-complete**; no further feature roadmap—**only shipping** (Play Console, compliance, listing, AAB, purchase/restore QA). **Repo:** V40.71 product stack + **i18n parity** (64 keys × 19 locales, hand-edited). **Play:** Account fee paid; identity verification submitted (await Google). *Next session: resume Play checklist when ready.*
 
 ### Where we left off (engineering truth)
 

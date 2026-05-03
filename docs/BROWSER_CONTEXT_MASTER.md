@@ -181,7 +181,7 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / 
 
 **Purpose:** Onboarding for any AI joining mid-stream. Update when milestones change. **Do not** treat older `CURRENT CONDITION` blocks lower in this excerpt as “today”; they are historical.
 
-**Last handoff update:** 2026-05-02 — Owner: **feature freeze / v1 complete**; **no new features**—only **Play ship** (verification, AAB, Data safety, listing, SKUs↔RC). Repo: V40.71 stack + **V40.72** i18n parity (64 keys × 19 locales, hand-edited). Play: fee paid; identity submitted (await Google).
+**Last handoff update:** 2026-02-25 (~23:30 local, owner EOD) — **Feature freeze / v1 complete**; **no new features**—only **Play ship** (verification, AAB, Data safety, listing, SKUs↔RC). Repo: V40.71 + **V40.72** i18n parity. Play: fee paid; identity submitted (await Google).
 
 ### Where we left off
 - **Ship stance:** Treat app as **feature-complete**; next work is **console + compliance + QA**, not greenfield product.

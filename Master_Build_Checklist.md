@@ -194,7 +194,7 @@
   - **Locales:** MissingTranslation key set closed across **ar → zh-rTW** (64 keys each, hand-edited per `strings.xml`).
   - **Docs:** `docs/BROWSER_CONTEXT_NARRATIVE.md` + `docs/BROWSER_CONTEXT_MASTER.md` handoff synced to ship-only path.
 
-### Play Store path forward (as of 2026-05-02)
+### Play Store path forward (as of 2026-02-25, owner EOD)
 
 - [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
 - [ ] Play Console: store listing live draft (package locked), privacy policy URL, support email/URL, default language, category.
