@@ -119,6 +119,21 @@
     <string name="settings_bug_report_failed">Could not send. Check your connection and try again.</string>
     <string name="settings_bug_report_required">Please enter a message before submitting.</string>
     <string name="settings_bug_report_char_count">%1$d / 500</string>
+    <!-- Translation feedback (email); defaults required so locale-only keys are not stripped at merge. -->
+    <string name="settings_translation_feedback_button">REPORT TRANSLATION</string>
+    <string name="settings_translation_feedback_hint">See a bad translation? Send the text and your suggested correction.</string>
+    <string name="settings_translation_feedback_title">Translation feedback</string>
+    <string name="settings_translation_feedback_subtitle">This opens your email app with a pre-filled report.</string>
+    <string name="settings_translation_feedback_screen">Screen or feature</string>
+    <string name="settings_translation_feedback_current_text">Current text</string>
+    <string name="settings_translation_feedback_suggested_text">Suggested translation</string>
+    <string name="settings_translation_feedback_notes">Notes (optional)</string>
+    <string name="settings_translation_feedback_submit">SEND REPORT</string>
+    <string name="settings_translation_feedback_required">Please enter your suggested translation.</string>
+    <string name="settings_translation_feedback_chooser_title">Send translation feedback</string>
+    <string name="settings_translation_feedback_no_email_app">No email app found on this device.</string>
+    <string name="settings_translation_feedback_email_subject">Translation feedback (%1$s)</string>
+    <string name="settings_translation_feedback_email_body">Language: %1$s\nScreen: %2$s\nCurrent text: %3$s\nSuggested translation: %4$s\nNotes: %5$s</string>
     <string name="settings_theme_depth">THEME &amp; DEPTH</string>
     <string name="settings_management">MANAGEMENT</string>
     <string name="settings_upgrade_to_pro_now">UPGRADE TO PRO NOW</string>
@@ -318,6 +333,8 @@
     <string name="architect_icon_cta_add">ADD ASSET</string>
     <string name="architect_icon_cta_update">UPDATE</string>
     <string name="architect_back_to_blueprint">BACK TO BLUEPRINT</string>
+    <string name="architect_proceed_to_card">CONTINUE TO CARD</string>
+    <string name="architect_finalize_vault">FINALIZE &amp; SAVE VAULT</string>
     <string name="architect_metal_gold">Gold</string>
     <string name="architect_metal_silver">Silver</string>
     <string name="architect_metal_platinum">Platinum</string>
@@ -335,6 +352,24 @@
     <string name="architect_unit_choice_oz">OZ</string>
     <string name="architect_unit_choice_kilo">KILO</string>
     <string name="architect_unit_choice_gram">GRAM</string>
+    <!-- Asset architect funnel grid labels; defaults required so locale-only keys are not stripped at merge. -->
+    <string name="action_next">NEXT</string>
+    <string name="action_finalize">FINALIZE</string>
+    <string name="funnel_select_type">SELECT TYPE</string>
+    <string name="funnel_name">NAME</string>
+    <string name="funnel_icon">ICON</string>
+    <string name="funnel_labels">LABELS</string>
+    <string name="funnel_value">VALUE</string>
+    <string name="funnel_quantity">QUANTITY</string>
+    <string name="funnel_premium">PREMIUM</string>
+    <string name="funnel_label_under_icon">LABEL UNDER ICON</string>
+    <string name="funnel_enter_name">Enter name…</string>
+    <string name="funnel_tap_photo">TAP PHOTO (OR SWAN)</string>
+    <string name="funnel_description_lines">DESCRIPTION LINES</string>
+    <string name="funnel_line_1">Line 1…</string>
+    <string name="funnel_line_2">Line 2…</string>
+    <string name="funnel_unit_value">UNIT VALUE</string>
+    <string name="funnel_enter_quantity">Enter quantity…</string>
     <string name="sparkline_gathering_data">Gathering Data...</string>
     <string name="action_back">BACK</string>
     <string name="crypto_settings_title">%1$s SETTINGS</string>
