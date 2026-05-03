@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Swanie's Portfolio — track crypto and precious metals on your Android device. Local vault, optional sync, encrypted backup." />
+  <title>Swanie's Portfolio — Crypto &amp; precious metals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="logo" href="index.html">
+        <span class="logo-mark" aria-hidden="true">◆</span>
+        <span class="logo-text">Swanie's Portfolio</span>
+      </a>
+      <nav class="nav-links" aria-label="Site">
+        <a href="#features">Features</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="hero-badge">Android app</p>
+        <h1>Your metals &amp; <span>crypto</span> in one vault</h1>
+        <p class="hero-lead">
+          Swanie's Portfolio is a tracker for crypto and precious metals. Your vault stays on your device;
+          optional features use only the permissions you grant.
+        </p>
+        <div class="cta-row">
+          <!-- When live: use <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=YOUR.PACKAGE">Get it on Google Play</a> -->
+          <span class="btn btn-primary" id="play-cta" role="status">Google Play — soon</span>
+          <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
+        </div>
+        <p class="hero-note">Listing in progress — replace the grayed “soon” control with your Play link in <code style="color: var(--gold-dim);">index.html</code> when the store listing is public.</p>
+      </section>
+
+      <section id="features">
+        <h2 class="section-title">Built for serious holders</h2>
+        <p class="section-sub">Local-first design with the extras you need when you want them.</p>
+        <div class="feature-grid">
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🔐</div>
+            <h3>Vault &amp; unlock</h3>
+            <p>Lock your portfolio behind a password and biometrics. You control when it opens.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🪙</div>
+            <h3>Crypto &amp; metals</h3>
+            <p>Track digital assets and bullion with spot-aware valuation tuned for grams, kilos, and troy ounces.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">📊</div>
+            <h3>Analytics &amp; widgets</h3>
+            <p>Dig into concentration and mix on-device; home-screen widgets keep totals in view.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">💾</div>
+            <h3>Backup &amp; restore</h3>
+            <p>Encrypted export you can store yourself; optional Google Drive sync when you enable it.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🎨</div>
+            <h3>Themes</h3>
+            <p>Make the app yours with customizable colors and a theme studio on supported tiers.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🌍</div>
+            <h3>Many languages</h3>
+            <p>Interface localized for a wide set of locales so you can use the app comfortably.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="pro-strip" aria-labelledby="pro-heading">
+        <h2 id="pro-heading">Pro (subscription)</h2>
+        <p>
+          Some capabilities are offered as an in-app subscription where available (themes, deeper analytics,
+          widget customization, and related Pro surfaces). Details appear inside the app and at checkout.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="y"></span> Swanie's Portfolio</span>
+      <span><a href="privacy.html">Privacy policy</a> · Not financial advice</span>
+    </footer>
+  </div>
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
