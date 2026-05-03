@@ -175,27 +175,30 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.71: METAL SPOT VALUATION + ABOUT/I18N + PLAY VERIFICATION QUEUE)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / SHIP TRACK ONLY)
 
 ## AI AGENT HANDOFF (READ FIRST) — keep in sync with `docs/BROWSER_CONTEXT_NARRATIVE.md`
 
 **Purpose:** Onboarding for any AI joining mid-stream. Update when milestones change. **Do not** treat older `CURRENT CONDITION` blocks lower in this excerpt as “today”; they are historical.
 
-**Last handoff update:** 2026-05-02 — **V40.71** in repo: `MetalSpotMath`/`AssetValuation` end-to-end; **`BackupRestoreScreen`** + `BACKUP_RESTORE` route; **`BugReportSubmitter`** + Feedback OkHttp; About + i18n wave; Play **fee paid** + **identity submitted** (await Google → device app → phone).
+**Last handoff update:** 2026-05-02 — Owner: **feature freeze / v1 complete**; **no new features**—only **Play ship** (verification, AAB, Data safety, listing, SKUs↔RC). Repo: V40.71 stack + **V40.72** i18n parity (64 keys × 19 locales, hand-edited). Play: fee paid; identity submitted (await Google).
 
 ### Where we left off
-- Android Kotlin/Compose app; RevenueCat Pro gating on theme, multi-portfolio, analytics, widget customization.
-- **Vault backup VER1:** `VaultBackupEngine.kt` unchanged contract (WAL `query`, SAF, cold restart). **UI:** `BackupRestoreScreen.kt`, `Routes.BACKUP_RESTORE`, `NavGraph`; `SettingsViewModel` still powers export/import.
-- **Metal spot (V40.71):** `data/local/MetalSpotMath.kt` — `MetalSpotMath` + **`AssetValuation`** (`spotMassHoldingsUsd`, `holdingValueUsd`, `cardPriceRowUsd`). Wired: `HoldingsUIComponents`, `MyHoldingsScreen`, `AnalyticsScreen`, `AssetRepository`, `ThemeStudioScreen`, `WidgetManagerScreen`, `PortfolioWidget`, `AssetArchitectScreen`, `SettingsViewModel` totals.
-- **Feedback:** `BugReportSubmitter` + `@Named("Feedback")` client in `NetworkModule`; Settings dialog + `submitBugReport`; log tag `SwanieBugReport`.
-- **About / legal / i18n:** `AboutScreen`, `ABOUT` route, bottom bar hidden on About; `LanguageDisplay.kt`; strings + **all** maintained `values-*` locales updated for new keys; **TEST INFO** removed from Settings.
-- **Next:** Owner: identity email → device + phone verification → internal AAB + checklist. Engineering: QA metal **GRAM/KILO** + widgets; backlog V40.36 / V40.61.
+- **Ship stance:** Treat app as **feature-complete**; next work is **console + compliance + QA**, not greenfield product.
+- Android Kotlin/Compose; RevenueCat Pro gating (theme, multi-portfolio, analytics, widgets).
+- **Vault VER1 + backup UI:** `VaultBackupEngine` + `BackupRestoreScreen` + `BACKUP_RESTORE` + `SettingsViewModel` export/import.
+- **Metal spot:** `MetalSpotMath.kt` / `AssetValuation` wired through holdings, analytics, repo, widget, theme, architect, settings totals.
+- **Feedback / About / i18n:** `BugReportSubmitter`, `AboutScreen`, `LanguageDisplay`; **all** `values-*` include the former MissingTranslation key set; **TEST INFO** removed from Settings.
+- **Next:** Checklist Play path only; backlog V40.36/V40.61 **non-blocking** unless owner reprioritizes post-1.0.
 
 ### Quick file map
-`VaultBackupEngine.kt` | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` | `MetalSpotMath.kt` | `BugReportSubmitter.kt`, `NetworkModule.kt` | `SettingsScreen.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `MainActivity.kt` | `LanguageDisplay.kt`
+`VaultBackupEngine.kt` | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` | `MetalSpotMath.kt` | `BugReportSubmitter.kt`, `NetworkModule.kt` | `SettingsScreen.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `MainActivity.kt` | `values/strings.xml` + `values-*`
+
+V40.72 UPDATE (excerpt)
+- Feature freeze; i18n parity pass; finish line = Play + QA only.
 
 V40.71 UPDATE (excerpt — see canonical `docs/BROWSER_CONTEXT_NARRATIVE.md`)
-- Troy-oz metal USD pipeline; backup screen extraction; FormSubmit bug reports; About + locale parity; Play verification queue.
+- Troy-oz metal USD pipeline; backup screen extraction; FormSubmit bug reports; About + locale wave; Play verification queue.
 
 V40.70 UPDATE
 - `VaultBackupEngine` VER1: WAL checkpoint via `query` (not `execSQL`); import via `openFileDescriptor` stream with BOM strip + robust magic parse; export/import wired from Settings (SAF) with cold restart after successful restore.

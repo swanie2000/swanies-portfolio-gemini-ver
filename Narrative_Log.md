@@ -10,6 +10,13 @@ For every completed milestone, the agent must automatically execute:
 
 ---
 
+## [2026-05-02] V40.72 — Feature-complete stance; i18n parity; ship-only handoff
+
+- **Owner intent:** No further features planned; **finish line** = Google Play (verification, AAB, Data safety, listing, RevenueCat/Play SKUs) + targeted QA only.
+- **i18n:** 64 missing keys added **manually** to all **19** `values-*` locale files (MissingTranslation closure for that set); narrative/master updated to match.
+
+---
+
 ## [2026-05-02] V40.71 — Metal spot pipeline + backup screen + bug reports + About + i18n + Play queue
 
 - **Metal math:** `MetalSpotMath` + `AssetValuation` in `data/local/MetalSpotMath.kt` — **USD/troy oz** spot; **GRAM/KILO/KG** → troy oz before `spot × mass`; used on holdings cards, analytics, `AssetRepository` refresh, widget + theme previews, architect, settings totals.

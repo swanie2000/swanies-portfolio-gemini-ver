@@ -189,6 +189,11 @@
   - **Locales:** default + all maintained `values-*` bundles updated for new strings; **`LanguageDisplay.kt`** for native language picker labels.
   - **Play (ops):** Developer fee paid; identity verification submitted (pending Google).
 
+- [x] V40.72 Feature-freeze + i18n parity + narrative handoff — COMPLETED (2026-05-02)
+  - **Product:** Owner considers app **feature-complete** for v1; remaining work is **shipping** (checklist Play/RevenueCat + QA), not new product features unless scope reopens.
+  - **Locales:** MissingTranslation key set closed across **ar → zh-rTW** (64 keys each, hand-edited per `strings.xml`).
+  - **Docs:** `docs/BROWSER_CONTEXT_NARRATIVE.md` + `docs/BROWSER_CONTEXT_MASTER.md` handoff synced to ship-only path.
+
 ### Play Store path forward (as of 2026-05-02)
 
 - [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
