@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">该账号上的 Pro 已激活。</string>
     <string name="settings_restore_purchases_no_entitlement">该账号未找到此前的 Pro 购买记录。</string>
     <string name="settings_restore_purchases_failed">当前无法恢复购买。</string>
+    <string name="settings_backup_restore">备份与恢复</string>
+    <string name="settings_backup_restore_nav">备份/恢复</string>
+    <string name="settings_backup_screen_title">备份与恢复</string>
+    <string name="settings_backup_screen_intro">创建保险库、主题和图标的加密备份，或从先前保存的文件恢复。导入将替换此设备上的数据并重启应用。</string>
+    <string name="settings_backup_export">导出加密备份</string>
+    <string name="settings_backup_export_subtitle">将保险库、主题和图标保存到受口令保护的文件（下载、云端硬盘等）。</string>
+    <string name="settings_backup_import">导入加密备份</string>
+    <string name="settings_backup_import_subtitle">从备份文件替换此设备的保险库。完成后应用将重启。</string>
+    <string name="settings_backup_passphrase_title_export">输入口令以加密此导出</string>
+    <string name="settings_backup_passphrase_title_import">输入备份口令</string>
+    <string name="settings_backup_passphrase_label">口令</string>
+    <string name="settings_backup_confirm_export">保存备份</string>
+    <string name="settings_backup_confirm_import">恢复</string>
+    <string name="settings_backup_export_ok">备份已保存。</string>
+    <string name="settings_backup_import_ok">保险库已恢复。正在重启…</string>
+    <string name="settings_backup_error_generic">备份失败。请检查口令和文件。</string>
+    <string name="settings_backup_error_wrong_passphrase">口令不正确。</string>
+    <string name="settings_backup_error_empty_passphrase">请输入口令。</string>
     <string name="pro_gate_title">PRO 功能</string>
     <string name="pro_gate_subtitle">%1$s 可在 Pro 中使用。</string>
     <string name="pro_gate_upgrade_coming">升级购买流程正在完善中。</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">将保管库重置为出厂设置？</string>
     <string name="settings_factory_reset_body">这将完全擦除当前保管库，包括所有资产和历史记录。此操作是主权性质的且不可撤销。</string>
+    <string name="settings_factory_reset_continue">继续</string>
+    <string name="settings_factory_reset_sure_title">确定要继续吗？</string>
+    <string name="settings_factory_reset_sure_body">这将永久擦除此设备上的保管库、已保存的主题和设置以及自定义图标。无法撤销。</string>
+    <string name="settings_factory_reset_confirm_erase">全部清除</string>
+    <string name="settings_factory_reset_progress_database">正在清除保管库数据库…</string>
+    <string name="settings_factory_reset_progress_settings">正在清除已保存的设置…</string>
+    <string name="settings_factory_reset_progress_db_files">正在删除数据库文件…</string>
+    <string name="settings_factory_reset_progress_icons">正在删除自定义图标文件…</string>
+    <string name="settings_factory_reset_progress_widgets">正在刷新主屏幕小组件…</string>
+    <string name="settings_factory_reset_progress_restart">正在重启应用…</string>
     <string name="settings_reset_everything">重置所有内容</string>
     <string name="action_cancel">取消</string>
 

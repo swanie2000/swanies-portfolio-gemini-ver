@@ -181,7 +181,15 @@
   - **Import robustness:** Prefer `openFileDescriptor` + capped byte read; fallback `openInputStream`; strip UTF-8 BOM before header; explicit ASCII magic decode; friendly error if file looks UTF-16 re-saved from an editor.
   - **Verification:** On-device round-trip (save backup → restore → app restart) succeeds; `:app:compileDebugKotlin` green.
 
-### Play Store path forward (as of 2026-05-03)
+- [x] V40.71 Metal spot valuation + backup UI split + feedback + About + i18n — COMPLETED (2026-05-02)
+  - **`MetalSpotMath` / `AssetValuation`** (`data/local/MetalSpotMath.kt`): troy-oz conversion for **GRAM/KILO**; single valuation API for holdings, analytics, `AssetRepository`, widget/theme/architect/settings totals.
+  - **`BackupRestoreScreen`** + **`Routes.BACKUP_RESTORE`**: dedicated encrypted backup UX; `SettingsScreen` navigates; VM/engine unchanged in behavior.
+  - **`BugReportSubmitter`** + **`@Named("Feedback")` OkHttp** + Settings dialog + `SettingsViewModel.submitBugReport`.
+  - **`AboutScreen`** + **`Routes.ABOUT`**; `MainActivity` hides bottom bar on About; Settings + Unlock links; **TEST INFO** removed from Settings.
+  - **Locales:** default + all maintained `values-*` bundles updated for new strings; **`LanguageDisplay.kt`** for native language picker labels.
+  - **Play (ops):** Developer fee paid; identity verification submitted (pending Google).
+
+### Play Store path forward (as of 2026-05-02)
 
 - [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
 - [ ] Play Console: store listing live draft (package locked), privacy policy URL, support email/URL, default language, category.

@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro is al actief op dit account.</string>
     <string name="settings_restore_purchases_no_entitlement">Geen eerdere Pro-aankoop gevonden voor dit account.</string>
     <string name="settings_restore_purchases_failed">Aankopen kunnen nu niet worden hersteld.</string>
+    <string name="settings_backup_restore">BACK-UP &amp; HERSTEL</string>
+    <string name="settings_backup_restore_nav">BACK-UP/HERSTEL</string>
+    <string name="settings_backup_screen_title">BACK-UP &amp; HERSTEL</string>
+    <string name="settings_backup_screen_intro">Maak een versleutelde back-up van uw kluis, thema en pictogrammen, of herstel vanuit een eerder opgeslagen bestand. Importeren vervangt de gegevens op dit apparaat en start de app opnieuw.</string>
+    <string name="settings_backup_export">VERSLEUTELDE BACK-UP EXPORTEREN</string>
+    <string name="settings_backup_export_subtitle">Sla kluis, thema en pictogrammen op in een met wachtwoordzin beveiligd bestand (Downloads, Drive, enz.).</string>
+    <string name="settings_backup_import">VERSLEUTELDE BACK-UP IMPORTEREN</string>
+    <string name="settings_backup_import_subtitle">Vervangt de kluis van dit apparaat vanuit een back-upbestand. De app start daarna opnieuw.</string>
+    <string name="settings_backup_passphrase_title_export">Voer wachtwoordzin in om deze export te versleutelen</string>
+    <string name="settings_backup_passphrase_title_import">Voer back-upwachtwoordzin in</string>
+    <string name="settings_backup_passphrase_label">Wachtwoordzin</string>
+    <string name="settings_backup_confirm_export">BACK-UP OPSLAAN</string>
+    <string name="settings_backup_confirm_import">HERSTELLEN</string>
+    <string name="settings_backup_export_ok">Back-up opgeslagen.</string>
+    <string name="settings_backup_import_ok">Kluis hersteld. Opnieuw opstarten…</string>
+    <string name="settings_backup_error_generic">Back-up mislukt. Controleer wachtwoordzin en bestand.</string>
+    <string name="settings_backup_error_wrong_passphrase">Onjuiste wachtwoordzin.</string>
+    <string name="settings_backup_error_empty_passphrase">Voer een wachtwoordzin in.</string>
     <string name="pro_gate_title">PRO-FUNCTIE</string>
     <string name="pro_gate_subtitle">%1$s is beschikbaar in Pro.</string>
     <string name="pro_gate_upgrade_coming">De upgrade-aankoopflow wordt afgerond.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">KLUIS HERSTELLEN NAAR FABRIEK?</string>
     <string name="settings_factory_reset_body">Dit wist de huidige kluis volledig, inclusief alle activa en geschiedenis. Deze actie is onomkeerbaar.</string>
+    <string name="settings_factory_reset_continue">DOORGAAN</string>
+    <string name="settings_factory_reset_sure_title">WEET JE HET ZEKER?</string>
+    <string name="settings_factory_reset_sure_body">Dit wist permanent je kluis, opgeslagen thema en instellingen en aangepaste pictogrammen op dit apparaat. Dit kun je niet ongedaan maken.</string>
+    <string name="settings_factory_reset_confirm_erase">ALLES WISSEN</string>
+    <string name="settings_factory_reset_progress_database">Kluisdatabase wissen…</string>
+    <string name="settings_factory_reset_progress_settings">Opgeslagen instellingen wissen…</string>
+    <string name="settings_factory_reset_progress_db_files">Databasebestanden verwijderen…</string>
+    <string name="settings_factory_reset_progress_icons">Aangepaste pictogrammen verwijderen…</string>
+    <string name="settings_factory_reset_progress_widgets">Startschermwidgets vernieuwen…</string>
+    <string name="settings_factory_reset_progress_restart">App opnieuw starten…</string>
     <string name="settings_reset_everything">ALLES RESETTEN</string>
     <string name="action_cancel">ANNULEREN</string>
 

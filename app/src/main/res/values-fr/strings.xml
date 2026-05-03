@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro est déjà actif sur ce compte.</string>
     <string name="settings_restore_purchases_no_entitlement">Aucun achat Pro antérieur trouvé pour ce compte.</string>
     <string name="settings_restore_purchases_failed">Impossible de restaurer les achats pour le moment.</string>
+    <string name="settings_backup_restore">SAUVEGARDE ET RESTAURATION</string>
+    <string name="settings_backup_restore_nav">SAUVEGARDE/RESTAURATION</string>
+    <string name="settings_backup_screen_title">SAUVEGARDE ET RESTAURATION</string>
+    <string name="settings_backup_screen_intro">Créez une sauvegarde chiffrée de votre coffre, thème et icônes, ou restaurez à partir d\'un fichier enregistré. L\'importation remplace les données sur cet appareil et redémarre l\'application.</string>
+    <string name="settings_backup_export">EXPORTER UNE SAUVEGARDE CHIFFRÉE</string>
+    <string name="settings_backup_export_subtitle">Enregistrez le coffre, le thème et les icônes dans un fichier protégé par phrase secrète (Téléchargements, Drive, etc.).</string>
+    <string name="settings_backup_import">IMPORTER UNE SAUVEGARDE CHIFFRÉE</string>
+    <string name="settings_backup_import_subtitle">Remplace le coffre de cet appareil à partir d\'un fichier de sauvegarde. L\'application redémarrera une fois terminé.</string>
+    <string name="settings_backup_passphrase_title_export">Entrez la phrase secrète pour chiffrer cette exportation</string>
+    <string name="settings_backup_passphrase_title_import">Entrez la phrase secrète de sauvegarde</string>
+    <string name="settings_backup_passphrase_label">Phrase secrète</string>
+    <string name="settings_backup_confirm_export">ENREGISTRER LA SAUVEGARDE</string>
+    <string name="settings_backup_confirm_import">RESTAURER</string>
+    <string name="settings_backup_export_ok">Sauvegarde enregistrée.</string>
+    <string name="settings_backup_import_ok">Coffre restauré. Redémarrage…</string>
+    <string name="settings_backup_error_generic">Échec de la sauvegarde. Vérifiez la phrase secrète et le fichier.</string>
+    <string name="settings_backup_error_wrong_passphrase">Phrase secrète incorrecte.</string>
+    <string name="settings_backup_error_empty_passphrase">Entrez une phrase secrète.</string>
     <string name="pro_gate_title">FONCTION PRO</string>
     <string name="pro_gate_subtitle">%1$s est disponible avec Pro.</string>
     <string name="pro_gate_upgrade_coming">Le flux d\'achat de mise à niveau est en cours de finalisation.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">RÉINITIALISER LE COFFRE ?</string>
     <string name="settings_factory_reset_body">Cela effacera complètement le coffre actuel, y compris les actifs et l\'historique. Cette action est souveraine et permanente.</string>
+    <string name="settings_factory_reset_continue">CONTINUER</string>
+    <string name="settings_factory_reset_sure_title">ÊTES-VOUS SÛR ?</string>
+    <string name="settings_factory_reset_sure_body">Cela effacera définitivement votre coffre, le thème enregistré, les paramètres et les icônes personnalisées sur cet appareil. Cette action est irréversible.</string>
+    <string name="settings_factory_reset_confirm_erase">TOUT EFFACER</string>
+    <string name="settings_factory_reset_progress_database">Effacement de la base du coffre…</string>
+    <string name="settings_factory_reset_progress_settings">Effacement des paramètres enregistrés…</string>
+    <string name="settings_factory_reset_progress_db_files">Suppression des fichiers de base de données…</string>
+    <string name="settings_factory_reset_progress_icons">Suppression des icônes personnalisées…</string>
+    <string name="settings_factory_reset_progress_widgets">Actualisation des widgets de l\'écran d\'accueil…</string>
+    <string name="settings_factory_reset_progress_restart">Redémarrage de l\'application…</string>
     <string name="settings_reset_everything">TOUT RÉINITIALISER</string>
     <string name="action_cancel">ANNULER</string>
 

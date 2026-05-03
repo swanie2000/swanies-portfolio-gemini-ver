@@ -13,7 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import android.content.res.Resources
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.graphics.Color
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.AssetValuation
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.holdings.ArchitectIconSelectionStep
 import com.swanie.portfolio.ui.holdings.AssetViewModel
@@ -51,6 +54,7 @@ fun AssetArchitectScreen(
     onCancel: () -> Unit
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
+    val res = LocalContext.current.resources
     val draftKey = existingAsset?.coinId ?: "create_${initialSymbol}_${initialPrice}"
     var architectStage by remember(draftKey) { mutableStateOf(ArchitectStage.BLUEPRINT) }
     var activeEditor by remember { mutableStateOf<ArchitectEditorField?>(null) }
@@ -77,9 +81,8 @@ fun AssetArchitectScreen(
         "XPD", "PALLADIUM" -> "XPD"
         else -> "XAU"
     }
-    val defaultMetalName = metalNameFromTicker(defaultTicker)
     val defaultShape = "Bar"
-    val defaultName = buildMetalDisplayName(defaultMetalName, defaultShape)
+    val defaultName = buildLocalizedMetalDisplayName(res, defaultTicker, defaultShape)
 
     // Step 1: new row uses defaults; edit (holdings pencil) hydrates from [existingAsset].
     var draftAsset by remember(draftKey) {
@@ -186,23 +189,26 @@ fun AssetArchitectScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             FunnelGrid(
-                                options = listOf("Gold", "Silver", "Platinum", "Palladium"),
-                                selected = when {
-                                    draftAsset.symbol.contains("XAU", true) || draftAsset.name.contains("Gold", true) -> "Gold"
-                                    draftAsset.symbol.contains("XAG", true) || draftAsset.name.contains("Silver", true) -> "Silver"
-                                    draftAsset.symbol.contains("XPT", true) || draftAsset.name.contains("Plat", true) -> "Platinum"
-                                    else -> "Palladium"
-                                },
+                                options = listOf("XAU", "XAG", "XPT", "XPD"),
+                                selected = architectMetalSelectionKey(draftAsset.symbol, draftAsset.name),
                                 compact = true,
-                            ) { metal ->
-                                val ticker = when (metal) {
-                                    "Gold" -> "XAU"
-                                    "Silver" -> "XAG"
-                                    "Platinum" -> "XPT"
-                                    else -> "XPD"
-                                }
-                                val displayName = buildMetalDisplayName(metal, draftAsset.physicalForm)
-                                draftAsset = draftAsset.copy(symbol = ticker, name = displayName, displayName = displayName)
+                                labelForOption = { ticker ->
+                                    when (ticker) {
+                                        "XAU" -> res.getString(R.string.architect_metal_gold)
+                                        "XAG" -> res.getString(R.string.architect_metal_silver)
+                                        "XPT" -> res.getString(R.string.architect_metal_platinum)
+                                        else -> res.getString(R.string.architect_metal_palladium)
+                                    }
+                                },
+                            ) { ticker ->
+                                val displayName = buildLocalizedMetalDisplayName(res, ticker, draftAsset.physicalForm)
+                                draftAsset = draftAsset.copy(
+                                    symbol = ticker,
+                                    apiId = ticker,
+                                    baseSymbol = ticker,
+                                    name = displayName,
+                                    displayName = displayName,
+                                )
                             }
                         }
 
@@ -218,9 +224,15 @@ fun AssetArchitectScreen(
                                 options = listOf("Bar", "Coin", "Round"),
                                 selected = draftAsset.physicalForm,
                                 compact = true,
+                                labelForOption = { form ->
+                                    when (form) {
+                                        "Coin" -> res.getString(R.string.architect_shape_coin)
+                                        "Round" -> res.getString(R.string.architect_shape_round)
+                                        else -> res.getString(R.string.architect_shape_bar)
+                                    }
+                                },
                             ) { form ->
-                                val metal = metalNameFromTicker(draftAsset.symbol)
-                                val displayName = buildMetalDisplayName(metal, form)
+                                val displayName = buildLocalizedMetalDisplayName(res, draftAsset.symbol, form)
                                 draftAsset = draftAsset.copy(physicalForm = form, name = displayName, displayName = displayName)
                             }
                         }
@@ -237,6 +249,13 @@ fun AssetArchitectScreen(
                                 options = listOf("OZ", "KILO", "GRAM"),
                                 selected = draftAsset.weightUnit,
                                 compact = true,
+                                labelForOption = { unit ->
+                                    when (unit) {
+                                        "KILO" -> res.getString(R.string.architect_unit_choice_kilo)
+                                        "GRAM" -> res.getString(R.string.architect_unit_choice_gram)
+                                        else -> res.getString(R.string.architect_unit_choice_oz)
+                                    }
+                                },
                             ) { draftAsset = draftAsset.copy(weightUnit = it) }
                         }
 
@@ -296,8 +315,7 @@ fun AssetArchitectScreen(
                                             draftAsset = draftAsset.copy(amountHeld = 0.0)
                                         }
                                         ArchitectEditorField.NAME -> {
-                                            val metal = metalNameFromTicker(draftAsset.symbol)
-                                            val fallback = buildMetalDisplayName(metal, draftAsset.physicalForm)
+                                            val fallback = buildLocalizedMetalDisplayName(res, draftAsset.symbol, draftAsset.physicalForm)
                                             draftAsset = draftAsset.copy(displayName = fallback, name = fallback)
                                         }
                                         ArchitectEditorField.WEIGHT -> {
@@ -370,9 +388,9 @@ fun AssetArchitectScreen(
                                                 }
                                         )
                                         Text(
-                                            text = formatUnitAbbreviation(draftAsset.weightUnit), 
-                                            color = Color.White.copy(alpha = 0.6f), 
-                                            fontWeight = FontWeight.Black, 
+                                            text = formatUnitAbbreviation(res, draftAsset.weightUnit),
+                                            color = Color.White.copy(alpha = 0.6f),
+                                            fontWeight = FontWeight.Black,
                                             fontSize = 10.sp
                                         )
                                     }
@@ -503,7 +521,7 @@ fun AssetArchitectScreen(
                             // TOTAL VALUE PREVIEW
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Text(stringResource(R.string.architect_estimated_value), color = Color.White.copy(0.6f), fontSize = 10.sp, fontWeight = FontWeight.Black)
-                                val total = (draftAsset.officialSpotPrice * draftAsset.weight * draftAsset.amountHeld) + draftAsset.premium
+                                val total = AssetValuation.holdingValueUsd(draftAsset)
                                 Text(text = formatCurrency(total), color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 16.sp)
                             }
                         }
@@ -546,8 +564,7 @@ fun AssetArchitectScreen(
                     persistCustomIcon = { id, uri -> viewModel.persistCustomIconFromUri(id, uri) },
                     deleteCustomIcon = { id -> viewModel.deleteCustomAssetIcon(id) },
                     onFinished = { path ->
-                        val metal = metalNameFromTicker(draftAsset.symbol)
-                        val fallback = buildMetalDisplayName(metal, draftAsset.physicalForm)
+                        val fallback = buildLocalizedMetalDisplayName(res, draftAsset.symbol, draftAsset.physicalForm)
                         val label = draftAsset.displayName.trim()
                             .ifBlank { draftAsset.name.trim() }
                             .ifBlank { fallback }
@@ -631,31 +648,42 @@ fun SmartNumericField(
     }
 }
 
-/**
- * 🛠️ UNIT ABBREVIATIONS
- * Maps OZ -> oz, KILO -> kg, GRAM -> g for professional stamping look.
- */
-private fun formatUnitAbbreviation(unit: String): String = when (unit.uppercase()) {
-    "GRAM" -> "g"
-    "KILO" -> "kg"
-    "OZ" -> "oz"
-    else -> unit.lowercase()
-}
-
-private fun metalNameFromTicker(symbol: String): String = when (symbol.uppercase()) {
-    "XAG", "SILVER" -> "Silver"
-    "XPT", "PLATINUM" -> "Platinum"
-    "XPD", "PALLADIUM" -> "Palladium"
-    else -> "Gold"
-}
-
-private fun buildMetalDisplayName(metal: String, form: String): String {
-    val formLabel = when (form.uppercase()) {
-        "COIN", "COINS" -> "COINS"
-        "ROUND", "ROUNDS" -> "ROUNDS"
-        else -> "BAR"
+private fun architectMetalSelectionKey(symbol: String, assetName: String): String {
+    val s = symbol.uppercase()
+    val n = assetName
+    return when {
+        s == "XAU" || s.contains("XAU") || s == "GOLD" || n.contains("gold", ignoreCase = true) -> "XAU"
+        s == "XAG" || s.contains("XAG") || s == "SILVER" || n.contains("silver", ignoreCase = true) -> "XAG"
+        s == "XPD" || s.contains("XPD") || s == "PALLADIUM" || n.contains("pallad", ignoreCase = true) -> "XPD"
+        s == "XPT" || s.contains("XPT") || s == "PLATINUM" || n.contains("plat", ignoreCase = true) -> "XPT"
+        else -> "XAU"
     }
-    return "${metal.uppercase()} $formLabel"
+}
+
+private fun buildLocalizedMetalDisplayName(res: Resources, ticker: String, physicalForm: String): String {
+    val t = ticker.uppercase()
+    val metalWord = when {
+        t.contains("XAG") || t == "SILVER" -> res.getString(R.string.architect_metal_silver)
+        t.contains("XPT") || t == "PLATINUM" -> res.getString(R.string.architect_metal_platinum)
+        t.contains("XPD") || t == "PALLADIUM" -> res.getString(R.string.architect_metal_palladium)
+        else -> res.getString(R.string.architect_metal_gold)
+    }
+    val formSuffix = when (physicalForm.uppercase()) {
+        "COIN", "COINS" -> res.getString(R.string.architect_form_suffix_coins)
+        "ROUND", "ROUNDS" -> res.getString(R.string.architect_form_suffix_rounds)
+        else -> res.getString(R.string.architect_form_suffix_bar)
+    }
+    return res.getString(
+        R.string.architect_asset_display_name_template,
+        metalWord.uppercase(),
+        formSuffix.uppercase(),
+    )
+}
+
+private fun formatUnitAbbreviation(res: Resources, unit: String): String = when (unit.uppercase()) {
+    "GRAM" -> res.getString(R.string.architect_unit_abbr_gram)
+    "KILO" -> res.getString(R.string.architect_unit_abbr_kilo)
+    else -> res.getString(R.string.architect_unit_abbr_oz)
 }
 
 private enum class ArchitectStage {

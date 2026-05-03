@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -24,6 +25,28 @@ object NetworkModule {
                 .header("Accept", "application/json")
                 .build()
             chain.proceed(request)
+        }
+        .build()
+
+    /** Form relays often reject API-style user agents; use a normal mobile browser fingerprint. */
+    @Provides
+    @Singleton
+    @Named("Feedback")
+    fun provideFeedbackOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(45, TimeUnit.SECONDS)
+        .readTimeout(45, TimeUnit.SECONDS)
+        .writeTimeout(45, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .followSslRedirects(true)
+        .addInterceptor { chain ->
+            val req = chain.request().newBuilder()
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36",
+                )
+                .header("Accept", "application/json, text/plain, text/html, */*;q=0.8")
+                .build()
+            chain.proceed(req)
         }
         .build()
 

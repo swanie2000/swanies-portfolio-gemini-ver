@@ -115,7 +115,9 @@ private fun LargeProAdPanel(
             ProLockBadge(label = stringResource(R.string.analytics_premium_badge), modifier = Modifier.fillMaxWidth())
             Text(text = preview.title, color = ProPalette.Accent, fontSize = 18.sp, fontWeight = FontWeight.Black, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             Text(text = preview.description, color = textColor.copy(alpha = 0.9f), fontSize = 14.sp, lineHeight = 20.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-            preview.highlights.forEach { Text(text = "• $it", color = textColor.copy(alpha = 0.82f), fontSize = 13.sp) }
+            preview.highlights.forEach {
+                Text(text = stringResource(R.string.analytics_pro_bullet_line, it), color = textColor.copy(alpha = 0.82f), fontSize = 13.sp)
+            }
             Button(
                 onClick = onUpgradeClick,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -166,7 +168,12 @@ fun RiskExposureProScreen(textColor: Color, segments: List<AssetSegment>, onUpgr
             trackColor = Color.White.copy(alpha = 0.08f)
         )
         Spacer(modifier = Modifier.height(6.dp))
-        Text(text = "$concentrationScore / 100  •  $concentrationLabel", color = concentrationTone, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+        Text(
+            text = stringResource(R.string.analytics_pro_concentration_score_line, concentrationScore, concentrationLabel),
+            color = concentrationTone,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
     }
 }
 
@@ -271,7 +278,9 @@ private fun PremiumInsightDetailDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(text = preview.description, color = textColor.copy(alpha = 0.8f), fontSize = 13.sp)
-                preview.highlights.forEach { Text(text = "• $it", color = textColor.copy(alpha = 0.78f), fontSize = 12.sp) }
+                preview.highlights.forEach {
+                    Text(text = stringResource(R.string.analytics_pro_bullet_line, it), color = textColor.copy(alpha = 0.78f), fontSize = 12.sp)
+                }
             }
         },
         dismissButton = {

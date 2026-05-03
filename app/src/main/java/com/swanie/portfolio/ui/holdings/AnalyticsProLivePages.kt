@@ -88,7 +88,7 @@ fun RiskExposureLiveScreen(
         Text(stringResource(R.string.analytics_live_risk_engine_description), color = textColor.copy(alpha = 0.75f), fontSize = 12.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ModelChip("HHI + VOL + MIX", textColor, accentColor)
+            ModelChip(stringResource(R.string.analytics_live_model_chip_engine), textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_top), "${String.format(Locale.getDefault(), "%.1f", topShare)}%", textColor, accentColor)
             MetricPill(stringResource(R.string.analytics_live_metric_diversified), "${String.format(Locale.getDefault(), "%.1f", diversification)}%", textColor, accentColor)
         }
@@ -102,7 +102,12 @@ fun RiskExposureLiveScreen(
             trackColor = Color.White.copy(alpha = 0.08f)
         )
         Spacer(modifier = Modifier.height(6.dp))
-        Text("${animatedScore.toInt()} / 100", color = riskTone, fontSize = 13.sp, fontWeight = FontWeight.Black)
+        Text(
+            stringResource(R.string.analytics_live_score_fraction, animatedScore.toInt()),
+            color = riskTone,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Black
+        )
         Text(stringResource(R.string.analytics_live_risk_regime_label, riskRegime), color = riskTone, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Text(stringResource(R.string.analytics_live_risk_top_position_share, String.format(Locale.getDefault(), "%.1f", topShare)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)
         Text(stringResource(R.string.analytics_live_risk_hhi_concentration, String.format(Locale.getDefault(), "%.1f", hhi)), color = textColor.copy(alpha = 0.72f), fontSize = 12.sp)

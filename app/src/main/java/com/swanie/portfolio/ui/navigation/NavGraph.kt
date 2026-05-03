@@ -28,6 +28,7 @@ import com.swanie.portfolio.ui.features.CreateAccountScreen
 import com.swanie.portfolio.ui.features.HomeScreen
 import com.swanie.portfolio.ui.features.RestoreVaultScreen
 import com.swanie.portfolio.ui.features.UnlockVaultScreen
+import com.swanie.portfolio.ui.features.AboutScreen
 import com.swanie.portfolio.ui.features.TermsAndConditionsScreen
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.holdings.*
@@ -54,7 +55,10 @@ fun NavGraph(
 
     val shouldForceUnlock = authState !is AuthViewModel.AuthState.Authenticated &&
         currentRoute != Routes.UNLOCK_VAULT &&
-        currentRoute != Routes.CREATE_ACCOUNT
+        currentRoute != Routes.CREATE_ACCOUNT &&
+        currentRoute != Routes.RESTORE_VAULT &&
+        currentRoute != Routes.TERMS_CONDITIONS &&
+        currentRoute != Routes.ABOUT
 
     Box(modifier = Modifier.fillMaxSize()) {
         NavHost(
@@ -88,9 +92,21 @@ fun NavGraph(
                 TermsAndConditionsScreen(navController = navController)
             }
 
+            composable(Routes.ABOUT) {
+                AboutScreen(navController = navController)
+            }
+
             composable(Routes.SETTINGS) {
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 SettingsScreen(
+                    navController = navController,
+                    settingsViewModel = settingsViewModel
+                )
+            }
+
+            composable(Routes.BACKUP_RESTORE) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                BackupRestoreScreen(
                     navController = navController,
                     settingsViewModel = settingsViewModel
                 )

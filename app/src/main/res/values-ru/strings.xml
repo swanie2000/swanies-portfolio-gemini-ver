@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro уже активен для этого аккаунта.</string>
     <string name="settings_restore_purchases_no_entitlement">Для этого аккаунта не найдена предыдущая покупка Pro.</string>
     <string name="settings_restore_purchases_failed">Сейчас не удалось восстановить покупки.</string>
+    <string name="settings_backup_restore">РЕЗЕРВНОЕ КОПИРОВАНИЕ И ВОССТАНОВЛЕНИЕ</string>
+    <string name="settings_backup_restore_nav">РЕЗЕРВ/ВОССТАНОВЛЕНИЕ</string>
+    <string name="settings_backup_screen_title">РЕЗЕРВНОЕ КОПИРОВАНИЕ И ВОССТАНОВЛЕНИЕ</string>
+    <string name="settings_backup_screen_intro">Создайте зашифрованную резервную копию хранилища, темы и значков или восстановите из ранее сохранённого файла. Импорт заменит данные на этом устройстве и перезапустит приложение.</string>
+    <string name="settings_backup_export">ЭКСПОРТ ЗАШИФРОВАННОЙ КОПИИ</string>
+    <string name="settings_backup_export_subtitle">Сохраните хранилище, тему и значки в файл, защищённый парольной фразой (Загрузки, Drive и т. д.).</string>
+    <string name="settings_backup_import">ИМПОРТ ЗАШИФРОВАННОЙ КОПИИ</string>
+    <string name="settings_backup_import_subtitle">Заменяет хранилище устройства из файла резервной копии. По завершении приложение перезапустится.</string>
+    <string name="settings_backup_passphrase_title_export">Введите парольную фразу для шифрования экспорта</string>
+    <string name="settings_backup_passphrase_title_import">Введите парольную фразу резервной копии</string>
+    <string name="settings_backup_passphrase_label">Парольная фраза</string>
+    <string name="settings_backup_confirm_export">СОХРАНИТЬ КОПИЮ</string>
+    <string name="settings_backup_confirm_import">ВОССТАНОВИТЬ</string>
+    <string name="settings_backup_export_ok">Резервная копия сохранена.</string>
+    <string name="settings_backup_import_ok">Хранилище восстановлено. Перезапуск…</string>
+    <string name="settings_backup_error_generic">Ошибка резервного копирования. Проверьте парольную фразу и файл.</string>
+    <string name="settings_backup_error_wrong_passphrase">Неверная парольная фраза.</string>
+    <string name="settings_backup_error_empty_passphrase">Введите парольную фразу.</string>
     <string name="pro_gate_title">ФУНКЦИЯ PRO</string>
     <string name="pro_gate_subtitle">%1$s доступно в Pro.</string>
     <string name="pro_gate_upgrade_coming">Процесс покупки обновления находится в финальной доработке.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">СБРОСИТЬ ХРАНИЛИЩЕ?</string>
     <string name="settings_factory_reset_body">Это полностью очистит текущее хранилище, включая активы и историю. Это действие необратимо.</string>
+    <string name="settings_factory_reset_continue">ПРОДОЛЖИТЬ</string>
+    <string name="settings_factory_reset_sure_title">ВЫ УВЕРЕНЫ?</string>
+    <string name="settings_factory_reset_sure_body">Это навсегда удалит хранилище, сохранённую тему, настройки и пользовательские значки на этом устройстве. Отменить нельзя.</string>
+    <string name="settings_factory_reset_confirm_erase">УДАЛИТЬ ВСЁ</string>
+    <string name="settings_factory_reset_progress_database">Очистка базы хранилища…</string>
+    <string name="settings_factory_reset_progress_settings">Очистка сохранённых настроек…</string>
+    <string name="settings_factory_reset_progress_db_files">Удаление файлов базы данных…</string>
+    <string name="settings_factory_reset_progress_icons">Удаление пользовательских значков…</string>
+    <string name="settings_factory_reset_progress_widgets">Обновление виджетов главного экрана…</string>
+    <string name="settings_factory_reset_progress_restart">Перезапуск приложения…</string>
     <string name="settings_reset_everything">СБРОСИТЬ ВСЁ</string>
     <string name="action_cancel">ОТМЕНА</string>
 

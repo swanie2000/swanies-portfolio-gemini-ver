@@ -15,6 +15,8 @@ import java.security.SecureRandom
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
+import javax.crypto.AEADBadTagException
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
@@ -46,7 +48,7 @@ class VaultBackupEngine @Inject constructor(
             buildZip(innerZip)
             val plain = innerZip.readBytes()
             val encrypted = encryptPayload(plain, passphrase)
-            context.contentResolver.openOutputStream(outputUri)?.use { out ->
+            context.contentResolver.openOutputStream(outputUri, "w")?.use { out ->
                 out.write(encrypted)
             } ?: error("Could not open output stream.")
         } finally {
@@ -61,7 +63,13 @@ class VaultBackupEngine @Inject constructor(
         require(passphrase.isNotEmpty()) { "Passphrase is empty." }
         val maxBytes = 100L * 1024 * 1024
         val encrypted = readAllBytesFromContentUri(inputUri, maxBytes)
-        val plain = decryptPayload(encrypted, passphrase)
+        val plain = try {
+            decryptPayload(encrypted, passphrase)
+        } catch (_: AEADBadTagException) {
+            throw IllegalArgumentException(WRONG_BACKUP_PASSPHRASE_MARKER)
+        } catch (_: BadPaddingException) {
+            throw IllegalArgumentException(WRONG_BACKUP_PASSPHRASE_MARKER)
+        }
         val workDir = File(context.cacheDir, "vault_import_${System.currentTimeMillis()}")
         deleteDirRecursive(workDir)
         workDir.mkdirs()
@@ -281,6 +289,10 @@ class VaultBackupEngine @Inject constructor(
 
     companion object {
         private const val TAG = "VaultBackup"
+
+        /** GCM decrypt auth failure; UI maps [message] to a localized string. */
+        const val WRONG_BACKUP_PASSPHRASE_MARKER = "WRONG_BACKUP_PASSPHRASE"
+
         private const val FORMAT_VERSION = 1
         private const val MAGIC = "SWPB"
         private const val SALT_LEN = 16

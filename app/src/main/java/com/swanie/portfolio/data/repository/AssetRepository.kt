@@ -15,6 +15,7 @@ import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetCategory
+import com.swanie.portfolio.data.local.AssetValuation
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.VaultDao
@@ -204,7 +205,7 @@ class AssetRepository @Inject constructor(
                             asset.localIconPath != null -> "file:${asset.localIconPath}"
                             else -> asset.imageUrl
                         }
-                        val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                        val assetValue = AssetValuation.holdingValueUsd(asset)
                         val formattedTotal = formatBoutiquePrice(assetValue)
                         
                         // 📈 Generate Sparkline for Widget
@@ -222,10 +223,10 @@ class AssetRepository @Inject constructor(
                         val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
                         val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
                         
-                        // 🎯 DYNAMIC PRECISION: Bulletproof Boutique Formatter
-                        val price = asset.officialSpotPrice
-                        val formattedPrice = formatBoutiquePrice(price)
-                        Log.d("SWANIE_PRECISION", "Asset: $safeSymbol | Raw Bits: ${java.lang.Double.doubleToLongBits(price)} | Raw: $price | Formatted: $formattedPrice")
+                        // 🎯 DYNAMIC PRECISION: Bulletproof Boutique Formatter (per-line spot for metals)
+                        val linePrice = AssetValuation.cardPriceRowUsd(asset)
+                        val formattedPrice = formatBoutiquePrice(linePrice)
+                        Log.d("SWANIE_PRECISION", "Asset: $safeSymbol | Line price: $linePrice | Formatted: $formattedPrice")
                         
                         "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                     }.joinToString("||")
@@ -237,7 +238,7 @@ class AssetRepository @Inject constructor(
                     }
                     
                     this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
-                    val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }
+                    val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { AssetValuation.holdingValueUsd(it) }
                     this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
                 }.toPreferences()
             }

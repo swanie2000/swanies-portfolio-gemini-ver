@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro đã được kích hoạt trên tài khoản này.</string>
     <string name="settings_restore_purchases_no_entitlement">Không tìm thấy giao dịch mua Pro trước đó cho tài khoản này.</string>
     <string name="settings_restore_purchases_failed">Không thể khôi phục giao dịch mua lúc này.</string>
+    <string name="settings_backup_restore">SAO LƯU &amp; KHÔI PHỤC</string>
+    <string name="settings_backup_restore_nav">SAO LƯU/KHÔI PHỤC</string>
+    <string name="settings_backup_screen_title">SAO LƯU &amp; KHÔI PHỤC</string>
+    <string name="settings_backup_screen_intro">Tạo bản sao lưu được mã hóa cho két, chủ đề và biểu tượng, hoặc khôi phục từ tệp đã lưu trước đó. Việc nhập khẩu sẽ thay thế dữ liệu trên thiết bị này và khởi động lại ứng dụng.</string>
+    <string name="settings_backup_export">XUẤT BẢN SAO LƯU MÃ HÓA</string>
+    <string name="settings_backup_export_subtitle">Lưu két, chủ đề và biểu tượng vào tệp được bảo vệ bằng cụm mật khẩu (Tải xuống, Drive, v.v.).</string>
+    <string name="settings_backup_import">NHẬP BẢN SAO LƯU MÃ HÓA</string>
+    <string name="settings_backup_import_subtitle">Thay thế két của thiết bị này từ tệp sao lưu. Ứng dụng sẽ khởi động lại khi xong.</string>
+    <string name="settings_backup_passphrase_title_export">Nhập cụm mật khẩu để mã hóa lần xuất này</string>
+    <string name="settings_backup_passphrase_title_import">Nhập cụm mật khẩu sao lưu</string>
+    <string name="settings_backup_passphrase_label">Cụm mật khẩu</string>
+    <string name="settings_backup_confirm_export">LƯU SAO LƯU</string>
+    <string name="settings_backup_confirm_import">KHÔI PHỤC</string>
+    <string name="settings_backup_export_ok">Đã lưu bản sao lưu.</string>
+    <string name="settings_backup_import_ok">Đã khôi phục két. Đang khởi động lại…</string>
+    <string name="settings_backup_error_generic">Sao lưu thất bại. Kiểm tra cụm mật khẩu và tệp.</string>
+    <string name="settings_backup_error_wrong_passphrase">Cụm mật khẩu không đúng.</string>
+    <string name="settings_backup_error_empty_passphrase">Nhập cụm mật khẩu.</string>
     <string name="pro_gate_title">TÍNH NĂNG PRO</string>
     <string name="pro_gate_subtitle">%1$s có trong gói Pro.</string>
     <string name="pro_gate_upgrade_coming">Luồng mua nâng cấp đang được hoàn thiện.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">ĐẶT LẠI KHO VỀ CÀI ĐẶT GỐC?</string>
     <string name="settings_factory_reset_body">Hành động này sẽ xóa hoàn toàn kho hiện tại, bao gồm tất cả tài sản và lịch sử. Hành động này có tính vĩnh viễn.</string>
+    <string name="settings_factory_reset_continue">TIẾP TỤC</string>
+    <string name="settings_factory_reset_sure_title">BẠN CHẮC CHẮN CHỨ?</string>
+    <string name="settings_factory_reset_sure_body">Thao tác này sẽ xóa vĩnh viễn kho, chủ đề và cài đặt đã lưu cùng biểu tượng tùy chỉnh trên thiết bị này. Không thể hoàn tác.</string>
+    <string name="settings_factory_reset_confirm_erase">XÓA HẾT</string>
+    <string name="settings_factory_reset_progress_database">Đang xóa cơ sở dữ liệu kho…</string>
+    <string name="settings_factory_reset_progress_settings">Đang xóa cài đặt đã lưu…</string>
+    <string name="settings_factory_reset_progress_db_files">Đang xóa tệp cơ sở dữ liệu…</string>
+    <string name="settings_factory_reset_progress_icons">Đang xóa biểu tượng tùy chỉnh…</string>
+    <string name="settings_factory_reset_progress_widgets">Đang làm mới tiện ích màn hình chính…</string>
+    <string name="settings_factory_reset_progress_restart">Đang khởi động lại ứng dụng…</string>
     <string name="settings_reset_everything">ĐẶT LẠI TẤT CẢ</string>
     <string name="action_cancel">HỦY</string>
 

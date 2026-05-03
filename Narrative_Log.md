@@ -10,12 +10,15 @@ For every completed milestone, the agent must automatically execute:
 
 ---
 
-## [2026-05-03] V40.71 — Metal spot valuation + About + i18n + Play account queue
+## [2026-05-02] V40.71 — Metal spot pipeline + backup screen + bug reports + About + i18n + Play queue
 
-- **Metal math:** `MetalSpotMath.kt` / `AssetValuation.kt` — industry-style **USD per troy ounce** spot with **Gram/Kilo → troy oz** conversion before valuation across holdings, analytics, repository, widgets, previews.
-- **Holdings:** Collapsed compact metal total + expanded price row corrected (`AssetValuation`, `cardPriceRowUsd`).
-- **Product:** `AboutScreen` + `Routes.ABOUT`, nav + bottom-bar behavior, Settings/Unlock links; removed Settings **TEST INFO**; broad stringResource/locale updates.
-- **Play (human):** Developer Console access after fee; **identity docs submitted** — next agent: assume verification **pending** until user confirms approval.
+- **Metal math:** `MetalSpotMath` + `AssetValuation` in `data/local/MetalSpotMath.kt` — **USD/troy oz** spot; **GRAM/KILO/KG** → troy oz before `spot × mass`; used on holdings cards, analytics, `AssetRepository` refresh, widget + theme previews, architect, settings totals.
+- **Holdings:** Collapsed metal total + price row fixed (`holdingValueUsd` / `cardPriceRowUsd` / `spotMassHoldingsUsd` paths).
+- **Settings / backup UX:** `BackupRestoreScreen.kt`, `Routes.BACKUP_RESTORE`, `NavGraph` — encrypted backup flow moved off main settings list; `SettingsViewModel` + `VaultBackupEngine` unchanged semantically.
+- **Feedback:** `BugReportSubmitter` (FormSubmit), `NetworkModule` `@Named("Feedback")` OkHttp, Settings dialog + `SettingsViewModel.submitBugReport`, factory/Hilt wiring; **`SwanieBugReport`** log tag.
+- **About + i18n:** `AboutScreen`, `Routes.ABOUT`, `MainActivity` bottom bar; Unlock + Settings entry; `LanguageDisplay.kt`; `strings.xml` + **ar, de, es, fr, hi, in, it, ja, ko, nl, pl, pt-rBR, ru, th, tr, uk, vi, zh-rCN, zh-rTW** for new keys; analytics/home/unlock/create-account/widget/theme touchups.
+- **Cleanup:** Settings **TEST INFO** removed (RC test route may remain).
+- **Play (human):** Registration fee paid; **identity verification submitted** — await Google, then console device + phone steps.
 
 ---
 

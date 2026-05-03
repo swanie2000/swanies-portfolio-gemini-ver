@@ -41,6 +41,7 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetValuation
 // 🛡️ NO EXTRA IMPORTS ADDED HERE
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
@@ -80,13 +81,13 @@ fun AnalyticsScreen(navController: NavController) {
         Color(0xFF2979FF), Color(0xFFEEFF41), Color(0xFFB2FF59)
     )
 
-    val totalValue = safeHoldings.sumOf { it.officialSpotPrice * (it.weight * it.amountHeld) }
+    val totalValue = safeHoldings.sumOf { AssetValuation.spotMassHoldingsUsd(it) }
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.US) }
 
     var selectedAssetId by remember { mutableStateOf<String?>(null) }
 
     val assetSegments = safeHoldings.mapIndexed { index, asset ->
-        val assetValue = asset.officialSpotPrice * (asset.weight * asset.amountHeld)
+        val assetValue = AssetValuation.spotMassHoldingsUsd(asset)
         AssetSegment(
             asset = asset,
             value = assetValue,

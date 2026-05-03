@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,9 +65,12 @@ fun AmountEntryScreen(
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     var visualProgress by remember { mutableFloatStateOf(0f) }
-    var visualStatus by remember { mutableStateOf("Initializing...") }
+    var visualStatus by remember(context.resources.configuration) {
+        mutableStateOf(context.getString(R.string.amount_entry_status_initializing))
+    }
     var isSaving by remember { mutableStateOf(false) }
     var isActualWorkDone by remember { mutableStateOf(false) }
     var showCheckmark by remember { mutableStateOf(false) }
@@ -77,14 +81,14 @@ fun AmountEntryScreen(
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val milestones = remember(name, apiId, priceSource) {
+    val milestones = remember(name, apiId, priceSource, context.resources.configuration) {
         listOf(
-            0.15f to "Securing $apiId in local vault...",
-            0.35f to "Connecting to $priceSource servers...",
-            0.55f to "Fetching live market metrics...",
-            0.75f to "Validating entry sequence...",
-            0.90f to "Synchronizing portfolio DB...",
-            1.00f to "Asset secured successfully!"
+            0.15f to context.getString(R.string.amount_entry_milestone_securing, apiId),
+            0.35f to context.getString(R.string.amount_entry_milestone_connecting, priceSource),
+            0.55f to context.getString(R.string.amount_entry_milestone_fetching),
+            0.75f to context.getString(R.string.amount_entry_milestone_validating),
+            0.90f to context.getString(R.string.amount_entry_milestone_syncing),
+            1.00f to context.getString(R.string.amount_entry_milestone_done),
         )
     }
 
@@ -202,7 +206,12 @@ fun AmountEntryScreen(
                                 CircularProgressIndicator(progress = { visualProgress }, modifier = Modifier.size(140.dp), color = Color.Yellow, strokeWidth = 10.dp, trackColor = Color.White.copy(alpha = 0.1f))
                             }
                             if (!showCheckmark) {
-                                Text(text = "${(visualProgress * 100).toInt()}%", color = Color.White, fontWeight = FontWeight.Black, fontSize = 28.sp)
+                                Text(
+                                    text = stringResource(R.string.amount_entry_visual_progress_percent, (visualProgress * 100).toInt()),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 28.sp
+                                )
                             }
                         }
                         Spacer(Modifier.height(40.dp))

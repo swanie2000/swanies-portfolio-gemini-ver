@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro è già attivo su questo account.</string>
     <string name="settings_restore_purchases_no_entitlement">Nessun acquisto Pro precedente trovato per questo account.</string>
     <string name="settings_restore_purchases_failed">Impossibile ripristinare gli acquisti in questo momento.</string>
+    <string name="settings_backup_restore">BACKUP E RIPRISTINO</string>
+    <string name="settings_backup_restore_nav">BACKUP/RIPRISTINO</string>
+    <string name="settings_backup_screen_title">BACKUP E RIPRISTINO</string>
+    <string name="settings_backup_screen_intro">Crea un backup crittografato del caveau, tema e icone, oppure ripristina da un file salvato in precedenza. L\'importazione sostituisce i dati su questo dispositivo e riavvia l\'app.</string>
+    <string name="settings_backup_export">ESPORTA BACKUP CRITTOGRAFATO</string>
+    <string name="settings_backup_export_subtitle">Salva caveau, tema e icone in un file protetto da passphrase (Download, Drive, ecc.).</string>
+    <string name="settings_backup_import">IMPORTA BACKUP CRITTOGRAFATO</string>
+    <string name="settings_backup_import_subtitle">Sostituisce il caveau di questo dispositivo da un file di backup. L\'app si riavvierà al termine.</string>
+    <string name="settings_backup_passphrase_title_export">Inserisci la passphrase per crittografare questa esportazione</string>
+    <string name="settings_backup_passphrase_title_import">Inserisci la passphrase del backup</string>
+    <string name="settings_backup_passphrase_label">Passphrase</string>
+    <string name="settings_backup_confirm_export">SALVA BACKUP</string>
+    <string name="settings_backup_confirm_import">RIPRISTINA</string>
+    <string name="settings_backup_export_ok">Backup salvato.</string>
+    <string name="settings_backup_import_ok">Caveau ripristinato. Riavvio…</string>
+    <string name="settings_backup_error_generic">Backup non riuscito. Controlla passphrase e file.</string>
+    <string name="settings_backup_error_wrong_passphrase">Passphrase errata.</string>
+    <string name="settings_backup_error_empty_passphrase">Inserisci una passphrase.</string>
     <string name="pro_gate_title">FUNZIONE PRO</string>
     <string name="pro_gate_subtitle">%1$s è disponibile con Pro.</string>
     <string name="pro_gate_upgrade_coming">Il flusso di acquisto upgrade è in fase di finalizzazione.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">RIPRISTINARE IL VAULT?</string>
     <string name="settings_factory_reset_body">Questo cancellerà completamente il vault attuale, inclusi asset e cronologia. Questa azione è sovrana e permanente.</string>
+    <string name="settings_factory_reset_continue">CONTINUA</string>
+    <string name="settings_factory_reset_sure_title">SEI SICURO?</string>
+    <string name="settings_factory_reset_sure_body">Questo eliminerà in modo permanente il vault, tema e impostazioni salvate e icone personalizzate su questo dispositivo. Non potrai annullare.</string>
+    <string name="settings_factory_reset_confirm_erase">CANCELLA TUTTO</string>
+    <string name="settings_factory_reset_progress_database">Cancellazione database del vault…</string>
+    <string name="settings_factory_reset_progress_settings">Cancellazione impostazioni salvate…</string>
+    <string name="settings_factory_reset_progress_db_files">Rimozione file di database…</string>
+    <string name="settings_factory_reset_progress_icons">Rimozione icone personalizzate…</string>
+    <string name="settings_factory_reset_progress_widgets">Aggiornamento widget schermata home…</string>
+    <string name="settings_factory_reset_progress_restart">Riavvio dell\'app…</string>
     <string name="settings_reset_everything">RIPRISTINA TUTTO</string>
     <string name="action_cancel">ANNULLA</string>
 

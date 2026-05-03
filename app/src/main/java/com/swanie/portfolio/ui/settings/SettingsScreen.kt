@@ -1,7 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
-import android.net.Uri
-import android.content.Intent
+import android.util.Log
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -25,46 +25,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.zIndex
 import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
+import com.swanie.portfolio.data.feedback.BugReportSubmitter
 import com.swanie.portfolio.security.AuthPolicy
+import com.swanie.portfolio.ui.i18n.languageDisplayNameForOption
 import com.swanie.portfolio.ui.navigation.Routes
 import kotlinx.coroutines.launch
-
-private fun languageLabel(code: String): String = when (code) {
-    "en" -> "English"
-    "es" -> "Spanish"
-    "pt-BR" -> "Portuguese (Brazil)"
-    "fr" -> "French"
-    "de" -> "German"
-    "ja" -> "Japanese"
-    "ko" -> "Korean"
-    "zh-CN" -> "Chinese (Simplified)"
-    "hi" -> "Hindi"
-    "ar" -> "Arabic"
-    "zh-TW" -> "Chinese (Traditional)"
-    "it" -> "Italian"
-    "ru" -> "Russian"
-    "tr" -> "Turkish"
-    "id" -> "Indonesian"
-    "vi" -> "Vietnamese"
-    "th" -> "Thai"
-    "pl" -> "Polish"
-    "nl" -> "Dutch"
-    "uk" -> "Ukrainian"
-    else -> "English"
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,44 +92,16 @@ fun SettingsScreen(
     var passwordChangeMessage by remember { mutableStateOf<String?>(null) }
     var showPasswordResetDialog by remember { mutableStateOf(false) }
 
-    var showFactoryResetDialog by remember { mutableStateOf(false) }
+    var showFactoryResetFirstDialog by remember { mutableStateOf(false) }
+    var showFactoryResetSecondDialog by remember { mutableStateOf(false) }
+    var showFactoryResetProgress by remember { mutableStateOf(false) }
+    var factoryResetProgress by remember { mutableStateOf(0f) }
+    var factoryResetStatus by remember { mutableStateOf("") }
     var languageExpanded by remember { mutableStateOf(false) }
-    var showTranslationFeedbackDialog by remember { mutableStateOf(false) }
-    var translationScreenInput by remember { mutableStateOf("") }
-    var translationCurrentTextInput by remember { mutableStateOf("") }
-    var translationSuggestedTextInput by remember { mutableStateOf("") }
-    var translationNotesInput by remember { mutableStateOf("") }
+    var showBugReportDialog by remember { mutableStateOf(false) }
+    var bugReportMessage by remember { mutableStateOf("") }
+    var bugReportSending by remember { mutableStateOf(false) }
     val settingsScrollState = rememberSaveable(saver = ScrollState.Saver) { ScrollState(0) }
-
-    var pendingExportUri by remember { mutableStateOf<Uri?>(null) }
-    var pendingImportUri by remember { mutableStateOf<Uri?>(null) }
-    var showBackupExportPassphraseDialog by remember { mutableStateOf(false) }
-    var showBackupImportPassphraseDialog by remember { mutableStateOf(false) }
-    var backupPassphraseField by remember { mutableStateOf("") }
-    var backupPassphraseVisible by remember { mutableStateOf(false) }
-    var backupOperationBusy by remember { mutableStateOf(false) }
-
-    val exportDocLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
-    ) { uri ->
-        if (uri != null) {
-            pendingExportUri = uri
-            backupPassphraseField = ""
-            backupPassphraseVisible = false
-            showBackupExportPassphraseDialog = true
-        }
-    }
-
-    val importDocLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            pendingImportUri = uri
-            backupPassphraseField = ""
-            backupPassphraseVisible = false
-            showBackupImportPassphraseDialog = true
-        }
-    }
 
     val passwordStrength = AuthPolicy.evaluatePasswordStrength(newPassword)
     val cleanNewPassword = passwordStrength.normalized
@@ -162,46 +112,103 @@ fun SettingsScreen(
     val cleanConfirmNewPassword = confirmNewPassword.trim().replace("\\s".toRegex(), "")
     val passwordsMatch = cleanNewPassword == cleanConfirmNewPassword && cleanNewPassword.isNotEmpty()
 
-    if (showFactoryResetDialog) {
+    if (showFactoryResetFirstDialog) {
         AlertDialog(
-            onDismissRequest = { showFactoryResetDialog = false },
+            onDismissRequest = { showFactoryResetFirstDialog = false },
             title = {
                 Text(
                     text = stringResource(R.string.settings_factory_reset_title),
                     fontWeight = FontWeight.Black,
                     fontSize = 20.sp,
-                    color = Color.Red
+                    color = safeText
                 )
             },
             text = {
                 Text(
                     text = stringResource(R.string.settings_factory_reset_body),
-                    color = safeText
+                    color = safeText.copy(alpha = 0.85f),
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        scope.launch {
-                            settingsViewModel.factoryResetAllData()
-                            showFactoryResetDialog = false
-                            isExiting = true
-                            navController.navigate(Routes.HOME) {
-                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        }
+                        showFactoryResetFirstDialog = false
+                        showFactoryResetSecondDialog = true
                     }
                 ) {
-                    Text(stringResource(R.string.settings_reset_everything), color = Color.Red, fontWeight = FontWeight.Black)
+                    Text(
+                        stringResource(R.string.settings_factory_reset_continue),
+                        color = safeText,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showFactoryResetDialog = false }) {
-                    Text(stringResource(R.string.action_cancel), color = safeText.copy(alpha = 0.6f))
+                TextButton(onClick = { showFactoryResetFirstDialog = false }) {
+                    Text(stringResource(R.string.action_cancel), color = safeText.copy(alpha = 0.7f))
                 }
             },
-            containerColor = safeBg
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
+        )
+    }
+
+    if (showFactoryResetSecondDialog) {
+        AlertDialog(
+            onDismissRequest = { showFactoryResetSecondDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.settings_factory_reset_sure_title),
+                    fontWeight = FontWeight.Black,
+                    fontSize = 22.sp,
+                    color = safeText
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.settings_factory_reset_sure_body),
+                    color = safeText.copy(alpha = 0.85f),
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showFactoryResetSecondDialog = false
+                        showFactoryResetProgress = true
+                        factoryResetProgress = 0f
+                        factoryResetStatus = ""
+                        settingsViewModel.factoryResetAllDataWithProgress(
+                            onProgress = { p, msg ->
+                                factoryResetProgress = p
+                                factoryResetStatus = msg
+                            },
+                            onFinished = {
+                                showFactoryResetProgress = false
+                                settingsViewModel.coldRestartApplication()
+                            }
+                        )
+                    }
+                ) {
+                    Text(
+                        stringResource(R.string.settings_factory_reset_confirm_erase),
+                        color = Color.Red,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFactoryResetSecondDialog = false }) {
+                    Text(stringResource(R.string.action_cancel), color = safeText.copy(alpha = 0.7f))
+                }
+            },
+            containerColor = safeBg,
+            titleContentColor = safeText,
+            textContentColor = safeText
         )
     }
 
@@ -404,288 +411,124 @@ fun SettingsScreen(
         )
     }
 
-    if (showTranslationFeedbackDialog) {
+    if (showBugReportDialog) {
         AlertDialog(
             modifier = Modifier
                 .imePadding()
                 .navigationBarsPadding(),
-            onDismissRequest = { showTranslationFeedbackDialog = false },
-            title = { Text(stringResource(R.string.settings_translation_feedback_title)) },
+            onDismissRequest = {
+                showBugReportDialog = false
+                bugReportMessage = ""
+                bugReportSending = false
+            },
+            title = { Text(stringResource(R.string.settings_bug_report_dialog_title)) },
             text = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 340.dp)
+                        .heightIn(max = 420.dp)
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.settings_translation_feedback_subtitle),
+                        text = stringResource(R.string.settings_bug_report_dialog_subtitle),
                         fontSize = 13.sp,
                         color = safeText.copy(alpha = 0.8f)
                     )
                     OutlinedTextField(
-                        value = effectiveLanguageCode,
-                        onValueChange = {},
-                        readOnly = true,
+                        value = bugReportMessage,
+                        onValueChange = { if (it.length <= 500) bugReportMessage = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.language_selector_title)) },
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = translationScreenInput,
-                        onValueChange = { translationScreenInput = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.settings_translation_feedback_screen)) },
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = translationCurrentTextInput,
-                        onValueChange = { translationCurrentTextInput = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.settings_translation_feedback_current_text)) }
-                    )
-                    OutlinedTextField(
-                        value = translationSuggestedTextInput,
-                        onValueChange = { translationSuggestedTextInput = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.settings_translation_feedback_suggested_text)) }
-                    )
-                    OutlinedTextField(
-                        value = translationNotesInput,
-                        onValueChange = { translationNotesInput = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.settings_translation_feedback_notes)) }
+                        label = { Text(stringResource(R.string.settings_bug_report_field_label)) },
+                        supportingText = {
+                            Text(
+                                stringResource(R.string.settings_bug_report_char_count, bugReportMessage.length),
+                                color = safeText.copy(alpha = 0.55f)
+                            )
+                        },
+                        minLines = 4,
+                        maxLines = 10,
+                        enabled = !bugReportSending,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = KeyboardType.Text,
+                        ),
                     )
                 }
             },
             confirmButton = {
                 TextButton(
+                    enabled = !bugReportSending,
                     onClick = {
-                        if (translationSuggestedTextInput.isBlank()) {
+                        if (bugReportMessage.isBlank()) {
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.settings_translation_feedback_required),
+                                context.getString(R.string.settings_bug_report_required),
                                 Toast.LENGTH_SHORT
                             ).show()
                             return@TextButton
                         }
-
-                        val emailSubject = context.getString(
-                            R.string.settings_translation_feedback_email_subject,
-                            effectiveLanguageCode
-                        )
-                        val emailBody = context.getString(
-                            R.string.settings_translation_feedback_email_body,
-                            effectiveLanguageCode,
-                            translationScreenInput.ifBlank { "-" },
-                            translationCurrentTextInput.ifBlank { "-" },
-                            translationSuggestedTextInput,
-                            translationNotesInput.ifBlank { "-" }
-                        )
-                        val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = "mailto:".toUri()
-                            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@swaniesportfolio.app"))
-                            putExtra(Intent.EXTRA_SUBJECT, emailSubject)
-                            putExtra(Intent.EXTRA_TEXT, emailBody)
-                        }
-                        runCatching {
-                            context.startActivity(
-                                Intent.createChooser(
-                                    mailIntent,
-                                    context.getString(R.string.settings_translation_feedback_chooser_title)
+                        scope.launch {
+                            try {
+                                bugReportSending = true
+                                Log.i(BugReportSubmitter.LOG_TAG, "UI: submit tapped, len=${bugReportMessage.trim().length}")
+                                val result = settingsViewModel.submitBugReport(
+                                    bugReportMessage.trim(),
+                                    effectiveLanguageCode,
                                 )
-                            )
-                        }.onFailure {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.settings_translation_feedback_no_email_app),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                ) {
-                    Text(stringResource(R.string.settings_translation_feedback_submit))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showTranslationFeedbackDialog = false }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            },
-            containerColor = safeBg,
-            titleContentColor = safeText,
-            textContentColor = safeText
-        )
-    }
-
-    if (showBackupExportPassphraseDialog && pendingExportUri != null) {
-        AlertDialog(
-            modifier = Modifier
-                .imePadding()
-                .navigationBarsPadding(),
-            onDismissRequest = {
-                if (!backupOperationBusy) {
-                    showBackupExportPassphraseDialog = false
-                    pendingExportUri = null
-                    backupPassphraseField = ""
-                }
-            },
-            title = { Text(stringResource(R.string.settings_backup_passphrase_title_export)) },
-            text = {
-                OutlinedTextField(
-                    value = backupPassphraseField,
-                    onValueChange = { backupPassphraseField = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.settings_backup_passphrase_label)) },
-                    singleLine = true,
-                    enabled = !backupOperationBusy,
-                    visualTransformation = if (backupPassphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = { backupPassphraseVisible = !backupPassphraseVisible }) {
-                            Icon(
-                                imageVector = if (backupPassphraseVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    enabled = !backupOperationBusy,
-                    onClick = {
-                        val trimmed = backupPassphraseField.trim()
-                        if (trimmed.isEmpty()) {
-                            Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
-                            return@TextButton
-                        }
-                        val uri = pendingExportUri ?: return@TextButton
-                        val pass = trimmed.toCharArray()
-                        backupOperationBusy = true
-                        settingsViewModel.exportVaultBackup(uri, pass) { result ->
-                            backupOperationBusy = false
-                            showBackupExportPassphraseDialog = false
-                            pendingExportUri = null
-                            backupPassphraseField = ""
-                            result.fold(
-                                onSuccess = {
-                                    Toast.makeText(context, context.getString(R.string.settings_backup_export_ok), Toast.LENGTH_SHORT).show()
-                                },
-                                onFailure = {
+                                if (result.isSuccess) {
                                     Toast.makeText(
                                         context,
-                                        it.message ?: context.getString(R.string.settings_backup_error_generic),
+                                        context.getString(R.string.settings_bug_report_sent),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    bugReportMessage = ""
+                                    showBugReportDialog = false
+                                } else {
+                                    val err = result.exceptionOrNull()
+                                    Log.e(
+                                        BugReportSubmitter.LOG_TAG,
+                                        "UI: submit returned failure: ${err?.message}",
+                                        err,
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.settings_bug_report_failed),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
-                            )
-                        }
-                    }
-                ) {
-                    Text(if (backupOperationBusy) stringResource(R.string.settings_updating) else stringResource(R.string.settings_backup_confirm_export))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    enabled = !backupOperationBusy,
-                    onClick = {
-                        showBackupExportPassphraseDialog = false
-                        pendingExportUri = null
-                        backupPassphraseField = ""
-                    }
-                ) { Text(stringResource(R.string.action_cancel)) }
-            },
-            containerColor = safeBg,
-            titleContentColor = safeText,
-            textContentColor = safeText
-        )
-    }
-
-    if (showBackupImportPassphraseDialog && pendingImportUri != null) {
-        AlertDialog(
-            modifier = Modifier
-                .imePadding()
-                .navigationBarsPadding(),
-            onDismissRequest = {
-                if (!backupOperationBusy) {
-                    showBackupImportPassphraseDialog = false
-                    pendingImportUri = null
-                    backupPassphraseField = ""
-                }
-            },
-            title = { Text(stringResource(R.string.settings_backup_passphrase_title_import)) },
-            text = {
-                Column {
-                    Text(
-                        text = stringResource(R.string.settings_backup_import_subtitle),
-                        fontSize = 13.sp,
-                        color = safeText.copy(alpha = 0.75f),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = backupPassphraseField,
-                        onValueChange = { backupPassphraseField = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.settings_backup_passphrase_label)) },
-                        singleLine = true,
-                        enabled = !backupOperationBusy,
-                        visualTransformation = if (backupPassphraseVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { backupPassphraseVisible = !backupPassphraseVisible }) {
-                                Icon(
-                                    imageVector = if (backupPassphraseVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = null
-                                )
+                            } catch (e: Throwable) {
+                                Log.e(BugReportSubmitter.LOG_TAG, "UI: submit threw before Result", e)
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.settings_bug_report_failed),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } finally {
+                                bugReportSending = false
                             }
                         }
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    enabled = !backupOperationBusy,
-                    onClick = {
-                        val trimmed = backupPassphraseField.trim()
-                        if (trimmed.isEmpty()) {
-                            Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
-                            return@TextButton
-                        }
-                        val uri = pendingImportUri ?: return@TextButton
-                        val pass = trimmed.toCharArray()
-                        backupOperationBusy = true
-                        settingsViewModel.importVaultBackup(uri, pass) { result ->
-                            backupOperationBusy = false
-                            showBackupImportPassphraseDialog = false
-                            pendingImportUri = null
-                            backupPassphraseField = ""
-                            result.fold(
-                                onSuccess = {
-                                    Toast.makeText(context, context.getString(R.string.settings_backup_import_ok), Toast.LENGTH_SHORT).show()
-                                },
-                                onFailure = {
-                                    Toast.makeText(
-                                        context,
-                                        it.message ?: context.getString(R.string.settings_backup_error_generic),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            )
-                        }
                     }
                 ) {
-                    Text(if (backupOperationBusy) stringResource(R.string.settings_updating) else stringResource(R.string.settings_backup_confirm_import))
+                    Text(
+                        if (bugReportSending) {
+                            stringResource(R.string.settings_bug_report_sending)
+                        } else {
+                            stringResource(R.string.settings_bug_report_submit)
+                        }
+                    )
                 }
             },
             dismissButton = {
                 TextButton(
-                    enabled = !backupOperationBusy,
+                    enabled = !bugReportSending,
                     onClick = {
-                        showBackupImportPassphraseDialog = false
-                        pendingImportUri = null
-                        backupPassphraseField = ""
+                        showBugReportDialog = false
+                        bugReportMessage = ""
                     }
-                ) { Text(stringResource(R.string.action_cancel)) }
+                ) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             },
             containerColor = safeBg,
             titleContentColor = safeText,
@@ -713,7 +556,7 @@ fun SettingsScreen(
                         "en", "es", "pt-BR", "fr", "de", "ja", "ko", "zh-CN", "hi", "ar",
                         "zh-TW", "it", "ru", "tr", "id", "vi", "th", "pl", "nl", "uk"
                     )
-                    val selectedLanguageLabel = languageLabel(effectiveLanguageCode)
+                    val selectedLanguageLabel = languageDisplayNameForOption(effectiveLanguageCode)
                     ExposedDropdownMenuBox(
                         expanded = languageExpanded,
                         onExpandedChange = { languageExpanded = !languageExpanded },
@@ -743,7 +586,7 @@ fun SettingsScreen(
                             onDismissRequest = { languageExpanded = false }
                         ) {
                             languageOptions.forEach { option ->
-                                val optionLabel = languageLabel(option)
+                                val optionLabel = languageDisplayNameForOption(option)
                                 DropdownMenuItem(
                                     text = { Text(optionLabel) },
                                     onClick = {
@@ -874,11 +717,11 @@ fun SettingsScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { showTranslationFeedbackDialog = true }
+                            .clickable { showBugReportDialog = true }
                             .padding(vertical = 4.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.settings_translation_feedback_button),
+                            text = stringResource(R.string.settings_bug_report_button),
                             color = safeText,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 22.sp,
@@ -887,7 +730,7 @@ fun SettingsScreen(
                         )
                     }
                     Text(
-                        text = stringResource(R.string.settings_translation_feedback_hint),
+                        text = stringResource(R.string.settings_bug_report_hint),
                         color = safeText.copy(alpha = 0.6f),
                         fontSize = 13.sp,
                         lineHeight = 18.sp,
@@ -1001,45 +844,32 @@ fun SettingsScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- BACKUP & RESTORE (VER1: local encrypted file) ---
-                    Text(stringResource(R.string.settings_backup_restore), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-
-                    Text(
-                        text = stringResource(R.string.settings_backup_export_subtitle),
-                        color = safeText.copy(alpha = 0.6f),
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
                     Button(
                         onClick = {
-                            exportDocLauncher.launch("swanie_vault_backup.swpb")
+                            isExiting = true
+                            navController.navigate(Routes.BACKUP_RESTORE)
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f)),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(stringResource(R.string.settings_backup_export), color = safeText, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_backup_restore_nav), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
 
-                    Text(
-                        text = stringResource(R.string.settings_backup_import_subtitle),
-                        color = safeText.copy(alpha = 0.6f),
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    Text(stringResource(R.string.settings_legal_section), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
+
                     Button(
                         onClick = {
-                            importDocLauncher.launch(arrayOf("*/*"))
+                            isExiting = true
+                            navController.navigate(Routes.ABOUT)
                         },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.12f)),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.08f)),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
-                        Text(stringResource(R.string.settings_backup_import), color = safeText, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_nav_about), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(48.dp))
@@ -1048,7 +878,7 @@ fun SettingsScreen(
                     Text(stringResource(R.string.settings_system_actions), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
                     Button(
-                        onClick = { showFactoryResetDialog = true },
+                        onClick = { showFactoryResetFirstDialog = true },
                         modifier = Modifier.fillMaxWidth().height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = safeText.copy(alpha = 0.05f)),
                         shape = RoundedCornerShape(12.dp)
@@ -1056,24 +886,58 @@ fun SettingsScreen(
                         Text(stringResource(R.string.settings_factory_default), color = safeText, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(120.dp))
+                }
+            }
+        }
 
-                    OutlinedButton(
-                        onClick = {
-                            isExiting = true
-                            navController.navigate(Routes.REVENUECAT_TEST_INFO)
-                        },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = safeText)
+        if (showFactoryResetProgress) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(4f)
+                    .background(Color.Black.copy(alpha = 0.55f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 28.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = safeBg),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = stringResource(R.string.settings_test_info_button),
-                            fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.settings_factory_default),
+                            color = safeText,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        LinearProgressIndicator(
+                            progress = { factoryResetProgress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp),
+                            color = Color(0xFFFFD54F),
+                            trackColor = safeText.copy(alpha = 0.15f),
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Text(
+                            text = factoryResetStatus.ifBlank {
+                                stringResource(R.string.settings_factory_reset_progress_database)
+                            },
+                            color = safeText.copy(alpha = 0.85f),
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(120.dp))
                 }
             }
         }

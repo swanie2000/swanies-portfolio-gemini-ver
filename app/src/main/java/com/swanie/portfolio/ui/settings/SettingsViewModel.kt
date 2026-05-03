@@ -19,6 +19,7 @@ import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.billing.MonetizationPackage
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.backup.VaultBackupEngine
+import com.swanie.portfolio.data.feedback.BugReportSubmitter
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.widget.PortfolioWidget
@@ -66,6 +67,7 @@ class SettingsViewModel @Inject constructor(
     private val securityManager: SecurityManager,
     private val monetizationManager: MonetizationManager,
     private val vaultBackupEngine: VaultBackupEngine,
+    private val bugReportSubmitter: BugReportSubmitter,
 ) : ViewModel() {
 
     private val userConfigDao = database.userConfigDao()
@@ -430,27 +432,76 @@ class SettingsViewModel @Inject constructor(
         android.os.Process.killProcess(android.os.Process.myPid())
     }
 
-    suspend fun factoryResetAllData() {
-        withContext(Dispatchers.IO) {
-            // Room wipe for all entities.
-            database.clearAllTables()
+    /** Same cold restart as vault import — use after factory reset so Room/DataStore reload cleanly. */
+    fun coldRestartApplication() {
+        restartApplicationCold()
+    }
 
-            // Clear DataStore settings/toggles/starred portfolio preference.
-            themePreferences.clearAllPreferences()
+    suspend fun submitBugReport(message: String, localeTag: String): Result<Unit> {
+        val email = userDao.getFirstUser()?.email?.trim().orEmpty()
+        return bugReportSubmitter.submit(
+            accountEmail = email,
+            userMessage = message.trim(),
+            localeTag = localeTag,
+        )
+    }
 
-            // Optional nuclear fallback: remove DB files entirely.
-            context.deleteDatabase(AppDatabase.DB_NAME)
-            context.deleteDatabase("portfolio_database")
-        }
-
-        // Best-effort widget cleanup refresh after wipe.
-        withContext(NonCancellable) {
+    /**
+     * Factory reset with visible phases for UX. Invokes [onProgress] on Main (fraction 0..1 and message).
+     * [onFinished] runs on Main after the final delay; caller typically navigates home / recreates activity.
+     */
+    fun factoryResetAllDataWithProgress(
+        onProgress: (Float, String) -> Unit,
+        onFinished: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            suspend fun emitProgress(fraction: Float, messageResId: Int) {
+                val msg = context.getString(messageResId)
+                withContext(Dispatchers.Main) { onProgress(fraction, msg) }
+                delay(520L)
+            }
             try {
-                PortfolioWidget().updateAll(context)
-            } catch (e: Exception) {
-                Log.e("FACTORY_RESET", "Widget refresh after wipe failed", e)
+                emitProgress(0.1f, R.string.settings_factory_reset_progress_database)
+                withContext(Dispatchers.IO) { database.clearAllTables() }
+
+                emitProgress(0.3f, R.string.settings_factory_reset_progress_settings)
+                withContext(Dispatchers.IO) { themePreferences.clearAllPreferences() }
+
+                emitProgress(0.5f, R.string.settings_factory_reset_progress_db_files)
+                withContext(Dispatchers.IO) {
+                    AppDatabase.closeAndClearInstance()
+                    context.deleteDatabase(AppDatabase.DB_NAME)
+                    context.deleteDatabase("portfolio_database")
+                }
+
+                emitProgress(0.72f, R.string.settings_factory_reset_progress_icons)
+                withContext(Dispatchers.IO) { clearFactoryResetDiskCaches() }
+
+                emitProgress(0.88f, R.string.settings_factory_reset_progress_widgets)
+                withContext(Dispatchers.IO) {
+                    try {
+                        PortfolioWidget().updateAll(context)
+                    } catch (e: Exception) {
+                        Log.e("FACTORY_RESET", "Widget refresh after wipe failed", e)
+                    }
+                }
+
+                emitProgress(1f, R.string.settings_factory_reset_progress_restart)
+                delay(700L)
+            } finally {
+                withContext(Dispatchers.Main) { onFinished() }
             }
         }
+    }
+
+    private fun clearFactoryResetDiskCaches() {
+        fun clearDirFiles(dir: File) {
+            if (!dir.isDirectory) return
+            dir.listFiles()?.forEach { child -> if (child.isFile) child.delete() }
+        }
+        clearDirFiles(File(context.filesDir, "icons"))
+        clearDirFiles(File(context.filesDir, "custom_icons"))
+        File(context.filesDir, "datastore/theme_settings.preferences_pb").delete()
     }
 
     fun clearWidgetSelection(vaultId: Int) {
@@ -504,7 +555,7 @@ class SettingsViewModel @Inject constructor(
         remoteViews.setTextColor(R.id.widget_loading_msg, bgTextColor)
         remoteViews.setTextViewText(R.id.vault_name_text, vault.name.uppercase())
         if (vault.showWidgetTotal) {
-            val total = assetDao.getAssetsByVaultOnce(vaultId).sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }
+            val total = assetDao.getAssetsByVaultOnce(vaultId).sumOf { AssetValuation.holdingValueUsd(it) }
             remoteViews.setTextViewText(R.id.total_balance_text, NumberFormat.getCurrencyInstance(Locale.US).format(total))
         } else {
             remoteViews.setTextViewText(R.id.total_balance_text, "")
@@ -557,7 +608,7 @@ class SettingsViewModel @Inject constructor(
                                         asset.localIconPath != null -> "file:${asset.localIconPath}"
                                         else -> asset.imageUrl
                                     }
-                                    val assetValue = (asset.officialSpotPrice * asset.weight * asset.amountHeld) + asset.premium
+                                    val assetValue = AssetValuation.holdingValueUsd(asset)
                                     val formattedTotal = formatBoutiquePrice(assetValue)
 
                                     // 📈 Generate Sparkline for Widget
@@ -588,7 +639,7 @@ class SettingsViewModel @Inject constructor(
                                 this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = serializedAssets
                             }
                             this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
-                            val total = allAssetsForVault.sumOf { (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium }
+                            val total = allAssetsForVault.sumOf { AssetValuation.holdingValueUsd(it) }
                             this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
                         }.toPreferences()
                     }

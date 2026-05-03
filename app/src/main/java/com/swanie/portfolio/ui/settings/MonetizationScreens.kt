@@ -151,7 +151,9 @@ fun RevenueCatTestInfoScreen(
                     entitlementId,
                     offeringId
                 )
-                clipboard?.setPrimaryClip(ClipData.newPlainText("RevenueCat checklist", checklist))
+                clipboard?.setPrimaryClip(
+                    ClipData.newPlainText(context.getString(R.string.revenuecat_checklist_clip_label), checklist)
+                )
                 Toast.makeText(
                     context,
                     context.getString(R.string.settings_revenuecat_copied),

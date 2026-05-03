@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Bu hesapta Pro zaten aktif.</string>
     <string name="settings_restore_purchases_no_entitlement">Bu hesap için önceki bir Pro satın alımı bulunamadı.</string>
     <string name="settings_restore_purchases_failed">Satın alımlar şu anda geri yüklenemiyor.</string>
+    <string name="settings_backup_restore">YEDEKLEME VE GERİ YÜKLEME</string>
+    <string name="settings_backup_restore_nav">YEDEK/GERİ YÜKLE</string>
+    <string name="settings_backup_screen_title">YEDEKLEME VE GERİ YÜKLEME</string>
+    <string name="settings_backup_screen_intro">Kasanızın, temanızın ve simgelerinizin şifreli yedeğini oluşturun veya daha önce kaydettiğiniz dosyadan geri yükleyin. İçe aktarma bu cihazdaki verilerin yerini alır ve uygulamayı yeniden başlatır.</string>
+    <string name="settings_backup_export">ŞİFRELİ YEDEĞİ DIŞA AKTAR</string>
+    <string name="settings_backup_export_subtitle">Kasa, tema ve simgeleri parola öbeğiyle korunan dosyaya kaydedin (İndirilenler, Drive vb.).</string>
+    <string name="settings_backup_import">ŞİFRELİ YEDEĞİ İÇE AKTAR</string>
+    <string name="settings_backup_import_subtitle">Yedek dosyasından bu cihazın kasasının yerini alır. Bittiğinde uygulama yeniden başlar.</string>
+    <string name="settings_backup_passphrase_title_export">Bu dışa aktarımı şifrelemek için parola öbeği girin</string>
+    <string name="settings_backup_passphrase_title_import">Yedek parola öbeğini girin</string>
+    <string name="settings_backup_passphrase_label">Parola öbeği</string>
+    <string name="settings_backup_confirm_export">YEDEĞİ KAYDET</string>
+    <string name="settings_backup_confirm_import">GERİ YÜKLE</string>
+    <string name="settings_backup_export_ok">Yedek kaydedildi.</string>
+    <string name="settings_backup_import_ok">Kasa geri yüklendi. Yeniden başlatılıyor…</string>
+    <string name="settings_backup_error_generic">Yedekleme başarısız. Parola öbeğini ve dosyayı kontrol edin.</string>
+    <string name="settings_backup_error_wrong_passphrase">Yanlış parola öbeği.</string>
+    <string name="settings_backup_error_empty_passphrase">Parola öbeği girin.</string>
     <string name="pro_gate_title">PRO ÖZELLİĞİ</string>
     <string name="pro_gate_subtitle">%1$s Pro\'da kullanılabilir.</string>
     <string name="pro_gate_upgrade_coming">Yükseltme satın alma akışı sonlandırılıyor.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">KASAYI FABRİKA AYARLARINA SIFIRLA?</string>
     <string name="settings_factory_reset_body">Bu işlem, tüm varlıklar ve geçmiş dahil olmak üzere mevcut kasayı tamamen silecektir. Bu işlem kalıcıdır.</string>
+    <string name="settings_factory_reset_continue">DEVAM</string>
+    <string name="settings_factory_reset_sure_title">EMİN MİSİNİZ?</string>
+    <string name="settings_factory_reset_sure_body">Bu işlem kasanızı, kayıtlı temayı ve ayarları ile özel simgeleri bu cihazda kalıcı olarak siler. Geri alınamaz.</string>
+    <string name="settings_factory_reset_confirm_erase">HER ŞEYİ SİL</string>
+    <string name="settings_factory_reset_progress_database">Kasa veritabanı temizleniyor…</string>
+    <string name="settings_factory_reset_progress_settings">Kayıtlı ayarlar temizleniyor…</string>
+    <string name="settings_factory_reset_progress_db_files">Veritabanı dosyaları kaldırılıyor…</string>
+    <string name="settings_factory_reset_progress_icons">Özel simge dosyaları kaldırılıyor…</string>
+    <string name="settings_factory_reset_progress_widgets">Ana ekran widget\'ları yenileniyor…</string>
+    <string name="settings_factory_reset_progress_restart">Uygulama yeniden başlatılıyor…</string>
     <string name="settings_reset_everything">HER ŞEYİ SIFIRLA</string>
     <string name="action_cancel">İPTAL</string>
 

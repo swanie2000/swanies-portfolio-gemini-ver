@@ -181,20 +181,21 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.71: METAL SPOT VALUATION + ABOUT/I18N +
 
 **Purpose:** Onboarding for any AI joining mid-stream. Update when milestones change. **Do not** treat older `CURRENT CONDITION` blocks lower in this excerpt as “today”; they are historical.
 
-**Last handoff update:** 2026-05-03 — V40.71 metal spot + About/i18n in repo; Play dev **account registered**; **identity verification submitted** (awaiting Google); device + phone verification still queued in console.
+**Last handoff update:** 2026-05-02 — **V40.71** in repo: `MetalSpotMath`/`AssetValuation` end-to-end; **`BackupRestoreScreen`** + `BACKUP_RESTORE` route; **`BugReportSubmitter`** + Feedback OkHttp; About + i18n wave; Play **fee paid** + **identity submitted** (await Google → device app → phone).
 
 ### Where we left off
 - Android Kotlin/Compose app; RevenueCat Pro gating on theme, multi-portfolio, analytics, widget customization.
-- **Vault backup VER1:** Device-verified — `VaultBackupEngine.kt` (magic `SWPB`, WAL checkpoint via `query` not `execSQL`, import prefers `openFileDescriptor`, BOM strip), `SettingsScreen` / `SettingsViewModel` SAF export-import, cold restart after restore.
-- **Metal spot (V40.71):** `MetalSpotMath.kt` + `AssetValuation.kt` — spot as **USD/troy oz**; **Gram/Kilo → troy oz** before spot×mass on cards, totals, analytics, repo/widget/theme paths. Holdings: collapsed metal total + `cardPriceRowUsd` price row fixed/aligned.
-- **About / legal:** `AboutScreen.kt`, `Routes.ABOUT`, `NavGraph`, `MainActivity` hides bottom bar on ABOUT; Settings + Unlock entry; full ToS still `TermsAndConditionsScreen`. **TEST INFO** removed from Settings (debug route may remain).
-- **Next:** Owner waits on **Google identity** → console device + phone verification → then checklist (AAB internal, Data safety, SKUs↔RC). Engineering QA/backlog per `Master_Build_Checklist.md`.
+- **Vault backup VER1:** `VaultBackupEngine.kt` unchanged contract (WAL `query`, SAF, cold restart). **UI:** `BackupRestoreScreen.kt`, `Routes.BACKUP_RESTORE`, `NavGraph`; `SettingsViewModel` still powers export/import.
+- **Metal spot (V40.71):** `data/local/MetalSpotMath.kt` — `MetalSpotMath` + **`AssetValuation`** (`spotMassHoldingsUsd`, `holdingValueUsd`, `cardPriceRowUsd`). Wired: `HoldingsUIComponents`, `MyHoldingsScreen`, `AnalyticsScreen`, `AssetRepository`, `ThemeStudioScreen`, `WidgetManagerScreen`, `PortfolioWidget`, `AssetArchitectScreen`, `SettingsViewModel` totals.
+- **Feedback:** `BugReportSubmitter` + `@Named("Feedback")` client in `NetworkModule`; Settings dialog + `submitBugReport`; log tag `SwanieBugReport`.
+- **About / legal / i18n:** `AboutScreen`, `ABOUT` route, bottom bar hidden on About; `LanguageDisplay.kt`; strings + **all** maintained `values-*` locales updated for new keys; **TEST INFO** removed from Settings.
+- **Next:** Owner: identity email → device + phone verification → internal AAB + checklist. Engineering: QA metal **GRAM/KILO** + widgets; backlog V40.36 / V40.61.
 
 ### Quick file map
-`VaultBackupEngine.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt` | `MetalSpotMath.kt`, `AssetValuation.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `NavGraph.kt`, `Routes.kt`, `MainActivity.kt`
+`VaultBackupEngine.kt` | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` | `MetalSpotMath.kt` | `BugReportSubmitter.kt`, `NetworkModule.kt` | `SettingsScreen.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `MainActivity.kt` | `LanguageDisplay.kt`
 
-V40.71 UPDATE (excerpt)
-- Unified metal USD math via troy oz; i18n sweep; About screen + nav; Play registration fee paid, identity pending.
+V40.71 UPDATE (excerpt — see canonical `docs/BROWSER_CONTEXT_NARRATIVE.md`)
+- Troy-oz metal USD pipeline; backup screen extraction; FormSubmit bug reports; About + locale parity; Play verification queue.
 
 V40.70 UPDATE
 - `VaultBackupEngine` VER1: WAL checkpoint via `query` (not `execSQL`); import via `openFileDescriptor` stream with BOM strip + robust magic parse; export/import wired from Settings (SAF) with cold restart after successful restore.

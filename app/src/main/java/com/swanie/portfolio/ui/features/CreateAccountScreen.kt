@@ -309,19 +309,29 @@ fun CreateAccountScreen(
         } else {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text(stringResource(R.string.account_created_title)) },
+            title = {
+                Text(
+                    stringResource(R.string.account_created_title),
+                    color = siteText,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 20.sp
+                )
+            },
             text = {
                 Text(
-                    stringResource(
+                    text = stringResource(
                         R.string.account_created_receipt,
                         profile.userName,
                         profile.email,
                         profile.loginPassword
-                    )
+                    ),
+                    color = siteText.copy(alpha = 0.92f),
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp
                 )
             },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         showReceiptDialog = false
                         receiptProfile = null
@@ -330,12 +340,27 @@ fun CreateAccountScreen(
                             popUpTo(Routes.HOME) { inclusive = true }
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = siteText,
+                        contentColor = siteBg
+                    )
                 ) {
-                    Text(stringResource(R.string.account_created_done))
+                    Text(
+                        text = stringResource(R.string.action_login),
+                        fontWeight = FontWeight.Black,
+                        fontSize = 16.sp
+                    )
                 }
             },
-            containerColor = dialogBg
+            containerColor = dialogBg,
+            titleContentColor = siteText,
+            textContentColor = siteText
         )
         }
     }

@@ -35,34 +35,11 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
+import com.swanie.portfolio.ui.i18n.languageDisplayNameForOption
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.min
-
-private fun languageLabel(code: String): String = when (code) {
-    "en" -> "English"
-    "es" -> "Spanish"
-    "pt-BR" -> "Portuguese (Brazil)"
-    "fr" -> "French"
-    "de" -> "German"
-    "ja" -> "Japanese"
-    "ko" -> "Korean"
-    "zh-CN" -> "Chinese (Simplified)"
-    "hi" -> "Hindi"
-    "ar" -> "Arabic"
-    "zh-TW" -> "Chinese (Traditional)"
-    "it" -> "Italian"
-    "ru" -> "Russian"
-    "tr" -> "Turkish"
-    "id" -> "Indonesian"
-    "vi" -> "Vietnamese"
-    "th" -> "Thai"
-    "pl" -> "Polish"
-    "nl" -> "Dutch"
-    "uk" -> "Ukrainian"
-    else -> "English"
-}
 
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
@@ -96,7 +73,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val languageCode by settingsViewModel.languageCode.collectAsState()
     val effectiveLanguageCode = if (languageCode == "system") "en" else languageCode
     var languageMenuExpanded by remember { mutableStateOf(false) }
-    val selectedLanguageLabel = languageLabel(effectiveLanguageCode)
+    val selectedLanguageLabel = languageDisplayNameForOption(effectiveLanguageCode)
 
     // 🌊 SEAMLESS NAVY FADE: The background color reveals itself in sync with the Swan
     val backgroundAlpha by animateFloatAsState(
@@ -204,7 +181,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                     "zh-TW", "it", "ru", "tr", "id", "vi", "th", "pl", "nl", "uk"
                 )
                 languageOptions.forEach { option ->
-                    val optionLabel = languageLabel(option)
+                    val optionLabel = languageDisplayNameForOption(option)
                     DropdownMenuItem(
                         text = { Text(optionLabel) },
                         onClick = {

@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">O Pro já está ativo nesta conta.</string>
     <string name="settings_restore_purchases_no_entitlement">Nenhuma compra Pro anterior foi encontrada para esta conta.</string>
     <string name="settings_restore_purchases_failed">Não foi possível restaurar compras agora.</string>
+    <string name="settings_backup_restore">BACKUP E RESTAURAÇÃO</string>
+    <string name="settings_backup_restore_nav">BACKUP/RESTAURAR</string>
+    <string name="settings_backup_screen_title">BACKUP E RESTAURAÇÃO</string>
+    <string name="settings_backup_screen_intro">Crie um backup criptografado do seu cofre, tema e ícones, ou restaure de um arquivo salvo antes. A importação substitui os dados neste dispositivo e reinicia o app.</string>
+    <string name="settings_backup_export">EXPORTAR BACKUP CRIPTOGRAFADO</string>
+    <string name="settings_backup_export_subtitle">Salve cofre, tema e ícones em um arquivo protegido por senha (Downloads, Drive etc.).</string>
+    <string name="settings_backup_import">IMPORTAR BACKUP CRIPTOGRAFADO</string>
+    <string name="settings_backup_import_subtitle">Substitui o cofre deste dispositivo a partir de um arquivo de backup. O app reiniciará ao concluir.</string>
+    <string name="settings_backup_passphrase_title_export">Digite a senha para criptografar esta exportação</string>
+    <string name="settings_backup_passphrase_title_import">Digite a senha do backup</string>
+    <string name="settings_backup_passphrase_label">Senha</string>
+    <string name="settings_backup_confirm_export">SALVAR BACKUP</string>
+    <string name="settings_backup_confirm_import">RESTAURAR</string>
+    <string name="settings_backup_export_ok">Backup salvo.</string>
+    <string name="settings_backup_import_ok">Cofre restaurado. Reiniciando…</string>
+    <string name="settings_backup_error_generic">Falha no backup. Verifique a senha e o arquivo.</string>
+    <string name="settings_backup_error_wrong_passphrase">Senha incorreta.</string>
+    <string name="settings_backup_error_empty_passphrase">Digite uma senha.</string>
     <string name="pro_gate_title">RECURSO PRO</string>
     <string name="pro_gate_subtitle">%1$s está disponível no Pro.</string>
     <string name="pro_gate_upgrade_coming">O fluxo de compra de upgrade está sendo finalizado.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">REDEFINIR COFRE PARA FÁBRICA?</string>
     <string name="settings_factory_reset_body">Isso apagará completamente o cofre atual, incluindo todos os ativos e histórico. Esta ação é soberana e permanente.</string>
+    <string name="settings_factory_reset_continue">CONTINUAR</string>
+    <string name="settings_factory_reset_sure_title">TEM CERTEZA?</string>
+    <string name="settings_factory_reset_sure_body">Isso apagará permanentemente seu cofre, tema salvo, configurações e ícones personalizados neste dispositivo. Não é possível desfazer.</string>
+    <string name="settings_factory_reset_confirm_erase">APAGAR TUDO</string>
+    <string name="settings_factory_reset_progress_database">Limpando banco de dados do cofre…</string>
+    <string name="settings_factory_reset_progress_settings">Limpando configurações salvas…</string>
+    <string name="settings_factory_reset_progress_db_files">Removendo arquivos de banco de dados…</string>
+    <string name="settings_factory_reset_progress_icons">Removendo ícones personalizados…</string>
+    <string name="settings_factory_reset_progress_widgets">Atualizando widgets da tela inicial…</string>
+    <string name="settings_factory_reset_progress_restart">Reiniciando o app…</string>
     <string name="settings_reset_everything">REDEFINIR TUDO</string>
     <string name="action_cancel">CANCELAR</string>
 

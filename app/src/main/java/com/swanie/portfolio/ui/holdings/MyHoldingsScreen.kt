@@ -50,6 +50,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetValuation
 import com.swanie.portfolio.ui.holdings.formatAmount
 import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
@@ -285,7 +286,7 @@ fun MyHoldingsScreen(
 
                             val totalValueFormatted = remember(filteredHoldingsForPage, vaultForPage.baseCurrency) {
                                 val total = filteredHoldingsForPage.sumOf {
-                                    (it.officialSpotPrice * it.weight * it.amountHeld) + it.premium
+                                    AssetValuation.holdingValueUsd(it)
                                 }
                                 formatCurrency(total, 2, vaultForPage.baseCurrency)
                             }

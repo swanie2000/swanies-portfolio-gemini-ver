@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro jest już aktywne na tym koncie.</string>
     <string name="settings_restore_purchases_no_entitlement">Nie znaleziono wcześniejszego zakupu Pro dla tego konta.</string>
     <string name="settings_restore_purchases_failed">Nie można teraz przywrócić zakupów.</string>
+    <string name="settings_backup_restore">KOPIA ZAPASOWA I PRZYWRACANIE</string>
+    <string name="settings_backup_restore_nav">KOPIA/PRZYWRÓĆ</string>
+    <string name="settings_backup_screen_title">KOPIA ZAPASOWA I PRZYWRACANIE</string>
+    <string name="settings_backup_screen_intro">Utwórz zaszyfrowaną kopię sejfu, motywu i ikon albo przywróć z wcześniej zapisanego pliku. Import zastępuje dane na tym urządzeniu i uruchamia aplikację ponownie.</string>
+    <string name="settings_backup_export">EKSPORTUJ ZASZYFROWANĄ KOPIĘ</string>
+    <string name="settings_backup_export_subtitle">Zapisz sejf, motyw i ikony w pliku chronionym hasłem (Pobrane, Dysk itd.).</string>
+    <string name="settings_backup_import">IMPORTUJ ZASZYFROWANĄ KOPIĘ</string>
+    <string name="settings_backup_import_subtitle">Zastępuje sejf tego urządzenia z pliku kopii. Aplikacja uruchomi się ponownie po zakończeniu.</string>
+    <string name="settings_backup_passphrase_title_export">Wprowadź hasło, aby zaszyfrować ten eksport</string>
+    <string name="settings_backup_passphrase_title_import">Wprowadź hasło kopii zapasowej</string>
+    <string name="settings_backup_passphrase_label">Hasło</string>
+    <string name="settings_backup_confirm_export">ZAPISZ KOPIĘ</string>
+    <string name="settings_backup_confirm_import">PRZYWRÓĆ</string>
+    <string name="settings_backup_export_ok">Kopia zapisana.</string>
+    <string name="settings_backup_import_ok">Sejf przywrócony. Ponowne uruchamianie…</string>
+    <string name="settings_backup_error_generic">Kopia nie powiodła się. Sprawdź hasło i plik.</string>
+    <string name="settings_backup_error_wrong_passphrase">Nieprawidłowe hasło.</string>
+    <string name="settings_backup_error_empty_passphrase">Wprowadź hasło.</string>
     <string name="pro_gate_title">FUNKCJA PRO</string>
     <string name="pro_gate_subtitle">%1$s jest dostępne w Pro.</string>
     <string name="pro_gate_upgrade_coming">Proces zakupu aktualizacji jest finalizowany.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">ZRESETOWAĆ SEJF DO USTAWIEŃ FABRYCZNYCH?</string>
     <string name="settings_factory_reset_body">Spowoduje to całkowite wyczyszczenie sejfu, w tym wszystkich aktywów i historii. Ta akcja jest nieodwracalna.</string>
+    <string name="settings_factory_reset_continue">DALEJ</string>
+    <string name="settings_factory_reset_sure_title">NA PEWNO?</string>
+    <string name="settings_factory_reset_sure_body">To trwale usunie sejf, zapisany motyw i ustawienia oraz niestandardowe ikony na tym urządzeniu. Nie można tego cofnąć.</string>
+    <string name="settings_factory_reset_confirm_erase">USUŃ WSZYSTKO</string>
+    <string name="settings_factory_reset_progress_database">Czyszczenie bazy sejfu…</string>
+    <string name="settings_factory_reset_progress_settings">Czyszczenie zapisanych ustawień…</string>
+    <string name="settings_factory_reset_progress_db_files">Usuwanie plików bazy danych…</string>
+    <string name="settings_factory_reset_progress_icons">Usuwanie niestandardowych ikon…</string>
+    <string name="settings_factory_reset_progress_widgets">Odświeżanie widżetów ekranu głównego…</string>
+    <string name="settings_factory_reset_progress_restart">Ponowne uruchamianie aplikacji…</string>
     <string name="settings_reset_everything">ZRESETUJ WSZYSTKO</string>
     <string name="action_cancel">ANULUJ</string>
 

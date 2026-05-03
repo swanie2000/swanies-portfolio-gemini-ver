@@ -71,6 +71,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetValuation
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.ui.components.BoutiqueHeader
@@ -348,7 +349,11 @@ fun WidgetManagerScreen(
                                     if (isConfigMode) {
                                         onConfigComplete()
                                     } else {
-                                        Toast.makeText(context, "Registry Synced!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.widget_manager_registry_synced),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                     dragOrderedIds = null
                                     postDragOrderLock = null
@@ -620,7 +625,7 @@ fun WidgetManagerScreen(
                                 runCatching {
                                     val selectedTotalValue = orderedWidgetAssets
                                         .filter { it.coinId in widgetSelectedIds }
-                                        .sumOf { (it.officialSpotPrice * it.amountHeld) + it.premium }
+                                        .sumOf { AssetValuation.holdingValueUsd(it) }
                                     val selectedTotalText =
                                         NumberFormat.getCurrencyInstance(Locale.US).format(selectedTotalValue)
                                     val cleanName = (selectedVault?.name ?: "Portfolio")
@@ -680,7 +685,7 @@ fun WidgetManagerScreen(
                                 val finalAssets = immutableList.filter { it.coinId in widgetSelectedIds }.take(5)
                                 val selectedTotalValue = immutableList
                                     .filter { it.coinId in widgetSelectedIds }
-                                    .sumOf { (it.officialSpotPrice * it.amountHeld) + it.premium }
+                                    .sumOf { AssetValuation.holdingValueUsd(it) }
                                 val selectedTotalText =
                                     NumberFormat.getCurrencyInstance(Locale.US).format(selectedTotalValue)
                                 val cleanName = (selectedVault?.name ?: "Portfolio")
@@ -1036,14 +1041,14 @@ private fun SimulatedAssetRow(
     val sparklineH = if (hi) 20.dp else 16.dp
     val sparklineStartPad = if (hi) 6.dp else 10.dp
     val displayPrice = runCatching {
-        val safePrice = asset.officialSpotPrice
-        if (!safePrice.isFinite()) error("invalid price")
-        formatBoutiquePrice(safePrice, "USD")
+        val line = AssetValuation.cardPriceRowUsd(asset)
+        if (!line.isFinite()) error("invalid price")
+        formatBoutiquePrice(line, "USD")
     }.getOrDefault("N/A")
     val totalValue = runCatching {
-        val safePrice = asset.officialSpotPrice
-        if (!safePrice.isFinite()) error("invalid price")
-        NumberFormat.getCurrencyInstance(Locale.US).format((safePrice * asset.amountHeld) + asset.premium)
+        val v = AssetValuation.holdingValueUsd(asset)
+        if (!v.isFinite()) error("invalid total")
+        NumberFormat.getCurrencyInstance(Locale.US).format(v)
     }.getOrDefault("N/A")
     val changeText = runCatching {
         String.format(Locale.US, "%.1f", asset.priceChange24h)

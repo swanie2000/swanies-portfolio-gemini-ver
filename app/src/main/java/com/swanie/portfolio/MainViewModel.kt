@@ -1,8 +1,10 @@
 package com.swanie.portfolio
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swanie.portfolio.R
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.local.UserDao
@@ -12,6 +14,7 @@ import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.security.AuthPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -26,7 +29,8 @@ class MainViewModel @Inject constructor(
     private val themePreferences: ThemePreferences,
     private val vaultDao: VaultDao,
     private val userDao: UserDao,
-    private val monetizationManager: MonetizationManager
+    private val monetizationManager: MonetizationManager,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     private val _isDataReady = MutableStateFlow(false)
@@ -66,14 +70,14 @@ class MainViewModel @Inject constructor(
         isDataReady
     ) { vaults, currentId, ready ->
         if (!ready || vaults.isEmpty()) {
-            VaultEntity(name = "LOADING...", id = -1)
+            VaultEntity(name = appContext.getString(R.string.vault_status_loading), id = -1)
         } else {
             vaults.find { it.id == currentId } ?: vaults.first()
         }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        VaultEntity(name = "INITIALIZING...", id = -1)
+        VaultEntity(name = appContext.getString(R.string.vault_status_initializing), id = -1)
     )
 
     // Preferences observed as StateFlows

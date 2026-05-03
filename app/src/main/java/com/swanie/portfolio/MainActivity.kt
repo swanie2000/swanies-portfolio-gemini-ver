@@ -86,7 +86,8 @@ class MainActivity : AppCompatActivity() {
                     Routes.CREATE_ACCOUNT,
                     Routes.UNLOCK_VAULT,
                     Routes.RESTORE_VAULT,
-                    Routes.TERMS_CONDITIONS
+                    Routes.TERMS_CONDITIONS,
+                    Routes.ABOUT,
                 )
                 val shouldShowBottomBar = currentRoute !in hideBottomBarRoutes
 

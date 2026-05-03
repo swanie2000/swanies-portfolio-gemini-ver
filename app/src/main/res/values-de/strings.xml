@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro ist für dieses Konto bereits aktiv.</string>
     <string name="settings_restore_purchases_no_entitlement">Für dieses Konto wurde kein früherer Pro-Kauf gefunden.</string>
     <string name="settings_restore_purchases_failed">Käufe können derzeit nicht wiederhergestellt werden.</string>
+    <string name="settings_backup_restore">SICHERUNG &amp; WIEDERHERSTELLUNG</string>
+    <string name="settings_backup_restore_nav">SICHERUNG/WIEDERHERSTELLUNG</string>
+    <string name="settings_backup_screen_title">SICHERUNG &amp; WIEDERHERSTELLUNG</string>
+    <string name="settings_backup_screen_intro">Erstellen Sie ein verschlüsseltes Backup Ihres Tresors, Designs und Ihrer Symbole, oder stellen Sie aus einer zuvor gespeicherten Datei wieder her. Der Import ersetzt die Daten auf diesem Gerät und startet die App neu.</string>
+    <string name="settings_backup_export">VERSCHLÜSSELTE SICHERUNG EXPORTIEREN</string>
+    <string name="settings_backup_export_subtitle">Tresor, Design und Symbole in eine passwortgeschützte Datei speichern (Downloads, Drive usw.).</string>
+    <string name="settings_backup_import">VERSCHLÜSSELTE SICHERUNG IMPORTIEREN</string>
+    <string name="settings_backup_import_subtitle">Ersetzt den Tresor dieses Geräts aus einer Sicherungsdatei. Die App wird danach neu gestartet.</string>
+    <string name="settings_backup_passphrase_title_export">Passphrase eingeben, um diesen Export zu verschlüsseln</string>
+    <string name="settings_backup_passphrase_title_import">Backup-Passphrase eingeben</string>
+    <string name="settings_backup_passphrase_label">Passphrase</string>
+    <string name="settings_backup_confirm_export">SICHERUNG SPEICHERN</string>
+    <string name="settings_backup_confirm_import">WIEDERHERSTELLEN</string>
+    <string name="settings_backup_export_ok">Sicherung gespeichert.</string>
+    <string name="settings_backup_import_ok">Tresor wiederhergestellt. Neustart…</string>
+    <string name="settings_backup_error_generic">Sicherung fehlgeschlagen. Passphrase und Datei prüfen.</string>
+    <string name="settings_backup_error_wrong_passphrase">Falsche Passphrase.</string>
+    <string name="settings_backup_error_empty_passphrase">Passphrase eingeben.</string>
     <string name="pro_gate_title">PRO-FUNKTION</string>
     <string name="pro_gate_subtitle">%1$s ist in Pro verfügbar.</string>
     <string name="pro_gate_upgrade_coming">Der Upgrade-Kaufablauf wird gerade finalisiert.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">VAULT AUF WERKSEINSTELLUNGEN ZURÜCKSETZEN?</string>
     <string name="settings_factory_reset_body">Dies löscht den aktuellen Vault vollständig, einschließlich aller Vermögenswerte und Verläufe. Diese Aktion ist endgültig.</string>
+    <string name="settings_factory_reset_continue">WEITER</string>
+    <string name="settings_factory_reset_sure_title">WIRKLICH FORTFAHREN?</string>
+    <string name="settings_factory_reset_sure_body">Dadurch werden Ihr Tresor, gespeichertes Design und Einstellungen sowie benutzerdefinierte Symbole auf diesem Gerät dauerhaft gelöscht. Dies lässt sich nicht rückgängig machen.</string>
+    <string name="settings_factory_reset_confirm_erase">ALLES LÖSCHEN</string>
+    <string name="settings_factory_reset_progress_database">Tresor-Datenbank wird geleert…</string>
+    <string name="settings_factory_reset_progress_settings">Gespeicherte Einstellungen werden gelöscht…</string>
+    <string name="settings_factory_reset_progress_db_files">Datenbankdateien werden entfernt…</string>
+    <string name="settings_factory_reset_progress_icons">Benutzerdefinierte Symbole werden entfernt…</string>
+    <string name="settings_factory_reset_progress_widgets">Startbildschirm-Widgets werden aktualisiert…</string>
+    <string name="settings_factory_reset_progress_restart">App wird neu gestartet…</string>
     <string name="settings_reset_everything">ALLES ZURÜCKSETZEN</string>
     <string name="action_cancel">ABBRECHEN</string>
 

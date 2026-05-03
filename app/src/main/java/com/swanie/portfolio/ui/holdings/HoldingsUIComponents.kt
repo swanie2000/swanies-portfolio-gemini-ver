@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -69,6 +70,7 @@ import com.yalantis.ucrop.UCrop
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetValuation
 import java.io.File
 import java.text.DecimalFormat
 import java.util.Locale
@@ -335,6 +337,7 @@ fun FunnelGrid(
     options: List<String>,
     selected: String,
     compact: Boolean = false,
+    labelForOption: (String) -> String = { it },
     onSelect: (String) -> Unit,
 ) {
     val rowGap = if (compact) 6.dp else 10.dp
@@ -346,8 +349,9 @@ fun FunnelGrid(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(colGap)) {
                 rowItems.forEach { option ->
                     val isSelected = option.equals(selected, ignoreCase = true)
+                    val label = labelForOption(option)
                     Box(modifier = Modifier.weight(1f).height(cellHeight).clip(RoundedCornerShape(12.dp)).background(if (isSelected) Color.Yellow else Color.White.copy(0.05f)).clickable { onSelect(option) }.border(1.dp, if (isSelected) Color.Transparent else Color.White.copy(0.1f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                        Text(text = option.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = fontSize)
+                        Text(text = label.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = fontSize)
                     }
                 }
                 if (rowItems.size == 1) Spacer(Modifier.weight(1f))
@@ -676,14 +680,37 @@ fun CryptoEditFunnel(
             ?: asset.imageUrl.takeIf { it.isNotBlank() }
     }
 
-    Dialog(onDismissRequest = onDismiss) {
-        Card(modifier = Modifier.fillMaxWidth().padding(16.dp), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), border = BorderStroke(1.dp, Color.White.copy(0.1f))) {
-            Column(
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false,
+        ),
+    ) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            Card(
                 modifier = Modifier
-                    .verticalScroll(scroll)
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .heightIn(max = maxHeight)
+                    .align(Alignment.TopCenter),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
+                border = BorderStroke(1.dp, Color.White.copy(0.1f)),
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scroll)
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                 Text(stringResource(R.string.crypto_settings_title, asset.symbol.uppercase()), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
                 Spacer(Modifier.height(20.dp))
                 Text(stringResource(R.string.asset_custom_icon_section), color = Color.White.copy(0.6f), fontSize = 10.sp)
@@ -799,6 +826,7 @@ fun CryptoEditFunnel(
                     Text(stringResource(R.string.action_save_changes), fontWeight = FontWeight.Black)
                 }
                 TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel), color = Color.Gray) }
+                }
             }
         }
     }
@@ -1258,7 +1286,7 @@ fun FullAssetCard(
                             ),
                         )
                         AutoResizingText(
-                            text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                            text = formatBoutiquePrice(AssetValuation.cardPriceRowUsd(asset), baseCurrency),
                             style = TextStyle(
                                 color = cardText,
                                 fontWeight = FontWeight.Bold,
@@ -1286,7 +1314,7 @@ fun FullAssetCard(
                             ),
                         )
                         AutoResizingText(
-                            text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency),
+                            text = formatCurrency(AssetValuation.spotMassHoldingsUsd(asset), 2, baseCurrency),
                             style = TextStyle(
                                 color = cardText,
                                 fontWeight = FontWeight.Black,
@@ -1536,7 +1564,7 @@ fun CompactAssetCard(
                                         overflow = TextOverflow.Ellipsis,
                                     )
                                     AutoResizingText(
-                                        text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                                        text = formatBoutiquePrice(AssetValuation.cardPriceRowUsd(asset), baseCurrency),
                                         style = LocalTextStyle.current.copy(
                                             color = cardText.copy(alpha = 0.75f),
                                             fontWeight = FontWeight.Medium,
@@ -1596,12 +1624,11 @@ fun CompactAssetCard(
                                     Icon(Icons.Default.Edit, null, tint = Color.Black, modifier = Modifier.size(20.dp))
                                 }
                             } else {
+                                val collapsedHoldingValue =
+                                    AssetValuation.spotMassHoldingsUsd(asset) +
+                                        if (asset.category == AssetCategory.CRYPTO) asset.premium else 0.0
                                 AutoResizingText(
-                                    text = formatCurrency(
-                                        (asset.officialSpotPrice * asset.amountHeld) + asset.premium,
-                                        2,
-                                        baseCurrency
-                                    ),
+                                    text = formatCurrency(collapsedHoldingValue, 2, baseCurrency),
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             color = cardText,
@@ -1797,7 +1824,7 @@ fun CompactAssetCard(
                                     ),
                                 )
                                 AutoResizingText(
-                                    text = formatBoutiquePrice(asset.officialSpotPrice, baseCurrency),
+                                    text = formatBoutiquePrice(AssetValuation.cardPriceRowUsd(asset), baseCurrency),
                                     style = TextStyle(
                                         color = cardText,
                                         fontWeight = FontWeight.Bold,
@@ -1825,7 +1852,7 @@ fun CompactAssetCard(
                                     ),
                                 )
                                 AutoResizingText(
-                                    text = formatCurrency(asset.officialSpotPrice * asset.weight * asset.amountHeld, 2, baseCurrency),
+                                    text = formatCurrency(AssetValuation.spotMassHoldingsUsd(asset), 2, baseCurrency),
                                     style = TextStyle(
                                         color = cardText,
                                         fontWeight = FontWeight.Black,
@@ -1901,7 +1928,7 @@ fun MetalMarketCard(
                             maxLines = 1
                         )
                         if (isOwned) {
-                            Text(text = "    \"Holding\"", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
+                            Text(text = stringResource(R.string.holdings_metal_card_owned_badge), fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.Yellow)
                         }
                     }
                 }
@@ -1916,7 +1943,11 @@ fun MetalMarketCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "${if (changePercent >= 0) "+" else ""}${String.format(Locale.US, "%.2f", changePercent)}%",
+                            text = stringResource(
+                                R.string.widget_percent_change,
+                                if (changePercent >= 0) "+" else "",
+                                changePercent,
+                            ),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = trendColor,

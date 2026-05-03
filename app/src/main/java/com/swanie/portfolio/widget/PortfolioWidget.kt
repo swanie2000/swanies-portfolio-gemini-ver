@@ -91,7 +91,7 @@ class PortfolioWidget : GlanceAppWidget() {
             if (boundId == 0) {
                 UnlinkedContent(context = context, appWidgetId = appWidgetId)
             } else {
-                val vaultName = prefs[STATIC_VAULT_NAME_KEY] ?: "PORTFOLIO"
+                val vaultName = prefs[STATIC_VAULT_NAME_KEY] ?: context.getString(R.string.widget_portfolio_label)
                 val totalValue = prefs[STATIC_TOTAL_BALANCE_KEY] ?: ""
                 val showTotal = prefs[SHOW_TOTAL_KEY] ?: true
 
@@ -232,7 +232,7 @@ fun ZombieFallbackContent(
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.7f)), fontSize = 10.sp)
         )
         Text(
-            text = "Updated: $lastUpdated",
+            text = context.getString(R.string.widget_updated_at, lastUpdated),
             style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.5f)), fontSize = 9.sp)
         )
     }
@@ -322,7 +322,11 @@ fun WidgetContent(
             }
             Spacer(modifier = GlanceModifier.height(2.dp))
         }
-        Text(text = "Updated: $lastUpdated", style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.5f)), textAlign = TextAlign.End), modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp))
+        Text(
+            text = context.getString(R.string.widget_updated_at, lastUpdated),
+            style = TextStyle(fontSize = 8.sp, color = ColorProvider(bgTextColor.copy(alpha = 0.5f)), textAlign = TextAlign.End),
+            modifier = GlanceModifier.fillMaxWidth().padding(top = 2.dp)
+        )
     }
 }
 
@@ -398,7 +402,12 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                 maxLines = 1
             )
             val trendColor = if (asset.priceChange24h >= 0) Color(0xFF00FF00) else Color(0xFFFF4444)
-            Text(text = "${if (asset.priceChange24h >= 0) "+" else ""}${String.format(Locale.getDefault(), "%.2f", asset.priceChange24h)}%", style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
+            val changeText = context.getString(
+                R.string.widget_percent_change,
+                if (asset.priceChange24h >= 0) "+" else "",
+                asset.priceChange24h,
+            )
+            Text(text = changeText, style = TextStyle(color = ColorProvider(trendColor), fontSize = 10.sp, fontWeight = FontWeight.Bold))
         }
     }
 }

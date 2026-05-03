@@ -340,6 +340,15 @@ fun UnlockVaultScreen(
                     )
                 }
 
+                TextButton(onClick = { navController.navigate(Routes.ABOUT) }) {
+                    Text(
+                        stringResource(R.string.unlock_footer_about),
+                        color = accentSilver.copy(alpha = 0.85f),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }

@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">このアカウントでは Pro はすでに有効です。</string>
     <string name="settings_restore_purchases_no_entitlement">このアカウントに以前の Pro 購入は見つかりませんでした。</string>
     <string name="settings_restore_purchases_failed">現在、購入を復元できません。</string>
+    <string name="settings_backup_restore">バックアップと復元</string>
+    <string name="settings_backup_restore_nav">バックアップ/復元</string>
+    <string name="settings_backup_screen_title">バックアップと復元</string>
+    <string name="settings_backup_screen_intro">金庫・テーマ・アイコンの暗号化バックアップを作成するか、以前保存したファイルから復元します。インポートはこの端末上のデータを置き換え、アプリを再起動します。</string>
+    <string name="settings_backup_export">暗号化バックアップをエクスポート</string>
+    <string name="settings_backup_export_subtitle">金庫・テーマ・アイコンをパスフレーズ保護ファイルに保存します（ダウンロード、Drive など）。</string>
+    <string name="settings_backup_import">暗号化バックアップをインポート</string>
+    <string name="settings_backup_import_subtitle">バックアップファイルからこの端末の金庫を置き換えます。完了後にアプリが再起動します。</string>
+    <string name="settings_backup_passphrase_title_export">このエクスポートを暗号化するパスフレーズを入力</string>
+    <string name="settings_backup_passphrase_title_import">バックアップのパスフレーズを入力</string>
+    <string name="settings_backup_passphrase_label">パスフレーズ</string>
+    <string name="settings_backup_confirm_export">バックアップを保存</string>
+    <string name="settings_backup_confirm_import">復元</string>
+    <string name="settings_backup_export_ok">バックアップを保存しました。</string>
+    <string name="settings_backup_import_ok">金庫を復元しました。再起動しています…</string>
+    <string name="settings_backup_error_generic">バックアップに失敗しました。パスフレーズとファイルを確認してください。</string>
+    <string name="settings_backup_error_wrong_passphrase">パスフレーズが正しくありません。</string>
+    <string name="settings_backup_error_empty_passphrase">パスフレーズを入力してください。</string>
     <string name="pro_gate_title">PRO 機能</string>
     <string name="pro_gate_subtitle">%1$s は Pro で利用できます。</string>
     <string name="pro_gate_upgrade_coming">アップグレード購入フローは現在最終調整中です。</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">保管庫を初期化しますか？</string>
     <string name="settings_factory_reset_body">現在の保管庫のすべての資産と履歴が完全に削除されます。この操作は取り消せません。</string>
+    <string name="settings_factory_reset_continue">続行</string>
+    <string name="settings_factory_reset_sure_title">本当によろしいですか？</string>
+    <string name="settings_factory_reset_sure_body">保管庫、保存したテーマと設定、この端末のカスタムアイコンが完全に消去されます。取り消せません。</string>
+    <string name="settings_factory_reset_confirm_erase">すべて消去</string>
+    <string name="settings_factory_reset_progress_database">保管庫のデータベースを消去しています…</string>
+    <string name="settings_factory_reset_progress_settings">保存した設定を消去しています…</string>
+    <string name="settings_factory_reset_progress_db_files">データベースファイルを削除しています…</string>
+    <string name="settings_factory_reset_progress_icons">カスタムアイコンファイルを削除しています…</string>
+    <string name="settings_factory_reset_progress_widgets">ホーム画面ウィジェットを更新しています…</string>
+    <string name="settings_factory_reset_progress_restart">アプリを再起動しています…</string>
     <string name="settings_reset_everything">すべてをリセット</string>
     <string name="action_cancel">キャンセル</string>
 

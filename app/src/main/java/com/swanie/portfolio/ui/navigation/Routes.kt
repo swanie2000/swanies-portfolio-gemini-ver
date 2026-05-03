@@ -10,6 +10,7 @@ object Routes {
     const val HOLDINGS_WITH_VAULT = "my_holdings/{vaultId}"
     const val ANALYTICS = "analytics"
     const val SETTINGS = "settings"
+    const val BACKUP_RESTORE = "backup_restore"
     const val THEME_STUDIO = "theme_studio"
     const val UPGRADE_TO_PRO = "upgrade_to_pro"
     const val REVENUECAT_TEST_INFO = "revenuecat_test_info"
@@ -21,6 +22,7 @@ object Routes {
     const val ASSET_ARCHITECT = "asset_architect/{symbol}/{price}/{source}/{vaultId}"
     const val PORTFOLIO_MANAGER = "portfolio_manager"
     const val TERMS_CONDITIONS = "terms_conditions" // ⚖️ New Route for Privacy Pledge
+    const val ABOUT = "about"
 
     fun addAssetRoute(vaultId: Int): String = "add_asset/$vaultId"
     fun holdingsRoute(vaultId: Int): String = "my_holdings/$vaultId"

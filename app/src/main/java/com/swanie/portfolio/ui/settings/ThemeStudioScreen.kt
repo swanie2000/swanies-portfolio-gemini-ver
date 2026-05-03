@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.AssetValuation
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
@@ -62,6 +64,7 @@ fun ThemeStudioScreen(
     viewModel: ThemeViewModel = hiltViewModel()
 ) {
     val assetViewModel: AssetViewModel = hiltViewModel()
+    val appContext = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
@@ -74,7 +77,7 @@ fun ThemeStudioScreen(
     val liveHoldings by assetViewModel.holdings.collectAsState()
     val liveSampleAsset = liveHoldings?.firstOrNull()
     val liveTotalValue = remember(liveHoldings) {
-        (liveHoldings ?: emptyList()).sumOf { (it.officialSpotPrice * it.amountHeld) + it.premium }
+        (liveHoldings ?: emptyList()).sumOf { AssetValuation.holdingValueUsd(it) }
     }
     val liveTotalValueText = remember(liveTotalValue) {
         NumberFormat.getCurrencyInstance(Locale.US).format(liveTotalValue)
@@ -82,7 +85,12 @@ fun ThemeStudioScreen(
 
     // Local UI State
     var activeTarget by remember { mutableIntStateOf(0) }
-    val targets = listOf("APP Background", "App Text", "Card Background", "Card Text")
+    val targets = listOf(
+        stringResource(R.string.theme_studio_target_app_background),
+        stringResource(R.string.theme_studio_target_app_text),
+        stringResource(R.string.theme_studio_target_card_background),
+        stringResource(R.string.theme_studio_target_card_text),
+    )
     var targetMenuExpanded by remember { mutableStateOf(false) }
 
     var hue by remember { mutableFloatStateOf(0f) }
@@ -134,14 +142,14 @@ fun ThemeStudioScreen(
 
     fun applyColor() {
         if (hexInput.length != 6) {
-            errorMessage = "6 CHARACTERS REQUIRED"
+            errorMessage = appContext.getString(R.string.theme_studio_error_hex_length)
             showError = true
             scope.launch { delay(2500); showError = false }
             return
         }
         val isValid = hexInput.all { it.isDigit() || it.uppercaseChar() in 'A'..'F' }
         if (!isValid) {
-            errorMessage = "INVALID HEX: 0-9 & A-F ONLY"
+            errorMessage = appContext.getString(R.string.theme_studio_error_hex_invalid)
             showError = true
             scope.launch { delay(2500); showError = false }
             return
@@ -160,7 +168,7 @@ fun ThemeStudioScreen(
             focusManager.clearFocus()
             scope.launch { delay(300); isFlashing = false }
         } catch (e: Exception) {
-            errorMessage = "SAVE ERROR"
+            errorMessage = appContext.getString(R.string.theme_studio_error_save)
             showError = true
             scope.launch { delay(2500); showError = false }
         }
@@ -408,7 +416,7 @@ private fun ThemeStudioSamplePreview(
 ) {
     WidgetPreviewSlim(
         sampleAsset = sampleAsset,
-        vaultName = "LIVE PREVIEW",
+        vaultName = stringResource(R.string.theme_studio_live_preview),
         totalValue = totalValue,
         bgHex = appBgHex,
         bgTxtHex = appTextHex,

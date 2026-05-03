@@ -131,6 +131,24 @@
     <string name="settings_restore_purchases_already_active">Pro sudah aktif pada akun ini.</string>
     <string name="settings_restore_purchases_no_entitlement">Tidak ditemukan pembelian Pro sebelumnya untuk akun ini.</string>
     <string name="settings_restore_purchases_failed">Tidak dapat memulihkan pembelian saat ini.</string>
+    <string name="settings_backup_restore">CADANGAN &amp; PULIHKAN</string>
+    <string name="settings_backup_restore_nav">CADANGAN/PULIH</string>
+    <string name="settings_backup_screen_title">CADANGAN &amp; PULIHKAN</string>
+    <string name="settings_backup_screen_intro">Buat cadangan terenkripsi brankas, tema, dan ikon Anda, atau pulihkan dari file yang pernah disimpan. Impor mengganti data di perangkat ini dan memulai ulang aplikasi.</string>
+    <string name="settings_backup_export">EKSPOR CADANGAN TERENKRIPSI</string>
+    <string name="settings_backup_export_subtitle">Simpan brankas, tema, dan ikon ke file yang dilindungi frasa sandi (Unduhan, Drive, dll.).</string>
+    <string name="settings_backup_import">IMPOR CADANGAN TERENKRIPSI</string>
+    <string name="settings_backup_import_subtitle">Mengganti brankas perangkat ini dari file cadangan. Aplikasi akan mulai ulang setelah selesai.</string>
+    <string name="settings_backup_passphrase_title_export">Masukkan frasa sandi untuk mengenkripsi ekspor ini</string>
+    <string name="settings_backup_passphrase_title_import">Masukkan frasa sandi cadangan</string>
+    <string name="settings_backup_passphrase_label">Frasa sandi</string>
+    <string name="settings_backup_confirm_export">SIMPAN CADANGAN</string>
+    <string name="settings_backup_confirm_import">PULIHKAN</string>
+    <string name="settings_backup_export_ok">Cadangan disimpan.</string>
+    <string name="settings_backup_import_ok">Brankas dipulihkan. Memulai ulang…</string>
+    <string name="settings_backup_error_generic">Cadangan gagal. Periksa frasa sandi dan file.</string>
+    <string name="settings_backup_error_wrong_passphrase">Frasa sandi salah.</string>
+    <string name="settings_backup_error_empty_passphrase">Masukkan frasa sandi.</string>
     <string name="pro_gate_title">FITUR PRO</string>
     <string name="pro_gate_subtitle">%1$s tersedia di Pro.</string>
     <string name="pro_gate_upgrade_coming">Alur pembelian upgrade sedang diselesaikan.</string>
@@ -165,6 +183,16 @@
 
     <string name="settings_factory_reset_title">RESET VAULT KE PABRIK?</string>
     <string name="settings_factory_reset_body">Ini akan menghapus seluruh isi vault saat ini, termasuk aset dan riwayat. Tindakan ini bersifat permanen.</string>
+    <string name="settings_factory_reset_continue">LANJUT</string>
+    <string name="settings_factory_reset_sure_title">ANDA YAKIN?</string>
+    <string name="settings_factory_reset_sure_body">Ini akan menghapus secara permanen brankas, tema dan pengaturan yang disimpan, serta ikon khusus di perangkat ini. Tidak dapat dibatalkan.</string>
+    <string name="settings_factory_reset_confirm_erase">HAPUS SEMUA</string>
+    <string name="settings_factory_reset_progress_database">Membersihkan basis data brankas…</string>
+    <string name="settings_factory_reset_progress_settings">Membersihkan pengaturan yang disimpan…</string>
+    <string name="settings_factory_reset_progress_db_files">Menghapus file basis data…</string>
+    <string name="settings_factory_reset_progress_icons">Menghapus file ikon khusus…</string>
+    <string name="settings_factory_reset_progress_widgets">Memperbarui widget layar beranda…</string>
+    <string name="settings_factory_reset_progress_restart">Memulai ulang aplikasi…</string>
     <string name="settings_reset_everything">RESET SEMUANYA</string>
     <string name="action_cancel">BATAL</string>
 
