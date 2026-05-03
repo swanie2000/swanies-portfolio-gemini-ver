@@ -181,8 +181,9 @@
   - **Import robustness:** Prefer `openFileDescriptor` + capped byte read; fallback `openInputStream`; strip UTF-8 BOM before header; explicit ASCII magic decode; friendly error if file looks UTF-16 re-saved from an editor.
   - **Verification:** On-device round-trip (save backup → restore → app restart) succeeds; `:app:compileDebugKotlin` green.
 
-### Play Store path forward (as of 2026-04-30)
+### Play Store path forward (as of 2026-05-03)
 
+- [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
 - [ ] Play Console: store listing live draft (package locked), privacy policy URL, support email/URL, default language, category.
 - [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.
 - [ ] Monetization: Google Play subscription products + base plans (monthly/yearly, trials if any); map SKUs to RevenueCat offerings/packages; confirm `pro` entitlement behavior with license testers.

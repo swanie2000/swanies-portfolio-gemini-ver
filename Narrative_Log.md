@@ -10,6 +10,15 @@ For every completed milestone, the agent must automatically execute:
 
 ---
 
+## [2026-05-03] V40.71 — Metal spot valuation + About + i18n + Play account queue
+
+- **Metal math:** `MetalSpotMath.kt` / `AssetValuation.kt` — industry-style **USD per troy ounce** spot with **Gram/Kilo → troy oz** conversion before valuation across holdings, analytics, repository, widgets, previews.
+- **Holdings:** Collapsed compact metal total + expanded price row corrected (`AssetValuation`, `cardPriceRowUsd`).
+- **Product:** `AboutScreen` + `Routes.ABOUT`, nav + bottom-bar behavior, Settings/Unlock links; removed Settings **TEST INFO**; broad stringResource/locale updates.
+- **Play (human):** Developer Console access after fee; **identity docs submitted** — next agent: assume verification **pending** until user confirms approval.
+
+---
+
 ## V40.22 - The High-Fidelity Mirror
 
 Release recorded: V40.22 "The High-Fidelity Mirror".

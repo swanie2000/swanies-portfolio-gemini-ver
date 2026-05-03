@@ -1,4 +1,4 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READINESS)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.71: METAL SPOT VALUATION + ABOUT/I18N + PLAY VERIFICATION QUEUE)
 
 ---
 
@@ -8,31 +8,52 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.70: ENCRYPTED VAULT BACKUP + PLAY READI
 
 **Canonical vs excerpt:** This file (`docs/BROWSER_CONTEXT_NARRATIVE.md`) is the **canonical** product timeline + handoff. `docs/BROWSER_CONTEXT_MASTER.md` embeds a copy under `BEGIN_NARRATIVE` for paste bundles; if the two diverge, **update this file first**, then refresh the MASTER excerpt.
 
-**Last handoff update:** 2026-04-30 — after encrypted vault backup VER1 hardened + device round-trip verified; Play-track checklist captured in `Master_Build_Checklist.md`.
+**Last handoff update:** 2026-05-03 — V40.71 metal spot math + About/i18n polish in repo; Google Play Developer **account live** with **identity verification submitted** (awaiting Google); device + phone verification remain in console queue.
 
 ### Where we left off (engineering truth)
 
 - **Stack:** Android (Kotlin, Compose, Hilt, Room). Pro monetization via **RevenueCat** + Play billing when distributed on Play; gated surfaces include Theme Manager, multi-portfolio holdings swipe, full Analytics experience, widget customization (see monetization package and `SettingsScreen` Pro flows).
 - **Vault backup / restore (VER1):** **Working on device** — Settings → `EXPORT ENCRYPTED BACKUP` / `IMPORT ENCRYPTED BACKUP` (SAF), passphrase, `.swpb` format (magic `SWPB`). Zip contains Room DB, `theme_settings.preferences_pb`, `icons/` and `custom_icons/`. **Critical:** WAL checkpoint uses `writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))`, not `execSQL`. Import prefers `openFileDescriptor` + full read, strips UTF-8 BOM, then decrypts. Successful import → cold process restart. Code: `app/src/main/java/com/swanie/portfolio/data/backup/VaultBackupEngine.kt`; UI + VM: `SettingsScreen.kt`, `SettingsViewModel.kt`.
-- **Recent product (before backup):** Metals funnel + holdings cards — `AssetRepository` preserves metal `displayName`; `HoldingsUIComponents` / `MyHoldingsScreen` two-line metal labels, no duplicate middle title on expanded cards (`underIconTickerText`). See **V40.69** below for detail.
+- **Metal spot valuation (V40.71):** Centralized **`MetalSpotMath.kt`** + **`AssetValuation.kt`**. Spot quotes are treated as **USD per troy ounce**; holdings with **GRAM/KILO** convert to troy oz before `spot × mass` for cards, totals, analytics, repository refresh, widget snapshots, and theme/widget previews (`AssetArchitectScreen`, etc.).
+- **Holdings UI:** Compact collapsed metal **total** uses `AssetValuation` (prior wrong formula fixed); price row uses **`cardPriceRowUsd`** so displayed spot aligns with line mass. Prior V40.69 metal naming / two-line card behavior still applies (`underIconTickerText`, `AssetRepository` `displayName`).
+- **About / legal surface:** **`AboutScreen.kt`**, route **`Routes.ABOUT`**, wired in **`NavGraph.kt`**; **`MainActivity`** hides bottom bar on ABOUT; Settings **Legal & about** + Unlock footer link; strings in `values/strings.xml` + locale bundles. Full ToS remains **`TermsAndConditionsScreen`** + `terms_*` / `tos_*` keys.
+- **Settings cleanup:** Debug **TEST INFO** button (RevenueCat test nav) **removed** from `SettingsScreen.kt`; the test route/screen may still exist for dev if needed.
 - **Quality gates:** Use `:app:compileDebugKotlin` and `:app:lintDebug` before declaring a drop done; lint policy lives in `app/lint.xml`.
 
 ### What to do next (owner intent, priority order)
 
-1. **Play Store:** Execute items under **Play Store path forward** in `Master_Build_Checklist.md` (Console, Data safety, ratings, SKUs ↔ RevenueCat, internal/closed AAB, listing assets, device matrix including **vault backup round-trip**).
-2. **QA:** Post-restore spot checks — widgets, multi-vault, custom crypto icons, Pro-gated analytics.
-3. **Backlog:** Auth instrumentation (`Master_Build_Checklist` V40.36), monetization funnel telemetry (V40.61), small-screen / large-font metal card pass (V40.69 follow-up).
+1. **Play Console (human):** Wait for **identity verification** email; then complete **Play Console mobile app** device verification and **phone** verification per dashboard order. Publishing stays blocked until that stack clears.
+2. **Play Store engineering:** When console is green — app record, **internal testing** AAB, **Data safety**, content rating, listing, **SKUs ↔ RevenueCat** — follow **`Master_Build_Checklist.md`** Play section.
+3. **QA:** Post-restore spot checks — widgets, multi-vault, custom crypto icons, Pro-gated analytics; spot-check metal cards in **GRAM/KILO** after spot math change.
+4. **Backlog:** Auth instrumentation (V40.36), monetization funnel telemetry (V40.61), small-screen / large-font metal card pass (V40.69 follow-up).
 
 ### Quick file map
 
 | Area | Start here |
 |------|------------|
 | Encrypted backup | `VaultBackupEngine.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt` |
+| Metal spot / USD valuation | `MetalSpotMath.kt`, `AssetValuation.kt` |
 | Pro / billing | `billing/` package, `MonetizationManager.kt` |
 | Holdings / metals UI | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` |
-| Nav / routes | `NavGraph.kt`, `Routes.kt` |
+| About / nav | `AboutScreen.kt`, `NavGraph.kt`, `Routes.kt`, `MainActivity.kt` |
+| Nav / routes (general) | `NavGraph.kt`, `Routes.kt` |
 
 ---
+
+V40.71 UPDATE (Metal spot math + holdings card totals + i18n sweep + About + Play account progress)
+- **Valuation:** `MetalSpotMath` (troy-oz helpers, spot-from-id) and `AssetValuation` (oz equivalent, list USD, card price row) unify metal math; **Gram/Kilo → troy oz** before multiplying by spot everywhere the app shows or aggregates metal USD.
+- **Holdings:** Collapsed compact metal total corrected; expanded price row shows spot for the displayed mass unit path via `cardPriceRowUsd`.
+- **i18n:** Residual user-facing literals moved to `strings.xml` and maintained locale `values-*` files (architect, analytics labels, metals audit, widget manager, funnel grids, etc.).
+- **About:** New About screen + route; bottom bar hidden on About; entry from Settings and Unlock; Play distribution hint copy where applicable.
+- **Play (ops):** Developer registration **completed** ($25, receipt to project Gmail); **identity docs submitted** — pending Google review; subsequent steps are console-indicated (device app, then phone).
+
+CURRENT CONDITION (END OF SESSION)
+- Repo reflects consistent **USD/troy oz** metal valuation for all weight units on wired surfaces.
+- Play: **no publishing** until verification pipeline completes.
+
+FUTURE PATH (NEXT IMPLEMENTATION TRACK)
+- Owner: console verification → internal AAB → compliance + RevenueCat mapping per checklist.
+- Engineering: resume QA matrix and backlog items when unblocked.
 
 V40.70 UPDATE (Vault backup / restore VER1 — engine hardening + device-verified round-trip)
 - **Export:** `VaultBackupEngine` checkpoints WAL with `writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(FULL)"))` (cursor closed); Android SQLite forbids `execSQL` for pragmas that return rows, which previously broke export at zip time.
