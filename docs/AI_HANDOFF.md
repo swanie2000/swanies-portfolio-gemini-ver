@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-04 (EOD) — Play **package name registration** submitted; Console **In review**  
+**Last updated:** 2026-05-05 — Release **signing verified**; owner taking a break  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -37,7 +37,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + **draft** privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** still has **`[bracket]`** placeholders — finalize before Play uses the URL as final policy.
 
-**Play / Google:** **Driver’s license**, **emails**, and **phone** verified (2026-05-04). **Android developer verification (package `com.swanie.portfolio`):** owner submitted **package name registration** — Play listed an **eligible** cert matching the **debug** keystore (`%USERPROFILE%\.android\debug.keystore`); proof APK required **`assets/adi-registration.properties`** with the Console token → see **`app/src/main/assets/adi-registration.properties`**. **Release** signing for store uploads remains **`…\Android-Signing\swanie_portfolio_release.jks`** (alias `swanie_portfolio_release`), **not** the debug key. Console fingerprint row shows **In review** (email when Google finishes — often well under 48h). **Next:** after approval, continue listing + **signed AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat** — **`Master_Build_Checklist.md`**.
+**Play / Google:** **Driver’s license**, **emails**, and **phone** verified (2026-05-04). **Android developer verification (package `com.swanie.portfolio`):** owner submitted **package name registration** (debug cert + challenge APK); Console was **In review** — confirm email/status when back. **Release signing:** **`swanie_portfolio_release.jks`** (alias **`swanie_portfolio_release`**) confirmed via **`keytool -list -v`** and **`keytool -printcert -jarfile app\release\app-release.aab`** — **SHA256** matches (`1A:5A:E4:F5:…`); AAB is correctly release-signed. For CLI **`keytool`**, use **`-storetype PKCS12`** and/or Studio’s **JBR** `keytool.exe` if PATH JDK differs. **Next:** listing + **signed AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat** — **`Master_Build_Checklist.md`**.
 
 ---
 
@@ -81,6 +81,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-05 — Release signing closure:** Confirmed **`swanie_portfolio_release.jks`** unlocks with **`keytool`**; **`app\release\app-release.aab`** signer **SHA256** matches keystore (release path aligned with Play’s separate **debug** package-registration proof). Noted **`keytool -storetype PKCS12`** / Studio **JBR** vs PATH JDK for future CLI checks. Owner pausing for the day.
 - **2026-05-04 (EOD) — Package name registration:** Play **Android developer verification** — eligible cert was **debug** SHA-256 (not new release `.jks`). Added **`adi-registration.properties`** under **`app/src/main/assets/`**, removed bogus **`androidTest`** duplicate **`test holding file.kt`** that blocked **`assembleDebug`**. Owner **submitted** registration; Console **In review**. Release keystore path: **`AndroidStudioProjects\Android-Signing\swanie_portfolio_release.jks`**.
 - **2026-05-04 — Play verification:** Google confirmed **driver’s license**; owner completed **email** + **phone** verification in Play Console. Ship track moves to listing, compliance, AAB tracks, and RevenueCat alignment (see checklist).
 - **2026-05-03 — Repo cleanup:** Deleted `docs/BROWSER_CONTEXT_NARRATIVE.md`, `docs/BROWSER_CONTEXT_MASTER.md`, `docs/BROWSER_CONTEXT_HEADER.txt` (browser-era bundle). Canonical doc remains **`docs/AI_HANDOFF.md`**; old prose recoverable from **git history** only.

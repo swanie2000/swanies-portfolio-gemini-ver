@@ -10,6 +10,12 @@ Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HAND
 
 ---
 
+## [2026-05-05] Release keystore + AAB signing verified
+
+- **`keytool -list -v`** on **`swanie_portfolio_release.jks`** and **`keytool -printcert -jarfile app-release.aab`** — same **SHA256**; release signing OK for future Play **AAB** uploads. CLI **`keytool`**: use **`-storetype PKCS12`** / Studio **JBR** if PATH JDK mismatches.
+
+---
+
 ## [2026-05-04] EOD — Play package name registration submitted (In review)
 
 - **ADI / `com.swanie.portfolio`:** Play required proof with **debug** SHA-256 (eligible key on file) + signed APK containing **`app/src/main/assets/adi-registration.properties`** (Console token). Removed stray **`androidTest`** file **`test holding file.kt`** (duplicate UI code) that blocked **`assembleDebug`**. **Release** uploads continue to use **`Android-Signing/swanie_portfolio_release.jks`** (not debug).

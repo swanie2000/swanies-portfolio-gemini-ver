@@ -198,12 +198,13 @@
   - **`website/`** static landing + **`privacy.html`** draft + **`CNAME`** (`swaniedesigns.com`); **`deploy-website.yml`** (**build**/**deploy**, actions v5); live **`https://swaniedesigns.com`** with **Enforce HTTPS**; Cloudflare DNS (**DNS only** to GitHub); legacy **`swanies-portfolio`** repo removed on GitHub.
   - **Owner follow-up:** Finalize **`website/privacy.html`** before Play Data safety / listing uses URL as “final.”
 
-### Play Store path forward (as of 2026-05-04 EOD)
+### Play Store path forward (as of 2026-05-05)
 
 - [x] Play Developer account: **registration fee paid** ($25).
 - [x] **Account verification (owner, 2026-05-04):** Google verified **driver’s license**; **emails** + **phone number** verified in Play Console. *(No longer waiting on this step.)*
 - [x] **Public marketing + privacy shell host:** **`https://swaniedesigns.com`** (landing) + **`https://swaniedesigns.com/privacy.html`** (draft—replace **`[bracket]`** placeholders + remove **`noindex`** when copy is final); GitHub Pages + Cloudflare per narrative **V40.73**.
 - [x] **Package name registration submitted (owner, 2026-05-04):** **`com.swanie.portfolio`** — Android developer verification: **debug** upload cert + APK with **`assets/adi-registration.properties`**; Play Console fingerprint **In review** pending Google email.
+- [x] **Release signing sanity-check (2026-05-05):** **`swanie_portfolio_release.jks`** ↔ **`app/release/app-release.aab`** — matching **SHA256** (`keytool` / `printcert`); no blocker on signing **AAB** for Play tracks when ready.
 - [ ] **Package name registration approved:** Wait for Google **email** / Console — fingerprint status leaves **In review** → registered for this developer account.
 - [ ] Play Console: store listing live draft (package locked), **privacy policy URL** (use hosted URL above after copy final), support email/URL, default language, category.
 - [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.
