@@ -6,13 +6,13 @@ For every completed milestone, the agent should:
 2. **Checklist:** Update **`Master_Build_Checklist.md`** when shipped items or Play path ticks change.
 3. **Git:** Commit and push (`Docs: handoff — …` or `[Version]: …` as appropriate).
 
-Legacy: `docs/BROWSER_CONTEXT_NARRATIVE.md` is an **archive** milestone log, not the live handoff target.
+Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HANDOFF.md`** only. Old narrative prose: **git history** (paths/commits before 2026-05-04).
 
 ---
 
 ## [2026-05-03] Handoff system — single `docs/AI_HANDOFF.md`; retired browser dump workflow
 
-- **Canonical handoff:** `docs/AI_HANDOFF.md` only. Updated Cursor rule **Update the Handoff** + `START_HERE_FOR_AI.md`. Removed `docs/Rebuild-BrowserContextPaths.ps1`, `docs/rebuild_browser_context_dump.bat`, `docs/BROWSER_CONTEXT_DUMP.md`. `BROWSER_CONTEXT_MASTER.md` → short pointer; `BROWSER_CONTEXT_NARRATIVE.md` → archived milestone log (blockquote at top).
+- **Canonical handoff:** `docs/AI_HANDOFF.md` only. Updated Cursor rule **Update the Handoff** + `START_HERE_FOR_AI.md`. Removed dump scripts + `BROWSER_CONTEXT_DUMP.md`; later removed legacy **`BROWSER_CONTEXT_NARRATIVE.md`**, **`BROWSER_CONTEXT_MASTER.md`**, **`BROWSER_CONTEXT_HEADER.txt`** (2026-05-04) — superseded by `AI_HANDOFF.md`; deep history in **git** only.
 
 ---
 

@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-03 — added EOD / closure reminder for Cursor AI  
+**Last updated:** 2026-05-04 — removed legacy `BROWSER_CONTEXT_*` files from tree  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -79,13 +79,14 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-04 — Repo cleanup:** Deleted `docs/BROWSER_CONTEXT_NARRATIVE.md`, `docs/BROWSER_CONTEXT_MASTER.md`, `docs/BROWSER_CONTEXT_HEADER.txt` (browser-era bundle). Canonical doc remains **`docs/AI_HANDOFF.md`**; old prose recoverable from **git history** only.
 - **2026-05-03 — Cursor reminder policy:** Instructed agents to nudge **Update the handoff & push** at closure, after wins, and **always EOD** (see § Nudge the owner above); Cursor rule updated to match.
-- **2026-05-03 — Handoff simplification:** Retired multi-file browser bundle (`BROWSER_CONTEXT_MASTER` dump scripts, `DUMP.md`). **Canonical handoff = this file only** (`docs/AI_HANDOFF.md`). `START_HERE_FOR_AI.md` and **Update the Handoff** Cursor rule updated. Archived narrative log kept under `docs/BROWSER_CONTEXT_NARRATIVE.md` (historical).
+- **2026-05-03 — Handoff simplification:** Retired multi-file browser bundle (dump scripts, `DUMP.md`). **Canonical handoff = this file only** (`docs/AI_HANDOFF.md`). `START_HERE_FOR_AI.md` and **Update the Handoff** Cursor rule updated. *(Later: legacy `BROWSER_CONTEXT_*` files deleted — see 2026-05-04 in `Narrative_Log.md`.)*
 - **2026-05-03 — V40.73 / public site:** `https://swaniedesigns.com` live (Pages + Cloudflare); `deploy-website.yml` build/deploy fix; `website/CNAME`; legacy GitHub repo removed; Play identity still waiting on Google.
 - **2026-05-02 — V40.72:** i18n MissingTranslation closure (64 keys × 19 locales); ship-only narrative handoff.
 - **2026-05-02 — V40.71:** Metal spot pipeline, backup screen split, bug reports, About, i18n wave; Play fee paid + identity submitted.
 
-*(Older milestone detail lives in git history on `docs/BROWSER_CONTEXT_NARRATIVE.md` if you need archaeology.)*
+*(Older milestone detail: search **git history** for removed paths under `docs/` before 2026-05-04, or read milestone bullets in `Narrative_Log.md`.)*
 
 ---
 
@@ -94,4 +95,4 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - Prefer **minimal, safe edits**; don’t refactor unrelated code.
 - Don’t assume files exist — read before changing.
 - **Canonical state for the next agent** = **this file** + the actual repo. If something disagrees with code, **code wins** — then fix this doc.
-- Browser-era paste bundles (`BROWSER_CONTEXT_MASTER.md` long form) are **retired**; ignore unless you intentionally need old text from history.
+- Browser-era paste bundles are **removed** from the tree; use **git** if you need old prose.

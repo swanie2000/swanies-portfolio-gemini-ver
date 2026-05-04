@@ -26,4 +26,4 @@ When the user says **"Update the Handoff"**, **"update the narrative"**, **"upda
 
 **Do not** use this trigger to change application code unless the user also asked for implementation in the same message.
 
-**Legacy:** `docs/BROWSER_CONTEXT_NARRATIVE.md` is an **archive log** only. **`docs/BROWSER_CONTEXT_MASTER.md`** is a short pointer. No batch scripts, no dump files, no syncing two narratives.
+**Legacy browser-context files** (`BROWSER_CONTEXT_NARRATIVE.md`, `MASTER.md`, `HEADER.txt`) have been **removed** from the repo; use **git history** if you need old narrative text.

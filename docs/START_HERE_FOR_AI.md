@@ -10,9 +10,8 @@ When the owner says **“update the handoff”** or **“update the narrative an
 
 - **`Master_Build_Checklist.md`** — shipped milestones and Play Store checklist (ticks), not narrative prose.
 - **`Narrative_Log.md`** — short dated milestone bullets; optional to append when you ship something notable.
-- **`docs/BROWSER_CONTEXT_NARRATIVE.md`** — **archived** long milestone log (not “current truth”).
-- **`docs/BROWSER_CONTEXT_MASTER.md`** — retired pointer to **`AI_HANDOFF.md`**.
-- **`docs/BROWSER_CONTEXT_HEADER.txt`** — legacy Level-4 text; ignore unless you intentionally revive browser-only paste workflows.
+
+Old browser-context files (`BROWSER_CONTEXT_NARRATIVE.md`, `MASTER.md`, `HEADER.txt`) were **removed**; deep history lives in **git** if you ever need archaeology.
 
 ## Daily habit (optional)
 
