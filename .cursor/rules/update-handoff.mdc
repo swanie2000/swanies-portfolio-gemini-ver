@@ -1,20 +1,23 @@
 ---
-description: When the user says "Update the Handoff", refresh AI continuity docs and push to GitHub.
+description: When the user says "Update the Handoff" or wants to refresh continuity for the next AI, update one doc and push.
 alwaysApply: true
 ---
 
-# Update the Handoff (user trigger)
+# Update the handoff (user trigger)
 
-When the user says **"Update the Handoff"** (or clear variants like "handoff update", "refresh the handoff"), treat it as an explicit request to:
+When the user says **"Update the Handoff"**, **"update the narrative"**, **"update the narrative and push"**, or the same intent in plain language, treat it as:
 
-1. **Canonical narrative** — Edit `docs/BROWSER_CONTEXT_NARRATIVE.md`: keep **`AI AGENT HANDOFF (READ FIRST)`** accurate (where we left off, engineering truth, next priorities, quick file map, last handoff date). Fold in whatever the **current session** established; if the session outcome is ambiguous, ask one short clarifying question before writing fiction.
+1. **Edit one file:** **`docs/AI_HANDOFF.md`**
+   - Bump **Last updated** (date).
+   - Refresh **§ Current session** (where we are, blockers, wins).
+   - Refresh **§ Next steps** (numbered, honest priorities).
+   - Add a bullet under **§ Session history** (newest first) for this session.
+   - Adjust **§ Engineering snapshot** / **§ Quick file map** only if the repo or priorities actually changed.
 
-2. **MASTER excerpt** — Edit `docs/BROWSER_CONTEXT_MASTER.md`: sync the **`### BEGIN_NARRATIVE`** block through **`### END_NARRATIVE`** so it matches the handoff + latest milestone intent (browser/paste workflows rely on this; narrative file wins on detail).
+2. **Optional:** If a milestone closed, update **`Master_Build_Checklist.md`** and/or a line in **`Narrative_Log.md`** — still separate *checklists*, not duplicate prose.
 
-3. **Path index + short dump** — Run **`docs\rebuild_browser_context_dump.bat`** (calls **`docs\Rebuild-BrowserContextPaths.ps1`**) so the **AUTO-GENERATED** appendix (git fingerprint + config / website / Kotlin / res path lists) in `docs/BROWSER_CONTEXT_MASTER.md` and **`docs/BROWSER_CONTEXT_DUMP.md`** stays current. **Commit** those outputs if they changed (they are normal doc churn after narrative edits).
+3. **Git:** `git add docs/AI_HANDOFF.md` (plus any checklist/log you touched) → `git commit -m "Docs: handoff — [one-line summary]"` → **`git push`** to the current branch (default `main`).
 
-4. **Optional same pass** — If the session closed a milestone: bump `Narrative_Log.md`, tick/shift `Master_Build_Checklist.md`, and adjust `docs/START_HERE_FOR_AI.md` only when those need to change.
+**Do not** use this trigger to change application code unless the user also asked for implementation in the same message.
 
-5. **Git** — Stage the doc(s) you touched, commit with a message like `Docs: handoff — [one-line summary]`, and **`git push`** to the branch the user is on (default `main` unless they specify otherwise).
-
-Do **not** use this trigger to change application code unless the user also asked for implementation in the same message.
+**Legacy:** `docs/BROWSER_CONTEXT_NARRATIVE.md` is an **archive log** only. **`docs/BROWSER_CONTEXT_MASTER.md`** is a short pointer. No batch scripts, no dump files, no syncing two narratives.

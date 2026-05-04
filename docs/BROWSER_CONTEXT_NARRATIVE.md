@@ -1,55 +1,9 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.73: PLAY SHIP — PUBLIC SITE LIVE; AWAIT GOOGLE IDENTITY)
+> **Archived narrative (historical log).** For the **current** product state, next steps, and session history, read and edit **`docs/AI_HANDOFF.md`** only.
+> Do not treat old `CURRENT CONDITION` blocks below as "today."
 
 ---
 
-## AI AGENT HANDOFF (READ FIRST)
-
-**Why this file exists:** Continuity for Cursor/Studio agents and browser-side advisors across days and sessions. **Keep this section accurate** when milestones or priorities change so the next agent does not infer “today” from older `CURRENT CONDITION` blocks further down (those belong to past drops only).
-
-**Canonical vs excerpt:** This file (`docs/BROWSER_CONTEXT_NARRATIVE.md`) is the **canonical** product timeline + handoff. `docs/BROWSER_CONTEXT_MASTER.md` embeds a copy under `BEGIN_NARRATIVE` for paste bundles; if the two diverge, **update this file first**, then refresh the MASTER excerpt.
-
-**Last handoff update:** 2026-05-03 — **Product:** **Feature freeze** unchanged—**ship-only** (Play Console, compliance, listing, AAB, purchase/restore QA). **Android / app code:** No product changes this session (still **V40.72** stack). **Wins today:** **Public marketing site** live at **`https://swaniedesigns.com`** (GitHub Pages from **`website/`** on **`swanie2000/swanies-portfolio-gemini-ver`**); **Cloudflare** domain **`swaniedesigns.com`** + DNS (apex **A** → GitHub Pages IPs, **`www`** → **`swanie2000.github.io`**, **DNS only**); **GitHub Actions** workflow **`.github/workflows/deploy-website.yml`** fixed (**build** + **deploy** jobs, `configure-pages@v5` / `deploy-pages@v5`); **`website/CNAME`**; **Settings → Pages** custom domain + **Enforce HTTPS** verified. **Privacy shell:** **`https://swaniedesigns.com/privacy.html`** exists for Play URL—**`[bracket]` placeholders must be replaced** before store/Data safety final. **Repo hygiene:** Legacy **`swanies-portfolio`** GitHub repo **removed** by owner (current repo only **`swanies-portfolio-gemini-ver`**). **Play:** Identity verification **still awaiting Google** (external gate unchanged). **Next:** When Google clears identity → resume **`Master_Build_Checklist.md`** Play path; **before** submit—finalize **`website/privacy.html`** + optional **`website/`** marketing polish (edit locally → push **`main`** → auto-deploy).
-
-### Where we left off (engineering truth)
-
-- **Product stance:** **Feature freeze** from the owner’s perspective—treat the codebase as **ship-ready** aside from store/console work, release QA, and any **must-fix** bugs found during testing. Do not assume greenfield feature requests unless the owner reopens scope.
-- **Stack:** Android (Kotlin, Compose, Hilt, Room). Pro monetization via **RevenueCat** + Play billing when distributed on Play; gated surfaces include Theme Manager, multi-portfolio holdings swipe, full Analytics experience, widget customization (see monetization package and `SettingsScreen` Pro flows).
-- **Vault backup / restore (VER1):** **Working on device** — engine unchanged in spirit: `VaultBackupEngine.kt` (magic `SWPB`, WAL `query` checkpoint, SAF paths, cold restart). **UI split:** dedicated **`BackupRestoreScreen.kt`** + **`Routes.BACKUP_RESTORE`** + **`NavGraph`** composable; Settings navigates here so export/import/passphrase UX lives off the main settings scroll. VM hooks remain **`SettingsViewModel`** (+ factory wiring).
-- **Metal spot valuation (V40.71):** **`data/local/MetalSpotMath.kt`** defines troy-oz conversion (**GRAM/KILO/G** → troy oz) and `spotUsdForMass`. **`AssetValuation`** (same file) exposes **`spotMassHoldingsUsd`**, **`holdingValueUsd`** (spot + premium), **`cardPriceRowUsd`** (per-line metal mass vs whole-crypto token). Wired through **`HoldingsUIComponents`** (collapsed totals + expanded price row), **`MyHoldingsScreen`**, **`AnalyticsScreen`**, **`AssetRepository`** (live refresh totals/line prices), **`SettingsViewModel`** (vault totals for theme/widget data), **`ThemeStudioScreen`**, **`WidgetManagerScreen`**, **`PortfolioWidget`**, **`AssetArchitectScreen`**.
-- **Holdings UI:** Metal compact **total** and **price** row corrected to use `AssetValuation` (no more wrong gram/kilo math on collapsed lines). V40.69 metal naming / two-line cards unchanged in intent (`underIconTickerText`, **`AssetRepository`** `displayName`).
-- **About / legal:** **`AboutScreen.kt`**, **`Routes.ABOUT`**, **`NavGraph`**, **`MainActivity`** (bottom bar hidden on About). Settings **Legal & about** + **`UnlockVaultScreen`** footer link. Copy in **`values/strings.xml`** + **all maintained `values-*` bundles**. Full ToS still **`TermsAndConditionsScreen`** + `terms_*` / `tos_*`.
-- **In-app feedback:** **`BugReportSubmitter`** (`data/feedback/`) posts via **FormSubmit** using a dedicated **`@Named("Feedback")` OkHttpClient** (browser-like UA/timeouts) from **`NetworkModule`**. Settings: dialog + **`SettingsViewModel.submitBugReport`**, **`SettingsViewModelFactory`** / Hilt constructor injection. Log tag **`SwanieBugReport`** for QA.
-- **i18n:** Residual literals pushed to resources across key flows; **`LanguageDisplay.kt`** for native language picker labels. **MissingTranslation closure:** the **64** default keys that were absent from locale bundles (vault/amount-entry/widget/analytics/theme strings, bug-report + About/legal, architect metal/unit labels) were added **per file** to **ar, de, es, fr, hi, in, it, ja, ko, nl, pl, pt-rBR, ru, th, tr, uk, vi, zh-rCN, zh-rTW** with translated copy (no bulk scripts). Default **`values/strings.xml`** already holds English + funnel/architect/translation-feedback defaults from the earlier merge fix.
-- **Settings cleanup:** Debug **TEST INFO** (RevenueCat test nav) **removed** from **`SettingsScreen`**; route **`REVENUECAT_TEST_INFO`** may remain for dev builds.
-- **Other touches:** **`MainViewModel`** small fixes (e.g. application `Context` usage where needed for widget/portfolio labeling). **`VaultBackupEngine`** minor follow-ups if any (see diff). **`AmountEntryScreen`**, **`CreateAccountScreen`**, **`HomeScreen`** aligned with new strings/flows.
-- **Quality gates:** Run `:app:compileDebugKotlin` and `:app:lintDebug` before calling a milestone done; lint policy in **`app/lint.xml`**.
-
-- **Public web (V40.73):** Static site in **`website/`** (`index.html`, `styles.css`, **`privacy.html`** outline for Play URL, `README.md`, **`CNAME`** = `swaniedesigns.com`). **Deploy:** **`.github/workflows/deploy-website.yml`** on **`main`** when **`website/**`** or that workflow changes + **`workflow_dispatch`**. **Live:** **`https://swaniedesigns.com`** (HTTPS enforced in GitHub Pages). **Workflow:** `build` (checkout → configure-pages → upload artifact from `website/`) then `deploy` (`github-pages` env → `deploy-pages`).
-
-### What to do next (owner intent, priority order) — **finish line only**
-
-1. **Play Console (human):** Identity verification result → **Play Console mobile app** device verification → **phone** verification → create/list the app when the console allows.
-2. **Privacy policy URL (before Data safety / listing final):** Replace **`website/privacy.html`** **`[bracket]`** placeholders with final legal copy aligned to in-app Privacy & Terms + Data safety answers; remove draft **`noindex`** when you want indexing; push **`main`** to redeploy (**`https://swaniedesigns.com/privacy.html`**).
-3. **Store / compliance:** **Internal (then closed) testing** AAB from Android Studio; **Data safety**, content rating, target audience, store listing assets and copy; **Google Play subscription SKUs ↔ RevenueCat** offerings and **`pro`** entitlement testing with license testers — see **`Master_Build_Checklist.md`** Play section.
-4. **Pre-launch QA (targeted):** Encrypted backup round-trip; purchase + restore + expiry paths; widgets + Pro-gated surfaces; **GRAM/KILO** metal display sanity on a physical device.
-5. **Backlog (explicitly non-blocking for v1 ship):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen metal polish—**only if** the owner schedules post-1.0 work.
-
-### Quick file map
-
-| Area | Start here |
-|------|------------|
-| Encrypted backup engine | `VaultBackupEngine.kt` |
-| Backup / restore UI | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt` (`BACKUP_RESTORE`), `NavGraph.kt` |
-| Settings shell / feedback | `SettingsScreen.kt`, `SettingsViewModel.kt`, `SettingsViewModelFactory.kt`, `BugReportSubmitter.kt`, `NetworkModule.kt` (`Feedback` client) |
-| Metal spot / USD valuation | `MetalSpotMath.kt` (`MetalSpotMath` + `AssetValuation`) |
-| Pro / billing | `billing/` package, `MonetizationManager.kt` |
-| Holdings / metals UI | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` |
-| About / nav | `AboutScreen.kt`, `NavGraph.kt`, `Routes.kt`, `MainActivity.kt` |
-| Language picker labels | `LanguageDisplay.kt`, `values/strings.xml` + `values-*` |
-| Nav / routes (general) | `NavGraph.kt`, `Routes.kt` |
-| Marketing / Play listing host | `website/`, `.github/workflows/deploy-website.yml`, `website/README.md` |
-
----
+# Swanie’s Portfolio — archived narrative log (milestones V40.70+)
 
 V40.73 UPDATE (2026-05-03 — public **`swaniedesigns.com`** site + Pages CI + handoff)
 - **Live URL:** **`https://swaniedesigns.com`** — static landing + **draft** privacy page; GitHub Pages (**Actions** source) on **`swanies-portfolio-gemini-ver`**; Cloudflare DNS/registrar for **`swaniedesigns.com`**.

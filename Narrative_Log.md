@@ -1,12 +1,18 @@
 ## Standard Operating Procedure (SOP)
 
-For every completed milestone, the agent must automatically execute:
+For every completed milestone, the agent should:
 
-1. Narrative Update: Log the version number, specific technical wins (logic and UI), and any ghosts or bugs resolved.
-2. **AI handoff accuracy:** Update **`AI AGENT HANDOFF (READ FIRST)`** at the top of `docs/BROWSER_CONTEXT_NARRATIVE.md` (where we left off, next priorities, file map). Refresh the matching **`BEGIN_NARRATIVE`** excerpt in `docs/BROWSER_CONTEXT_MASTER.md` so paste-only workflows stay aligned.
-3. Checklist Maintenance: Update `Master_Build_Checklist.md` to reflect the latest Golden Vault state.
-4. Projected Path: Update the Next Phase section based on current conversation intent.
-5. Terminal Handover: Provide a formatted git command block with `git add .`, `git commit -m "[Version]: [Summary]"`, and `git push`.
+1. **Handoff:** Update **`docs/AI_HANDOFF.md`** (session history + current/next sections; bump **Last updated**). Optionally append a dated line here in **`Narrative_Log.md`**.
+2. **Checklist:** Update **`Master_Build_Checklist.md`** when shipped items or Play path ticks change.
+3. **Git:** Commit and push (`Docs: handoff — …` or `[Version]: …` as appropriate).
+
+Legacy: `docs/BROWSER_CONTEXT_NARRATIVE.md` is an **archive** milestone log, not the live handoff target.
+
+---
+
+## [2026-05-03] Handoff system — single `docs/AI_HANDOFF.md`; retired browser dump workflow
+
+- **Canonical handoff:** `docs/AI_HANDOFF.md` only. Updated Cursor rule **Update the Handoff** + `START_HERE_FOR_AI.md`. Removed `docs/Rebuild-BrowserContextPaths.ps1`, `docs/rebuild_browser_context_dump.bat`, `docs/BROWSER_CONTEXT_DUMP.md`. `BROWSER_CONTEXT_MASTER.md` → short pointer; `BROWSER_CONTEXT_NARRATIVE.md` → archived milestone log (blockquote at top).
 
 ---
 
