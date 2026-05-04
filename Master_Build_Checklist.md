@@ -187,7 +187,7 @@
   - **`BugReportSubmitter`** + **`@Named("Feedback")` OkHttp** + Settings dialog + `SettingsViewModel.submitBugReport`.
   - **`AboutScreen`** + **`Routes.ABOUT`**; `MainActivity` hides bottom bar on About; Settings + Unlock links; **TEST INFO** removed from Settings.
   - **Locales:** default + all maintained `values-*` bundles updated for new strings; **`LanguageDisplay.kt`** for native language picker labels.
-  - **Play (ops):** Developer fee paid; identity verification submitted (pending Google).
+  - **Play (ops):** Developer fee paid; identity verification submitted (later **completed** 2026-05-04 — see Play Store path forward).
 
 - [x] V40.72 Feature-freeze + i18n parity + narrative handoff — COMPLETED (2026-05-02)
   - **Product:** Owner considers app **feature-complete** for v1; remaining work is **shipping** (checklist Play/RevenueCat + QA), not new product features unless scope reopens.
@@ -198,9 +198,10 @@
   - **`website/`** static landing + **`privacy.html`** draft + **`CNAME`** (`swaniedesigns.com`); **`deploy-website.yml`** (**build**/**deploy**, actions v5); live **`https://swaniedesigns.com`** with **Enforce HTTPS**; Cloudflare DNS (**DNS only** to GitHub); legacy **`swanies-portfolio`** repo removed on GitHub.
   - **Owner follow-up:** Finalize **`website/privacy.html`** before Play Data safety / listing uses URL as “final.”
 
-### Play Store path forward (as of 2026-05-03)
+### Play Store path forward (as of 2026-05-04)
 
-- [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
+- [x] Play Developer account: **registration fee paid** ($25).
+- [x] **Account verification (owner, 2026-05-04):** Google verified **driver’s license**; **emails** + **phone number** verified in Play Console. *(No longer waiting on this step.)*
 - [x] **Public marketing + privacy shell host:** **`https://swaniedesigns.com`** (landing) + **`https://swaniedesigns.com/privacy.html`** (draft—replace **`[bracket]`** placeholders + remove **`noindex`** when copy is final); GitHub Pages + Cloudflare per narrative **V40.73**.
 - [ ] Play Console: store listing live draft (package locked), **privacy policy URL** (use hosted URL above after copy final), support email/URL, default language, category.
 - [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.

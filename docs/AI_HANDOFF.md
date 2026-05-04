@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-03 — removed legacy `BROWSER_CONTEXT_*` files from tree  
+**Last updated:** 2026-05-04 — Google Play identity + contact verification complete  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -37,13 +37,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + **draft** privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** still has **`[bracket]`** placeholders — finalize before Play uses the URL as final policy.
 
-**Play blocker:** **Google identity verification** still pending (human / email). Publishing stays blocked until Google finishes that chain (then Play Console app + phone checks, etc.).
+**Play / Google:** **Driver’s license** verified by Google; **email addresses** and **phone number** verified in Play Console (owner, 2026-05-04). **Next (human, in Play Console):** create or finish the **app listing** if not already done, then **AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat**, listing assets — see **`Master_Build_Checklist.md`**. Publishing is no longer blocked on *this* verification step; remaining gates are store setup + policy + tracks + QA.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play (human):** When identity clears → device / phone verification in Play Console → create listing, AAB to internal → closed testing, Data safety, content rating, SKUs ↔ RevenueCat, license testers — details in **`Master_Build_Checklist.md`** § Play Store path forward.
+1. **Play (human):** In Play Console — finish **app record / listing** as needed → **signed AAB** to **internal** (then **closed**) testing → **Data safety**, **content rating**, **target audience** → **subscription products / base plans** mapped to **RevenueCat** → **license testers** for `pro` — step list in **`Master_Build_Checklist.md`** § Play Store path forward.
 2. **Privacy URL:** Replace placeholders in **`website/privacy.html`**, align with in-app Privacy & Terms + Data safety; remove **`noindex`** when ready; push **`main`** to redeploy.
 3. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on a real device.
 4. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
@@ -79,10 +79,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-04 — Play verification:** Google confirmed **driver’s license**; owner completed **email** + **phone** verification in Play Console. Ship track moves to listing, compliance, AAB tracks, and RevenueCat alignment (see checklist).
 - **2026-05-03 — Repo cleanup:** Deleted `docs/BROWSER_CONTEXT_NARRATIVE.md`, `docs/BROWSER_CONTEXT_MASTER.md`, `docs/BROWSER_CONTEXT_HEADER.txt` (browser-era bundle). Canonical doc remains **`docs/AI_HANDOFF.md`**; old prose recoverable from **git history** only.
 - **2026-05-03 — Cursor reminder policy:** Instructed agents to nudge **Update the handoff & push** at closure, after wins, and **always EOD** (see § Nudge the owner above); Cursor rule updated to match.
 - **2026-05-03 — Handoff simplification:** Retired multi-file browser bundle (dump scripts, `DUMP.md`). **Canonical handoff = this file only** (`docs/AI_HANDOFF.md`). `START_HERE_FOR_AI.md` and **Update the Handoff** Cursor rule updated. *(Same period: legacy `BROWSER_CONTEXT_*` files later deleted from tree — see **Repo cleanup** in session history.)*
-- **2026-05-03 — V40.73 / public site:** `https://swaniedesigns.com` live (Pages + Cloudflare); `deploy-website.yml` build/deploy fix; `website/CNAME`; legacy GitHub repo removed; Play identity still waiting on Google.
+- **2026-05-03 — V40.73 / public site:** `https://swaniedesigns.com` live (Pages + Cloudflare); `deploy-website.yml` build/deploy fix; `website/CNAME`; legacy GitHub repo removed. *(Identity was still pending Google until 2026-05-04.)*
 - **2026-05-02 — V40.72:** i18n MissingTranslation closure (64 keys × 19 locales); ship-only narrative handoff.
 - **2026-05-02 — V40.71:** Metal spot pipeline, backup screen split, bug reports, About, i18n wave; Play fee paid + identity submitted.
 

@@ -10,6 +10,12 @@ Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HAND
 
 ---
 
+## [2026-05-04] Play Console — Google ID verified; email + phone verified
+
+- Owner: driver’s license verification confirmed by Google; Play account **emails** and **phone** completed. Ship work moves to listing, Data safety, AAB tracks, RevenueCat SKUs per **`Master_Build_Checklist.md`**.
+
+---
+
 ## [2026-05-03] Handoff system — single `docs/AI_HANDOFF.md`; retired browser dump workflow
 
 - **Canonical handoff:** `docs/AI_HANDOFF.md` only. Updated Cursor rule **Update the Handoff** + `START_HERE_FOR_AI.md`. Removed dump scripts + `BROWSER_CONTEXT_DUMP.md`; later removed legacy **`BROWSER_CONTEXT_NARRATIVE.md`**, **`BROWSER_CONTEXT_MASTER.md`**, **`BROWSER_CONTEXT_HEADER.txt`** — superseded by `AI_HANDOFF.md`; deep history in **git** only.
