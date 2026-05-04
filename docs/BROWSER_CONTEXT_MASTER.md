@@ -175,24 +175,28 @@ END CONTROL HEADER
 NARRATIVE SECTION (SOURCE FILE - EDIT docs/BROWSER_CONTEXT_NARRATIVE.md)
 ============================================================
 ### BEGIN_NARRATIVE
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / SHIP TRACK ONLY)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.73: PLAY SHIP — PUBLIC SITE LIVE; AWAIT GOOGLE IDENTITY)
 
 ## AI AGENT HANDOFF (READ FIRST) — keep in sync with `docs/BROWSER_CONTEXT_NARRATIVE.md`
 
 **Purpose:** Onboarding for any AI joining mid-stream. Update when milestones change. **Do not** treat older `CURRENT CONDITION` blocks lower in this excerpt as “today”; they are historical.
 
-**Last handoff update:** 2026-02-25 (~23:30 local, owner EOD) — **Feature freeze / v1 complete**; **no new features**—only **Play ship** (verification, AAB, Data safety, listing, SKUs↔RC). Repo: V40.71 + **V40.72** i18n parity. Play: fee paid; identity submitted (await Google).
+**Last handoff update:** 2026-05-03 — **App:** Feature freeze (**V40.72** stack), ship-only. **Web win:** **`https://swaniedesigns.com`** live (GitHub Pages **`website/`**, Cloudflare DNS/domain, **`deploy-website.yml`** build+deploy v5, **Enforce HTTPS**). **Privacy:** **`/privacy.html`** = draft placeholders—finalize before Play Data safety final. **Play:** Identity verification **still await Google**. **Next:** After Google → checklist Play/RevenueCat/tracks/QA; parallel finalize **`website/privacy.html`** + optional **`website/`** polish (push **`main`** → deploy).
 
 ### Where we left off
-- **Ship stance:** Treat app as **feature-complete**; next work is **console + compliance + QA**, not greenfield product.
+- **Ship stance:** App **feature-complete**; next work **Play + compliance + QA** + **finalize hosted privacy copy** (`website/privacy.html`).
 - Android Kotlin/Compose; RevenueCat Pro gating (theme, multi-portfolio, analytics, widgets).
 - **Vault VER1 + backup UI:** `VaultBackupEngine` + `BackupRestoreScreen` + `BACKUP_RESTORE` + `SettingsViewModel` export/import.
 - **Metal spot:** `MetalSpotMath.kt` / `AssetValuation` wired through holdings, analytics, repo, widget, theme, architect, settings totals.
 - **Feedback / About / i18n:** `BugReportSubmitter`, `AboutScreen`, `LanguageDisplay`; **all** `values-*` include the former MissingTranslation key set; **TEST INFO** removed from Settings.
-- **Next:** Checklist Play path only; backlog V40.36/V40.61 **non-blocking** unless owner reprioritizes post-1.0.
+- **Public web (V40.73):** `website/` + `.github/workflows/deploy-website.yml` → **`swaniedesigns.com`**; old **`swanies-portfolio`** repo removed on GitHub (current: **`swanies-portfolio-gemini-ver`**).
+- **Backlog:** V40.36/V40.61 **non-blocking** unless owner reprioritizes post-1.0.
 
 ### Quick file map
-`VaultBackupEngine.kt` | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` | `MetalSpotMath.kt` | `BugReportSubmitter.kt`, `NetworkModule.kt` | `SettingsScreen.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `MainActivity.kt` | `values/strings.xml` + `values-*`
+`VaultBackupEngine.kt` | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` | `MetalSpotMath.kt` | `BugReportSubmitter.kt`, `NetworkModule.kt` | `SettingsScreen.kt` | `billing/` | `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt`, `AssetRepository.kt` | `AboutScreen.kt`, `MainActivity.kt` | `values/strings.xml` + `values-*` | **`website/`**, **`deploy-website.yml`**
+
+V40.73 UPDATE (excerpt — 2026-05-03)
+- **`https://swaniedesigns.com`** marketing + privacy shell; Pages **Actions** workflow fixed; **`website/CNAME`**; legacy **`swanies-portfolio`** repo deleted.
 
 V40.72 UPDATE (excerpt)
 - Feature freeze; i18n parity pass; finish line = Play + QA only.

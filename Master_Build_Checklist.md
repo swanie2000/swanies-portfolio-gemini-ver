@@ -194,10 +194,15 @@
   - **Locales:** MissingTranslation key set closed across **ar → zh-rTW** (64 keys each, hand-edited per `strings.xml`).
   - **Docs:** `docs/BROWSER_CONTEXT_NARRATIVE.md` + `docs/BROWSER_CONTEXT_MASTER.md` handoff synced to ship-only path.
 
-### Play Store path forward (as of 2026-02-25, owner EOD)
+- [x] V40.73 Public marketing site + GitHub Pages + domain — COMPLETED (2026-05-03)
+  - **`website/`** static landing + **`privacy.html`** draft + **`CNAME`** (`swaniedesigns.com`); **`deploy-website.yml`** (**build**/**deploy**, actions v5); live **`https://swaniedesigns.com`** with **Enforce HTTPS**; Cloudflare DNS (**DNS only** to GitHub); legacy **`swanies-portfolio`** repo removed on GitHub.
+  - **Owner follow-up:** Finalize **`website/privacy.html`** before Play Data safety / listing uses URL as “final.”
+
+### Play Store path forward (as of 2026-05-03)
 
 - [x] Play Developer account: **registration fee paid** ($25); **identity verification submitted** (awaiting Google email). **Publishing blocked** until identity + subsequent console checks (device via Play Console app, phone) complete per dashboard.
-- [ ] Play Console: store listing live draft (package locked), privacy policy URL, support email/URL, default language, category.
+- [x] **Public marketing + privacy shell host:** **`https://swaniedesigns.com`** (landing) + **`https://swaniedesigns.com/privacy.html`** (draft—replace **`[bracket]`** placeholders + remove **`noindex`** when copy is final); GitHub Pages + Cloudflare per narrative **V40.73**.
+- [ ] Play Console: store listing live draft (package locked), **privacy policy URL** (use hosted URL above after copy final), support email/URL, default language, category.
 - [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.
 - [ ] Monetization: Google Play subscription products + base plans (monthly/yearly, trials if any); map SKUs to RevenueCat offerings/packages; confirm `pro` entitlement behavior with license testers.
 - [ ] Tracks & quality: Upload signed AAB to **internal testing** → **closed testing**; crash/ANR dashboards; purchase + **Play restore purchases** + **local vault backup restore** matrix on physical devices.

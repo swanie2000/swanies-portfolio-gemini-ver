@@ -1,4 +1,4 @@
-SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / SHIP TRACK ONLY)
+SWANIES PORTFOLIO: MASTER NARRATIVE (V40.73: PLAY SHIP — PUBLIC SITE LIVE; AWAIT GOOGLE IDENTITY)
 
 ---
 
@@ -8,7 +8,7 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / 
 
 **Canonical vs excerpt:** This file (`docs/BROWSER_CONTEXT_NARRATIVE.md`) is the **canonical** product timeline + handoff. `docs/BROWSER_CONTEXT_MASTER.md` embeds a copy under `BEGIN_NARRATIVE` for paste bundles; if the two diverge, **update this file first**, then refresh the MASTER excerpt.
 
-**Last handoff update:** 2026-02-25 (~23:30 local, owner EOD) — **Product:** Owner considers the **app feature-complete**; no further feature roadmap—**only shipping** (Play Console, compliance, listing, AAB, purchase/restore QA). **Repo:** V40.71 product stack + **i18n parity** (64 keys × 19 locales, hand-edited). **Play:** Account fee paid; identity verification submitted (await Google). *Next session: resume Play checklist when ready.*
+**Last handoff update:** 2026-05-03 — **Product:** **Feature freeze** unchanged—**ship-only** (Play Console, compliance, listing, AAB, purchase/restore QA). **Android / app code:** No product changes this session (still **V40.72** stack). **Wins today:** **Public marketing site** live at **`https://swaniedesigns.com`** (GitHub Pages from **`website/`** on **`swanie2000/swanies-portfolio-gemini-ver`**); **Cloudflare** domain **`swaniedesigns.com`** + DNS (apex **A** → GitHub Pages IPs, **`www`** → **`swanie2000.github.io`**, **DNS only**); **GitHub Actions** workflow **`.github/workflows/deploy-website.yml`** fixed (**build** + **deploy** jobs, `configure-pages@v5` / `deploy-pages@v5`); **`website/CNAME`**; **Settings → Pages** custom domain + **Enforce HTTPS** verified. **Privacy shell:** **`https://swaniedesigns.com/privacy.html`** exists for Play URL—**`[bracket]` placeholders must be replaced** before store/Data safety final. **Repo hygiene:** Legacy **`swanies-portfolio`** GitHub repo **removed** by owner (current repo only **`swanies-portfolio-gemini-ver`**). **Play:** Identity verification **still awaiting Google** (external gate unchanged). **Next:** When Google clears identity → resume **`Master_Build_Checklist.md`** Play path; **before** submit—finalize **`website/privacy.html`** + optional **`website/`** marketing polish (edit locally → push **`main`** → auto-deploy).
 
 ### Where we left off (engineering truth)
 
@@ -24,12 +24,15 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / 
 - **Other touches:** **`MainViewModel`** small fixes (e.g. application `Context` usage where needed for widget/portfolio labeling). **`VaultBackupEngine`** minor follow-ups if any (see diff). **`AmountEntryScreen`**, **`CreateAccountScreen`**, **`HomeScreen`** aligned with new strings/flows.
 - **Quality gates:** Run `:app:compileDebugKotlin` and `:app:lintDebug` before calling a milestone done; lint policy in **`app/lint.xml`**.
 
+- **Public web (V40.73):** Static site in **`website/`** (`index.html`, `styles.css`, **`privacy.html`** outline for Play URL, `README.md`, **`CNAME`** = `swaniedesigns.com`). **Deploy:** **`.github/workflows/deploy-website.yml`** on **`main`** when **`website/**`** or that workflow changes + **`workflow_dispatch`**. **Live:** **`https://swaniedesigns.com`** (HTTPS enforced in GitHub Pages). **Workflow:** `build` (checkout → configure-pages → upload artifact from `website/`) then `deploy` (`github-pages` env → `deploy-pages`).
+
 ### What to do next (owner intent, priority order) — **finish line only**
 
 1. **Play Console (human):** Identity verification result → **Play Console mobile app** device verification → **phone** verification → create/list the app when the console allows.
-2. **Store / compliance:** **Internal (then closed) testing** AAB from Android Studio; **Data safety**, content rating, target audience, **privacy policy URL** (hosted), store listing assets and copy; **Google Play subscription SKUs ↔ RevenueCat** offerings and **`pro`** entitlement testing with license testers — see **`Master_Build_Checklist.md`** Play section.
-3. **Pre-launch QA (targeted):** Encrypted backup round-trip; purchase + restore + expiry paths; widgets + Pro-gated surfaces; **GRAM/KILO** metal display sanity on a physical device.
-4. **Backlog (explicitly non-blocking for v1 ship):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen metal polish—**only if** the owner schedules post-1.0 work.
+2. **Privacy policy URL (before Data safety / listing final):** Replace **`website/privacy.html`** **`[bracket]`** placeholders with final legal copy aligned to in-app Privacy & Terms + Data safety answers; remove draft **`noindex`** when you want indexing; push **`main`** to redeploy (**`https://swaniedesigns.com/privacy.html`**).
+3. **Store / compliance:** **Internal (then closed) testing** AAB from Android Studio; **Data safety**, content rating, target audience, store listing assets and copy; **Google Play subscription SKUs ↔ RevenueCat** offerings and **`pro`** entitlement testing with license testers — see **`Master_Build_Checklist.md`** Play section.
+4. **Pre-launch QA (targeted):** Encrypted backup round-trip; purchase + restore + expiry paths; widgets + Pro-gated surfaces; **GRAM/KILO** metal display sanity on a physical device.
+5. **Backlog (explicitly non-blocking for v1 ship):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen metal polish—**only if** the owner schedules post-1.0 work.
 
 ### Quick file map
 
@@ -44,8 +47,23 @@ SWANIES PORTFOLIO: MASTER NARRATIVE (V40.72: FEATURE-COMPLETE — PLAY LAUNCH / 
 | About / nav | `AboutScreen.kt`, `NavGraph.kt`, `Routes.kt`, `MainActivity.kt` |
 | Language picker labels | `LanguageDisplay.kt`, `values/strings.xml` + `values-*` |
 | Nav / routes (general) | `NavGraph.kt`, `Routes.kt` |
+| Marketing / Play listing host | `website/`, `.github/workflows/deploy-website.yml`, `website/README.md` |
 
 ---
+
+V40.73 UPDATE (2026-05-03 — public **`swaniedesigns.com`** site + Pages CI + handoff)
+- **Live URL:** **`https://swaniedesigns.com`** — static landing + **draft** privacy page; GitHub Pages (**Actions** source) on **`swanies-portfolio-gemini-ver`**; Cloudflare DNS/registrar for **`swaniedesigns.com`**.
+- **CI:** **`deploy-website.yml`** — `build` + `deploy` jobs; **`configure-pages@v5`**, **`upload-pages-artifact@v3`** (`path: website`), **`deploy-pages@v5`**; fixes earlier single-job deploy failures.
+- **Custom domain:** Repo **`website/CNAME`**; GitHub **Settings → Pages** → **`swaniedesigns.com`** + **Enforce HTTPS** (cert propagation verified multi-device).
+- **Hygiene:** Old **`swanies-portfolio`** repo deleted on GitHub; **`swanie2000.github.io/swanies-portfolio-gemini-ver/`** remains project Pages origin behind custom host.
+
+CURRENT CONDITION (END OF SESSION)
+- **App:** Unchanged (**V40.72**); **ship** still blocked on **Google identity verification** (human).
+- **Web:** **Production** marketing host ready; **privacy.html** still **owner-editable template** before Play policy URL is “final.”
+
+FUTURE PATH (NEXT TRACK)
+- Google identity clears → **`Master_Build_Checklist.md`** Play / RevenueCat / tracks / QA until launch decision.
+- Parallel: finalize **`website/privacy.html`**; optional **`website/`** design/copy passes (push **`main`** → auto-deploy).
 
 V40.72 UPDATE (owner: feature-complete — i18n parity pass; ship-only path)
 - **Intent:** No further product features planned; focus is **Google Play launch** (verification chain, compliance, AAB, listing, billing alignment).

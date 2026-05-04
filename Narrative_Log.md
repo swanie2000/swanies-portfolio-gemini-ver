@@ -14,6 +14,16 @@ For every completed milestone, the agent must automatically execute:
 
 ---
 
+## [2026-05-03] V40.73 — Public marketing site live; Play identity still pending Google
+
+- **Live site:** **`https://swaniedesigns.com`** (GitHub Pages from **`website/`** on **`swanies-portfolio-gemini-ver`**); **Cloudflare** registrar/DNS for **`swaniedesigns.com`** (apex **A** → GitHub IPs, **`www`** → **`swanie2000.github.io`**, **DNS only**); **Enforce HTTPS** on Pages.
+- **CI:** **`.github/workflows/deploy-website.yml`** — **build** + **deploy** jobs, **`configure-pages@v5`** / **`deploy-pages@v5`** / **`upload-pages-artifact@v3`**; push **`main`** when `website/**` or workflow changes + **`workflow_dispatch`**.
+- **Files:** `website/index.html`, `styles.css`, **`privacy.html`** (draft for Play URL), `README.md`, **`CNAME`** (`swaniedesigns.com`).
+- **Repo:** Legacy **`swanies-portfolio`** deleted on GitHub (owner).
+- **Play:** Identity verification **still awaiting Google** (unchanged external gate). **Next:** Finalize **`website/privacy.html`** before listing/Data safety final; resume **`Master_Build_Checklist.md`** when verification clears.
+
+---
+
 ## [2026-05-02] V40.72 — Feature-complete stance; i18n parity; ship-only handoff
 
 - **Owner intent:** No further features planned; **finish line** = Google Play (verification, AAB, Data safety, listing, RevenueCat/Play SKUs) + targeted QA only.

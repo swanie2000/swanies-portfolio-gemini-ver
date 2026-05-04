@@ -9,6 +9,7 @@ This repo uses an AI-safe context system so browser AIs and Studio agents stay i
 3. **`Master_Build_Checklist.md`** — Shipped milestones and the **Play Store path forward** checklist.
 
 ## Files
+- **`website/`** — Static marketing site deployed to **`https://swaniedesigns.com`** (see `website/README.md`, workflow `.github/workflows/deploy-website.yml`).
 - `docs/BROWSER_CONTEXT_HEADER.txt`  
   Level-4 rules. Do not change unless intentionally updating behavior rules.
 - `docs/BROWSER_CONTEXT_DUMP.md`  
