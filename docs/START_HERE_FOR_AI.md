@@ -4,7 +4,7 @@
 
 Open **`docs/AI_HANDOFF.md`** and read it end-to-end. That file is the **only** handoff the next agent needs: current product stance, engineering snapshot, next steps, recent session history, and a compact file map.
 
-When the owner says **“update the handoff”** or **“update the narrative and push”**, edit **`docs/AI_HANDOFF.md`**, commit, and push (see **`.cursor/rules/update-handoff.mdc`**).
+When the owner says **“update the handoff”** or **“update the narrative and push”**, edit **`docs/AI_HANDOFF.md`**, commit, and push (see **`.cursor/rules/update-handoff.mdc`**). Cursor agents are nudged to suggest that phrase at closure, after wins, and **EOD** — see **`docs/AI_HANDOFF.md`** (§ *Nudge the owner*).
 
 ## Optional references
 

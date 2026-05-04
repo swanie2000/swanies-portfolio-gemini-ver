@@ -3,6 +3,12 @@ description: When the user says "Update the Handoff" or wants to refresh continu
 alwaysApply: true
 ---
 
+# Proactive reminder (Cursor AI)
+
+At a **good closure point**, after a **successful win**, and **always at end of day (EOD)** before wrapping: remind the owner in **one short sentence** to say **Update the handoff & push** so `docs/AI_HANDOFF.md` and git stay synced with GitHub. See **`docs/AI_HANDOFF.md`** § *Nudge the owner* for wording intent. Do not nag; one nudge is enough.
+
+---
+
 # Update the handoff (user trigger)
 
 When the user says **"Update the Handoff"**, **"update the narrative"**, **"update the narrative and push"**, or the same intent in plain language, treat it as:

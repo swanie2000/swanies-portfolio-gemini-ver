@@ -3,6 +3,16 @@
 **One file for the next Cursor agent:** product stance, engineering snapshot, what changed recently, what to do next, and where to look in code.  
 **You maintain this file** when the owner says things like *“update the handoff”* or *“update the narrative and push.”*
 
+### Nudge the owner (Cursor AI — keep GitHub current)
+
+The owner wants the **remote repo** to stay aligned with reality (easy to forget when sessions go well). **Proactively** remind them, in **one short sentence**, to say **Update the handoff & push** when:
+
+- You reach a **natural closure** (task done, PR merged, decision recorded, good stopping point).
+- There is a **clear win** (shipped fix, Play/listing progress, site change, checklist tick, etc.).
+- **End of day (EOD)** — always remind before the session ends, even if the day was quiet (note “no code changes” in the handoff if true).
+
+Do not lecture; a single nudge is enough. If they decline, respect that.
+
 ---
 
 ## How to update this doc (agent checklist)
@@ -19,7 +29,7 @@
 
 ## Current session
 
-**Last updated:** 2026-05-03 (evening — single-doc handoff simplification)  
+**Last updated:** 2026-05-03 — added EOD / closure reminder for Cursor AI  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -69,6 +79,7 @@
 
 ## Session history (newest first)
 
+- **2026-05-03 — Cursor reminder policy:** Instructed agents to nudge **Update the handoff & push** at closure, after wins, and **always EOD** (see § Nudge the owner above); Cursor rule updated to match.
 - **2026-05-03 — Handoff simplification:** Retired multi-file browser bundle (`BROWSER_CONTEXT_MASTER` dump scripts, `DUMP.md`). **Canonical handoff = this file only** (`docs/AI_HANDOFF.md`). `START_HERE_FOR_AI.md` and **Update the Handoff** Cursor rule updated. Archived narrative log kept under `docs/BROWSER_CONTEXT_NARRATIVE.md` (historical).
 - **2026-05-03 — V40.73 / public site:** `https://swaniedesigns.com` live (Pages + Cloudflare); `deploy-website.yml` build/deploy fix; `website/CNAME`; legacy GitHub repo removed; Play identity still waiting on Google.
 - **2026-05-02 — V40.72:** i18n MissingTranslation closure (64 keys × 19 locales); ship-only narrative handoff.
