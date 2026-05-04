@@ -10,6 +10,13 @@ Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HAND
 
 ---
 
+## [2026-05-04] EOD — Play package name registration submitted (In review)
+
+- **ADI / `com.swanie.portfolio`:** Play required proof with **debug** SHA-256 (eligible key on file) + signed APK containing **`app/src/main/assets/adi-registration.properties`** (Console token). Removed stray **`androidTest`** file **`test holding file.kt`** (duplicate UI code) that blocked **`assembleDebug`**. **Release** uploads continue to use **`Android-Signing/swanie_portfolio_release.jks`** (not debug).
+- **Status:** Android developer verification shows fingerprint **In review**; next: approval email, then listing + internal **AAB** track per **`Master_Build_Checklist.md`**.
+
+---
+
 ## [2026-05-04] Play Console — Google ID verified; email + phone verified
 
 - Owner: driver’s license verification confirmed by Google; Play account **emails** and **phone** completed. Ship work moves to listing, Data safety, AAB tracks, RevenueCat SKUs per **`Master_Build_Checklist.md`**.

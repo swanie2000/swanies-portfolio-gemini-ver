@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-04 — Google Play identity + contact verification complete  
+**Last updated:** 2026-05-04 (EOD) — Play **package name registration** submitted; Console **In review**  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -37,16 +37,17 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + **draft** privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** still has **`[bracket]`** placeholders — finalize before Play uses the URL as final policy.
 
-**Play / Google:** **Driver’s license** verified by Google; **email addresses** and **phone number** verified in Play Console (owner, 2026-05-04). **Next (human, in Play Console):** create or finish the **app listing** if not already done, then **AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat**, listing assets — see **`Master_Build_Checklist.md`**. Publishing is no longer blocked on *this* verification step; remaining gates are store setup + policy + tracks + QA.
+**Play / Google:** **Driver’s license**, **emails**, and **phone** verified (2026-05-04). **Android developer verification (package `com.swanie.portfolio`):** owner submitted **package name registration** — Play listed an **eligible** cert matching the **debug** keystore (`%USERPROFILE%\.android\debug.keystore`); proof APK required **`assets/adi-registration.properties`** with the Console token → see **`app/src/main/assets/adi-registration.properties`**. **Release** signing for store uploads remains **`…\Android-Signing\swanie_portfolio_release.jks`** (alias `swanie_portfolio_release`), **not** the debug key. Console fingerprint row shows **In review** (email when Google finishes — often well under 48h). **Next:** after approval, continue listing + **signed AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat** — **`Master_Build_Checklist.md`**.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play (human):** In Play Console — finish **app record / listing** as needed → **signed AAB** to **internal** (then **closed**) testing → **Data safety**, **content rating**, **target audience** → **subscription products / base plans** mapped to **RevenueCat** → **license testers** for `pro` — step list in **`Master_Build_Checklist.md`** § Play Store path forward.
-2. **Privacy URL:** Replace placeholders in **`website/privacy.html`**, align with in-app Privacy & Terms + Data safety; remove **`noindex`** when ready; push **`main`** to redeploy.
-3. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on a real device.
-4. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
+1. **Play (human):** Confirm **package registration** email / Console status moves from **In review** to **registered** (no code action). Then finish **app listing** → **signed release AAB** to **internal** (then **closed**) testing → **Data safety**, **content rating**, **target audience** → **subscription products / base plans** mapped to **RevenueCat** → **license testers** for `pro` — **`Master_Build_Checklist.md`** § Play Store path forward.
+2. **Optional cleanup:** After registration succeeds, you may **delete** **`app/src/main/assets/adi-registration.properties`** (Play challenge file) or leave it; it is only needed for that verification upload.
+3. **Privacy URL:** Replace placeholders in **`website/privacy.html`**, align with in-app Privacy & Terms + Data safety; remove **`noindex`** when ready; push **`main`** to redeploy.
+4. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on a real device.
+5. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
 
 ---
 
@@ -74,11 +75,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | About / legal | `AboutScreen.kt`, `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` |
 | Marketing site | `website/`, `.github/workflows/deploy-website.yml` |
 | Play checklist | `Master_Build_Checklist.md` |
+| Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
 
 ---
 
 ## Session history (newest first)
 
+- **2026-05-04 (EOD) — Package name registration:** Play **Android developer verification** — eligible cert was **debug** SHA-256 (not new release `.jks`). Added **`adi-registration.properties`** under **`app/src/main/assets/`**, removed bogus **`androidTest`** duplicate **`test holding file.kt`** that blocked **`assembleDebug`**. Owner **submitted** registration; Console **In review**. Release keystore path: **`AndroidStudioProjects\Android-Signing\swanie_portfolio_release.jks`**.
 - **2026-05-04 — Play verification:** Google confirmed **driver’s license**; owner completed **email** + **phone** verification in Play Console. Ship track moves to listing, compliance, AAB tracks, and RevenueCat alignment (see checklist).
 - **2026-05-03 — Repo cleanup:** Deleted `docs/BROWSER_CONTEXT_NARRATIVE.md`, `docs/BROWSER_CONTEXT_MASTER.md`, `docs/BROWSER_CONTEXT_HEADER.txt` (browser-era bundle). Canonical doc remains **`docs/AI_HANDOFF.md`**; old prose recoverable from **git history** only.
 - **2026-05-03 — Cursor reminder policy:** Instructed agents to nudge **Update the handoff & push** at closure, after wins, and **always EOD** (see § Nudge the owner above); Cursor rule updated to match.
