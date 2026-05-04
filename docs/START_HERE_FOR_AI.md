@@ -13,23 +13,21 @@ This repo uses an AI-safe context system so browser AIs and Studio agents stay i
 - `docs/BROWSER_CONTEXT_HEADER.txt`  
   Level-4 rules. Do not change unless intentionally updating behavior rules.
 - `docs/BROWSER_CONTEXT_DUMP.md`  
-  SHORT paste-friendly dump (generated).
-- `docs/BROWSER_CONTEXT_DUMP_FULL.md`  
-  FULL reference dump (generated).
-- `scripts/rebuild_browser_context_dump.bat`  
-  Rebuilds both dumps.
+  **Auto-generated** short paste: pointers + git fingerprint + path indexes (run **`docs\rebuild_browser_context_dump.bat`** to refresh after narrative/master updates).
+- `docs/rebuild_browser_context_dump.bat`  
+  Runs **`docs\Rebuild-BrowserContextPaths.ps1`**: refreshes the **AUTO-GENERATED** tail in **`docs/BROWSER_CONTEXT_MASTER.md`** (everything after **`### END_NARRATIVE`**) and rewrites **`docs/BROWSER_CONTEXT_DUMP.md`**. Does **not** replace the Level-4 header or narrative body in MASTER.
 
 ## Daily Workflow
 ### Start of day
 1) `git pull`
-2) Run: `scripts\rebuild_browser_context_dump.bat`
-3) Paste `docs/BROWSER_CONTEXT_DUMP.md` into browser AI.
+2) Run: `docs\rebuild_browser_context_dump.bat`
+3) Paste `docs/BROWSER_CONTEXT_DUMP.md` (or `docs/BROWSER_CONTEXT_MASTER.md`) into browser AI as needed.
 
 ### During work / milestones
 - After major milestones: `git commit` + `git push`
 
 ### End of day
-1) Optional: run rebuild again
+1) Optional: run `docs\rebuild_browser_context_dump.bat` again
 2) `git commit` + `git push`
 
 ## Browser AI Rules

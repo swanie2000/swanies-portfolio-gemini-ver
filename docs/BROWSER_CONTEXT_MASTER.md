@@ -692,29 +692,24 @@ Constraint: Keep changes minimal and safe. Maintain Sovereign Shield. Confirm 'S
 
 ### END_NARRATIVE
 
+
 ============================================================
 AUTO-GENERATED DAILY SECTION (REBUILT EVERY RUN)
 ============================================================
 
-Generated: Sun 04/26/2026 22:21:26.49
+Generated: 2026-05-03 20:37:07
 
 Branch:
 main
 Commit:
-fa6589734dcd6b8be1b8b841fb3271a447ea4d30
+7577be021bf2d49a0ed2547e4e5709ae1b945744
 Working tree status (git status --porcelain):
- M .idea/deploymentTargetSelector.xml
- M Master_Build_Checklist.md
- M Narrative_Log.md
- M app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
- M app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/MonetizationScreens.kt
- M app/src/main/java/com/swanie/portfolio/ui/settings/ProFeatureGateScreen.kt
- M app/src/main/res/values/strings.xml
- M docs/BROWSER_CONTEXT_NARRATIVE.md
-?? app/src/main/java/com/swanie/portfolio/ui/theme/ProLockBadge.kt
-?? app/src/main/java/com/swanie/portfolio/ui/theme/ProPalette.kt
+ M .cursor/rules/update-handoff.mdc
+ M docs/BROWSER_CONTEXT_MASTER.md
+ M docs/START_HERE_FOR_AI.md
+ M docs/rebuild_browser_context_dump.bat
+?? docs/BROWSER_CONTEXT_DUMP.md
+?? docs/Rebuild-BrowserContextPaths.ps1
 
 --------------------------------------------------
 KEY CONFIG FILES (paths)
@@ -723,25 +718,32 @@ KEY CONFIG FILES (paths)
 settings.gradle.kts
 build.gradle.kts
 gradle.properties
-gradle\wrapper\gradle-wrapper.properties
-app\build.gradle.kts
-app\src\main\AndroidManifest.xml
+gradle/wrapper/gradle-wrapper.properties
+app/build.gradle.kts
+app/src/main/AndroidManifest.xml
+
+--------------------------------------------------
+WEBSITE / GITHUB PAGES (paths)
+--------------------------------------------------
+
+website
+.github/workflows/deploy-website.yml
+website/CNAME
+website/index.html
+website/privacy.html
+website/README.md
+website/styles.css
 
 --------------------------------------------------
 SOURCE FILE INDEX (Kotlin/Java paths)
 --------------------------------------------------
 
-app/src/main/java/com/swanie/portfolio/MainActivity.kt
-app/src/main/java/com/swanie/portfolio/MainViewModel.kt
-app/src/main/java/com/swanie/portfolio/PortfolioApplication.kt
 app/src/main/java/com/swanie/portfolio/billing/MonetizationManager.kt
 app/src/main/java/com/swanie/portfolio/billing/MonetizationModels.kt
 app/src/main/java/com/swanie/portfolio/billing/NoOpMonetizationManager.kt
 app/src/main/java/com/swanie/portfolio/billing/RevenueCatInitializer.kt
 app/src/main/java/com/swanie/portfolio/billing/RevenueCatMonetizationManager.kt
-app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
-app/src/main/java/com/swanie/portfolio/data/api/SearchEngineRegistry.kt
-app/src/main/java/com/swanie/portfolio/data/api/SearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/impl/AzbitSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/BinanceSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/CoinbaseSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/CoinGeckoSearchProvider.kt
@@ -750,13 +752,18 @@ app/src/main/java/com/swanie/portfolio/data/api/impl/KuCoinSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MetalSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/MexcSearchProvider.kt
 app/src/main/java/com/swanie/portfolio/data/api/impl/WeexSearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/api/SearchEngineRegistry.kt
+app/src/main/java/com/swanie/portfolio/data/api/SearchProvider.kt
+app/src/main/java/com/swanie/portfolio/data/backup/VaultBackupEngine.kt
 app/src/main/java/com/swanie/portfolio/data/di/DatabaseModule.kt
 app/src/main/java/com/swanie/portfolio/data/di/NetworkModule.kt
+app/src/main/java/com/swanie/portfolio/data/feedback/BugReportSubmitter.kt
 app/src/main/java/com/swanie/portfolio/data/local/AppDatabase.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/AssetEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/Converters.kt
 app/src/main/java/com/swanie/portfolio/data/local/IconManager.kt
+app/src/main/java/com/swanie/portfolio/data/local/MetalSpotMath.kt
 app/src/main/java/com/swanie/portfolio/data/local/PortfolioDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/PortfolioEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/PriceHistoryDao.kt
@@ -772,11 +779,13 @@ app/src/main/java/com/swanie/portfolio/data/local/VaultDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/VaultEntity.kt
 app/src/main/java/com/swanie/portfolio/data/local/WidgetSnapshotDao.kt
 app/src/main/java/com/swanie/portfolio/data/local/WidgetSnapshotEntity.kt
+app/src/main/java/com/swanie/portfolio/data/network/AzbitApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/BinanceApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinbaseApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinGeckoApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/CoinMarketResponse.kt
 app/src/main/java/com/swanie/portfolio/data/network/CryptoCompareApiService.kt
+app/src/main/java/com/swanie/portfolio/data/network/JupiterTokenApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/KuCoinApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/MexcApiService.kt
 app/src/main/java/com/swanie/portfolio/data/network/RetrofitClient.kt
@@ -787,16 +796,20 @@ app/src/main/java/com/swanie/portfolio/data/remote/GoogleDriveService.kt
 app/src/main/java/com/swanie/portfolio/data/repository/AssetRepository.kt
 app/src/main/java/com/swanie/portfolio/data/repository/DataSyncCoordinator.kt
 app/src/main/java/com/swanie/portfolio/data/repository/MarketPriceData.kt
+app/src/main/java/com/swanie/portfolio/data/ThemePreferences.kt
 app/src/main/java/com/swanie/portfolio/di/MonetizationModule.kt
+app/src/main/java/com/swanie/portfolio/MainActivity.kt
+app/src/main/java/com/swanie/portfolio/MainViewModel.kt
+app/src/main/java/com/swanie/portfolio/PortfolioApplication.kt
 app/src/main/java/com/swanie/portfolio/security/AuthPolicy.kt
 app/src/main/java/com/swanie/portfolio/security/SecurityManager.kt
-app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/ui/components/AlphaKeyboard.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BottomNavigationBar.kt
 app/src/main/java/com/swanie/portfolio/ui/components/BoutiqueHeader.kt
 app/src/main/java/com/swanie/portfolio/ui/components/CustomToast.kt
 app/src/main/java/com/swanie/portfolio/ui/components/SkeletonAssetCard.kt
 app/src/main/java/com/swanie/portfolio/ui/entry/AssetArchitectScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/features/AboutScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/AuthViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/features/CreateAccountScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/HomeScreen.kt
@@ -805,15 +818,20 @@ app/src/main/java/com/swanie/portfolio/ui/features/TermsAndConditionsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/features/UnlockVaultScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AmountEntryViewModel.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsProLivePages.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsProUiComponents.kt
+app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsProUpsellPages.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AnalyticsScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetCard.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetPickerScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/AssetViewModel.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/HoldingsUIComponents.kt
 app/src/main/java/com/swanie/portfolio/ui/holdings/MyHoldingsScreen.kt
+app/src/main/java/com/swanie/portfolio/ui/i18n/LanguageDisplay.kt
 app/src/main/java/com/swanie/portfolio/ui/metals/MetalsAuditScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/NavGraph.kt
 app/src/main/java/com/swanie/portfolio/ui/navigation/Routes.kt
+app/src/main/java/com/swanie/portfolio/ui/settings/BackupRestoreScreen.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/ColorPicker.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/MonetizationScreens.kt
 app/src/main/java/com/swanie/portfolio/ui/settings/PortfolioManagerScreen.kt
@@ -829,6 +847,7 @@ app/src/main/java/com/swanie/portfolio/ui/theme/ProLockBadge.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/ProPalette.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/Theme.kt
 app/src/main/java/com/swanie/portfolio/ui/theme/ThemeDefaults.kt
+app/src/main/java/com/swanie/portfolio/ui/Type.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidget.kt
 app/src/main/java/com/swanie/portfolio/widget/PortfolioWidgetReceiver.kt
 app/src/main/java/com/swanie/portfolio/widget/SparklineDrawUtils.kt
@@ -840,44 +859,12 @@ app/src/main/java/com/swanie/portfolio/widget/WidgetSyncWorker.kt
 RESOURCES INDEX (res paths)
 --------------------------------------------------
 
-app/src/main/res/drawable
-app/src/main/res/layout
-app/src/main/res/mipmap-anydpi-v26
-app/src/main/res/mipmap-hdpi
-app/src/main/res/mipmap-mdpi
-app/src/main/res/mipmap-xhdpi
-app/src/main/res/mipmap-xxhdpi
-app/src/main/res/mipmap-xxxhdpi
-app/src/main/res/values
-app/src/main/res/values-ar
-app/src/main/res/values-de
-app/src/main/res/values-es
-app/src/main/res/values-fr
-app/src/main/res/values-hi
-app/src/main/res/values-in
-app/src/main/res/values-it
-app/src/main/res/values-ja
-app/src/main/res/values-ko
-app/src/main/res/values-nl
-app/src/main/res/values-pl
-app/src/main/res/values-pt-rBR
-app/src/main/res/values-ru
-app/src/main/res/values-th
-app/src/main/res/values-tr
-app/src/main/res/values-uk
-app/src/main/res/values-vi
-app/src/main/res/values-zh-rCN
-app/src/main/res/values-zh-rTW
-app/src/main/res/xml
-app/src/main/res/drawable/bg_navy_gradient.xml
 app/src/main/res/drawable/ic_launcher_background.xml
 app/src/main/res/drawable/ic_launcher_foreground.xml
-app/src/main/res/drawable/ic_vault_auth.xml
-app/src/main/res/drawable/swanie_foreground.png
-app/src/main/res/drawable/swanie_splash.png
 app/src/main/res/drawable/swan_launcher_icon.png
 app/src/main/res/drawable/swan_splash_icon_wrapper.xml
-app/src/main/res/drawable/widget_background.xml
+app/src/main/res/drawable/swanie_foreground.png
+app/src/main/res/drawable/ucrop_dialog_window_bg.xml
 app/src/main/res/layout/glance_default_layout.xml
 app/src/main/res/layout/widget_layout_fallback.xml
 app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
@@ -892,8 +879,8 @@ app/src/main/res/mipmap-xxhdpi/ic_launcher.webp
 app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp
 app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp
 app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp
-app/src/main/res/mipmap-xxxhdpi/ic_launcher_swanie.png
 app/src/main/res/values/colors.xml
+app/src/main/res/values/fractions.xml
 app/src/main/res/values/strings.xml
 app/src/main/res/values/themes.xml
 app/src/main/res/values-ar/strings.xml
@@ -917,14 +904,13 @@ app/src/main/res/values-zh-rCN/strings.xml
 app/src/main/res/values-zh-rTW/strings.xml
 app/src/main/res/xml/backup_rules.xml
 app/src/main/res/xml/data_extraction_rules.xml
+app/src/main/res/xml/file_paths.xml
 app/src/main/res/xml/portfolio_widget_info.xml
 
 --------------------------------------------------
 BROWSER AI REMINDERS
 --------------------------------------------------
-- Follow the LEVEL 4 AI CONTROL HEADER above.
+- Follow the LEVEL 4 AI CONTROL HEADER in docs/BROWSER_CONTEXT_MASTER.md when pasting the full doc.
+- Canonical product handoff: docs/BROWSER_CONTEXT_NARRATIVE.md -> AI AGENT HANDOFF (READ FIRST).
 - If you need file contents, request: NEED FILE: path/to/file
-- If this document is older than 24 hours, remind the user to rebuild it.
 - Prefer minimal safe changes; avoid refactors unless asked.
-
-===== END OF FILE =====

@@ -9,10 +9,12 @@ When the user says **"Update the Handoff"** (or clear variants like "handoff upd
 
 1. **Canonical narrative** — Edit `docs/BROWSER_CONTEXT_NARRATIVE.md`: keep **`AI AGENT HANDOFF (READ FIRST)`** accurate (where we left off, engineering truth, next priorities, quick file map, last handoff date). Fold in whatever the **current session** established; if the session outcome is ambiguous, ask one short clarifying question before writing fiction.
 
-2. **MASTER excerpt** — Edit `docs/BROWSER_CONTEXT_MASTER.md`: sync the **`### BEGIN_NARRATIVE`** block so it matches the handoff + latest milestone intent (browser/paste workflows rely on this; narrative file wins on detail).
+2. **MASTER excerpt** — Edit `docs/BROWSER_CONTEXT_MASTER.md`: sync the **`### BEGIN_NARRATIVE`** block through **`### END_NARRATIVE`** so it matches the handoff + latest milestone intent (browser/paste workflows rely on this; narrative file wins on detail).
 
-3. **Optional same pass** — If the session closed a milestone: bump `Narrative_Log.md`, tick/shift `Master_Build_Checklist.md`, and adjust `docs/START_HERE_FOR_AI.md` only when those need to change.
+3. **Path index + short dump** — Run **`docs\rebuild_browser_context_dump.bat`** (calls **`docs\Rebuild-BrowserContextPaths.ps1`**) so the **AUTO-GENERATED** appendix (git fingerprint + config / website / Kotlin / res path lists) in `docs/BROWSER_CONTEXT_MASTER.md` and **`docs/BROWSER_CONTEXT_DUMP.md`** stays current. **Commit** those outputs if they changed (they are normal doc churn after narrative edits).
 
-4. **Git** — Stage the doc(s) you touched, commit with a message like `Docs: handoff — [one-line summary]`, and **`git push`** to the branch the user is on (default `main` unless they specify otherwise).
+4. **Optional same pass** — If the session closed a milestone: bump `Narrative_Log.md`, tick/shift `Master_Build_Checklist.md`, and adjust `docs/START_HERE_FOR_AI.md` only when those need to change.
+
+5. **Git** — Stage the doc(s) you touched, commit with a message like `Docs: handoff — [one-line summary]`, and **`git push`** to the branch the user is on (default `main` unless they specify otherwise).
 
 Do **not** use this trigger to change application code unless the user also asked for implementation in the same message.
