@@ -10,6 +10,12 @@ Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HAND
 
 ---
 
+## [2026-05-08] Play Console — app created; playbook for next session
+
+- Owner: **Play app** exists; **Dashboard** setup rows complete; **Internal testing** still needs first **AAB** rollout. **`docs/AI_HANDOFF.md`** now has **§ Play Console — ordered steps** (internal → closed 12×14 → production, publishing review, privacy HTML).
+
+---
+
 ## [2026-05-07] Widget — metal title + spot line match holdings
 
 - **`PortfolioWidget.kt`:** **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** for metal rows (e.g. Silver coins vs bare **XAG**). **`SettingsViewModel`** widget pack uses **`AssetValuation.cardPriceRowUsd`** like **`AssetRepository.pushFreshAssetsToWidget`**.

@@ -198,7 +198,9 @@
   - **`website/`** static landing + **`privacy.html`** draft + **`CNAME`** (`swaniedesigns.com`); **`deploy-website.yml`** (**build**/**deploy**, actions v5); live **`https://swaniedesigns.com`** with **Enforce HTTPS**; Cloudflare DNS (**DNS only** to GitHub); legacy **`swanies-portfolio`** repo removed on GitHub.
   - **Owner follow-up:** Finalize **`website/privacy.html`** before Play Data safety / listing uses URL as “final.”
 
-### Play Store path forward (as of 2026-05-07)
+### Play Store path forward (as of 2026-05-08)
+
+**Ordered “next session” steps** (internal AAB → closed → production, etc.) live in **`docs/AI_HANDOFF.md`** § *Play Console — ordered steps*.
 
 - [x] Play Developer account: **registration fee paid** ($25).
 - [x] **Account verification (owner, 2026-05-04):** Google verified **driver’s license**; **emails** + **phone number** verified in Play Console. *(No longer waiting on this step.)*
@@ -207,12 +209,15 @@
 - [x] **Package name registration approved (owner):** Console shows **Registered** / fingerprint **Verified** for **`com.swanie.portfolio`**.
 - [x] **Release signing sanity-check (2026-05-05):** **`swanie_portfolio_release.jks`** ↔ **`app/release/app-release.aab`** — matching **SHA256** (`keytool` / `printcert`); no blocker on signing **AAB** for Play tracks when ready.
 - [x] **Widget metal display parity (2026-05-07):** Glance **`AssetCardOriginal`** uses same **metal title + optional XAG subtitle** as holdings cards; **`SettingsViewModel`** widget price string uses **`AssetValuation.cardPriceRowUsd`** (matches **`AssetRepository`** widget push).
-- [ ] Play Console: store listing live draft (package locked), **privacy policy URL** (use hosted URL above after copy final), support email/URL, default language, category.
-- [ ] Policy & safety: Data safety form (data types, collection, encryption, deletion), content rating questionnaire, target audience / ads declarations as applicable.
-- [ ] Monetization: Google Play subscription products + base plans (monthly/yearly, trials if any); map SKUs to RevenueCat offerings/packages; confirm `pro` entitlement behavior with license testers.
-- [ ] Tracks & quality: Upload signed AAB to **internal testing** → **closed testing**; crash/ANR dashboards; purchase + **Play restore purchases** + **local vault backup restore** matrix on physical devices.
-- [ ] Listing assets: phone (and 7-inch if required) screenshots, feature graphic, icon, short description, full description, release notes per track.
-- [ ] Go / no-go: 48–72h stable metrics on internal/closed before staged **production** rollout; watch refunds and entitlement edge cases.
+- [x] **Play app record + initial Dashboard setup (owner, 2026-05-08):** App **created** in Console; **Finish setting up your app** checklist (policy, listing, data safety, etc.) **complete** on Dashboard snapshot — confirm in Console if anything reopens.
+- [ ] **Internal testing:** **Create new release** → upload **signed release AAB** (`versionCode` incremented) → rollout to internal testers.
+- [ ] **Closed testing:** When Console unlocks — release + **≥12 opted-in testers** + **≥14 days** for production-access path (per Dashboard).
+- [ ] **Production:** Apply / staged rollout when Console requirements met.
+- [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
+- [ ] Monetization: Google Play subscription products + base plans; map SKUs to **RevenueCat**; **`pro`** license testers.
+- [ ] Tracks & quality: Crash/ANR; purchase + **Play restore** + **local vault backup restore** on device.
+- [ ] Listing assets: screenshots, feature graphic, short/long description polish as needed per track.
+- [ ] Go / no-go: stable internal/closed metrics before broad **production**; watch refunds / entitlements.
 
 - [ ] V40.36 Auth Flow Instrumentation Harness - NEXT
   - Add instrumentation coverage for login navigation and biometric success/cancel/failure UI behavior.
