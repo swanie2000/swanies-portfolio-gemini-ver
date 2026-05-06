@@ -10,6 +10,12 @@ Legacy browser-context markdown was **removed**; live handoff is **`docs/AI_HAND
 
 ---
 
+## [2026-05-07] Widget — metal title + spot line match holdings
+
+- **`PortfolioWidget.kt`:** **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** for metal rows (e.g. Silver coins vs bare **XAG**). **`SettingsViewModel`** widget pack uses **`AssetValuation.cardPriceRowUsd`** like **`AssetRepository.pushFreshAssetsToWidget`**.
+
+---
+
 ## [2026-05-05] Release keystore + AAB signing verified
 
 - **`keytool -list -v`** on **`swanie_portfolio_release.jks`** and **`keytool -printcert -jarfile app-release.aab`** — same **SHA256**; release signing OK for future Play **AAB** uploads. CLI **`keytool`**: use **`-storetype PKCS12`** / Studio **JBR** if PATH JDK mismatches.

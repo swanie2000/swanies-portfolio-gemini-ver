@@ -623,13 +623,13 @@ class SettingsViewModel @Inject constructor(
                                         file.absolutePath
                                     } else "none"
 
-                                    // 🛡️ Packing 10 parts: coinId|symbol|displayName|imageUrl|officialSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
+                                    // 🛡️ Packing 10 parts: coinId|symbol|displayName|imageUrl|lineSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
                                     val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
                                     val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
                                     
-                                    // 🎯 DYNAMIC PRECISION: Bulletproof Boutique Formatter
-                                    val price = asset.officialSpotPrice
-                                    val formattedPrice = formatBoutiquePrice(price)
+                                    // 🎯 Same per-line spot as holdings cards + AssetRepository widget push (gram/kilo/oz aware)
+                                    val linePrice = AssetValuation.cardPriceRowUsd(asset)
+                                    val formattedPrice = formatBoutiquePrice(linePrice)
                                     "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                                 }.joinToString("||")
                             }

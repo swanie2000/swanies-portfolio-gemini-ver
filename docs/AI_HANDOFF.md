@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-05 — Release **signing verified**; owner taking a break  
+**Last updated:** 2026-05-07 — Widget **metal title / spot** parity with holdings; docs pushed  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -37,13 +37,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + **draft** privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** still has **`[bracket]`** placeholders — finalize before Play uses the URL as final policy.
 
-**Play / Google:** **Driver’s license**, **emails**, and **phone** verified (2026-05-04). **Android developer verification (package `com.swanie.portfolio`):** owner submitted **package name registration** (debug cert + challenge APK); Console was **In review** — confirm email/status when back. **Release signing:** **`swanie_portfolio_release.jks`** (alias **`swanie_portfolio_release`**) confirmed via **`keytool -list -v`** and **`keytool -printcert -jarfile app\release\app-release.aab`** — **SHA256** matches (`1A:5A:E4:F5:…`); AAB is correctly release-signed. For CLI **`keytool`**, use **`-storetype PKCS12`** and/or Studio’s **JBR** `keytool.exe` if PATH JDK differs. **Next:** listing + **signed AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat** — **`Master_Build_Checklist.md`**.
+**Play / Google:** **Driver’s license**, **emails**, and **phone** verified (2026-05-04). **Package `com.swanie.portfolio`:** Android developer verification **Registered** / fingerprint **Verified** (owner, Console). **Release signing:** **`swanie_portfolio_release.jks`** (alias **`swanie_portfolio_release`**) — use **`-storetype PKCS12`** and/or Studio **JBR** `keytool.exe` for CLI if PATH JDK differs. **Next (human in Console):** listing completeness, **signed AAB → internal testing**, **Data safety**, **content rating**, **SKUs ↔ RevenueCat** — use **`Master_Build_Checklist.md`** + in-console **Dashboard** / **Policy** / **Release** readiness indicators.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play (human):** Confirm **package registration** email / Console status moves from **In review** to **registered** (no code action). Then finish **app listing** → **signed release AAB** to **internal** (then **closed**) testing → **Data safety**, **content rating**, **target audience** → **subscription products / base plans** mapped to **RevenueCat** → **license testers** for `pro` — **`Master_Build_Checklist.md`** § Play Store path forward.
+1. **Play (human):** Package **registered** — finish **app listing** → **signed release AAB** to **internal** (then **closed**) testing → **Data safety**, **content rating**, **target audience** → **subscription products / base plans** mapped to **RevenueCat** → **license testers** for `pro` — **`Master_Build_Checklist.md`** § Play Store path forward; use Console **Publishing overview** / **Policy status** for blockers.
 2. **Optional cleanup:** After registration succeeds, you may **delete** **`app/src/main/assets/adi-registration.properties`** (Play challenge file) or leave it; it is only needed for that verification upload.
 3. **Privacy URL:** Replace placeholders in **`website/privacy.html`**, align with in-app Privacy & Terms + Data safety; remove **`noindex`** when ready; push **`main`** to redeploy.
 4. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on a real device.
@@ -71,6 +71,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Backup UI | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` |
 | Settings / feedback | `SettingsScreen.kt`, `BugReportSubmitter.kt`, `NetworkModule.kt` |
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
+| Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` |
 | Marketing site | `website/`, `.github/workflows/deploy-website.yml` |
@@ -81,6 +82,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-07 — Widget metal parity:** **`PortfolioWidget.kt`** **`AssetCardOriginal`** now uses **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** (same as compact/full holdings cards). **`SettingsViewModel`** widget serialization uses **`AssetValuation.cardPriceRowUsd`** for per-line spot string to match **`AssetRepository.pushFreshAssetsToWidget`**. Owner confirmed widget behavior OK.
 - **2026-05-05 — Release signing closure:** Confirmed **`swanie_portfolio_release.jks`** unlocks with **`keytool`**; **`app\release\app-release.aab`** signer **SHA256** matches keystore (release path aligned with Play’s separate **debug** package-registration proof). Noted **`keytool -storetype PKCS12`** / Studio **JBR** vs PATH JDK for future CLI checks. Owner pausing for the day.
 - **2026-05-04 (EOD) — Package name registration:** Play **Android developer verification** — eligible cert was **debug** SHA-256 (not new release `.jks`). Added **`adi-registration.properties`** under **`app/src/main/assets/`**, removed bogus **`androidTest`** duplicate **`test holding file.kt`** that blocked **`assembleDebug`**. Owner **submitted** registration; Console **In review**. Release keystore path: **`AndroidStudioProjects\Android-Signing\swanie_portfolio_release.jks`**.
 - **2026-05-04 — Play verification:** Google confirmed **driver’s license**; owner completed **email** + **phone** verification in Play Console. Ship track moves to listing, compliance, AAB tracks, and RevenueCat alignment (see checklist).

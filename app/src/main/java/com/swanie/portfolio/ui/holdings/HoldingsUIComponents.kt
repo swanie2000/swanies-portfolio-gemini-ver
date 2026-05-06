@@ -518,11 +518,11 @@ private fun underIconTickerText(asset: AssetEntity): String =
     }
 
 /** User-facing title for metal cards: prefer funnel / vault text over bare symbol. */
-private fun metalCardPrimaryLabel(asset: AssetEntity): String =
+internal fun metalCardPrimaryLabel(asset: AssetEntity): String =
     asset.displayName.trim().ifBlank { asset.name.trim() }.ifBlank { asset.symbol.trim() }
 
 /** Second-line spot ticker (e.g. XAG) when it is not already spelled out in the user title. */
-private fun metalShouldShowSymbolSubtitle(asset: AssetEntity, primary: String): Boolean {
+internal fun metalShouldShowSymbolSubtitle(asset: AssetEntity, primary: String): Boolean {
     if (asset.category != AssetCategory.METAL) return false
     val sym = asset.symbol.trim()
     if (sym.isEmpty()) return false

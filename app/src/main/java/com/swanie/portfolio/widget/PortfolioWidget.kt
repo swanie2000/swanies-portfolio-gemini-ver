@@ -38,6 +38,8 @@ import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
+import com.swanie.portfolio.ui.holdings.metalCardPrimaryLabel
+import com.swanie.portfolio.ui.holdings.metalShouldShowSymbolSubtitle
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -354,8 +356,32 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
             }
             Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
-                Text(text = asset.symbol.uppercase(), style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold))
-                
+                val isMetalRow = asset.category == AssetCategory.METAL || asset.isMetal
+                if (isMetalRow) {
+                    val primary = metalCardPrimaryLabel(asset)
+                    Text(
+                        text = primary.uppercase(Locale.getDefault()),
+                        style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                        maxLines = 2,
+                    )
+                    if (metalShouldShowSymbolSubtitle(asset, primary)) {
+                        Text(
+                            text = asset.symbol.trim().uppercase(Locale.getDefault()),
+                            style = TextStyle(
+                                color = ColorProvider(textColor.copy(alpha = 0.55f)),
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                            ),
+                            maxLines = 1,
+                        )
+                    }
+                } else {
+                    Text(
+                        text = asset.symbol.uppercase(Locale.getDefault()),
+                        style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                    )
+                }
+
                 // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
                 val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 
                                    else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
