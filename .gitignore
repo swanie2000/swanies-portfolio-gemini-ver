@@ -24,6 +24,11 @@ secrets.xml
 .cxx
 /app/build
 
+# Release bundles / APKs (rebuild locally or download from Play; don’t version in-repo)
+*.apk
+*.aab
+/app/release/
+
 # --- KOTLIN & OTHER ---
 .kotlin
 bin/
