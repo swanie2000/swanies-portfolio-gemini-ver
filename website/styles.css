@@ -72,11 +72,14 @@ body {
 }
 
 .logo-mark {
-  width: 40px;
-  height: 40px;
+  height: 44px;
+  width: auto;
+  max-width: min(160px, 38vw);
   border-radius: 10px;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  flex-shrink: 0;
   box-shadow: 0 0 24px rgba(212, 168, 83, 0.25);
 }
 
