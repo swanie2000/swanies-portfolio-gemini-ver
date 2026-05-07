@@ -4,9 +4,9 @@ Single-page marketing site plus a **privacy policy shell** for your Play Console
 
 ## Before you publish
 
-1. **`index.html`** — Set the real Google Play link on the primary button (see comments in the file). Remove `aria-disabled` when the URL is live.
-2. **`privacy.html`** — Replace `[bracketed]` placeholders and the yellow callout with your final policy text. Remove `noindex` from the meta tag when you want search engines to index it.
-3. **`privacy.html`** — Remove or relax the draft callout once the page is final.
+1. **`favicon.png`** — Put your **square** swan PNG in `website/` with this exact name: **`favicon.png`** (recommended **512×512** or **256×256** PNG with transparent or solid background). The HTML already points `<link rel="icon">` and `apple-touch-icon` at this file; until it exists in the repo, browsers fall back to `favicon.svg`.
+2. **`index.html`** — Set `PLAY_URL` / `TESTER_URL` in the script at the bottom when links are ready.
+3. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
 
 ## Free hosting options
 
