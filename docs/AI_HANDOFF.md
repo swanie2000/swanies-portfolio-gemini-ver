@@ -29,13 +29,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-07 — **Marketing site locked in:** **`ic_swan_website.png`** header branding + **`home_subtitle`** tagline; **`favicon-tab.png`** (navy **`#000416`** backing + swan) for tab / apple-touch; JPEG screenshot gallery (**`website/images/`**, four shots); **`.gitignore`** excludes **`*.aab`** / **`app/release/`**; handoff refreshed + pushed  
+**Last updated:** 2026-05-08 — **Truthful marketing + legal:** Removed misleading **Google Drive vault sync** claims (app uses a **stub** `GoogleDriveService`); **website** (`index.html`, `privacy.html`, `press.html`) and **all `values*` locales** updated for about/terms + **`setting_sync_drive`** “planned” wording. **§7 Terms** added — limitation of liability, indemnity, AS IS, liability cap (Play payments / zero); **`TermsAndConditionsScreen.kt`** wired; **`privacy.html`** new §8 + Contact §9, **effective date 2026-05-07**. **`AssetViewModel`** comments/logs reflect Drive hook as stub for future wiring.
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
 **Repo / branch:** `swanies-portfolio-gemini-ver` on GitHub (`swanie2000`), default branch **`main`**. Legacy repo **`swanies-portfolio`** was deleted.
 
-**Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** has **effective date** text and plain prose — **re-read vs Play Data safety** before calling the policy URL final.
+**Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** now includes **§8 Terms of use / limitation of liability** (mirrors in-app §7) — **re-read vs Play Data safety** and counsel before calling the policy URL final.
 
 **Play / Google:** **App created** in Play Console (**Swanie’s Portfolio**). **Dashboard (2026-05-08 snapshot):** “**Finish setting up your app**” items (privacy, app access, ads, content rating, target audience, data safety, store listing, category, contact, etc.) appear **complete**; **Internal testing** still needs **Create a new release** (AAB not rolled out yet). **Closed testing** stays locked until Play unlocks it (often after internal release is live). **Production** path shows **12 testers × 14 days** closed test before **Apply for production**. **Publishing overview** may show **Send app for review** disabled until Dashboard / quick checks allow — use banner link **Go to dashboard** when shown. **Release signing:** **`swanie_portfolio_release.jks`** — CLI **`keytool`** use **`-storetype PKCS12`** / Studio **JBR** if needed.
 
@@ -49,7 +49,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 6. **Production:** When eligible, **Apply for production** / staged rollout per Console.
 7. **Grow users → Store presence / Monetize with Play:** Screenshots, feature graphic, subscriptions + **RevenueCat** SKU alignment, **license testers** for `pro`.
 8. **Publishing overview:** When **Send app for review** is enabled and you intend listing/metadata review — send; optional **Managed publishing** if you want manual go-live after approval.
-9. **Website:** Finalize **`website/privacy.html`** (remove **`[bracket]`** placeholders, **`noindex`** when final) → push **`main`** so Play policy URL matches.
+9. **Website:** Finalize **`website/privacy.html`** (remove any **`[bracket]`** placeholders if present, **`noindex`** when final) → push **`main`** so Play policy URL matches; confirm **§8 liability** wording with counsel if needed.
 
 ---
 
@@ -85,7 +85,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
-| About / legal | `AboutScreen.kt`, `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` |
+| About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
@@ -94,6 +94,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-08 — Truthful copy + TOS §7 + i18n:** Marketing and in-app/legal strings no longer claim **live Google Drive vault sync** (stub only; deferred); **website** index/press/privacy aligned; **§7** limitation of liability / indemnity in **`values/strings.xml`**, **`TermsAndConditionsScreen.kt`**, **`privacy.html`** §8; **all 19 locales** carry **`terms_section_7_*`** (+ prior Drive-truth strings); **`AssetViewModel`** Drive-sync comments honest; **`setting_sync_drive`** “planned” label. **Handoff + push** with this commit.
 - **2026-05-08 — Play playbook:** Owner created **Play app**; **Dashboard** shows setup tasks done; **Internal testing** still missing **AAB release**; **Publishing overview** / **Send for review** gated until Console allows. Captured **ordered next-session steps** in **§ Current session** (internal → closed → production → listing/monetization → privacy site).
 - **2026-05-07 — Marketing site lock-in:** **`website/ic_swan_website.png`** in header + two-line title/tagline aligned with **`home_title`** / **`home_subtitle`**; **`favicon-tab.png`** for tab / apple-touch (**`#000416`** plate + centered swan); screenshot grid **JPEGs** in **`website/images/`** (four cards incl. widget manager); **`.gitignore`** **`*.aab`** + **`/app/release/`**; **`docs/AI_HANDOFF.md`** refreshed (**Update the handoff & push**).
 - **2026-05-07 — Widget metal parity:** **`PortfolioWidget.kt`** **`AssetCardOriginal`** now uses **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** (same as compact/full holdings cards). **`SettingsViewModel`** widget serialization uses **`AssetValuation.cardPriceRowUsd`** for per-line spot string to match **`AssetRepository.pushFreshAssetsToWidget`**. Owner confirmed widget behavior OK.

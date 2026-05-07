@@ -75,6 +75,11 @@ fun TermsAndConditionsScreen(navController: NavController) {
                 stringResource(R.string.terms_section_6_body)
             )
 
+            TermSection(
+                stringResource(R.string.terms_section_7_title),
+                stringResource(R.string.terms_section_7_body)
+            )
+
             Spacer(modifier = Modifier.height(50.dp))
 
             Text(

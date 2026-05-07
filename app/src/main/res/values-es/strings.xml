@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">Acerca de</string>
     <string name="about_version">Versión %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio es un rastreador de cripto y metales preciosos. Tu bóveda permanece en el dispositivo; las funciones opcionales (p. ej. copia de seguridad en Google Drive) solo usan los permisos que concedas. Más detalles en Privacidad y términos.</string>
+    <string name="about_intro">Swanie\'s Portfolio es un rastreador de cripto y metales preciosos. Tu bóveda permanece en tu dispositivo; la copia cifrada es un archivo que exportas tú. La sincronización automática con Google Drive está prevista para una versión futura y no está en esta versión. Funciones de red opcionales (facturación de Play si te suscribes, comentarios opcionales, datos de mercado) solo se usan cuando las usas. Más en Privacidad y términos.</string>
     <string name="about_legal_header">Información legal</string>
     <string name="about_open_privacy_terms">Abrir privacidad y términos</string>
     <string name="about_play_console_hint">Para Google Play, añade en Play Console (Seguridad de datos) una URL de política de privacidad acorde con el tratamiento de datos de la app. La pantalla de privacidad y términos resume el comportamiento para los usuarios.</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">CORREO ELECTRÓNICO</string>
     <string name="label_confirm_password">CONFIRMAR CONTRASEÑA</string>
     <string name="label_recovery_hint">PISTA DE RECUPERACIÓN</string>
-    <string name="setting_sync_drive">Sincronizar bóveda con Google Drive</string>
+    <string name="setting_sync_drive">Sincronización con Google Drive (prevista)</string>
     <string name="tos_accept_prefix">Acepto los </string>
     <string name="tos_terms">Términos y Condiciones</string>
     <string name="status_creating">CREANDO...</string>
@@ -286,17 +286,19 @@
     <string name="terms_title">PRIVACIDAD Y TÉRMINOS</string>
     <string name="terms_last_updated">Última actualización: Abril 2026</string>
     <string name="terms_section_1_title">1. ARQUITECTURA DE CONOCIMIENTO CERO</string>
-    <string name="terms_section_1_body">No almacenamos tus datos. Punto. SwaniesPortfolio es un puente entre tus activos y tu Google Drive privado. No tenemos servidores ni acceso a tu bóveda.</string>
+    <string name="terms_section_1_body">No almacenamos los datos de tu cartera en nuestros servidores. La bóveda permanece en tu dispositivo; no podemos acceder a su contenido. La sincronización automática con Google Drive no está en esta versión (prevista para el futuro).</string>
     <string name="terms_section_2_title">2. LIMITACIONES DE RECUPERACIÓN</string>
     <string name="terms_section_2_body">Debido a nuestro modelo de cifrado, el creador NO PUEDE recuperar tu contraseña. Si pierdes tu \'Vault Password\' y tu \'Recovery Hint\', tus datos se pierden. Ese es el costo de la privacidad absoluta.</string>
-    <string name="terms_section_3_title">3. INTEGRACIÓN CON GOOGLE DRIVE</string>
-    <string name="terms_section_3_body">La app usa una carpeta oculta de \'App Data\' en tu Google Drive personal. Concedes permiso de lectura/escritura solo a esa carpeta. No podemos ver tus fotos ni documentos personales.</string>
+    <string name="terms_section_3_title">3. FUNCIONES DE RED OPCIONALES</string>
+    <string name="terms_section_3_body">Esta versión mantiene la bóveda en tu dispositivo y no la sincroniza automáticamente con Google Drive (está previsto en una versión futura). Las funciones de red opcionales incluyen facturación/suscripciones de Google Play al comprar, comentarios opcionales si los envías y proveedores de datos de mercado al cargar precios. La copia cifrada es un archivo que exportas y guardas tú.</string>
     <string name="terms_section_4_title">4. CONTINUIDAD DE SUSCRIPCIÓN</string>
     <string name="terms_section_4_body">Las suscripciones se vinculan a tu identidad de Google Play. Aunque los datos de tus activos son privados, tu \'Pro Status\' puede recuperarse en cualquier dispositivo con tu cuenta de Google.</string>
     <string name="terms_section_5_title">5. SIN ASESORÍA FINANCIERA</string>
     <string name="terms_section_5_body">Esta app es una herramienta de seguimiento. Los precios provienen de APIs de terceros. No somos responsables por fluctuaciones del mercado ni por la precisión de datos externos.</string>
     <string name="terms_section_6_title">6. AVISO DE TRADUCCIÓN</string>
     <string name="terms_section_6_body">El inglés es el idioma legal principal. Las traducciones pueden ser generadas por IA; en caso de conflicto, prevalece el texto en inglés.</string>
+    <string name="terms_section_7_title">7. LIMITACIÓN DE RESPONSABILIDAD; INDEMNIZACIÓN; USO BAJO SU PROPIO RIESGO</string>
+    <string name="terms_section_7_body">Al descargar, instalar o usar Swanie\'s Portfolio, usted acepta en su propio nombre y en el de quienes represente que, en la máxima medida permitida por la ley aplicable, no responsabilizará a Swanie\'s Portfolio, ni a sus desarrolladores, contratistas, licenciantes o agentes por daños indirectos, incidentales, especiales, consecuentes, ejemplares o punitivos, ni por pérdida de beneficios, datos, fondo de comercio, interrupción del negocio o pérdidas de inversión, incluidos los daños o pérdidas derivados de: su uso o la imposibilidad de usar la app; la confianza en precios, gráficos, analíticas u otro contenido; errores, fallos o interrupciones; pérdida o corrupción de datos locales, credenciales o copias de seguridad; o servicios o fuentes de datos de terceros. La app se proporciona «tal cual» y «según disponibilidad» sin garantías de ningún tipo, expresas o implícitas, incluidas las de comerciabilidad, idoneidad para un fin determinado, titularidad o no infracción, salvo donde la ley prohíba dichas exclusiones. Usted acepta indemnizar, defender y eximir de responsabilidad a Swanie\'s Portfolio y a sus desarrolladores, contratistas, licenciantes y agentes frente a reclamaciones, responsabilidades, daños, pérdidas, costes o gastos (incluidos honorarios razonables de abogados) derivados de su uso de la app, de la violación de estos términos o de derechos de terceros. Algunas jurisdicciones no permiten ciertas limitaciones o exclusiones; en esos casos, nuestra responsabilidad se limita en la mayor medida permitida por la ley. Si se exige un remedio y la ley permite un tope, nuestra responsabilidad agregada por cualquier reclamación relacionada con la app no excederá el mayor entre (a) los importes que nos haya pagado por la app o compras in-app a través de Google Play en los doce (12) meses anteriores a la reclamación, o (b) cero si no realizó tales pagos. Esta sección sobrevive a la finalización de su uso. Si no está de acuerdo, no use la app.</string>
 
     <string name="holdings_create_first_portfolio">Crea tu primer portafolio</string>
     <string name="holdings_delete_asset_title">¿ELIMINAR ACTIVO?</string>

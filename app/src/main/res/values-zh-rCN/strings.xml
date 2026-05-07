@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">关于</string>
     <string name="about_version">版本 %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio 用于跟踪加密货币与贵金属。保险库保留在设备上；可选功能（如 Google 云端硬盘备份）仅使用您授予的权限。详情请参阅隐私与条款。</string>
+    <string name="about_intro">Swanie\'s Portfolio 用于跟踪加密货币与贵金属。保险库保留在您的设备上；加密备份是您自行导出的文件。与 Google 云端硬盘的自动保险库同步计划在后续版本提供，当前版本不包含。可选网络功能（订阅时的 Play 结算、可选反馈、行情数据）仅在使用相关功能时才会涉及。详情请参阅隐私与条款。</string>
     <string name="about_legal_header">法律信息</string>
     <string name="about_open_privacy_terms">打开隐私与条款</string>
     <string name="about_play_console_hint">针对 Google Play，请在 Play 控制台（数据安全）中添加与数据处理一致的隐私政策链接。应用内屏幕向用户概述相关内容。</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">电子邮件地址</string>
     <string name="label_confirm_password">确认密码</string>
     <string name="label_recovery_hint">恢复提示</string>
-    <string name="setting_sync_drive">将保管库同步到 Google 云端硬盘</string>
+    <string name="setting_sync_drive">Google 云端硬盘同步（计划中）</string>
     <string name="tos_accept_prefix">我接受 </string>
     <string name="tos_terms">条款与条件</string>
     <string name="status_creating">正在创建...</string>
@@ -289,17 +289,19 @@
     <string name="terms_title">隐私与条款</string>
     <string name="terms_last_updated">最后更新时间：2026年4月</string>
     <string name="terms_section_1_title">1. 零知识架构</string>
-    <string name="terms_section_1_body">我们不存储您的数据。Swanie Portfolio 是您的资产与个人 Google 云端硬盘之间的桥梁。我们没有服务器，也无法访问您的保管库。</string>
+    <string name="terms_section_1_body">我们不在服务器上存储您的投资组合数据。保险库保留在您的设备上；我们无法访问其内容。与 Google 云端硬盘的自动同步当前版本不可用（计划后续提供）。</string>
     <string name="terms_section_2_title">2. 数据恢复限制</string>
     <string name="terms_section_2_body">由于我们的加密模型，开发者无法找回您的密码。如果您丢失了保管库密码和恢复提示，您的数据将永久丢失。这是绝对隐私的代价。</string>
-    <string name="terms_section_3_title">3. Google 云端硬盘集成</string>
-    <string name="terms_section_3_body">应用使用您个人 Google 云端硬盘中的隐藏应用数据文件夹。应用仅对该文件夹拥有读写权限。我们无法查看您的个人照片或文档。</string>
+    <string name="terms_section_3_title">3. 可选网络功能</string>
+    <string name="terms_section_3_body">此版本将保险库保留在您的设备上，不会自动同步到 Google 云端硬盘（计划在后续版本提供）。可选网络功能包括购买时的 Google Play 结算/订阅、您提交时的可选反馈，以及加载价格时的市场数据提供方。加密备份是您导出并自行保存的文件。</string>
     <string name="terms_section_4_title">4. 订阅持续性</string>
     <string name="terms_section_4_body">终身和月度订阅与您的 Google Play 身份绑定。您的资产数据保持私密，专业版状态可在登录您 Google 账户的设备上找回。</string>
     <string name="terms_section_5_title">5. 非财务建议</string>
     <string name="terms_section_5_body">本应用是一个追踪工具。价格数据来自 CoinGecko 等第三方接口。我们对市场波动或外部数据准确性不承担责任。</string>
     <string name="terms_section_6_title">6. 语言翻译免责声明</string>
     <string name="terms_section_6_body">英语是本应用的主要法律和产品语言。非英语翻译可能由人工智能生成，并可能存在措辞差异。如有任何冲突，以英文文本为准。</string>
+    <string name="terms_section_7_title">7. 责任限制；赔偿；自担风险使用</string>
+    <string name="terms_section_7_body">下载、安装或使用 Swanie\'s Portfolio，即表示您代表本人及您所代表的任何人同意：在适用法律允许的最大范围内，您不会使 Swanie\'s Portfolio、其开发者、承包商、许可方或代理人对任何间接、附带、特殊、后果性、惩戒性或惩罚性损害，或任何利润、数据、商誉、业务中断或投资损失承担责任，包括因以下原因产生的损害或损失：您使用或无法使用本应用；依赖价格、图表、分析或其他内容；错误、缺陷或中断；本地数据、凭据或备份的丢失或损坏；或第三方服务或数据源。除法律禁止此类免责的情形外，本应用按「现状」和「可用」基础提供，不作任何明示或默示担保，包括对适销性、特定用途适用性、所有权或不侵权的默示担保。您同意就因您使用本应用、违反本条款或侵犯第三方权利而产生的任何索赔、责任、损害、损失、费用或开支（包括合理的律师费），为 Swanie\'s Portfolio 及其开发者、承包商、许可方和代理人辩护、赔偿并使其免受损害。某些司法辖区不允许特定限制或排除；在此情况下，我们的责任以法律允许的最大范围为限。如需要救济且允许设定上限，我们就与本应用相关的任何索赔的累计责任不超过以下两者中的较大者：(a) 您在索赔前十二（12）个月内通过 Google Play 就本应用或应用内购买向我们支付的金额，或 (b) 若您未进行此类支付则为零。本条在您停止使用本应用后继续有效。若您不同意，请勿使用本应用。</string>
 
     <string name="holdings_create_first_portfolio">创建您的第一个投资组合</string>
     <string name="holdings_delete_asset_title">移除资产？</string>

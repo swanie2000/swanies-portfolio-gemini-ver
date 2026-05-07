@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">Sobre</string>
     <string name="about_version">Versão %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio é um rastreador de cripto e metais preciosos. Seu cofre fica no dispositivo; recursos opcionais (ex.: backup no Google Drive) usam apenas as permissões que você conceder. Detalhes em Privacidade e termos.</string>
+    <string name="about_intro">Swanie\'s Portfolio é um rastreador de cripto e metais preciosos. Seu cofre fica no seu dispositivo; o backup criptografado é um arquivo que você exporta. A sincronização automática do cofre com o Google Drive está planejada para uma versão futura e não está nesta versão. Recursos de rede opcionais (cobrança do Play em assinatura, feedback opcional, dados de mercado) só são usados quando você os usa. Detalhes em Privacidade e termos.</string>
     <string name="about_legal_header">Informações legais</string>
     <string name="about_open_privacy_terms">Abrir privacidade e termos</string>
     <string name="about_play_console_hint">Para o Google Play, adicione na Play Console (Segurança dos dados) um URL de política de privacidade alinhado ao tratamento de dados do app. A tela no app resume o comportamento para os usuários.</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">ENDEREÇO DE E-MAIL</string>
     <string name="label_confirm_password">CONFIRMAR SENHA</string>
     <string name="label_recovery_hint">DICA DE RECUPERAÇÃO</string>
-    <string name="setting_sync_drive">Sincronizar cofre com o Google Drive</string>
+    <string name="setting_sync_drive">Sync cofre Google Drive (planejado)</string>
     <string name="tos_accept_prefix">Eu aceito os </string>
     <string name="tos_terms">Termos e Condições</string>
     <string name="status_creating">CRIANDO...</string>
@@ -289,17 +289,19 @@
     <string name="terms_title">PRIVACIDADE E TERMOS</string>
     <string name="terms_last_updated">Última atualização: Abril 2026</string>
     <string name="terms_section_1_title">1. ARQUITETURA ZERO-KNOWLEDGE</string>
-    <string name="terms_section_1_body">Não armazenamos seus dados. O SwaniesPortfolio é uma ponte entre seus ativos e seu Google Drive privado. Não temos servidores nem acesso ao seu cofre.</string>
+    <string name="terms_section_1_body">Não armazenamos os dados do seu portfólio em nossos servidores. O cofre permanece no seu dispositivo; não podemos acessar o conteúdo. A sincronização automática com o Google Drive não está nesta versão (planejada para o futuro).</string>
     <string name="terms_section_2_title">2. LIMITAÇÕES DE RECUPERAÇÃO</string>
     <string name="terms_section_2_body">Devido ao nosso modelo de criptografia, o criador NÃO PODE recuperar sua senha. Se você perder sua Senha do Cofre e sua Dica de Recuperação, seus dados serão perdidos. Esse é o custo da privacidade absoluta.</string>
-    <string name="terms_section_3_title">3. INTEGRAÇÃO COM GOOGLE DRIVE</string>
-    <string name="terms_section_3_body">O app usa uma pasta oculta \'App Data\' no seu Google Drive pessoal. O app pode ler e gravar apenas nessa pasta. Não podemos ver suas fotos ou documentos pessoais.</string>
+    <string name="terms_section_3_title">3. RECURSOS DE REDE OPCIONAIS</string>
+    <string name="terms_section_3_body">Esta versão mantém o cofre no seu dispositivo e não o sincroniza automaticamente com o Google Drive (planejado para uma versão futura). Recursos de rede opcionais incluem faturamento/assinaturas do Google Play na compra, feedback opcional se você enviar e provedores de dados de mercado ao carregar cotações. O backup criptografado é um arquivo que você exporta e guarda.</string>
     <string name="terms_section_4_title">4. CONTINUIDADE DA ASSINATURA</string>
     <string name="terms_section_4_body">Assinaturas mensais e vitalícias são vinculadas à sua identidade do Google Play. Embora os dados dos ativos sejam privados, seu \'Status Pro\' é recuperável em dispositivos logados com sua conta Google.</string>
     <string name="terms_section_5_title">5. SEM ACONSELHAMENTO FINANCEIRO</string>
     <string name="terms_section_5_body">Este app é uma ferramenta de rastreamento. Os dados de preços vêm de APIs de terceiros (CoinGecko, etc.). Não somos responsáveis por flutuações de mercado ou pela precisão de dados externos.</string>
     <string name="terms_section_6_title">6. AVISO DE TRADUÇÃO</string>
     <string name="terms_section_6_body">O inglês é o idioma mestre legal e do produto. Traduções para outros idiomas podem ser geradas por IA; em caso de conflito, o texto em inglês prevalece.</string>
+    <string name="terms_section_7_title">7. LIMITAÇÃO DE RESPONSABILIDADE; INDENIZAÇÃO; USO POR SUA CONTA E RISCO</string>
+    <string name="terms_section_7_body">Ao baixar, instalar ou usar o Swanie\'s Portfolio, você concorda em seu próprio nome e em nome de qualquer pessoa que represente que, na máxima extensão permitida pela lei aplicável, não responsabilizará o Swanie\'s Portfolio, seus desenvolvedores, contratados, licenciadores ou agentes por quaisquer danos indiretos, incidentais, especiais, consequenciais, exemplares ou punitivos, nem por perda de lucros, dados, fundo de comércio, interrupção de negócios ou perdas de investimento, incluindo danos ou perdas decorrentes de: seu uso ou incapacidade de usar o app; confiança em preços, gráficos, análises ou outro conteúdo; erros, falhas ou interrupções; perda ou corrupção de dados locais, credenciais ou backups; ou serviços ou fontes de dados de terceiros. O app é fornecido \"no estado em que se encontra\" e \"conforme disponível\", sem garantias de qualquer tipo, expressas ou implícitas, incluindo garantias implícitas de comercialização, adequação a uma finalidade específica, título ou não violação, exceto onde tais exclusões forem proibidas por lei. Você concorda em indenizar, defender e isentar o Swanie\'s Portfolio e seus desenvolvedores, contratados, licenciadores e agentes de quaisquer reclamações, responsabilidades, danos, perdas, custos ou despesas (incluindo honorários advocatícios razoáveis) decorrentes do seu uso do app, violação destes termos ou violação de direitos de terceiros. Algumas jurisdições não permitem certas limitações; nesses casos, nossa responsabilidade é limitada na maior extensão permitida por lei. Se for exigido ressarcimento e for permitido um teto, nossa responsabilidade agregada por qualquer reclamação relacionada ao app não excederá o maior entre (a) os valores que você nos pagou pelo app ou compras no app via Google Play nos doze (12) meses anteriores à reclamação, ou (b) zero se você não realizou tais pagamentos. Esta seção sobrevive ao término do seu uso. Se não concordar, não use o app.</string>
 
     <string name="holdings_create_first_portfolio">Crie sua primeira carteira</string>
     <string name="holdings_delete_asset_title">REMOVER ATIVO?</string>

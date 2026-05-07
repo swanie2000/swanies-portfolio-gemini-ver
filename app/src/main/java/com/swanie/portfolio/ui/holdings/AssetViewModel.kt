@@ -157,11 +157,9 @@ class AssetViewModel @Inject constructor(
     }
 
     /**
-     * 🛰️ INTERNAL HELPER: Pushes the current vault state to Google Drive.
-     * Triggered after any local database modification.
-     * 
-     * REVISION V7.5.0: Now fetches ALL assets across ALL vaults to ensure 
-     * the cloud backup is a complete mirror of the local database.
+     * Calls [GoogleDriveService.uploadFullVaultBackup] after local DB changes.
+     * Drive upload is a stub in this release (no cloud mirror); kept so a future
+     * version can wire real sync without changing call sites.
      */
     private fun triggerCloudSync() {
         viewModelScope.launch {
@@ -171,9 +169,9 @@ class AssetViewModel @Inject constructor(
                 if (allAssets.isNotEmpty()) {
                     val success = googleDriveService.uploadFullVaultBackup(allAssets)
                     if (success) {
-                        Log.d("VAULT_DEBUG", "Heartbeat: Cloud Sync Successful (${allAssets.size} assets)")
+                        Log.d("VAULT_DEBUG", "Heartbeat: Drive backup hook returned success (${allAssets.size} assets)")
                     } else {
-                        Log.w("VAULT_DEBUG", "Heartbeat: Cloud Sync Skipped or Failed.")
+                        Log.w("VAULT_DEBUG", "Heartbeat: Drive backup skipped or failed (stub in this build).")
                     }
                 } else {
                     Log.d("VAULT_DEBUG", "Heartbeat: No assets to sync.")

@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">O aplikacji</string>
     <string name="about_version">Wersja %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio śledzi krypto i metale szlachetne. Skarbiec pozostaje na urządzeniu; funkcje opcjonalne (np. kopia Google Drive) używają tylko przyznanych uprawnień. Szczegóły w Prywatności i warunkach.</string>
+    <string name="about_intro">Swanie\'s Portfolio śledzi krypto i metale szlachetne. Skarbiec pozostaje na urządzeniu; zaszyfrowana kopia to plik, który eksportujesz sam. Automatyczna synchronizacja skarbca z Dyskiem Google jest planowana w przyszłej wersji i nie jest w tej wersji. Opcjonalne funkcje sieciowe (rozliczenia Play przy subskrypcji, opcjonalna opinia, dane rynkowe) są używane tylko wtedy, gdy z nich korzystasz. Szczegóły w Prywatności i warunkach.</string>
     <string name="about_legal_header">Informacje prawne</string>
     <string name="about_open_privacy_terms">Otwórz prywatność i warunki</string>
     <string name="about_play_console_hint">Dla Google Play dodaj w Play Console (Bezpieczeństwo danych) URL polityki prywatności zgodny z przetwarzaniem danych. Ekran w aplikacji podsumowuje to dla użytkowników.</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">ADRES E-MAIL</string>
     <string name="label_confirm_password">POTWIERDŹ HASŁO</string>
     <string name="label_recovery_hint">PODPOWIEDŹ DO ODZYSKANIA</string>
-    <string name="setting_sync_drive">Synchronizuj Sejf z Google Drive</string>
+    <string name="setting_sync_drive">Sync z Dyskiem Google (planowane)</string>
     <string name="tos_accept_prefix">Akceptuję </string>
     <string name="tos_terms">Regulamin i Warunki</string>
     <string name="status_creating">TWORZENIE...</string>
@@ -289,17 +289,19 @@
     <string name="terms_title">PRYWATNOŚĆ I WARUNKI</string>
     <string name="terms_last_updated">Ostatnia aktualizacja: Kwiecień 2026</string>
     <string name="terms_section_1_title">1. ARCHITEKTURA ZERO-KNOWLEDGE</string>
-    <string name="terms_section_1_body">Nie przechowujemy Twoich danych. Punkt. SwaniesPortfolio to most między Twoimi aktywami a prywatnym Google Drive. Nie mamy serwerów ani dostępu do Twojego sejfu.</string>
+    <string name="terms_section_1_body">Nie przechowujemy danych Twojego portfela na naszych serwerach. Sejf pozostaje na Twoim urządzeniu; nie mamy dostępu do jego treści. Automatyczna synchronizacja z Dyskiem Google nie jest dostępna w tej wersji (planowana później).</string>
     <string name="terms_section_2_title">2. OGRANICZENIA ODZYSKIWANIA</string>
     <string name="terms_section_2_body">Ze względu na model szyfrowania, twórca NIE MOŻE odzyskać Twojego hasła. Jeśli zgubisz hasło do sejfu i podpowiedź, dane zostaną utracone. To koszt absolutnej prywatności.</string>
-    <string name="terms_section_3_title">3. INTEGRACJA Z GOOGLE DRIVE</string>
-    <string name="terms_section_3_body">Aplikacja korzysta z ukrytego folderu „App Data” na Twoim prywatnym dysku Google Drive. Mamy dostęp tylko do tego folderu. Nie widzimy Twoich zdjęć ani dokumentów.</string>
+    <string name="terms_section_3_title">3. OPCJONALNE FUNKCJE SIECIOWE</string>
+    <string name="terms_section_3_body">Ta wersja przechowuje sejf na urządzeniu i nie synchronizuje go automatycznie z Dyskiem Google (planowane w przyszłej wersji). Opcjonalne funkcje sieciowe obejmują rozliczenia/subskrypcje Google Play przy zakupie, opcjonalną opinię po jej wysłaniu oraz dostawców danych rynkowych przy ładowaniu cen. Zaszyfrowana kopia zapasowa to plik, który eksportujesz i przechowujesz sam.</string>
     <string name="terms_section_4_title">4. CIĄGŁOŚĆ SUBSKRYPCJI</string>
     <string name="terms_section_4_body">Subskrypcje są powiązane z Twoją tożsamością Google Play. Twoje dane pozostają prywatne, a status Pro można odzyskać na dowolnym urządzeniu zalogowanym do konta Google.</string>
     <string name="terms_section_5_title">5. BRAK PORAD FINANSOWYCH</string>
     <string name="terms_section_5_body">Ta aplikacja jest narzędziem do śledzenia. Dane cenowe pochodzą od zewnętrznych dostawców (CoinGecko). Nie odpowiadamy za wahania rynkowe ani dokładność danych.</string>
     <string name="terms_section_6_title">6. OŚWIADCZENIE O TŁUMACZENIACH</string>
     <string name="terms_section_6_body">Angielski jest głównym językiem prawnym. Tłumaczenia mogą być generowane przez AI; w przypadku konfliktów decyduje tekst angielski.</string>
+    <string name="terms_section_7_title">7. OGRANICZENIE ODPOWIEDZIALNOŚCI; ZWOLNIENIE Z ROSZCZEŃ; KORZYSTANIE NA WŁASNE RYZYKO</string>
+    <string name="terms_section_7_body">Pobierając, instalując lub korzystając ze Swanie\'s Portfolio, zgadzasz się w swoim imieniu oraz w imieniu osób, które reprezentujesz, że w najszerszym zakresie dozwolonym przez obowiązujące prawo nie będziesz dochodzić odpowiedzialności wobec Swanie\'s Portfolio, jego deweloperów, wykonawców, licencjodawców ani agentów z tytułu jakichkolwiek szkód pośrednich, ubocznych, szczególnych, następowych, przykładowych lub karowych ani utraty zysków, danych, reputacji, przerw w działalności lub strat inwestycyjnych, w tym szkód lub strat wynikających z: korzystania lub niemożności korzystania z aplikacji; polegania na cenach, wykresach, analityce lub innej treści; błędów, usterek lub przerw; utraty lub uszkodzenia danych lokalnych, danych logowania lub kopii zapasowych; lub usług lub źródeł danych stron trzecich. Aplikacja jest udostępniana w stanie „takim, jakim jest” i „w miarę dostępności” bez jakichkolwiek gwarancji, wyraźnych lub dorozumianych, w tym dorozumianych gwarancji przydatności handlowej, przydatności do określonego celu, tytułu własności lub braku naruszeń, z wyjątkiem przypadków, gdy prawo zabrania takich wyłączeń. Zgadzasz się zwolnić z odpowiedzialności, bronić i chronić Swanie\'s Portfolio oraz jego deweloperów, wykonawców, licencjodawców i agentów przed wszelkimi roszczeniami, zobowiązaniami, szkodami, stratami, kosztami lub wydatkami (w tym uzasadnionymi honorariami adwokackimi) wynikającymi z korzystania z aplikacji, naruszenia niniejszych warunków lub praw osób trzecich. W niektórych jurysdykcjach pewne ograniczenia są niedozwolone; w takim przypadku nasza odpowiedzialność jest ograniczona do maksymalnego zakresu dopuszczonego przez prawo. Jeśli wymagane jest świadczenie i dopuszczalny jest limit, łączna odpowiedzialność z tytułu jakiegokolwiek roszczenia związanego z aplikacją nie przekroczy wyższej z kwot: (a) sumy zapłaconej nam za aplikację lub zakupy w aplikacji przez Google Play w dwunastu (12) miesiącach przed roszczeniem, lub (b) zero, jeśli nie dokonano takich płatności. Niniejszy rozdział pozostaje w mocy po zakończeniu korzystania. Jeśli nie zgadzasz się, nie korzystaj z aplikacji.</string>
 
     <string name="holdings_create_first_portfolio">Stwórz swój pierwszy portfel</string>
     <string name="holdings_delete_asset_title">USUNĄĆ AKTYWO?</string>

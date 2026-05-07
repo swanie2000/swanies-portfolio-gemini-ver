@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">Giới thiệu</string>
     <string name="about_version">Phiên bản %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio theo dõi tiền mã hóa và kim loại quý. Kho của bạn ở trên thiết bị; tính năng tùy chọn (ví dụ sao lưu Google Drive) chỉ dùng quyền bạn cấp. Chi tiết trong Quyền riêng tư và điều khoản.</string>
+    <string name="about_intro">Swanie\'s Portfolio theo dõi tiền mã hóa và kim loại quý. Kho của bạn ở trên thiết bị; bản sao lưu mã hóa là tệp bạn tự xuất. Đồng bộ kho tự động với Google Drive được dự kiến cho phiên bản sau và không có trong phiên bản này. Tính năng mạng tùy chọn (thanh toán Play khi đăng ký, phản hồi tùy chọn, dữ liệu thị trường) chỉ dùng khi bạn dùng chúng. Chi tiết trong Quyền riêng tư và điều khoản.</string>
     <string name="about_legal_header">Thông tin pháp lý</string>
     <string name="about_open_privacy_terms">Mở quyền riêng tư và điều khoản</string>
     <string name="about_play_console_hint">Cho Google Play, thêm URL chính sách quyền riêng tư trong Play Console (An toàn dữ liệu) phù hợp cách ứng dụng xử lý dữ liệu. Màn hình trong ứng dụng tóm tắt cho người dùng.</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">ĐỊA CHỈ EMAIL</string>
     <string name="label_confirm_password">XÁC NHẬN MẬT KHẨU</string>
     <string name="label_recovery_hint">GỢI Ý KHÔI PHỤC</string>
-    <string name="setting_sync_drive">Đồng bộ Kho với Google Drive</string>
+    <string name="setting_sync_drive">Đồng bộ Google Drive (dự kiến)</string>
     <string name="tos_accept_prefix">Tôi chấp nhận </string>
     <string name="tos_terms">Điều khoản và Điều kiện</string>
     <string name="status_creating">ĐANG TẠO...</string>
@@ -289,17 +289,19 @@
     <string name="terms_title">QUYỀN RIÊNG TƯ &amp; ĐIỀU KHOẢN</string>
     <string name="terms_last_updated">Cập nhật lần cuối: Tháng 4 2026</string>
     <string name="terms_section_1_title">1. KIẾN TRÚC ZERO-KNOWLEDGE</string>
-    <string name="terms_section_1_body">Chúng tôi không lưu trữ dữ liệu của bạn. Swanie Portfolio là cầu nối giữa tài sản của bạn và Google Drive cá nhân. Chúng tôi không có máy chủ và không có quyền truy cập vào kho của bạn.</string>
+    <string name="terms_section_1_body">Chúng tôi không lưu dữ liệu danh mục của bạn trên máy chủ. Kho ở trên thiết bị của bạn; chúng tôi không thể truy cập nội dung. Đồng bộ tự động với Google Drive không có trong phiên bản này (dự kiến sau).</string>
     <string name="terms_section_2_title">2. GIỚI HẠN KHÔI PHỤC DỮ LIỆU</string>
     <string name="terms_section_2_body">Do mô hình mã hóa, nhà phát triển không thể khôi phục mật khẩu của bạn. Nếu bạn mất Mật khẩu Kho và Gợi ý Khôi phục, dữ liệu của bạn sẽ mất vĩnh viễn. Đây là cái giá của sự riêng tư tuyệt đối.</string>
-    <string name="terms_section_3_title">3. TÍCH HỢP GOOGLE DRIVE</string>
-    <string name="terms_section_3_body">Ứng dụng sử dụng thư mục App Data ẩn trong Google Drive cá nhân của bạn. Ứng dụng chỉ có quyền đọc và ghi trong thư mục đó. Chúng tôi không thể xem ảnh hoặc tài liệu cá nhân của bạn.</string>
+    <string name="terms_section_3_title">3. TÍNH NĂNG MẠNG TÙY CHỌN</string>
+    <string name="terms_section_3_body">Phiên bản này giữ kho trên thiết bị và không tự đồng bộ với Google Drive (dự kiến trong phiên bản sau). Tính năng mạng tùy chọn gồm thanh toán/đăng ký Google Play khi mua, phản hồi tùy chọn nếu bạn gửi, và nhà cung cấp dữ liệu thị trường khi tải giá. Sao lưu mã hóa là tệp bạn xuất và tự lưu.</string>
     <string name="terms_section_4_title">4. TÍNH BỀN VỮNG CỦA GÓI ĐĂNG KÝ</string>
     <string name="terms_section_4_body">Gói hàng tháng và trọn đời được gắn với danh tính Google Play của bạn. Dữ liệu tài sản là riêng tư, và Trạng thái Pro có thể khôi phục trên các thiết bị đăng nhập cùng tài khoản Google.</string>
     <string name="terms_section_5_title">5. KHÔNG PHẢI TƯ VẤN TÀI CHÍNH</string>
     <string name="terms_section_5_body">Ứng dụng này là công cụ theo dõi. Dữ liệu giá lấy từ các API bên thứ ba như CoinGecko. Chúng tôi không chịu trách nhiệm về biến động thị trường hoặc độ chính xác của dữ liệu bên ngoài.</string>
     <string name="terms_section_6_title">6. TUYÊN BỐ VỀ DỊCH THUẬT</string>
     <string name="terms_section_6_body">Tiếng Anh là ngôn ngữ pháp lý và sản phẩm chính. Các bản dịch khác có thể do AI tạo ra; trong trường hợp xung đột, bản tiếng Anh sẽ được ưu tiên.</string>
+    <string name="terms_section_7_title">7. GIỚI HẠN TRÁCH NHIỆM; BỒI THƯỜNG; SỬ DỤNG TRÊN RỦI RO CỦA BẠN</string>
+    <string name="terms_section_7_body">Bằng việc tải xuống, cài đặt hoặc sử dụng Swanie\'s Portfolio, bạn đồng ý thay mặt cho bản thân và bất kỳ người nào bạn đại diện rằng, trong phạm vi tối đa mà pháp luật hiện hành cho phép, bạn sẽ không buộc Swanie\'s Portfolio, các nhà phát triển, nhà thầu, bên cấp phép hoặc đại lý của họ phải chịu trách nhiệm về bất kỳ thiệt hại gián tiếp, ngẫu nhiên, đặc biệt, hệ quả, mang tính hình phạt hoặc tiêu biểu nào, hoặc về mất lợi nhuận, dữ liệu, uy tín, gián đoạn kinh doanh hoặc tổn thất đầu tư, bao gồm thiệt hại hoặc tổn thất phát sinh từ: việc bạn sử dụng hoặc không thể sử dụng ứng dụng; dựa vào giá cả, biểu đồ, phân tích hoặc nội dung khác; lỗi, lỗi phần mềm hoặc gián đoạn; mất hoặc hỏng dữ liệu cục bộ, thông tin đăng nhập hoặc bản sao lưu; hoặc dịch vụ hoặc nguồn dữ liệu của bên thứ ba. Ứng dụng được cung cấp \"nguyên trạng\" và \"theo khả năng sẵn có\" mà không có bảo đảm dưới bất kỳ hình thức nào, dù rõ ràng hay ngụ ý, bao gồm các bảo đảm ngụ ý về khả năng kinh doanh, sự phù hợp cho một mục đích cụ thể, quyền sở hữu hoặc không vi phạm, trừ khi pháp luật cấm các tuyên bố từ chối đó. Bạn đồng ý bồi thường, bảo vệ và giữ cho Swanie\'s Portfolio cùng các nhà phát triển, nhà thầu, bên cấp phép và đại lý của họ không bị tổn hại trước mọi khiếu nại, nghĩa vụ pháp lý, thiệt hại, tổn thất, chi phí hoặc phí tổn (bao gồm phí luật sư hợp lý) phát sinh từ việc bạn sử dụng ứng dụng, vi phạm các điều khoản này hoặc vi phạm quyền của bên thứ ba. Một số khu vực pháp lý không cho phép một số hạn chế hoặc loại trừ; trong trường hợp đó, trách nhiệm của chúng tôi được giới hạn ở mức tối đa mà pháp luật cho phép. Nếu cần có biện pháp khắc phục và được phép đặt mức trần, tổng trách nhiệm của chúng tôi đối với bất kỳ khiếu nại nào liên quan đến ứng dụng sẽ không vượt quá giá trị lớn hơn trong hai giá trị sau: (a) số tiền bạn đã thanh toán cho chúng tôi về ứng dụng hoặc mua trong ứng dụng qua Google Play trong mười hai (12) tháng trước khiếu nại, hoặc (b) bằng không nếu bạn không thực hiện các khoản thanh toán đó. Mục này vẫn có hiệu lực sau khi bạn ngừng sử dụng. Nếu bạn không đồng ý, đừng sử dụng ứng dụng.</string>
 
     <string name="holdings_create_first_portfolio">Tạo danh mục đầu tiên của bạn</string>
     <string name="holdings_delete_asset_title">GỠ BỎ TÀI SẢN?</string>

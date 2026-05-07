@@ -66,7 +66,7 @@
     <string name="settings_bug_report_char_count">%1$d / 500</string>
     <string name="about_title">Tentang</string>
     <string name="about_version">Versi %1$s</string>
-    <string name="about_intro">Swanie\'s Portfolio adalah pelacak kripto dan logam mulia. Brankas Anda tetap di perangkat; fitur opsional (mis. cadangan Google Drive) hanya memakai izin yang Anda berikan. Detail ada di Privasi &amp; ketentuan.</string>
+    <string name="about_intro">Swanie\'s Portfolio adalah pelacak kripto dan logam mulia. Brankas Anda tetap di perangkat Anda; cadangan terenkripsi adalah berkas yang Anda ekspor sendiri. Sinkronisasi brankas otomatis ke Google Drive direncanakan untuk rilis mendatang dan tidak ada di versi ini. Fitur jaringan opsional (penagihan Play saat berlangganan, umpan balik opsional, data pasar) hanya dipakai saat Anda menggunakannya. Detail ada di Privasi &amp; ketentuan.</string>
     <string name="about_legal_header">Informasi hukum</string>
     <string name="about_open_privacy_terms">Buka privasi &amp; ketentuan</string>
     <string name="about_play_console_hint">Untuk Google Play, tambahkan URL kebijakan privasi di Play Console (Keamanan data) yang sesuai dengan pemrosesan data aplikasi. Layar Privasi &amp; ketentuan di aplikasi merangkum perilaku bagi pengguna.</string>
@@ -102,7 +102,7 @@
     <string name="label_email_address">ALAMAT EMAIL</string>
     <string name="label_confirm_password">KONFIRMASI KATA SANDI</string>
     <string name="label_recovery_hint">PETUNJUK PEMULIHAN</string>
-    <string name="setting_sync_drive">Sinkronkan Vault ke Google Drive</string>
+    <string name="setting_sync_drive">Sinkron Google Drive (direncanakan)</string>
     <string name="tos_accept_prefix">Saya menerima </string>
     <string name="tos_terms">Syarat dan Ketentuan</string>
     <string name="status_creating">MENCIPTAKAN...</string>
@@ -289,17 +289,19 @@
     <string name="terms_title">PRIVASI DAN KETENTUAN</string>
     <string name="terms_last_updated">Terakhir Diperbarui: April 2026</string>
     <string name="terms_section_1_title">1. ARSITEKTUR TANPA PENGETAHUAN</string>
-    <string name="terms_section_1_body">Kami tidak menyimpan data Anda. Swanie Portfolio adalah jembatan antara aset Anda dan Google Drive pribadi Anda. Kami tidak memiliki server dan tidak memiliki akses ke vault Anda.</string>
+    <string name="terms_section_1_body">Kami tidak menyimpan data portofolio Anda di server kami. Brankas tetap di perangkat Anda; kami tidak dapat mengakses isinya. Sinkronisasi otomatis ke Google Drive tidak tersedia di versi ini (direncanakan nanti).</string>
     <string name="terms_section_2_title">2. BATASAN PEMULIHAN DATA</string>
     <string name="terms_section_2_body">Karena model enkripsi kami, pembuat aplikasi tidak dapat memulihkan kata sandi Anda. Jika Anda kehilangan Kata Sandi Vault dan Petunjuk Pemulihan, data Anda hilang. Ini adalah biaya untuk privasi absolut.</string>
-    <string name="terms_section_3_title">3. INTEGRASI GOOGLE DRIVE</string>
-    <string name="terms_section_3_body">Aplikasi menggunakan folder App Data tersembunyi di Google Drive pribadi Anda. Aplikasi hanya dapat membaca dan menulis di folder tersebut. Kami tidak dapat melihat foto atau dokumen pribadi Anda.</string>
+    <string name="terms_section_3_title">3. FITUR JARINGAN OPSIONAL</string>
+    <string name="terms_section_3_body">Versi ini menyimpan brankas di perangkat Anda dan tidak menyinkronkannya secara otomatis ke Google Drive (direncanakan untuk rilis mendatang). Fitur jaringan opsional meliputi penagihan/langganan Google Play saat membeli, umpan balik opsional jika Anda mengirimkannya, dan penyedia data pasar saat harga dimuat. Cadangan terenkripsi adalah berkas yang Anda ekspor dan simpan sendiri.</string>
     <string name="terms_section_4_title">4. KEBERLANGSUNGAN BERLANGGANAN</string>
     <string name="terms_section_4_body">Langganan bulanan dan seumur hidup terikat dengan identitas Google Play Anda. Data aset Anda tetap pribadi, dan Status Pro dapat dipulihkan pada perangkat yang masuk dengan akun Google Anda.</string>
     <string name="terms_section_5_title">5. BUKAN SARAN KEUANGAN</string>
     <string name="terms_section_5_body">Aplikasi ini adalah alat pelacak. Data harga berasal dari API pihak ketiga seperti CoinGecko. Kami tidak bertanggung jawab atas fluktuasi pasar atau akurasi data eksternal.</string>
     <string name="terms_section_6_title">6. PENAFIAN TERJEMAHAN BAHASA</string>
     <string name="terms_section_6_body">Bahasa Inggris adalah bahasa hukum dan produk utama untuk aplikasi ini. Terjemahan non-Inggris mungkin dihasilkan oleh AI dan dapat mengandung perbedaan diksi. Jika terjadi konflik, teks bahasa Inggris yang berlaku.</string>
+    <string name="terms_section_7_title">7. PEMBATASAN TANGGUNG JAWAB; GANTI RUGI; PENGGUNAAN ATAS RISIKO ANDA SENDIRI</string>
+    <string name="terms_section_7_body">Dengan mengunduh, menginstal, atau menggunakan Swanie\'s Portfolio, Anda setuju atas nama diri sendiri dan siapa pun yang Anda wakili bahwa, sejauh diizinkan oleh hukum yang berlaku, Anda tidak akan mempertanggungjawabkan Swanie\'s Portfolio, pengembangnya, kontraktor, pemberi lisensi, atau agennya atas kerugian tidak langsung, insidental, khusus, konsekuensial, contoh, atau hukuman, atau atas kehilangan laba, data, niat baik, gangguan bisnis, atau kerugian investasi, termasuk kerugian yang timbul dari: penggunaan atau ketidakmampuan Anda menggunakan aplikasi; mengandalkan harga, grafik, analitik, atau konten lainnya; kesalahan, bug, atau gangguan; kehilangan atau korupsi data lokal, kredensial, atau cadangan; atau layanan atau sumber data pihak ketiga. Aplikasi disediakan \"APA ADANYA\" dan \"SEBAGAIMANA TERSEDIA\" tanpa jaminan apa pun, tersurat maupun tersirat, termasuk jaminan tersirat mengenai kelayakan untuk diperdagangkan, kesesuaian untuk tujuan tertentu, hak milik, atau non-pelanggaran, kecuali jika penafian tersebut dilarang oleh hukum. Anda setuju untuk mengganti rugi, membela, dan membebaskan Swanie\'s Portfolio serta pengembang, kontraktor, pemberi lisensi, dan agennya dari klaim, liabilitas, kerugian, biaya, atau pengeluaran (termasuk biaya pengacara yang wajar) yang timbul dari penggunaan aplikasi Anda, pelanggaran terhadap syarat ini, atau pelanggaran hak pihak ketiga. Beberapa yurisdiksi tidak mengizinkan pembatasan atau pengecualian tertentu; dalam hal tersebut, tanggung jawab kami dibatasi sejauh maksimum yang diizinkan oleh hukum. Jika diperlukan upaya pemulihan dan batas atas diizinkan, total tanggung jawab kami untuk klaim apa pun yang berkaitan dengan aplikasi tidak akan melebihi yang lebih besar antara (a) jumlah yang Anda bayarkan kepada kami untuk aplikasi atau pembelian dalam aplikasi melalui Google Play dalam dua belas (12) bulan sebelum klaim, atau (b) nol jika Anda tidak melakukan pembayaran tersebut. Bagian ini tetap berlaku setelah penggunaan Anda berakhir. Jika Anda tidak setuju, jangan gunakan aplikasi.</string>
 
     <string name="holdings_create_first_portfolio">Buat Portofolio Pertama Anda</string>
     <string name="holdings_delete_asset_title">HAPUS ASET?</string>

@@ -69,7 +69,6 @@ fun CreateAccountScreen(
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var passwordHint by rememberSaveable { mutableStateOf("") }
-    var syncToDrive by rememberSaveable { mutableStateOf(true) }
     var isTosChecked by rememberSaveable { mutableStateOf(false) }
 
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -218,12 +217,6 @@ fun CreateAccountScreen(
             Spacer(Modifier.height(20.dp))
             InputLabel(stringResource(R.string.label_recovery_hint), siteText)
             OutlinedTextField(value = passwordHint, onValueChange = { passwordHint = it }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors, singleLine = true)
-
-            Spacer(Modifier.height(24.dp))
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { syncToDrive = !syncToDrive }) {
-                Checkbox(checked = syncToDrive, onCheckedChange = { syncToDrive = it }, colors = CheckboxDefaults.colors(checkedColor = accentSilver, checkmarkColor = siteBg))
-                Text(stringResource(R.string.setting_sync_drive), color = siteText.copy(0.7f), fontSize = 12.sp)
-            }
 
             Spacer(Modifier.height(16.dp))
             Row(
