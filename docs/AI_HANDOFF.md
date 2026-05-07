@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-08 — Play **Dashboard** state captured; ordered **next-session** playbook below; pushed  
+**Last updated:** 2026-05-07 — **Marketing site favicon:** owner added **`website/favicon.png`** (swan PNG); tab + Apple touch wired in **`website/index.html`** / **`privacy.html`**; pushed with handoff  
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -50,6 +50,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 7. **Grow users → Store presence / Monetize with Play:** Screenshots, feature graphic, subscriptions + **RevenueCat** SKU alignment, **license testers** for `pro`.
 8. **Publishing overview:** When **Send app for review** is enabled and you intend listing/metadata review — send; optional **Managed publishing** if you want manual go-live after approval.
 9. **Website:** Finalize **`website/privacy.html`** (remove **`[bracket]`** placeholders, **`noindex`** when final) → push **`main`** so Play policy URL matches.
+
+**Win (this session):** **`website/favicon.png`** is in repo; GitHub Pages will serve it at **`/favicon.png`** after deploy (hard-refresh if cached).
 
 ---
 
@@ -85,7 +87,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` |
-| Marketing site | `website/`, `.github/workflows/deploy-website.yml` |
+| Marketing site | `website/` (incl. **`favicon.png`**, `favicon.svg` fallback), `.github/workflows/deploy-website.yml` |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
 
@@ -94,6 +96,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 ## Session history (newest first)
 
 - **2026-05-08 — Play playbook:** Owner created **Play app**; **Dashboard** shows setup tasks done; **Internal testing** still missing **AAB release**; **Publishing overview** / **Send for review** gated until Console allows. Captured **ordered next-session steps** in **§ Current session** (internal → closed → production → listing/monetization → privacy site).
+- **2026-05-07 — Site favicon:** Owner placed **swan** PNG as **`website/favicon.png`**. Committed + pushed with **`docs/AI_HANDOFF.md`** update; **`index.html`** / **`privacy.html`** already reference PNG + SVG fallback (**`website/README.md`**).
 - **2026-05-07 — Widget metal parity:** **`PortfolioWidget.kt`** **`AssetCardOriginal`** now uses **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** (same as compact/full holdings cards). **`SettingsViewModel`** widget serialization uses **`AssetValuation.cardPriceRowUsd`** for per-line spot string to match **`AssetRepository.pushFreshAssetsToWidget`**. Owner confirmed widget behavior OK.
 - **2026-05-05 — Release signing closure:** Confirmed **`swanie_portfolio_release.jks`** unlocks with **`keytool`**; **`app\release\app-release.aab`** signer **SHA256** matches keystore (release path aligned with Play’s separate **debug** package-registration proof). Noted **`keytool -storetype PKCS12`** / Studio **JBR** vs PATH JDK for future CLI checks. Owner pausing for the day.
 - **2026-05-04 (EOD) — Package name registration:** Play **Android developer verification** — eligible cert was **debug** SHA-256 (not new release `.jks`). Added **`adi-registration.properties`** under **`app/src/main/assets/`**, removed bogus **`androidTest`** duplicate **`test holding file.kt`** that blocked **`assembleDebug`**. Owner **submitted** registration; Console **In review**. Release keystore path: **`AndroidStudioProjects\Android-Signing\swanie_portfolio_release.jks`**.
