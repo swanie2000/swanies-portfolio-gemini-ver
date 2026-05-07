@@ -230,6 +230,31 @@ span.btn-primary {
   color: var(--muted);
 }
 
+.pitch-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+  margin-top: -0.5rem;
+}
+
+.pitch-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.pitch-item h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+}
+
+.pitch-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 /* Features */
 section {
   margin-bottom: 3.5rem;
@@ -279,6 +304,47 @@ section {
   margin: 0;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+.shots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.shot-card {
+  margin: 0;
+}
+
+.shot-frame {
+  aspect-ratio: 9 / 19.5;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(212, 168, 83, 0.14), rgba(10, 15, 33, 0.9));
+  display: grid;
+  place-items: center;
+}
+
+.shot-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shot-placeholder {
+  display: none;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.shot-card figcaption {
+  margin-top: 0.55rem;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 /* Pro strip */
