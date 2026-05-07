@@ -1,0 +1,5 @@
+The file qrcode.min.js in this folder is QRCode.js from:
+  https://github.com/davidshimjs/qrcodejs
+
+It is used only to draw QR matrices in the visitor’s browser (no network calls for encoding).
+License: MIT (see the upstream repository for full text).

@@ -698,14 +698,94 @@ section {
   margin: 0.25rem 0 0;
 }
 
-/* Tester invite — QR (live) or placeholder until TESTER_URL is set in index.html */
-.tester-qr-panel {
+/* QR deck — site URL + optional Play tester invite (generated in-browser via js/qrcode.min.js) */
+.qr-deck {
   margin-top: 1.35rem;
   padding: 1.15rem 1rem 1.25rem;
-  text-align: center;
   border-radius: var(--radius);
   border: 1px solid rgba(94, 234, 212, 0.28);
   background: rgba(12, 18, 42, 0.72);
+}
+
+.qr-deck-intro {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.55;
+  text-align: left;
+}
+
+.qr-help {
+  margin: 0 0 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  background: rgba(0, 4, 22, 0.28);
+  padding: 0 0.85rem;
+}
+
+.qr-help summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--gold-dim);
+  padding: 0.65rem 0;
+  list-style: none;
+}
+
+.qr-help summary::-webkit-details-marker {
+  display: none;
+}
+
+.qr-help summary::marker {
+  content: "";
+}
+
+.qr-help-body {
+  padding: 0 0 0.75rem;
+  border-top: 1px solid rgba(212, 168, 83, 0.1);
+}
+
+.qr-help-body p {
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.qr-deck-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (max-width: 640px) {
+  .qr-deck-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qr-card {
+  text-align: center;
+  padding: 1rem 0.85rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(0, 4, 22, 0.35);
+}
+
+.qr-card-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.qr-card-sub {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .tester-qr-live[hidden],
@@ -714,7 +794,7 @@ section {
 }
 
 .tester-qr-placeholder-box {
-  max-width: 28rem;
+  max-width: 100%;
   margin: 0 auto;
   padding: 1rem 1.1rem;
   border-radius: 12px;
@@ -735,12 +815,6 @@ section {
   font-size: 0.85em;
 }
 
-.tester-qr-caption {
-  margin: 0 0 0.65rem;
-  font-size: 0.88rem;
-  color: var(--muted);
-}
-
 .tester-qr-frame {
   display: inline-block;
   padding: 0.5rem;
@@ -750,7 +824,8 @@ section {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
-.tester-qr-frame img {
+.tester-qr-frame .qr-host canvas,
+.tester-qr-frame .qr-host table {
   display: block;
   border-radius: 6px;
 }

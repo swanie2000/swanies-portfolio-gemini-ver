@@ -169,21 +169,56 @@
           <p class="testing-links">
             <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
           </p>
-          <div id="tester-qr-panel" class="tester-qr-panel">
-            <div id="tester-qr-pending" class="tester-qr-pending">
-              <p class="tester-qr-caption">Tester invite QR</p>
-              <div class="tester-qr-placeholder-box" role="status">
-                <p class="tester-qr-placeholder-text">
-                  Set <code>TESTER_URL</code> in the script at the bottom of this page to your <strong>https://</strong> Play tester link, then save and redeploy. A scannable QR will appear here.
+          <div class="qr-deck" id="qr-deck">
+            <p class="qr-deck-intro">
+              Two different links: <strong>This page</strong> opens the same site on your phone.
+              <strong>Play testing</strong> is the Google Play tester invite (opt-in / install) — set <code>TESTER_URL</code> when you have it.
+            </p>
+            <details class="qr-help">
+              <summary>About these QR codes &amp; privacy</summary>
+              <div class="qr-help-body">
+                <p>
+                  <strong>Site QR</strong> encodes this marketing page’s URL so someone at a desk can jump to the same page on mobile without typing.
+                  It is <em>not</em> the Play Store install link.
+                </p>
+                <p>
+                  <strong>Tester QR</strong> encodes your <strong>Google Play</strong> internal or closed-testing invite URL (the long <code>play.google.com/…</code> link).
+                  Scanning it skips retyping that URL on a phone.
+                </p>
+                <p>
+                  Both codes are drawn <strong>entirely in your browser</strong> using the open-source <strong>QRCode.js</strong> file shipped in this site
+                  (<code>website/js/qrcode.min.js</code>). No third-party “QR image API” is called.
                 </p>
               </div>
-            </div>
-            <div id="tester-qr-live" class="tester-qr-live" hidden>
-              <p class="tester-qr-caption">Scan with your phone to open the tester invite.</p>
-              <div class="tester-qr-frame">
-                <img id="tester-qr-img" width="200" height="200" decoding="async" alt="" />
+            </details>
+            <div class="qr-deck-grid">
+              <div class="qr-card">
+                <h4 class="qr-card-title">This page on your phone</h4>
+                <p class="qr-card-sub">Same site you’re viewing — handy from a desktop browser.</p>
+                <div class="tester-qr-frame">
+                  <div id="site-qr-host" class="qr-host"></div>
+                </div>
+                <a id="site-qr-open" class="tester-qr-link" href="#">Open this page</a>
               </div>
-              <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open tester link</a>
+              <div class="qr-card qr-card-tester">
+                <div id="tester-qr-pending" class="tester-qr-pending">
+                  <h4 class="qr-card-title">Google Play tester invite</h4>
+                  <p class="qr-card-sub">Appears when <code>TESTER_URL</code> is set in the page script.</p>
+                  <div class="tester-qr-placeholder-box" role="status">
+                    <p class="tester-qr-placeholder-text">
+                      Set <code>TESTER_URL</code> at the bottom of this file to your <strong>https://</strong> Play tester link, save, and redeploy. A QR will appear here.
+                    </p>
+                  </div>
+                </div>
+                <div id="tester-qr-live" class="tester-qr-live" hidden>
+                  <h4 class="qr-card-title">Google Play tester invite</h4>
+                  <p class="qr-card-sub">Scan to open the opt-in / install flow in Play.</p>
+                  <div class="tester-qr-frame">
+                    <div id="tester-qr-host" class="qr-host"></div>
+                  </div>
+                  <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open tester link</a>
+                </div>
+              </div>
             </div>
           </div>
           <details class="reviewers-details">
@@ -199,7 +234,7 @@
             </div>
           </details>
           <p class="hero-note">
-            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready. The QR below switches from instructions to a live code automatically.
+            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> when links are ready. Optional: set <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> to a canonical <strong>https://</strong> homepage if the auto-detected URL is wrong (e.g. local preview).
           </p>
         </div>
       </section>
@@ -210,9 +245,12 @@
       <span><a href="privacy.html">Privacy</a> · <a href="press.html">Press</a> · Not financial advice</span>
     </footer>
   </div>
+  <script src="js/qrcode.min.js"></script>
   <script>
     const PLAY_URL = "";
     const TESTER_URL = "";
+    /** Optional: force the “site” QR to a public https URL (e.g. https://swaniedesigns.com/). Leave "" to use the current page URL. */
+    const SITE_SHARE_URL = "";
 
     function wireCta(id, url, liveLabel) {
       const el = document.getElementById(id);
@@ -229,28 +267,53 @@
     wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
 
+    function siteShareTarget() {
+      if (SITE_SHARE_URL && /^https?:\/\//.test(SITE_SHARE_URL)) return SITE_SHARE_URL;
+      var p = window.location.pathname || "/";
+      if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+      return window.location.origin + (p || "/");
+    }
+
+    function drawQr(hostId, text) {
+      var el = document.getElementById(hostId);
+      if (!el || typeof QRCode === "undefined") return;
+      el.innerHTML = "";
+      new QRCode(el, {
+        text: text,
+        width: 200,
+        height: 200,
+        colorDark: "#0a0a12",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+
+    function wireSiteQr() {
+      var target = siteShareTarget();
+      var openLink = document.getElementById("site-qr-open");
+      drawQr("site-qr-host", target);
+      if (openLink) openLink.href = target;
+    }
+
     function wireTesterQr(url) {
       var pending = document.getElementById("tester-qr-pending");
       var live = document.getElementById("tester-qr-live");
-      var img = document.getElementById("tester-qr-img");
       var fallback = document.getElementById("tester-qr-fallback");
-      var panel = document.getElementById("tester-qr-panel");
-      if (!pending || !live || !img || !fallback || !panel) return;
+      if (!pending || !live || !fallback) return;
       if (url && /^https?:\/\//.test(url)) {
-        img.src =
-          "https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=" +
-          encodeURIComponent(url);
-        img.alt = "QR code linking to the Google Play tester invite";
+        drawQr("tester-qr-host", url);
         fallback.href = url;
         pending.hidden = true;
         live.hidden = false;
-        panel.classList.add("is-live");
       } else {
         pending.hidden = false;
         live.hidden = true;
-        panel.classList.remove("is-live");
+        var host = document.getElementById("tester-qr-host");
+        if (host) host.innerHTML = "";
       }
     }
+
+    wireSiteQr();
     wireTesterQr(TESTER_URL);
 
     (function () {
