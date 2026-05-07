@@ -4,9 +4,10 @@ Single-page marketing site plus a **privacy policy shell** for your Play Console
 
 ## Before you publish
 
-1. **`favicon.png`** — Put your **square** swan PNG in `website/` with this exact name: **`favicon.png`** (recommended **512×512** or **256×256** PNG with transparent or solid background). The HTML already points `<link rel="icon">` and `apple-touch-icon` at this file; until it exists in the repo, browsers fall back to `favicon.svg`.
-2. **`index.html`** — Set `PLAY_URL` / `TESTER_URL` in the script at the bottom when links are ready.
-3. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
+1. **`favicon.png`** — Keep your **square** swan PNG in `website/` as **`favicon.png`** (recommended **512×512** or **256×256**). HTML uses **`favicon.png?v=…`** to reduce cache confusion after you replace the file (bump `?v=` in `index.html` / `privacy.html`). Legacy **`favicon.svg`** is unused by the pages now so the PNG wins in every browser.
+2. **Screenshots (optional)** — Add PNGs under **`website/images/`** using the exact names in `index.html`: `screen-01-vault-home.png`, `screen-02-asset-details.png`, `screen-03-widget.png`. Other filenames or folders will not load until you change the `<img src="…">` paths.
+3. **`index.html`** — Set `PLAY_URL` / `TESTER_URL` in the script at the bottom when links are ready.
+4. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
 
 ## Free hosting options
 
