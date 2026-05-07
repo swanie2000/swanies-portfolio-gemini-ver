@@ -33,11 +33,11 @@
           optional features use only the permissions you grant.
         </p>
         <div class="cta-row">
-          <!-- When live: use <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=YOUR.PACKAGE">Get it on Google Play</a> -->
-          <span class="btn btn-primary" id="play-cta" role="status">Google Play — soon</span>
+          <a class="btn btn-primary is-disabled" id="play-cta" href="#" aria-disabled="true">Google Play — soon</a>
+          <a class="btn btn-secondary" href="#join-testing">Join testing</a>
           <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
         </div>
-        <p class="hero-note">Listing in progress — replace the grayed “soon” control with your Play link in <code style="color: var(--gold-dim);">index.html</code> when the store listing is public.</p>
+        <p class="hero-note">Use the tester section below while your Play rollout is in progress.</p>
       </section>
 
       <section id="features">
@@ -84,6 +84,25 @@
           widget customization, and related Pro surfaces). Details appear inside the app and at checkout.
         </p>
       </section>
+
+      <section id="join-testing">
+        <h2 class="section-title">Join testing</h2>
+        <p class="section-sub">Use this section while the listing moves through internal and closed testing.</p>
+        <div class="card testing-card">
+          <h3>How to get access</h3>
+          <ol>
+            <li>Request access from the Swanie's Portfolio tester list owner.</li>
+            <li>Accept the Google Play tester invitation when you receive it.</li>
+            <li>Install from the tester link in Google Play.</li>
+          </ol>
+          <p class="testing-links">
+            <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
+          </p>
+          <p class="hero-note">
+            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready.
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
@@ -92,6 +111,22 @@
     </footer>
   </div>
   <script>
+    const PLAY_URL = "";
+    const TESTER_URL = "";
+
+    function wireCta(id, url, liveLabel) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (url && /^https?:\/\//.test(url)) {
+        el.href = url;
+        el.textContent = liveLabel;
+        el.removeAttribute("aria-disabled");
+        el.classList.remove("is-disabled");
+      }
+    }
+
+    wireCta("play-cta", PLAY_URL, "Get it on Google Play");
+    wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
   </script>
 </body>

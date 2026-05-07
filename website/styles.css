@@ -206,6 +206,24 @@ span.btn-primary {
   color: var(--cyan);
 }
 
+.btn-secondary {
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--cyan);
+  border: 1px solid rgba(94, 234, 212, 0.35);
+}
+
+.btn-secondary:hover {
+  background: rgba(94, 234, 212, 0.18);
+}
+
+.is-disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: default;
+  box-shadow: none;
+}
+
 .hero-note {
   margin-top: 1rem;
   font-size: 0.85rem;
@@ -282,6 +300,25 @@ section {
   color: var(--muted);
   font-size: 0.95rem;
   max-width: 65ch;
+}
+
+.testing-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.testing-card ol {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: var(--muted);
+}
+
+.testing-card li {
+  margin-bottom: 0.35rem;
+}
+
+.testing-links {
+  margin: 0.25rem 0 0;
 }
 
 /* Footer */
