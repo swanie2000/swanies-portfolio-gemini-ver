@@ -75,10 +75,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--gold) 0%, #6b5428 100%);
-  display: grid;
-  place-items: center;
-  font-size: 1.15rem;
+  display: block;
+  object-fit: cover;
   box-shadow: 0 0 24px rgba(212, 168, 83, 0.25);
 }
 
