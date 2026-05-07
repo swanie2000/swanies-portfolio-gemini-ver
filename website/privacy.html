@@ -85,5 +85,15 @@
       <span><a href="index.html">Home</a></span>
     </footer>
   </div>
+  <script>
+    (function () {
+      var threshold = 12;
+      function syncScrollHeader() {
+        document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
+      }
+      syncScrollHeader();
+      window.addEventListener("scroll", syncScrollHeader, { passive: true });
+    })();
+  </script>
 </body>
 </html>

@@ -68,29 +68,41 @@
         <div class="shots-grid">
           <figure class="shot-card">
             <div class="shot-frame">
-              <img src="images/screen-01-vault-home.jpg" alt="Vault and holdings home screen preview" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-              <span class="shot-placeholder">Add: <code>website/images/screen-01-vault-home.jpg</code></span>
+              <div class="shot-device-screen">
+                <span class="shot-device-earpiece" aria-hidden="true"></span>
+                <img src="images/screen-01-vault-home.jpg" alt="Vault and holdings home screen preview" loading="lazy" onerror="this.style.display='none'; var e=this.previousElementSibling; if(e) e.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="shot-placeholder">Add: <code>website/images/screen-01-vault-home.jpg</code></span>
+              </div>
             </div>
             <figcaption>Vault home and live portfolio totals.</figcaption>
           </figure>
           <figure class="shot-card">
             <div class="shot-frame">
-              <img src="images/screen-02-asset-details.jpg" alt="Asset card details and valuation preview" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-              <span class="shot-placeholder">Add: <code>website/images/screen-02-asset-details.jpg</code></span>
+              <div class="shot-device-screen">
+                <span class="shot-device-earpiece" aria-hidden="true"></span>
+                <img src="images/screen-02-asset-details.jpg" alt="Asset card details and valuation preview" loading="lazy" onerror="this.style.display='none'; var e=this.previousElementSibling; if(e) e.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="shot-placeholder">Add: <code>website/images/screen-02-asset-details.jpg</code></span>
+              </div>
             </div>
             <figcaption>Asset cards with metal-aware pricing and formatting.</figcaption>
           </figure>
           <figure class="shot-card">
             <div class="shot-frame">
-              <img src="images/screen-03-widget.jpg" alt="Home screen widget preview" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-              <span class="shot-placeholder">Add: <code>website/images/screen-03-widget.jpg</code></span>
+              <div class="shot-device-screen">
+                <span class="shot-device-earpiece" aria-hidden="true"></span>
+                <img src="images/screen-03-widget.jpg" alt="Home screen widget preview" loading="lazy" onerror="this.style.display='none'; var e=this.previousElementSibling; if(e) e.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="shot-placeholder">Add: <code>website/images/screen-03-widget.jpg</code></span>
+              </div>
             </div>
             <figcaption>Widget view for at-a-glance totals and movement.</figcaption>
           </figure>
           <figure class="shot-card">
             <div class="shot-frame">
-              <img src="images/screen-03-widget-manager.jpg" alt="Widget manager and customization preview" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-              <span class="shot-placeholder">Add: <code>website/images/screen-03-widget-manager.jpg</code></span>
+              <div class="shot-device-screen">
+                <span class="shot-device-earpiece" aria-hidden="true"></span>
+                <img src="images/screen-03-widget-manager.jpg" alt="Widget manager and customization preview" loading="lazy" onerror="this.style.display='none'; var e=this.previousElementSibling; if(e) e.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                <span class="shot-placeholder">Add: <code>website/images/screen-03-widget-manager.jpg</code></span>
+              </div>
             </div>
             <figcaption>Widget manager — tune what appears on your home screen.</figcaption>
           </figure>
@@ -185,6 +197,15 @@
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    (function () {
+      var threshold = 12;
+      function syncScrollHeader() {
+        document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
+      }
+      syncScrollHeader();
+      window.addEventListener("scroll", syncScrollHeader, { passive: true });
+    })();
   </script>
 </body>
 </html>
