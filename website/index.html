@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="bg-pattern" aria-hidden="true"></div>
   <div class="bg-layer" aria-hidden="true"></div>
   <div class="wrap">
     <header class="site-header">
@@ -28,6 +29,7 @@
       <nav class="nav-links" aria-label="Site">
         <a href="#features">Features</a>
         <a href="privacy.html">Privacy</a>
+        <a href="press.html">Press</a>
       </nav>
     </header>
 
@@ -167,8 +169,27 @@
           <p class="testing-links">
             <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
           </p>
+          <div id="tester-qr-panel" class="tester-qr-panel" hidden>
+            <p class="tester-qr-caption">On a computer? Scan with your phone to open the tester invite.</p>
+            <div class="tester-qr-frame">
+              <img id="tester-qr-img" width="200" height="200" decoding="async" alt="" />
+            </div>
+            <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open tester link</a>
+          </div>
+          <details class="reviewers-details">
+            <summary>For reviewers &amp; press</summary>
+            <div class="reviewers-details-body">
+              <ul>
+                <li><strong>What it is:</strong> Android portfolio tracker for crypto and precious metals; local-first vault; optional Google Drive backup when enabled.</li>
+                <li><strong>Package ID:</strong> <code>com.swanie.portfolio</code></li>
+                <li><strong>Policy:</strong> <a href="privacy.html">Privacy policy</a></li>
+                <li><strong>Contact:</strong> Use the support channel on the Google Play listing once the app is public.</li>
+              </ul>
+              <p class="reviewers-details-more"><a class="btn btn-ghost" href="press.html">Full press kit</a></p>
+            </div>
+          </details>
           <p class="hero-note">
-            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready.
+            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready. The tester QR shows on <strong>desktop-width</strong> viewports once <code>TESTER_URL</code> is set.
           </p>
         </div>
       </section>
@@ -176,7 +197,7 @@
 
     <footer class="site-footer">
       <span>© <span id="y"></span> Swanie's Portfolio</span>
-      <span><a href="privacy.html">Privacy policy</a> · Not financial advice</span>
+      <span><a href="privacy.html">Privacy</a> · <a href="press.html">Press</a> · Not financial advice</span>
     </footer>
   </div>
   <script>
@@ -197,6 +218,23 @@
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    function wireTesterQr(url) {
+      var panel = document.getElementById("tester-qr-panel");
+      var img = document.getElementById("tester-qr-img");
+      var fallback = document.getElementById("tester-qr-fallback");
+      if (!panel || !img || !fallback) return;
+      if (url && /^https?:\/\//.test(url)) {
+        img.src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=" +
+          encodeURIComponent(url);
+        img.alt = "QR code linking to the Google Play tester invite";
+        fallback.href = url;
+        panel.hidden = false;
+        panel.classList.add("is-live");
+      }
+    }
+    wireTesterQr(TESTER_URL);
 
     (function () {
       var threshold = 12;

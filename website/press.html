@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Press kit — Swanie's Portfolio: crypto and precious metals tracker for Android." />
+  <meta name="theme-color" content="#000416" />
+  <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
+  <link rel="apple-touch-icon" href="favicon-tab.png?v=2" />
+  <title>Press kit — Swanie's Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="logo" href="index.html">
+        <img class="logo-mark" src="ic_swan_website.png" alt="" aria-hidden="true" />
+        <div class="logo-text-stack">
+          <span class="logo-text">Swanie's Portfolio</span><br aria-hidden="true" />
+          <span class="logo-tagline">Crypto &amp; Precious Metals</span>
+        </div>
+      </a>
+      <nav class="nav-links" aria-label="Site">
+        <a href="index.html#features">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="press.html" aria-current="page">Press</a>
+      </nav>
+    </header>
+
+    <main class="legal-page press-page">
+      <a class="back-link" href="index.html">← Back to home</a>
+      <h1>Press kit</h1>
+      <p class="meta">Facts for journalists, reviewers, and testers. <strong>Last updated:</strong> 2026-05-07</p>
+
+      <div class="callout">
+        <strong>One-liner:</strong> Swanie's Portfolio is a local-first Android app for tracking cryptocurrency and precious metals—with vault security, widgets, analytics, encrypted backup, and optional cloud features when you enable them.
+      </div>
+
+      <h2>Product</h2>
+      <ul>
+        <li><strong>Platform:</strong> Android (Google Play).</li>
+        <li><strong>Category:</strong> Finance / portfolio tracking (crypto &amp; bullion).</li>
+        <li><strong>Monetization:</strong> Free core; <strong>Pro</strong> subscription where available (themes, deeper analytics, widget customization, and related Pro surfaces).</li>
+        <li><strong>Languages:</strong> Wide locale coverage; see in-app language list.</li>
+        <li><strong>Privacy policy:</strong> <a href="privacy.html">Privacy</a> (same site).</li>
+      </ul>
+
+      <h2>Package &amp; listing</h2>
+      <ul>
+        <li><strong>Application ID:</strong> <code>com.swanie.portfolio</code></li>
+        <li><strong>Display name:</strong> Swanie's Portfolio</li>
+        <li><strong>Tester / Play links:</strong> Use the live links on the <a href="index.html#join-testing">home page</a> when the owner has published them.</li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>
+        For press or partnership questions, use the <strong>support contact shown on the Google Play listing</strong> for Swanie's Portfolio once the app is public. Until then, reach the developer through the channels you already use with the project owner.
+      </p>
+
+      <h2>Assets</h2>
+      <ul>
+        <li><strong>Site &amp; branding:</strong> Swan motif and screenshots live under the site’s <code>website/</code> folder in the public repo (e.g. <code>ic_swan_website.png</code>, <code>images/</code>).</li>
+        <li><strong>Play Console:</strong> Use store listing screenshots and feature graphic from Play when the listing is live.</li>
+      </ul>
+
+      <p style="margin-top: 2rem;"><a href="index.html" class="back-link">← Home</a></p>
+    </main>
+
+    <footer class="site-footer">
+      <span>Swanie's Portfolio</span>
+      <span><a href="index.html">Home</a> · <a href="privacy.html">Privacy</a></span>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      var threshold = 12;
+      function syncScrollHeader() {
+        document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
+      }
+      syncScrollHeader();
+      window.addEventListener("scroll", syncScrollHeader, { passive: true });
+    })();
+  </script>
+</body>
+</html>

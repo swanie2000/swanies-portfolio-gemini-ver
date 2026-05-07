@@ -37,6 +37,30 @@ body {
   line-height: 1.55;
 }
 
+/* Subtle texture under gradients — opacity follows system light/dark preference */
+.bg-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("bg-pattern.svg");
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  opacity: 0.16;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-pattern {
+    opacity: 0.26;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .bg-pattern {
+    opacity: 0.09;
+  }
+}
+
 /* Ambient background — slow drift so the page feels alive */
 .bg-layer {
   position: fixed;
@@ -674,6 +698,122 @@ section {
   margin: 0.25rem 0 0;
 }
 
+/* Tester invite — QR for desktop visitors (hidden until TESTER_URL is wired in index.html) */
+.tester-qr-panel {
+  margin-top: 1.35rem;
+  padding: 1.15rem 1rem 1.25rem;
+  text-align: center;
+  border-radius: var(--radius);
+  border: 1px solid rgba(94, 234, 212, 0.28);
+  background: rgba(12, 18, 42, 0.72);
+}
+
+.tester-qr-panel[hidden] {
+  display: none !important;
+}
+
+.tester-qr-panel.is-live {
+  display: block;
+}
+
+@media (max-width: 719px) {
+  .tester-qr-panel.is-live {
+    display: none !important;
+  }
+}
+
+.tester-qr-caption {
+  margin: 0 0 0.65rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.tester-qr-frame {
+  display: inline-block;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: #fff;
+  line-height: 0;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.tester-qr-frame img {
+  display: block;
+  border-radius: 6px;
+}
+
+.tester-qr-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+.tester-qr-link:hover {
+  text-decoration: underline;
+}
+
+.reviewers-details {
+  margin-top: 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(12, 18, 42, 0.45);
+  padding: 0 1rem;
+}
+
+.reviewers-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--cyan);
+  padding: 0.85rem 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.reviewers-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.reviewers-details summary::marker {
+  content: "";
+}
+
+.reviewers-details summary::after {
+  content: "▸";
+  font-size: 0.65rem;
+  opacity: 0.75;
+  transition: transform 0.2s ease;
+}
+
+.reviewers-details[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.reviewers-details-body {
+  padding: 0 0 1rem;
+  border-top: 1px solid rgba(212, 168, 83, 0.12);
+}
+
+.reviewers-details-body ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.reviewers-details-body li {
+  margin-bottom: 0.45rem;
+}
+
+.reviewers-details-more {
+  margin: 0.75rem 0 0;
+}
+
 /* Footer */
 .site-footer {
   border-top: 1px solid var(--border);
@@ -807,6 +947,10 @@ section {
   }
 
   .nav-links a::after {
+    transition: none;
+  }
+
+  .reviewers-details summary::after {
     transition: none;
   }
 }
