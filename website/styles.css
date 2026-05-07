@@ -698,7 +698,7 @@ section {
   margin: 0.25rem 0 0;
 }
 
-/* Tester invite — QR for desktop visitors (hidden until TESTER_URL is wired in index.html) */
+/* Tester invite — QR (live) or placeholder until TESTER_URL is set in index.html */
 .tester-qr-panel {
   margin-top: 1.35rem;
   padding: 1.15rem 1rem 1.25rem;
@@ -708,18 +708,31 @@ section {
   background: rgba(12, 18, 42, 0.72);
 }
 
-.tester-qr-panel[hidden] {
+.tester-qr-live[hidden],
+.tester-qr-pending[hidden] {
   display: none !important;
 }
 
-.tester-qr-panel.is-live {
-  display: block;
+.tester-qr-placeholder-box {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(212, 168, 83, 0.35);
+  background: rgba(0, 4, 22, 0.35);
 }
 
-@media (max-width: 719px) {
-  .tester-qr-panel.is-live {
-    display: none !important;
-  }
+.tester-qr-placeholder-text {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.tester-qr-placeholder-text code {
+  color: var(--gold-dim);
+  font-size: 0.85em;
 }
 
 .tester-qr-caption {

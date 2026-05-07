@@ -169,12 +169,22 @@
           <p class="testing-links">
             <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
           </p>
-          <div id="tester-qr-panel" class="tester-qr-panel" hidden>
-            <p class="tester-qr-caption">On a computer? Scan with your phone to open the tester invite.</p>
-            <div class="tester-qr-frame">
-              <img id="tester-qr-img" width="200" height="200" decoding="async" alt="" />
+          <div id="tester-qr-panel" class="tester-qr-panel">
+            <div id="tester-qr-pending" class="tester-qr-pending">
+              <p class="tester-qr-caption">Tester invite QR</p>
+              <div class="tester-qr-placeholder-box" role="status">
+                <p class="tester-qr-placeholder-text">
+                  Set <code>TESTER_URL</code> in the script at the bottom of this page to your <strong>https://</strong> Play tester link, then save and redeploy. A scannable QR will appear here.
+                </p>
+              </div>
             </div>
-            <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open tester link</a>
+            <div id="tester-qr-live" class="tester-qr-live" hidden>
+              <p class="tester-qr-caption">Scan with your phone to open the tester invite.</p>
+              <div class="tester-qr-frame">
+                <img id="tester-qr-img" width="200" height="200" decoding="async" alt="" />
+              </div>
+              <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open tester link</a>
+            </div>
           </div>
           <details class="reviewers-details">
             <summary>For reviewers &amp; press</summary>
@@ -189,7 +199,7 @@
             </div>
           </details>
           <p class="hero-note">
-            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready. The tester QR shows on <strong>desktop-width</strong> viewports once <code>TESTER_URL</code> is set.
+            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> in the script at the bottom of this file when links are ready. The QR below switches from instructions to a live code automatically.
           </p>
         </div>
       </section>
@@ -220,18 +230,25 @@
     document.getElementById("y").textContent = new Date().getFullYear();
 
     function wireTesterQr(url) {
-      var panel = document.getElementById("tester-qr-panel");
+      var pending = document.getElementById("tester-qr-pending");
+      var live = document.getElementById("tester-qr-live");
       var img = document.getElementById("tester-qr-img");
       var fallback = document.getElementById("tester-qr-fallback");
-      if (!panel || !img || !fallback) return;
+      var panel = document.getElementById("tester-qr-panel");
+      if (!pending || !live || !img || !fallback || !panel) return;
       if (url && /^https?:\/\//.test(url)) {
         img.src =
           "https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=" +
           encodeURIComponent(url);
         img.alt = "QR code linking to the Google Play tester invite";
         fallback.href = url;
-        panel.hidden = false;
+        pending.hidden = true;
+        live.hidden = false;
         panel.classList.add("is-live");
+      } else {
+        pending.hidden = false;
+        live.hidden = true;
+        panel.classList.remove("is-live");
       }
     }
     wireTesterQr(TESTER_URL);
