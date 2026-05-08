@@ -50,6 +50,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.glance.ColorFilter
 
+@Composable
+private fun WidgetPlaceholderSwanWhite(sizeDp: androidx.compose.ui.unit.Dp) {
+    Image(
+        provider = ImageProvider(R.drawable.swan_widget_icon_padded),
+        contentDescription = null,
+        modifier = GlanceModifier.size(sizeDp),
+        colorFilter = ColorFilter.tint(ColorProvider(Color.White))
+    )
+}
+
 class PortfolioWidget : GlanceAppWidget() {
 
     override val stateDefinition = PreferencesGlanceStateDefinition
@@ -247,7 +257,7 @@ fun UnlinkedContent(context: Context, appWidgetId: Int) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = null, modifier = GlanceModifier.size(48.dp))
+        WidgetPlaceholderSwanWhite(48.dp)
         Spacer(modifier = GlanceModifier.height(12.dp))
         Text(text = context.getString(R.string.app_name), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold))
         Spacer(modifier = GlanceModifier.height(4.dp))
@@ -274,7 +284,7 @@ fun WidgetContent(
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
                 Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
-                    Image(provider = ImageProvider(R.drawable.swan_launcher_icon), contentDescription = null, modifier = GlanceModifier.size(28.dp))
+                    Image(provider = ImageProvider(R.drawable.swan_widget_icon_padded), contentDescription = null, modifier = GlanceModifier.size(28.dp))
                 }
             }
             Text(text = vaultName.uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
@@ -399,14 +409,44 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
         // 🎯 LANE 2: SPARKLINE (Fixed 80dp)
         Box(modifier = GlanceModifier.width(80.dp).height(40.dp), contentAlignment = Alignment.Center) {
             val path = asset.localIconPath
-            if (path != null && path != "none") {
-                val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
-                if (bitmap != null) {
-                    Image(
-                        provider = ImageProvider(bitmap),
-                        contentDescription = null,
-                        modifier = GlanceModifier.fillMaxSize(),
-                        contentScale = ContentScale.FillBounds
+            val bitmap = if (path != null && path != "none") {
+                try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
+            } else {
+                null
+            }
+            if (bitmap != null) {
+                Image(
+                    provider = ImageProvider(bitmap),
+                    contentDescription = null,
+                    modifier = GlanceModifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds
+                )
+            } else {
+                val trendUp = asset.priceChange24h >= 0
+                val trendColor = if (trendUp) Color(0xFF00FF00) else Color(0xFFFF4444)
+                val trendGlyph = if (trendUp) "↗" else "↘"
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = trendGlyph,
+                        style = TextStyle(
+                            color = ColorProvider(trendColor),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    Text(
+                        text = String.format(
+                            Locale.US,
+                            "%s%.2f%%",
+                            if (trendUp) "+" else "",
+                            asset.priceChange24h
+                        ),
+                        style = TextStyle(
+                            color = ColorProvider(trendColor.copy(alpha = 0.82f)),
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        maxLines = 1
                     )
                 }
             }
@@ -445,12 +485,7 @@ fun SyncingContent(context: Context, bgColor: Color, textColor: Color) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            provider = ImageProvider(R.drawable.swan_launcher_icon),
-            contentDescription = null,
-            modifier = GlanceModifier.size(48.dp),
-            colorFilter = ColorFilter.tint(ColorProvider(textColor.copy(alpha = 0.5f)))
-        )
+        WidgetPlaceholderSwanWhite(48.dp)
         Spacer(modifier = GlanceModifier.height(12.dp))
         Text(
             text = context.getString(R.string.widget_loading),
@@ -466,12 +501,7 @@ fun EmptyWidgetContent(context: Context, bgColor: Color, textColor: Color, appWi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            provider = ImageProvider(R.drawable.swan_launcher_icon),
-            contentDescription = null,
-            modifier = GlanceModifier.size(40.dp),
-            colorFilter = ColorFilter.tint(ColorProvider(textColor.copy(alpha = 0.5f)))
-        )
+        WidgetPlaceholderSwanWhite(44.dp)
         Spacer(modifier = GlanceModifier.height(12.dp))
         Text(
             text = context.getString(R.string.widget_no_assets_available),

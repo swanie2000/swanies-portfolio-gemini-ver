@@ -208,16 +208,17 @@ class AssetRepository @Inject constructor(
                         val assetValue = AssetValuation.holdingValueUsd(asset)
                         val formattedTotal = formatBoutiquePrice(assetValue)
                         
-                        // 📈 Generate Sparkline for Widget
+                        // Use history table first, then provider sparkline as fallback.
                         val history = try { priceHistoryDao.getRecentHistory(asset.coinId).map { it.price }.reversed() } catch (e: Exception) { emptyList() }
-                        val sparklinePath = if (history.size >= 2) {
+                        val sparklinePoints = when {
+                            history.size >= 2 -> history
+                            asset.sparklineData.size >= 2 -> asset.sparklineData
+                            else -> emptyList()
+                        }
+                        val sparklinePath = if (sparklinePoints.size >= 2) {
                             val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
-                            val bitmap = SparklineDrawUtils.drawSparklineBitmap(history, color)
-                            val file = File(context.cacheDir, "spark_${asset.coinId}.png")
-                            FileOutputStream(file).use { out ->
-                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                            }
-                            file.absolutePath
+                            val bitmap = SparklineDrawUtils.drawSparklineBitmap(sparklinePoints, color)
+                            persistWidgetSparkline(asset.coinId, bitmap) ?: "none"
                         } else "none"
 
                         val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
@@ -389,6 +390,26 @@ class AssetRepository @Inject constructor(
             assetDao.getAllAssetsOnce(portfolioId)
         }
         pushFreshAssetsToWidget(context, portfolioId, assets)
+    }
+
+    private fun persistWidgetSparkline(coinId: String, bitmap: Bitmap): String? {
+        return try {
+            val dir = File(context.filesDir, "widget_sparklines")
+            if (!dir.exists() && !dir.mkdirs()) return null
+            val target = File(dir, "spark_$coinId.png")
+            val tmp = File(dir, "spark_$coinId.tmp")
+            FileOutputStream(tmp).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            if (!tmp.renameTo(target)) {
+                tmp.copyTo(target, overwrite = true)
+                tmp.delete()
+            }
+            target.absolutePath
+        } catch (e: Exception) {
+            Log.w("SWANIE_WIDGET", "Failed to persist sparkline for $coinId: ${e.message}")
+            null
+        }
     }
 
     private fun formatBoutiquePrice(price: Double): String {

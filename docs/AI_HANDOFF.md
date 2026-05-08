@@ -29,7 +29,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-09 — **Marketing site (screenshots):** Gallery **`figcaption`** text shortened; captions **centered** under phone frames with **`max-width`** + **`text-wrap: balance`**, tighter mobile typography (**`website/index.html`**, **`website/styles.css`**). **Recently shipped (2026-05-08):** Truthful **Drive sync** copy (stub only) across app locales + **website**; **§7** limitation of liability / indemnity in app **`TermsAndConditionsScreen`** + **`privacy.html`** §8; **`AssetViewModel`** Drive-hook comments honest.
+**Last updated:** 2026-05-08 — **Icons (owner EOD lock-in):** Launcher + **fingerprint** both use **`android:icon`** → **`@mipmap/ic_launcher`** (same **adaptive** resource). They often **look different** because the OS draws that one asset at **different sizes**, **masks** (circle vs squircle), and **sometimes only the foreground layer** in the credential sheet — not because two files exist. **Split assets:** `swan_asset_launcher.png` / `splash` / `toast` / `widget` (copies of transparent master) wired in **`ic_launcher_foreground.xml`**, **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **`CustomToast.kt`** rasters **`ic_toast_swan`**. Image Asset wizard must target a **PNG**, not XML (trim/resize disabled on XML paths). Owner **unhappy with icon polish**; treat as **follow-up**, not v1 blocker.
+
+**Recently shipped (same week):** Marketing site screenshot captions; truthful Drive copy; TOS §7 / privacy §8; **`AssetViewModel`** Drive comments honest.
 
 **Product:** Android app **Swanie’s Portfolio** — crypto & precious metals tracker. Owner considers the app **feature-complete for v1** (**feature freeze**). Remaining work is **shipping** (Play Console, compliance, listing, AAB, RevenueCat/Play QA), not new product features unless the owner reopens scope.
 
@@ -60,6 +62,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 3. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration.
 4. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
 5. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
+6. **Icons (optional / post-owner-break):** Re-tune symmetric **`dp`** insets in **`ic_launcher_foreground.xml`**, **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **`CustomToast.kt`** slot size. Fingerprint **cannot** use a separate drawable without privileged APIs — only **`ic_launcher`** tuning or accept OEM rendering.
 
 ---
 
@@ -84,6 +87,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Settings / feedback | `SettingsScreen.kt`, `BugReportSubmitter.kt`, `NetworkModule.kt` |
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
+| App / splash / toast icons | **`mipmap-anydpi-v26/ic_launcher.xml`**, **`drawable/ic_launcher_foreground.xml`** (`swan_asset_launcher.png`), **`swan_splash_icon_wrapper.xml`** (`swan_asset_splash.png`), **`ic_toast_swan.xml`** + **`CustomToast.kt`** (`swan_asset_toast.png`), **`swan_widget_icon_padded.xml`** (`swan_asset_widget.png`); legacy **`swan_launcher_icon.png`** may remain for Image Asset wizard only |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`**, **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
@@ -94,6 +98,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-08 — Icon pipeline lock-in (owner frustrated, EOD):** Per-surface **`swan_asset_*.png`** copies; **`ic_launcher_foreground`**, splash/toast/widget XML; **`CustomToast`** uses **`ic_toast_swan`**; symmetric insets + comments; **fingerprint = same `ic_launcher` as launcher** (OS rendering differs). **`docs/AI_HANDOFF.md`** + **push `main`**.
 - **2026-05-09 — Screenshot captions (mobile):** **`website/index.html`** — shorter **`figcaption`** lines under the four device shots; **`website/styles.css`** — **`shot-card`** column flex + centered caption, **`max-width`** / **`text-wrap: balance`**, **`@media (max-width: 480px)`** tweak. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-08 — Truthful copy + TOS §7 + i18n:** Marketing and in-app/legal strings no longer claim **live Google Drive vault sync** (stub only; deferred); **website** index/press/privacy aligned; **§7** limitation of liability / indemnity in **`values/strings.xml`**, **`TermsAndConditionsScreen.kt`**, **`privacy.html`** §8; **all 19 locales** carry **`terms_section_7_*`** (+ prior Drive-truth strings); **`AssetViewModel`** Drive-sync comments honest; **`setting_sync_drive`** “planned” label. **Handoff + push** with this commit.
 - **2026-05-08 — Play playbook:** Owner created **Play app**; **Dashboard** shows setup tasks done; **Internal testing** still missing **AAB release**; **Publishing overview** / **Send for review** gated until Console allows. Captured **ordered next-session steps** in **§ Current session** (internal → closed → production → listing/monetization → privacy site).

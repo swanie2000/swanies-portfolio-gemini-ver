@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Toast chip only. Bitmap: swan_asset_toast.png — own copy so toast padding ≠ launcher.
+  TUNE: all four insets equal — bigger = smaller swan in the toast.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/launcher_navy" />
+        </shape>
+    </item>
+    <item>
+        <inset
+            android:drawable="@drawable/swan_asset_toast"
+            android:insetLeft="42dp"
+            android:insetTop="42dp"
+            android:insetRight="42dp"
+            android:insetBottom="42dp" />
+    </item>
+</layer-list>

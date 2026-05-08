@@ -1,6 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash only (themes.xml). Bitmap: swan_asset_splash.png — own copy so splash size ≠ launcher.
+  TUNE: all four insets equal — bigger = smaller swan in the splash circle.
+-->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/swan_launcher_icon"
-    android:insetLeft="48dp"
-    android:insetTop="48dp"
-    android:insetRight="48dp"
-    android:insetBottom="48dp" />
+    android:drawable="@drawable/swan_asset_splash"
+    android:insetLeft="34dp"
+    android:insetTop="34dp"
+    android:insetRight="34dp"
+    android:insetBottom="34dp" />

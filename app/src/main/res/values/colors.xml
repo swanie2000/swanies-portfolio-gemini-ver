@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Used by Image Asset / adaptive-icon background; same as launcher_navy. -->
+    <color name="ic_launcher_background">#000416</color>
     <color name="launcher_navy">#000416</color>
     <color name="ucrop_surface">#2A2A2A</color>
     <color name="ucrop_toolbar">#323232</color>
