@@ -40,6 +40,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.feedback.BugReportSubmitter
 import com.swanie.portfolio.security.AuthPolicy
+import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.ui.i18n.languageDisplayNameForOption
 import com.swanie.portfolio.ui.navigation.Routes
 import kotlinx.coroutines.launch
@@ -366,7 +367,7 @@ fun SettingsScreen(
                                             newPasswordVisible = false
                                             confirmPasswordVisible = false
                                             passwordChangeMessage = null
-                                            Toast.makeText(context, context.getString(R.string.settings_password_updated), Toast.LENGTH_SHORT).show()
+                                            context.showPortfolioToast(context.getString(R.string.settings_password_updated))
                                         } else {
                                             passwordChangeMessage = context.getString(R.string.settings_password_update_failed)
                                         }
@@ -461,11 +462,9 @@ fun SettingsScreen(
                     enabled = !bugReportSending,
                     onClick = {
                         if (bugReportMessage.isBlank()) {
-                            Toast.makeText(
-                                context,
+                            context.showPortfolioToast(
                                 context.getString(R.string.settings_bug_report_required),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            )
                             return@TextButton
                         }
                         scope.launch {
@@ -477,11 +476,10 @@ fun SettingsScreen(
                                     effectiveLanguageCode,
                                 )
                                 if (result.isSuccess) {
-                                    Toast.makeText(
-                                        context,
+                                    context.showPortfolioToast(
                                         context.getString(R.string.settings_bug_report_sent),
                                         Toast.LENGTH_LONG
-                                    ).show()
+                                    )
                                     bugReportMessage = ""
                                     showBugReportDialog = false
                                 } else {
@@ -491,19 +489,17 @@ fun SettingsScreen(
                                         "UI: submit returned failure: ${err?.message}",
                                         err,
                                     )
-                                    Toast.makeText(
-                                        context,
+                                    context.showPortfolioToast(
                                         context.getString(R.string.settings_bug_report_failed),
                                         Toast.LENGTH_LONG
-                                    ).show()
+                                    )
                                 }
                             } catch (e: Throwable) {
                                 Log.e(BugReportSubmitter.LOG_TAG, "UI: submit threw before Result", e)
-                                Toast.makeText(
-                                    context,
+                                context.showPortfolioToast(
                                     context.getString(R.string.settings_bug_report_failed),
                                     Toast.LENGTH_LONG
-                                ).show()
+                                )
                             } finally {
                                 bugReportSending = false
                             }
@@ -625,7 +621,7 @@ fun SettingsScreen(
                             val activity = context as? FragmentActivity
                             if (activity != null) {
                                 settingsViewModel.setBiometricEnabled(activity, enabled) { error ->
-                                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                                    context.showPortfolioToast(error)
                                 }
                             }
                         },

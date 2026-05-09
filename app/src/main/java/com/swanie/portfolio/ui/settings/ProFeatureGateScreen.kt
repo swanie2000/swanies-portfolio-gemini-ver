@@ -1,7 +1,6 @@
 package com.swanie.portfolio.ui.settings
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.ui.theme.ProLockBadge
 import com.swanie.portfolio.ui.theme.ProPalette
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -164,7 +164,7 @@ fun ProFeatureGateScreen(
                     } else {
                         R.string.pro_gate_purchase_failed
                     }
-                    Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                    context.showPortfolioToast(context.getString(msgRes))
                 }
             },
             enabled = activity != null && selectedPackageId != null && availablePackages.isNotEmpty(),
@@ -211,11 +211,9 @@ fun ProFeatureGateScreen(
                 runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW, uri))
                 }.onFailure {
-                    Toast.makeText(
-                        context,
+                    context.showPortfolioToast(
                         context.getString(R.string.pro_gate_manage_subscription_failed),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    )
                 }
             },
             modifier = Modifier
@@ -249,7 +247,7 @@ fun ProFeatureGateScreen(
                         RestorePurchasesResult.FAILED ->
                             R.string.settings_restore_purchases_failed
                     }
-                    Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                    context.showPortfolioToast(context.getString(msgRes))
                 }
             },
             modifier = Modifier

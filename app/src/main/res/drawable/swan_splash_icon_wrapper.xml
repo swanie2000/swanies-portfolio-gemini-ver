@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Splash only (themes.xml). Bitmap: swan_asset_splash.png — own copy so splash size ≠ launcher.
-  TUNE: all four insets equal — bigger = smaller swan in the splash circle.
+  Splash only (themes.xml). Same bitmap as HomeScreen (swanie_foreground.png).
+  ~15% larger than 16.5dp insets: 10.875dp (inner ~86dp vs ~75dp on ~108dp canvas). TUNE: equal sides — smaller inset = bigger swan.
 -->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/swan_asset_splash"
-    android:insetLeft="34dp"
-    android:insetTop="34dp"
-    android:insetRight="34dp"
-    android:insetBottom="34dp" />
+    android:drawable="@drawable/swanie_foreground"
+    android:insetLeft="10.875dp"
+    android:insetTop="10.875dp"
+    android:insetRight="10.875dp"
+    android:insetBottom="10.875dp" />

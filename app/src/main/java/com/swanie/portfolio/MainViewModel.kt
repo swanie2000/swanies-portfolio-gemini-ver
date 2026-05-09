@@ -134,7 +134,6 @@ class MainViewModel @Inject constructor(
                         else -> vaults.first().id
                     }
 
-                    // Atomically set the ID and signal that the UI is ready to render
                     themePreferences.saveCurrentVaultId(targetId)
                     _isDataReady.value = true
                     emergencyDataReadyFallback?.cancel()

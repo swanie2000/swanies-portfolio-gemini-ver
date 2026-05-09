@@ -4,7 +4,6 @@ package com.swanie.portfolio.ui.settings
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -28,6 +27,7 @@ import androidx.compose.ui.zIndex
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.showPortfolioToast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ViewList
@@ -349,11 +349,9 @@ fun WidgetManagerScreen(
                                     if (isConfigMode) {
                                         onConfigComplete()
                                     } else {
-                                        Toast.makeText(
-                                            context,
+                                        context.showPortfolioToast(
                                             context.getString(R.string.widget_manager_registry_synced),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        )
                                     }
                                     dragOrderedIds = null
                                     postDragOrderLock = null
@@ -567,11 +565,9 @@ fun WidgetManagerScreen(
                                                 onToggleChecked = { checked ->
                                                     if (checked) {
                                                         if (widgetSelectedIds.size >= 5 && !isChecked) {
-                                                            Toast.makeText(
-                                                                context,
+                                                            context.showPortfolioToast(
                                                                 "Max 5 assets allowed on widget.",
-                                                                Toast.LENGTH_SHORT,
-                                                            ).show()
+                                                            )
                                                             return@WidgetReorderVisibilityItem
                                                         }
                                                     }

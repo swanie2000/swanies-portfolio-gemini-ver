@@ -2,7 +2,6 @@ package com.swanie.portfolio.ui.settings
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.ui.theme.ProPalette
 import androidx.compose.foundation.shape.RoundedCornerShape
 
@@ -154,11 +154,9 @@ fun RevenueCatTestInfoScreen(
                 clipboard?.setPrimaryClip(
                     ClipData.newPlainText(context.getString(R.string.revenuecat_checklist_clip_label), checklist)
                 )
-                Toast.makeText(
-                    context,
+                context.showPortfolioToast(
                     context.getString(R.string.settings_revenuecat_copied),
-                    Toast.LENGTH_SHORT
-                ).show()
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,7 +188,7 @@ fun RevenueCatTestInfoScreen(
                         RestorePurchasesResult.FAILED ->
                             R.string.settings_restore_purchases_failed
                     }
-                    Toast.makeText(context, context.getString(msgRes), Toast.LENGTH_SHORT).show()
+                    context.showPortfolioToast(context.getString(msgRes))
                 }
             },
             modifier = Modifier

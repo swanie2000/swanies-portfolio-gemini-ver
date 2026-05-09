@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Widget / Glance. Bitmap: swan_asset_widget.png — own copy. TUNE: equal insets. -->
+<!--
+  Widget / Glance (28.dp slot). Bitmap: swan_asset_widget.png — own copy.
+  Slightly tighter insets than launcher so the swan stays legible on a small home-screen chip.
+-->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
     android:drawable="@drawable/swan_asset_widget"
-    android:insetLeft="18dp"
-    android:insetTop="18dp"
-    android:insetRight="18dp"
-    android:insetBottom="18dp" />
+    android:insetLeft="14dp"
+    android:insetTop="14dp"
+    android:insetRight="14dp"
+    android:insetBottom="14dp" />

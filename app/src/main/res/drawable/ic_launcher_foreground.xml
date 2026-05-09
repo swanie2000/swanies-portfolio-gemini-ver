@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Launcher + fingerprint. Bitmap: swan_asset_launcher.png (copy of your transparent PNG;
-  edit/replace only this file for launcher framing). TUNE: all four insets equal — bigger = smaller swan.
+  Adaptive launcher + fingerprint foreground: PNG @drawable/swan_asset_launcher (full metal detail).
+  Asset Studio vector attempt kept under docs/assets/swan_asset_launcher_vectordrawable_from_studio.xml
 -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <inset
-            android:drawable="@drawable/swan_asset_launcher"
-            android:insetLeft="18dp"
-            android:insetTop="18dp"
-            android:insetRight="18dp"
-            android:insetBottom="18dp" />
-    </item>
-</layer-list>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/swan_asset_launcher"
+    android:insetLeft="20dp"
+    android:insetTop="20dp"
+    android:insetRight="20dp"
+    android:insetBottom="20dp" />

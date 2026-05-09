@@ -64,6 +64,7 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.ui.holdings.AutoResizingText
 import java.text.SimpleDateFormat
@@ -142,7 +143,7 @@ fun BackupRestoreScreen(
             onConfirm = exportConfirm@{
                 val trimmed = backupPassphraseField.trim()
                 if (trimmed.isEmpty()) {
-                    Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
+                    context.showPortfolioToast(context.getString(R.string.settings_backup_error_empty_passphrase))
                     return@exportConfirm
                 }
                 val uri = pendingExportUri ?: return@exportConfirm
@@ -155,14 +156,13 @@ fun BackupRestoreScreen(
                     backupPassphraseField = ""
                     result.fold(
                         onSuccess = {
-                            Toast.makeText(context, context.getString(R.string.settings_backup_export_ok), Toast.LENGTH_SHORT).show()
+                            context.showPortfolioToast(context.getString(R.string.settings_backup_export_ok))
                         },
                         onFailure = {
-                            Toast.makeText(
-                                context,
+                            context.showPortfolioToast(
                                 it.message ?: context.getString(R.string.settings_backup_error_generic),
                                 Toast.LENGTH_LONG
-                            ).show()
+                            )
                         }
                     )
                 }
@@ -196,7 +196,7 @@ fun BackupRestoreScreen(
             onConfirm = restoreConfirm@{
                 val trimmed = backupPassphraseField.trim()
                 if (trimmed.isEmpty()) {
-                    Toast.makeText(context, context.getString(R.string.settings_backup_error_empty_passphrase), Toast.LENGTH_SHORT).show()
+                    context.showPortfolioToast(context.getString(R.string.settings_backup_error_empty_passphrase))
                     return@restoreConfirm
                 }
                 val uri = pendingImportUri ?: return@restoreConfirm
@@ -209,7 +209,7 @@ fun BackupRestoreScreen(
                             showBackupImportPassphraseDialog = false
                             pendingImportUri = null
                             backupPassphraseField = ""
-                            Toast.makeText(context, context.getString(R.string.settings_backup_import_ok), Toast.LENGTH_SHORT).show()
+                            context.showPortfolioToast(context.getString(R.string.settings_backup_import_ok))
                         },
                         onFailure = { err ->
                             val wrongPass = err.message == VaultBackupEngine.WRONG_BACKUP_PASSPHRASE_MARKER
@@ -218,11 +218,10 @@ fun BackupRestoreScreen(
                                 pendingImportUri = null
                             }
                             backupPassphraseField = ""
-                            Toast.makeText(
-                                context,
+                            context.showPortfolioToast(
                                 backupImportFailureMessage(err, context),
                                 Toast.LENGTH_LONG
-                            ).show()
+                            )
                         },
                     )
                 }

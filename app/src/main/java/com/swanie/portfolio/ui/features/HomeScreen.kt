@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -41,6 +42,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
+/** Matches login column `slideInVertically` + `fadeIn`: tween(800, 1600). */
+private const val LOGIN_COLUMN_ENTER_DELAY_MS = 1600
+private const val LOGIN_COLUMN_ENTER_DURATION_MS = 800
+/** Pause after login buttons finish before the language globe slides in from the left. */
+private const val LANGUAGE_GLOBE_AFTER_LOGIN_MS = 180
+
 @Composable
 fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     val activity = LocalActivity.current as FragmentActivity
@@ -66,6 +73,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     var animateText by remember { mutableStateOf(false) }
     var showSparkles by remember { mutableStateOf(false) }
     var loginControlsRevealed by remember { mutableStateOf(false) }
+    /** True shortly after the bottom login column finishes its slide-in. */
+    var languageChromeRevealed by remember { mutableStateOf(false) }
     var hasAutoPromptedBiometric by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
@@ -98,6 +107,24 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
     // ⚡ SNAPPY REVEAL: 1000ms -> 800ms, delay 200ms -> 160ms (20% reduction)
     val alpha by animateFloatAsState(targetValue = if (animationStarted) 1f else 0f, animationSpec = tween(800, delayMillis = 160), label = "")
 
+    // Language / globe: slow slide in from the left, just after login buttons finish sliding up
+    val languageChromeOffsetX by animateDpAsState(
+        targetValue = if (languageChromeRevealed) 0.dp else (-132).dp,
+        animationSpec = tween(
+            durationMillis = 1200,
+            easing = FastOutSlowInEasing,
+        ),
+        label = "languageChromeSlideX",
+    )
+    val languageChromeAlpha by animateFloatAsState(
+        targetValue = if (languageChromeRevealed) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 1000,
+            easing = LinearOutSlowInEasing,
+        ),
+        label = "languageChromeFade",
+    )
+
     val configuration = LocalConfiguration.current
     val minDimension = min(configuration.screenWidthDp, configuration.screenHeightDp)
     val logoSize = (minDimension * 0.7f).dp
@@ -117,6 +144,16 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             delay(900)
             loginControlsRevealed = true
         }
+    }
+
+    LaunchedEffect(animateText) {
+        if (!animateText) return@LaunchedEffect
+        delay(
+            LOGIN_COLUMN_ENTER_DELAY_MS +
+                LOGIN_COLUMN_ENTER_DURATION_MS +
+                LANGUAGE_GLOBE_AFTER_LOGIN_MS.toLong()
+        )
+        languageChromeRevealed = true
     }
 
     // Auto-open biometric prompt after login controls are fully revealed when enabled.
@@ -150,6 +187,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 .align(Alignment.TopStart)
                 .statusBarsPadding()
                 .padding(start = 12.dp, top = 8.dp)
+                .offset(x = languageChromeOffsetX)
+                .alpha(languageChromeAlpha)
                 .zIndex(5f)
         ) {
             Column(horizontalAlignment = Alignment.Start) {
@@ -288,6 +327,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
             }
         }
 
+        // Enter timing is paired with LOGIN_COLUMN_* + LANGUAGE_GLOBE_AFTER_LOGIN_MS (globe slide).
         AnimatedVisibility(
             visible = animateText,
             enter = fadeIn(tween(800, 1600)) + slideInVertically(
