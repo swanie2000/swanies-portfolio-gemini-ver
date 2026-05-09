@@ -29,7 +29,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-09 — **Portfolio toast chip (owner tweak):** **`toast_chip_background.xml`** — solid opaque **`@color/launcher_navy`** (`#000416`) instead of semi-transparent grey-black; **`showPortfolioToast`** / **`toast_portfolio.xml`** unchanged.
+**Last updated:** 2026-05-09 — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
+
+**Portfolio toast chip:** **`toast_chip_background.xml`** — solid opaque **`@color/launcher_navy`** (`#000416`); **`showPortfolioToast`** / **`toast_portfolio.xml`** unchanged.
 
 **Adaptive launcher + fingerprint (owner verified):** Vector **`drawable/swan_launcher_extra_small_hq.xml`** — **`108×108`** viewport, **1104×859** art, **nested `<group>`** (scale **~0.0554** + translate); **mipmap** **`foreground`** → **`@drawable/swan_launcher_extra_small_hq` directly** (no **`InsetDrawable`** on adaptive foreground); **`ic_launcher_foreground.xml`** = thin **`layer-list`** alias. **Other Cursor / second PC:** **`git pull`** **`main`** + full wiring; vector XML alone is not enough.
 
@@ -100,11 +102,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Marketing site | `website/` — **`index.html`**, **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
+| Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
 
 ---
 
 ## Session history (newest first)
 
+- **2026-05-09 — Workflow: git pull first:** Owner rule — **`git pull`** before changes on any machine; **`.cursor/rules/git-pull-first.mdc`** + **Working agreements** updated. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-09 — Toast chip solid navy:** **`toast_chip_background.xml`** → opaque **`@color/launcher_navy`** (was **`#CC000000`**). Owner prefers look. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-09 — Adaptive vector launcher + fingerprint (owner verified):** **`swan_launcher_extra_small_hq.xml`** on **`main`** with **108×108 viewport**, **group** scale/translate (no **`InsetDrawable`** on adaptive foreground); **mipmap** foreground points **direct** at vector; **~10%** scale-down for launcher margin. **`scripts/svg_path_to_vector.*`** (CLI input/output). **`docs/AI_HANDOFF.md`** + push. *(Owner: same vector file on second desktop Cursor did not converge — **`git pull`** + full resource wiring required.)*
 - **2026-05-08 (EOD) — Portfolio toast + home globe:** **`showPortfolioToast`** + **`toast_portfolio.xml`** / **`toast_chip_background`**; wired across settings flows; **36dp** swan. **HomeScreen** language control **slow slide from left** after login buttons **`tween(800,1600)`** finish. **`docs/AI_HANDOFF.md`** + push.
@@ -130,6 +134,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Working agreements (Cursor)
 
+- **Git first (owner + agents):** **`git pull`** from **`origin`** (usually **`main`**) **before** starting substantive edits — multi-machine + Cursor; keeps GitHub as source of truth. Cursor rule **`.cursor/rules/git-pull-first.mdc`** reinforces this.
 - Prefer **minimal, safe edits**; don’t refactor unrelated code.
 - Don’t assume files exist — read before changing.
 - **Canonical state for the next agent** = **this file** + the actual repo. If something disagrees with code, **code wins** — then fix this doc.
