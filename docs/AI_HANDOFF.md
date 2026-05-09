@@ -29,9 +29,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-09 — **Adaptive launcher + fingerprint (owner verified):** Vector asset **`drawable/swan_launcher_extra_small_hq.xml`** — **`108×108`** viewport, art in **1104×859** space, **nested `<group>`** (scale **~0.0554** + translate) for safe-zone centering; **~10% smaller** than max width for extra launcher margin. **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** **`foreground`** → **`@drawable/swan_launcher_extra_small_hq` directly** (not **`InsetDrawable`**). **`ic_launcher_foreground.xml`** kept as thin **`layer-list`** alias for tooling/docs only. **Why it mattered:** wrong intrinsic **`dp`** broke some OEMs; then **`InsetDrawable`** foreground made **credential / fingerprint** UI show **navy-only** while the launcher looked fine — both fixed. **Other Cursor / second PC:** same model ≠ same outcome without **`git pull`** of **`main`** and these files; handing an agent **only** the vector XML without **mipmap + viewport/group** wiring reproduces failures.
+**Last updated:** 2026-05-09 — **Portfolio toast chip (owner tweak):** **`toast_chip_background.xml`** — solid opaque **`@color/launcher_navy`** (`#000416`) instead of semi-transparent grey-black; **`showPortfolioToast`** / **`toast_portfolio.xml`** unchanged.
 
-**Also shipped (prior same week):** **Portfolio toast** — **`showPortfolioToast`** + **`toast_portfolio.xml`** / **`toast_chip_background`**; **Home** language control **slow slide from left** after login column (**`LOGIN_COLUMN_ENTER_*`**, **`LANGUAGE_GLOBE_AFTER_LOGIN_MS`**).
+**Adaptive launcher + fingerprint (owner verified):** Vector **`drawable/swan_launcher_extra_small_hq.xml`** — **`108×108`** viewport, **1104×859** art, **nested `<group>`** (scale **~0.0554** + translate); **mipmap** **`foreground`** → **`@drawable/swan_launcher_extra_small_hq` directly** (no **`InsetDrawable`** on adaptive foreground); **`ic_launcher_foreground.xml`** = thin **`layer-list`** alias. **Other Cursor / second PC:** **`git pull`** **`main`** + full wiring; vector XML alone is not enough.
+
+**Also shipped (same week):** **Portfolio toast** plumbing — **`showPortfolioToast`** + **`toast_portfolio.xml`**; **Home** language **slow slide from left** (**`LOGIN_COLUMN_ENTER_*`**, **`LANGUAGE_GLOBE_AFTER_LOGIN_MS`**).
 
 **Icons elsewhere:** Splash / toast / widget still use **PNG + wrapper XML** as before; Image Asset wizard → **PNG** paths.
 
@@ -91,7 +93,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Settings / feedback | `SettingsScreen.kt`, `BugReportSubmitter.kt`, `NetworkModule.kt` |
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
-| App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`**; **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
+| App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
@@ -103,6 +105,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-09 — Toast chip solid navy:** **`toast_chip_background.xml`** → opaque **`@color/launcher_navy`** (was **`#CC000000`**). Owner prefers look. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-09 — Adaptive vector launcher + fingerprint (owner verified):** **`swan_launcher_extra_small_hq.xml`** on **`main`** with **108×108 viewport**, **group** scale/translate (no **`InsetDrawable`** on adaptive foreground); **mipmap** foreground points **direct** at vector; **~10%** scale-down for launcher margin. **`scripts/svg_path_to_vector.*`** (CLI input/output). **`docs/AI_HANDOFF.md`** + push. *(Owner: same vector file on second desktop Cursor did not converge — **`git pull`** + full resource wiring required.)*
 - **2026-05-08 (EOD) — Portfolio toast + home globe:** **`showPortfolioToast`** + **`toast_portfolio.xml`** / **`toast_chip_background`**; wired across settings flows; **36dp** swan. **HomeScreen** language control **slow slide from left** after login buttons **`tween(800,1600)`** finish. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-08 — Icon pipeline lock-in (owner frustrated, EOD):** Per-surface **`swan_asset_*.png`** copies; **`ic_launcher_foreground`**, splash/toast/widget XML; toast asset **`ic_toast_swan`**; symmetric insets + comments; **fingerprint = same `ic_launcher` as launcher** (OS rendering differs). **`docs/AI_HANDOFF.md`** + **push `main`**.
