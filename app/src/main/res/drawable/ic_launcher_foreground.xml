@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Adaptive launcher + fingerprint foreground: PNG @drawable/swan_asset_launcher (full metal detail).
-  Asset Studio vector attempt kept under docs/assets/swan_asset_launcher_vectordrawable_from_studio.xml
+  Legacy name kept for tooling/docs. Adaptive mipmaps use @drawable/swan_launcher_extra_small_hq
+  directly so the foreground is not an InsetDrawable (biometric / credential UIs often drop that).
 -->
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/swan_asset_launcher"
-    android:insetLeft="20dp"
-    android:insetTop="20dp"
-    android:insetRight="20dp"
-    android:insetBottom="20dp" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/swan_launcher_extra_small_hq" />
+</layer-list>
