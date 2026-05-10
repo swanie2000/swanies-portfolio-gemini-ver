@@ -198,10 +198,11 @@
   - **`website/`** static landing + **`privacy.html`** draft + **`CNAME`** (`swaniedesigns.com`); **`deploy-website.yml`** (**build**/**deploy**, actions v5); live **`https://swaniedesigns.com`** with **Enforce HTTPS**; Cloudflare DNS (**DNS only** to GitHub); legacy **`swanies-portfolio`** repo removed on GitHub.
   - **Owner follow-up:** Finalize **`website/privacy.html`** before Play Data safety / listing uses URL as “final.”
 
-### Play Store path forward (as of 2026-05-08)
+### Play Store path forward (as of 2026-05-08; verification email logged)
 
 **Ordered “next session” steps** (internal AAB → closed → production, etc.) live in **`docs/AI_HANDOFF.md`** § *Play Console — ordered steps*.
 
+- [x] **Android developer verification — Play auto-registration (Google email to owner):** All Play apps **registered** to the verified account; confirm on **Console Home**. **Before Sept 2026:** add any **other signing keys** used outside Play and register **non-Play** distributions per [Android developer verification](https://developer.android.com/developer-verification).
 - [x] Play Developer account: **registration fee paid** ($25).
 - [x] **Account verification (owner, 2026-05-04):** Google verified **driver’s license**; **emails** + **phone number** verified in Play Console. *(No longer waiting on this step.)*
 - [x] **Public marketing + privacy shell host:** **`https://swaniedesigns.com`** (landing) + **`https://swaniedesigns.com/privacy.html`** (draft—replace **`[bracket]`** placeholders + remove **`noindex`** when copy is final); GitHub Pages + Cloudflare per narrative **V40.73**.
