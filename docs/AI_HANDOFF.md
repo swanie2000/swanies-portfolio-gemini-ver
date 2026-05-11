@@ -29,9 +29,19 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-10 (EOD) — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
+**Last updated:** 2026-05-11 — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
 
-**Play Console — Data safety (today):** Questionnaire **finished and saved**; **store listing preview** reviewed against **`§ Play Data safety — facts from codebase`** (email + user IDs **collected/shared**, purchase history, photos, files & docs, other user-generated content → **FormSubmit**, device IDs; encrypted in transit). Owner should **Export to CSV** once as an answer backup. **`Send app for review`** remains **off** until **Dashboard** clears remaining tasks (**content rating**, **target audience**, **privacy policy URL**, **ads declaration**, etc.) — then **Publishing overview** enables bundling. Reasonable place to **pause** after this step.
+**Play Console — where things stand (human progress):**
+
+- **Data safety:** Questionnaire **saved** (optional **Export to CSV** archive); canonical answers remain **`§ Play Data safety — facts from codebase`** below.
+- **Declarations / App content:** Owner stepped through multiple forms (**financial features**, **advertising ID** = no ads SDK / no **`AD_ID`** in manifest, **health**, **government apps**, store listing–adjacent tasks). Continue until **Dashboard** shows nothing blocking.
+- **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
+- **Default store listing (en-US):** **App name** + **full description** in progress; **short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **“local-first”** if **“first”** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
+- **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
+- **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
+- **Testing path:** **Studio sideload** to family devices continues for private QA; **Internal testing** track (**signed AAB**, **`TESTER_URL`** on **`website/index.html`**) when ready for Play-delivered testers — see **§ Play Console — ordered steps**.
+
+**This session (2026-05-11):** **`docs/AI_HANDOFF.md`** refresh only — **no Android app source changes today.**
 
 **i18n next:** **`values/strings.xml`** (default English) and **`website/`** have diverged from **`values-*`** during recent edits — schedule a **locale parity pass** (legal About/privacy/deletion alignment + any new UI strings).
 
@@ -90,7 +100,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Next steps (priority order)
 
-1. **Play (human):** **Dashboard** — complete remaining **App content** / listing gates so **`Send app for review`** enables (**Publishing overview**). Then **§ Play Console — ordered steps** (**internal testing AAB**, closed track, etc.); **`Master_Build_Checklist.md`** in sync. **Data safety** is **saved**; CSV export optional archive.
+1. **Play (human):** **Dashboard** + **Create default store listing** — finish **screenshots**, **icon**, **feature graphic**, **content rating**, **target audience**, **privacy URL**, **ads declaration**, short-description wording (avoid ranking-style keywords). When green, **Publishing overview → Send app for review**. Then **§ Play Console — ordered steps** (**internal testing AAB**, closed track, etc.); **`Master_Build_Checklist.md`** in sync. **Data safety** already **saved**; CSV export optional archive.
 2. **i18n (required parity):** Propagate recent **`values/strings.xml`** + **`website/`** English changes into **`values-*`** (all maintained locales) — privacy/deletion/account copy, marketing-adjacent strings, any new keys; avoid English-only drift before listing finalization.
 3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live.
 4. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration.
@@ -126,7 +136,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | `website/` — **`index.html`**, **`privacy.html`** (**§4** anchors **`#account-deletion`**, **`#data-deletion`** for Play **Data safety**), **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
+| Marketing site | `website/` — **`index.html`** (**`PLAY_URL`** / **`TESTER_URL`** when listing/testing links exist), **`privacy.html`** (**§4** anchors **`#account-deletion`**, **`#data-deletion`** for Play **Data safety**), **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), **`play_store_app_icon_512.png`** / **`play_store_feature_graphic_1024x500.png`** (Play listing uploads); **`scripts/compose-play-feature-graphic.ps1`**; legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
@@ -136,6 +146,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-11 — Handoff only (Play Console snapshot):** **`docs/AI_HANDOFF.md`** — **§ Current session** Play progress (declarations, store settings, listing, graphics paths, Publishing overview gate, testing path); **§ Next steps** tightened; **Quick file map** Play assets on **`website/`**. **No app code changes today.** **Push `main`**.
 - **2026-05-10 (EOD) — Data safety completed + handoff:** Owner finished **Google Play → Data safety** questionnaire (saved; preview + optional **Export CSV**). **`Send for review`** blocked until **Dashboard** tasks — documented in **§ Current session** / **§ Next steps**. **`docs/AI_HANDOFF.md`** — **i18n** raised to honest priority (**`values/strings.xml`** + **`website/`** ahead of **`values-*`**). **Push `main`**.
 - **2026-05-10 — Play Data safety canon + handoff:** **`docs/AI_HANDOFF.md`** — new **§ Play Data safety — facts from codebase** (permissions, RevenueCat **`logIn`** email/username, FormSubmit, purchases, photos/SAF backup, no Crashlytics in **`build.gradle.kts`**); **§ Next steps** + **Quick file map** pointer. **Purpose:** single source for Google Play **Data safety** so owner does not guess AI wiring. **Push `main`**.
 - **2026-05-10 — Privacy `#data-deletion` + handoff (Play Delete data URL):** **`website/privacy.html`** — subsection **`id="data-deletion"`** (in-app partial removal: holdings / vaults) for optional Play **Data safety → Delete data URL** when **Yes** to deleting data without deleting account; **`#account-deletion`** unchanged. **`docs/AI_HANDOFF.md`** — **§ Current session**, ordered step **9**, **§ Next steps**, **Quick file map**. Site change was on **`main`** (`14258fb`); this session **handoff + push** so owner can paste **`https://swaniedesigns.com/privacy.html#data-deletion`** after **Actions** deploy.
