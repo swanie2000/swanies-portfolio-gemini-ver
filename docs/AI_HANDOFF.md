@@ -31,6 +31,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Last updated:** 2026-05-09 — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
 
+**Website / Play Data safety — account deletion:** **`website/privacy.html`** now has **§4 Account and data deletion** (`id="account-deletion"`) — local-only data, **uninstall** / **Clear storage** / **factory reset**, subscriptions via **Google Play**, support via Play listing. **Effective date** bumped to **2026-05-08** in that file (section renumber **4→10**). **Owner:** merge **`main`** → wait for **GitHub Actions** (`deploy-website.yml`) → set Play Console **Data safety → Delete account URL** to **`https://swaniedesigns.com/privacy.html#account-deletion`** (or path your Pages uses if different). **Follow-up (not done this commit):** sync **in-app** copy — **`values/strings.xml`** + **`values-*`** — if About / privacy / settings should echo the same deletion story (see **§ Next steps**).
+
 **Portfolio toast chip:** **`toast_chip_background.xml`** — solid opaque **`@color/launcher_navy`** (`#000416`); **`showPortfolioToast`** / **`toast_portfolio.xml`** unchanged.
 
 **Adaptive launcher + fingerprint (owner verified):** Vector **`drawable/swan_launcher_extra_small_hq.xml`** — **`108×108`** viewport, **1104×859** art, **nested `<group>`** (scale **~0.0554** + translate); **mipmap** **`foreground`** → **`@drawable/swan_launcher_extra_small_hq` directly** (no **`InsetDrawable`** on adaptive foreground); **`ic_launcher_foreground.xml`** = thin **`layer-list`** alias. **Other Cursor / second PC:** **`git pull`** **`main`** + full wiring; vector XML alone is not enough.
@@ -45,7 +47,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Repo / branch:** `swanies-portfolio-gemini-ver` on GitHub (`swanie2000`), default branch **`main`**. Legacy repo **`swanies-portfolio`** was deleted.
 
-**Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`** now includes **§8 Terms of use / limitation of liability** (mirrors in-app §7) — **re-read vs Play Data safety** and counsel before calling the policy URL final.
+**Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** account/data deletion (Play **Delete account URL** anchor), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
 **Play / Google:** **App created** in Play Console (**Swanie’s Portfolio**). **Android developer verification:** Google emailed that **Play apps are auto-registered** to the verified account — confirm status on **Play Console → Home**. **By September 2026:** register any **extra signing keys** used outside Play and any apps you ship **outside Play** (see [Android developer verification](https://developer.android.com/developer-verification)); unregistered package+key pairs may stop installing on certified devices in some regions. **Dashboard (2026-05-08 snapshot):** “**Finish setting up your app**” looked **complete**; **Internal testing** still needs **Create new release** + **signed release AAB**. **Closed testing** unlocks after internal track is live; **production** path may require **≥12 testers × 14 days** closed test. **Policy email** from Play is generic pre-launch guidance — align **app access** test credentials, **listing** accuracy vs screenshots, and **Data safety** with reality before **Send for review**. **Release signing:** **`swanie_portfolio_release.jks`** — CLI **`keytool`** use **`-storetype PKCS12`** / Studio **JBR** if needed.
 
@@ -59,18 +61,19 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 6. **Production:** When eligible, **Apply for production** / staged rollout per Console.
 7. **Grow users → Store presence / Monetize with Play:** Screenshots, feature graphic, subscriptions + **RevenueCat** SKU alignment, **license testers** for `pro`.
 8. **Publishing overview:** When **Send app for review** is enabled and you intend listing/metadata review — send; optional **Managed publishing** if you want manual go-live after approval.
-9. **Website:** Finalize **`website/privacy.html`** (remove any **`[bracket]`** placeholders if present, **`noindex`** when final) → push **`main`** so Play policy URL matches; confirm **§8 liability** wording with counsel if needed.
+9. **Website:** After **`privacy.html`** changes on **`main`**, confirm **GitHub Pages** deployed → paste **`https://swaniedesigns.com/privacy.html#account-deletion`** (or live path) into Play **Data safety → Delete account URL**. Remove any **`[bracket]`** placeholders / **`noindex`** when listing is public; confirm **§9** liability wording with counsel if needed.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play (human):** Follow **§ Play Console — ordered steps** above (starts at **Internal testing AAB**). Keep **`Master_Build_Checklist.md`** in sync as items complete.
-2. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live.
-3. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration.
-4. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
-5. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
-6. **Icons (optional / post-v1):** Fine-tune **`swan_launcher_extra_small_hq.xml`** group **scale/translate** (launcher vs fingerprint share one foreground); splash/toast/widget wrappers; toast size in **`toast_portfolio.xml`**.
+1. **Play (human):** Follow **§ Play Console — ordered steps** above (starts at **Internal testing AAB**). Keep **`Master_Build_Checklist.md`** in sync as items complete. **Data safety:** use live **`privacy.html#account-deletion`** after site deploy.
+2. **i18n (deletion copy parity):** When in-app **About / privacy / data deletion** UX should match the site, add or update strings in **`values/strings.xml`** and **`values-*`** (same ideas as **`website/privacy.html`** §4 — uninstall, Clear storage, factory reset, Play subscriptions). Not required for Play URL alone; track before listing finalization if desired.
+3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live.
+4. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration.
+5. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
+6. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
+7. **Icons (optional / post-v1):** Fine-tune **`swan_launcher_extra_small_hq.xml`** group **scale/translate** (launcher vs fingerprint share one foreground); splash/toast/widget wrappers; toast size in **`toast_portfolio.xml`**.
 
 ---
 
@@ -99,7 +102,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | `website/` — **`index.html`**, **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
+| Marketing site | `website/` — **`index.html`**, **`privacy.html`** (**§4** `#account-deletion` for Play **Delete account URL**), **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
 | Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
@@ -108,6 +111,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Session history (newest first)
 
+- **2026-05-09 — Privacy §4 + handoff (Play Delete account URL):** **`website/privacy.html`** — **§4 Account and data deletion** (`#account-deletion`), section renumber, effective date **2026-05-08**; supports **Data safety** “Delete account URL” after **Pages deploy**. **`docs/AI_HANDOFF.md`** — Play progress note, **§ Next steps** item for **i18n** parity (`values` / `values-*`) with deletion verbiage when in-app copy should match site. **Push `main`** for live site.
 - **Play / verification:** Google email — Play apps **auto-registered** to verified developer account; **Sept 2026** deadline for extra keys / sideload registration noted in **`docs/AI_HANDOFF.md`** + **`Master_Build_Checklist.md`**. Next human step: **internal testing AAB** (ordered steps in handoff).
 - **2026-05-09 — Workflow: git pull first:** Owner rule — **`git pull`** before changes on any machine; **`.cursor/rules/git-pull-first.mdc`** + **Working agreements** updated. **`docs/AI_HANDOFF.md`** + push.
 - **2026-05-09 — Toast chip solid navy:** **`toast_chip_background.xml`** → opaque **`@color/launcher_navy`** (was **`#CC000000`**). Owner prefers look. **`docs/AI_HANDOFF.md`** + push.
