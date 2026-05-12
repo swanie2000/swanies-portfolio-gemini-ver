@@ -16,7 +16,7 @@ secrets.xml
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
-/.idea/assetWizard.settings.xml
+/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
@@ -33,6 +33,9 @@ secrets.xml
 .kotlin
 bin/
 gen/
+
+# Local raster / icon experiments (not part of shipped app)
+/docs/drawable-backups/
 
 # --- LOGS & MISC ---
 *.log
