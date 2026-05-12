@@ -487,12 +487,27 @@ section {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  /* Explicit columns: auto-fill + minmax was unreliable in Firefox narrow viewports */
+  grid-template-columns: 1fr;
   gap: 1rem;
+  width: 100%;
   min-width: 0;
 }
 
+@media (min-width: 560px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .card {
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -943,6 +958,8 @@ section {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   align-items: stretch;
+  justify-items: stretch;
+  width: 100%;
   min-width: 0;
 }
 
@@ -953,8 +970,13 @@ section {
 }
 
 .qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
   text-align: center;
   padding: 1rem 0.85rem 1.1rem;
   border-radius: var(--radius);
@@ -964,6 +986,8 @@ section {
 
 .qr-card-title {
   margin: 0 0 0.35rem;
+  width: 100%;
+  max-width: 100%;
   font-family: var(--font-display);
   font-size: 1.02rem;
   font-weight: 600;
@@ -972,9 +996,21 @@ section {
 
 .qr-card-sub {
   margin: 0 0 0.75rem;
+  width: 100%;
+  max-width: 100%;
   font-size: 0.82rem;
   color: var(--muted);
   line-height: 1.45;
+}
+
+.tester-qr-pending,
+.tester-qr-live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .tester-qr-live[hidden],
@@ -983,7 +1019,9 @@ section {
 }
 
 .tester-qr-placeholder-box {
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 1rem 1.1rem;
   border-radius: 12px;
@@ -1006,9 +1044,11 @@ section {
 }
 
 .tester-qr-frame {
-  display: block;
-  width: fit-content;
-  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: min(220px, 100%);
   margin-left: auto;
   margin-right: auto;
   padding: 0.5rem;
@@ -1016,12 +1056,13 @@ section {
   background: #fff;
   line-height: 0;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
 }
 
 .qr-host {
   display: block;
-  width: min(200px, 100%);
-  max-width: 100%;
+  width: 100%;
+  max-width: 200px;
   margin: 0 auto;
 }
 
@@ -1048,6 +1089,8 @@ section {
   font-weight: 600;
   color: var(--cyan);
   text-decoration: none;
+  text-align: center;
+  max-width: 100%;
 }
 
 .tester-qr-link:hover {
