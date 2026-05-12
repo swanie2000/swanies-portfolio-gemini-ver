@@ -1,0 +1,49 @@
+Swanie's Portfolio is a focused Android tracker for cryptocurrency and precious metals — built for holders who want clarity without spreadsheet sprawl. Organize positions into vaults, watch totals move with clean cards and on-device charts, and keep portfolio data local by default. When you want portability, export an encrypted .swpb backup you control.
+
+Built for serious holders
+
+Whether you stack sats, accumulate kilos, or do both, the goal is the same: a trustworthy ledger that stays understandable when markets are noisy. Swanie's Portfolio keeps the emphasis on comprehension — so you spend less time fighting spreadsheets and more time acting on plans you already made.
+
+Why it feels different day to day
+
+The app is tuned for quick review: holdings read as cards so you can scan value, allocation, and context without digging through menus. Crypto and precious metals can live side by side, with unit thinking that matches real-world metals (grams, kilos, and troy ounces where it applies) so spot-driven totals stay legible when you mix bars, coins, and digital assets.
+
+Highlights
+
+• Holdings that stay organized — Add and manage crypto and metals with pricing context built for how you actually hold (including gram / kilo / troy ounce thinking where it applies).
+
+• On-device analytics — Explore mix and concentration with portfolio-level views designed for understanding allocation. "Analytics" here means your holdings visualized on your phone — not a bundled third-party ad or crash SDK.
+
+• Home screen widget — Glanceable totals and layout you can tune so your portfolio stays visible without opening the app.
+
+• Encrypted backup (.swpb) — Export a passphrase-protected vault backup when you want an offline copy or your own storage workflow. Restore through the in-app backup & restore flow when you are ready — deliberate and user-controlled.
+
+• Secure unlock — Use biometric unlock when your device supports it, alongside your existing login flow.
+
+• Themes & appearance — Tune the look so daily review matches how you like to read numbers.
+
+• Many languages — Use the app in a wide set of locales so labels and flows match how you prefer to read the interface.
+
+• Optional Pro — Go Pro for deeper customization and premium capabilities where enabled in-app (handled through Google Play billing).
+
+Go Pro when you want the extras
+
+Where available, Pro expands surfaces such as deeper analytics, richer home-screen widget customization, multi-portfolio workflows on-device, and broader theming — billed through Google Play so you can manage or cancel with familiar subscription controls. The core tracker remains useful without Pro; Pro is for people who live in the app daily and want finer control over depth and layout.
+
+Open the app with confidence
+
+Optional password vault and biometric gate help keep totals off the screen when someone else has your phone. Combined with local storage by default, you get a practical balance: convenience when it is just you, and friction when casual peeking should not be effortless.
+
+Privacy-minded by design
+
+Portfolio content is stored on your device. Network use is for features that need it — such as market/price data, optional in-app purchases, or feedback when you choose to send it — not for replacing your local vault with a cloud copy in this release. Subscription handling (where Pro is sold) follows Google Play billing; your holdings are not uploaded as an automatic cloud backup in this release. There are no ads in the app.
+
+Screenshots on this listing show real in-app flows—including analytics and widget options—so you can preview before install.
+
+Important
+
+Swanie's Portfolio is a tracking and organization tool. It is not investment advice, a broker, or a bank. Markets move fast; always verify critical decisions independently.
+
+Support
+
+Questions or feedback? Use the contact options shown on this Play listing.
