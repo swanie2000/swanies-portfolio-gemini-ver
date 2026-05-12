@@ -435,6 +435,9 @@
     <string name="widget_upgrade_to_pro">PROにアップグレード</string>
     <string name="widget_continue_with_free">無料ウィジェットで続行</string>
     <string name="widget_free_pro_banner">PRO: ウィジェットの色とレイアウトをカスタマイズ</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">リスクエクスポージャマップ</string>
     <string name="analytics_pro_risk_description">集中度・ボラティリティ圧力・カテゴリバランスを1画面で把握。</string>
     <string name="analytics_pro_risk_highlight_top_position">最大ポジションは現在ポートフォリオの%1$s%%です。</string>

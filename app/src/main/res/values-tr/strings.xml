@@ -436,6 +436,9 @@
     <string name="widget_upgrade_to_pro">PRO\'YA YÜKSELT</string>
     <string name="widget_continue_with_free">ÜCRETSİZ WIDGET İLE DEVAM ET</string>
     <string name="widget_free_pro_banner">PRO: Widget renklerini ve düzenini özelleştir</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">RİSK MARUZİYET HARİTASI</string>
     <string name="analytics_pro_risk_description">Konsantrasyon, oynaklık baskısı ve kategori dengesini tek görünümde ölçün.</string>
     <string name="analytics_pro_risk_highlight_top_position">En büyük pozisyon şu an portföyünüzün %1$s%% kadarını temsil ediyor.</string>

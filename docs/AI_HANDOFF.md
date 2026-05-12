@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-12 — **Locale terms:** Play-aligned **`terms_last_updated`** + **`terms_section_1`–`6`** in all **`values-*`**; handoff + **`main`** push. **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
+**Last updated:** 2026-05-13 — **Pro home widget:** up to **8** assets on the Glance widget (free path stays **3**); **`WidgetAssetLimits`**, **`MonetizationManager`** on **`AssetRepository.pushFreshAssetsToWidget`** ( **`IS_PRO_USER_KEY`** + tier caps); **`writeWidgetPackedAssetRows`** — one DataStore string per asset row (avoids long single-string truncation); **`parseSingleWidgetAssetEntry`** — pipe-tolerant tail so long **`iconSource`** URLs do not drop rows; **`WidgetContent`** — **one nested `Column` per asset row** so the list column stays under the RemoteViews **~10 direct children per `Column`** cap (previously capped visible rows at **~5**). Owner verified **8** rows + dynamic spacers. **`:app:compileDebugKotlin`** green. **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
 
 **Play Console — where things stand (human progress):**
 
@@ -44,6 +44,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 **Marketing site (2026-05-11 evening — shipped on `main`):** **Screenshots** — two-line **`figcaption`** copy; **‹ ›** controls moved **below** the horizontal strip (full-width phones; hover auto-pan removed as awkward). **Mobile layout** — root **`overflow-x: hidden`** + **`overscroll-behavior-x`** (Firefox Android sideways wobble); **`.wrap`** + **`min-width: 0`** / **`width: 100%`** on cards; **feature grid** explicit **1 / 2 / 3** column breakpoints (replacing fragile **`auto-fill`** **`minmax`** on narrow viewports); **QR deck** — responsive **`drawQr`** pixel size + debounced **`resize`**, **`.tester-qr-frame`** constrained (**no** oversized **`fit-content`**), **`.qr-card`** flex column + **`qr-deck-grid`** **`justify-items: stretch`**. Owner: **Firefox mobile** reads stable after last pass.
 
 **Repo hygiene (2026-05-12):** Owner standardizing on **one laptop** (dropped dual home/work Studio sync). **`47e6f40`**: **`gradle/libs.versions.toml`** accidental **AGP 9.2.1** bump **reverted** to **9.2.0**; **`.idea/assetWizardSettings.xml`** **removed from git** (Image Asset Wizard noise); **`.gitignore`** — correct **`/.idea/assetWizardSettings.xml`** (old pattern had a typo), **`/docs/drawable-backups/`** for local PNG experiments; untracked **`docs/drawable-backups/`** folder **deleted** from working tree.
+
+**This session (2026-05-13):** Pro widget **8**-row ship (limits, prefs packing, parsing, **`isProUser`** on repo push, Glance layout nesting); **`values/strings.xml`** + **`values-*`** widget strings; **`docs/AI_HANDOFF.md`**; **push `main`**.
 
 **This session (2026-05-12):** **`docs/play_store_long_description_en-US.txt`** — Play **en-US** full listing copy (~**3948** chars); **`docs/AI_HANDOFF.md`**; **push `main`**.
 
@@ -110,7 +112,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 2. **i18n (maintenance):** **Privacy & Terms §1–§6** are synced across **`values-*`** (2026-05-12). When **`values/strings.xml`** changes again, propagate the same keys to locales; optionally spot-check **About** / **Drive sync** strings vs English before listing freeze. **`website/`** → **`main`** + Pages deploy stays a separate step from **`values-*`**.
 3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live. **2026-05-11:** mobile layout / QR / screenshot carousel hardened in **`styles.css`** + **`index.html`** — spot-check **GitHub Pages** after each **`main`** deploy if a device looks off.
 4. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration. **`.idea`:** **`assetWizardSettings.xml`** is intentionally **untracked** (wizard UI); do not re-add without cause.
-5. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
+5. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; **widgets** (Pro **8**-row Glance path after **2026-05-13** layout + prefs packing) + Pro gates; GRAM/KILO metals on device.
 6. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
 7. **Icons (optional / post-v1):** Fine-tune **`swan_launcher_extra_small_hq.xml`** group **scale/translate** (launcher vs fingerprint share one foreground); splash/toast/widget wrappers; toast size in **`toast_portfolio.xml`**.
 
@@ -119,6 +121,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 ## Engineering snapshot (v1 ship stack)
 
 - **Stack:** Kotlin, Jetpack Compose, Hilt, Room.
+- **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; list column nests each row (**RemoteViews** direct-child limit).
 - **Pro:** RevenueCat + Play billing when on store; gates Theme Manager, multi-portfolio swipe, full Analytics, widget customization, etc.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
@@ -137,7 +140,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 | Backup UI | `BackupRestoreScreen.kt`, `SettingsViewModel.kt`, `Routes.kt`, `NavGraph.kt` |
 | Settings / feedback | `SettingsScreen.kt`, `BugReportSubmitter.kt`, `NetworkModule.kt` |
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
-| Home screen widget | `PortfolioWidget.kt` (Glance rows; metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`**) |
+| Home screen widget | **`PortfolioWidget.kt`** (Glance; **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`** per-line prefs; **`parseSingleWidgetAssetEntry`** pipe-safe; **nested `Column` per row** for RemoteViews child cap); **`AssetRepository.kt`**, **`SettingsViewModel.kt`**; **`WidgetManagerScreen.kt`**, **`AssetViewModel.kt`**, **`WidgetConfigActivity.kt`** — metal labels reuse **`metalCardPrimaryLabel`** / **`metalShouldShowSymbolSubtitle`** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
@@ -154,6 +157,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-13 — Pro widget 8 rows + Glance/RemoteViews fix + handoff + push:** **`WidgetAssetLimits.kt`**; **`AssetViewModel`** (**`widgetAssetCap`**, tier trim); **`WidgetManagerScreen`**, **`WidgetConfigActivity`**; **`AssetRepository`** + **`DatabaseModule`** (**`MonetizationManager`**, **`pushFreshAssetsToWidget`** sets **`IS_PRO_USER_KEY`**, per-line **`writeWidgetPackedAssetRows`**); **`SettingsViewModel.triggerWidgetUpdate`**; **`PortfolioWidget`** (**`parseSingleWidgetAssetEntry`**, **`WidgetContent`** one nested **`Column` per asset** — fixes **~5** visible rows from **2×N** children hitting RemoteViews **~10** cap); **`values/strings.xml`** + **`values-*`** (widget copy / toasts). Owner verified. **Handoff + push `main`.**
 - **2026-05-12 — Locale terms (Play) + handoff + push:** **`values-*`/`strings.xml`** — **`terms_last_updated`** + **`terms_section_1`–`6`** aligned to default English (Play listing contact, storage, optional network, data limits, not advice, children/language/policy); **514**-key parity vs **`values/strings.xml`**. **`docs/AI_HANDOFF.md`** — **§ Current session**, **§ Next steps** (i18n), **§ Engineering snapshot**. **Push `main`**.
 - **2026-05-12 — Play en-US long description + handoff:** **`docs/play_store_long_description_en-US.txt`** — expanded **Google Play** default **full description** (~**3948** / **4000** chars). **`docs/AI_HANDOFF.md`** — **§ Current session** (listing bullet), **Quick file map**, **§ Session history**. **Push `main`**.
 - **2026-05-12 — Repo hygiene + handoff:** **`47e6f40`** — **`gradle/libs.versions.toml`** AGP **9.2.0** (revert stray **9.2.1**); **`git rm --cached`** **`.idea/assetWizardSettings.xml`**; **`.gitignore`** fix **`assetWizardSettings.xml`** + **`docs/drawable-backups/`**; delete local **`docs/drawable-backups/`**. Owner: **laptop-only** dev. **`docs/AI_HANDOFF.md`** + **push `main`**.

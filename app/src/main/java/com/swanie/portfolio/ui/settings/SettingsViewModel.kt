@@ -25,6 +25,8 @@ import com.swanie.portfolio.security.SecurityManager
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import com.swanie.portfolio.widget.SparklineDrawUtils
+import com.swanie.portfolio.widget.WidgetAssetLimits
+import com.swanie.portfolio.widget.writeWidgetPackedAssetRows
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -595,12 +597,14 @@ class SettingsViewModel @Inject constructor(
                             this[PortfolioWidget.IS_PRO_USER_KEY] = _isProUser.value
                             val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
                             val selectedIds = vSafe.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            val widgetCap =
+                                if (_isProUser.value) WidgetAssetLimits.PRO_MAX else WidgetAssetLimits.FREE_MAX
                             val filteredAssets = if (selectedIds.isEmpty()) {
-                                allAssetsForVault.take(10)
+                                allAssetsForVault.take(widgetCap)
                             } else {
-                                selectedIds.mapNotNull { coinId -> allAssetsForVault.find { it.coinId == coinId } }
+                                selectedIds.take(widgetCap).mapNotNull { coinId -> allAssetsForVault.find { it.coinId == coinId } }
                             }
-                            val serializedAssets = withContext(Dispatchers.IO) {
+                            val rowLines = withContext(Dispatchers.IO) {
                                 filteredAssets.map { asset ->
                                     val iconSource = when {
                                         asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
@@ -632,13 +636,9 @@ class SettingsViewModel @Inject constructor(
                                     val linePrice = AssetValuation.cardPriceRowUsd(asset)
                                     val formattedPrice = formatBoutiquePrice(linePrice)
                                     "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
-                                }.joinToString("||")
+                                }
                             }
-                            if (serializedAssets.isNotBlank()) {
-                                this.remove(PortfolioWidget.ASSETS_DATA_KEY)
-                                this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
-                                this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = serializedAssets
-                            }
+                            writeWidgetPackedAssetRows(rowLines)
                             this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
                             val total = allAssetsForVault.sumOf { AssetValuation.holdingValueUsd(it) }
                             this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)

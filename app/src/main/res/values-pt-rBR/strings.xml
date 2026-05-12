@@ -436,6 +436,9 @@
     <string name="widget_upgrade_to_pro">FAZER UPGRADE PARA PRO</string>
     <string name="widget_continue_with_free">CONTINUAR COM WIDGET GRATUITO</string>
     <string name="widget_free_pro_banner">PRO: Personalize as cores e o layout do widget</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">MAPA DE EXPOSIÇÃO AO RISCO</string>
     <string name="analytics_pro_risk_description">Meça concentração, pressão de volatilidade e equilíbrio por categoria em uma única visão.</string>
     <string name="analytics_pro_risk_highlight_top_position">A maior posição representa atualmente %1$s%% da sua carteira.</string>

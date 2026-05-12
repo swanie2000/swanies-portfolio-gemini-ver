@@ -145,6 +145,7 @@ fun WidgetManagerScreen(
     val displayedPortfolioVaultId =
         remember(targetVaultId) { if (targetVaultId > 0) targetVaultId else 0 }
     val widgetSelectedIds by assetViewModel.widgetSelectedAssetIds.collectAsStateWithLifecycle()
+    val widgetAssetCap by assetViewModel.widgetAssetCap.collectAsStateWithLifecycle()
     var dragOrderedIds by remember { mutableStateOf<List<String>?>(null) }
     /** Full row order after finger lifts; keeps UI on this order until [persistWidgetSelectionOrderForCurrentVault] succeeds. */
     var postDragOrderLock by remember { mutableStateOf<List<String>?>(null) }
@@ -522,7 +523,7 @@ fun WidgetManagerScreen(
                                             color = safeThemeText.copy(alpha = 0.12f),
                                         ) {
                                             Text(
-                                                "$selectedCount/5",
+                                                stringResource(R.string.widget_selected_assets_count, selectedCount, widgetAssetCap),
                                                 modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
                                                 color = safeThemeText,
                                                 fontSize = 10.sp,
@@ -564,9 +565,9 @@ fun WidgetManagerScreen(
                                                 animatePlacement = isChecked || isDragging,
                                                 onToggleChecked = { checked ->
                                                     if (checked) {
-                                                        if (widgetSelectedIds.size >= 5 && !isChecked) {
+                                                        if (widgetSelectedIds.size >= widgetAssetCap && !isChecked) {
                                                             context.showPortfolioToast(
-                                                                "Max 5 assets allowed on widget.",
+                                                                context.getString(R.string.widget_max_assets_toast, widgetAssetCap),
                                                             )
                                                             return@WidgetReorderVisibilityItem
                                                         }
@@ -678,7 +679,7 @@ fun WidgetManagerScreen(
                         3 -> {
                             val previewData = runCatching {
                                 val immutableList = orderedWidgetAssets.toList()
-                                val finalAssets = immutableList.filter { it.coinId in widgetSelectedIds }.take(5)
+                                val finalAssets = immutableList.filter { it.coinId in widgetSelectedIds }.take(widgetAssetCap)
                                 val selectedTotalValue = immutableList
                                     .filter { it.coinId in widgetSelectedIds }
                                     .sumOf { AssetValuation.holdingValueUsd(it) }
@@ -716,6 +717,7 @@ fun WidgetManagerScreen(
                                                 cardTxtHex = draftCrdTxt,
                                                 showTotal = !draftHideTotals,
                                                 isHighVisibilityMode = isHighVisibilityMode,
+                                                previewAssetCap = widgetAssetCap,
                                             )
                                         } else {
                                             Box(
@@ -922,13 +924,14 @@ private fun HeroWidgetPreview(
     cardTxtHex: String,
     showTotal: Boolean,
     isHighVisibilityMode: Boolean = false,
+    previewAssetCap: Int,
 ) {
     val bgColor = try { Color(bgHex.toColorInt()) } catch (e: Exception) { Color(0xFF000416) }
     val bgTextColor = try { Color(bgTxtHex.toColorInt()) } catch (e: Exception) { Color.White }
     val cardColor = try { Color(cardHex.toColorInt()) } catch (e: Exception) { Color(0xFF1C1C1E) }
     val cardTextColor = try { Color(cardTxtHex.toColorInt()) } catch (e: Exception) { Color.White }
-    val shownAssets = remember(orderedAssets, selectedIds) {
-        (orderedAssets ?: emptyList()).filter { it.coinId in selectedIds }.take(5)
+    val shownAssets = remember(orderedAssets, selectedIds, previewAssetCap) {
+        (orderedAssets ?: emptyList()).filter { it.coinId in selectedIds }.take(previewAssetCap)
     }
     Box(
         modifier = Modifier

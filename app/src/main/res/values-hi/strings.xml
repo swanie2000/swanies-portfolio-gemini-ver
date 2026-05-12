@@ -414,6 +414,9 @@
     <string name="widget_upgrade_to_pro">प्रो में अपग्रेड करें</string>
     <string name="widget_continue_with_free">फ्री विजेट जारी रखें</string>
     <string name="widget_free_pro_banner">PRO: विजेट के रंग और लेआउट कस्टमाइज़ करें</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">जोखिम एक्सपोज़र मैप</string>
     <string name="analytics_pro_risk_description">एक ही दृश्य में एकाग्रता, अस्थिरता दबाव और श्रेणी संतुलन मापें।</string>
     <string name="analytics_pro_risk_highlight_top_position">शीर्ष पोज़िशन अभी आपके पोर्टफोलियो का %1$s%% है।</string>

@@ -11,18 +11,22 @@ import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.swanie.portfolio.billing.AccessTier
+import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.api.SearchEngineRegistry
+import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
-import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetValuation
+import com.swanie.portfolio.data.local.IconManager
 import com.swanie.portfolio.data.local.PriceHistoryDao
 import com.swanie.portfolio.data.local.UserConfigDao
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
-import com.swanie.portfolio.data.local.IconManager
 import com.swanie.portfolio.widget.SparklineDrawUtils
+import com.swanie.portfolio.widget.WidgetAssetLimits
+import com.swanie.portfolio.widget.writeWidgetPackedAssetRows
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +49,8 @@ class AssetRepository @Inject constructor(
     private val vaultDao: VaultDao,
     private val searchRegistry: SearchEngineRegistry,
     private val syncCoordinator: DataSyncCoordinator,
-    private val iconManager: IconManager
+    private val iconManager: IconManager,
+    private val monetizationManager: MonetizationManager,
 ) {
     val allAssets: Flow<List<AssetEntity>> = assetDao.getAllAssetsFlow()
 
@@ -187,18 +192,30 @@ class AssetRepository @Inject constructor(
                     this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
                     this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
 
+                    val entitlement = monetizationManager.entitlement.value
+                    val tierCap = WidgetAssetLimits.capFor(entitlement)
+                    this[PortfolioWidget.IS_PRO_USER_KEY] =
+                        entitlement.tier == AccessTier.PRO && entitlement.isActive
+
                     val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
                     
                     // 🚀 SEQUENTIAL ORDER FIX: Map the selectedIds list to maintain user numbering/sorting
                     val filteredAssets = if (selectedIds.isEmpty()) {
-                        freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.take(10)
+                        val emptyFallbackCap =
+                            if (entitlement.tier == AccessTier.PRO && entitlement.isActive) {
+                                WidgetAssetLimits.PRO_MAX
+                            } else {
+                                WidgetAssetLimits.FREE_MAX
+                            }
+                        freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }
+                            .take(emptyFallbackCap)
                     } else {
-                        selectedIds.mapNotNull { id -> 
-                            freshAssets.find { it.coinId == id } 
+                        selectedIds.take(tierCap).mapNotNull { id ->
+                            freshAssets.find { it.coinId == id }
                         }
                     }
 
-                    val serializedAssets = filteredAssets.map { asset ->
+                    val rowLines = filteredAssets.map { asset ->
                         val iconSource = when {
                             asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
                             asset.imageUrl.startsWith("file:") -> asset.imageUrl
@@ -230,13 +247,10 @@ class AssetRepository @Inject constructor(
                         Log.d("SWANIE_PRECISION", "Asset: $safeSymbol | Line price: $linePrice | Formatted: $formattedPrice")
                         
                         "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
-                    }.joinToString("||")
+                    }
 
                     // 🚀 ANTI-GHOSTING: Always update the state, even if empty, to ensure deleted assets are cleared from view
-                    this[PortfolioWidget.ASSETS_DATA_KEY] = serializedAssets
-                    if (serializedAssets.isNotBlank()) {
-                        this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = serializedAssets
-                    }
+                    writeWidgetPackedAssetRows(rowLines)
                     
                     this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
                     val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { AssetValuation.holdingValueUsd(it) }

@@ -429,6 +429,9 @@
     <string name="widget_upgrade_to_pro">الترقية إلى برو</string>
     <string name="widget_continue_with_free">المتابعة بالأداة المجانية</string>
     <string name="widget_free_pro_banner">برو: خصّص ألوان الأداة وتخطيطها</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">خريطة التعرض للمخاطر</string>
     <string name="analytics_pro_risk_description">قِس التركيز وضغط التقلبات وتوازن الفئات في عرض واحد.</string>
     <string name="analytics_pro_risk_highlight_top_position">أكبر مركز يمثل حاليًا %1$s%% من محفظتك.</string>

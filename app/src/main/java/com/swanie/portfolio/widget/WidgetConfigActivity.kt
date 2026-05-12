@@ -124,7 +124,7 @@ class WidgetConfigActivity : ComponentActivity() {
                             androidx.compose.runtime.LaunchedEffect(targetVaultId, targetVaultAssets) {
                                 val currentVaultId = targetVaultId
                                 if (currentVaultId <= 0) return@LaunchedEffect
-                                val selectedIds = targetVaultAssets.take(3).map { it.coinId }
+                                val selectedIds = targetVaultAssets.take(WidgetAssetLimits.FREE_MAX).map { it.coinId }
                                 assetViewModel.saveWidgetConfiguration(
                                     portfolioVaultId = currentVaultId,
                                     appWidgetId = appWidgetId,

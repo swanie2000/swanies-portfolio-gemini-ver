@@ -19,9 +19,11 @@ import com.swanie.portfolio.data.local.AssetDao
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.IconManager
 import com.swanie.portfolio.data.local.PriceHistoryDao
+import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.repository.*
+import com.swanie.portfolio.widget.WidgetAssetLimits
 import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,6 +44,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AssetViewModel @Inject constructor(
     private val repository: AssetRepository,
+    private val monetizationManager: MonetizationManager,
     private val syncCoordinator: DataSyncCoordinator,
     private val searchRegistry: SearchEngineRegistry,
     private val themePreferences: ThemePreferences,
@@ -118,6 +121,16 @@ class AssetViewModel @Inject constructor(
                     }
                 }
         }
+        viewModelScope.launch {
+            monetizationManager.entitlement
+                .map { WidgetAssetLimits.capFor(it) }
+                .distinctUntilChanged()
+                .collect { max ->
+                    withContext(Dispatchers.IO) {
+                        trimAllVaultWidgetSelectionsTo(max)
+                    }
+                }
+        }
     }
 
     // Keep widget state vault-scoped to match SettingsViewModel contract.
@@ -140,6 +153,15 @@ class AssetViewModel @Inject constructor(
             ?.filter { it.isNotBlank() }
             ?: emptyList()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val widgetAssetCap: StateFlow<Int> = monetizationManager.entitlement
+        .map { WidgetAssetLimits.capFor(it) }
+        .distinctUntilChanged()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            WidgetAssetLimits.capFor(monetizationManager.entitlement.value),
+        )
 
     val widgetShowTotal: StateFlow<Boolean> = combine(
         widgetContractVaultId,
@@ -317,7 +339,7 @@ class AssetViewModel @Inject constructor(
             .map { it.trim() }
             .filter { it.isNotBlank() }
             .distinct()
-            .take(5)
+            .take(WidgetAssetLimits.capFor(monetizationManager.entitlement.value))
         _isUpdating.value = true
         return try {
             val persisted = withTimeoutOrNull(3000L) {
@@ -333,11 +355,12 @@ class AssetViewModel @Inject constructor(
         }
     }
 
-    fun toggleAssetInWidgetSelection(asset: AssetEntity, maxSelected: Int = 5) {
+    fun toggleAssetInWidgetSelection(asset: AssetEntity) {
         if (_isUpdating.value) return
         viewModelScope.launch(Dispatchers.IO) {
             _isUpdating.value = true
             try {
+                val maxSelected = WidgetAssetLimits.capFor(monetizationManager.entitlement.value)
                 val currentIds = widgetSelectedAssetIds.value
                 val nextIds = if (asset.coinId in currentIds) {
                     currentIds.filter { it != asset.coinId }
@@ -377,9 +400,11 @@ class AssetViewModel @Inject constructor(
                 }
                 val orderedCsv = buildList {
                     val seen = LinkedHashSet<String>()
+                    val max = WidgetAssetLimits.capFor(monetizationManager.entitlement.value)
                     for (raw in selectedIds) {
                         val id = raw.trim()
                         if (id.isEmpty() || id in seen) continue
+                        if (size >= max) break
                         seen.add(id)
                         add(id)
                     }
@@ -461,6 +486,17 @@ class AssetViewModel @Inject constructor(
                 decimalPreference = decimals
             ))
             triggerCloudSync() // 🛰️ Sync Detailed Update
+        }
+    }
+
+    private suspend fun trimAllVaultWidgetSelectionsTo(max: Int) {
+        val vaults = vaultDao.getAllVaults()
+        for (vault in vaults) {
+            val ids = vault.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
+            if (ids.size > max) {
+                vaultDao.updateSelectedWidgetAssets(vault.id, ids.take(max).joinToString(","))
+                repository.pushAssetsToWidget(context, vault.id.toString())
+            }
         }
     }
 

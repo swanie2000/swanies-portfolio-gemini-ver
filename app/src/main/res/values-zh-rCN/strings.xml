@@ -436,6 +436,9 @@
     <string name="widget_upgrade_to_pro">升级到 PRO</string>
     <string name="widget_continue_with_free">继续使用免费小组件</string>
     <string name="widget_free_pro_banner">PRO：自定义小组件颜色和布局</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">风险敞口图</string>
     <string name="analytics_pro_risk_description">在一个视图中衡量集中度、波动压力与类别平衡。</string>
     <string name="analytics_pro_risk_highlight_top_position">最大持仓目前占您投资组合的 %1$s%%。</string>

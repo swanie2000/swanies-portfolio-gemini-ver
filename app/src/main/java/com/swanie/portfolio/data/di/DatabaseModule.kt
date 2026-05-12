@@ -1,6 +1,7 @@
 package com.swanie.portfolio.data.di
 
 import android.content.Context
+import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.*
 import com.swanie.portfolio.data.repository.AssetRepository
@@ -80,8 +81,19 @@ object DatabaseModule {
         vaultDao: VaultDao,
         searchRegistry: SearchEngineRegistry,
         syncCoordinator: DataSyncCoordinator,
-        iconManager: IconManager
+        iconManager: IconManager,
+        monetizationManager: MonetizationManager,
     ): AssetRepository {
-        return AssetRepository(context, assetDao, priceHistoryDao, userConfigDao, vaultDao, searchRegistry, syncCoordinator, iconManager)
+        return AssetRepository(
+            context,
+            assetDao,
+            priceHistoryDao,
+            userConfigDao,
+            vaultDao,
+            searchRegistry,
+            syncCoordinator,
+            iconManager,
+            monetizationManager,
+        )
     }
 }

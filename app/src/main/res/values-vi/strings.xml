@@ -436,6 +436,9 @@
     <string name="widget_upgrade_to_pro">NÂNG CẤP LÊN PRO</string>
     <string name="widget_continue_with_free">TIẾP TỤC VỚI WIDGET MIỄN PHÍ</string>
     <string name="widget_free_pro_banner">PRO: Tùy chỉnh màu sắc và bố cục widget</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">BẢN ĐỒ RỦI RO TIẾP XÚC</string>
     <string name="analytics_pro_risk_description">Đo mức tập trung, áp lực biến động và cân bằng danh mục trong một màn hình.</string>
     <string name="analytics_pro_risk_highlight_top_position">Vị thế lớn nhất hiện chiếm %1$s%% danh mục của bạn.</string>

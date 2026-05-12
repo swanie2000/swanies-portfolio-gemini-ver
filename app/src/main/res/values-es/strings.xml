@@ -433,6 +433,9 @@
     <string name="widget_upgrade_to_pro">MEJORAR A PRO</string>
     <string name="widget_continue_with_free">CONTINUAR CON WIDGET GRATUITO</string>
     <string name="widget_free_pro_banner">PRO: Personaliza colores y diseño del widget</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">MAPA DE EXPOSICIÓN AL RIESGO</string>
     <string name="analytics_pro_risk_description">Mide concentración, presión de volatilidad y equilibrio por categoría en una sola vista.</string>
     <string name="analytics_pro_risk_highlight_top_position">La posición principal representa actualmente el %1$s%% de tu cartera.</string>

@@ -436,6 +436,9 @@
     <string name="widget_upgrade_to_pro">UPGRADE NAAR PRO</string>
     <string name="widget_continue_with_free">DOORGAAN MET GRATIS WIDGET</string>
     <string name="widget_free_pro_banner">PRO: Pas widgetkleuren en lay-out aan</string>
+    <string name="widget_selected_assets_count">%1$d / %2$d</string>
+    <string name="widget_max_assets_toast">You can select up to %1$d assets for the widget.</string>
+
     <string name="analytics_pro_risk_title">RISICO-EXPOSITIEMAP</string>
     <string name="analytics_pro_risk_description">Meet concentratie, volatiliteitsdruk en categoriebalans in één overzicht.</string>
     <string name="analytics_pro_risk_highlight_top_position">De grootste positie is nu %1$s%% van uw portefeuille.</string>

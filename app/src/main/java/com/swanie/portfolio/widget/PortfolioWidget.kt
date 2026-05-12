@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -80,6 +81,12 @@ class PortfolioWidget : GlanceAppWidget() {
         val LAST_GOOD_ASSETS_DATA_KEY = stringPreferencesKey("last_good_assets_key")
         val IS_PRO_USER_KEY = booleanPreferencesKey("is_pro_user")
 
+        /** Row count when using [widgetAssetLineKey] / [lastGoodWidgetAssetLineKey] (avoids single-string OEM limits). */
+        val ASSET_ROW_COUNT_KEY = intPreferencesKey("widget_asset_row_n")
+        fun widgetAssetLineKey(index: Int) = stringPreferencesKey("widget_asset_line_$index")
+        val LAST_GOOD_ASSET_ROW_COUNT_KEY = intPreferencesKey("widget_asset_last_row_n")
+        fun lastGoodWidgetAssetLineKey(index: Int) = stringPreferencesKey("widget_asset_last_line_$index")
+
         val WIDGET_ID_KEY = ActionParameters.Key<Int>("widgetId")
     }
 
@@ -95,8 +102,8 @@ class PortfolioWidget : GlanceAppWidget() {
             val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
 
             val boundId = prefs[VAULT_ID_KEY] ?: 0
-            val assetsData = prefs[ASSETS_DATA_KEY] ?: ""
-            val lastGoodAssetsData = prefs[LAST_GOOD_ASSETS_DATA_KEY] ?: ""
+            val assetsData = prefs.readWidgetPackedAssetData(lastGood = false)
+            val lastGoodAssetsData = prefs.readWidgetPackedAssetData(lastGood = true)
             Log.d("SWANIE_PIPE", "Widget Received Suitcase for Vault $boundId: $assetsData")
             Log.d("SWANIE_WIDGET", "provideGlance id=$appWidgetId vault=$boundId payload=${assetsData.length} lastGood=${lastGoodAssetsData.length}")
 
@@ -154,6 +161,7 @@ class PortfolioWidget : GlanceAppWidget() {
                         cardColor = cardColor,
                         cardTextColor = cardTextColor,
                         vaultName = vaultName,
+                        isProUser = isProUser,
                         showUpgradeBanner = !isProUser
                     )
                 }
@@ -170,43 +178,111 @@ class PortfolioWidget : GlanceAppWidget() {
     private fun parseAssetsData(data: String): List<Triple<AssetEntity, String, String>> {
         if (data.isBlank()) return emptyList()
         return data.split("||").mapNotNull { entry ->
-            val parts = entry.split("|")
-            if (parts.size >= 10 && parts[0].isNotBlank()) {
-                val asset = AssetEntity(
-                    coinId = parts[0],
-                    symbol = parts[1],
-                    displayName = parts[2],
-                    name = parts[2],
-                    imageUrl = parts[3],
-                    officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
-                    category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
-                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
-                    weight = parts[6].toDoubleOrNull() ?: 1.0,
-                    amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
-                    premium = parts[8].toDoubleOrNull() ?: 0.0, 
-                    localIconPath = parts[9],
-                    widgetOrder = if (parts.size > 10) parts[10].toIntOrNull() ?: 0 else 0
-                )
-                Triple(asset, parts[4], parts[8])
-            } else if (parts.size == 9 && parts[0].isNotBlank()) {
-                val asset = AssetEntity(
-                    coinId = parts[0],
-                    symbol = parts[1],
-                    displayName = parts[2],
-                    name = parts[2],
-                    imageUrl = parts[3],
-                    officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
-                    category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
-                    priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
-                    weight = parts[6].toDoubleOrNull() ?: 1.0,
-                    amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
-                    premium = parts[8].toDoubleOrNull() ?: 0.0,
-                    localIconPath = "none",
-                    widgetOrder = 0
-                )
-                Triple(asset, parts[4], parts[8])
-            } else null
+            parseSingleWidgetAssetEntry(entry.trim())
         }
+    }
+}
+
+/**
+ * Pack each asset line into its own preference entry so a single `pushed_assets_key` string is never
+ * truncated by OEM/DataStore limits (which previously capped visible rows around ~5).
+ */
+internal fun MutablePreferences.writeWidgetPackedAssetRows(rowLines: List<String>) {
+    val maxSlots = WidgetAssetLimits.PRO_MAX
+    if (rowLines.isEmpty()) {
+        for (i in 0 until maxSlots) {
+            remove(PortfolioWidget.widgetAssetLineKey(i))
+            remove(PortfolioWidget.lastGoodWidgetAssetLineKey(i))
+        }
+        this[PortfolioWidget.ASSET_ROW_COUNT_KEY] = 0
+        this[PortfolioWidget.LAST_GOOD_ASSET_ROW_COUNT_KEY] = 0
+        this[PortfolioWidget.ASSETS_DATA_KEY] = ""
+        remove(PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY)
+        return
+    }
+    rowLines.forEachIndexed { i, line ->
+        this[PortfolioWidget.widgetAssetLineKey(i)] = line
+        this[PortfolioWidget.lastGoodWidgetAssetLineKey(i)] = line
+    }
+    for (i in rowLines.size until maxSlots) {
+        remove(PortfolioWidget.widgetAssetLineKey(i))
+        remove(PortfolioWidget.lastGoodWidgetAssetLineKey(i))
+    }
+    this[PortfolioWidget.ASSET_ROW_COUNT_KEY] = rowLines.size
+    this[PortfolioWidget.LAST_GOOD_ASSET_ROW_COUNT_KEY] = rowLines.size
+    val joined = rowLines.joinToString("||")
+    this[PortfolioWidget.ASSETS_DATA_KEY] = joined
+    this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] = joined
+}
+
+private fun Preferences.readWidgetPackedAssetData(lastGood: Boolean): String {
+    val countKey =
+        if (lastGood) PortfolioWidget.LAST_GOOD_ASSET_ROW_COUNT_KEY else PortfolioWidget.ASSET_ROW_COUNT_KEY
+    val n = this[countKey] ?: 0
+    if (n > 0) {
+        return (0 until n).mapNotNull { i ->
+            val key =
+                if (lastGood) PortfolioWidget.lastGoodWidgetAssetLineKey(i) else PortfolioWidget.widgetAssetLineKey(i)
+            this[key]?.takeIf { it.isNotBlank() }
+        }.joinToString("||")
+    }
+    return if (lastGood) this[PortfolioWidget.LAST_GOOD_ASSETS_DATA_KEY] ?: "" else this[PortfolioWidget.ASSETS_DATA_KEY] ?: ""
+}
+
+/**
+ * One packed widget row: fixed tail (line price, 24h%, weight, amount, total, sparkline) so [iconSource]
+ * may contain `|` (e.g. URLs) without breaking the parser.
+ */
+internal fun parseSingleWidgetAssetEntry(entry: String): Triple<AssetEntity, String, String>? {
+    if (entry.isBlank()) return null
+    val parts = entry.split('|')
+    if (parts.isEmpty() || parts[0].isBlank()) return null
+    return when {
+        parts.size == 9 -> {
+            val asset = AssetEntity(
+                coinId = parts[0],
+                symbol = parts[1],
+                displayName = parts[2],
+                name = parts[2],
+                imageUrl = parts[3],
+                officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
+                category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
+                priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
+                weight = parts[6].toDoubleOrNull() ?: 1.0,
+                amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
+                premium = parts[8].toDoubleOrNull() ?: 0.0,
+                localIconPath = "none",
+                widgetOrder = 0
+            )
+            Triple(asset, parts[4], parts[8])
+        }
+        parts.size >= 10 -> {
+            val end = parts.size
+            val iconSource = parts.subList(3, end - 6).joinToString("|")
+            val linePriceStr = parts[end - 6]
+            val priceChange = parts[end - 5].toDoubleOrNull() ?: 0.0
+            val weight = parts[end - 4].toDoubleOrNull() ?: 1.0
+            val amount = parts[end - 3].toDoubleOrNull() ?: 1.0
+            val formattedTotal = parts[end - 2]
+            val sparklinePath = parts[end - 1]
+            val asset = AssetEntity(
+                coinId = parts[0],
+                symbol = parts[1],
+                displayName = parts[2],
+                name = parts[2],
+                imageUrl = iconSource,
+                officialSpotPrice = linePriceStr.toDoubleOrNull() ?: 0.0,
+                category = if (iconSource.startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
+                priceChange24h = priceChange,
+                weight = weight,
+                amountHeld = amount,
+                premium = formattedTotal.toDoubleOrNull() ?: 0.0,
+                localIconPath = sparklinePath,
+                widgetOrder = 0
+            )
+            Triple(asset, linePriceStr, formattedTotal)
+        }
+        else -> null
     }
 }
 
@@ -278,6 +354,7 @@ fun WidgetContent(
     cardColor: Color,
     cardTextColor: Color,
     vaultName: String,
+    isProUser: Boolean,
     showUpgradeBanner: Boolean
 ) {
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
@@ -307,9 +384,15 @@ fun WidgetContent(
         }
 
         Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
-            assets.take(5).forEach { (asset, priceStr, totalStr) ->
-                AssetCardOriginal(context, asset, priceStr, totalStr, cardColor, cardTextColor)
-                Spacer(modifier = GlanceModifier.defaultWeight())
+            val rowCap = if (isProUser) WidgetAssetLimits.PRO_MAX else WidgetAssetLimits.FREE_MAX
+            val visible = assets.take(rowCap)
+            visible.forEach { (asset, priceStr, totalStr) ->
+                // RemoteViews (Glance → RV) allows only a small number of direct children per Column (~10).
+                // Card + Spacer as siblings was 2×N children → capped around 5 rows. Nest so this Column has one child per asset.
+                Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
+                    AssetCardOriginal(context, asset, priceStr, totalStr, cardColor, cardTextColor)
+                    Spacer(modifier = GlanceModifier.defaultWeight())
+                }
             }
         }
         if (showUpgradeBanner) {
