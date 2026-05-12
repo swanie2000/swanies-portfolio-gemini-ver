@@ -25,6 +25,10 @@ html {
   scroll-behavior: smooth;
   /* Anchor targets (#features) land below sticky header */
   scroll-padding-top: calc(7rem + env(safe-area-inset-top, 0px));
+  max-width: 100%;
+  overflow-x: hidden;
+  /* Firefox / Android: stop sideways “rubber band” when scrolling vertically */
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -35,20 +39,9 @@ body {
   color: var(--text);
   background: var(--bg-deep);
   line-height: 1.55;
-}
-
-/* Prevent any horizontal overflow from shrinking mobile layout */
-html,
-body {
   max-width: 100%;
-  overflow-x: clip;
-}
-
-@supports not (overflow: clip) {
-  html,
-  body {
-    overflow-x: hidden;
-  }
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 /* Subtle texture under gradients — opacity follows system light/dark preference */
@@ -617,6 +610,8 @@ section {
   min-width: 0;
   overflow-x: auto;
   overflow-y: visible;
+  /* Keep horizontal panning inside this row so it does not nudge the page (Firefox). */
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
   scroll-padding-left: 0.5rem;
