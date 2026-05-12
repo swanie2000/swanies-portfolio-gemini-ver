@@ -67,7 +67,7 @@
       <section id="screenshots" aria-labelledby="screenshots-heading">
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
         <p class="section-sub">Twelve real-device screenshots—use the arrows or scroll sideways (swipe on touch). Pause the pointer over the strip to tour them automatically. Same files work for your Play Store listing.</p>
-        <div class="shots-carousel">
+        <div class="shots-carousel" id="shots-carousel">
           <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-controls="shots-scroll" aria-label="Scroll screenshots left">‹</button>
           <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App screenshots carousel" tabindex="0">
             <div class="shots-track">
@@ -394,12 +394,15 @@
       var sc = document.getElementById("shots-scroll");
       var prev = document.getElementById("shots-arrow-prev");
       var next = document.getElementById("shots-arrow-next");
+      var carousel = document.getElementById("shots-carousel");
       if (!sc || !prev || !next) return;
+      if (!carousel) carousel = sc.parentElement;
 
-      var carousel = sc.parentElement;
       var autoRaf = null;
       var autoDir = 1;
       var autoLastTs = 0;
+      var scrollIdleTimer = null;
+      var lastScrollableMax = 0;
       var reduceMotionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       function amount() {
@@ -455,21 +458,29 @@
         autoRaf = window.requestAnimationFrame(autoScrollLoop);
       }
 
-      function startAutoScroll() {
+      function startAutoScroll(e) {
         if (reduceMotionMq.matches) return;
+        if (e && e.pointerType === "touch") return;
         if (sc.scrollWidth - sc.clientWidth <= 1) return;
         if (autoRaf !== null) return;
         autoLastTs = 0;
         autoRaf = window.requestAnimationFrame(autoScrollLoop);
       }
 
-      if (carousel) {
-        carousel.addEventListener("mouseenter", startAutoScroll);
-        carousel.addEventListener("mouseleave", stopAutoScroll);
-      }
-      reduceMotionMq.addEventListener("change", function () {
+      function onReduceMotionChange() {
         if (reduceMotionMq.matches) stopAutoScroll();
-      });
+      }
+      if (reduceMotionMq.addEventListener) {
+        reduceMotionMq.addEventListener("change", onReduceMotionChange);
+      } else if (reduceMotionMq.addListener) {
+        reduceMotionMq.addListener(onReduceMotionChange);
+      }
+
+      if (carousel) {
+        carousel.addEventListener("pointerenter", startAutoScroll);
+        carousel.addEventListener("pointerleave", stopAutoScroll);
+      }
+
       document.addEventListener("visibilitychange", function () {
         if (document.hidden) stopAutoScroll();
       });
@@ -482,16 +493,35 @@
         stopAutoScroll();
         sc.scrollBy({ left: amount(), behavior: "smooth" });
       });
-      sc.addEventListener("wheel", stopAutoScroll, { passive: true });
+      sc.addEventListener("wheel", function (e) {
+        var ax = Math.abs(e.deltaX);
+        var ay = Math.abs(e.deltaY);
+        if (ax > 0.5) stopAutoScroll();
+        else if (e.shiftKey && ay > 0.5) stopAutoScroll();
+      }, { passive: true });
       sc.addEventListener("touchstart", stopAutoScroll, { passive: true });
       sc.addEventListener("scroll", function () {
+        sc.classList.add("is-scrolling");
+        if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);
+        scrollIdleTimer = window.setTimeout(function () {
+          sc.classList.remove("is-scrolling");
+          scrollIdleTimer = null;
+        }, 160);
         window.requestAnimationFrame(updateDisabled);
       }, { passive: true });
       window.addEventListener("resize", updateDisabled, { passive: true });
       if ("ResizeObserver" in window) {
-        new ResizeObserver(updateDisabled).observe(sc);
+        new ResizeObserver(function () {
+          updateDisabled();
+          var max = sc.scrollWidth - sc.clientWidth;
+          if (max > 1 && lastScrollableMax <= 1 && carousel && carousel.matches(":hover")) {
+            startAutoScroll();
+          }
+          lastScrollableMax = max;
+        }).observe(sc);
       }
       updateDisabled();
+      lastScrollableMax = sc.scrollWidth - sc.clientWidth;
     })();
 
     (function () {
