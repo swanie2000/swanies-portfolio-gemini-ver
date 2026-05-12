@@ -104,7 +104,9 @@ body {
 .wrap {
   position: relative;
   z-index: 1;
+  width: 100%;
   max-width: 1080px;
+  min-width: 0;
   margin: 0 auto;
   padding: 0 1.25rem 4rem;
 }
@@ -419,12 +421,14 @@ span.btn-primary {
 
 .pitch-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   gap: 0.9rem;
   margin-top: -0.5rem;
+  min-width: 0;
 }
 
 .pitch-item {
+  min-width: 0;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -483,11 +487,15 @@ section {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   gap: 1rem;
+  min-width: 0;
 }
 
 .card {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -804,6 +812,9 @@ section {
 
 /* Pro strip */
 .pro-strip {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   border-radius: var(--radius);
   padding: 1.5rem 1.35rem;
   background: linear-gradient(
@@ -845,6 +856,12 @@ section {
   max-width: 65ch;
 }
 
+.testing-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 .testing-card h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -866,6 +883,8 @@ section {
 
 /* QR deck — site URL + optional Play tester invite (generated in-browser via js/qrcode.min.js) */
 .qr-deck {
+  min-width: 0;
+  max-width: 100%;
   margin-top: 1.35rem;
   padding: 1.15rem 1rem 1.25rem;
   border-radius: var(--radius);
@@ -879,6 +898,7 @@ section {
   color: var(--muted);
   line-height: 1.55;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .qr-help {
@@ -923,6 +943,7 @@ section {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   align-items: stretch;
+  min-width: 0;
 }
 
 @media (max-width: 640px) {
@@ -932,6 +953,8 @@ section {
 }
 
 .qr-card {
+  min-width: 0;
+  max-width: 100%;
   text-align: center;
   padding: 1rem 0.85rem 1.1rem;
   border-radius: var(--radius);
@@ -974,6 +997,7 @@ section {
   color: var(--muted);
   line-height: 1.5;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .tester-qr-placeholder-text code {
@@ -982,7 +1006,11 @@ section {
 }
 
 .tester-qr-frame {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0.5rem;
   border-radius: 12px;
   background: #fff;
@@ -990,10 +1018,27 @@ section {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
 
+.qr-host {
+  display: block;
+  width: min(200px, 100%);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
 .tester-qr-frame .qr-host canvas,
+.tester-qr-frame .qr-host img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  border-radius: 6px;
+}
+
 .tester-qr-frame .qr-host table {
   display: block;
+  max-width: 100% !important;
   border-radius: 6px;
+  overflow: hidden;
 }
 
 .tester-qr-link {

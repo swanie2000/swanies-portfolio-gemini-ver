@@ -350,14 +350,25 @@
       return window.location.origin + (p || "/");
     }
 
+    function qrPixelSize(hostEl) {
+      var frame = hostEl && hostEl.closest ? hostEl.closest(".tester-qr-frame") : null;
+      if (frame && frame.getBoundingClientRect) {
+        var w = Math.floor(frame.getBoundingClientRect().width);
+        if (w > 24) return Math.max(120, Math.min(200, w - 24));
+      }
+      var vw = document.documentElement.clientWidth || window.innerWidth || 400;
+      return Math.max(120, Math.min(200, Math.floor(vw * 0.46)));
+    }
+
     function drawQr(hostId, text) {
       var el = document.getElementById(hostId);
       if (!el || typeof QRCode === "undefined") return;
       el.innerHTML = "";
+      var side = qrPixelSize(el);
       new QRCode(el, {
         text: text,
-        width: 200,
-        height: 200,
+        width: side,
+        height: side,
         colorDark: "#0a0a12",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M,
@@ -391,6 +402,19 @@
 
     wireSiteQr();
     wireTesterQr(TESTER_URL);
+
+    var qrResizeTimer = null;
+    window.addEventListener(
+      "resize",
+      function () {
+        window.clearTimeout(qrResizeTimer);
+        qrResizeTimer = window.setTimeout(function () {
+          wireSiteQr();
+          wireTesterQr(TESTER_URL);
+        }, 200);
+      },
+      { passive: true }
+    );
 
     (function wireShotsCarousel() {
       var sc = document.getElementById("shots-scroll");
