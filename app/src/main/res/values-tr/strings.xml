@@ -287,19 +287,19 @@
     <string name="action_save">KAYDET</string>
 
     <string name="terms_title">GİZLİLİK VE ŞARTLAR</string>
-    <string name="terms_last_updated">Son Güncelleme: Nisan 2026</string>
-    <string name="terms_section_1_title">1. SIFIR BİLGİ MİMARİSİ</string>
-    <string name="terms_section_1_body">Portföy verilerinizi sunucularımızda saklamıyoruz. Kasa cihazınızda kalır; içeriğine erişemeyiz. Google Drive ile otomatik eşitleme bu sürümde yoktur (ileride planlanmıştır).</string>
-    <string name="terms_section_2_title">2. VERİ KURTARMA SINIRLARI</string>
-    <string name="terms_section_2_body">Şifreleme modelimiz nedeniyle, geliştirici şifrenizi kurtaramaz. Kasa Şifrenizi ve Kurtarma İpucunuzu kaybederseniz verileriniz kaybolur. Bu, mutlak gizliliğin bedelidir.</string>
+    <string name="terms_last_updated">Son Güncelleme: Mayıs 2026</string>
+    <string name="terms_section_1_title">1. BİZ KİMİZ</string>
+    <string name="terms_section_1_body">Swanie\'s Portfolio, Swanie\'s Portfolio ekibi tarafından geliştirilir ve yayımlanır. Destek için bu uygulamanın Google Play mağaza sayfasında belirtilen iletişim yöntemini kullanın.</string>
+    <string name="terms_section_2_title">2. VERİLERİNİZ NASIL SAKLANIR</string>
+    <string name="terms_section_2_body">Bu uygulama, portföy içeriğinizi öncelikle cihazınızda tutmak için tasarlanmıştır; buna kasa/giriş verileri, pozisyonlar, tercihler ve normal kullanım için gerekli yapılandırma dahildir.</string>
     <string name="terms_section_3_title">3. İSTEĞE BAĞLI AĞ ÖZELLİKLERİ</string>
     <string name="terms_section_3_body">Bu sürüm kasayı cihazınızda tutar ve Google Drive ile otomatik olarak eşitlemez (gelecek sürüm için planlanmıştır). İsteğe bağlı ağ özellikleri satın alırken Google Play faturalandırması/abonelikleri, gönderirseniz isteğe bağlı geri bildirim ve fiyatlar yüklenirken piyasa verisi sağlayıcılarını içerir. Şifreli yedek, dışa aktarıp kendiniz sakladığınız bir dosyadır.</string>
-    <string name="terms_section_4_title">4. ABONELİK SÜREKLİLİĞİ</string>
-    <string name="terms_section_4_body">Aylık ve ömür boyu abonelikler Google Play kimliğinize bağlıdır. Varlık verileriniz gizli kalır ve Pro Durumu, Google hesabınızla giriş yapılan cihazlarda geri yüklenebilir.</string>
+    <string name="terms_section_4_title">4. VERİ SINIRLARI VE ERİŞİM</string>
+    <string name="terms_section_4_body">Kişisel verilerinizi satmıyoruz. Özellikler, minimum veri toplama ve kullanıcı tarafından kontrollü erişim için tasarlanmıştır. Yerel şifreleme nedeniyle, kimlik bilgileri kaybolursa hesap veya parola kurtarma sınırlı olabilir.</string>
     <string name="terms_section_5_title">5. FİNANSAL TAVSİYE DEĞİLDİR</string>
-    <string name="terms_section_5_body">Bu uygulama bir takip aracıdır. Fiyat verileri CoinGecko gibi üçüncü taraf API\'lerden gelir. Piyasa dalgalanmaları veya dış veri doğruluğu konusunda sorumluluk kabul etmeyiz.</string>
-    <string name="terms_section_6_title">6. ÇEVİRİ SORUMLULUK REDDİ</string>
-    <string name="terms_section_6_body">İngilizce bu uygulamanın ana yasal ve ürün dilidir. Diğer dillerdeki çeviriler yapay zeka ile oluşturulmuş olabilir; çelişki durumunda İngilizce metin esastır.</string>
+    <string name="terms_section_5_body">Swanie\'s Portfolio bir izleme aracıdır. Piyasa ve fiyat verileri üçüncü taraflardan gelebilir. Piyasa dalgalanmaları veya dış kaynakların doğruluğu için sorumluluk kabul etmeyiz.</string>
+    <string name="terms_section_6_title">6. ÇOCUKLAR, DİL VE POLİTİKA GÜNCELLEMELERİ</string>
+    <string name="terms_section_6_body">Bu uygulama 13 yaşın altındaki çocuklara yönelik değildir. İngilizce, bu uygulamanın ana hukuki dilidir. Bu politikayı zaman içinde güncelleyebiliriz; güncel sürüm aşağıdaki tarih ve web sitemizdeki gizlilik sayfasında belirtilir.</string>
     <string name="terms_section_7_title">7. SORUMLULUK SINIRLAMASI; TAZMİNAT; KULLANIM KENDİ RİSKİNİZDİR</string>
     <string name="terms_section_7_body">Swanie\'s Portfolio\'yu indirerek, kurarak veya kullanarak, kendi adınıza ve temsil ettiğiniz kişiler adına, uygulanabilir kanunun izin verdiği azami ölçüde Swanie\'s Portfolio\'yu, geliştiricilerini, yüklenicilerini, lisans verenlerini veya temsilcilerini dolaylı, arızi, özel, netice, örnek veya cezai zararlar veya kâr, veri, itibar, iş kesintisi veya yatırım kayıplarından sorumlu tutmayacağınızı kabul edersiniz; buna şunlardan kaynaklanan zararlar da dahildir: uygulamayı kullanmanız veya kullanamamanız; fiyatlara, grafiklere, analitiklere veya diğer içeriğe güvenmeniz; hatalar, aksaklıklar veya kesintiler; yerel verilerin, kimlik bilgilerinin veya yedeklerin kaybı veya bozulması; veya üçüncü taraf hizmetleri veya veri kaynakları. Uygulama, kanunların yasaklamadığı ölçüde, açık veya zımni ticari elverişlilik, belirli bir amaca uygunluk, mülkiyet veya ihlal etmeme dahil olmak üzere herhangi bir tür garanti olmaksızın \"olduğu gibi\" ve \"mevcut olduğu şekliyle\" sunulur. Uygulamayı kullanmanızdan, bu şartları ihlal etmenizden veya üçüncü taraf haklarını ihlal etmenizden doğan her türlü iddia, yükümlülük, zarar, kayıp, masraf veya giderlere (makul avukatlık ücretleri dahil) karşı Swanie\'s Portfolio\'yu ve geliştiricilerini, yüklenicilerini, lisans verenlerini ve temsilcilerini tazmin etmeyi, savunmayı ve zararsız tutmayı kabul edersiniz. Bazı yargı bölgelerinde belirli sınırlamalara izin verilmez; bu durumlarda sorumluluğumuz kanunun izin verdiği azami ölçüyle sınırlıdır. Bir çare gerekli ve bir üst sınır mümkünse, uygulamayla ilgili herhangi bir iddiadan doğan toplam sorumluluğumuz, (a) iddia tarihinden önceki on iki (12) ay içinde Google Play üzerinden uygulama veya uygulama içi satın alımlar için bize ödediğiniz tutarların büyüğü veya (b) böyle bir ödeme yapmadıysanız sıfırı aşmaz. Bu bölüm kullanımınızın sona ermesinden sonra da geçerlidir. Kabul etmiyorsanız uygulamayı kullanmayın.</string>
 

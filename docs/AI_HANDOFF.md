@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-12 — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
+**Last updated:** 2026-05-12 — **Locale terms:** Play-aligned **`terms_last_updated`** + **`terms_section_1`–`6`** in all **`values-*`**; handoff + **`main`** push. **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
 
 **Play Console — where things stand (human progress):**
 
@@ -47,7 +47,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **This session (2026-05-12):** **`docs/play_store_long_description_en-US.txt`** — Play **en-US** full listing copy (~**3948** chars); **`docs/AI_HANDOFF.md`**; **push `main`**.
 
-**i18n next:** **`values/strings.xml`** (default English) and **`website/`** have diverged from **`values-*`** during recent edits — schedule a **locale parity pass** (legal About/privacy/deletion alignment + any new UI strings).
+**Locale / Play terms (2026-05-12, agent):** **`terms_last_updated`** + **`terms_section_1`–`terms_section_6`** refreshed in **every `values-*`** to match Play-aligned default English (who we are / how data is stored / optional network / data limits & access / not financial advice / children, language, policy changes). **`terms_section_7_*`** left as already present per locale. **Check:** all locale **`strings.xml`** files contain the same **514** string keys as **`values/strings.xml`** (no missing, no extras). **Build:** **`:app:compileDebugKotlin`** OK on agent checkout. **Commit + push `main`** with **`docs/AI_HANDOFF.md`** update.
+
+**i18n maintenance:** Re-sync **`values-*`** whenever **default `values/strings.xml`** changes meaning again. **`website/`** is deployed separately from app strings—align **`privacy.html`** / marketing copy on its own timeline when English there shifts.
 
 ### Play Data safety — facts from codebase (canonical for Console answers)
 
@@ -105,7 +107,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 ## Next steps (priority order)
 
 1. **Play (human):** **Dashboard** + **Create default store listing** — finish **screenshots**, **icon**, **feature graphic**, **content rating**, **target audience**, **privacy URL**, **ads declaration**, short-description wording (avoid ranking-style keywords). When green, **Publishing overview → Send app for review**. Then **§ Play Console — ordered steps** (**internal testing AAB**, closed track, etc.); **`Master_Build_Checklist.md`** in sync. **Data safety** already **saved**; CSV export optional archive.
-2. **i18n (required parity):** Propagate recent **`values/strings.xml`** + **`website/`** English changes into **`values-*`** (all maintained locales) — privacy/deletion/account copy, marketing-adjacent strings, any new keys; avoid English-only drift before listing finalization.
+2. **i18n (maintenance):** **Privacy & Terms §1–§6** are synced across **`values-*`** (2026-05-12). When **`values/strings.xml`** changes again, propagate the same keys to locales; optionally spot-check **About** / **Drive sync** strings vs English before listing freeze. **`website/`** → **`main`** + Pages deploy stays a separate step from **`values-*`**.
 3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live. **2026-05-11:** mobile layout / QR / screenshot carousel hardened in **`styles.css`** + **`index.html`** — spot-check **GitHub Pages** after each **`main`** deploy if a device looks off.
 4. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration. **`.idea`:** **`assetWizardSettings.xml`** is intentionally **untracked** (wizard UI); do not re-add without cause.
 5. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
@@ -122,7 +124,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
 - **Feedback:** `BugReportSubmitter` + `@Named("Feedback")` OkHttp in `NetworkModule`; Settings dialog; tag **`SwanieBugReport`** — POST **`formsubmit.co`** (email in form body).
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** locales — **2026-05:** English **`values/strings.xml`** + **`website/`** moved ahead of translations; **parity pass pending** (see **§ Next steps**).
+- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **2026-05-12:** Play-aligned **`terms_last_updated`** + **`terms_section_1`–`6`** in all locales; **514** keys match **`values/strings.xml`**. **`website/`** may still differ until explicitly updated + deployed.
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, `:app:lintDebug` (`app/lint.xml` policy).
 
 ---
@@ -152,6 +154,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-12 — Locale terms (Play) + handoff + push:** **`values-*`/`strings.xml`** — **`terms_last_updated`** + **`terms_section_1`–`6`** aligned to default English (Play listing contact, storage, optional network, data limits, not advice, children/language/policy); **514**-key parity vs **`values/strings.xml`**. **`docs/AI_HANDOFF.md`** — **§ Current session**, **§ Next steps** (i18n), **§ Engineering snapshot**. **Push `main`**.
 - **2026-05-12 — Play en-US long description + handoff:** **`docs/play_store_long_description_en-US.txt`** — expanded **Google Play** default **full description** (~**3948** / **4000** chars). **`docs/AI_HANDOFF.md`** — **§ Current session** (listing bullet), **Quick file map**, **§ Session history**. **Push `main`**.
 - **2026-05-12 — Repo hygiene + handoff:** **`47e6f40`** — **`gradle/libs.versions.toml`** AGP **9.2.0** (revert stray **9.2.1**); **`git rm --cached`** **`.idea/assetWizardSettings.xml`**; **`.gitignore`** fix **`assetWizardSettings.xml`** + **`docs/drawable-backups/`**; delete local **`docs/drawable-backups/`**. Owner: **laptop-only** dev. **`docs/AI_HANDOFF.md`** + **push `main`**.
 - **2026-05-11 (EOD) — Marketing site mobile + handoff:** **`website/index.html`** + **`website/styles.css`** — screenshot **two-line captions**, **carousel** (**arrows below** strip; **no** hover auto-scroll), **Firefox** **overscroll** / horizontal overflow clamp, **QR** responsive draw + **resize**, **feature** grid **1→2→3** columns, **QR cards** flex + **`.tester-qr-frame`** **`max-width`**. **`docs/AI_HANDOFF.md`** — **§ Current session**, **§ Next steps**, **Quick file map**. **No Android app edits this session.** **Push `main`**.
