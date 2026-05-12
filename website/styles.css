@@ -37,6 +37,20 @@ body {
   line-height: 1.55;
 }
 
+/* Prevent any horizontal overflow from shrinking mobile layout */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
 /* Subtle texture under gradients — opacity follows system light/dark preference */
 .bg-pattern {
   position: fixed;
