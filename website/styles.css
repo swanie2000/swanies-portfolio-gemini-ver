@@ -543,10 +543,33 @@ section {
   color: var(--muted);
 }
 
-.shots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+/* Screenshots — horizontal scroll row (Play listing can reuse same JPEGs under website/images/) */
+.shots-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 1.25rem;
+  scroll-padding-right: 1.25rem;
+  margin-left: -1.25rem;
+  margin-right: -1.25rem;
+  padding: 0.5rem 1.25rem 1rem;
+  scrollbar-gutter: stable;
+  scrollbar-color: rgba(212, 168, 83, 0.45) rgba(5, 6, 15, 0.5);
+}
+
+.shots-scroll:focus-visible {
+  outline: 2px solid rgba(212, 168, 83, 0.55);
+  outline-offset: 4px;
+}
+
+.shots-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 1rem;
+  width: max-content;
+  padding: 0.15rem 0 0.35rem;
 }
 
 .shot-card {
@@ -554,6 +577,9 @@ section {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 0 0 auto;
+  width: clamp(200px, 52vw, 260px);
+  scroll-snap-align: start;
 }
 
 /* Screenshot “device” — bezel + screen; earpiece is decorative chrome only */
