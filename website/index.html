@@ -66,7 +66,7 @@
 
       <section id="screenshots" aria-labelledby="screenshots-heading">
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
-        <p class="section-sub">Twelve real-device screenshots—use the arrows or scroll sideways (swipe on touch). Pause the pointer over the strip to tour them automatically. Same files work for your Play Store listing.</p>
+        <p class="section-sub">Twelve real-device screenshots—use the arrows or scroll sideways (swipe on touch). Rest the pointer inside the screenshot row (not the side arrows) to tour them automatically. Same files work for your Play Store listing.</p>
         <div class="shots-carousel" id="shots-carousel">
           <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-controls="shots-scroll" aria-label="Scroll screenshots left">‹</button>
           <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App screenshots carousel" tabindex="0">
@@ -394,9 +394,7 @@
       var sc = document.getElementById("shots-scroll");
       var prev = document.getElementById("shots-arrow-prev");
       var next = document.getElementById("shots-arrow-next");
-      var carousel = document.getElementById("shots-carousel");
       if (!sc || !prev || !next) return;
-      if (!carousel) carousel = sc.parentElement;
 
       var autoRaf = null;
       var autoDir = 1;
@@ -459,7 +457,6 @@
       }
 
       function startAutoScroll(e) {
-        if (reduceMotionMq.matches) return;
         if (e && e.pointerType === "touch") return;
         if (sc.scrollWidth - sc.clientWidth <= 1) return;
         if (autoRaf !== null) return;
@@ -476,10 +473,12 @@
         reduceMotionMq.addListener(onReduceMotionChange);
       }
 
-      if (carousel) {
-        carousel.addEventListener("pointerenter", startAutoScroll);
-        carousel.addEventListener("pointerleave", stopAutoScroll);
-      }
+      /* Hover auto-scroll: bind to the scroll strip only (carousel includes arrows;
+         pointerenter on the outer box was unreliable for some browsers). */
+      sc.addEventListener("mouseenter", startAutoScroll);
+      sc.addEventListener("mouseleave", stopAutoScroll);
+      sc.addEventListener("pointerenter", startAutoScroll);
+      sc.addEventListener("pointerleave", stopAutoScroll);
 
       document.addEventListener("visibilitychange", function () {
         if (document.hidden) stopAutoScroll();
@@ -514,7 +513,7 @@
         new ResizeObserver(function () {
           updateDisabled();
           var max = sc.scrollWidth - sc.clientWidth;
-          if (max > 1 && lastScrollableMax <= 1 && carousel && carousel.matches(":hover")) {
+          if (max > 1 && lastScrollableMax <= 1 && sc.matches(":hover")) {
             startAutoScroll();
           }
           lastScrollableMax = max;

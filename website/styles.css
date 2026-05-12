@@ -732,6 +732,7 @@ section {
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  transition: color 0.2s ease;
 }
 
 .shot-caption-sub {
@@ -740,6 +741,19 @@ section {
   font-size: 0.78rem;
   color: rgba(200, 206, 220, 0.88);
   margin-top: 0.12rem;
+  transition: color 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shot-frame:hover ~ figcaption,
+  .shot-card figcaption:hover {
+    color: rgba(244, 238, 220, 0.98);
+  }
+
+  .shot-frame:hover ~ figcaption .shot-caption-sub,
+  .shot-card figcaption:hover .shot-caption-sub {
+    color: rgba(224, 188, 112, 0.98);
+  }
 }
 
 @media (max-width: 480px) {
@@ -1164,6 +1178,11 @@ section {
 
   .card:hover .card-icon {
     transform: none;
+  }
+
+  .shot-card figcaption,
+  .shot-caption-sub {
+    transition: none;
   }
 
   .nav-links a::after {
