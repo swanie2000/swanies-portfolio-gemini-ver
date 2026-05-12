@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-11 — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
+**Last updated:** 2026-05-11 (EOD) — **Workflow:** **`git pull`** from **`origin`** before edits on any machine (multi-PC + Cursor); see **Working agreements** + **`.cursor/rules/git-pull-first.mdc`**.
 
 **Play Console — where things stand (human progress):**
 
@@ -41,7 +41,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Studio sideload** to family devices continues for private QA; **Internal testing** track (**signed AAB**, **`TESTER_URL`** on **`website/index.html`**) when ready for Play-delivered testers — see **§ Play Console — ordered steps**.
 
-**This session (2026-05-11):** **`docs/AI_HANDOFF.md`** refresh only — **no Android app source changes today.**
+**Marketing site (2026-05-11 evening — shipped on `main`):** **Screenshots** — two-line **`figcaption`** copy; **‹ ›** controls moved **below** the horizontal strip (full-width phones; hover auto-pan removed as awkward). **Mobile layout** — root **`overflow-x: hidden`** + **`overscroll-behavior-x`** (Firefox Android sideways wobble); **`.wrap`** + **`min-width: 0`** / **`width: 100%`** on cards; **feature grid** explicit **1 / 2 / 3** column breakpoints (replacing fragile **`auto-fill`** **`minmax`** on narrow viewports); **QR deck** — responsive **`drawQr`** pixel size + debounced **`resize`**, **`.tester-qr-frame`** constrained (**no** oversized **`fit-content`**), **`.qr-card`** flex column + **`qr-deck-grid`** **`justify-items: stretch`**. Owner: **Firefox mobile** reads stable after last pass.
+
+**This session (2026-05-11 EOD):** **`docs/AI_HANDOFF.md`** synced to the above + Play snapshot below; **push `main`**.
 
 **i18n next:** **`values/strings.xml`** (default English) and **`website/`** have diverged from **`values-*`** during recent edits — schedule a **locale parity pass** (legal About/privacy/deletion alignment + any new UI strings).
 
@@ -102,7 +104,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 1. **Play (human):** **Dashboard** + **Create default store listing** — finish **screenshots**, **icon**, **feature graphic**, **content rating**, **target audience**, **privacy URL**, **ads declaration**, short-description wording (avoid ranking-style keywords). When green, **Publishing overview → Send app for review**. Then **§ Play Console — ordered steps** (**internal testing AAB**, closed track, etc.); **`Master_Build_Checklist.md`** in sync. **Data safety** already **saved**; CSV export optional archive.
 2. **i18n (required parity):** Propagate recent **`values/strings.xml`** + **`website/`** English changes into **`values-*`** (all maintained locales) — privacy/deletion/account copy, marketing-adjacent strings, any new keys; avoid English-only drift before listing finalization.
-3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live.
+3. **Website (when listing exists):** Set **`PLAY_URL`** / **`TESTER_URL`** in **`website/index.html`** script block so CTAs go live. **2026-05-11:** mobile layout / QR / screenshot carousel hardened in **`styles.css`** + **`index.html`** — spot-check **GitHub Pages** after each **`main`** deploy if a device looks off.
 4. **Optional cleanup:** Remove or keep **`app/src/main/assets/adi-registration.properties`** (ADI challenge); not needed on device after registration.
 5. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; widgets + Pro gates; GRAM/KILO metals on device.
 6. **Backlog (non-blocking for v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled post-1.0.
@@ -136,7 +138,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
 | Pro / billing | `billing/`, `MonetizationManager.kt` |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | `website/` — **`index.html`** (**`PLAY_URL`** / **`TESTER_URL`** when listing/testing links exist), **`privacy.html`** (**§4** anchors **`#account-deletion`**, **`#data-deletion`** for Play **Data safety**), **`styles.css`**, **`ic_swan_website.png`** (header), **`favicon-tab.png`** (tab / apple-touch, navy **`#000416`** plate), **`images/*.jpg`** (screenshots; `#screenshots` / **`.shot-card figcaption`**), **`play_store_app_icon_512.png`** / **`play_store_feature_graphic_1024x500.png`** (Play listing uploads); **`scripts/compose-play-feature-graphic.ps1`**; legacy **`favicon.svg`** unused by HTML; `.github/workflows/deploy-website.yml` |
+| Marketing site | `website/` — **`index.html`** (**`PLAY_URL`** / **`TESTER_URL`**, **QR** **`drawQr`** + debounced **`resize`**, **`.shots-carousel`** + **arrows-below** nav), **`privacy.html`** (**§4** **`#account-deletion`**, **`#data-deletion`**), **`styles.css`** (mobile overflow / overscroll, **`.feature-grid`** breakpoints, **`.qr-deck`** / **`.qr-card`**), **`ic_swan_website.png`**, **`favicon-tab.png`**, **`images/*.jpg`**, **`js/qrcode.min.js`**, **`play_store_app_icon_512.png`** / **`play_store_feature_graphic_1024x500.png`**, **`scripts/compose-play-feature-graphic.ps1`**, `.github/workflows/deploy-website.yml` |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play checklist | `Master_Build_Checklist.md` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
@@ -146,7 +148,8 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
-- **2026-05-11 — Handoff only (Play Console snapshot):** **`docs/AI_HANDOFF.md`** — **§ Current session** Play progress (declarations, store settings, listing, graphics paths, Publishing overview gate, testing path); **§ Next steps** tightened; **Quick file map** Play assets on **`website/`**. **No app code changes today.** **Push `main`**.
+- **2026-05-11 (EOD) — Marketing site mobile + handoff:** **`website/index.html`** + **`website/styles.css`** — screenshot **two-line captions**, **carousel** (**arrows below** strip; **no** hover auto-scroll), **Firefox** **overscroll** / horizontal overflow clamp, **QR** responsive draw + **resize**, **feature** grid **1→2→3** columns, **QR cards** flex + **`.tester-qr-frame`** **`max-width`**. **`docs/AI_HANDOFF.md`** — **§ Current session**, **§ Next steps**, **Quick file map**. **No Android app edits this session.** **Push `main`**.
+- **2026-05-11 — Handoff only (Play Console snapshot):** **`docs/AI_HANDOFF.md`** — **§ Current session** Play progress (declarations, store settings, listing, graphics paths, Publishing overview gate, testing path); **§ Next steps** tightened; **Quick file map** Play assets on **`website/`**. **No app code changes that day.** **Push `main`**.
 - **2026-05-10 (EOD) — Data safety completed + handoff:** Owner finished **Google Play → Data safety** questionnaire (saved; preview + optional **Export CSV**). **`Send for review`** blocked until **Dashboard** tasks — documented in **§ Current session** / **§ Next steps**. **`docs/AI_HANDOFF.md`** — **i18n** raised to honest priority (**`values/strings.xml`** + **`website/`** ahead of **`values-*`**). **Push `main`**.
 - **2026-05-10 — Play Data safety canon + handoff:** **`docs/AI_HANDOFF.md`** — new **§ Play Data safety — facts from codebase** (permissions, RevenueCat **`logIn`** email/username, FormSubmit, purchases, photos/SAF backup, no Crashlytics in **`build.gradle.kts`**); **§ Next steps** + **Quick file map** pointer. **Purpose:** single source for Google Play **Data safety** so owner does not guess AI wiring. **Push `main`**.
 - **2026-05-10 — Privacy `#data-deletion` + handoff (Play Delete data URL):** **`website/privacy.html`** — subsection **`id="data-deletion"`** (in-app partial removal: holdings / vaults) for optional Play **Data safety → Delete data URL** when **Yes** to deleting data without deleting account; **`#account-deletion`** unchanged. **`docs/AI_HANDOFF.md`** — **§ Current session**, ordered step **9**, **§ Next steps**, **Quick file map**. Site change was on **`main`** (`14258fb`); this session **handoff + push** so owner can paste **`https://swaniedesigns.com/privacy.html#data-deletion`** after **Actions** deploy.
