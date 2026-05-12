@@ -66,7 +66,7 @@
 
       <section id="screenshots" aria-labelledby="screenshots-heading">
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
-        <p class="section-sub">Twelve real-device screenshots—use the arrows or scroll sideways (swipe on touch). Same files work for your Play Store listing.</p>
+        <p class="section-sub">Twelve real-device screenshots—use the arrows or scroll sideways (swipe on touch). Pause the pointer over the strip to tour them automatically. Same files work for your Play Store listing.</p>
         <div class="shots-carousel">
           <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-controls="shots-scroll" aria-label="Scroll screenshots left">‹</button>
           <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App screenshots carousel" tabindex="0">
@@ -168,7 +168,7 @@
                   <img src="images/11_sp_wm_style.jpg" alt="Widget style and appearance customization" loading="lazy" decoding="async" />
                 </div>
               </div>
-              <figcaption>Widget Manager<br /><span class="shot-caption-sub">Customize colors</span></figcaption>
+              <figcaption>Widget Manager<br /><span class="shot-caption-sub">Custom Colors</span></figcaption>
             </figure>
             <figure class="shot-card">
               <div class="shot-frame">
@@ -396,6 +396,12 @@
       var next = document.getElementById("shots-arrow-next");
       if (!sc || !prev || !next) return;
 
+      var carousel = sc.parentElement;
+      var autoRaf = null;
+      var autoDir = 1;
+      var autoLastTs = 0;
+      var reduceMotionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+
       function amount() {
         return Math.max(220, Math.floor(sc.clientWidth * 0.82));
       }
@@ -416,12 +422,68 @@
         next.setAttribute("aria-disabled", next.disabled ? "true" : "false");
       }
 
+      function stopAutoScroll() {
+        if (autoRaf !== null) {
+          window.cancelAnimationFrame(autoRaf);
+          autoRaf = null;
+        }
+        autoLastTs = 0;
+      }
+
+      function autoScrollLoop(ts) {
+        var max = sc.scrollWidth - sc.clientWidth;
+        if (max <= 1) {
+          stopAutoScroll();
+          return;
+        }
+        if (!autoLastTs) autoLastTs = ts;
+        var dt = Math.min(40, ts - autoLastTs);
+        autoLastTs = ts;
+        var speedPxPerSec = 22;
+        var step = (speedPxPerSec * dt / 1000) * autoDir;
+        var left = sc.scrollLeft;
+        if (autoDir > 0 && left + step >= max - 0.5) {
+          sc.scrollLeft = max;
+          autoDir = -1;
+        } else if (autoDir < 0 && left + step <= 0.5) {
+          sc.scrollLeft = 0;
+          autoDir = 1;
+        } else {
+          sc.scrollLeft = left + step;
+        }
+        updateDisabled();
+        autoRaf = window.requestAnimationFrame(autoScrollLoop);
+      }
+
+      function startAutoScroll() {
+        if (reduceMotionMq.matches) return;
+        if (sc.scrollWidth - sc.clientWidth <= 1) return;
+        if (autoRaf !== null) return;
+        autoLastTs = 0;
+        autoRaf = window.requestAnimationFrame(autoScrollLoop);
+      }
+
+      if (carousel) {
+        carousel.addEventListener("mouseenter", startAutoScroll);
+        carousel.addEventListener("mouseleave", stopAutoScroll);
+      }
+      reduceMotionMq.addEventListener("change", function () {
+        if (reduceMotionMq.matches) stopAutoScroll();
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) stopAutoScroll();
+      });
+
       prev.addEventListener("click", function () {
+        stopAutoScroll();
         sc.scrollBy({ left: -amount(), behavior: "smooth" });
       });
       next.addEventListener("click", function () {
+        stopAutoScroll();
         sc.scrollBy({ left: amount(), behavior: "smooth" });
       });
+      sc.addEventListener("wheel", stopAutoScroll, { passive: true });
+      sc.addEventListener("touchstart", stopAutoScroll, { passive: true });
       sc.addEventListener("scroll", function () {
         window.requestAnimationFrame(updateDisabled);
       }, { passive: true });
