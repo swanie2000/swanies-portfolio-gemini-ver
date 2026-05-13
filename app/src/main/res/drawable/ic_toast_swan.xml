@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Toast chip only. Bitmap: swan_asset_toast.png — own copy so toast padding ≠ launcher.
+  Toast chip only. Bitmap: swan_asset_toast.jpg — own copy so toast padding ≠ launcher.
   Toast-only bitmap with insets; CustomToast rasterizes larger then displays small for clarity.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
