@@ -75,6 +75,7 @@ import java.io.File
 import java.text.DecimalFormat
 import java.util.Locale
 import java.util.UUID
+import kotlin.math.abs
 import kotlinx.coroutines.launch
 
 private const val CROP_TAG = "ICON_CROP"
@@ -161,6 +162,29 @@ private fun buildIconCropIntent(context: Context, source: Uri, destination: Uri?
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         }
+}
+
+/**
+ * Center text for built-in (non-photo) metal icons on the Glance widget — matches [MetalIcon] weight tokens.
+ */
+fun metalWidgetCenterLabel(asset: AssetEntity): String {
+    val weight = asset.weight
+    val unit = asset.weightUnit
+    return when (unit.uppercase(Locale.US)) {
+        "GRAM" -> "1g"
+        "KILO" -> "1k"
+        "OZ" -> {
+            when {
+                abs(weight - 0.1) < 0.001 -> "1/10"
+                abs(weight - 100.0) < 0.001 -> "100"
+                abs(weight - 10.0) < 0.001 -> "10"
+                abs(weight - 1.0) < 0.001 -> "1"
+                weight < 1.0 -> weight.toString().replace("0.", ".").trimEnd('0').trimEnd('.')
+                else -> weight.toInt().toString()
+            }
+        }
+        else -> weight.toString()
+    }
 }
 
 @Composable
@@ -533,6 +557,42 @@ internal fun metalShouldShowSymbolSubtitle(asset: AssetEntity, primary: String):
     return true
 }
 
+private val METAL_HEADLINE_CAMEL_BOUNDARY = Regex("([a-z])([A-Z])")
+private val METAL_HEADLINE_RUNON_PREFIX =
+    Regex("^(?i)(platinum|palladium|silver|gold)(.+)$")
+
+/** Spaces, underscores, and camelCase so stored titles like `SilverBar` or `SILVER_BAR` split cleanly. */
+private fun normalizeMetalPrimaryForSplit(raw: String): String {
+    val t = raw.trim()
+    if (t.isEmpty()) return t
+    var s = t.replace('_', ' ')
+    s = METAL_HEADLINE_CAMEL_BOUNDARY.replace(s) { "${it.groupValues[1]} ${it.groupValues[2]}" }
+    return s
+}
+
+/**
+ * Two-line metal title for widget + collapsed/expanded cards: first token / remainder.
+ * Handles spaces, [normalizeMetalPrimaryForSplit], and run‑together bullion names (`SILVERBAR` → SILVER / BAR).
+ */
+internal fun metalWidgetHeadlinePair(primary: String): Pair<String, String?> {
+    val raw = primary.trim()
+    if (raw.isEmpty()) return "" to null
+    val spaced = normalizeMetalPrimaryForSplit(raw)
+    val idx = spaced.indexOf(' ')
+    if (idx >= 0) {
+        val first = spaced.substring(0, idx).trim().uppercase(Locale.US)
+        val rest = spaced.substring(idx + 1).trim().uppercase(Locale.US)
+        return if (rest.isEmpty()) first to null else first to rest
+    }
+    val runon = METAL_HEADLINE_RUNON_PREFIX.find(spaced)
+    if (runon != null) {
+        val head = runon.groupValues[1].trim().uppercase(Locale.US)
+        val tail = runon.groupValues[2].trim().uppercase(Locale.US)
+        if (tail.isNotEmpty()) return head to tail
+    }
+    return spaced.uppercase(Locale.US) to null
+}
+
 /** MetalIcon tint logic: keep symbol in the string so gradients match even if the user title omits \"Silver\". */
 private fun metalIconLookupName(asset: AssetEntity): String =
     when (asset.category) {
@@ -578,12 +638,13 @@ private fun AssetUnderIconNameBlock(
         return
     }
     val primary = metalCardPrimaryLabel(asset)
+    val (headLine1, headLine2) = metalWidgetHeadlinePair(primary)
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = primary.uppercase(Locale.US),
+            text = headLine1,
             modifier = Modifier.fillMaxWidth(),
             style = LocalTextStyle.current.merge(
                 TextStyle(
@@ -595,10 +656,29 @@ private fun AssetUnderIconNameBlock(
                     platformStyle = platform,
                 )
             ),
-            maxLines = 2,
-            softWrap = true,
+            maxLines = 1,
+            softWrap = false,
             overflow = TextOverflow.Ellipsis,
         )
+        if (headLine2 != null) {
+            Text(
+                text = headLine2,
+                modifier = Modifier.fillMaxWidth(),
+                style = LocalTextStyle.current.merge(
+                    TextStyle(
+                        color = cardText,
+                        fontWeight = FontWeight.Black,
+                        fontSize = symSize,
+                        textAlign = TextAlign.Center,
+                        lineHeight = lineHeight,
+                        platformStyle = platform,
+                    )
+                ),
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         if (metalShouldShowSymbolSubtitle(asset, primary)) {
             Text(
                 text = asset.symbol.trim().uppercase(Locale.US),
@@ -1546,23 +1626,60 @@ fun CompactAssetCard(
                                     },
                                     horizontalAlignment = Alignment.Start
                                 ) {
-                                    AutoResizingText(
-                                        text = titleText.uppercase(),
-                                        style = LocalTextStyle.current.copy(
-                                            color = cardText,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = tickerSize,
-                                            lineHeight = lineCluster,
-                                            platformStyle = platformCluster,
-                                            textAlign = TextAlign.Start,
-                                        ),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        maxFontSize = tickerSize,
-                                        minFontSize = 12.sp,
-                                        maxLines = if (asset.category == AssetCategory.METAL) 2 else 1,
-                                        softWrap = asset.category == AssetCategory.METAL,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
+                                    if (asset.category == AssetCategory.METAL) {
+                                        // Explicit two lines (same logic as widget): avoids soft-wrap breaking mid-word (SILVE / R CO…).
+                                        val (h1, h2) = metalWidgetHeadlinePair(titleText)
+                                        Text(
+                                            text = h1,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            style = LocalTextStyle.current.copy(
+                                                color = cardText,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = tickerSize,
+                                                lineHeight = lineCluster,
+                                                platformStyle = platformCluster,
+                                                textAlign = TextAlign.Start,
+                                            ),
+                                            maxLines = 1,
+                                            softWrap = false,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                        if (h2 != null) {
+                                            Text(
+                                                text = h2,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                style = LocalTextStyle.current.copy(
+                                                    color = cardText,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = tickerSize,
+                                                    lineHeight = lineCluster,
+                                                    platformStyle = platformCluster,
+                                                    textAlign = TextAlign.Start,
+                                                ),
+                                                maxLines = 1,
+                                                softWrap = false,
+                                                overflow = TextOverflow.Ellipsis,
+                                            )
+                                        }
+                                    } else {
+                                        AutoResizingText(
+                                            text = titleText.uppercase(Locale.US),
+                                            style = LocalTextStyle.current.copy(
+                                                color = cardText,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = tickerSize,
+                                                lineHeight = lineCluster,
+                                                platformStyle = platformCluster,
+                                                textAlign = TextAlign.Start,
+                                            ),
+                                            modifier = Modifier.fillMaxWidth(),
+                                            maxFontSize = tickerSize,
+                                            minFontSize = 12.sp,
+                                            maxLines = 1,
+                                            softWrap = false,
+                                            overflow = TextOverflow.Ellipsis,
+                                        )
+                                    }
                                     AutoResizingText(
                                         text = formatBoutiquePrice(AssetValuation.cardPriceRowUsd(asset), baseCurrency),
                                         style = LocalTextStyle.current.copy(

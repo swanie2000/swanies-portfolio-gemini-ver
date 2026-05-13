@@ -2,6 +2,7 @@ package com.swanie.portfolio.widget
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -40,7 +41,8 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.ui.holdings.metalCardPrimaryLabel
-import com.swanie.portfolio.ui.holdings.metalShouldShowSymbolSubtitle
+import com.swanie.portfolio.ui.holdings.metalWidgetHeadlinePair
+import com.swanie.portfolio.ui.holdings.metalWidgetCenterLabel
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -230,6 +232,35 @@ private fun Preferences.readWidgetPackedAssetData(lastGood: Boolean): String {
 }
 
 /**
+ * Packed widget rows omit category. [file:] icons are used for custom metal photos and (rarely) local crypto art;
+ * infer metals from standard bullion tickers plus name/coinId hints so [metalCardPrimaryLabel] matches holdings.
+ */
+internal fun inferPackedRowIsMetal(
+    coinId: String,
+    symbol: String,
+    displayName: String,
+    iconSource: String,
+): Boolean {
+    if (iconSource.startsWith("res:") || iconSource == "__METAL_DEFAULT__") return true
+    if (!iconSource.startsWith("file:")) return false
+    val sym = symbol.trim().uppercase(Locale.US)
+    val metalSymbols = setOf("XAU", "XAG", "XPT", "XPD")
+    if (sym in metalSymbols) return true
+    if (sym.endsWith("=F") && (sym.contains("GC") || sym.contains("SI") || sym.contains("PL") || sym.contains("PA"))) return true
+    val hay = buildString {
+        append(coinId.lowercase(Locale.US))
+        append(' ')
+        append(symbol.lowercase(Locale.US))
+        append(' ')
+        append(displayName.lowercase(Locale.US))
+    }
+    return hay.contains("gold") || hay.contains("silver") || hay.contains("platinum") || hay.contains("palladium") ||
+        hay.contains("bullion") || hay.contains("xau") || hay.contains("xag") || hay.contains("xpt") || hay.contains("xpd") ||
+        hay.contains("metal_") || hay.contains("metal-") || hay.contains(" kilo") || hay.contains(" gram") ||
+        hay.contains("(1oz") || hay.contains("(100oz") || hay.contains("10oz") || hay.contains("1/10")
+}
+
+/**
  * One packed widget row: fixed tail (line price, 24h%, weight, amount, total, sparkline) so [iconSource]
  * may contain `|` (e.g. URLs) without breaking the parser.
  */
@@ -239,14 +270,17 @@ internal fun parseSingleWidgetAssetEntry(entry: String): Triple<AssetEntity, Str
     if (parts.isEmpty() || parts[0].isBlank()) return null
     return when {
         parts.size == 9 -> {
+            val icon = parts[3]
+            val isRowMetal = inferPackedRowIsMetal(parts[0], parts[1], parts[2], icon)
             val asset = AssetEntity(
                 coinId = parts[0],
                 symbol = parts[1],
                 displayName = parts[2],
                 name = parts[2],
-                imageUrl = parts[3],
+                imageUrl = icon,
                 officialSpotPrice = parts[4].toDoubleOrNull() ?: 0.0,
-                category = if (parts[3].startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
+                category = if (isRowMetal) AssetCategory.METAL else AssetCategory.CRYPTO,
+                isMetal = isRowMetal,
                 priceChange24h = parts[5].toDoubleOrNull() ?: 0.0,
                 weight = parts[6].toDoubleOrNull() ?: 1.0,
                 amountHeld = parts[7].toDoubleOrNull() ?: 1.0,
@@ -265,6 +299,7 @@ internal fun parseSingleWidgetAssetEntry(entry: String): Triple<AssetEntity, Str
             val amount = parts[end - 3].toDoubleOrNull() ?: 1.0
             val formattedTotal = parts[end - 2]
             val sparklinePath = parts[end - 1]
+            val isRowMetal = inferPackedRowIsMetal(parts[0], parts[1], parts[2], iconSource)
             val asset = AssetEntity(
                 coinId = parts[0],
                 symbol = parts[1],
@@ -272,7 +307,8 @@ internal fun parseSingleWidgetAssetEntry(entry: String): Triple<AssetEntity, Str
                 name = parts[2],
                 imageUrl = iconSource,
                 officialSpotPrice = linePriceStr.toDoubleOrNull() ?: 0.0,
-                category = if (iconSource.startsWith("res:")) AssetCategory.METAL else AssetCategory.CRYPTO,
+                category = if (isRowMetal) AssetCategory.METAL else AssetCategory.CRYPTO,
+                isMetal = isRowMetal,
                 priceChange24h = priceChange,
                 weight = weight,
                 amountHeld = amount,
@@ -426,45 +462,109 @@ fun WidgetContent(
 }
 
 @Composable
+private fun MetalWidgetWeightStamp(asset: AssetEntity) {
+    val label = metalWidgetCenterLabel(asset)
+    val fontSize = if (label.length > 2) 8.sp else 10.sp
+    Text(
+        text = label,
+        style = TextStyle(
+            color = ColorProvider(Color.Black.copy(alpha = 0.7f)),
+            fontSize = fontSize,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        ),
+        maxLines = 1,
+    )
+}
+
+@Composable
 fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, totalStr: String, cardColor: Color, textColor: Color) {
     Row(
         modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        val isMetal = asset.imageUrl.startsWith("res:")
-        val iconBgColor = if (isMetal) { if (asset.imageUrl.contains("gold", true)) Color(0xFFFFD700) else Color(0xFFC0C0C0) } else Color.White.copy(alpha = 0.1f)
+        val isMetalAsset = asset.category == AssetCategory.METAL || asset.isMetal
+        val haystack = "${asset.displayName} ${asset.name} ${asset.symbol}".lowercase(Locale.getDefault())
+        val customIconBitmap: Bitmap? =
+            if (asset.imageUrl.startsWith("file:")) {
+                val path = asset.imageUrl.substringAfter("file:")
+                try {
+                    BitmapFactory.decodeFile(path)
+                } catch (_: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
+        // Custom photos: neutral plate (matches crypto); built-in metal stamp keeps gold/silver disk.
+        val iconBgColor = when {
+            customIconBitmap != null -> Color.White.copy(alpha = 0.1f)
+            isMetalAsset -> if (haystack.contains("gold") || haystack.contains("xau")) Color(0xFFFFD700) else Color(0xFFC0C0C0)
+            else -> Color.White.copy(alpha = 0.1f)
+        }
 
         // 🎯 LANE 1: IDENTITY (Fixed 130dp for High-Precision)
         Row(modifier = GlanceModifier.width(130.dp), verticalAlignment = Alignment.Vertical.CenterVertically) {
             Box(modifier = GlanceModifier.size(28.dp).cornerRadius(14.dp).background(iconBgColor), contentAlignment = Alignment.Center) {
-                if (isMetal) {
-                    val resName = asset.imageUrl.substringAfter("res:")
-                    val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
-                    if (resId != 0) Image(provider = ImageProvider(resId), contentDescription = null, modifier = GlanceModifier.size(18.dp))
-                } else if (asset.imageUrl.startsWith("file:")) {
-                    val path = asset.imageUrl.substringAfter("file:")
-                    val bitmap = try { BitmapFactory.decodeFile(path) } catch (e: Exception) { null }
-                    if (bitmap != null) Image(provider = ImageProvider(bitmap), contentDescription = null, modifier = GlanceModifier.size(20.dp)) else StampFallback(asset)
-                } else StampFallback(asset)
+                when {
+                    asset.imageUrl.startsWith("file:") -> {
+                        when {
+                            customIconBitmap != null -> Image(
+                                provider = ImageProvider(customIconBitmap),
+                                contentDescription = null,
+                                modifier = GlanceModifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop,
+                            )
+                            isMetalAsset -> MetalWidgetWeightStamp(asset)
+                            else -> StampFallback(asset)
+                        }
+                    }
+                    isMetalAsset && (asset.imageUrl == "__METAL_DEFAULT__" || asset.imageUrl.isBlank()) -> {
+                        MetalWidgetWeightStamp(asset)
+                    }
+                    isMetalAsset && asset.imageUrl.startsWith("res:") -> {
+                        val resName = asset.imageUrl.substringAfter("res:")
+                        val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+                        when {
+                            resId != 0 -> Image(
+                                provider = ImageProvider(resId),
+                                contentDescription = null,
+                                modifier = GlanceModifier.size(18.dp),
+                            )
+                            else -> MetalWidgetWeightStamp(asset)
+                        }
+                    }
+                    asset.imageUrl.startsWith("res:") -> {
+                        val resName = asset.imageUrl.substringAfter("res:")
+                        val resId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+                        if (resId != 0) {
+                            Image(
+                                provider = ImageProvider(resId),
+                                contentDescription = null,
+                                modifier = GlanceModifier.size(18.dp),
+                            )
+                        } else {
+                            StampFallback(asset)
+                        }
+                    }
+                    else -> StampFallback(asset)
+                }
             }
             Spacer(modifier = GlanceModifier.width(8.dp))
             Column {
                 val isMetalRow = asset.category == AssetCategory.METAL || asset.isMetal
                 if (isMetalRow) {
                     val primary = metalCardPrimaryLabel(asset)
+                    val (headLine1, headLine2) = metalWidgetHeadlinePair(primary)
                     Text(
-                        text = primary.uppercase(Locale.getDefault()),
+                        text = headLine1,
                         style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
-                        maxLines = 2,
+                        maxLines = 1,
                     )
-                    if (metalShouldShowSymbolSubtitle(asset, primary)) {
+                    if (headLine2 != null) {
                         Text(
-                            text = asset.symbol.trim().uppercase(Locale.getDefault()),
-                            style = TextStyle(
-                                color = ColorProvider(textColor.copy(alpha = 0.55f)),
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                            ),
+                            text = headLine2,
+                            style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
                             maxLines = 1,
                         )
                     }

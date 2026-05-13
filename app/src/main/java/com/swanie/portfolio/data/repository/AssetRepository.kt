@@ -217,9 +217,10 @@ class AssetRepository @Inject constructor(
 
                     val rowLines = filteredAssets.map { asset ->
                         val iconSource = when {
-                            asset.category == AssetCategory.METAL || asset.isMetal -> "res:ic_${asset.symbol.lowercase()}"
+                            // Custom metal (or any) photo icons must win over packaged res:ic_* metal art.
                             asset.imageUrl.startsWith("file:") -> asset.imageUrl
                             asset.localIconPath != null -> "file:${asset.localIconPath}"
+                            asset.category == AssetCategory.METAL || asset.isMetal -> "__METAL_DEFAULT__"
                             else -> asset.imageUrl
                         }
                         val assetValue = AssetValuation.holdingValueUsd(asset)
