@@ -1,10 +1,10 @@
 ---
-description: Sync with GitHub before editing this repo (owner workflow, multi-machine).
+description: Sync with GitHub before editing this repo (owner workflow, laptop + origin).
 alwaysApply: true
 ---
 
 # Git first (step 0)
 
-Before making **code or resource** changes in this workspace, ensure **`main`** (or the active branch) is current with **`origin`**: run **`git pull`** (or fetch + merge/rebase as the owner prefers) so local work matches GitHub. The owner uses **multiple machines**; skipping pull causes duplicate effort, merge pain, and “the other Cursor had the project but not the fix” drift.
+Before making **code or resource** changes in this workspace, ensure **`main`** (or the active branch) is current with **`origin`**: run **`git pull`** (or fetch + merge/rebase as the owner prefers) so the **laptop** checkout matches GitHub. **All dev is on one machine**; pull still avoids stale **`main`**, surprise merges, and “I thought that was already on **`origin`**” drift.
 
 If **`git pull`** reports conflicts, resolve them **before** new edits. Shell-capable agents should **`git pull`** at session start when the task touches the repo.
