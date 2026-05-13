@@ -896,6 +896,82 @@ section {
   margin: 0.25rem 0 0;
 }
 
+.testing-subhead {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 1.35rem 0 0.5rem;
+}
+
+.tester-request {
+  margin: 0 0 1rem;
+  padding: 1rem 1rem 1.05rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 168, 83, 0.22);
+  background: rgba(0, 4, 22, 0.45);
+  min-width: 0;
+}
+
+.tester-request-note {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.tester-request-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.tester-request-form input[type="email"] {
+  width: 100%;
+  max-width: 22rem;
+  box-sizing: border-box;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.38);
+  color: var(--text);
+  font: inherit;
+  margin-bottom: 0.35rem;
+}
+
+.tester-request-form input[type="email"]:focus {
+  outline: 2px solid rgba(94, 234, 212, 0.45);
+  outline-offset: 1px;
+}
+
+.tester-request-form input[type="email"][aria-invalid="true"] {
+  border-color: rgba(255, 107, 107, 0.65);
+}
+
+.tester-request-hint {
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.tester-request-form .btn {
+  margin-top: 0.15rem;
+}
+
+.tester-request-manual {
+  margin: 0.85rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.tester-request-manual strong {
+  color: var(--text);
+  font-weight: 600;
+  word-break: break-all;
+}
+
 /* QR deck — site URL + optional Play tester invite (generated in-browser via js/qrcode.min.js) */
 .qr-deck {
   min-width: 0;

@@ -234,13 +234,40 @@
 
       <section id="join-testing">
         <h2 class="section-title">Join testing</h2>
-        <p class="section-sub">Use this section while the listing moves through internal and closed testing.</p>
+        <p class="section-sub">Read this page first, then ask to be added. Google Play internal testing only works for accounts the developer adds by hand.</p>
         <div class="card testing-card">
-          <h3>How to get access</h3>
+          <h3>Step 1 — Request access by email</h3>
+          <p class="tester-request-note">
+            Internal testing on Google Play does <strong>not</strong> let random installs. You must use the
+            <strong>same Google account email</strong> you use in the Play Store. After you send the request below, the developer
+            will <strong>manually add</strong> your address to the tester list in Play Console. Until that is done, the tester invite link will not work for you.
+          </p>
+          <div class="tester-request">
+            <form class="tester-request-form" id="tester-request-form" action="#" method="get" novalidate>
+              <label for="tester-request-email">Google account email (Play Store)</label>
+              <input
+                type="email"
+                id="tester-request-email"
+                name="email"
+                required
+                autocomplete="email"
+                inputmode="email"
+                placeholder="you@gmail.com"
+              />
+              <p class="tester-request-hint">Use the exact address you sign into Google Play with.</p>
+              <button type="submit" class="btn btn-secondary" id="tester-request-submit">Email my request to join</button>
+            </form>
+            <p class="tester-request-manual">
+              If the button does not open your mail app, send the same request yourself to
+              <strong id="tester-request-show-email"></strong> from any email client.
+            </p>
+          </div>
+
+          <h3 class="testing-subhead">Step 2 — After you are added</h3>
           <ol>
-            <li>Request access from the Swanie's Portfolio tester list owner.</li>
-            <li>Accept the Google Play tester invitation when you receive it.</li>
-            <li>Install from the tester link in Google Play.</li>
+            <li>Wait for confirmation (or try again later the same day once you know you were added).</li>
+            <li>Open <strong>Open tester invite</strong> below (or scan the Play QR). Sign in with the <strong>same</strong> Google account you requested with.</li>
+            <li>Accept the Play invitation, then install or update <strong>Swanie's Portfolio</strong> from the Google Play Store.</li>
           </ol>
           <p class="testing-links">
             <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
@@ -310,7 +337,7 @@
             </div>
           </details>
           <p class="hero-note">
-            Owner note: set <code style="color: var(--gold-dim);">TESTER_URL</code> and <code style="color: var(--gold-dim);">PLAY_URL</code> when links are ready. Optional: set <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> to a canonical <strong>https://</strong> homepage if the auto-detected URL is wrong (e.g. local preview).
+            Owner: set <code style="color: var(--gold-dim);">TESTER_REQUEST_EMAIL</code> in the script to the inbox where you receive tester requests. Set <code style="color: var(--gold-dim);">PLAY_URL</code> when the public store listing exists. Optional: <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> for a canonical <strong>https://</strong> homepage if the site QR is wrong locally.
           </p>
         </div>
       </section>
@@ -324,7 +351,10 @@
   <script src="js/qrcode.min.js"></script>
   <script>
     const PLAY_URL = "";
-    const TESTER_URL = "";
+    /** Google Play internal (or closed) testing opt-in URL — QR + “Open tester invite” button. */
+    const TESTER_URL = "https://play.google.com/apps/internaltest/4700913622589567786";
+    /** Inbox that receives prefilled “add me to Play testers” mailto messages (edit if different from feedback Gmail). */
+    const TESTER_REQUEST_EMAIL = "swanies.portfolio@gmail.com";
     /** Optional: force the “site” QR to a public https URL (e.g. https://swaniedesigns.com/). Leave "" to use the current page URL. */
     const SITE_SHARE_URL = "";
 
@@ -342,6 +372,34 @@
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    (function wireTesterRequestForm() {
+      var show = document.getElementById("tester-request-show-email");
+      if (show) show.textContent = TESTER_REQUEST_EMAIL;
+      var form = document.getElementById("tester-request-form");
+      if (!form) return;
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var input = document.getElementById("tester-request-email");
+        if (!input) return;
+        var em = input.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
+          input.focus();
+          input.setAttribute("aria-invalid", "true");
+          return;
+        }
+        input.removeAttribute("aria-invalid");
+        var subject = encodeURIComponent("Play internal tester request — Swanie's Portfolio");
+        var body = encodeURIComponent(
+          "Please add this Google account to the Play Console internal testing email list for Swanie's Portfolio (com.swanie.portfolio):\n\n" +
+            em +
+            "\n\nSubmitted from: " +
+            window.location.href +
+            "\n\nAfter I'm added, I will use the tester invite on the website to install from Google Play."
+        );
+        window.location.href = "mailto:" + TESTER_REQUEST_EMAIL + "?subject=" + subject + "&body=" + body;
+      });
+    })();
 
     function siteShareTarget() {
       if (SITE_SHARE_URL && /^https?:\/\//.test(SITE_SHARE_URL)) return SITE_SHARE_URL;
