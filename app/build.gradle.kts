@@ -29,6 +29,9 @@ fun resolveLocalSecret(name: String): String {
     return fromLocalProperties ?: fromGradleProperty ?: fromEnv ?: ""
 }
 
+/** Google Play / store builds: RevenueCat *public* SDK key (dashboard → usually `goog_…`). Never use a `test_` key here — the SDK exits the app on release if it sees a test key. */
+fun resolveRevenueCatPublicApiKey(): String = resolveLocalSecret("REVENUECAT_PUBLIC_API_KEY").trim()
+
 android {
     namespace = "com.swanie.portfolio"
     compileSdk = 35
@@ -37,8 +40,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -58,7 +61,7 @@ android {
             buildConfigField(
                 "String",
                 "REVENUECAT_API_KEY",
-                "\"${resolveLocalSecret("REVENUECAT_API_KEY")}\""
+                "\"${resolveRevenueCatPublicApiKey()}\"",
             )
             buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
