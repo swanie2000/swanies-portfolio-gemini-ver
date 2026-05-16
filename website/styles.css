@@ -933,6 +933,14 @@ section {
   line-height: 1.55;
 }
 
+.tester-play-warning {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 213, 79, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 213, 79, 0.08);
+  color: var(--text);
+}
+
 .tester-request-form label {
   display: block;
   font-size: 0.85rem;
