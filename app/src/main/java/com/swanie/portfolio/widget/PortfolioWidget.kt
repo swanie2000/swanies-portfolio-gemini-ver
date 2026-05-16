@@ -41,8 +41,8 @@ import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.ui.holdings.metalCardPrimaryLabel
-import com.swanie.portfolio.ui.holdings.metalWidgetHeadlinePair
 import com.swanie.portfolio.ui.holdings.metalWidgetCenterLabel
+import com.swanie.portfolio.ui.holdings.metalWidgetHeadlinePair
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -62,6 +62,17 @@ private fun WidgetPlaceholderSwanWhite(sizeDp: androidx.compose.ui.unit.Dp) {
         colorFilter = ColorFilter.tint(ColorProvider(Color.White))
     )
 }
+
+/** Metal identity column: three lines at compact sizes so row height matches crypto (2 lines at 11/9 sp). */
+private val WidgetMetalHeadlineFont = 9.sp
+private val WidgetMetalPriceFont = 7.sp
+private val WidgetMetalPriceFontCompact = 6.sp
+
+/**
+ * Uniform card height so weighted gap below each row is even. Must fit sparkline (40dp), holdings column,
+ * and metal identity (3 compact lines). 52–61dp clipped the metal spot-price row; 62dp shows full price.
+ */
+private val WidgetAssetCardHeight = 62.dp
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -425,6 +436,7 @@ fun WidgetContent(
             visible.forEach { (asset, priceStr, totalStr) ->
                 // RemoteViews (Glance → RV) allows only a small number of direct children per Column (~10).
                 // Card + Spacer as siblings was 2×N children → capped around 5 rows. Nest so this Column has one child per asset.
+                // Do not use fillMaxHeight() on each row — on many launchers every row expands to the full list height and only one card shows.
                 Column(modifier = GlanceModifier.fillMaxWidth().defaultWeight()) {
                     AssetCardOriginal(context, asset, priceStr, totalStr, cardColor, cardTextColor)
                     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -480,8 +492,13 @@ private fun MetalWidgetWeightStamp(asset: AssetEntity) {
 @Composable
 fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, totalStr: String, cardColor: Color, textColor: Color) {
     Row(
-        modifier = GlanceModifier.fillMaxWidth().cornerRadius(10.dp).background(cardColor).padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.Vertical.CenterVertically
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .height(WidgetAssetCardHeight)
+            .cornerRadius(10.dp)
+            .background(cardColor)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.Vertical.CenterVertically,
     ) {
         val isMetalAsset = asset.category == AssetCategory.METAL || asset.isMetal
         val haystack = "${asset.displayName} ${asset.name} ${asset.symbol}".lowercase(Locale.getDefault())
@@ -551,20 +568,30 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                 }
             }
             Spacer(modifier = GlanceModifier.width(8.dp))
-            Column {
+            Column(
+                modifier = GlanceModifier.fillMaxHeight(),
+                verticalAlignment = Alignment.Vertical.Top,
+            ) {
                 val isMetalRow = asset.category == AssetCategory.METAL || asset.isMetal
                 if (isMetalRow) {
-                    val primary = metalCardPrimaryLabel(asset)
-                    val (headLine1, headLine2) = metalWidgetHeadlinePair(primary)
+                    val (headLine1, headLine2) = metalWidgetHeadlinePair(metalCardPrimaryLabel(asset))
                     Text(
                         text = headLine1,
-                        style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                        style = TextStyle(
+                            color = ColorProvider(textColor),
+                            fontSize = WidgetMetalHeadlineFont,
+                            fontWeight = FontWeight.Bold,
+                        ),
                         maxLines = 1,
                     )
                     if (headLine2 != null) {
                         Text(
                             text = headLine2,
-                            style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                            style = TextStyle(
+                                color = ColorProvider(textColor),
+                                fontSize = WidgetMetalHeadlineFont,
+                                fontWeight = FontWeight.Bold,
+                            ),
                             maxLines = 1,
                         )
                     }
@@ -572,19 +599,23 @@ fun AssetCardOriginal(context: Context, asset: AssetEntity, priceStr: String, to
                     Text(
                         text = asset.symbol.uppercase(Locale.getDefault()),
                         style = TextStyle(color = ColorProvider(textColor), fontSize = 11.sp, fontWeight = FontWeight.Bold),
+                        maxLines = 1,
                     )
                 }
 
                 // 🎯 DIRECT STRING DISPLAY: Bypasses CurrencyFormatter rounding
-                val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr" 
-                                   else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
-                
-                val dynamicFontSize = if (displayPrice.length > 12) 7.sp else 9.sp
+                val displayPrice = if (priceStr.isNotEmpty()) "$$priceStr"
+                    else NumberFormat.getCurrencyInstance(Locale.US).format(asset.officialSpotPrice)
+
+                val dynamicFontSize = when {
+                    isMetalRow -> if (displayPrice.length > 12) WidgetMetalPriceFontCompact else WidgetMetalPriceFont
+                    else -> if (displayPrice.length > 12) 7.sp else 9.sp
+                }
 
                 Text(
-                    text = displayPrice, 
+                    text = displayPrice,
                     style = TextStyle(color = ColorProvider(textColor.copy(alpha = 0.6f)), fontSize = dynamicFontSize, fontWeight = FontWeight.Medium),
-                    maxLines = 1
+                    maxLines = 1,
                 )
             }
         }
