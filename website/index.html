@@ -465,17 +465,23 @@
         }
 
         var fullMessage =
-          "Please add this Google account to the Play Console internal testing list for Swanie's Portfolio (com.swanie.portfolio).\n\n" +
-          "Play Store Google account: " +
+          "INTERNAL TESTING REQUEST — Swanie's Portfolio (com.swanie.portfolio)\n\n" +
+          "Requester name: " +
+          name +
+          "\n" +
+          "Play Store Google account — add manually in Play Console:\n" +
           em +
           "\n\n";
         if (note) {
           fullMessage += "Message from requester:\n" + note + "\n\n";
         }
-        fullMessage +=
-          "Submitted from: " +
-          window.location.href +
-          "\n\nAfter I'm added, I will use the tester invite on the website to install from Google Play.";
+        if (TESTER_URL && /^https?:\/\//.test(TESTER_URL)) {
+          fullMessage +=
+            "Step 2 — Google Play tester invite link (send to requester after they are added):\n" +
+            TESTER_URL +
+            "\n\n";
+        }
+        fullMessage += "Join testing page (submitted from):\n" + window.location.href;
 
         if (submitBtn) {
           submitBtn.disabled = true;
@@ -510,7 +516,7 @@
             form.reset();
             setStatus(
               "success",
-              "Request sent — thank you! Swanie will add your Play email when possible. Watch for confirmation, then use Step 2 below."
+              "Thanks for your help in testing SWANIE'S PORTFOLIO. Your email address will need to be added manually into the testing environment. Watch for confirmation, then you can proceed to Step 2 below."
             );
           })
           .catch(function () {
