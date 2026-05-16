@@ -403,6 +403,82 @@
     wireCta("tester-cta", TESTER_URL, "Open tester invite");
     document.getElementById("y").textContent = new Date().getFullYear();
 
+    function testerFirstName(fullName) {
+      var t = (fullName || "").trim();
+      if (!t) return "there";
+      return t.split(/\s+/)[0];
+    }
+
+    /**
+     * Email body for Web3Forms: reply-ready text first, Play Console checklist below.
+     * Reply-To is the requester's Play email (set on the JSON payload).
+     */
+    function buildTesterRequestAdminEmail(name, playEmail, note) {
+      var first = testerFirstName(name);
+      var invite =
+        TESTER_URL && /^https?:\/\//.test(TESTER_URL)
+          ? TESTER_URL
+          : "(Set TESTER_URL in website/index.html — invite link missing)";
+      var joinPage = window.location.href;
+
+      var replyReady =
+        "Hi " +
+        first +
+        ",\n\n" +
+        "Thank you for helping test SWANIE'S PORTFOLIO!\n\n" +
+        "I've added your Google account to our internal testing list on Google Play. " +
+        "When you're ready, follow these steps on your Android phone:\n\n" +
+        "1) Open this tester invite link (Chrome is fine):\n" +
+        invite +
+        "\n\n" +
+        "2) Sign in with the SAME Google account you used on the join-testing form:\n" +
+        playEmail +
+        "\n\n" +
+        "3) Accept the invitation in Google Play, then install or update \"Swanie's Portfolio\" from the Play Store.\n\n" +
+        "If the link says you're not a tester yet, wait a little while and try again — Play can take a short time after you're added.\n\n" +
+        "Join testing help page (steps & QR codes):\n" +
+        joinPage +
+        "\n\n" +
+        "Thanks again for testing — your feedback really helps.\n\n" +
+        "— Swanie\n";
+
+      var lines = [];
+      lines.push("══════════════════════════════════════════════════════════════");
+      lines.push("✉️  READY TO REPLY — send after adding them in Play Console");
+      lines.push("    (Gmail: Reply — trim anything below this block if you prefer)");
+      lines.push("══════════════════════════════════════════════════════════════");
+      lines.push("");
+      lines.push(replyReady.trim());
+      lines.push("");
+      lines.push("──────────────────────────────────────────────────────────────");
+      lines.push("📋 FOR SWANIE — do this first, then Reply with the block above");
+      lines.push("──────────────────────────────────────────────────────────────");
+      lines.push("");
+      lines.push("Play Console checklist:");
+      lines.push("  [ ] Google Play Console → Swanie's Portfolio");
+      lines.push("  [ ] Release → Testing → Internal testing → Testers");
+      lines.push("  [ ] Add email address (exact Play account):");
+      lines.push("      " + playEmail);
+      lines.push("  [ ] Save");
+      lines.push("");
+      lines.push("Request summary");
+      lines.push("  Name:              " + name);
+      lines.push("  Play account:      " + playEmail);
+      lines.push("  Package ID:        com.swanie.portfolio");
+      lines.push("  Tester invite URL: " + invite);
+      lines.push("  Join testing page: " + joinPage);
+      if (note) {
+        lines.push("");
+        lines.push("Note from requester:");
+        lines.push(note);
+      }
+      lines.push("");
+      lines.push("──────────────────────────────────────────────────────────────");
+      lines.push("Internal testing request — automated from swaniedesigns.com");
+      lines.push("──────────────────────────────────────────────────────────────");
+      return lines.join("\n");
+    }
+
     (function wireTesterRequestForm() {
       var show = document.getElementById("tester-request-show-email");
       if (show) show.textContent = TESTER_REQUEST_EMAIL;
@@ -464,24 +540,7 @@
           return;
         }
 
-        var fullMessage =
-          "INTERNAL TESTING REQUEST — Swanie's Portfolio (com.swanie.portfolio)\n\n" +
-          "Requester name: " +
-          name +
-          "\n" +
-          "Play Store Google account — add manually in Play Console:\n" +
-          em +
-          "\n\n";
-        if (note) {
-          fullMessage += "Message from requester:\n" + note + "\n\n";
-        }
-        if (TESTER_URL && /^https?:\/\//.test(TESTER_URL)) {
-          fullMessage +=
-            "Step 2 — Google Play tester invite link (send to requester after they are added):\n" +
-            TESTER_URL +
-            "\n\n";
-        }
-        fullMessage += "Join testing page (submitted from):\n" + window.location.href;
+        var fullMessage = buildTesterRequestAdminEmail(name, em, note);
 
         if (submitBtn) {
           submitBtn.disabled = true;
