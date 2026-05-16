@@ -56,8 +56,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.0.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
@@ -121,6 +121,42 @@ tasks.register("validateRevenueCatReleaseKey") {
     group = "verification"
     description = "Ensures REVENUECAT_PUBLIC_API_KEY is set to goog_… (not test_…)"
     doLast { validateRevenueCatPublicApiKeyForRelease() }
+}
+
+/** After bundleRelease, fails if the AAB still embeds a sandbox `test_` RevenueCat key. */
+tasks.register("verifyReleaseBundleRevenueCatKey") {
+    group = "verification"
+    description = "Scans release AAB for test_ vs goog_ RevenueCat SDK key strings"
+    dependsOn("bundleRelease")
+    doLast {
+        val bundleDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
+        val aab =
+            bundleDir
+                .listFiles()
+                ?.firstOrNull { it.isFile && it.extension == "aab" }
+                ?: error("No release .aab under ${bundleDir.absolutePath} — run bundleRelease first")
+        var hasTestKey = false
+        var hasProductionKey = false
+        java.util.zip.ZipFile(aab).use { zip ->
+            zip.entries().asSequence().filter { it.name.endsWith(".dex") }.forEach { entry ->
+                zip.getInputStream(entry).use { input ->
+                    val text = input.readBytes().decodeToString()
+                    if (text.contains("test_dz")) hasTestKey = true
+                    if (text.contains("goog_")) hasProductionKey = true
+                }
+            }
+        }
+        check(!hasTestKey) {
+            "Release AAB still contains sandbox RevenueCat key (test_dz…). " +
+                "Build → Clean Project, confirm REVENUECAT_PUBLIC_API_KEY=goog_… in local.properties, " +
+                "then rebuild a signed release bundle."
+        }
+        check(hasProductionKey) {
+            "Release AAB is missing production RevenueCat key (goog_…). " +
+                "Set REVENUECAT_PUBLIC_API_KEY in local.properties and rebuild."
+        }
+        logger.lifecycle("Verified ${aab.name}: production RevenueCat key (goog_…), no test_dz")
+    }
 }
 
 dependencies {
