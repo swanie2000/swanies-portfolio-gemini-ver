@@ -2,6 +2,8 @@ package com.swanie.portfolio.widget
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -73,6 +75,16 @@ private val WidgetMetalPriceFontCompact = 6.sp
  * and metal identity (3 compact lines). 52–61dp clipped the metal spot-price row; 62dp shows full price.
  */
 private val WidgetAssetCardHeight = 62.dp
+
+/** Header chrome: larger tap target for refresh (Material ≥48dp); icon stays 20dp. */
+private val WidgetHeaderRefreshTouchWidth = 52.dp
+private val WidgetHeaderActionsWidth = 100.dp
+
+/** From the widget: cold-start the app or bring an existing task to the foreground (no duplicate stack). */
+internal fun widgetLaunchMainActivityIntent(context: Context): Intent =
+    Intent(context, MainActivity::class.java).apply {
+        addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_REORDER_TO_FRONT)
+    }
 
 class PortfolioWidget : GlanceAppWidget() {
 
@@ -407,18 +419,29 @@ fun WidgetContent(
     Column(modifier = GlanceModifier.fillMaxSize().background(bgColor).padding(horizontal = 8.dp, vertical = 4.dp)) {
         Row(modifier = GlanceModifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterStart) {
-                Box(modifier = GlanceModifier.size(44.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = GlanceModifier.size(44.dp).clickable(
+                        actionStartActivity(widgetLaunchMainActivityIntent(context)),
+                    ),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Image(provider = ImageProvider(R.drawable.swan_widget_icon_padded), contentDescription = null, modifier = GlanceModifier.size(28.dp))
                 }
             }
             Text(text = vaultName.uppercase(), style = TextStyle(color = ColorProvider(Color.White), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center), modifier = GlanceModifier.defaultWeight())
-            Box(modifier = GlanceModifier.width(80.dp).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
+            Box(modifier = GlanceModifier.width(WidgetHeaderActionsWidth).fillMaxHeight(), contentAlignment = Alignment.CenterEnd) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<WidgetClickCallback>(actionParametersOf(PortfolioWidget.WIDGET_ID_KEY to appWidgetId))), contentAlignment = Alignment.Center) {
                         Image(provider = ImageProvider(android.R.drawable.ic_menu_edit), contentDescription = null, modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.Yellow)))
                     }
                     Spacer(modifier = GlanceModifier.width(4.dp))
-                    Box(modifier = GlanceModifier.size(44.dp).clickable(actionRunCallback<RefreshCallback>()), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = GlanceModifier
+                            .width(WidgetHeaderRefreshTouchWidth)
+                            .fillMaxHeight()
+                            .clickable(actionRunCallback<RefreshCallback>()),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Image(provider = ImageProvider(android.R.drawable.ic_popup_sync), contentDescription = null, modifier = GlanceModifier.size(20.dp), colorFilter = ColorFilter.tint(ColorProvider(Color.White)))
                     }
                 }
