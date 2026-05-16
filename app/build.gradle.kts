@@ -32,6 +32,9 @@ fun resolveLocalSecret(name: String): String {
 /** Google Play / store builds: RevenueCat *public* SDK key (dashboard → usually `goog_…`). Never use a `test_` key here — the SDK exits the app on release if it sees a test key. */
 fun resolveRevenueCatPublicApiKey(): String = resolveLocalSecret("REVENUECAT_PUBLIC_API_KEY").trim()
 
+/** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
+fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_KEY").trim()
+
 android {
     namespace = "com.swanie.portfolio"
     compileSdk = 35
@@ -43,6 +46,7 @@ android {
         versionCode = 3
         versionName = "1.0.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
 
     buildTypes {

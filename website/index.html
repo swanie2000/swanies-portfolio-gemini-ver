@@ -360,7 +360,7 @@
             </div>
           </details>
           <p class="hero-note">
-            Owner: tester form posts via <code style="color: var(--gold-dim);">FORMSUBMIT_AJAX_URL</code> (same FormSubmit form as in-app feedback). Set <code style="color: var(--gold-dim);">PLAY_URL</code> when the public store listing exists. Optional: <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> for a canonical <strong>https://</strong> homepage if the site QR is wrong locally.
+            Owner: set <code style="color: var(--gold-dim);">WEB3FORMS_ACCESS_KEY</code> in the script (and <code style="color: var(--gold-dim);">local.properties</code> for the app). Restrict domain at web3forms.com. Set <code style="color: var(--gold-dim);">PLAY_URL</code> when the public store listing exists.
           </p>
         </div>
       </section>
@@ -378,8 +378,13 @@
     const TESTER_URL = "https://play.google.com/apps/internaltest/4700913622589567786";
     /** Inbox for tester requests (FormSubmit + fallback copy). Same Gmail as in-app feedback. */
     const TESTER_REQUEST_EMAIL = "swanies.portfolio@gmail.com";
-    /** FormSubmit AJAX endpoint (same activated form as app bug reports — see BugReportSubmitter.kt). */
-    const FORMSUBMIT_AJAX_URL = "https://formsubmit.co/ajax/6a72ac79f262ea55b696d51c2f75eb4c";
+    /**
+     * Web3Forms access key (free at https://web3forms.com — delivers to your Gmail).
+     * Safe in this public file if you restrict allowed domains in the Web3Forms dashboard (swaniedesigns.com).
+     * Must match WEB3FORMS_ACCESS_KEY in Android local.properties for in-app bug reports.
+     */
+    const WEB3FORMS_ACCESS_KEY = "";
+    const WEB3FORMS_SUBMIT_URL = "https://api.web3forms.com/submit";
     /** Optional: force the “site” QR to a public https URL (e.g. https://swaniedesigns.com/). Leave "" to use the current page URL. */
     const SITE_SHARE_URL = "";
 
@@ -451,6 +456,13 @@
           setStatus("error", "Please enter your name and a valid Google Play email address.");
           return;
         }
+        if (!WEB3FORMS_ACCESS_KEY) {
+          setStatus(
+            "error",
+            "Testing form is not configured yet. Email " + TESTER_REQUEST_EMAIL + " directly for now."
+          );
+          return;
+        }
 
         var fullMessage =
           "Please add this Google account to the Play Console internal testing list for Swanie's Portfolio (com.swanie.portfolio).\n\n" +
@@ -471,31 +483,26 @@
         }
         setStatus(null, "Sending your request…");
 
-        fetch(FORMSUBMIT_AJAX_URL, {
+        fetch(WEB3FORMS_SUBMIT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
           body: JSON.stringify({
-            _subject: "Swanie's Portfolio — internal testing request",
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject: "Swanie's Portfolio — internal testing request",
             name: name,
             email: em,
             message: fullMessage,
-            _captcha: "false",
-            _template: "table",
+            botcheck: "",
           }),
         })
           .then(function (res) {
-            return res.text().then(function (text) {
-              if (!res.ok) throw new Error(text || "Request failed");
-              if (text.trim().charAt(0) === "{") {
-                try {
-                  var data = JSON.parse(text);
-                  if (data.success === false) throw new Error("FormSubmit rejected the request");
-                } catch (parseErr) {
-                  if (parseErr.message === "FormSubmit rejected the request") throw parseErr;
-                }
+            return res.json().then(function (data) {
+              if (!res.ok || !data || data.success !== true) {
+                var msg = (data && data.message) ? data.message : "Request failed";
+                throw new Error(msg);
               }
             });
           })

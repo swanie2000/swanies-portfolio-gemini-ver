@@ -4,20 +4,20 @@ import android.util.Log
 import com.swanie.portfolio.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.FormBody
-import okhttp3.HttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
 /**
- * Posts bug/feedback in the background via [FormSubmit](https://formsubmit.co) (no mail client).
+ * Posts bug/feedback in the background via [Web3Forms](https://web3forms.com) (no mail client).
  *
- * Uses FormSubmit’s **form id** (opaque token) in the URL — not the raw inbox address — so
- * submissions match the form you activated for **swanies.portfolio@gmail.com**.
+ * Set **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`** (free key from web3forms.com → same inbox).
+ * The access key is safe in the public website script when domain-restricted in the Web3Forms dashboard.
  *
  * Logcat: filter **`SwanieBugReport`** (case-sensitive) to see every attempt, HTTP status, and errors.
  */
@@ -26,14 +26,9 @@ class BugReportSubmitter @Inject constructor(
     @Named("Feedback") private val okHttpClient: OkHttpClient,
 ) {
     companion object {
-        /** Single tag so Logcat search `SwanieBugReport` always finds this flow. */
         const val LOG_TAG = "SwanieBugReport"
-
-        /**
-         * FormSubmit “invisible form” id (from their activation email). Replaces the naked email in
-         * `/ajax/...` and `/{id}` paths; deliveries still go to the linked Gmail after you tap **Activate Form**.
-         */
-        private const val FORMSUBMIT_FORM_ID = "6a72ac79f262ea55b696d51c2f75eb4c"
+        private const val WEB3FORMS_SUBMIT_URL = "https://api.web3forms.com/submit"
+        private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
     }
 
     suspend fun submit(
@@ -41,6 +36,12 @@ class BugReportSubmitter @Inject constructor(
         userMessage: String,
         localeTag: String,
     ): Result<Unit> = withContext(Dispatchers.IO) {
+        val accessKey = BuildConfig.WEB3FORMS_ACCESS_KEY.trim()
+        if (accessKey.isBlank()) {
+            Log.e(LOG_TAG, "WEB3FORMS_ACCESS_KEY is missing — add it to local.properties")
+            return@withContext Result.failure(IllegalStateException("WEB3FORMS_ACCESS_KEY missing"))
+        }
+
         Log.i(LOG_TAG, "submit() start version=${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
         val fullMessage = buildString {
             append("App: ").append(BuildConfig.VERSION_NAME).append(" (")
@@ -51,89 +52,51 @@ class BugReportSubmitter @Inject constructor(
         }
         val replyEmail = accountEmail.trim().ifBlank { "anonymous@example.com" }
 
-        val ajaxUrl = HttpUrl.Builder()
-            .scheme("https")
-            .host("formsubmit.co")
-            .addPathSegment("ajax")
-            .addPathSegment(FORMSUBMIT_FORM_ID)
-            .build()
-
-        val classicUrl = HttpUrl.Builder()
-            .scheme("https")
-            .host("formsubmit.co")
-            .addPathSegment(FORMSUBMIT_FORM_ID)
-            .build()
-
-        // Each POST must use its own FormBody — OkHttp RequestBody is not always safe to reuse.
-        Log.i(LOG_TAG, "Trying FormSubmit AJAX url=$ajaxUrl")
-        val ajaxResult = postForm(ajaxUrl, buildFormBody(replyEmail, fullMessage))
-        if (ajaxResult.isSuccess) {
-            Log.i(LOG_TAG, "AJAX endpoint succeeded")
-            return@withContext ajaxResult
-        }
-        ajaxResult.exceptionOrNull()?.let { ex ->
-            Log.e(LOG_TAG, "AJAX attempt failed: ${ex.message}", ex)
+        val payload = JSONObject().apply {
+            put("access_key", accessKey)
+            put("subject", "Swanie's Portfolio — bug/feedback (${BuildConfig.VERSION_NAME})")
+            put("name", "Portfolio user")
+            put("email", replyEmail)
+            put("message", fullMessage)
+            put("botcheck", "")
         }
 
-        Log.i(LOG_TAG, "Trying FormSubmit classic url=$classicUrl")
-        val classicResult = postForm(classicUrl, buildFormBody(replyEmail, fullMessage))
-        classicResult.onFailure { ex ->
-            Log.e(LOG_TAG, "Classic attempt failed: ${ex.message}", ex)
-        }
-        classicResult.onSuccess {
-            Log.i(LOG_TAG, "Classic endpoint succeeded")
-        }
-        classicResult
+        postJson(payload)
     }
 
-    private fun buildFormBody(replyEmail: String, fullMessage: String): FormBody =
-        FormBody.Builder()
-            .add("_subject", "Swanie's Portfolio — bug/feedback (${BuildConfig.VERSION_NAME})")
-            .add("name", "Portfolio user")
-            .add("email", replyEmail)
-            .add("message", fullMessage)
-            .add("_captcha", "false")
-            .build()
-
-    private fun postForm(url: HttpUrl, body: FormBody): Result<Unit> {
+    private fun postJson(payload: JSONObject): Result<Unit> {
         val result = runCatching {
             val request = Request.Builder()
-                .url(url)
-                .post(body)
-                .header("Origin", "https://formsubmit.co")
-                .header("Referer", "https://formsubmit.co/")
+                .url(WEB3FORMS_SUBMIT_URL)
+                .post(payload.toString().toRequestBody(JSON_MEDIA))
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
                 .build()
 
             okHttpClient.newCall(request).execute().use { response ->
-                val code = response.code
                 val text = response.body?.string().orEmpty()
-                Log.i(LOG_TAG, "HTTP $code from $url bodyLen=${text.length} preview=${text.take(120).replace('\n', ' ')}")
+                Log.i(
+                    LOG_TAG,
+                    "HTTP ${response.code} from Web3Forms bodyLen=${text.length} preview=${text.take(160).replace('\n', ' ')}",
+                )
 
                 if (!response.isSuccessful) {
-                    error("HTTP $code: ${text.take(400)}")
+                    error("HTTP ${response.code}: ${text.take(400)}")
                 }
+
                 val trimmed = text.trimStart()
                 if (trimmed.startsWith("{")) {
-                    val jo = runCatching { JSONObject(text) }.getOrNull()
-                    if (jo != null && !parseSuccessFlag(jo)) {
-                        error("FormSubmit rejected JSON: ${text.take(400)}")
+                    val jo = JSONObject(text)
+                    if (!jo.optBoolean("success", false)) {
+                        val msg = jo.optString("message", "Web3Forms rejected the request")
+                        error(msg)
                     }
                 }
             }
         }
         result.exceptionOrNull()?.let { ex ->
-            Log.e(LOG_TAG, "postForm exception for $url: ${ex.javaClass.simpleName} ${ex.message}", ex)
+            Log.e(LOG_TAG, "postJson exception: ${ex.javaClass.simpleName} ${ex.message}", ex)
         }
         return result
-    }
-
-    private fun parseSuccessFlag(jo: JSONObject): Boolean {
-        if (!jo.has("success")) return true
-        return when (val s = jo.opt("success")) {
-            is Boolean -> s
-            is String -> s.equals("true", ignoreCase = true)
-            is Int -> s != 0
-            else -> true
-        }
     }
 }
