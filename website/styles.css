@@ -938,10 +938,18 @@ section {
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 0.4rem;
+  margin-top: 0.65rem;
   color: var(--text);
 }
 
-.tester-request-form input[type="email"] {
+.tester-request-form label:first-of-type {
+  margin-top: 0;
+}
+
+.tester-request-form input[type="text"],
+.tester-request-form input[type="email"],
+.tester-request-form textarea {
+  display: block;
   width: 100%;
   max-width: 22rem;
   box-sizing: border-box;
@@ -952,26 +960,70 @@ section {
   color: var(--text);
   font: inherit;
   margin-bottom: 0.35rem;
+  resize: vertical;
 }
 
-.tester-request-form input[type="email"]:focus {
+.tester-request-form textarea {
+  min-height: 4.5rem;
+  max-height: 12rem;
+  line-height: 1.45;
+}
+
+.tester-request-form input[type="text"]:focus,
+.tester-request-form input[type="email"]:focus,
+.tester-request-form textarea:focus {
   outline: 2px solid rgba(94, 234, 212, 0.45);
   outline-offset: 1px;
 }
 
-.tester-request-form input[type="email"][aria-invalid="true"] {
+.tester-request-form input[aria-invalid="true"],
+.tester-request-form textarea[aria-invalid="true"] {
   border-color: rgba(255, 107, 107, 0.65);
 }
 
+.tester-request-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.label-optional {
+  font-weight: 500;
+  color: var(--muted);
+}
+
 .tester-request-hint {
-  margin: 0 0 1rem;
+  margin: 0 0 0.75rem;
   font-size: 0.8rem;
   color: var(--muted);
   line-height: 1.45;
 }
 
 .tester-request-form .btn {
-  margin-top: 0.15rem;
+  margin-top: 0.35rem;
+}
+
+.tester-request-form .btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.tester-request-status {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  max-width: 28rem;
+}
+
+.tester-request-status.is-success {
+  color: var(--cyan);
+}
+
+.tester-request-status.is-error {
+  color: #ff9b9b;
 }
 
 .tester-request-manual {

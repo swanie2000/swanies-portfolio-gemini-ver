@@ -237,14 +237,24 @@
         <h2 class="section-title">Join testing</h2>
         <p class="section-sub">Read this page first, then ask to be added. Google Play internal testing only works for accounts the developer adds by hand.</p>
         <div class="card testing-card">
-          <h3>Step 1 — Request access by email</h3>
+          <h3>Step 1 — Request access</h3>
           <p class="tester-request-note">
             Internal testing on Google Play does <strong>not</strong> let random installs. You must use the
-            <strong>same Google account email</strong> you use in the Play Store. After you send the request below, the developer
-            will <strong>manually add</strong> your address to the tester list in Play Console. Until that is done, the tester invite link will not work for you.
+            <strong>same Google account email</strong> you use in the Play Store. Submit the form below — Swanie will
+            <strong>manually add</strong> your address to the tester list in Play Console. Until that is done, the tester invite link will not work for you.
           </p>
           <div class="tester-request">
-            <form class="tester-request-form" id="tester-request-form" action="#" method="get" novalidate>
+            <form class="tester-request-form" id="tester-request-form" action="#" method="post" novalidate>
+              <label for="tester-request-name">Your name</label>
+              <input
+                type="text"
+                id="tester-request-name"
+                name="name"
+                required
+                autocomplete="name"
+                maxlength="120"
+                placeholder="How Swanie knows you"
+              />
               <label for="tester-request-email">Google account email (Play Store)</label>
               <input
                 type="email"
@@ -253,14 +263,26 @@
                 required
                 autocomplete="email"
                 inputmode="email"
+                maxlength="254"
                 placeholder="you@gmail.com"
               />
               <p class="tester-request-hint">Use the exact address you sign into Google Play with.</p>
-              <button type="submit" class="btn btn-secondary" id="tester-request-submit">Email my request to join</button>
+              <label for="tester-request-message">Message to Swanie <span class="label-optional">(optional)</span></label>
+              <textarea
+                id="tester-request-message"
+                name="message"
+                rows="3"
+                maxlength="1500"
+                placeholder="A short note — optional"
+              ></textarea>
+              <input type="text" name="_honey" class="tester-request-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <button type="submit" class="btn btn-secondary" id="tester-request-submit">Send request</button>
+              <p class="tester-request-status" id="tester-request-status" role="status" aria-live="polite" hidden></p>
             </form>
             <p class="tester-request-manual">
-              If the button does not open your mail app, send the same request yourself to
-              <strong id="tester-request-show-email"></strong> from any email client.
+              If the form fails, email
+              <strong id="tester-request-show-email"></strong>
+              with your name, Play account email, and a note that you want internal testing access.
             </p>
           </div>
 
@@ -338,7 +360,7 @@
             </div>
           </details>
           <p class="hero-note">
-            Owner: set <code style="color: var(--gold-dim);">TESTER_REQUEST_EMAIL</code> in the script to the inbox where you receive tester requests. Set <code style="color: var(--gold-dim);">PLAY_URL</code> when the public store listing exists. Optional: <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> for a canonical <strong>https://</strong> homepage if the site QR is wrong locally.
+            Owner: tester form posts via <code style="color: var(--gold-dim);">FORMSUBMIT_AJAX_URL</code> (same FormSubmit form as in-app feedback). Set <code style="color: var(--gold-dim);">PLAY_URL</code> when the public store listing exists. Optional: <code style="color: var(--gold-dim);">SITE_SHARE_URL</code> for a canonical <strong>https://</strong> homepage if the site QR is wrong locally.
           </p>
         </div>
       </section>
@@ -354,8 +376,10 @@
     const PLAY_URL = "";
     /** Google Play internal (or closed) testing opt-in URL — QR + “Open tester invite” button. */
     const TESTER_URL = "https://play.google.com/apps/internaltest/4700913622589567786";
-    /** Inbox that receives prefilled “add me to Play testers” mailto messages (edit if different from feedback Gmail). */
+    /** Inbox for tester requests (FormSubmit + fallback copy). Same Gmail as in-app feedback. */
     const TESTER_REQUEST_EMAIL = "swanies.portfolio@gmail.com";
+    /** FormSubmit AJAX endpoint (same activated form as app bug reports — see BugReportSubmitter.kt). */
+    const FORMSUBMIT_AJAX_URL = "https://formsubmit.co/ajax/6a72ac79f262ea55b696d51c2f75eb4c";
     /** Optional: force the “site” QR to a public https URL (e.g. https://swaniedesigns.com/). Leave "" to use the current page URL. */
     const SITE_SHARE_URL = "";
 
@@ -379,26 +403,121 @@
       if (show) show.textContent = TESTER_REQUEST_EMAIL;
       var form = document.getElementById("tester-request-form");
       if (!form) return;
+      var nameInput = document.getElementById("tester-request-name");
+      var emailInput = document.getElementById("tester-request-email");
+      var messageInput = document.getElementById("tester-request-message");
+      var submitBtn = document.getElementById("tester-request-submit");
+      var statusEl = document.getElementById("tester-request-status");
+      var honey = form.querySelector('input[name="_honey"]');
+      var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function setStatus(kind, text) {
+        if (!statusEl) return;
+        statusEl.hidden = false;
+        statusEl.textContent = text;
+        statusEl.classList.remove("is-success", "is-error");
+        if (kind) statusEl.classList.add(kind === "success" ? "is-success" : "is-error");
+      }
+
+      function clearInvalid() {
+        if (nameInput) nameInput.removeAttribute("aria-invalid");
+        if (emailInput) emailInput.removeAttribute("aria-invalid");
+      }
+
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var input = document.getElementById("tester-request-email");
-        if (!input) return;
-        var em = input.value.trim();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
-          input.focus();
-          input.setAttribute("aria-invalid", "true");
+        clearInvalid();
+        if (honey && honey.value.trim()) return;
+
+        var name = nameInput ? nameInput.value.trim() : "";
+        var em = emailInput ? emailInput.value.trim() : "";
+        var note = messageInput ? messageInput.value.trim() : "";
+        var invalid = false;
+        if (!name) {
+          if (nameInput) {
+            nameInput.focus();
+            nameInput.setAttribute("aria-invalid", "true");
+          }
+          invalid = true;
+        }
+        if (!emailRe.test(em)) {
+          if (emailInput) {
+            emailInput.focus();
+            emailInput.setAttribute("aria-invalid", "true");
+          }
+          invalid = true;
+        }
+        if (invalid) {
+          setStatus("error", "Please enter your name and a valid Google Play email address.");
           return;
         }
-        input.removeAttribute("aria-invalid");
-        var subject = encodeURIComponent("Play internal tester request — Swanie's Portfolio");
-        var body = encodeURIComponent(
-          "Please add this Google account to the Play Console internal testing email list for Swanie's Portfolio (com.swanie.portfolio):\n\n" +
-            em +
-            "\n\nSubmitted from: " +
-            window.location.href +
-            "\n\nAfter I'm added, I will use the tester invite on the website to install from Google Play."
-        );
-        window.location.href = "mailto:" + TESTER_REQUEST_EMAIL + "?subject=" + subject + "&body=" + body;
+
+        var fullMessage =
+          "Please add this Google account to the Play Console internal testing list for Swanie's Portfolio (com.swanie.portfolio).\n\n" +
+          "Play Store Google account: " +
+          em +
+          "\n\n";
+        if (note) {
+          fullMessage += "Message from requester:\n" + note + "\n\n";
+        }
+        fullMessage +=
+          "Submitted from: " +
+          window.location.href +
+          "\n\nAfter I'm added, I will use the tester invite on the website to install from Google Play.";
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sending…";
+        }
+        setStatus(null, "Sending your request…");
+
+        fetch(FORMSUBMIT_AJAX_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            _subject: "Swanie's Portfolio — internal testing request",
+            name: name,
+            email: em,
+            message: fullMessage,
+            _captcha: "false",
+            _template: "table",
+          }),
+        })
+          .then(function (res) {
+            return res.text().then(function (text) {
+              if (!res.ok) throw new Error(text || "Request failed");
+              if (text.trim().charAt(0) === "{") {
+                try {
+                  var data = JSON.parse(text);
+                  if (data.success === false) throw new Error("FormSubmit rejected the request");
+                } catch (parseErr) {
+                  if (parseErr.message === "FormSubmit rejected the request") throw parseErr;
+                }
+              }
+            });
+          })
+          .then(function () {
+            form.reset();
+            setStatus(
+              "success",
+              "Request sent — thank you! Swanie will add your Play email when possible. Watch for confirmation, then use Step 2 below."
+            );
+          })
+          .catch(function () {
+            setStatus(
+              "error",
+              "Could not send right now. Try again in a moment, or email " + TESTER_REQUEST_EMAIL + " directly."
+            );
+          })
+          .finally(function () {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Send request";
+            }
+          });
       });
     })();
 
