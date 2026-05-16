@@ -7,6 +7,7 @@ plugins {
 }
 
 import java.util.Properties
+import java.util.zip.ZipFile
 
 // 🛡️ Force Metadata Resolution to fix Kotlin 2.1 Compatibility
 configurations.all {
@@ -137,7 +138,7 @@ tasks.register("verifyReleaseBundleRevenueCatKey") {
                 ?: error("No release .aab under ${bundleDir.absolutePath} — run bundleRelease first")
         var hasTestKey = false
         var hasProductionKey = false
-        java.util.zip.ZipFile(aab).use { zip ->
+        ZipFile(aab).use { zip ->
             zip.entries().asSequence().filter { it.name.endsWith(".dex") }.forEach { entry ->
                 zip.getInputStream(entry).use { input ->
                     val text = input.readBytes().decodeToString()
