@@ -27,6 +27,18 @@ class RevenueCatInitializer @Inject constructor() {
             }
         Log.i(LOG_TAG, "configure Purchases keyKind=$keyKind prefix=${apiKey.take(8)}…")
 
+        // Release + sandbox key → RevenueCat SDK force-closes the app. Skip configure so you can
+        // open the app and fix the next signed bundle (REVENUECAT_PUBLIC_API_KEY must be goog_…).
+        if (!BuildConfig.DEBUG && apiKey.startsWith("test_")) {
+            Log.e(
+                LOG_TAG,
+                "Release build contains sandbox RevenueCat key (test_…). " +
+                    "Set REVENUECAT_PUBLIC_API_KEY to the Play production goog_… key in local.properties, " +
+                    "then Build → Clean Project → Generate Signed App Bundle (release) and upload a new AAB.",
+            )
+            return
+        }
+
         if (runCatching { Purchases.sharedInstance }.isSuccess) return
 
         Purchases.logLevel = LogLevel.INFO

@@ -44,6 +44,10 @@ fun validateRevenueCatPublicApiKeyForRelease() {
     check(!key.startsWith("test_")) {
         "Release build blocked: REVENUECAT_PUBLIC_API_KEY must be the Play production key (goog_…), not test_…"
     }
+    check(!key.contains("paste", ignoreCase = true) && key.length >= 20) {
+        "Release build blocked: REVENUECAT_PUBLIC_API_KEY looks like a placeholder. " +
+            "Paste the real goog_… key from RevenueCat → Project → API keys → Google Play Store."
+    }
 }
 
 /** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
@@ -57,8 +61,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.0.6"
+        versionCode = 8
+        versionName = "1.0.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
