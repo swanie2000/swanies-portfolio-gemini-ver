@@ -32,6 +32,19 @@ fun resolveLocalSecret(name: String): String {
 /** Google Play / store builds: RevenueCat *public* SDK key (dashboard → usually `goog_…`). Never use a `test_` key here — the SDK exits the app on release if it sees a test key. */
 fun resolveRevenueCatPublicApiKey(): String = resolveLocalSecret("REVENUECAT_PUBLIC_API_KEY").trim()
 
+/** Fails release bundles if the Play key is missing or still a sandbox `test_` key. */
+fun validateRevenueCatPublicApiKeyForRelease() {
+    val key = resolveRevenueCatPublicApiKey()
+    check(key.isNotBlank()) {
+        "Release build blocked: set REVENUECAT_PUBLIC_API_KEY=goog_… in local.properties " +
+            "(RevenueCat dashboard → Swanies Portfolio → API keys → Public app-specific key). " +
+            "REVENUECAT_API_KEY (test_…) is for debug only."
+    }
+    check(!key.startsWith("test_")) {
+        "Release build blocked: REVENUECAT_PUBLIC_API_KEY must be the Play production key (goog_…), not test_…"
+    }
+}
+
 /** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
 fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_KEY").trim()
 
@@ -96,6 +109,18 @@ kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
+}
+
+/** Run before every release AAB/APK so Play never gets a test RevenueCat key again. */
+listOf("bundleRelease", "assembleRelease", "packageRelease").forEach { taskName ->
+    tasks.matching { it.name == taskName }.configureEach {
+        dependsOn("validateRevenueCatReleaseKey")
+    }
+}
+tasks.register("validateRevenueCatReleaseKey") {
+    group = "verification"
+    description = "Ensures REVENUECAT_PUBLIC_API_KEY is set to goog_… (not test_…)"
+    doLast { validateRevenueCatPublicApiKeyForRelease() }
 }
 
 dependencies {
