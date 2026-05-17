@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Parola öbeği girin.</string>
     <string name="pro_gate_title">PRO ÖZELLİĞİ</string>
     <string name="pro_gate_subtitle">%1$s Pro\'da kullanılabilir.</string>
+    <string name="pro_gate_choose_plan">Bu cihazda Pro\'yu açmak için aşağıdan bir plan seçin.</string>
+    <string name="pro_gate_value_props">Birden fazla portföy · Temalar · Analitik · Widget özelleştirme</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Aylık plan</string>
+    <string name="pro_plan_yearly">Yıllık plan</string>
+    <string name="pro_plan_lifetime">Ömür boyu erişim</string>
+    <string name="pro_plan_best_value">EN İYİ DEĞER</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">PRO\'YA YÜKSELT</string>
     <string name="pro_gate_purchase_working">SATIN ALIM İŞLENİYOR...</string>
     <string name="pro_gate_purchase_success">Pro başarıyla açıldı.</string>

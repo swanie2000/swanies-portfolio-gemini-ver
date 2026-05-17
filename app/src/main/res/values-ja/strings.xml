@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">パスフレーズを入力してください。</string>
     <string name="pro_gate_title">PRO 機能</string>
     <string name="pro_gate_subtitle">%1$s は Pro で利用できます。</string>
+    <string name="pro_gate_choose_plan">このデバイスで Pro を解放するには、下からプランを選んでください。</string>
+    <string name="pro_gate_value_props">複数ポートフォリオ · テーマ · 分析 · ウィジェットのカスタマイズ</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">月額プラン</string>
+    <string name="pro_plan_yearly">年額プラン</string>
+    <string name="pro_plan_lifetime">生涯アクセス</string>
+    <string name="pro_plan_best_value">おすすめ</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">PRO にアップグレード</string>
     <string name="pro_gate_purchase_working">購入を処理中...</string>
     <string name="pro_gate_purchase_success">Pro のロック解除に成功しました。</string>

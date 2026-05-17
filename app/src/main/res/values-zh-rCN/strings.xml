@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">请输入口令。</string>
     <string name="pro_gate_title">PRO 功能</string>
     <string name="pro_gate_subtitle">%1$s 可在 Pro 中使用。</string>
+    <string name="pro_gate_choose_plan">在下方选择方案，在此设备上解锁 Pro。</string>
+    <string name="pro_gate_value_props">多个投资组合 · 主题 · 分析 · 小组件自定义</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">月度方案</string>
+    <string name="pro_plan_yearly">年度方案</string>
+    <string name="pro_plan_lifetime">终身访问</string>
+    <string name="pro_plan_best_value">最超值</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">升级到 PRO</string>
     <string name="pro_gate_purchase_working">正在处理购买...</string>
     <string name="pro_gate_purchase_success">Pro 解锁成功。</string>

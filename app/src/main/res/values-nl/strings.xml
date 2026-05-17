@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Voer een wachtwoordzin in.</string>
     <string name="pro_gate_title">PRO-FUNCTIE</string>
     <string name="pro_gate_subtitle">%1$s is beschikbaar in Pro.</string>
+    <string name="pro_gate_choose_plan">Kies hieronder een abonnement om Pro op dit apparaat te ontgrendelen.</string>
+    <string name="pro_gate_value_props">Meerdere portfolios · Thema\'s · Analytics · Widget-aanpassing</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Maandabonnement</string>
+    <string name="pro_plan_yearly">Jaarabonnement</string>
+    <string name="pro_plan_lifetime">Levenslange toegang</string>
+    <string name="pro_plan_best_value">BESTE DEAL</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">UPGRADEN NAAR PRO</string>
     <string name="pro_gate_purchase_working">AANKOOP VERWERKEN...</string>
     <string name="pro_gate_purchase_success">Pro succesvol ontgrendeld.</string>

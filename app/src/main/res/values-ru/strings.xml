@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Введите парольную фразу.</string>
     <string name="pro_gate_title">ФУНКЦИЯ PRO</string>
     <string name="pro_gate_subtitle">%1$s доступно в Pro.</string>
+    <string name="pro_gate_choose_plan">Выберите план ниже, чтобы разблокировать Pro на этом устройстве.</string>
+    <string name="pro_gate_value_props">Несколько портфелей · Темы · Аналитика · Настройка виджета</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Месячный план</string>
+    <string name="pro_plan_yearly">Годовой план</string>
+    <string name="pro_plan_lifetime">Пожизненный доступ</string>
+    <string name="pro_plan_best_value">ЛУЧШЕЕ ПРЕДЛОЖЕНИЕ</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">ПЕРЕЙТИ НА PRO</string>
     <string name="pro_gate_purchase_working">ОБРАБОТКА ПОКУПКИ...</string>
     <string name="pro_gate_purchase_success">Pro успешно разблокирован.</string>

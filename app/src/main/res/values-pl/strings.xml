@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Wprowadź hasło.</string>
     <string name="pro_gate_title">FUNKCJA PRO</string>
     <string name="pro_gate_subtitle">%1$s jest dostępne w Pro.</string>
+    <string name="pro_gate_choose_plan">Wybierz plan poniżej, aby odblokować Pro na tym urządzeniu.</string>
+    <string name="pro_gate_value_props">Wiele portfeli · Motywy · Analityka · Personalizacja widgetu</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Plan miesięczny</string>
+    <string name="pro_plan_yearly">Plan roczny</string>
+    <string name="pro_plan_lifetime">Dostęp dożywotni</string>
+    <string name="pro_plan_best_value">NAJLEPSZA OFERTA</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">PRZEJDŹ NA PRO</string>
     <string name="pro_gate_purchase_working">PRZETWARZANIE ZAKUPU...</string>
     <string name="pro_gate_purchase_success">Pro odblokowane pomyślnie.</string>

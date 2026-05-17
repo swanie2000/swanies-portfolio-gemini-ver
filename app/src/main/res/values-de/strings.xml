@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Passphrase eingeben.</string>
     <string name="pro_gate_title">PRO-FUNKTION</string>
     <string name="pro_gate_subtitle">%1$s ist in Pro verfügbar.</string>
+    <string name="pro_gate_choose_plan">Wähle unten einen Plan, um Pro auf diesem Gerät freizuschalten.</string>
+    <string name="pro_gate_value_props">Mehrere Portfolios · Themes · Analytics · Widget-Anpassung</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Monatsabo</string>
+    <string name="pro_plan_yearly">Jahresabo</string>
+    <string name="pro_plan_lifetime">Lebenslanger Zugang</string>
+    <string name="pro_plan_best_value">BESTES ANGEBOT</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">AUF PRO UPGRADEN</string>
     <string name="pro_gate_purchase_working">KAUF WIRD VERARBEITET...</string>
     <string name="pro_gate_purchase_success">Pro erfolgreich freigeschaltet.</string>

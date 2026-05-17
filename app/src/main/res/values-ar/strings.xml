@@ -197,6 +197,14 @@
     <string name="settings_backup_error_empty_passphrase">أدخل عبارة سرية.</string>
     <string name="pro_gate_title">ميزة برو</string>
     <string name="pro_gate_subtitle">%1$s متاح في برو.</string>
+    <string name="pro_gate_choose_plan">اختر خطة أدناه لفتح Pro على هذا الجهاز.</string>
+    <string name="pro_gate_value_props">محافظ متعددة · سمات · تحليلات · تخصيص الويدجت</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">الخطة الشهرية</string>
+    <string name="pro_plan_yearly">الخطة السنوية</string>
+    <string name="pro_plan_lifetime">الوصول مدى الحياة</string>
+    <string name="pro_plan_best_value">أفضل قيمة</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">الترقية إلى برو</string>
     <string name="pro_gate_purchase_working">جارٍ معالجة الشراء...</string>
     <string name="pro_gate_purchase_success">تم فتح برو بنجاح.</string>

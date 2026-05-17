@@ -194,6 +194,14 @@
     <string name="settings_backup_error_empty_passphrase">पासफ़्रेज़ दर्ज करें।</string>
     <string name="pro_gate_title">PRO फीचर</string>
     <string name="pro_gate_subtitle">%1$s, Pro में उपलब्ध है।</string>
+    <string name="pro_gate_choose_plan">इस डिवाइस पर Pro अनलॉक करने के लिए नीचे एक प्लान चुनें।</string>
+    <string name="pro_gate_value_props">कई पोर्टफोलियो · थीम · एनालिटिक्स · विजेट अनुकूलन</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">मासिक प्लान</string>
+    <string name="pro_plan_yearly">वार्षिक प्लान</string>
+    <string name="pro_plan_lifetime">आजीवन एक्सेस</string>
+    <string name="pro_plan_best_value">सर्वोत्तम मूल्य</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">PRO में अपग्रेड करें</string>
     <string name="pro_gate_purchase_working">खरीदारी प्रोसेस हो रही है...</string>
     <string name="pro_gate_purchase_success">Pro सफलतापूर्वक अनलॉक हो गया।</string>

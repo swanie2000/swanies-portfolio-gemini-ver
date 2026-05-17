@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Inserisci una passphrase.</string>
     <string name="pro_gate_title">FUNZIONE PRO</string>
     <string name="pro_gate_subtitle">%1$s è disponibile con Pro.</string>
+    <string name="pro_gate_choose_plan">Scegli un piano qui sotto per sbloccare Pro su questo dispositivo.</string>
+    <string name="pro_gate_value_props">Più portafogli · Temi · Analisi · Personalizzazione widget</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Piano mensile</string>
+    <string name="pro_plan_yearly">Piano annuale</string>
+    <string name="pro_plan_lifetime">Accesso a vita</string>
+    <string name="pro_plan_best_value">MIGLIOR OFFERTA</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">PASSA A PRO</string>
     <string name="pro_gate_purchase_working">ELABORAZIONE ACQUISTO...</string>
     <string name="pro_gate_purchase_success">Pro sbloccato con successo.</string>

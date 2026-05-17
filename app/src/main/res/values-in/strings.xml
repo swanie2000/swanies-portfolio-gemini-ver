@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Masukkan frasa sandi.</string>
     <string name="pro_gate_title">FITUR PRO</string>
     <string name="pro_gate_subtitle">%1$s tersedia di Pro.</string>
+    <string name="pro_gate_choose_plan">Pilih paket di bawah untuk membuka Pro di perangkat ini.</string>
+    <string name="pro_gate_value_props">Beberapa portofolio · Tema · Analitik · Kustomisasi widget</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Paket bulanan</string>
+    <string name="pro_plan_yearly">Paket tahunan</string>
+    <string name="pro_plan_lifetime">Akses seumur hidup</string>
+    <string name="pro_plan_best_value">NILAI TERBAIK</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">TINGKATKAN KE PRO</string>
     <string name="pro_gate_purchase_working">MEMPROSES PEMBELIAN...</string>
     <string name="pro_gate_purchase_success">Pro berhasil dibuka.</string>

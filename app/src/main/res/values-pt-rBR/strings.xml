@@ -199,6 +199,14 @@
     <string name="settings_backup_error_empty_passphrase">Digite uma senha.</string>
     <string name="pro_gate_title">RECURSO PRO</string>
     <string name="pro_gate_subtitle">%1$s está disponível no Pro.</string>
+    <string name="pro_gate_choose_plan">Escolha um plano abaixo para desbloquear o Pro neste dispositivo.</string>
+    <string name="pro_gate_value_props">Vários portfólios · Temas · Análises · Personalização do widget</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Plano mensal</string>
+    <string name="pro_plan_yearly">Plano anual</string>
+    <string name="pro_plan_lifetime">Acesso vitalício</string>
+    <string name="pro_plan_best_value">MELHOR VALOR</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">ATUALIZAR PARA PRO</string>
     <string name="pro_gate_purchase_working">PROCESSANDO COMPRA...</string>
     <string name="pro_gate_purchase_success">Pro desbloqueado com sucesso.</string>

@@ -194,6 +194,14 @@
     <string name="settings_backup_error_empty_passphrase">Введіть парольну фразу.</string>
     <string name="pro_gate_title">ФУНКЦІЯ PRO</string>
     <string name="pro_gate_subtitle">%1$s доступно в Pro.</string>
+    <string name="pro_gate_choose_plan">Оберіть план нижче, щоб розблокувати Pro на цьому пристрої.</string>
+    <string name="pro_gate_value_props">Кілька портфелів · Теми · Аналітика · Налаштування віджета</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Місячний план</string>
+    <string name="pro_plan_yearly">Річний план</string>
+    <string name="pro_plan_lifetime">Доступ назавжди</string>
+    <string name="pro_plan_best_value">НАЙКРАЩА ПРОПОЗИЦІЯ</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">ОНОВИТИ ДО PRO</string>
     <string name="pro_gate_purchase_working">ОБРОБКА ПОКУПКИ...</string>
     <string name="pro_gate_purchase_success">Pro успішно розблоковано.</string>

@@ -194,6 +194,14 @@
     <string name="settings_backup_error_empty_passphrase">ป้อนวลีรหัส</string>
     <string name="pro_gate_title">ฟีเจอร์ PRO</string>
     <string name="pro_gate_subtitle">%1$s ใช้งานได้ใน Pro</string>
+    <string name="pro_gate_choose_plan">เลือกแพ็กเกจด้านล่างเพื่อปลดล็อก Pro บนอุปกรณ์นี้</string>
+    <string name="pro_gate_value_props">พอร์ตโฟลิโอหลายรายการ · ธีม · การวิเคราะห์ · ปรับแต่งวิดเจ็ต</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">แพ็กเกจรายเดือน</string>
+    <string name="pro_plan_yearly">แพ็กเกจรายปี</string>
+    <string name="pro_plan_lifetime">การเข้าถึงตลอดชีพ</string>
+    <string name="pro_plan_best_value">คุ้มที่สุด</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">อัปเกรดเป็น PRO</string>
     <string name="pro_gate_purchase_working">กำลังดำเนินการซื้อ...</string>
     <string name="pro_gate_purchase_success">ปลดล็อก Pro สำเร็จ</string>
