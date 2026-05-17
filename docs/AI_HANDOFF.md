@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Repo ready for Play `versionCode` 10 (1.0.9):** holdings custom-icon fixes (prior session, owner verified); **Pro paywall** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on Home / unlock / create / restore (not hidden by keyboard); **Theme Manager** — dropdown on entry (no false “unsaved” from picker touch); big red **Cancel** only after real edit (`userInitiatedEdit` + ARGB compare). **Play:** Console still on **9 (1.0.8)** until owner uploads **10**. **Next human step:** signed AAB → **Internal testing** → install **`v1.0.9 (10)`** → billing QA.
+**Last updated:** 2026-05-18 — **Ship `1.0.9 (10)` now:** Repo has paywall polish, icon fixes, Theme Manager entry UX, **`BuildVersionLabel`** top-right, **Pro paywall strings in all 19 locales** (**523** keys parity), release **lint** clean (removed orphan **`pro_gate_upgrade_coming`**). **Owner rule added:** no bulk scripts on **`values-*/strings.xml`** — manual per-locale edits only. **Play:** Console still **9 (1.0.8)** — **next:** signed AAB + **`verify-aab-revenuecat-key.ps1`** → **Internal testing** upload **10**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -61,6 +61,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 **Locale / Play terms (2026-05-12, agent):** **`terms_last_updated`** + **`terms_section_1`–`terms_section_6`** refreshed in **every `values-*`** to match Play-aligned default English (who we are / how data is stored / optional network / data limits & access / not financial advice / children, language, policy changes). **`terms_section_7_*`** left as already present per locale. **Check:** all locale **`strings.xml`** files contain the same **514** string keys as **`values/strings.xml`** (no missing, no extras). **Build:** **`:app:compileDebugKotlin`** OK on agent checkout. **Commit + push `main`** with **`docs/AI_HANDOFF.md`** update.
 
 **i18n maintenance:** Re-sync **`values-*`** whenever **default `values/strings.xml`** changes meaning again. **`website/`** is deployed separately from app strings—align **`privacy.html`** / marketing copy on its own timeline when English there shifts.
+
+**Locale files — do not use bulk scripts (owner rule):** Never run PowerShell/Python/bash scripts to batch-edit **`app/src/main/res/values-*/strings.xml`**. Scripts repeatedly corrupt UTF-8, break **`%1$s`** placeholders (PowerShell eats **`$s`**), and merge XML lines. **Edit each locale file directly** in the IDE (or careful per-file agent edits). After default **`values/strings.xml`** changes: add the same keys to every **`values-*`** in the **next** handoff/update pass—manual translations, same key order as default. **Verify:** every locale has the same key set as **`values/strings.xml`** (no missing, no extras); **`:app:lintVitalRelease`** before Play AAB. OK to use **`scripts/verify-aab-revenuecat-key.ps1`** (reads AAB only)—that is not locale editing.
 
 ### Play Data safety — facts from codebase (canonical for Console answers)
 
@@ -121,7 +123,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 5. **Testers:** Join-testing approvals → Internal + License testing lists.
 6. **Website:** **`PLAY_URL`** when public listing exists.
 7. **Pre-launch QA:** Backup, widgets, metals GRAM/KILO on Play build.
-8. **i18n (maintenance):** Propagate **`values-*`** when default strings change.
+8. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file edits only** (no locale batch scripts; see **Locale files — do not use bulk scripts** above).
 
 ---
 
@@ -135,7 +137,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties` + public key in **`website/index.html`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. **`validateRevenueCatReleaseKey`** + **`verifyReleaseBundleRevenueCatKey`** / **`scripts/verify-aab-revenuecat-key.ps1`** before Play upload.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **2026-05-12:** Play-aligned **`terms_last_updated`** + **`terms_section_1`–`6`** in all locales; **514** keys match **`values/strings.xml`**. **`website/`** deploy via **GitHub Actions** on **`main`** (see **`index.html`** **`TESTER_URL`** / **`TESTER_REQUEST_EMAIL`** for internal testing UX).
+- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **523** keys match **`values/strings.xml`** (incl. **2026-05-18** Pro paywall strings); **no batch scripts** on locale XML (owner rule in handoff). **`website/`** deploy via **GitHub Actions** on **`main`** (see **`index.html`** **`TESTER_URL`** / **`TESTER_REQUEST_EMAIL`** for internal testing UX).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, `:app:lintDebug` (`app/lint.xml` policy).
 
 ---
@@ -169,6 +171,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-18 — i18n paywall + locale policy + Play upload prep:** **8** new **`pro_gate_*` / `pro_plan_*`** strings translated in **all 19** locales (manual edits after script attempt corrupted UTF-8 — **removed** **`sync-pro-gate-locale-strings.ps1`**). Handoff: **no bulk scripts** on **`values-*/strings.xml`**; Studio on same folder = no pull before AAB. Release lint: drop **`pro_gate_upgrade_coming`** from locales. **Push `main`** → owner builds signed AAB → Play internal **10**.
 - **2026-05-18 — Ship prep (paywall, version stamp, Theme Manager) + icon UX:** **Icons (earlier):** compact/full metal+crypto photo cycles; optimistic list, reload epoch, `MetalIcon`/`AssetRepository` upsert fixes — owner verified. **This push:** **`ProFeatureGateScreen.kt`** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on auth screens; **`ThemeStudioScreen.kt`** — dropdown on entry, red **Cancel** only after real edit. **Handoff + push `main`** → owner uploads **1.0.9 (10)** to Play internal.
 - **2026-05-17 (EOD) — Play subscriptions + RC offering + 1.0.9 prep:** **Payments profile** + **merchant** info. Play **subscriptions** **`pro_monthly`** / **`pro_yearly`**, one-time **`pro_lifetime`** (**$9.99 / $79.99 / $129.99**). **RevenueCat** import + **`default`** offering wired to **Play** (was Test Store only → empty paywall on Play builds). **Internal 9 (1.0.8)** published; phone stuck **1.0.7** (Play lag). **Studio:** 3 plans work; **`BuildVersionLabel`** on auth screens; paywall row layout fix. **`verify-aab-revenuecat-key.ps1`** PS parse fix. Repo **`versionCode` 10** / **`1.0.9`**. Owner: ship **1.0.9** + retry install tomorrow. **Handoff + push `main`**.
 - **2026-05-16 (EOD) — Play internal 1.0.7 + license testers + long ship day:** **Web3Forms** join-testing + reply-ready emails (site). **RevenueCat:** fixed **Wrong API Key** — real **`goog_…`** in **`REVENUECAT_PUBLIC_API_KEY`** (was placeholder / **`test_`** in old AABs); **`validateRevenueCatReleaseKey`**, **`verify-aab-revenuecat-key.ps1`**, release **`test_` block** in **`RevenueCatInitializer`**. **Play:** burned codes **3–7**; live **8 (1.0.7)**; **Create new release** + **Upload** lesson; **tester QR** not site QR; **Download test app** not public version. Owner: **1.0.7** opens from Play, account + asset + paywalls OK; **License testing** — **Swanie's Portfolio Testers** checked, saved. **Next:** re-test subscribe/restore. **`docs/AI_HANDOFF.md`** + **push `main`**.
@@ -220,6 +223,8 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 - **Git first (owner + agents):** **`git pull`** from **`origin`** (usually **`main`**) **before** starting substantive edits — keeps GitHub as source of truth for the **single laptop** dev checkout. Cursor rule **`.cursor/rules/git-pull-first.mdc`** reinforces this.
 - Prefer **minimal, safe edits**; don’t refactor unrelated code.
+- **Never batch-edit `values-*/strings.xml` with scripts** — see **§ Current session → Locale files — do not use bulk scripts**.
+- **`git pull`** before edits is for staying aligned with **`origin`** (another machine or an older checkout). If the agent and Android Studio share **the same folder** and edits were saved there, Studio already has the files—**no pull needed** unless **`git status`** shows you’re behind remote.
 - Don’t assume files exist — read before changing.
 - **Canonical state for the next agent** = **this file** + the actual repo. If something disagrees with code, **code wins** — then fix this doc.
 - Browser-era paste bundles are **removed** from the tree; use **git** if you need old prose.
