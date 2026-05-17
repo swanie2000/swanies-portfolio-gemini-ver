@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Masukkan frasa sandi.</string>
     <string name="pro_gate_title">FITUR PRO</string>
     <string name="pro_gate_subtitle">%1$s tersedia di Pro.</string>
-    <string name="pro_gate_upgrade_coming">Alur pembelian upgrade sedang diselesaikan.</string>
     <string name="pro_gate_upgrade_button">TINGKATKAN KE PRO</string>
     <string name="pro_gate_purchase_working">MEMPROSES PEMBELIAN...</string>
     <string name="pro_gate_purchase_success">Pro berhasil dibuka.</string>

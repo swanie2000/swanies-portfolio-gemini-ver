@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Digite uma senha.</string>
     <string name="pro_gate_title">RECURSO PRO</string>
     <string name="pro_gate_subtitle">%1$s está disponível no Pro.</string>
-    <string name="pro_gate_upgrade_coming">O fluxo de compra de upgrade está sendo finalizado.</string>
     <string name="pro_gate_upgrade_button">ATUALIZAR PARA PRO</string>
     <string name="pro_gate_purchase_working">PROCESSANDO COMPRA...</string>
     <string name="pro_gate_purchase_success">Pro desbloqueado com sucesso.</string>

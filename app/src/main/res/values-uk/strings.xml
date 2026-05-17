@@ -194,7 +194,6 @@
     <string name="settings_backup_error_empty_passphrase">Введіть парольну фразу.</string>
     <string name="pro_gate_title">ФУНКЦІЯ PRO</string>
     <string name="pro_gate_subtitle">%1$s доступно в Pro.</string>
-    <string name="pro_gate_upgrade_coming">Процес купівлі оновлення завершується.</string>
     <string name="pro_gate_upgrade_button">ОНОВИТИ ДО PRO</string>
     <string name="pro_gate_purchase_working">ОБРОБКА ПОКУПКИ...</string>
     <string name="pro_gate_purchase_success">Pro успішно розблоковано.</string>

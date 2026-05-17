@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Entrez une phrase secrète.</string>
     <string name="pro_gate_title">FONCTION PRO</string>
     <string name="pro_gate_subtitle">%1$s est disponible avec Pro.</string>
-    <string name="pro_gate_upgrade_coming">Le flux d\'achat de mise à niveau est en cours de finalisation.</string>
     <string name="pro_gate_upgrade_button">PASSER À PRO</string>
     <string name="pro_gate_purchase_working">TRAITEMENT DE L\'ACHAT...</string>
     <string name="pro_gate_purchase_success">Pro débloqué avec succès.</string>

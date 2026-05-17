@@ -194,7 +194,6 @@
     <string name="settings_backup_error_empty_passphrase">請輸入密語。</string>
     <string name="pro_gate_title">PRO 功能</string>
     <string name="pro_gate_subtitle">%1$s 可在 Pro 中使用。</string>
-    <string name="pro_gate_upgrade_coming">升級購買流程正在完成中。</string>
     <string name="pro_gate_upgrade_button">升級到 PRO</string>
     <string name="pro_gate_purchase_working">正在處理購買...</string>
     <string name="pro_gate_purchase_success">已成功解鎖 Pro。</string>

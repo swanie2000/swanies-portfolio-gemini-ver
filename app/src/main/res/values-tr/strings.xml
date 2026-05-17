@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Parola öbeği girin.</string>
     <string name="pro_gate_title">PRO ÖZELLİĞİ</string>
     <string name="pro_gate_subtitle">%1$s Pro\'da kullanılabilir.</string>
-    <string name="pro_gate_upgrade_coming">Yükseltme satın alma akışı sonlandırılıyor.</string>
     <string name="pro_gate_upgrade_button">PRO\'YA YÜKSELT</string>
     <string name="pro_gate_purchase_working">SATIN ALIM İŞLENİYOR...</string>
     <string name="pro_gate_purchase_success">Pro başarıyla açıldı.</string>

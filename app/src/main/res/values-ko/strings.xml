@@ -163,7 +163,6 @@
     <string name="settings_backup_error_empty_passphrase">암호 문구를 입력하세요.</string>
     <string name="pro_gate_title">PRO 기능</string>
     <string name="pro_gate_subtitle">%1$s은(는) Pro에서 사용할 수 있습니다.</string>
-    <string name="pro_gate_upgrade_coming">업그레이드 구매 흐름을 마무리하는 중입니다.</string>
     <string name="pro_gate_upgrade_button">PRO로 업그레이드</string>
     <string name="pro_gate_purchase_working">구매 처리 중...</string>
     <string name="pro_gate_purchase_success">Pro 잠금 해제에 성공했습니다.</string>

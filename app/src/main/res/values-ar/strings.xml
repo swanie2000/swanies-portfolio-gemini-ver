@@ -197,7 +197,6 @@
     <string name="settings_backup_error_empty_passphrase">أدخل عبارة سرية.</string>
     <string name="pro_gate_title">ميزة برو</string>
     <string name="pro_gate_subtitle">%1$s متاح في برو.</string>
-    <string name="pro_gate_upgrade_coming">يجري إنهاء مسار شراء الترقية.</string>
     <string name="pro_gate_upgrade_button">الترقية إلى برو</string>
     <string name="pro_gate_purchase_working">جارٍ معالجة الشراء...</string>
     <string name="pro_gate_purchase_success">تم فتح برو بنجاح.</string>

@@ -194,7 +194,6 @@
     <string name="settings_backup_error_empty_passphrase">ป้อนวลีรหัส</string>
     <string name="pro_gate_title">ฟีเจอร์ PRO</string>
     <string name="pro_gate_subtitle">%1$s ใช้งานได้ใน Pro</string>
-    <string name="pro_gate_upgrade_coming">กำลังสรุปขั้นตอนการซื้ออัปเกรด</string>
     <string name="pro_gate_upgrade_button">อัปเกรดเป็น PRO</string>
     <string name="pro_gate_purchase_working">กำลังดำเนินการซื้อ...</string>
     <string name="pro_gate_purchase_success">ปลดล็อก Pro สำเร็จ</string>

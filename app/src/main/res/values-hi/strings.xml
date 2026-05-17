@@ -194,7 +194,6 @@
     <string name="settings_backup_error_empty_passphrase">पासफ़्रेज़ दर्ज करें।</string>
     <string name="pro_gate_title">PRO फीचर</string>
     <string name="pro_gate_subtitle">%1$s, Pro में उपलब्ध है।</string>
-    <string name="pro_gate_upgrade_coming">अपग्रेड खरीदारी प्रवाह को अंतिम रूप दिया जा रहा है।</string>
     <string name="pro_gate_upgrade_button">PRO में अपग्रेड करें</string>
     <string name="pro_gate_purchase_working">खरीदारी प्रोसेस हो रही है...</string>
     <string name="pro_gate_purchase_success">Pro सफलतापूर्वक अनलॉक हो गया।</string>

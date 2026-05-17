@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Voer een wachtwoordzin in.</string>
     <string name="pro_gate_title">PRO-FUNCTIE</string>
     <string name="pro_gate_subtitle">%1$s is beschikbaar in Pro.</string>
-    <string name="pro_gate_upgrade_coming">De upgrade-aankoopflow wordt afgerond.</string>
     <string name="pro_gate_upgrade_button">UPGRADEN NAAR PRO</string>
     <string name="pro_gate_purchase_working">AANKOOP VERWERKEN...</string>
     <string name="pro_gate_purchase_success">Pro succesvol ontgrendeld.</string>

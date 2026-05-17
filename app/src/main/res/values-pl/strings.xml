@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Wprowadź hasło.</string>
     <string name="pro_gate_title">FUNKCJA PRO</string>
     <string name="pro_gate_subtitle">%1$s jest dostępne w Pro.</string>
-    <string name="pro_gate_upgrade_coming">Proces zakupu aktualizacji jest finalizowany.</string>
     <string name="pro_gate_upgrade_button">PRZEJDŹ NA PRO</string>
     <string name="pro_gate_purchase_working">PRZETWARZANIE ZAKUPU...</string>
     <string name="pro_gate_purchase_success">Pro odblokowane pomyślnie.</string>

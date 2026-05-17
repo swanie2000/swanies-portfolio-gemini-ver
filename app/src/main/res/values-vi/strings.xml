@@ -199,7 +199,6 @@
     <string name="settings_backup_error_empty_passphrase">Nhập cụm mật khẩu.</string>
     <string name="pro_gate_title">TÍNH NĂNG PRO</string>
     <string name="pro_gate_subtitle">%1$s có trong gói Pro.</string>
-    <string name="pro_gate_upgrade_coming">Luồng mua nâng cấp đang được hoàn thiện.</string>
     <string name="pro_gate_upgrade_button">NÂNG CẤP LÊN PRO</string>
     <string name="pro_gate_purchase_working">ĐANG XỬ LÝ MUA...</string>
     <string name="pro_gate_purchase_success">Đã mở khóa Pro thành công.</string>
