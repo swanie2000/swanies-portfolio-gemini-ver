@@ -99,10 +99,30 @@ fun MyHoldingsScreen(
 
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
-    /** Until Room Flow catches up after crypto edit save; avoids stale list + Coil same-path cache. */
-    var optimisticCryptoEdit by remember { mutableStateOf<AssetEntity?>(null) }
-    /** Bumps on crypto icon save so expanded rows reload when [AssetEntity] is unchanged (same file path, new bytes). */
-    var cryptoIconReloadNonce by remember { mutableIntStateOf(0) }
+    /** Until Room Flow catches up after asset edit save; avoids stale list + Coil same-path cache. */
+    var optimisticAssetEdit by remember { mutableStateOf<AssetEntity?>(null) }
+    /** Per-asset icon generation; same [AssetEntity.localIconPath] can point at new bytes after re-crop. */
+    val iconReloadEpochByCoinId = remember { mutableStateMapOf<String, Int>() }
+    val activeVaultHoldings by viewModel.getHoldingsForVault(activeVault.id)
+        .collectAsStateWithLifecycle(initialValue = emptyList())
+
+    LaunchedEffect(activeVaultHoldings, optimisticAssetEdit) {
+        val opt = optimisticAssetEdit ?: return@LaunchedEffect
+        val fromFlow = activeVaultHoldings.find { it.coinId == opt.coinId } ?: return@LaunchedEffect
+        val iconReady = if (opt.localIconPath.isNullOrBlank()) {
+            fromFlow.localIconPath.isNullOrBlank()
+        } else {
+            fromFlow.localIconPath == opt.localIconPath
+        }
+        val coreReady =
+            fromFlow.amountHeld == opt.amountHeld &&
+                fromFlow.decimalPreference == opt.decimalPreference
+        val metalReady = opt.category != AssetCategory.METAL ||
+            (fromFlow.displayName == opt.displayName && fromFlow.weight == opt.weight)
+        if (iconReady && coreReady && metalReady) {
+            optimisticAssetEdit = null
+        }
+    }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var editingAssetId by remember { mutableStateOf<String?>(null) }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
@@ -253,34 +273,29 @@ fun MyHoldingsScreen(
                             var localHoldingsForPage by remember(vaultForPage.id) { mutableStateOf(emptyList<AssetEntity>()) }
                             val pageLazyListState = rememberLazyListState()
 
-                            val holdingsMergedOptimistic = remember(holdingsForPage, optimisticCryptoEdit) {
-                                val opt = optimisticCryptoEdit ?: return@remember holdingsForPage
+                            val holdingsMergedOptimistic = remember(holdingsForPage, optimisticAssetEdit) {
+                                val opt = optimisticAssetEdit ?: return@remember holdingsForPage
                                 holdingsForPage.map { if (it.coinId == opt.coinId) opt else it }
                             }
 
-                            LaunchedEffect(holdingsForPage, optimisticCryptoEdit) {
-                                val opt = optimisticCryptoEdit ?: return@LaunchedEffect
-                                val fromFlow = holdingsForPage.find { it.coinId == opt.coinId } ?: return@LaunchedEffect
-                                if (fromFlow.amountHeld == opt.amountHeld &&
-                                    fromFlow.decimalPreference == opt.decimalPreference &&
-                                    fromFlow.localIconPath == opt.localIconPath
-                                ) {
-                                    optimisticCryptoEdit = null
-                                }
-                            }
+                            val isDraggingThisPage =
+                                isDraggingActive.value && draggingVaultId == vaultForPage.id
 
-                            LaunchedEffect(holdingsMergedOptimistic, vaultForPage.id, assetBeingEdited) {
-                                val isDraggingThisPage = isDraggingActive.value && draggingVaultId == vaultForPage.id
+                            LaunchedEffect(holdingsMergedOptimistic, vaultForPage.id, assetBeingEdited, isDraggingThisPage) {
                                 if (!isDraggingThisPage && assetBeingEdited == null) {
                                     localHoldingsForPage = holdingsMergedOptimistic
                                 }
                             }
 
-                            val filteredHoldingsForPage = remember(localHoldingsForPage, selectedTab) {
+                            // Use optimistic merge immediately on save; localHoldingsForPage lags one frame via LaunchedEffect.
+                            val displayHoldingsForPage =
+                                if (isDraggingThisPage) localHoldingsForPage else holdingsMergedOptimistic
+
+                            val filteredHoldingsForPage = remember(displayHoldingsForPage, selectedTab) {
                                 when (selectedTab) {
-                                    1 -> localHoldingsForPage.filter { it.category == AssetCategory.CRYPTO }
-                                    2 -> localHoldingsForPage.filter { it.category == AssetCategory.METAL }
-                                    else -> localHoldingsForPage
+                                    1 -> displayHoldingsForPage.filter { it.category == AssetCategory.CRYPTO }
+                                    2 -> displayHoldingsForPage.filter { it.category == AssetCategory.METAL }
+                                    else -> displayHoldingsForPage
                                 }
                             }
 
@@ -399,7 +414,7 @@ fun MyHoldingsScreen(
                                     ) {
                                         // Free-tier upsell: copy lives in holdings_* strings (not shared Settings keys).
                                         // Keep badge + subtitle single-line with tight sp so the CTA fits; bump
-                                        // cryptoIconReloadNonce on crypto save so MetalIcon reloads (see HoldingsUIComponents).
+                                        // iconReloadEpochByCoinId on icon save so MetalIcon reloads (see HoldingsUIComponents).
                                         if (!isProUser) {
                                             item(key = "pro_upsell_banner") {
                                                 val proBannerBg = ProPalette.Background
@@ -472,11 +487,21 @@ fun MyHoldingsScreen(
                                                 }
                                             }
                                         }
-                                        items(items = filteredHoldingsForPage, key = { it.coinId }) { asset ->
-                                            ReorderableItem(reorderableLazyListState, key = asset.coinId) { isDragging ->
+                                        items(
+                                            items = filteredHoldingsForPage,
+                                            key = { a ->
+                                                val epoch = iconReloadEpochByCoinId[a.coinId] ?: 0
+                                                "${a.coinId}_${epoch}_${a.localIconPath ?: "default"}"
+                                            },
+                                        ) { asset ->
+                                            val iconReloadNonce = iconReloadEpochByCoinId[asset.coinId] ?: 0
+                                            val listItemKey =
+                                                "${asset.coinId}_${iconReloadNonce}_${asset.localIconPath ?: "default"}"
+                                            ReorderableItem(reorderableLazyListState, key = listItemKey) { isDragging ->
                                             val hndl = Modifier.longPressDraggableHandle(
                                                 onDragStarted = {
                                                     draggingVaultId = vaultForPage.id
+                                                    localHoldingsForPage = holdingsMergedOptimistic
                                                     isDraggingActive.value = true
                                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 },
@@ -510,7 +535,7 @@ fun MyHoldingsScreen(
                                                         },
                                                         onEditRequest = { assetBeingEdited = asset },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
-                                                        localIconReloadNonce = cryptoIconReloadNonce,
+                                                        localIconReloadNonce = iconReloadNonce,
                                                         )
                                                     } else {
                                                         PolishedAssetCard(
@@ -522,7 +547,7 @@ fun MyHoldingsScreen(
                                                         },
                                                         onEditRequest = { assetBeingEdited = asset },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
-                                                        localIconReloadNonce = cryptoIconReloadNonce,
+                                                        localIconReloadNonce = iconReloadNonce,
                                                         )
                                                     }
                                                 } else {
@@ -537,7 +562,7 @@ fun MyHoldingsScreen(
                                                     },
                                                     showEditButton = showEdit,
                                                     isHighVisibilityMode = isHighVisibilityMode,
-                                                    localIconReloadNonce = cryptoIconReloadNonce,
+                                                    localIconReloadNonce = iconReloadNonce,
                                                     modifier = hndl
                                                     )
                                                 }
@@ -577,8 +602,13 @@ fun MyHoldingsScreen(
                         initialPrice = asset.officialSpotPrice,
                         initialSource = asset.priceSource,
                         onSave = { updated ->
+                            val iconChanged = updated.localIconPath != asset.localIconPath
+                            if (iconChanged || !updated.localIconPath.isNullOrBlank()) {
+                                iconReloadEpochByCoinId[updated.coinId] =
+                                    (iconReloadEpochByCoinId[updated.coinId] ?: 0) + 1
+                            }
+                            optimisticAssetEdit = updated
                             viewModel.updateAssetEntity(updated)
-                            cryptoIconReloadNonce++
                             assetBeingEdited = null
                             editingAssetId = null
                         },
@@ -590,7 +620,7 @@ fun MyHoldingsScreen(
                     asset = asset,
                     onDismiss = {
                         assetBeingEdited = null
-                        optimisticCryptoEdit = null
+                        optimisticAssetEdit = null
                     },
                     persistCustomIcon = { id, uri -> viewModel.persistCustomIconFromUri(id, uri) },
                     deleteCustomIcon = { id -> viewModel.deleteCustomAssetIcon(id) },
@@ -600,8 +630,11 @@ fun MyHoldingsScreen(
                             decimalPreference = save.decimalPreference,
                             localIconPath = save.localIconPath
                         )
-                        optimisticCryptoEdit = updated
-                        cryptoIconReloadNonce++
+                        if (save.iconChanged) {
+                            iconReloadEpochByCoinId[asset.coinId] =
+                                (iconReloadEpochByCoinId[asset.coinId] ?: 0) + 1
+                        }
+                        optimisticAssetEdit = updated
                         viewModel.updateAssetEntity(updated)
                         assetBeingEdited = null
                         editingAssetId = null

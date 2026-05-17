@@ -47,11 +47,20 @@ class IconManager @Inject constructor(
         null
     }
 
-    private fun customIconFile(coinId: String): File {
+    fun customIconFile(coinId: String): File {
         val safeId = coinId.replace(Regex("[^a-zA-Z0-9_-]"), "_")
         val dir = File(context.filesDir, "custom_icons")
         if (!dir.exists()) dir.mkdirs()
         return File(dir, "$safeId.png")
+    }
+
+    /** DB path if valid; heal from disk only when DB still references a custom icon. */
+    fun resolvedCustomIconPath(coinId: String, storedPath: String?): String? {
+        if (storedPath.isNullOrBlank()) return null
+        val stored = File(storedPath)
+        if (stored.exists()) return storedPath
+        val onDisk = customIconFile(coinId)
+        return if (onDisk.exists()) onDisk.absolutePath else null
     }
 
     suspend fun persistCustomIconFromUri(coinId: String, sourceUri: Uri): String? = withContext(Dispatchers.IO) {

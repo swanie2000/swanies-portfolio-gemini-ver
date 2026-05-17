@@ -462,10 +462,11 @@ class AssetViewModel @Inject constructor(
     fun getMetalDisplayOrder(): List<String>? =
         sharedPrefs.getString("metals_order", null)?.split(",")
 
-    fun updateAssetEntity(asset: AssetEntity) {
+    fun updateAssetEntity(asset: AssetEntity, onComplete: () -> Unit = {}) {
         viewModelScope.launch {
             repository.updateAssetEntity(asset)
             triggerCloudSync() // 🛰️ Sync Update
+            onComplete()
         }
     }
 

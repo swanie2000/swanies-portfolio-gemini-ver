@@ -102,7 +102,6 @@ class AssetRepository @Inject constructor(
                 return
             }
 
-            val allUpdatedAssets = mutableListOf<AssetEntity>()
             assets.groupBy { it.priceSource }.forEach { (sourceName, providerAssets) ->
                 val provider = searchRegistry.getProvider(sourceName) ?: return@forEach
                 val idString = providerAssets.joinToString(",") { it.apiId }
@@ -138,22 +137,46 @@ class AssetRepository @Inject constructor(
                             imageUrl = update.imageUrl.ifBlank { existing.imageUrl },
                             iconUrl = (update.iconUrl ?: update.imageUrl ?: "").ifBlank { existing.iconUrl },
                             lastUpdated = System.currentTimeMillis()
-                        ).also { allUpdatedAssets.add(it) }
+                        )
                     } else {
-                        allUpdatedAssets.add(existing)
                         null
                     }
                 }.filterNotNull()
                 
                 if (updatesToSave.isNotEmpty()) {
-                    assetDao.upsertAll(updatesToSave)
+                    val merged = updatesToSave.map { update ->
+                        val current = assetDao.getAssetByCoinId(update.coinId)
+                        if (current == null) {
+                            update
+                        } else {
+                            update.copy(
+                                localIconPath = iconManager.resolvedCustomIconPath(
+                                    current.coinId,
+                                    current.localIconPath,
+                                ),
+                                displayName = current.displayName.ifBlank { update.displayName },
+                                name = if (current.displayName.isNotBlank()) current.name else update.name,
+                                weight = current.weight,
+                                weightUnit = current.weightUnit,
+                                physicalForm = current.physicalForm,
+                                amountHeld = current.amountHeld,
+                                premium = current.premium,
+                                decimalPreference = current.decimalPreference,
+                            )
+                        }
+                    }
+                    assetDao.upsertAll(merged)
                 }
             }
             isSuccess = true
             userConfigDao.updateLastSync(System.currentTimeMillis())
-            
-            // 🚀 RACE CONDITION KILLER: Use the freshly updated list directly
-            pushFreshAssetsToWidget(context.applicationContext, portfolioId, allUpdatedAssets)
+
+            val freshForWidget = if (portfolioId.all { it.isDigit() }) {
+                assetDao.getAssetsByVaultOnce(portfolioId.toInt())
+            } else {
+                assetDao.getAllAssetsOnce(portfolioId)
+            }
+            pushFreshAssetsToWidget(context.applicationContext, portfolioId, freshForWidget)
         } catch (e: Exception) {
             Log.e("REPO_REFRESH", "Error: ${e.message}")
             isSuccess = false
@@ -374,7 +397,17 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun updateAssetOrder(assets: List<AssetEntity>) { assetDao.updateAssetOrder(assets) }
-    suspend fun updateAssetEntity(asset: AssetEntity) { assetDao.updateAssetEntity(asset) }
+    suspend fun updateAssetEntity(asset: AssetEntity) {
+        val resolvedIcon = iconManager.resolvedCustomIconPath(asset.coinId, asset.localIconPath)
+        assetDao.updateAssetEntity(
+            asset.copy(
+                localIconPath = resolvedIcon,
+                displayName = asset.displayName.ifBlank {
+                    assetDao.getAssetByCoinId(asset.coinId)?.displayName.orEmpty()
+                },
+            ),
+        )
+    }
     suspend fun toggleWidgetVisibility(id: String, isVisible: Boolean) { assetDao.updateWidgetVisibility(id, isVisible) }
 
     suspend fun executeSurgicalAdd(asset: AssetEntity, callback: (Boolean, String) -> Unit) {

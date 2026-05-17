@@ -368,7 +368,10 @@ fun AssetArchitectScreen(
                                         weight = draftAsset.weight,
                                         unit = draftAsset.weightUnit,
                                         physicalForm = draftAsset.physicalForm,
-                                        category = AssetCategory.METAL
+                                        coinId = draftAsset.coinId,
+                                        imageUrl = draftAsset.imageUrl,
+                                        localPath = draftAsset.localIconPath,
+                                        category = AssetCategory.METAL,
                                     )
                                     Spacer(Modifier.height(8.dp))
                                     // INLINE WEIGHT INPUT (Abbreviated Unit)

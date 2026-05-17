@@ -20,6 +20,9 @@ interface AssetDao {
     @Query("SELECT * FROM assets WHERE vaultId = :vaultId ORDER BY displayOrder ASC")
     suspend fun getAssetsByVaultOnce(vaultId: Int): List<AssetEntity>
 
+    @Query("SELECT * FROM assets WHERE coinId = :coinId LIMIT 1")
+    suspend fun getAssetByCoinId(coinId: String): AssetEntity?
+
     @Query("SELECT * FROM assets WHERE portfolioId = :pId ORDER BY displayOrder ASC")
     suspend fun getAllAssetsOnce(pId: String = "MAIN"): List<AssetEntity>
 

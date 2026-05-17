@@ -65,6 +65,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.yalantis.ucrop.UCrop
 import com.swanie.portfolio.R
@@ -187,6 +188,16 @@ fun metalWidgetCenterLabel(asset: AssetEntity): String {
     }
 }
 
+private fun resolveCustomIconFile(context: Context, coinId: String, localPath: String?): File? {
+    if (localPath.isNullOrBlank()) return null
+    val stored = File(localPath)
+    if (stored.exists()) return stored
+    if (coinId.isBlank()) return null
+    val safeId = coinId.replace(Regex("[^a-zA-Z0-9_-]"), "_")
+    val onDisk = File(File(context.filesDir, "custom_icons"), "$safeId.png")
+    return onDisk.takeIf { it.exists() }
+}
+
 @Composable
 fun MetalIcon(
     name: String,
@@ -195,34 +206,55 @@ fun MetalIcon(
     physicalForm: String = "Coin",
     size: Int = 44,
     imageUrl: String = "",
+    coinId: String = "",
     localPath: String? = null,
     category: AssetCategory = AssetCategory.METAL,
     /** Incremented by parent after custom icon save so the row reloads even when [localPath] string is unchanged. */
     localIconReloadNonce: Int = 0,
 ) {
     val context = LocalContext.current
-    var isError by remember { mutableStateOf(false) }
-    val localFile = localPath?.let { File(it) }
+    // Must reset when switching default/remote ↔ custom file; stale true skips the file branch.
+    var isError by remember(coinId, localPath, localIconReloadNonce, imageUrl) { mutableStateOf(false) }
+    val customFile = remember(coinId, localPath, localIconReloadNonce) {
+        resolveCustomIconFile(context, coinId, localPath)
+    }
+    val customIconPath = customFile?.absolutePath
 
-    if (localFile != null && localFile.exists() && !isError) {
-        val diskKey = "${localFile.lastModified()}_${localFile.length()}"
-        LaunchedEffect(localPath, diskKey, localIconReloadNonce) {
-            isError = false
+    LaunchedEffect(coinId, localPath, localIconReloadNonce, imageUrl) {
+        isError = false
+    }
+
+    if (customFile != null && !isError) {
+        var diskKey by remember(customIconPath, localIconReloadNonce) { mutableStateOf<String?>(null) }
+        LaunchedEffect(customIconPath, localIconReloadNonce) {
+            diskKey = "${customFile.lastModified()}_${customFile.length()}"
         }
-        val imageModel = remember(localPath, diskKey, localIconReloadNonce) {
-            ImageRequest.Builder(context)
-                .data(localFile)
-                .memoryCacheKey("${localFile.absolutePath}#$diskKey#$localIconReloadNonce")
-                .diskCacheKey("${localFile.absolutePath}#$diskKey#$localIconReloadNonce")
-                .build()
+        val resolvedDiskKey = diskKey
+        if (resolvedDiskKey != null) {
+            val imageModel = remember(customIconPath, resolvedDiskKey, localIconReloadNonce) {
+                ImageRequest.Builder(context)
+                    .data(customFile)
+                    .memoryCachePolicy(CachePolicy.DISABLED)
+                    .diskCacheKey("${customFile.absolutePath}#$resolvedDiskKey#$localIconReloadNonce")
+                    .build()
+            }
+            key(coinId, customIconPath, resolvedDiskKey, localIconReloadNonce) {
+                AsyncImage(
+                    model = imageModel,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(size.dp).clip(CircleShape),
+                    onError = { isError = true }
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(size.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.08f)),
+            )
         }
-        AsyncImage(
-            model = imageModel,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(size.dp).clip(CircleShape),
-            onError = { isError = true }
-        )
     } else if (imageUrl == "SW_DEFAULT") {
         Box(modifier = Modifier.size((size * 1.2).dp).clip(CircleShape).background(Color.White.copy(0.1f)), contentAlignment = Alignment.Center) {
             Image(painter = painterResource(R.drawable.swanie_foreground), contentDescription = null, modifier = Modifier.fillMaxSize().scale(1.5f))
@@ -703,7 +735,8 @@ private fun AssetUnderIconNameBlock(
 data class CryptoEditSave(
     val amountHeld: Double,
     val decimalPreference: Int,
-    val localIconPath: String?
+    val localIconPath: String?,
+    val iconChanged: Boolean,
 )
 
 @Composable
@@ -889,11 +922,13 @@ fun CryptoEditFunnel(
                                 }
                                 else -> asset.localIconPath
                             }
+                            val iconChanged = userClearedCustom || pendingIconUri != null
                             onSave(
                                 CryptoEditSave(
                                     amountHeld = amt.toDoubleOrNull() ?: asset.amountHeld,
                                     decimalPreference = dec.toInt(),
-                                    localIconPath = finalLocal
+                                    localIconPath = finalLocal,
+                                    iconChanged = iconChanged,
                                 )
                             )
                             onDismiss()
@@ -972,7 +1007,7 @@ fun ArchitectIconSelectionStep(
     val previewModel: Any? = when {
         pendingIconUri != null -> pendingIconUri
         userClearedCustom -> null
-        else -> existingLocalIconPath?.let { path -> File(path).takeIf { it.exists() } }
+        else -> resolveCustomIconFile(context, coinId, existingLocalIconPath)
             ?: imageUrl.takeIf { it.isNotBlank() }
     }
 
@@ -1227,17 +1262,20 @@ fun FullAssetCard(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top
                     ) {
-                        MetalIcon(
-                            name = metalIconLookupName(asset),
-                            weight = asset.weight,
-                            unit = asset.weightUnit,
-                            physicalForm = asset.physicalForm,
-                            imageUrl = asset.imageUrl,
-                            localPath = asset.localIconPath,
-                            category = asset.category,
-                            size = 44, // Master Icon Scale
-                            localIconReloadNonce = localIconReloadNonce,
-                        )
+                        key(asset.coinId, localIconReloadNonce, asset.localIconPath) {
+                            MetalIcon(
+                                name = metalIconLookupName(asset),
+                                weight = asset.weight,
+                                unit = asset.weightUnit,
+                                physicalForm = asset.physicalForm,
+                                coinId = asset.coinId,
+                                imageUrl = asset.imageUrl,
+                                localPath = asset.localIconPath,
+                                category = asset.category,
+                                size = 44, // Master Icon Scale
+                                localIconReloadNonce = localIconReloadNonce,
+                            )
+                        }
                         Spacer(Modifier.height(iconSymbolGap))
                         AssetUnderIconNameBlock(
                             asset = asset,
@@ -1602,17 +1640,20 @@ fun CompactAssetCard(
                                         .padding(3.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    MetalIcon(
-                                        name = metalIconLookupName(asset),
-                                        weight = asset.weight,
-                                        unit = asset.weightUnit,
-                                        physicalForm = asset.physicalForm,
-                                        size = 30,
-                                        imageUrl = asset.imageUrl,
-                                        localPath = asset.localIconPath,
-                                        category = asset.category,
-                                        localIconReloadNonce = localIconReloadNonce,
-                                    )
+                                    key(asset.coinId, localIconReloadNonce, asset.localIconPath) {
+                                        MetalIcon(
+                                            name = metalIconLookupName(asset),
+                                            weight = asset.weight,
+                                            unit = asset.weightUnit,
+                                            physicalForm = asset.physicalForm,
+                                            coinId = asset.coinId,
+                                            size = 30,
+                                            imageUrl = asset.imageUrl,
+                                            localPath = asset.localIconPath,
+                                            category = asset.category,
+                                            localIconReloadNonce = localIconReloadNonce,
+                                        )
+                                    }
                                 }
                                 Spacer(modifier = Modifier.width(iconTextGapW))
                                 Column(
@@ -1796,17 +1837,20 @@ fun CompactAssetCard(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Top
                             ) {
-                                MetalIcon(
-                                    name = metalIconLookupName(asset),
-                                    weight = asset.weight,
-                                    unit = asset.weightUnit,
-                                    physicalForm = asset.physicalForm,
-                                    size = 44, // Master Icon Scale Parity
-                                    imageUrl = asset.imageUrl,
-                                    localPath = asset.localIconPath,
-                                    category = asset.category,
-                                    localIconReloadNonce = localIconReloadNonce,
-                                )
+                                key(asset.coinId, localIconReloadNonce, asset.localIconPath) {
+                                    MetalIcon(
+                                        name = metalIconLookupName(asset),
+                                        weight = asset.weight,
+                                        unit = asset.weightUnit,
+                                        physicalForm = asset.physicalForm,
+                                        coinId = asset.coinId,
+                                        size = 44, // Master Icon Scale Parity
+                                        imageUrl = asset.imageUrl,
+                                        localPath = asset.localIconPath,
+                                        category = asset.category,
+                                        localIconReloadNonce = localIconReloadNonce,
+                                    )
+                                }
                                 Spacer(Modifier.height(expandedIconSymbolGap))
                                 AssetUnderIconNameBlock(
                                     asset = asset,
