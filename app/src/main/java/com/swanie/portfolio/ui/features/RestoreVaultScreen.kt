@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BuildVersionLabel
 import com.swanie.portfolio.ui.navigation.Routes
 
 /**
@@ -96,5 +97,9 @@ fun RestoreVaultScreen(
                 Text(stringResource(R.string.restore_back_to_start), color = Color.White.copy(alpha = 0.4f))
             }
         }
+
+        BuildVersionLabel(
+            modifier = Modifier.align(Alignment.BottomEnd),
+        )
     }
 }

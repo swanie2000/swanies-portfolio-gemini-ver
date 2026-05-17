@@ -2,6 +2,7 @@ package com.swanie.portfolio.ui.settings
 
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,6 +30,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import com.swanie.portfolio.billing.MonetizationPackage
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -102,25 +106,13 @@ fun ProFeatureGateScreen(
 
         if (availablePackages.isNotEmpty()) {
             availablePackages.forEach { proPackage ->
-                OutlinedButton(
-                    onClick = { selectedPackageId = proPackage.identifier },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(ProPalette.ButtonRadius),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = if (selectedPackageId == proPackage.identifier) {
-                            accent
-                        } else {
-                            safeText
-                        }
-                    )
-                ) {
-                    Text(
-                        text = "${proPackage.title} - ${proPackage.priceText}",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                ProPlanOptionButton(
+                    proPackage = proPackage,
+                    isSelected = selectedPackageId == proPackage.identifier,
+                    onSelect = { selectedPackageId = proPackage.identifier },
+                    accent = accent,
+                    safeText = safeText,
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         } else if (packagesLoadAttempted) {
@@ -268,6 +260,70 @@ fun ProFeatureGateScreen(
         }
 
         Spacer(modifier = Modifier.height(ProPalette.SectionSpacing))
+    }
+}
+
+@Composable
+private fun ProPlanOptionButton(
+    proPackage: MonetizationPackage,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    accent: Color,
+    safeText: Color,
+) {
+    val contentColor = if (isSelected) accent else safeText
+    val planLabel = resolveProPlanLabel(proPackage.identifier, proPackage.title)
+    OutlinedButton(
+        onClick = onSelect,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 72.dp),
+        shape = RoundedCornerShape(ProPalette.ButtonRadius),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) accent else ProPalette.NeutralBorder,
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (isSelected) accent.copy(alpha = 0.12f) else Color.Transparent,
+            contentColor = contentColor,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = planLabel,
+                color = contentColor,
+                fontWeight = FontWeight.Black,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = proPackage.priceText,
+                color = contentColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+private fun resolveProPlanLabel(identifier: String, title: String): String {
+    val id = identifier.lowercase()
+    return when {
+        "monthly" in id -> "Monthly"
+        "annual" in id || "yearly" in id -> "Yearly"
+        "lifetime" in id -> "Lifetime"
+        else -> {
+            val fromTitle = title.substringAfter('—').substringAfter('-').trim()
+            fromTitle.ifBlank { title }
+        }
     }
 }
 

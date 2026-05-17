@@ -40,6 +40,7 @@ import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.UserProfileEntity
 import com.swanie.portfolio.security.AuthPolicy
+import com.swanie.portfolio.ui.components.BuildVersionLabel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.launch
@@ -293,6 +294,11 @@ fun CreateAccountScreen(
             }
             Spacer(modifier = Modifier.height(40.dp))
         }
+
+        BuildVersionLabel(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            contentColor = siteText.copy(alpha = 0.45f),
+        )
     }
 
     if (showReceiptDialog) {

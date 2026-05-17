@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BuildVersionLabel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.settings.SettingsViewModel
@@ -352,6 +353,11 @@ fun UnlockVaultScreen(
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
+
+        BuildVersionLabel(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            contentColor = siteText.copy(alpha = 0.45f),
+        )
     }
 
     if (showRecoveryDialog) {

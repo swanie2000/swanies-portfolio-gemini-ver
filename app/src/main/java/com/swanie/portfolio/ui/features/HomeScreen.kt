@@ -34,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.components.BuildVersionLabel
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.i18n.languageDisplayNameForOption
@@ -357,6 +358,13 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
                 }
             }
         }
+
+        BuildVersionLabel(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .zIndex(10f),
+            contentColor = userThemeTextColor.copy(alpha = 0.45f),
+        )
     }
 }
 

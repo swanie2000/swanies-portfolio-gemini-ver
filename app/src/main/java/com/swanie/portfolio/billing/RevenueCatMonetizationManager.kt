@@ -1,6 +1,7 @@
 package com.swanie.portfolio.billing
 
 import android.app.Activity
+import android.util.Log
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.PurchaseParams
@@ -72,8 +73,28 @@ class RevenueCatMonetizationManager @Inject constructor() : MonetizationManager 
         val purchases = purchasesOrNull() ?: return Result.success(emptyList())
         return runCatching {
             val offerings = purchases.awaitOfferings()
-            val targetOffering = offerings[offeringId] ?: offerings.current
+            val offeringKeys = offerings.all.keys.joinToString()
+            val targetOffering =
+                offerings[offeringId]
+                    ?: offerings.current
+                    ?: offerings.all.values.firstOrNull { it.availablePackages.isNotEmpty() }
             val availablePackages = targetOffering?.availablePackages.orEmpty()
+            if (availablePackages.isEmpty()) {
+                Log.w(
+                    RevenueCatInitializer.LOG_TAG,
+                    "fetchPackages: no plans. expectedOffering=$offeringId " +
+                        "resolvedOffering=${targetOffering?.identifier} " +
+                        "allOfferings=[$offeringKeys] current=${offerings.current?.identifier}. " +
+                        "Play builds need Google Play products on offering \"$offeringId\" in RevenueCat " +
+                        "(Test Store-only products do not load with the goog_… key).",
+                )
+            } else {
+                Log.i(
+                    RevenueCatInitializer.LOG_TAG,
+                    "fetchPackages: ${availablePackages.size} plan(s) from offering " +
+                        "${targetOffering?.identifier} (expected=$offeringId)",
+                )
+            }
             packageCache.clear()
             availablePackages.forEach { packageCache[it.identifier] = it }
             availablePackages.map {
@@ -83,6 +104,8 @@ class RevenueCatMonetizationManager @Inject constructor() : MonetizationManager 
                     priceText = it.product.price.formatted
                 )
             }
+        }.onFailure { error ->
+            Log.e(RevenueCatInitializer.LOG_TAG, "fetchPackages failed", error)
         }
     }
 
