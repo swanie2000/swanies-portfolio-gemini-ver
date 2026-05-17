@@ -132,15 +132,12 @@ fun UnlockVaultScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(siteBg)
-        .statusBarsPadding()
-        .imePadding()
-    ) {
+    Box(modifier = Modifier.fillMaxSize().background(siteBg)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -355,7 +352,9 @@ fun UnlockVaultScreen(
         }
 
         BuildVersionLabel(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .zIndex(20f),
             contentColor = siteText.copy(alpha = 0.45f),
         )
     }

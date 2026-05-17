@@ -167,7 +167,14 @@
     <string name="settings_restore_purchases_failed">Unable to restore purchases right now.</string>
     <string name="pro_gate_title">PRO FEATURE</string>
     <string name="pro_gate_subtitle">%1$s is available on Pro.</string>
-    <string name="pro_gate_upgrade_coming">Upgrade purchase flow is being finalized.</string>
+    <string name="pro_gate_choose_plan">Pick a plan below to unlock Pro on this device.</string>
+    <string name="pro_gate_value_props">Multiple portfolios · Themes · Analytics · Widget customization</string>
+    <string name="pro_gate_brand_line">Swanie\'s Portfolio</string>
+    <string name="pro_plan_monthly">Monthly Plan</string>
+    <string name="pro_plan_yearly">Yearly Plan</string>
+    <string name="pro_plan_lifetime">Lifetime Access</string>
+    <string name="pro_plan_best_value">BEST VALUE</string>
+    <string name="pro_plan_line_format">%1$s  ·  %2$s</string>
     <string name="pro_gate_upgrade_button">UPGRADE TO PRO</string>
     <string name="pro_gate_purchase_working">PROCESSING PURCHASE...</string>
     <string name="pro_gate_purchase_success">Pro unlocked successfully.</string>

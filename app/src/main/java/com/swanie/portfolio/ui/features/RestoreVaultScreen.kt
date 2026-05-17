@@ -99,7 +99,7 @@ fun RestoreVaultScreen(
         }
 
         BuildVersionLabel(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier.align(Alignment.TopEnd),
         )
     }
 }

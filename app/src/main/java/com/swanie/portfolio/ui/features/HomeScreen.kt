@@ -361,7 +361,7 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel) {
 
         BuildVersionLabel(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
+                .align(Alignment.TopEnd)
                 .zIndex(10f),
             contentColor = userThemeTextColor.copy(alpha = 0.45f),
         )

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 import androidx.core.view.WindowCompat
@@ -107,10 +108,12 @@ fun CreateAccountScreen(
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDark
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(siteBg).statusBarsPadding().imePadding()) {
+    Box(modifier = Modifier.fillMaxSize().background(siteBg)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .imePadding()
                 .padding(horizontal = 32.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -296,7 +299,9 @@ fun CreateAccountScreen(
         }
 
         BuildVersionLabel(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .zIndex(20f),
             contentColor = siteText.copy(alpha = 0.45f),
         )
     }

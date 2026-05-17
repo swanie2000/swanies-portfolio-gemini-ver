@@ -1,7 +1,7 @@
 package com.swanie.portfolio.ui.components
 
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +13,8 @@ import com.swanie.portfolio.BuildConfig
 
 /**
  * Small build stamp for auth / onboarding screens so testers can confirm Play version
- * before creating an account or signing in.
+ * before creating an account or signing in. Pin with [Modifier.align][androidx.compose.ui.Alignment.TopEnd]
+ * on a root [androidx.compose.foundation.layout.Box] that does **not** use [imePadding].
  */
 @Composable
 fun BuildVersionLabel(
@@ -26,7 +27,7 @@ fun BuildVersionLabel(
         fontSize = 9.sp,
         fontWeight = FontWeight.Normal,
         modifier = modifier
-            .navigationBarsPadding()
-            .padding(end = 10.dp, bottom = 0.dp),
+            .statusBarsPadding()
+            .padding(top = 2.dp, end = 10.dp),
     )
 }

@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Holdings custom icons (shipped in repo, not on Play yet):** compact + full **metal** and **crypto** cards — photo / default / photo cycles, re-edit same asset, no collapse-to-refresh workaround. Fixes: optimistic list on save, per-**`coinId`** reload epoch, **`MetalIcon`** **`isError`** + path handling, price-refresh upsert no longer wipes **`localIconPath`**, removed grey placeholder on default metal. **Play:** owner on **1.0.8** via tester QR (delivery lag resolved). **Still to upload:** **`versionCode` 10 (1.0.9)** — paywall labels, **`BuildVersionLabel`**, **+ icon fixes** in one internal release. **Billing:** payments profile + **`pro_*`** SKUs + RC **`default`** offering on Play.
+**Last updated:** 2026-05-18 — **Repo ready for Play `versionCode` 10 (1.0.9):** holdings custom-icon fixes (prior session, owner verified); **Pro paywall** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on Home / unlock / create / restore (not hidden by keyboard); **Theme Manager** — dropdown on entry (no false “unsaved” from picker touch); big red **Cancel** only after real edit (`userInitiatedEdit` + ARGB compare). **Play:** Console still on **9 (1.0.8)** until owner uploads **10**. **Next human step:** signed AAB → **Internal testing** → install **`v1.0.9 (10)`** → billing QA.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,7 +40,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | Console **9 (1.0.8)** available; owner device may lag on **8 (1.0.7)**. **Ship next:** **10 (1.0.9)** with paywall + version stamp. |
 | **License testing** | **Swanie's Portfolio Testers** (3) **checked** · **`RESPOND_NORMALLY`**. |
 | **Verify build** | **`validateRevenueCatReleaseKey`** + **`verify-aab-revenuecat-key.ps1`** (ASCII-only script; fixed PS parse error 2026-05-17). |
-| **Version on device** | **`BuildVersionLabel`** bottom-right on auth screens — check **`v1.0.9 (10)`** before creating account (not in Settings; route exists but unwired). |
+| **Version on device** | **`BuildVersionLabel`** **top-right** on Home / unlock / create / restore — check **`v1.0.9 (10)`** before creating account (not in Settings; route exists but unwired). |
 
 **Play Console — where things stand (human progress):**
 
@@ -103,8 +103,8 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Ship `versionCode` 10 (1.0.9):** Repo ready — paywall labels + **`BuildVersionLabel`**. **`validateRevenueCatReleaseKey`** → Studio signed AAB → **`verify-aab-revenuecat-key.ps1`** → **Internal testing** → **Create new release** → upload only **10** → roll out.
-2. **Install on phone:** Uninstall → **tester link** → **Download test app**. Home bottom-right must show **`v1.0.9 (10)`** before sign-up. If still **1.0.7 (8)**, wait or **Internal app sharing** for same AAB.
+1. **Ship `versionCode` 10 (1.0.9):** Repo has paywall + version stamp + icon fixes + Theme Manager entry fix. **`validateRevenueCatReleaseKey`** → Studio **Generate signed bundle** → **`verify-aab-revenuecat-key.ps1`** → **Internal testing** → **Create new release** → upload **10** only → roll out.
+2. **Install on phone:** Uninstall → **tester link** → **Download test app**. Home **top-right** must show **`v1.0.9 (10)`** before sign-up. If still **1.0.7 (8)**, wait or **Internal app sharing** for same AAB.
 3. **Billing QA (Play):** Paywall → **3 plans** at Play prices → purchase **monthly** (license tester) → **Restore purchases** → Pro gates.
 4. **New testers:** Internal testing + **License testing** when approving join-testing emails.
 5. **Closed testing / listing:** When ready — dashboard tasks, screenshots, **`PLAY_URL`** on site.
@@ -114,8 +114,8 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Next steps (priority order)
 
-1. **Play internal — ship 10 (1.0.9):** Includes paywall + version stamp + **holdings custom-icon fixes** (`MyHoldingsScreen`, `HoldingsUIComponents`, `AssetRepository`, `IconManager`). Signed AAB + verify script → **Internal testing** → roll out.
-2. **Play internal QA (owner):** Confirm **`v1.0.9 (10)`** on Home stamp → paywall **$9.99 / $79.99 / $129.99** → subscribe + restore (license tester).
+1. **Play internal — ship 10 (1.0.9) (owner, now):** Paywall + **`BuildVersionLabel`** + icon fixes + **`ThemeStudioScreen`** entry UX. Signed AAB + verify script → **Internal testing** → roll out.
+2. **Play internal QA (owner):** **`v1.0.9 (10)`** top-right on Home → paywall **$9.99 / $79.99 / $129.99** → Theme Manager (dropdown on entry; Cancel after edit) → subscribe + restore (license tester).
 3. **Play install lag:** If device stays on **1.0.7**, retry tomorrow or **Internal app sharing** (minutes) instead of more reinstall loops.
 4. **Play (human) — closed testing / listing:** When ready; **`Master_Build_Checklist.md`** when milestones tick.
 5. **Testers:** Join-testing approvals → Internal + License testing lists.
@@ -152,8 +152,9 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`**, **`WidgetConfigActivity.kt`** |
 | Marketing site layout | **`website/styles.css`** — **`.site-header`** sticky + **`html.is-scrolled`** underline; **`.site-header-inner`** max-width **1080px**; **`overflow-x: clip`** on **`.wrap`** only (not **`html`/`body`**) |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
-| Home (login) | **`HomeScreen.kt`** — swan hero, login column; **`BuildVersionLabel.kt`** bottom-right on Home / unlock / create-account / restore |
-| Pro / billing | **`ProFeatureGateScreen.kt`** — plan rows (Monthly/Yearly/Lifetime + price). **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
+| Home (login) | **`HomeScreen.kt`** — swan hero, login column; **`BuildVersionLabel.kt`** top-right on Home / unlock / create-account / restore |
+| Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards, auto-select yearly. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
+| Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
 | Play internal ship | **Studio** AAB; **`versionCode` 10** / **`1.0.9`** in repo; Console active **9 (1.0.8)** until **10** uploaded |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
@@ -168,7 +169,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
-- **2026-05-18 — Holdings custom icon UX (compact + full metal/crypto):** Multi-session fix: list showed stale icon until card collapse; **default → photo → default** edge cases; full **metal** card reverted after ~1s (price refresh race wiping **`localIconPath`**); grey circle on default metal (over-broad placeholder). **Repo:** `MyHoldingsScreen` optimistic display + per-`coinId` reload epoch; `MetalIcon` `isError`/path/`coinId`; `IconManager.resolvedCustomIconPath`; `AssetRepository` upsert preserves user fields; `AssetDao.getAssetByCoinId`. Owner verified compact + full **metal**. **Handoff + push `main`** — bundle with **1.0.9** Play upload.
+- **2026-05-18 — Ship prep (paywall, version stamp, Theme Manager) + icon UX:** **Icons (earlier):** compact/full metal+crypto photo cycles; optimistic list, reload epoch, `MetalIcon`/`AssetRepository` upsert fixes — owner verified. **This push:** **`ProFeatureGateScreen.kt`** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on auth screens; **`ThemeStudioScreen.kt`** — dropdown on entry, red **Cancel** only after real edit. **Handoff + push `main`** → owner uploads **1.0.9 (10)** to Play internal.
 - **2026-05-17 (EOD) — Play subscriptions + RC offering + 1.0.9 prep:** **Payments profile** + **merchant** info. Play **subscriptions** **`pro_monthly`** / **`pro_yearly`**, one-time **`pro_lifetime`** (**$9.99 / $79.99 / $129.99**). **RevenueCat** import + **`default`** offering wired to **Play** (was Test Store only → empty paywall on Play builds). **Internal 9 (1.0.8)** published; phone stuck **1.0.7** (Play lag). **Studio:** 3 plans work; **`BuildVersionLabel`** on auth screens; paywall row layout fix. **`verify-aab-revenuecat-key.ps1`** PS parse fix. Repo **`versionCode` 10** / **`1.0.9`**. Owner: ship **1.0.9** + retry install tomorrow. **Handoff + push `main`**.
 - **2026-05-16 (EOD) — Play internal 1.0.7 + license testers + long ship day:** **Web3Forms** join-testing + reply-ready emails (site). **RevenueCat:** fixed **Wrong API Key** — real **`goog_…`** in **`REVENUECAT_PUBLIC_API_KEY`** (was placeholder / **`test_`** in old AABs); **`validateRevenueCatReleaseKey`**, **`verify-aab-revenuecat-key.ps1`**, release **`test_` block** in **`RevenueCatInitializer`**. **Play:** burned codes **3–7**; live **8 (1.0.7)**; **Create new release** + **Upload** lesson; **tester QR** not site QR; **Download test app** not public version. Owner: **1.0.7** opens from Play, account + asset + paywalls OK; **License testing** — **Swanie's Portfolio Testers** checked, saved. **Next:** re-test subscribe/restore. **`docs/AI_HANDOFF.md`** + **push `main`**.
 - **2026-05-16 — FormSubmit outage → Web3Forms (app + site):** **formsubmit.co** returning **521** (both website join-testing + in-app bug report failed). **`BugReportSubmitter.kt`** + **`website/index.html`** → **Web3Forms**; **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`** + site script (owner must create key at web3forms.com). **`docs/AI_HANDOFF.md`**. **Push `main`** (key not in repo).

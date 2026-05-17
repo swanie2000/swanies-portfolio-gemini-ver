@@ -92,6 +92,8 @@ fun ThemeStudioScreen(
         stringResource(R.string.theme_studio_target_card_text),
     )
     var targetMenuExpanded by remember { mutableStateOf(false) }
+    /** True after the user drags a picker or edits hex — avoids false "unsaved" from HSV float noise on entry. */
+    var userInitiatedEdit by remember { mutableStateOf(false) }
 
     var hue by remember { mutableFloatStateOf(0f) }
     var saturation by remember { mutableFloatStateOf(1f) }
@@ -127,7 +129,22 @@ fun ThemeStudioScreen(
     }.replace("#", "").uppercase()
     val normalizedInput = hexInput.uppercase()
     val hasValidHex = normalizedInput.length == 6 && normalizedInput.all { it.isDigit() || it in 'A'..'F' }
-    val hasUnsavedChanges = normalizedInput != currentTargetHex
+    val pendingColorArgb = remember(normalizedInput, hue, saturation, value, hasValidHex) {
+        try {
+            if (hasValidHex) Color("#$normalizedInput".toColorInt()).toArgb()
+            else Color.hsv(hue, saturation, value).toArgb()
+        } catch (e: Exception) {
+            Color.hsv(hue, saturation, value).toArgb()
+        }
+    }
+    val savedColorArgb = remember(currentTargetHex) {
+        try {
+            Color("#$currentTargetHex".toColorInt()).toArgb()
+        } catch (e: Exception) {
+            0
+        }
+    }
+    val hasUnsavedChanges = userInitiatedEdit && pendingColorArgb != savedColorArgb
     val saveButtonColor = when {
         !hasUnsavedChanges -> Color(0xFF6A6A6A)
         else -> Color(0xFFFFD54F).copy(alpha = savePulseAlpha)
@@ -163,6 +180,7 @@ fun ThemeStudioScreen(
                 2 -> viewModel.saveCardBackgroundColor(finalHex)
                 3 -> viewModel.saveCardTextColor(finalHex)
             }
+            userInitiatedEdit = false
             isFlashing = true
             keyboardController?.hide()
             focusManager.clearFocus()
@@ -175,6 +193,8 @@ fun ThemeStudioScreen(
     }
 
     LaunchedEffect(activeTarget) {
+        userInitiatedEdit = false
+        targetMenuExpanded = false
         val currentHex = when (activeTarget) {
             0 -> siteBgColor; 1 -> siteTextColor; 2 -> cardBgColor; else -> cardTextColor
         }
@@ -198,6 +218,7 @@ fun ThemeStudioScreen(
         saturation = hsv[1]
         value = hsv[2]
         hexInput = currentHex.replace("#", "").uppercase()
+        userInitiatedEdit = false
     }
 
     if (showResetDialog) {
@@ -367,6 +388,7 @@ fun ThemeStudioScreen(
                             value = hexInput,
                             onValueChange = { input ->
                                 if (input.length <= 6) {
+                                    userInitiatedEdit = true
                                     hexInput = input.uppercase()
                                     if (input.length == 6 && input.all { it.isDigit() || it.uppercaseChar() in 'A'..'F' }) {
                                         val hsv = FloatArray(3)
@@ -375,7 +397,12 @@ fun ThemeStudioScreen(
                                     }
                                 }
                             },
-                            modifier = Modifier.weight(1f).onFocusChanged { if (it.isFocused) hexInput = "" },
+                            modifier = Modifier.weight(1f).onFocusChanged {
+                                if (it.isFocused) {
+                                    userInitiatedEdit = true
+                                    hexInput = ""
+                                }
+                            },
                             textStyle = TextStyle(color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Black),
                             cursorBrush = SolidColor(Color.Yellow),
                             singleLine = true,
@@ -393,11 +420,14 @@ fun ThemeStudioScreen(
             }
 
             StudioSaturationBox(hue, saturation, value, modifier = Modifier.fillMaxWidth().height(88.dp)) { s, v ->
-                saturation = s; value = v
+                userInitiatedEdit = true
+                saturation = s
+                value = v
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(hue, s, v).toArgb())
             }
 
             StudioHueSlider(hue, modifier = Modifier.fillMaxWidth().height(18.dp)) { h ->
+                userInitiatedEdit = true
                 hue = h
                 hexInput = String.format("%06X", 0xFFFFFF and Color.hsv(h, saturation, value).toArgb())
             }
