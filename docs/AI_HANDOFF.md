@@ -29,18 +29,17 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-16 — **Feedback forms → Web3Forms (FormSubmit.co was down / HTTP 521).** Bug reports + **join-testing** use **`WEB3FORMS_ACCESS_KEY`** (`local.properties` + public key in **`website/index.html`** with domain restrict at [web3forms.com](https://web3forms.com)). **Owner:** create free access key → set both places → redeploy site / rebuild app. Prior: join-testing UI, sticky header, widget polish on **`main`**. **Join testing** on **`website/index.html`**: name + Play email + optional message; **Send request** posts via **FormSubmit AJAX** (same form id as **`BugReportSubmitter`**) — no mail client. Prior: widget polish + sticky header on **`main`**. **Widget (`PortfolioWidget.kt`):** metal rows **3-line** compact type + **`WidgetAssetCardHeight` = 62dp** + weighted row spacers (no **`fillMaxHeight()`** on row wrapper); swan tap **`widgetLaunchMainActivityIntent`** (**`NEW_TASK` + `REORDER_TO_FRONT`** — cold start or bring task forward); larger refresh hit target (**52×48dp**). **Website (`website/`):** restored **sticky** **`.site-header`** (moved outside **`.wrap`**; removed **`overflow-x`** on **`html`/`body`** — it broke sticky); scroll underline via **`html.is-scrolled`**; horizontal clip on **`.wrap`** only. **Push `main`** → **GitHub Actions** deploys **`https://swaniedesigns.com`**. **Next (shipping):** Play internal **`versionCode` 3** AAB — **§ Next steps** item **1**.
+**Last updated:** 2026-05-16 (EOD) — **Internal testing live on Play: 8 (1.0.7)** with production RevenueCat key; app opens from Play; paywalls verified. **Website:** Web3Forms join-testing + reply-ready emails; tester QR vs site QR + **Download test app** (not “Install public version”). **Play account:** **Settings → License testing** — **Swanie's Portfolio Testers** list **checked**, **`RESPOND_NORMALLY`**, saved (test purchases, no real charge for listed Gmail accounts). **Repo:** **`REVENUECAT_PUBLIC_API_KEY`** (`goog_…`) in **`local.properties`**; release guards + **`scripts/verify-aab-revenuecat-key.ps1`**; **`app/build.gradle.kts`** **`versionCode` 8** / **`1.0.7`**. **Owner EOD:** re-test internal flow (subscribe / restore) next session; done for today.
 
-### Resume when you reopen (RevenueCat + Play only)
+### Resume when you reopen (RevenueCat + Play)
 
 | Where | State |
 |-------|--------|
-| **RevenueCat** | App **Swanies Portfolio (Play Store)** · package **`com.swanie.portfolio`** · **Service account JSON uploaded** · dashboard shows **Valid credentials** (per-API checks resolved). **Google developer notifications** (Pub/Sub) still **optional** — **Select…** / **Connect to Google** can wait until after first Play-delivered billing QA. |
-| **Google Cloud** | Project **`gen-lang-client-0826062826`** (“Default Gemini Project” in UI). **Google Play Android Developer API** and **Google Play Developer Reporting API** — **Enabled** (owner verified). Service account **`RevenueCat Play billing sync`** · email **`revenuecat-play-billing-sync@gen-lang-client-0826062826.iam.gserviceaccount.com`**. JSON key on disk (do **not** commit). |
-| **Play Console** | Developer **8313761372289928213** · **Users and permissions** shows **2 users**, both **Active** (you + service account). **Invite URL** used: `https://play.google.com/console/developers/8313761372289928213/users-and-permissions/invite`. Service account **Account permissions** (grant for all apps): **View app information and download bulk reports (read-only)** + **View app quality information (read-only)** (check **read-only pair first** if financial boxes fight the UI) + **View financial data…** + **Manage orders and subscriptions**. **App permissions**: **Swanie's Portfolio** with financial + orders + view app info as applied. |
-| **Ship next** | RevenueCat → **API keys** → **`goog_…`** → **`local.properties`** **`REVENUECAT_PUBLIC_API_KEY=`** (never commit) if not already set → signed **release AAB** → **Internal testing** new release (**repo** **`versionCode` 3** / **`1.0.2`** — replace Play’s **2** when uploaded). |
-
-**Android repo (already on `main`):** Release builds use **`REVENUECAT_PUBLIC_API_KEY`** from **`local.properties`**; debug uses **`REVENUECAT_API_KEY`** (`test_…`). **`app/build.gradle.kts`**: **`versionCode` 3**, **`versionName` `1.0.2`**. Internal Play track previously had **2 (1.0.1)**; next store upload should be **3** once **`goog_`** is set and bundle built.
+| **RevenueCat** | **Valid credentials** · production **`goog_…`** in **`REVENUECAT_PUBLIC_API_KEY`** (`local.properties`, never commit). Debug **`REVENUECAT_API_KEY`** = `test_…` only. Pub/Sub notifications **optional** until after billing QA. |
+| **Play internal testing** | **Active release 8 (1.0.7)** — full rollout, available to testers. Prior codes **3–7** burned on track; always **upload new AAB** + **create new release** (don’t pick old bundles from library). **Studio** signed bundle + **`verify-aab-revenuecat-key.ps1`** before upload. |
+| **License testing** | **Settings → License testing** (account level, search if menu moved): **Swanie's Portfolio Testers** (3 users) **checked** · add new tester Gmail when approving join-testing requests. |
+| **Public site** | **`https://swaniedesigns.com`** — join-testing form (Web3Forms), **`TESTER_URL`**, Play **tester QR**. |
+| **Ship next (human)** | **Re-test:** upgrade / restore / Pro gates on **1.0.7** from Play (license tester account). Then **closed testing** (dashboard card) when ready; **production** after Console prerequisites. |
 
 **Play Console — where things stand (human progress):**
 
@@ -50,7 +49,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** release **2 (1.0.1)** on Play + **Swanie's Portfolio Testers**; **`website/index.html`** **`TESTER_URL`**. **Next:** upload **AAB `versionCode` 3** (RC credentials **valid**; ensure **`goog_`** in **`local.properties`** for release builds). Opt-in link on site.
+- **Testing path:** **Internal testing** **8 (1.0.7)** on Play; **`website/index.html`** **`TESTER_URL`** + **tester QR** (not site QR alone). Install: **Download test app** — not **Install public version**. **License testing** list checked for **3** testers. **Next session:** owner **re-tests** subscribe / restore on Play build.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -99,33 +98,31 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Internal testing** release **2 (1.0.1)** published; **Testers** list **Swanie's Portfolio Testers** (owner adds new addresses in Console after **`mailto`** requests from site). **App created** in Play Console (**Swanie’s Portfolio**, **`com.swanie.portfolio`**). **Android developer verification:** Play apps **auto-registered** to the verified account — confirm on **Play Console → Home**. **By September 2026:** register any **extra signing keys** used outside Play (see [Android developer verification](https://developer.android.com/developer-verification)). **Closed testing** unlocks per Console when prerequisites met; **production** may require **≥12 testers × 14 days** closed test. **Release signing:** **`swanie_portfolio_release.jks`** — CLI **`keytool`** use **`-storetype PKCS12`** / Studio **JBR** if needed.
+**Play / Google:** **Internal testing** **8 (1.0.7)** published (2026-05-16); **Testers** + **License testing** (**Swanie's Portfolio Testers**, 3 Gmail). **Production** track **inactive** — **closed testing** via dashboard when ready. **Release signing:** **`swanie_portfolio_release.jks`** (Studio **Generate Signed App Bundle**). **Sept 2026:** extra signing keys / sideload registration per [Android developer verification](https://developer.android.com/developer-verification).
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Bump `versionCode`** in `app/build.gradle.kts` before each **new** Play upload (Play rejects duplicate codes). **Repo:** **`versionCode` 3** / **`1.0.2`** — use next number (**4+**) when uploading **after** **3** is on Play.
-2. **Android Studio:** **Build → Generate Signed App Bundle** → **release** AAB with **`swanie_portfolio_release.jks`** (requires **`REVENUECAT_PUBLIC_API_KEY`** in **`local.properties`** for RC on device).
-3. **Play Console → Internal testing:** Live track had **2 (1.0.1)**; ship **3** when bundle ready. **Create new release** → upload AAB → **Save** → **Roll out**.
-4. **Website:** After **`main`** push, confirm **GitHub Pages** updated **`https://swaniedesigns.com`** (Actions). **`PLAY_URL`** in **`website/index.html`** when public listing exists.
-5. **Test and release → Closed testing:** When unlocked — new release, invite **≥12** testers who **opt in**; run **≥14 days** for production-access requirement.
-6. **Production:** When eligible, **Apply for production** / staged rollout per Console.
-7. **Grow users → Store presence / Monetize with Play:** Screenshots, feature graphic, subscriptions + **RevenueCat** SKU alignment, **license testers** for `pro`.
-8. **Publishing overview:** When **Send app for review** is enabled and you intend listing/metadata review — send; optional **Managed publishing** if you want manual go-live after approval.
-9. **Website:** After **`privacy.html`** on **`main`** deploys to **Pages**, paste Play **Data safety** URLs: **`…/privacy.html#account-deletion`** (delete account), and if the form has **Delete data URL** (**Yes**), **`…/privacy.html#data-deletion`**. Remove **`[bracket]`** placeholders / **`noindex`** when listing is public; confirm **§9** liability wording with counsel if needed.
+1. **Re-test internal (Play build 1.0.7):** Uninstall → **tester QR** → **Download test app** → confirm **1.0.7**. **Settings → Upgrade to Pro** (license tester) → **Restore purchases** → Pro gates (analytics page 4+, theme, multi-vault).
+2. **Before next AAB:** Bump **`versionCode`** in **`app/build.gradle.kts`** (Play never reuses a code). **`validateRevenueCatReleaseKey`** + **`verify-aab-revenuecat-key.ps1`** on Studio **`app-release.aab`**.
+3. **Android Studio:** **Sync** → **Clean** → **Generate Signed App Bundle** (**release**, **`swanie_portfolio_release.jks`**).
+4. **Internal testing:** **Create new release** → **Upload** (prefer fresh upload over old library row) → roll out. **Do not** add bundle **4 (1.0.3)** from library.
+5. **New testers:** Add Gmail to **Internal testing → Testers** + **Settings → License testing** (check list) → save.
+6. **Closed testing:** Dashboard card → **View tasks** when ready (**≥12** testers, **14 days** for production path).
+7. **Listing / Publishing overview:** Screenshots, feature graphic, **`PLAY_URL`** in **`website/index.html`** when public.
+8. **Data safety URLs** on live **`privacy.html`** after deploy (account + data deletion anchors).
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play internal — ship `versionCode` 3:** Confirm **`REVENUECAT_PUBLIC_API_KEY`** (`goog_…`) in **`local.properties`**. **Android Studio** → **Generate Signed App Bundle** (**release**) → **Play Console → Internal testing** → new release → upload AAB → roll out. **Device QA:** install from Play (tester account) → **subscribe / restore** / Pro gates.
-2. **Play (human) — listing:** Continue **default store listing** + **Publishing overview** when ready. **`Master_Build_Checklist.md`** when milestones tick.
-3. **Verify cloud surfaces:** Confirm **GitHub Actions** deployed latest **`website/`** to **`https://swaniedesigns.com`** (`#join-testing`, tester form, **`TESTER_URL`** QR). Install **Swanie's Portfolio** from **Play** on a device using a listed tester account.
-4. **i18n (maintenance):** **Privacy & Terms §1–§6** synced across **`values-*`** (2026-05-12). When **`values/strings.xml`** changes again, propagate keys; spot-check **About** before listing freeze. **`website/`** deploy is separate from app strings.
-5. **Website:** Set **`PLAY_URL`** in **`website/index.html`** when the **public** Play listing URL exists (`TESTER_URL` + **`TESTER_REQUEST_EMAIL`** already set for internal path).
-6. **Optional cleanup:** **`app/src/main/assets/adi-registration.properties`** (ADI); **`.idea`** **`assetWizardSettings.xml`** untracked — do not re-add without cause.
-7. **Pre-launch QA:** Backup round-trip; purchase / restore / expiry; **widgets** (Pro **8**-row, metal **3-line** + **62dp** row height — verified on device 2026-05-16) + Pro gates; GRAM/KILO metals on device (Play-delivered build).
-8. **Backlog (post-v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish — only if scheduled.
-9. **Icons (optional / post-v1):** **`swan_launcher_extra_small_hq.xml`** scale/translate; splash/toast/widget wrappers.
+1. **Play internal QA (owner, next session):** On **1.0.7** from Play — **Upgrade to Pro** + **Restore purchases** + Pro unlock smoke test (license tester Gmail).
+2. **Play (human) — closed testing:** Dashboard **Closed testing** tasks when ready; same AAB pattern (**Studio** + verify script).
+3. **Play (human) — listing:** Default store listing assets + **Publishing overview**; **`Master_Build_Checklist.md`** when milestones tick.
+4. **Testers:** On each join-testing approval — add Gmail to **Internal testing** + **License testing** (keep list **checked**).
+5. **Website:** **`PLAY_URL`** when public listing exists; site already has Web3Forms + **`TESTER_URL`** + tester QR warnings.
+6. **Pre-launch QA:** Backup round-trip; subscription expiry/sandbox renewals; widgets on Play build; metals GRAM/KILO on device.
+7. **i18n (maintenance):** When **`values/strings.xml`** changes, propagate **`values-*`**; spot-check **About** before listing freeze.
+8. **Backlog (post-v1):** V40.36 auth instrumentation, V40.61 monetization telemetry, V40.69 small-screen polish.
 
 ---
 
@@ -136,7 +133,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 - **Pro:** RevenueCat + Play billing when on store; gates Theme Manager, multi-portfolio swipe, full Analytics, widget customization, etc.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
-- **Feedback:** `BugReportSubmitter` + `@Named("Feedback")` OkHttp in `NetworkModule`; Settings dialog; tag **`SwanieBugReport`** — POST **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`).
+- **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties` + public key in **`website/index.html`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. **`validateRevenueCatReleaseKey`** + **`verifyReleaseBundleRevenueCatKey`** / **`scripts/verify-aab-revenuecat-key.ps1`** before Play upload.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
 - **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **2026-05-12:** Play-aligned **`terms_last_updated`** + **`terms_section_1`–`6`** in all locales; **514** keys match **`values/strings.xml`**. **`website/`** deploy via **GitHub Actions** on **`main`** (see **`index.html`** **`TESTER_URL`** / **`TESTER_REQUEST_EMAIL`** for internal testing UX).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, `:app:lintDebug` (`app/lint.xml` policy).
@@ -155,7 +152,8 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 | Marketing site layout | **`website/styles.css`** — **`.site-header`** sticky + **`html.is-scrolled`** underline; **`.site-header-inner`** max-width **1080px**; **`overflow-x: clip`** on **`.wrap`** only (not **`html`/`body`**) |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | Home (login) | **`HomeScreen.kt`** — swan hero, **`AnimatedVisibility`** login column, language globe slide-in timing |
-| Pro / billing | **`app/build.gradle.kts`** — release **`REVENUECAT_API_KEY`** from **`REVENUECAT_PUBLIC_API_KEY`** in **`local.properties`**; debug from **`REVENUECAT_API_KEY`** (`test_`). **`billing/`**, **`RevenueCatInitializer.kt`**, **`RevenueCatMonetizationManager.kt`**, **`MonetizationModule.kt`** |
+| Pro / billing | **`app/build.gradle.kts`** — release from **`REVENUECAT_PUBLIC_API_KEY`** (`goog_…`); debug **`REVENUECAT_API_KEY`** (`test_…`). **`RevenueCatInitializer.kt`**, **`scripts/verify-aab-revenuecat-key.ps1`**. Play **License testing:** account **Settings → License testing** |
+| Play internal ship | **Studio** signed AAB only for Play; **`versionCode` 8** / **`1.0.7`** on track; **Create new release** + **Upload** (not downgrade via library) |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
@@ -169,6 +167,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-16 (EOD) — Play internal 1.0.7 + license testers + long ship day:** **Web3Forms** join-testing + reply-ready emails (site). **RevenueCat:** fixed **Wrong API Key** — real **`goog_…`** in **`REVENUECAT_PUBLIC_API_KEY`** (was placeholder / **`test_`** in old AABs); **`validateRevenueCatReleaseKey`**, **`verify-aab-revenuecat-key.ps1`**, release **`test_` block** in **`RevenueCatInitializer`**. **Play:** burned codes **3–7**; live **8 (1.0.7)**; **Create new release** + **Upload** lesson; **tester QR** not site QR; **Download test app** not public version. Owner: **1.0.7** opens from Play, account + asset + paywalls OK; **License testing** — **Swanie's Portfolio Testers** checked, saved. **Next:** re-test subscribe/restore. **`docs/AI_HANDOFF.md`** + **push `main`**.
 - **2026-05-16 — FormSubmit outage → Web3Forms (app + site):** **formsubmit.co** returning **521** (both website join-testing + in-app bug report failed). **`BugReportSubmitter.kt`** + **`website/index.html`** → **Web3Forms**; **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`** + site script (owner must create key at web3forms.com). **`docs/AI_HANDOFF.md`**. **Push `main`** (key not in repo).
 - **2026-05-16 — Website tester request form + push:** **`website/index.html`** / **`styles.css`** — join-testing form: **name**, **Play email**, optional **message**; **FormSubmit** AJAX submit (no **mailto**); success/error status. **`docs/AI_HANDOFF.md`**. **Push `main`** → Pages.
 - **2026-05-16 — Widget UX + website sticky header + push:** **`PortfolioWidget.kt`** — **`widgetLaunchMainActivityIntent`** (swan opens or foregrounds app); larger refresh tap target; metal **62dp** rows (prior session). **`website/`** — sticky **`.site-header`** outside **`.wrap`**, **`html.is-scrolled`** underline, fix **`overflow-x`** regression on **`html`/`body`**. Owner verified widget + site behavior. **`docs/AI_HANDOFF.md`** + **push `main`** (Pages deploy).
