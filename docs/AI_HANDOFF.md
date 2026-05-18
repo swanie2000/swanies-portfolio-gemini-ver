@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Play internal `11 (1.0.10)` live** (replaces **10**): language-split fix so in-app picker gets all **19** locales on Play installs; prior **1.0.9** paywall/icons/theme/locales. **Owner prefs:** verify AAB via one-line **`.\scripts\verify-aab-revenuecat-key.ps1`** in Studio Terminal (default **`app\release\app-release.aab`**); no bulk scripts on **`values-*`**. **Next QA:** Korean (etc.) on Play build after install; billing smoke test.
+**Last updated:** 2026-05-18 — **Internal testing `11 (1.0.10)` — owner QA complete on Play build.** **Locales:** Korean + others OK after **`bundle.language.enableSplit = false`**. **Billing (license tester):** expired → restore “no purchase”; active sub → restore “already active”; full reinstall path (no sub → restore fails → subscribe → reinstall → restore unlocks Pro). **Note:** deleting **local** app account does **not** cancel **Play** subscription; Pro follows **Google account** + RevenueCat **`logIn`** (email). **Install tip:** clear **Play Store** cache if version lags. **Next:** closed testing / listing / production path when owner ready — not more internal AAB unless a bug ships.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -37,10 +37,10 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 |-------|--------|
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
-| **Play internal testing** | Console **9 (1.0.8)** available; owner device may lag on **8 (1.0.7)**. **Ship next:** **10 (1.0.9)** with paywall + version stamp. |
+| **Play internal testing** | **Active: 11 (1.0.10)** — owner verified on device (**`v1.0.10 (11)`**). Prior **10 (1.0.9)** replaced. Install lag: clear Play Store cache if needed. |
 | **License testing** | **Swanie's Portfolio Testers** (3) **checked** · **`RESPOND_NORMALLY`**. |
 | **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** in the **Android Studio Terminal** (project root). Default AAB path **`app\release\app-release.aab`** — Studio overwrites each build; **do not** pass **`-AabPath`** unless debugging a one-off export. |
-| **Version on device** | **`BuildVersionLabel`** **top-right** on Home / unlock / create / restore — check **`v1.0.9 (10)`** before creating account (not in Settings; route exists but unwired). |
+| **Version on device** | **`BuildVersionLabel`** **top-right** — current internal **`v1.0.10 (11)`**. |
 
 **Play Console — where things stand (human progress):**
 
@@ -50,7 +50,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **9 (1.0.8)** on Console; install via **tester QR** → **Download test app**. If phone shows **1.0.7**, wait or use **Internal app sharing** / fresh tester link. **Pricing (Play):** **$9.99 / $79.99 / $129.99**. **Next upload:** **10 (1.0.9)**.
+- **Testing path:** **Internal testing** **11 (1.0.10)** live; **tester QR** → **Download test app** (clear Play Store cache if stale). **Pricing:** **$9.99 / $79.99 / $129.99**. **Billing QA on Play build:** done (subscribe / expire / restore / reinstall).
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -103,7 +103,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Internal testing** **9 (1.0.8)** on Console (2026-05-16–17); **Play subscriptions + lifetime** live in Console (2026-05-17). **Payments profile** (**Swanie's Portfolio** / individual). **Testers** + **License testing**. **Production** inactive. **Release signing:** **`swanie_portfolio_release.jks`** (Studio AAB only).
+**Play / Google:** **Internal testing** **11 (1.0.10)** on Console; owner **Play-build QA passed** (features, **19** locales, billing). **Play subscriptions + lifetime** + RevenueCat **`default`** offering. **Payments profile** (**Swanie's Portfolio** / individual). **Testers** + **License testing**. **Production** inactive. **Release signing:** **`swanie_portfolio_release.jks`** (Studio AAB only).
 
 ### Play AAB verify — copy-paste (Android Studio Terminal)
 
@@ -120,27 +120,39 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 .\scripts\verify-aab-revenuecat-key.ps1
 ```
 
+### Play billing QA — owner verified on **1.0.10 (11)** (reference)
+
+| Scenario | Expected | Owner |
+|----------|----------|-------|
+| Sub **expired** + Restore | No previous Pro purchase | OK |
+| Active sub + Restore | Pro already active | OK |
+| Expired → subscribe yearly (test) → Pro on | Paywall down | OK |
+| **Factory reset / delete local account** | Google email: sub **not** cancelled | OK |
+| Reinstall + **same email** + **active Play sub** | Pro without new purchase | OK (by design) |
+| Reinstall, **no** active sub, Restore | No purchase found | OK |
+| Subscribe → uninstall → reinstall → Restore | Pro without paying again | OK |
+
+**Lifetime:** not exercised; same restore pattern expected while entitlement active.
+
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Ship next internal build:** Studio signed AAB → paste verify block above → **Internal testing** → **Create new release** → upload (monotonic **`versionCode`**) → roll out.
-2. **Install on phone:** Uninstall → **tester link** → **Download test app** (clear Play Store cache if version lags). Check **`BuildVersionLabel`** top-right → in-app **language** (all **19** locales require **`bundle.language.enableSplit = false`** in **`app/build.gradle.kts`**).
-3. **Billing QA (Play):** Paywall → **3 plans** at Play prices → purchase **monthly** (license tester) → **Restore purchases** → Pro gates.
-4. **New testers:** Internal testing + **License testing** when approving join-testing emails.
-5. **Closed testing / listing:** When ready — dashboard tasks, screenshots, **`PLAY_URL`** on site.
-6. **Data safety URLs** on live **`privacy.html`** if not already pasted in Console.
+1. **Closed testing / listing (when ready):** Dashboard open tasks, **screenshots**, **512** icon, **1024×500** feature graphic, **`docs/play_store_long_description_en-US.txt`**, **`PLAY_URL`** on site when public listing exists.
+2. **Closed testing track:** New release from current **`main`** when Console unlocks; **≥12** testers + **≥14 days** if production-access path required.
+3. **Production:** After closed metrics / review gates per Console.
+4. **New internal AAB only if:** regressions found — verify one-liner above, bump **`versionCode`**, upload.
+5. **Data safety URLs** on live **`privacy.html`** if not already pasted in Console.
+6. **Optional:** Lifetime purchase + restore smoke test on license tester account.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Play internal — ship 10 (1.0.9) (owner, now):** Paywall + **`BuildVersionLabel`** + icon fixes + **`ThemeStudioScreen`** entry UX. Signed AAB + verify script → **Internal testing** → roll out.
-2. **Play internal QA (owner):** **`v1.0.9 (10)`** top-right on Home → paywall **$9.99 / $79.99 / $129.99** → Theme Manager (dropdown on entry; Cancel after edit) → subscribe + restore (license tester).
-3. **Play install lag:** If device stays on **1.0.7**, retry tomorrow or **Internal app sharing** (minutes) instead of more reinstall loops.
-4. **Play (human) — closed testing / listing:** When ready; **`Master_Build_Checklist.md`** when milestones tick.
-5. **Testers:** Join-testing approvals → Internal + License testing lists.
-6. **Website:** **`PLAY_URL`** when public listing exists.
-7. **Pre-launch QA:** Backup, widgets, metals GRAM/KILO on Play build.
-8. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file edits only** (no locale batch scripts; see **Locale files — do not use bulk scripts** above).
+1. **Play (human) — closed testing + listing:** Screenshots, feature graphic, store copy polish; promote from internal when Dashboard allows; tick **`Master_Build_Checklist.md`**.
+2. **Website:** **`PLAY_URL`** on **`website/index.html`** when a public Play listing URL exists.
+3. **Pre-launch QA (optional soak):** Backup **`.swpb`**, widgets, metals **GRAM/KILO** on the Play build if not re-checked recently.
+4. **Production path:** Console requirements (closed testers / review) → staged rollout when owner is ready.
+5. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file only** (no locale batch scripts).
+6. **New internal build only if:** bugfix — **`.\scripts\verify-aab-revenuecat-key.ps1`** → bump **`versionCode`** → upload.
 
 ---
 
@@ -174,7 +186,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Home (login) | **`HomeScreen.kt`** — swan hero, login column; **`BuildVersionLabel.kt`** top-right on Home / unlock / create-account / restore |
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards, auto-select yearly. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **Studio** AAB; **`versionCode` 10** / **`1.0.9`** in repo; Console active **9 (1.0.8)** until **10** uploaded |
+| Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; repo **`versionCode` 11** / **`1.0.10`**; Console **11 (1.0.10)** active; internal QA **passed** |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
@@ -188,6 +200,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ## Session history (newest first)
 
+- **2026-05-18 — Internal 1.0.10 Play QA complete (owner):** Device **`v1.0.10 (11)`** via tester link (Play Store cache clear if lag). **Locales** OK (KO + others). **Billing:** full matrix — expire/restore, active/restore, reinstall without sub, subscribe + reinstall + restore; local account delete ≠ Play cancel. **Handoff + push `main`**. **Next:** closed testing / listing.
 - **2026-05-18 — Play `11 (1.0.10)` + locale split fix + verify copy-paste:** **`bundle.language.enableSplit = false`** — Play was installing English-only splits; in-app language looked “all English.” Internal **11 (1.0.10)** published. Handoff: Studio Terminal one-liner for **`verify-aab-revenuecat-key.ps1`** (no **`-AabPath`**).
 - **2026-05-18 — i18n paywall + locale policy + Play upload prep:** **8** new **`pro_gate_*` / `pro_plan_*`** strings translated in **all 19** locales (manual edits after script attempt corrupted UTF-8 — **removed** **`sync-pro-gate-locale-strings.ps1`**). Handoff: **no bulk scripts** on **`values-*/strings.xml`**; Studio on same folder = no pull before AAB. Release lint: drop **`pro_gate_upgrade_coming`** from locales. **Push `main`** → owner builds signed AAB → Play internal **10**.
 - **2026-05-18 — Ship prep (paywall, version stamp, Theme Manager) + icon UX:** **Icons (earlier):** compact/full metal+crypto photo cycles; optimistic list, reload epoch, `MetalIcon`/`AssetRepository` upsert fixes — owner verified. **This push:** **`ProFeatureGateScreen.kt`** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on auth screens; **`ThemeStudioScreen.kt`** — dropdown on entry, red **Cancel** only after real edit. **Handoff + push `main`** → owner uploads **1.0.9 (10)** to Play internal.
