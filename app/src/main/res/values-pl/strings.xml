@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio śledzi krypto i metale szlachetne. Skarbiec pozostaje na urządzeniu; zaszyfrowana kopia to plik, który eksportujesz sam. Automatyczna synchronizacja skarbca z Dyskiem Google jest planowana w przyszłej wersji i nie jest w tej wersji. Opcjonalne funkcje sieciowe (rozliczenia Play przy subskrypcji, opcjonalna opinia, dane rynkowe) są używane tylko wtedy, gdy z nich korzystasz. Szczegóły w Prywatności i warunkach.</string>
     <string name="about_legal_header">Informacje prawne</string>
     <string name="about_open_privacy_terms">Otwórz prywatność i warunki</string>
-    <string name="about_play_console_hint">Dla Google Play dodaj w Play Console (Bezpieczeństwo danych) URL polityki prywatności zgodny z przetwarzaniem danych. Ekran w aplikacji podsumowuje to dla użytkowników.</string>
     <string name="settings_legal_section">PRAWO I INFORMACJE</string>
     <string name="settings_nav_about">Informacje i prawo</string>
     <string name="unlock_footer_about">Informacje i prawo</string>

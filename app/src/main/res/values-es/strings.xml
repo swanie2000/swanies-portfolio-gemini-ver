@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio es un rastreador de cripto y metales preciosos. Tu bóveda permanece en tu dispositivo; la copia cifrada es un archivo que exportas tú. La sincronización automática con Google Drive está prevista para una versión futura y no está en esta versión. Funciones de red opcionales (facturación de Play si te suscribes, comentarios opcionales, datos de mercado) solo se usan cuando las usas. Más en Privacidad y términos.</string>
     <string name="about_legal_header">Información legal</string>
     <string name="about_open_privacy_terms">Abrir privacidad y términos</string>
-    <string name="about_play_console_hint">Para Google Play, añade en Play Console (Seguridad de datos) una URL de política de privacidad acorde con el tratamiento de datos de la app. La pantalla de privacidad y términos resume el comportamiento para los usuarios.</string>
     <string name="settings_legal_section">LEGAL Y ACERCA DE</string>
     <string name="settings_nav_about">Acerca de y legal</string>
     <string name="unlock_footer_about">Acerca de y legal</string>

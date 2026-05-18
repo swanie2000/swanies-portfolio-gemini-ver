@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio volgt crypto en edelmetalen. Je kluis blijft op je apparaat; versleutelde back-up is een bestand dat je zelf exporteert. Automatische kluis-synchronisatie met Google Drive is gepland voor een toekomstige release en zit niet in deze versie. Optionele netwerkfuncties (Play-facturering bij abonnement, optionele feedback, marktdata) worden alleen gebruikt als jij ze gebruikt. Zie Privacy en voorwaarden.</string>
     <string name="about_legal_header">Juridische informatie</string>
     <string name="about_open_privacy_terms">Privacy en voorwaarden openen</string>
-    <string name="about_play_console_hint">Voor Google Play: voeg in Play Console (Gegevensbeveiliging) een privacybeleid-URL toe die past bij de gegevensverwerking van de app. Het scherm Privacy en voorwaarden vat het gedrag samen.</string>
     <string name="settings_legal_section">JURIDISCH EN OVER</string>
     <string name="settings_nav_about">Over en juridisch</string>
     <string name="unlock_footer_about">Over en juridisch</string>

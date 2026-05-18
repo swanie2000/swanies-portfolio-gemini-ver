@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio ist ein Tracker für Krypto und Edelmetalle. Ihr Tresor bleibt auf dem Gerät; die verschlüsselte Sicherung ist eine Datei, die Sie selbst exportieren. Automatische Tresor-Synchronisation mit Google Drive ist für eine spätere Version geplant und in dieser Version nicht enthalten. Optionale Netzwerkfunktionen (Play-Abrechnung bei Abo, optionales Feedback, Marktdaten) werden nur genutzt, wenn Sie sie verwenden. Details unter Datenschutz &amp; AGB.</string>
     <string name="about_legal_header">Rechtliche Hinweise</string>
     <string name="about_open_privacy_terms">Datenschutz &amp; AGB öffnen</string>
-    <string name="about_play_console_hint">Für Google Play tragen Sie in der Play Console unter „Datensicherheit“ eine Datenschutz-URL ein, die zur Datenverarbeitung der App passt. Der Bildschirm „Datenschutz &amp; AGB“ in der App fasst dies für Nutzer zusammen.</string>
     <string name="settings_legal_section">RECHT &amp; ÜBER</string>
     <string name="settings_nav_about">Über &amp; Rechtliches</string>
     <string name="unlock_footer_about">Über &amp; Rechtliches</string>

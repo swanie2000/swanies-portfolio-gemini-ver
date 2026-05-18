@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio متتبع للعملات المشفرة والمعادن الثمينة. تبقى خزينتك على جهازك؛ النسخ الاحتياطي المشفر ملف تصدّره بنفسك. مزامنة الخزينة التلقائية مع Google Drive مخطّطة لإصدار لاحق وليست في هذا الإصدار. ميزات الشبكة الاختيارية (فوترة Play عند الاشتراك، ملاحظات اختيارية، بيانات السوق) تُستخدم فقط عند استخدامك لها. التفاصيل في الخصوصية والشروط.</string>
     <string name="about_legal_header">معلومات قانونية</string>
     <string name="about_open_privacy_terms">فتح الخصوصية والشروط</string>
-    <string name="about_play_console_hint">لـ Google Play، أضف رابط سياسة خصوصية في Play Console (أمان البيانات) يطابق كيفية تعامل التطبيق مع البيانات. شاشة الخصوصية والشروط في التطبيق تلخّص ذلك للمستخدمين.</string>
     <string name="settings_legal_section">قانوني وحول</string>
     <string name="settings_nav_about">حول وقانوني</string>
     <string name="unlock_footer_about">حول وقانوني</string>

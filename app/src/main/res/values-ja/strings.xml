@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolioは暗号資産と貴金属のトラッカーです。金庫は端末に残り、暗号化バックアップはご自身でエクスポートするファイルです。Googleドライブへの金庫の自動同期は将来のリリース向けに計画されており、このバージョンには含まれません。オプションのネットワーク機能（購読時のPlay課金、任意のフィードバック、相場データ）は、利用する場合にのみ使われます。詳細はプライバシーと利用規約をご覧ください。</string>
     <string name="about_legal_header">法的情報</string>
     <string name="about_open_privacy_terms">プライバシーと利用規約を開く</string>
-    <string name="about_play_console_hint">Google Playでは、Play Console（データの安全性）にアプリのデータ取り扱いに合ったプライバシーポリシーURLを登録してください。アプリ内の画面でユーザー向けに概要を示します。</string>
     <string name="settings_legal_section">法務と情報</string>
     <string name="settings_nav_about">情報と法務</string>
     <string name="unlock_footer_about">情報と法務</string>

@@ -51,7 +51,6 @@
     <string name="about_intro">Swanie\'s Portfolio는 암호화폐와 귀금속 추적기입니다. 금고는 기기에 남고, 암호화 백업은 사용자가 직접보내는 파일입니다. Google Drive로의 자동 금고 동기화는 향후 버전에 계획되어 있으며 이 버전에는 없습니다. 선택적 네트워크 기능(구독 시 Play 결제, 선택적 피드백, 시장 데이터)은 사용할 때만 적용됩니다. 자세한 내용은 개인정보 및 약관을 참조하세요.</string>
     <string name="about_legal_header">법적 정보</string>
     <string name="about_open_privacy_terms">개인정보 및 약관 열기</string>
-    <string name="about_play_console_hint">Google Play용으로 Play Console(데이터 보안)에 앱의 데이터 처리와 일치하는 개인정보 처리방침 URL을 추가하세요. 앱 내 화면에서 사용자에게 요약을 제공합니다.</string>
     <string name="settings_legal_section">법률 및 정보</string>
     <string name="settings_nav_about">정보 및 법률</string>
     <string name="unlock_footer_about">정보 및 법률</string>

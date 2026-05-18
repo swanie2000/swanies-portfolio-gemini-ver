@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio adalah pelacak kripto dan logam mulia. Brankas Anda tetap di perangkat Anda; cadangan terenkripsi adalah berkas yang Anda ekspor sendiri. Sinkronisasi brankas otomatis ke Google Drive direncanakan untuk rilis mendatang dan tidak ada di versi ini. Fitur jaringan opsional (penagihan Play saat berlangganan, umpan balik opsional, data pasar) hanya dipakai saat Anda menggunakannya. Detail ada di Privasi &amp; ketentuan.</string>
     <string name="about_legal_header">Informasi hukum</string>
     <string name="about_open_privacy_terms">Buka privasi &amp; ketentuan</string>
-    <string name="about_play_console_hint">Untuk Google Play, tambahkan URL kebijakan privasi di Play Console (Keamanan data) yang sesuai dengan pemrosesan data aplikasi. Layar Privasi &amp; ketentuan di aplikasi merangkum perilaku bagi pengguna.</string>
     <string name="settings_legal_section">HUKUM &amp; TENTANG</string>
     <string name="settings_nav_about">Tentang &amp; hukum</string>
     <string name="unlock_footer_about">Tentang &amp; hukum</string>

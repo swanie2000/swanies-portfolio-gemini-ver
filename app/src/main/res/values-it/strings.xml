@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio è un tracker per cripto e metalli preziosi. Il caveau resta sul dispositivo; il backup crittografato è un file che esporti tu. La sincronizzazione automatica del caveau con Google Drive è prevista per una versione futura e non è in questa versione. Funzioni di rete opzionali (fatturazione Play in abbonamento, feedback opzionale, dati di mercato) si usano solo quando le usi. Dettagli in Privacy e termini.</string>
     <string name="about_legal_header">Informazioni legali</string>
     <string name="about_open_privacy_terms">Apri privacy e termini</string>
-    <string name="about_play_console_hint">Per Google Play, aggiungi nella Play Console (Sicurezza dei dati) un URL dell\'informativa sulla privacy coerente con il trattamento dati dell\'app. La schermata Privacy e termini riassume il comportamento per gli utenti.</string>
     <string name="settings_legal_section">LEGALE E INFO</string>
     <string name="settings_nav_about">Info e legale</string>
     <string name="unlock_footer_about">Info e legale</string>

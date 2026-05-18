@@ -91,13 +91,6 @@ fun AboutScreen(navController: NavController) {
             ) {
                 Text(stringResource(R.string.about_open_privacy_terms), fontWeight = FontWeight.Black, fontSize = 14.sp)
             }
-            Spacer(Modifier.height(32.dp))
-            Text(
-                text = stringResource(R.string.about_play_console_hint),
-                color = siteText.copy(alpha = 0.45f),
-                fontSize = 11.sp,
-                lineHeight = 17.sp,
-            )
             Spacer(Modifier.height(40.dp))
         }
     }

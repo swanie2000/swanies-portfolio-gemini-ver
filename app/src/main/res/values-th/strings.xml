@@ -68,7 +68,6 @@
     <string name="about_intro">Swanie\'s Portfolio เป็นแอปติดตามคริปโตและโลหะมีค่า ตู้นิรภัยอยู่บนอุปกรณ์ของคุณ การสำรองแบบเข้ารหัสเป็นไฟล์ที่คุณส่งออกเอง การซิงก์ตู้นิรภัยอัตโนมัติกับ Google Drive วางแผนไว้ในเวอร์ชันถัดไปและไม่มีในเวอร์ชันนี้ ฟีเจอร์เครือข่ายทางเลือก (การเรียกเก็บเงิน Play เมื่อสมัครสมาชิก ข้อเสนอแนะทางเลือก ข้อมูลตลาด) ใช้เมื่อคุณใช้งานเท่านั้น รายละเอียดในนโยบายความเป็นส่วนตัวและข้อกำหนด</string>
     <string name="about_legal_header">ข้อมูลทางกฎหมาย</string>
     <string name="about_open_privacy_terms">เปิดความเป็นส่วนตัวและข้อกำหนด</string>
-    <string name="about_play_console_hint">สำหรับ Google Play เพิ่ม URL นโยบายความเป็นส่วนตัวใน Play Console (ความปลอดภัยของข้อมูล) ให้สอดคล้องกับการประมวลผลข้อมูลของแอป หน้าจอในแอปสรุปให้ผู้ใช้</string>
     <string name="settings_legal_section">กฎหมายและเกี่ยวกับ</string>
     <string name="settings_nav_about">เกี่ยวกับและกฎหมาย</string>
     <string name="unlock_footer_about">เกี่ยวกับและกฎหมาย</string>

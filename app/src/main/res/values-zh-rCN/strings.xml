@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio 用于跟踪加密货币与贵金属。保险库保留在您的设备上；加密备份是您自行导出的文件。与 Google 云端硬盘的自动保险库同步计划在后续版本提供，当前版本不包含。可选网络功能（订阅时的 Play 结算、可选反馈、行情数据）仅在使用相关功能时才会涉及。详情请参阅隐私与条款。</string>
     <string name="about_legal_header">法律信息</string>
     <string name="about_open_privacy_terms">打开隐私与条款</string>
-    <string name="about_play_console_hint">针对 Google Play，请在 Play 控制台（数据安全）中添加与数据处理一致的隐私政策链接。应用内屏幕向用户概述相关内容。</string>
     <string name="settings_legal_section">法律与关于</string>
     <string name="settings_nav_about">关于与法律</string>
     <string name="unlock_footer_about">关于与法律</string>

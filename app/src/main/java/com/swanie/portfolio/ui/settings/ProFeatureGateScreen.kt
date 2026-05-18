@@ -212,7 +212,9 @@ fun ProFeatureGateScreen(
                 },
                 color = ProPalette.AccentOn,
                 fontWeight = FontWeight.Black,
-                fontSize = 15.sp,
+                fontSize = if (isPurchasing) 11.sp else 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 

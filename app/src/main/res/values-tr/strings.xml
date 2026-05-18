@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio kripto ve değerli metaller için bir izleyicidir. Kasanız cihazınızda kalır; şifreli yedek, kendiniz dışa aktardığınız bir dosyadır. Google Drive ile otomatik kasa eşitlemesi gelecek bir sürüm için planlanmıştır ve bu sürümde yoktur. İsteğe bağlı ağ özellikleri (abonelikte Play faturalandırması, isteğe bağlı geri bildirim, piyasa verileri) yalnızca bunları kullandığınızda devreye girer. Ayrıntılar Gizlilik ve şartlar bölümündedir.</string>
     <string name="about_legal_header">Yasal bilgiler</string>
     <string name="about_open_privacy_terms">Gizlilik ve şartları aç</string>
-    <string name="about_play_console_hint">Google Play için Play Console\'da (Veri güvenliği) uygulamanın veri işlemesiyle uyumlu bir gizlilik politikası URL\'si ekleyin. Uygulama içi ekran kullanıcılar için özet sunar.</string>
     <string name="settings_legal_section">YASAL VE HAKKINDA</string>
     <string name="settings_nav_about">Hakkında ve yasal</string>
     <string name="unlock_footer_about">Hakkında ve yasal</string>

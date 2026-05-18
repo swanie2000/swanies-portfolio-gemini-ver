@@ -68,7 +68,6 @@
     <string name="about_intro">Swanie\'s Portfolio क्रिप्टो और कीमती धातुओं के लिए ट्रैकर है। आपका वॉल्ट आपके डिवाइस पर रहता है; एन्क्रिप्टेड बैकअप वह फ़ाइल है जिसे आप स्वयं निर्यात करते हैं। Google Drive से स्वचालित वॉल्ट सिंक भविष्य के संस्करण के लिए नियोजित है और इस संस्करण में नहीं है। वैकल्पिक नेटवर्क सुविधाएँ (सदस्यता पर Play बिलिंग, वैकल्पिक प्रतिक्रिया, बाज़ार डेटा) केवल तभी उपयोग होती हैं जब आप उन्हें उपयोग करते हैं। विवरण गोपनीयता व शर्तों में।</string>
     <string name="about_legal_header">कानूनी जानकारी</string>
     <string name="about_open_privacy_terms">गोपनीयता व शर्तें खोलें</string>
-    <string name="about_play_console_hint">Google Play के लिए Play Console (डेटा सुरक्षा) में गोपनीयता नीति URL जोड़ें जो ऐप के डेटा उपयोग से मेल खाता हो। इन-ऐप गोपनीयता व शर्तें स्क्रीन उपयोगकर्ताओं के लिए सारांश देती है।</string>
     <string name="settings_legal_section">कानूनी व परिचय</string>
     <string name="settings_nav_about">परिचय व कानूनी</string>
     <string name="unlock_footer_about">परिचय व कानूनी</string>

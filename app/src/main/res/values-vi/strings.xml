@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio theo dõi tiền mã hóa và kim loại quý. Kho của bạn ở trên thiết bị; bản sao lưu mã hóa là tệp bạn tự xuất. Đồng bộ kho tự động với Google Drive được dự kiến cho phiên bản sau và không có trong phiên bản này. Tính năng mạng tùy chọn (thanh toán Play khi đăng ký, phản hồi tùy chọn, dữ liệu thị trường) chỉ dùng khi bạn dùng chúng. Chi tiết trong Quyền riêng tư và điều khoản.</string>
     <string name="about_legal_header">Thông tin pháp lý</string>
     <string name="about_open_privacy_terms">Mở quyền riêng tư và điều khoản</string>
-    <string name="about_play_console_hint">Cho Google Play, thêm URL chính sách quyền riêng tư trong Play Console (An toàn dữ liệu) phù hợp cách ứng dụng xử lý dữ liệu. Màn hình trong ứng dụng tóm tắt cho người dùng.</string>
     <string name="settings_legal_section">PHÁP LÝ VÀ GIỚI THIỆU</string>
     <string name="settings_nav_about">Giới thiệu và pháp lý</string>
     <string name="unlock_footer_about">Giới thiệu và pháp lý</string>

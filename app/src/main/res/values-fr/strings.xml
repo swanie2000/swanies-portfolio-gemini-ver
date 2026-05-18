@@ -69,7 +69,6 @@
     <string name="about_intro">Swanie\'s Portfolio suit le crypto et les métaux précieux. Votre coffre reste sur votre appareil ; la sauvegarde chiffrée est un fichier que vous exportez vous-même. La synchronisation automatique du coffre avec Google Drive est prévue pour une version ultérieure et n\'est pas dans cette version. Les fonctions réseau optionnelles (facturation Play en cas d\'abonnement, retours optionnels, données de marché) ne sont utilisées que lorsque vous les utilisez. Détails dans Confidentialité et conditions.</string>
     <string name="about_legal_header">Informations légales</string>
     <string name="about_open_privacy_terms">Ouvrir confidentialité et conditions</string>
-    <string name="about_play_console_hint">Pour Google Play, ajoutez dans la Play Console (Sécurité des données) une URL de politique de confidentialité conforme au traitement des données. L\'écran Confidentialité et conditions résume le comportement pour les utilisateurs.</string>
     <string name="settings_legal_section">LÉGAL ET À PROPOS</string>
     <string name="settings_nav_about">À propos et légal</string>
     <string name="unlock_footer_about">À propos et légal</string>
