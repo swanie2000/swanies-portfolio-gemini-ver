@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Play internal `11 (1.0.10)` — full QA passed** (locales, billing matrix). **Repo ahead of Console:** **`46959b4`** — paywall **PROCESSING PURCHASE** at **11.sp** (one line); **About** developer Play-hint paragraph removed (**`about_play_console_hint`** dropped all locales). **Ship next internal `12` (1.0.11)** when owner wants polish on Play. **Otherwise next:** closed testing / listing.
+**Last updated:** 2026-05-18 — **Shipping internal `12` (1.0.11):** UI polish (paywall processing **11.sp**, About hint removed). **Play active:** **11 (1.0.10)** until **12** uploaded. Prior wins: locales (**`enableSplit = false`**), full billing QA on **11**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -187,7 +187,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; repo **`versionCode` 11** / **`1.0.10`**; Console **11 (1.0.10)** active; internal QA **passed** |
+| Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; repo **`versionCode` 12** / **`1.0.11`**; Console **11 (1.0.10)** until **12** uploaded |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
