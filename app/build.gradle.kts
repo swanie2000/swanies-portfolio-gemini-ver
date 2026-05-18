@@ -61,8 +61,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 11
+        versionName = "1.0.10"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
@@ -106,6 +106,14 @@ android {
             excludes.add("META-INF/NOTICE")
             excludes.add("META-INF/LICENSE.txt")
             excludes.add("META-INF/NOTICE.txt")
+        }
+    }
+
+    // In-app language picker (19 locales): Play must ship all translations, not only the
+    // device language split. Otherwise setApplicationLocales("ko") falls back to English.
+    bundle {
+        language {
+            enableSplit = false
         }
     }
 }

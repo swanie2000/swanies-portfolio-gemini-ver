@@ -162,11 +162,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applySelectedLocale(languageCode: String) {
-        val locales = if (languageCode == "system") {
-            LocaleListCompat.getEmptyLocaleList()
-        } else {
-            LocaleListCompat.forLanguageTags(languageCode)
+        val normalized = languageCode.trim()
+        val locales = when {
+            normalized.isBlank() || normalized == "system" -> LocaleListCompat.getEmptyLocaleList()
+            else -> LocaleListCompat.forLanguageTags(normalized)
         }
-        AppCompatDelegate.setApplicationLocales(locales)
+        if (AppCompatDelegate.getApplicationLocales() != locales) {
+            AppCompatDelegate.setApplicationLocales(locales)
+        }
     }
 }

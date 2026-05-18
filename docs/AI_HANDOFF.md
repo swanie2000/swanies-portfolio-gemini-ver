@@ -64,6 +64,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 **Locale files — do not use bulk scripts (owner rule):** Never run PowerShell/Python/bash scripts to batch-edit **`app/src/main/res/values-*/strings.xml`**. Scripts repeatedly corrupt UTF-8, break **`%1$s`** placeholders (PowerShell eats **`$s`**), and merge XML lines. **Edit each locale file directly** in the IDE (or careful per-file agent edits). After default **`values/strings.xml`** changes: add the same keys to every **`values-*`** in the **next** handoff/update pass—manual translations, same key order as default. **Verify:** every locale has the same key set as **`values/strings.xml`** (no missing, no extras); **`:app:lintVitalRelease`** before Play AAB. OK to use **`scripts/verify-aab-revenuecat-key.ps1`** (reads AAB only)—that is not locale editing.
 
+**Play + in-app language:** App Bundles default to **language splits** — Play installs only the **device** language, so the in-app picker looks “all English” on Play builds even though **`values-ko`** etc. exist in the repo. Fix: **`app/build.gradle.kts`** → **`bundle { language { enableSplit = false } }`** so all **19** locales ship in the base install. Bump **`versionCode`** for each Play upload that changes this.
+
 ### Play Data safety — facts from codebase (canonical for Console answers)
 
 Use this table so **Data safety** matches the wired app (AI-built; owner should not guess). Full detail lives in code paths cited below.
