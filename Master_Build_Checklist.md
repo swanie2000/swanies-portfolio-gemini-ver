@@ -211,8 +211,8 @@
 - [x] **Release signing sanity-check (2026-05-05):** **`swanie_portfolio_release.jks`** ↔ **`app/release/app-release.aab`** — matching **SHA256** (`keytool` / `printcert`); no blocker on signing **AAB** for Play tracks when ready.
 - [x] **Widget metal display parity (2026-05-07):** Glance **`AssetCardOriginal`** uses same **metal title + optional XAG subtitle** as holdings cards; **`SettingsViewModel`** widget price string uses **`AssetValuation.cardPriceRowUsd`** (matches **`AssetRepository`** widget push).
 - [x] **Play app record + initial Dashboard setup (owner, 2026-05-08):** App **created** in Console; **Finish setting up your app** checklist (policy, listing, data safety, etc.) **complete** on Dashboard snapshot — confirm in Console if anything reopens.
-- [x] **Internal testing:** **11 (1.0.10)** on track — signed AAB uploaded; owner **Play-build QA** passed (features, locales, subscribe/expire/restore/reinstall) **2026-05-18**.
-- [ ] **Closed testing:** When Console unlocks — release + **≥12 opted-in testers** + **≥14 days** for production-access path (per Dashboard).
+- [x] **Internal testing:** **12 (1.0.11)** on track — owner verified install from Play Store **2026-05-18**; **recruiting** more testers via site form (internal cap 100).
+- [ ] **Closed testing:** After **≥12 opted-in** internal testers — promote release to closed track + **≥14 days** if Dashboard requires for production-access path.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
 - [x] **Monetization (internal QA):** Play **`pro_monthly` / `pro_yearly` / `pro_lifetime`** + RevenueCat **`default`** offering; license tester purchase + restore matrix verified on **1.0.10** **2026-05-18**. *(Lifetime buy optional.)*

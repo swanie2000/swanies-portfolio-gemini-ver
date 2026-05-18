@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Website copy:** join-testing Step 1 — **Name** label/placeholder (was “How Swanie knows you”); removed hero line under CTA (“Use the tester section below…”). Prior: owner dev footer note removed; **push `main`** → Pages. **Play internal:** **12 (1.0.11)** uploaded; owner verifying on device (cache clear if stale).
+**Last updated:** 2026-05-18 — **Play internal `12` (1.0.11) verified on device** from Play Store; UI polish + locales OK. **Now:** owner **recruiting testers** via **`https://swaniedesigns.com/#join-testing`** (Web3Forms → manual add in Console). **After ≥12 opted-in testers:** promote to **closed testing** (agent helps with Console + release). Website copy tweaks shipped (Name field, hero/footer cleanup).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -37,10 +37,10 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 |-------|--------|
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
-| **Play internal testing** | **Active: 12 (1.0.11)** uploaded; owner verifying on device (was **`v1.0.10 (11)`**). Install lag: clear Play Store cache if needed. |
+| **Play internal testing** | **Active: 12 (1.0.11)** — owner verified **`v1.0.11 (12)`** from Play Store. **Recruiting** more testers (internal cap **100**). |
 | **License testing** | **Swanie's Portfolio Testers** (3) **checked** · **`RESPOND_NORMALLY`**. |
 | **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** in the **Android Studio Terminal** (project root). Default AAB path **`app\release\app-release.aab`** — Studio overwrites each build; **do not** pass **`-AabPath`** unless debugging a one-off export. |
-| **Version on device** | **`BuildVersionLabel`** **top-right** — target internal **`v1.0.11 (12)`** after Play delivers. |
+| **Version on device** | **`BuildVersionLabel`** **top-right** — **`v1.0.11 (12)`** (owner verified). |
 
 **Play Console — where things stand (human progress):**
 
@@ -50,7 +50,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **12 (1.0.11)** live on Console; **tester QR** → **Download test app** (clear Play Store cache if stale). **Pricing:** **$9.99 / $79.99 / $129.99**. **Billing QA on Play build:** done on **11** (re-check on **12** if desired).
+- **Testing path:** **Internal testing** **12 (1.0.11)** live; share **`https://swaniedesigns.com/#join-testing`** → form → owner adds Play email in Console → reply with **Open tester invite** / QR. **Goal:** **≥12** opted-in testers, then **closed testing**. **Pricing:** **$9.99 / $79.99 / $129.99**. **Billing QA:** done on **11**; **12** smoke OK per owner.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -103,7 +103,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Internal testing** **12 (1.0.11)** on Console; owner **Play-build QA passed** on **11** (features, **19** locales, billing). **Play subscriptions + lifetime** + RevenueCat **`default`** offering. **Payments profile** (**Swanie's Portfolio** / individual). **Testers** + **License testing**. **Production** inactive. **Release signing:** **`swanie_portfolio_release.jks`** (Studio AAB only).
+**Play / Google:** **Internal testing** **12 (1.0.11)** on Console; owner verified install from Play + recruiting testers. **Play-build QA** passed (**11** billing matrix; **12** polish). **Play subscriptions + lifetime** + RevenueCat **`default`** offering. **Payments profile** (**Swanie's Portfolio** / individual). **License testing** (3) separate from internal tester list. **Production** inactive. **Release signing:** **`swanie_portfolio_release.jks`** (Studio AAB only).
 
 ### Play AAB verify — copy-paste (Android Studio Terminal)
 
@@ -136,10 +136,10 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Closed testing / listing (when ready):** Dashboard open tasks, **screenshots**, **512** icon, **1024×500** feature graphic, **`docs/play_store_long_description_en-US.txt`**, **`PLAY_URL`** on site when public listing exists.
-2. **Closed testing track:** New release from current **`main`** when Console unlocks; **≥12** testers + **≥14 days** if production-access path required.
-3. **Production:** After closed metrics / review gates per Console.
-4. **Optional internal `12` (1.0.11):** UI polish on **`main`** (`ProFeatureGateScreen`, `AboutScreen`) — bump **`versionCode`** in **`app/build.gradle.kts`**, signed AAB, verify one-liner, upload.
+1. **Recruit internal testers (owner, now):** Share **`https://swaniedesigns.com/#join-testing`**; Web3Forms → **Testing → Internal testing → Testers** → add each **Play Gmail**; reply with invite link. Target **≥12** opted-in before closed track.
+2. **Closed testing (after ≥12):** Agent + owner — new release on **closed** track (same **`12`** AAB or newer), migrate/add testers, **≥14 days** on closed if Dashboard requires for production access.
+3. **Listing (parallel):** Screenshots, **512** icon, **1024×500** feature graphic, **`docs/play_store_long_description_en-US.txt`**, **`PLAY_URL`** on site when public listing exists.
+4. **Production:** After closed metrics / review gates per Console.
 5. **Data safety URLs** on live **`privacy.html`** if not already pasted in Console.
 6. **Optional:** Lifetime purchase + restore smoke test on license tester account.
 
@@ -147,12 +147,12 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ## Next steps (priority order)
 
-1. **Play (human) — closed testing + listing:** Screenshots, feature graphic, store copy polish; promote from internal when Dashboard allows; tick **`Master_Build_Checklist.md`**.
-2. **Website:** Set **`PLAY_URL`** in **`website/index.html`** script when a public Play listing URL exists (owner dev note removed from page footer).
-3. **Pre-launch QA (optional soak):** Backup **`.swpb`**, widgets, metals **GRAM/KILO** on the Play build if not re-checked recently.
-4. **Production path:** Console requirements (closed testers / review) → staged rollout when owner is ready.
-5. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file only** (no locale batch scripts).
-6. **Optional internal build:** UI polish (**`46959b4`**) or bugfix — bump **`versionCode`** → **`.\scripts\verify-aab-revenuecat-key.ps1`** → upload.
+1. **Play (human) — recruit internal testers:** **`https://swaniedesigns.com/#join-testing`** → add emails in Console → confirm **Download test app** works for each. Target **≥12** opted-in.
+2. **Play (human + agent when ready) — closed testing:** After **≥12** testers, promote **12 (1.0.11)** (or newer) to **closed** track; tick **`Master_Build_Checklist.md`**.
+3. **Play (human) — listing:** Screenshots, feature graphic, store copy polish while testers soak.
+4. **Website:** Set **`PLAY_URL`** in **`website/index.html`** when a public Play listing URL exists.
+5. **Production path:** Console requirements (closed **≥14 days** if required) → staged rollout when owner is ready.
+6. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file only** (no locale batch scripts).
 
 ---
 
@@ -187,7 +187,8 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; repo **`versionCode` 12** / **`1.0.11`**; Console **12 (1.0.11)** active |
+| Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; **`12` / `1.0.11`** live; owner verified on device; recruiting testers |
+| Tester recruitment | **`https://swaniedesigns.com/#join-testing`** → Web3Forms → Play Console **Testers** list; **≥12** then closed testing |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
@@ -201,6 +202,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ## Session history (newest first)
 
+- **2026-05-18 — Internal 1.0.11 verified + recruit testers:** Owner **`v1.0.11 (12)`** from Play Store; tweaks OK. **Next:** share join-testing link, manual Console adds; **≥12** testers → **closed testing** (agent helps then). **Handoff + push `main`**.
 - **2026-05-18 — Website join-testing + hero copy:** **`website/index.html`** — Step 1 field **Name** (label + placeholder); removed hero **`hero-note`** under CTA buttons. **Handoff + push `main`** for Pages.
 - **2026-05-18 — Website footer cleanup + handoff push:** **`website/index.html`** — removed visible owner setup line (**WEB3FORMS** / **`local.properties`** / **`PLAY_URL`**) above footer; Web3Forms integration unchanged in script. **Handoff + push `main`** for Pages deploy.
 - **2026-05-18 — Internal 1.0.11 + UI polish:** **`versionCode` 12** / **`1.0.11`** uploaded to Play internal. **`ProFeatureGateScreen`** — **11.sp** processing label; **`AboutScreen`** — removed **`about_play_console_hint`** (all locales, **522** keys). Prior commit **`46959b4`** on **`main`**.
