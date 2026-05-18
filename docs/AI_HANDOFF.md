@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Website:** removed owner-only dev note at bottom of join-testing (**`WEB3FORMS_ACCESS_KEY`** / **`PLAY_URL`** setup line on **`index.html`**); **push `main`** → Pages. **Play internal:** **12 (1.0.11)** uploaded (UI polish: paywall **11.sp**, About hint removed); owner waiting for Play delivery to phone (cache clear if stale). Prior wins: locales (**`enableSplit = false`**), full billing QA on **11**.
+**Last updated:** 2026-05-18 — **Website copy:** join-testing Step 1 — **Name** label/placeholder (was “How Swanie knows you”); removed hero line under CTA (“Use the tester section below…”). Prior: owner dev footer note removed; **push `main`** → Pages. **Play internal:** **12 (1.0.11)** uploaded; owner verifying on device (cache clear if stale).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -201,6 +201,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ## Session history (newest first)
 
+- **2026-05-18 — Website join-testing + hero copy:** **`website/index.html`** — Step 1 field **Name** (label + placeholder); removed hero **`hero-note`** under CTA buttons. **Handoff + push `main`** for Pages.
 - **2026-05-18 — Website footer cleanup + handoff push:** **`website/index.html`** — removed visible owner setup line (**WEB3FORMS** / **`local.properties`** / **`PLAY_URL`**) above footer; Web3Forms integration unchanged in script. **Handoff + push `main`** for Pages deploy.
 - **2026-05-18 — Internal 1.0.11 + UI polish:** **`versionCode` 12** / **`1.0.11`** uploaded to Play internal. **`ProFeatureGateScreen`** — **11.sp** processing label; **`AboutScreen`** — removed **`about_play_console_hint`** (all locales, **522** keys). Prior commit **`46959b4`** on **`main`**.
 - **2026-05-18 — UI polish + handoff:** **`ProFeatureGateScreen`** — **11.sp** for **PROCESSING PURCHASE...** (single line). **`AboutScreen`** — removed **`about_play_console_hint`** (all locales, **522** keys). Owner approved both. **Push `main`** **`46959b4`**; Play still on **11** until **12** upload.
