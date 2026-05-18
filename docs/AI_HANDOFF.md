@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Ship `1.0.9 (10)` now:** Repo has paywall polish, icon fixes, Theme Manager entry UX, **`BuildVersionLabel`** top-right, **Pro paywall strings in all 19 locales** (**523** keys parity), release **lint** clean (removed orphan **`pro_gate_upgrade_coming`**). **Owner rule added:** no bulk scripts on **`values-*/strings.xml`** — manual per-locale edits only. **Play:** Console still **9 (1.0.8)** — **next:** signed AAB + **`verify-aab-revenuecat-key.ps1`** → **Internal testing** upload **10**.
+**Last updated:** 2026-05-18 — **Play internal `11 (1.0.10)` live** (replaces **10**): language-split fix so in-app picker gets all **19** locales on Play installs; prior **1.0.9** paywall/icons/theme/locales. **Owner prefs:** verify AAB via one-line **`.\scripts\verify-aab-revenuecat-key.ps1`** in Studio Terminal (default **`app\release\app-release.aab`**); no bulk scripts on **`values-*`**. **Next QA:** Korean (etc.) on Play build after install; billing smoke test.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -39,7 +39,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
 | **Play internal testing** | Console **9 (1.0.8)** available; owner device may lag on **8 (1.0.7)**. **Ship next:** **10 (1.0.9)** with paywall + version stamp. |
 | **License testing** | **Swanie's Portfolio Testers** (3) **checked** · **`RESPOND_NORMALLY`**. |
-| **Verify build** | **`validateRevenueCatReleaseKey`** + **`verify-aab-revenuecat-key.ps1`** (ASCII-only script; fixed PS parse error 2026-05-17). |
+| **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** in the **Android Studio Terminal** (project root). Default AAB path **`app\release\app-release.aab`** — Studio overwrites each build; **do not** pass **`-AabPath`** unless debugging a one-off export. |
 | **Version on device** | **`BuildVersionLabel`** **top-right** on Home / unlock / create / restore — check **`v1.0.9 (10)`** before creating account (not in Settings; route exists but unwired). |
 
 **Play Console — where things stand (human progress):**
@@ -105,10 +105,25 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Play / Google:** **Internal testing** **9 (1.0.8)** on Console (2026-05-16–17); **Play subscriptions + lifetime** live in Console (2026-05-17). **Payments profile** (**Swanie's Portfolio** / individual). **Testers** + **License testing**. **Production** inactive. **Release signing:** **`swanie_portfolio_release.jks`** (Studio AAB only).
 
+### Play AAB verify — copy-paste (Android Studio Terminal)
+
+Owner workflow: Studio **Generate Signed Bundle** always writes **`app\release\app-release.aab`** (overwrites prior file). Give this block **as-is** for copy-paste — **no** **`-AabPath`** unless a non-default export path.
+
+```
+.\scripts\verify-aab-revenuecat-key.ps1
+```
+
+Expect: **`OK: production RevenueCat key (goog_), no test_dz`**. If Terminal is not at project root, prepend:
+
+```
+cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
+.\scripts\verify-aab-revenuecat-key.ps1
+```
+
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Ship `versionCode` 10 (1.0.9):** Repo has paywall + version stamp + icon fixes + Theme Manager entry fix. **`validateRevenueCatReleaseKey`** → Studio **Generate signed bundle** → **`verify-aab-revenuecat-key.ps1`** → **Internal testing** → **Create new release** → upload **10** only → roll out.
-2. **Install on phone:** Uninstall → **tester link** → **Download test app**. Home **top-right** must show **`v1.0.9 (10)`** before sign-up. If still **1.0.7 (8)**, wait or **Internal app sharing** for same AAB.
+1. **Ship next internal build:** Studio signed AAB → paste verify block above → **Internal testing** → **Create new release** → upload (monotonic **`versionCode`**) → roll out.
+2. **Install on phone:** Uninstall → **tester link** → **Download test app** (clear Play Store cache if version lags). Check **`BuildVersionLabel`** top-right → in-app **language** (all **19** locales require **`bundle.language.enableSplit = false`** in **`app/build.gradle.kts`**).
 3. **Billing QA (Play):** Paywall → **3 plans** at Play prices → purchase **monthly** (license tester) → **Restore purchases** → Pro gates.
 4. **New testers:** Internal testing + **License testing** when approving join-testing emails.
 5. **Closed testing / listing:** When ready — dashboard tasks, screenshots, **`PLAY_URL`** on site.
@@ -173,6 +188,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 ## Session history (newest first)
 
+- **2026-05-18 — Play `11 (1.0.10)` + locale split fix + verify copy-paste:** **`bundle.language.enableSplit = false`** — Play was installing English-only splits; in-app language looked “all English.” Internal **11 (1.0.10)** published. Handoff: Studio Terminal one-liner for **`verify-aab-revenuecat-key.ps1`** (no **`-AabPath`**).
 - **2026-05-18 — i18n paywall + locale policy + Play upload prep:** **8** new **`pro_gate_*` / `pro_plan_*`** strings translated in **all 19** locales (manual edits after script attempt corrupted UTF-8 — **removed** **`sync-pro-gate-locale-strings.ps1`**). Handoff: **no bulk scripts** on **`values-*/strings.xml`**; Studio on same folder = no pull before AAB. Release lint: drop **`pro_gate_upgrade_coming`** from locales. **Push `main`** → owner builds signed AAB → Play internal **10**.
 - **2026-05-18 — Ship prep (paywall, version stamp, Theme Manager) + icon UX:** **Icons (earlier):** compact/full metal+crypto photo cycles; optimistic list, reload epoch, `MetalIcon`/`AssetRepository` upsert fixes — owner verified. **This push:** **`ProFeatureGateScreen.kt`** branded plan cards + auto-select yearly; **`BuildVersionLabel`** top-right on auth screens; **`ThemeStudioScreen.kt`** — dropdown on entry, red **Cancel** only after real edit. **Handoff + push `main`** → owner uploads **1.0.9 (10)** to Play internal.
 - **2026-05-17 (EOD) — Play subscriptions + RC offering + 1.0.9 prep:** **Payments profile** + **merchant** info. Play **subscriptions** **`pro_monthly`** / **`pro_yearly`**, one-time **`pro_lifetime`** (**$9.99 / $79.99 / $129.99**). **RevenueCat** import + **`default`** offering wired to **Play** (was Test Store only → empty paywall on Play builds). **Internal 9 (1.0.8)** published; phone stuck **1.0.7** (Play lag). **Studio:** 3 plans work; **`BuildVersionLabel`** on auth screens; paywall row layout fix. **`verify-aab-revenuecat-key.ps1`** PS parse fix. Repo **`versionCode` 10** / **`1.0.9`**. Owner: ship **1.0.9** + retry install tomorrow. **Handoff + push `main`**.
