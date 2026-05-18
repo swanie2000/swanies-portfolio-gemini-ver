@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Internal testing `11 (1.0.10)` — owner QA complete on Play build.** **Locales:** Korean + others OK after **`bundle.language.enableSplit = false`**. **Billing (license tester):** expired → restore “no purchase”; active sub → restore “already active”; full reinstall path (no sub → restore fails → subscribe → reinstall → restore unlocks Pro). **Note:** deleting **local** app account does **not** cancel **Play** subscription; Pro follows **Google account** + RevenueCat **`logIn`** (email). **Install tip:** clear **Play Store** cache if version lags. **Next:** closed testing / listing / production path when owner ready — not more internal AAB unless a bug ships.
+**Last updated:** 2026-05-18 — **Play internal `11 (1.0.10)` — full QA passed** (locales, billing matrix). **Repo ahead of Console:** **`46959b4`** — paywall **PROCESSING PURCHASE** at **11.sp** (one line); **About** developer Play-hint paragraph removed (**`about_play_console_hint`** dropped all locales). **Ship next internal `12` (1.0.11)** when owner wants polish on Play. **Otherwise next:** closed testing / listing.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -139,7 +139,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 1. **Closed testing / listing (when ready):** Dashboard open tasks, **screenshots**, **512** icon, **1024×500** feature graphic, **`docs/play_store_long_description_en-US.txt`**, **`PLAY_URL`** on site when public listing exists.
 2. **Closed testing track:** New release from current **`main`** when Console unlocks; **≥12** testers + **≥14 days** if production-access path required.
 3. **Production:** After closed metrics / review gates per Console.
-4. **New internal AAB only if:** regressions found — verify one-liner above, bump **`versionCode`**, upload.
+4. **Optional internal `12` (1.0.11):** UI polish on **`main`** (`ProFeatureGateScreen`, `AboutScreen`) — bump **`versionCode`** in **`app/build.gradle.kts`**, signed AAB, verify one-liner, upload.
 5. **Data safety URLs** on live **`privacy.html`** if not already pasted in Console.
 6. **Optional:** Lifetime purchase + restore smoke test on license tester account.
 
@@ -152,7 +152,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 3. **Pre-launch QA (optional soak):** Backup **`.swpb`**, widgets, metals **GRAM/KILO** on the Play build if not re-checked recently.
 4. **Production path:** Console requirements (closed testers / review) → staged rollout when owner is ready.
 5. **i18n (maintenance):** Propagate **`values-*`** when default strings change — **manual per-file only** (no locale batch scripts).
-6. **New internal build only if:** bugfix — **`.\scripts\verify-aab-revenuecat-key.ps1`** → bump **`versionCode`** → upload.
+6. **Optional internal build:** UI polish (**`46959b4`**) or bugfix — bump **`versionCode`** → **`.\scripts\verify-aab-revenuecat-key.ps1`** → upload.
 
 ---
 
@@ -166,7 +166,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties` + public key in **`website/index.html`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. **`validateRevenueCatReleaseKey`** + **`verifyReleaseBundleRevenueCatKey`** / **`scripts/verify-aab-revenuecat-key.ps1`** before Play upload.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **523** keys match **`values/strings.xml`** (incl. **2026-05-18** Pro paywall strings); **no batch scripts** on locale XML (owner rule in handoff). **`website/`** deploy via **GitHub Actions** on **`main`** (see **`index.html`** **`TESTER_URL`** / **`TESTER_REQUEST_EMAIL`** for internal testing UX).
+- **i18n:** `LanguageDisplay.kt`; maintained **`values-*`** — **522** keys match **`values/strings.xml`** (removed **`about_play_console_hint`**); **no batch scripts** on locale XML (owner rule). **`website/`** deploy via **GitHub Actions** on **`main`**.
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, `:app:lintDebug` (`app/lint.xml` policy).
 
 ---
@@ -184,7 +184,8 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Marketing site layout | **`website/styles.css`** — **`.site-header`** sticky + **`html.is-scrolled`** underline; **`.site-header-inner`** max-width **1080px**; **`overflow-x: clip`** on **`.wrap`** only (not **`html`/`body`**) |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | Home (login) | **`HomeScreen.kt`** — swan hero, login column; **`BuildVersionLabel.kt`** top-right on Home / unlock / create-account / restore |
-| Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards, auto-select yearly. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
+| Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
+| About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
 | Play internal ship | **Studio** AAB → **`.\scripts\verify-aab-revenuecat-key.ps1`**; repo **`versionCode` 11** / **`1.0.10`**; Console **11 (1.0.10)** active; internal QA **passed** |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
@@ -200,6 +201,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 
 ## Session history (newest first)
 
+- **2026-05-18 — UI polish + handoff:** **`ProFeatureGateScreen`** — **11.sp** for **PROCESSING PURCHASE...** (single line). **`AboutScreen`** — removed **`about_play_console_hint`** (all locales, **522** keys). Owner approved both. **Push `main`** **`46959b4`**; Play still on **11** until optional **12** upload.
 - **2026-05-18 — Internal 1.0.10 Play QA complete (owner):** Device **`v1.0.10 (11)`** via tester link (Play Store cache clear if lag). **Locales** OK (KO + others). **Billing:** full matrix — expire/restore, active/restore, reinstall without sub, subscribe + reinstall + restore; local account delete ≠ Play cancel. **Handoff + push `main`**. **Next:** closed testing / listing.
 - **2026-05-18 — Play `11 (1.0.10)` + locale split fix + verify copy-paste:** **`bundle.language.enableSplit = false`** — Play was installing English-only splits; in-app language looked “all English.” Internal **11 (1.0.10)** published. Handoff: Studio Terminal one-liner for **`verify-aab-revenuecat-key.ps1`** (no **`-AabPath`**).
 - **2026-05-18 — i18n paywall + locale policy + Play upload prep:** **8** new **`pro_gate_*` / `pro_plan_*`** strings translated in **all 19** locales (manual edits after script attempt corrupted UTF-8 — **removed** **`sync-pro-gate-locale-strings.ps1`**). Handoff: **no bulk scripts** on **`values-*/strings.xml`**; Studio on same folder = no pull before AAB. Release lint: drop **`pro_gate_upgrade_coming`** from locales. **Push `main`** → owner builds signed AAB → Play internal **10**.
