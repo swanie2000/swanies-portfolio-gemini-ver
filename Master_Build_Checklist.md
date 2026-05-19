@@ -211,11 +211,12 @@
 - [x] **Release signing sanity-check (2026-05-05):** **`swanie_portfolio_release.jks`** ↔ **`app/release/app-release.aab`** — matching **SHA256** (`keytool` / `printcert`); no blocker on signing **AAB** for Play tracks when ready.
 - [x] **Widget metal display parity (2026-05-07):** Glance **`AssetCardOriginal`** uses same **metal title + optional XAG subtitle** as holdings cards; **`SettingsViewModel`** widget price string uses **`AssetValuation.cardPriceRowUsd`** (matches **`AssetRepository`** widget push).
 - [x] **Play app record + initial Dashboard setup (owner, 2026-05-08):** App **created** in Console; **Finish setting up your app** checklist (policy, listing, data safety, etc.) **complete** on Dashboard snapshot — confirm in Console if anything reopens.
-- [x] **Internal testing:** **12 (1.0.11)** on track — owner verified install from Play Store **2026-05-18**; **recruiting** more testers via site form (internal cap 100).
-- [ ] **Closed testing:** After **≥12 opted-in** internal testers — promote release to closed track + **≥14 days** if Dashboard requires for production-access path.
+- [x] **Internal testing:** **12 (1.0.11)** on track — owner verified install **2026-05-18**; **3** family on **internal testers**; recruiting **≥12** via **`#join-testing`** (not license testers).
+- [x] **License testing policy:** **Swanie's Portfolio Testers** **unchecked** on **Settings → License testing** — friends/family on **internal testers only**; see **`docs/AI_HANDOFF.md`** § *Play testing — two lists*.
+- [ ] **Closed testing:** After **≥12 internal** testers opted in — promote to closed track + **≥14 days** if Dashboard requires.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
-- [x] **Monetization (internal QA):** Play **`pro_monthly` / `pro_yearly` / `pro_lifetime`** + RevenueCat **`default`** offering; license tester purchase + restore matrix verified on **1.0.10** **2026-05-18**. *(Lifetime buy optional.)*
+- [x] **Monetization (internal QA):** Subscribe/expire/restore matrix on **1.0.10** **2026-05-18**; sufficient for ship. **Beta Pro:** **lifetime** or promotional — avoid monthly/yearly for daily use on internal.
 - [ ] Tracks & quality: Crash/ANR; **local vault backup restore** on Play build (purchase + **Play restore** verified **2026-05-18**).
 - [ ] Listing assets: screenshots, feature graphic, short/long description polish as needed per track.
 - [ ] Go / no-go: stable internal/closed metrics before broad **production**; watch refunds / entitlements.
