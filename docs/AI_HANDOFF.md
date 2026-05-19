@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Play `12` (1.0.11)** verified; **billing QA sufficient** (3 family accounts). **License testing unchecked** (Settings → License testing) — wife/mom off **list 2**; family uses app on **internal testers** only (**list 1**). Recruiting **≥12 internal testers** (not license testers); Facebook post **no signups yet**. **Pro during beta:** **lifetime** or free / RC promotional — not monthly/yearly on internal for daily use.
+**Last updated:** 2026-05-18 — **Website recruit conversion** shipped: hero **Android only** CTA, **`#join-testing`** copy (eligibility, free/lifetime beta note), nav link; hero **request access** link **gold** (was low-contrast cyan). **Recruit:** FB post uses **`https://swaniedesigns.com/#join-testing`**; **0** form requests so far. **Play `12` (1.0.11)** verified; **license testing unchecked**; **≥12 internal testers** (not license testers). See **§ Play testing — two lists**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -51,7 +51,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **12 (1.0.11)** live; recruit via **`https://swaniedesigns.com/#join-testing`** → add Play Gmail on **Internal testing → Testers** only. **Goal:** **≥12 internal testers** (install), then **closed testing** — **not** 12 license testers. **Billing QA:** done; new testers: **free** or **lifetime** for Pro. **Recruit:** FB banner posted; **0** form requests so far — revisit post copy / link if still quiet.
+- **Testing path:** **Internal testing** **12 (1.0.11)** live; recruit via **`https://swaniedesigns.com/#join-testing`** → add Play Gmail on **Internal testing → Testers** only. **Goal:** **≥12 internal testers** (install), then **closed testing** — **not** 12 license testers. **Billing QA:** done; new testers: **free** or **lifetime** for Pro. **Recruit:** FB post + conversion **`index.html`** live; **0** signups yet.
+
+**Marketing site (2026-05-18 recruit pass):** **`index.html`** — hero **`.hero-recruit`** (Android-only, gold link to **`#join-testing`**); **Join testing** section (kicker, eligibility list, free/lifetime beta, Step 1/2 plain language, **`1.0.11 (12)`**); header nav **Join testing**. Prior: sticky header, carousel, QRs (**2026-05-11 / 05-16**).
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -226,6 +228,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-18 — Website recruit conversion + handoff:** Join-testing copy for FB funnel (**Android only**, free, lifetime beta); hero **gold** link fix. **`a500966`** + handoff. Recruit link: **`#join-testing`** not **`/index.html`**.
 - **2026-05-18 — License vs internal testers (canonical):** Family (3) were on **license testing** → fast sub renewals / 24h blocks. Owner **unchecked** list on **Settings → License testing**. Clarified: need **≥12 internal testers**, **not** license testers; billing QA done; recruits **lifetime** or free. FB recruit **0** signups. **Handoff + push `main`**.
 - **2026-05-18 — Internal 1.0.11 verified + recruit testers:** Owner **`v1.0.11 (12)`** from Play Store; tweaks OK. **Next:** share join-testing link, manual Console adds; **≥12** testers → **closed testing** (agent helps then). **Handoff + push `main`**.
 - **2026-05-18 — Website join-testing + hero copy:** **`website/index.html`** — Step 1 field **Name** (label + placeholder); removed hero **`hero-note`** under CTA buttons. **Handoff + push `main`** for Pages.

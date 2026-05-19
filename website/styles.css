@@ -360,13 +360,16 @@ html.is-scrolled .site-header {
 }
 
 .hero-recruit a {
-  color: var(--cyan);
+  color: #e8c56e;
   font-weight: 600;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(232, 197, 110, 0.45);
+  text-underline-offset: 0.15em;
 }
 
 .hero-recruit a:hover {
-  text-decoration: underline;
+  color: var(--gold);
+  text-decoration-color: var(--gold);
 }
 
 .btn {
