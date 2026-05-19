@@ -350,6 +350,25 @@ html.is-scrolled .site-header {
   animation: fade-rise 0.7s 0.24s var(--ease-out) backwards;
 }
 
+.hero-recruit {
+  margin: 1.25rem auto 0;
+  max-width: 44ch;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.55;
+  animation: fade-rise 0.7s 0.32s var(--ease-out) backwards;
+}
+
+.hero-recruit a {
+  color: var(--cyan);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hero-recruit a:hover {
+  text-decoration: underline;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -498,6 +517,20 @@ section {
   color: var(--muted);
   font-size: 0.95rem;
   margin: 0 0 1.75rem;
+}
+
+.join-testing-kicker {
+  display: inline-block;
+  margin: 0 0 0.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(212, 168, 83, 0.35);
+  background: rgba(212, 168, 83, 0.08);
 }
 
 .feature-grid {
@@ -884,6 +917,44 @@ section {
   color: var(--muted);
   font-size: 0.95rem;
   max-width: 65ch;
+}
+
+.tester-eligibility {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  background: rgba(94, 234, 212, 0.06);
+}
+
+.tester-eligibility-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tester-eligibility ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tester-eligibility li {
+  margin-bottom: 0.35rem;
+}
+
+.tester-free-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text);
+  border: 1px solid rgba(212, 168, 83, 0.28);
+  background: rgba(212, 168, 83, 0.07);
 }
 
 .testing-card {

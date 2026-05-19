@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Swanie's Portfolio — track crypto and precious metals on your Android device. Local vault, optional sync, encrypted backup." />
+  <meta name="description" content="Swanie's Portfolio — Android app to track crypto and precious metals. Join free testing before Play Store launch." />
   <meta name="theme-color" content="#000416" />
   <!-- Tab icon: navy #000416 baked into favicon-tab.png so the swan reads on light browser chrome -->
   <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
@@ -27,6 +27,7 @@
         </div>
       </a>
       <nav class="nav-links" aria-label="Site">
+        <a href="#join-testing">Join testing</a>
         <a href="#features">Features</a>
         <a href="privacy.html">Privacy</a>
         <a href="press.html">Press</a>
@@ -47,6 +48,10 @@
           <a class="btn btn-secondary" href="#join-testing">Join testing</a>
           <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
         </div>
+        <p class="hero-recruit">
+          <strong>Android only.</strong> Help test before the public Play Store launch —
+          <a href="#join-testing">request access</a> (free, about 2 minutes).
+        </p>
       </section>
 
       <section class="pitch-strip" aria-label="Why Swanie's Portfolio">
@@ -233,14 +238,26 @@
       </section>
 
       <section id="join-testing">
+        <p class="join-testing-kicker">Android only · Free to test</p>
         <h2 class="section-title">Join testing</h2>
-        <p class="section-sub">Read this page first, then ask to be added. Google Play internal testing only works for accounts the developer adds by hand.</p>
+        <p class="section-sub">
+          Preview <strong>Swanie's Portfolio</strong> before it goes on the public Play Store. Submit the short form below — Swanie adds your Google Play account and emails you when you can install (usually within a day).
+        </p>
         <div class="card testing-card">
-          <h3>Step 1 — Request access</h3>
+          <div class="tester-eligibility">
+            <p class="tester-eligibility-title">A good fit if you:</p>
+            <ul>
+              <li>Use an <strong>Android</strong> phone (not iPhone)</li>
+              <li>Track <strong>crypto</strong> and/or <strong>precious metals</strong>, or want a simple local portfolio</li>
+              <li>Can install from Google Play and share quick, honest feedback</li>
+            </ul>
+          </div>
+          <h3>Step 1 — Request access (~2 minutes)</h3>
           <p class="tester-request-note">
-            Internal testing on Google Play does <strong>not</strong> let random installs. You must use the
-            <strong>same Google account email</strong> you use in the Play Store. Submit the form below — Swanie will
-            <strong>manually add</strong> your address to the tester list in Play Console. Until that is done, the tester invite link will not work for you.
+            Use the <strong>same Gmail</strong> you sign into the <strong>Google Play Store</strong> with. Swanie adds you to the tester list by hand — the install link will not work until you get a confirmation email.
+          </p>
+          <p class="tester-free-note">
+            <strong>No purchase required</strong> to help test. The free tier works for most feedback. Optional Pro is available in the app; during this beta, <strong>Lifetime</strong> is the best choice if you want Pro — avoid monthly/yearly plans until the public release.
           </p>
           <div class="tester-request">
             <form class="tester-request-form" id="tester-request-form" action="#" method="post" novalidate>
@@ -275,7 +292,7 @@
                 placeholder="A short note — optional"
               ></textarea>
               <input type="text" name="_honey" class="tester-request-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
-              <button type="submit" class="btn btn-secondary" id="tester-request-submit">Send request</button>
+              <button type="submit" class="btn btn-secondary" id="tester-request-submit">Send testing request</button>
               <p class="tester-request-status" id="tester-request-status" role="status" aria-live="polite" hidden></p>
             </form>
             <p class="tester-request-manual">
@@ -285,24 +302,23 @@
             </p>
           </div>
 
-          <h3 class="testing-subhead">Step 2 — After you are added</h3>
+          <h3 class="testing-subhead">Step 2 — After Swanie emails you</h3>
           <p class="tester-request-note tester-play-warning">
-            On Google’s tester page, tap <strong>Download test app</strong> (or <strong>Install</strong> / <strong>Update</strong> for the test version).
-            <strong>Do not</strong> use <strong>Install public version</strong> — the app is not on the public store yet; that link can install the wrong build or confuse Play.
+            On Google’s tester page, tap <strong>Download test app</strong> (or <strong>Install</strong> / <strong>Update</strong>).
+            <strong>Do not</strong> choose <strong>Install public version</strong> — the app is not on the public store yet.
           </p>
           <ol>
-            <li>Wait for confirmation (or try again later the same day once you know you were added).</li>
-            <li>Open <strong>Open tester invite</strong> below (or scan the Play QR). Sign in with the <strong>same</strong> Google account you requested with.</li>
-            <li>On the Google page, choose <strong>Download test app</strong> — not “Install public version.”</li>
-            <li>Accept the invitation, then install or update <strong>Swanie's Portfolio</strong> from Google Play. In app info, confirm you have the version Swanie told you (e.g. <strong>1.0.6</strong>).</li>
+            <li>Wait for Swanie’s email (usually within a day).</li>
+            <li>Open <strong>Open tester invite</strong> below or scan the Play QR. Sign in with the <strong>same</strong> Gmail you used on the form.</li>
+            <li>Tap <strong>Download test app</strong> on Google’s page — not “Install public version.”</li>
+            <li>Install or update <strong>Swanie's Portfolio</strong> from Google Play. Current test build is about <strong>1.0.11 (12)</strong>.</li>
           </ol>
           <p class="testing-links">
             <a class="btn btn-secondary is-disabled" id="tester-cta" href="#" aria-disabled="true">Tester invite link pending</a>
           </p>
           <div class="qr-deck" id="qr-deck">
             <p class="qr-deck-intro">
-              Two different links: <strong>This page</strong> opens the same site on your phone.
-              <strong>Play testing</strong> is the Google Play tester invite (opt-in / install) — set <code>TESTER_URL</code> when you have it.
+              After you’re added: scan <strong>This page</strong> to open the site on your phone, or scan <strong>Play testing</strong> to open the Google Play install invite directly.
             </p>
             <details class="qr-help">
               <summary>About these QR codes &amp; privacy</summary>
