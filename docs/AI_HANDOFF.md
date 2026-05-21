@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Website recruit conversion** shipped: hero **Android only** CTA, **`#join-testing`** copy (eligibility, free/lifetime beta note), nav link; hero **request access** link **gold** (was low-contrast cyan). **Recruit:** FB post uses **`https://swaniedesigns.com/#join-testing`**; **0** form requests so far. **Play `12` (1.0.11)** verified; **license testing unchecked**; **≥12 internal testers** (not license testers). See **§ Play testing — two lists**.
+**Last updated:** 2026-05-21 — **Beta tester playbook:** **`#join-testing`** form + Web3Forms email include **1 year Pro** (RevenueCat promotional, same Gmail for Play + in-app account, do not subscribe in app). **Payments:** **26** yearly orders **refunded**; earnings **$0**; **W-9 deferred** (stay internal). **Family:** Pro via **RC promotional**, not Play subs. **License testing** unchecked. **Push `main`** **`9c34395`** — owner testing live site.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -51,9 +51,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **12 (1.0.11)** live; recruit via **`https://swaniedesigns.com/#join-testing`** → add Play Gmail on **Internal testing → Testers** only. **Goal:** **≥12 internal testers** (install), then **closed testing** — **not** 12 license testers. **Billing QA:** done; new testers: **free** or **lifetime** for Pro. **Recruit:** FB post + conversion **`index.html`** live; **0** signups yet.
+- **Testing path:** **Internal testing** **12 (1.0.11)**; **`#join-testing`** → Play **Testers** + **RevenueCat promotional Pro (1 year)** on same Gmail; Web3Forms body has **copy-paste Reply** + RC checklist. **Do not** use Play subs for testers. **Billing incident:** **26** refunds; payments profile **$0**; tax **not** submitted yet (OK for internal-only). **Recruit:** FB crypto group post pending; **0** form signups.
 
-**Marketing site (2026-05-18 recruit pass):** **`index.html`** — hero **`.hero-recruit`** (Android-only, gold link to **`#join-testing`**); **Join testing** section (kicker, eligibility list, free/lifetime beta, Step 1/2 plain language, **`1.0.11 (12)`**); header nav **Join testing**. Prior: sticky header, carousel, QRs (**2026-05-11 / 05-16**).
+**Marketing site (2026-05-21):** **`website/index.html`** — beta form copy (1 year Pro, same Gmail); **`buildTesterRequestAdminEmail`** reply block + RC grant steps; gold **`.hero-recruit`** link. Deploy: **GitHub Actions** on **`main`** → **https://swaniedesigns.com/#join-testing**.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -135,7 +135,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Reinstall, **no** active sub, Restore | No purchase found | OK |
 | Subscribe → uninstall → reinstall → Restore | Pro without paying again | OK |
 
-**Lifetime:** blocked for family during license-tester subs + daily purchase limits; retest after list 2 off + subs canceled + 24h reset. **Beta policy:** recruits who want Pro → **lifetime** only (or free tier).
+**Lifetime:** owner hit Play purchase limit during license-tester yearly renewals; **refunded 26** orders. **Beta policy:** **RevenueCat promotional Pro ~1 year** per tester email — **not** Play Monthly/Yearly/Lifetime for recruits or family.
 
 ### Play testing — two lists (canonical; owner asked to re-read when recruiting)
 
@@ -152,12 +152,13 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 **When someone requests to test (playbook):**
 
 1. They submit **`https://swaniedesigns.com/#join-testing`** (name + **Play Store Gmail**).
-2. Owner adds that Gmail to **Internal testing → Testers** (list 1) — same **Swanie's Portfolio Testers** email list is fine **on that screen**.
-3. Owner replies with tester invite link / QR; they tap **Download test app**.
-4. **Do not** check their email on **Settings → License testing**.
-5. Tell them: **Android only**; **free** is fine; if they want Pro during beta → **Lifetime** (explain monthly/yearly are painful on internal test builds).
+2. **Play Console** → **Internal testing → Testers** → add that Gmail (list 1).
+3. **RevenueCat** → **Customers** → same Gmail → **Grant promotional** **Swanies Portfolio Pro** (~**1 year**).
+4. Web3Forms email → copy **READY TO REPLY** block (or edit) → send after steps 2–3.
+5. **Do not** check email on **Settings → License testing**.
+6. Tester: install → **create account with same Gmail** → Pro after sign-in (no in-app purchase).
 
-**Family (owner, wife, mom):** cancel old test subs in Play Store; stay on internal testers; Pro via **lifetime** (after limit clears) or **RevenueCat promotional** entitlement on app login email.
+**Family (owner, wife, mom):** internal testers + **RC promotional Pro** on each Gmail; **no** Play subscriptions. Subs canceled; orders refunded.
 
 ### Play Console — ordered steps (next session; do in order)
 
@@ -166,7 +167,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 3. **Listing (parallel):** Screenshots, feature graphic, store copy.
 4. **Production:** After closed gates.
 5. **Data safety URLs** on live **`privacy.html`** if not pasted in Console.
-6. **Family Pro:** lifetime or RC promotional after subs canceled; billing matrix already done on **11**.
+6. **Family Pro:** RevenueCat promotional (same emails); billing matrix done on **11**; **no** self-purchase on Play for daily use.
 
 ---
 
@@ -216,7 +217,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Tester recruitment | **`#join-testing`** → **Internal testing → Testers** (list 1). **Not** Settings → License testing (list 2). **`§ Play testing — two lists`** |
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal testing → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | `website/` — **`index.html`** (**`#join-testing`** Web3Forms: **`WEB3FORMS_ACCESS_KEY`**), **`TESTER_URL`**, **QR**, carousel), **`privacy.html`**, **`press.html`**, **`styles.css`**, **`.github/workflows/deploy-website.yml`** → **`https://swaniedesigns.com`** |
+| Marketing site | `website/index.html` — **`buildTesterRequestAdminEmail()`** (reply-ready + Play/RC checklists), **`#join-testing`**, **`TESTER_URL`**, Web3Forms; **`deploy-website.yml`** → **https://swaniedesigns.com** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
 | Play checklist | `Master_Build_Checklist.md` |
@@ -228,6 +229,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-21 — Beta tester email playbook + handoff:** **`index.html`** — 1 year **RC promotional Pro**, same Gmail Play + in-app, no in-app purchase; Web3Forms **READY TO REPLY** + RC checklist. Billing: **26** refunds, **$0** earnings, W-9 deferred. **`9c34395`** + handoff push.
 - **2026-05-18 — Website recruit conversion + handoff:** Join-testing copy for FB funnel (**Android only**, free, lifetime beta); hero **gold** link fix. **`a500966`** + handoff. Recruit link: **`#join-testing`** not **`/index.html`**.
 - **2026-05-18 — License vs internal testers (canonical):** Family (3) were on **license testing** → fast sub renewals / 24h blocks. Owner **unchecked** list on **Settings → License testing**. Clarified: need **≥12 internal testers**, **not** license testers; billing QA done; recruits **lifetime** or free. FB recruit **0** signups. **Handoff + push `main`**.
 - **2026-05-18 — Internal 1.0.11 verified + recruit testers:** Owner **`v1.0.11 (12)`** from Play Store; tweaks OK. **Next:** share join-testing link, manual Console adds; **≥12** testers → **closed testing** (agent helps then). **Handoff + push `main`**.
