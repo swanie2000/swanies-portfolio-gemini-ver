@@ -257,7 +257,9 @@
             Use the <strong>same Gmail</strong> you sign into the <strong>Google Play Store</strong> with. Swanie adds you to the tester list by hand — the install link will not work until you get a confirmation email.
           </p>
           <p class="tester-free-note">
-            <strong>No purchase required</strong> to help test. The free tier works for most feedback. Optional Pro is available in the app; during this beta, <strong>Lifetime</strong> is the best choice if you want Pro — avoid monthly/yearly plans until the public release.
+            <strong>Beta benefit:</strong> testers who join get <strong>one year of Pro free</strong> (unlocked on our side — not a Play subscription).
+            Use the <strong>same Gmail</strong> here, in the Play Store, and when you <strong>create your account</strong> in the app.
+            <strong>Do not buy</strong> Monthly, Yearly, or Lifetime in the app during testing.
           </p>
           <div class="tester-request">
             <form class="tester-request-form" id="tester-request-form" action="#" method="post" novalidate>
@@ -282,7 +284,9 @@
                 maxlength="254"
                 placeholder="you@gmail.com"
               />
-              <p class="tester-request-hint">Use the exact address you sign into Google Play with.</p>
+              <p class="tester-request-hint">
+                Use the Gmail you sign into <strong>Google Play</strong> with — and use this <strong>same address</strong> when you create your in-app account (required to sign in).
+              </p>
               <label for="tester-request-message">Message to Swanie <span class="label-optional">(optional)</span></label>
               <textarea
                 id="tester-request-message"
@@ -443,21 +447,28 @@
         first +
         ",\n\n" +
         "Thank you for helping test SWANIE'S PORTFOLIO!\n\n" +
-        "I've added your Google account to our internal testing list on Google Play. " +
-        "When you're ready, follow these steps on your Android phone:\n\n" +
+        "You're set up for beta:\n" +
+        "• One year of Pro access (free — enabled on our side, not a Play subscription)\n" +
+        "• Use this same Gmail in Google Play AND when you create your account in the app:\n" +
+        "  " +
+        playEmail +
+        "\n" +
+        "• Please do NOT purchase Monthly, Yearly, or Lifetime in the app during testing\n\n" +
+        "When you're ready on your Android phone:\n\n" +
         "1) Open this tester invite link (Chrome is fine):\n" +
         invite +
         "\n\n" +
-        "2) Sign in with the SAME Google account you used on the join-testing form:\n" +
-        playEmail +
-        "\n\n" +
+        "2) Sign in to Google Play with the account above.\n\n" +
         "3) On Google's page, tap Download test app — NOT \"Install public version\" (the app is not public yet).\n\n" +
         "4) Install or update \"Swanie's Portfolio\" from Google Play.\n\n" +
+        "5) Open the app and create your account using the SAME email (" +
+        playEmail +
+        "). Pro should unlock after sign-in (restart the app once if needed).\n\n" +
         "If the link says you're not a tester yet, wait a little while and try again — Play can take a short time after you're added.\n\n" +
         "Join testing help page (steps & QR codes):\n" +
         joinPage +
         "\n\n" +
-        "Thanks again for testing — your feedback really helps.\n\n" +
+        "Thanks again — your feedback really helps.\n\n" +
         "— Swanie\n";
 
       var lines = [];
@@ -478,6 +489,13 @@
       lines.push("  [ ] Add email address (exact Play account):");
       lines.push("      " + playEmail);
       lines.push("  [ ] Save");
+      lines.push("");
+      lines.push("RevenueCat checklist (1 year Pro for beta):");
+      lines.push("  [ ] app.revenuecat.com → Customers → search:");
+      lines.push("      " + playEmail);
+      lines.push("  [ ] Grant promotional entitlement: Swanies Portfolio Pro");
+      lines.push("  [ ] Duration: 1 year (or set expiration ~12 months out)");
+      lines.push("  [ ] Do BEFORE or right after Reply — same email as Play + in-app account");
       lines.push("");
       lines.push("Request summary");
       lines.push("  Name:              " + name);
