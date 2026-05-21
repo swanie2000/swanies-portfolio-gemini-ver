@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-21 — **Beta tester playbook:** **`#join-testing`** form + Web3Forms email include **1 year Pro** (RevenueCat promotional, same Gmail for Play + in-app account, do not subscribe in app). **Payments:** **26** yearly orders **refunded**; earnings **$0**; **W-9 deferred** (stay internal). **Family:** Pro via **RC promotional**, not Play subs. **License testing** unchecked. **Push `main`** **`9c34395`** — owner testing live site.
+**Last updated:** 2026-05-22 — **Planned (not coded):** **email-bound beta unlock codes** + per-code expiry + **program sunset** → Pro without RevenueCat grants for testers. Full spec **`docs/BETA_UNLOCK_CODE.md`**. **Until shipped:** recruiting blocked on painful RC workflow; free tier too naggy for meaningful beta. **RevenueCat stays** for Play purchases. **Payments:** **26** refunds; **$0** earnings. **License testing** unchecked. **No app/website code today** — docs only, pushed to **`main`**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -51,7 +51,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **12 (1.0.11)**; **`#join-testing`** → Play **Testers** + **RevenueCat promotional Pro (1 year)** on same Gmail; Web3Forms body has **copy-paste Reply** + RC checklist. **Do not** use Play subs for testers. **Billing incident:** **26** refunds; payments profile **$0**; tax **not** submitted yet (OK for internal-only). **Recruit:** FB crypto group post pending; **0** form signups.
+- **Testing path:** **Internal testing** **12 (1.0.11)**; **`#join-testing`** → Play **Testers** only. **Beta Pro (planned):** personal **unlock code** per Gmail (see **`docs/BETA_UNLOCK_CODE.md`**) — **not** RevenueCat dashboard grants. **Current live app:** still RC-only Pro; **pause heavy recruiting** until unlock ships. Web3Forms reply still has **RC checklist** until **`index.html`** updated with code generator output. **Do not** use Play subs for testers. **Billing incident:** **26** refunds; payments profile **$0**; tax **not** submitted yet (OK for internal-only). **Recruit:** FB post pending; **0** form signups.
 
 **Marketing site (2026-05-21):** **`website/index.html`** — beta form copy (1 year Pro, same Gmail); **`buildTesterRequestAdminEmail`** reply block + RC grant steps; gold **`.hero-recruit`** link. Deploy: **GitHub Actions** on **`main`** → **https://swaniedesigns.com/#join-testing**.
 
@@ -135,7 +135,7 @@ cd C:\Users\MichaelSwanson\AndroidStudioProjects\SwaniesPortfolio
 | Reinstall, **no** active sub, Restore | No purchase found | OK |
 | Subscribe → uninstall → reinstall → Restore | Pro without paying again | OK |
 
-**Lifetime:** owner hit Play purchase limit during license-tester yearly renewals; **refunded 26** orders. **Beta policy:** **RevenueCat promotional Pro ~1 year** per tester email — **not** Play Monthly/Yearly/Lifetime for recruits or family.
+**Lifetime:** owner hit Play purchase limit during license-tester yearly renewals; **refunded 26** orders. **Beta policy (target):** **Unlock code** ~1 year per tester email — **not** Play subs; RC grants **deprecated** for beta once unlock ships.
 
 ### Play testing — two lists (canonical; owner asked to re-read when recruiting)
 
@@ -149,16 +149,33 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | **Family / friends** | **Add here** | **Do not add** (leave unchecked) |
 | **Owner billing QA** | N/A | Optional: small dev-only list or publisher account only |
 
-**When someone requests to test (playbook):**
+**When someone requests to test (playbook — target after unlock codes ship):**
 
 1. They submit **`https://swaniedesigns.com/#join-testing`** (name + **Play Store Gmail**).
 2. **Play Console** → **Internal testing → Testers** → add that Gmail (list 1).
-3. **RevenueCat** → **Customers** → same Gmail → **Grant promotional** **Swanies Portfolio Pro** (~**1 year**).
-4. Web3Forms email → copy **READY TO REPLY** block (or edit) → send after steps 2–3.
+3. Run **`scripts/generate-beta-unlock-code.ps1`** (planned) with that email + expiry (~**1 year**). Paste code into reply email.
+4. Web3Forms email → **READY TO REPLY** with install steps + **personal code** (not RevenueCat steps).
 5. **Do not** check email on **Settings → License testing**.
-6. Tester: install → **create account with same Gmail** → Pro after sign-in (no in-app purchase).
+6. Tester: install → **account with same Gmail** → **Settings → Enter beta unlock code** → Pro (no in-app purchase).
 
-**Family (owner, wife, mom):** internal testers + **RC promotional Pro** on each Gmail; **no** Play subscriptions. Subs canceled; orders refunded.
+**Until unlock ships:** steps 3–6 blocked on RC; see **`docs/BETA_UNLOCK_CODE.md`**.
+
+**Family (owner, wife, mom):** internal testers; **target** unlock codes per email; **no** Play subscriptions. Subs canceled; orders refunded.
+
+### Beta unlock codes (planned — owner decision 2026-05-22)
+
+**Spec:** **`docs/BETA_UNLOCK_CODE.md`**
+
+| Piece | Behavior |
+|-------|----------|
+| **Email-bound code** | Signature over `email\|expiry-date`; redeem only when logged-in email matches. |
+| **Per-code expiry** | After date, paywall/nags return unless user paid via Play/RC. |
+| **Program sunset** | **`BETA_UNLOCK_PROGRAM_END`** in BuildConfig — after that calendar date, app **stops accepting any new codes**; Pro falls back to **RevenueCat / purchase** only. |
+| **`isProUser`** | `(valid unlock not expired)` **OR** `(RC entitlement active)` — implement in **`SettingsViewModel`**. |
+| **Secret** | **`BETA_UNLOCK_SECRET`** in **`local.properties`** only (never commit). |
+| **RevenueCat** | **Keep** for Monthly/Yearly/Lifetime; remove from **beta tester** workflow. |
+
+**Owner concern (security):** APK secret is extractable — mitigated by per-email codes + **program sunset**, not a public “master password.” Not a substitute for Play billing on the public store.
 
 ### Play Console — ordered steps (next session; do in order)
 
@@ -167,18 +184,19 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 3. **Listing (parallel):** Screenshots, feature graphic, store copy.
 4. **Production:** After closed gates.
 5. **Data safety URLs** on live **`privacy.html`** if not pasted in Console.
-6. **Family Pro:** RevenueCat promotional (same emails); billing matrix done on **11**; **no** self-purchase on Play for daily use.
+6. **Family Pro:** **After unlock ships** — generate codes for family emails; until then optional RC grant or wait for implementation.
 
 ---
 
 ## Next steps (priority order)
 
-1. **Recruit internal testers (not license testers):** **`#join-testing`** → **Internal testing → Testers**; see **§ Play testing — two lists**. **0** requests after FB post — consider clearer CTA (Android, free beta, 2‑minute form, direct link).
-2. **Closed testing (agent when ≥12 internal):** Promote build to closed; tick checklist.
-3. **Listing:** Screenshots, feature graphic, copy.
-4. **`PLAY_URL`** when public listing exists.
-5. **Production** after closed requirements.
-6. **i18n:** manual **`values-*`** only when default strings change.
+1. **Implement beta unlock codes** per **`docs/BETA_UNLOCK_CODE.md`** (validator, DataStore, Settings UI, `isProUser` combine, generator script, `local.properties` keys, unit tests). Bump **`versionCode`** for Play upload.
+2. **Website:** **`index.html`** — tester copy + **`buildTesterRequestAdminEmail()`** use unlock code, drop RC grant checklist.
+3. **Recruit internal testers** after **1.0.x** with unlock is on Play — **`#join-testing`** → Testers + email personal code only.
+4. **Closed testing (agent when ≥12 internal):** Promote build to closed; tick checklist.
+5. **Listing:** Screenshots, feature graphic, copy.
+6. **`PLAY_URL`** / **Production** after closed gates.
+7. **i18n:** manual **`values-*`** when new unlock strings added.
 
 ---
 
@@ -186,7 +204,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 - **Stack:** Kotlin, Jetpack Compose, Hilt, Room.
 - **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; list column nests each row (**RemoteViews** direct-child limit); metal **`metalWidgetHeadlinePair`** (3 lines, **9sp** / **7sp**) + **`WidgetAssetCardHeight` (62dp)**; swan → **`widgetLaunchMainActivityIntent`**; **`__METAL_DEFAULT__`** / **`file:`** icon packing on push.
-- **Pro:** RevenueCat + Play billing when on store; gates Theme Manager, multi-portfolio swipe, full Analytics, widget customization, etc.
+- **Pro:** RevenueCat + Play billing when on store (**planned:** optional **email-bound unlock** for beta — **`docs/BETA_UNLOCK_CODE.md`**). Gates Theme Manager, multi-portfolio swipe, full Analytics, widget customization, etc.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
@@ -217,7 +235,8 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Tester recruitment | **`#join-testing`** → **Internal testing → Testers** (list 1). **Not** Settings → License testing (list 2). **`§ Play testing — two lists`** |
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal testing → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | `website/index.html` — **`buildTesterRequestAdminEmail()`** (reply-ready + Play/RC checklists), **`#join-testing`**, **`TESTER_URL`**, Web3Forms; **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| Beta unlock (planned) | **`docs/BETA_UNLOCK_CODE.md`** — design; implement **`ProUnlockPreferences`**, **`BetaUnlockValidator`**, **`SettingsViewModel`**, **`scripts/generate-beta-unlock-code.ps1`** |
+| Marketing site | `website/index.html` — **`buildTesterRequestAdminEmail()`** (reply-ready; **RC checklist → unlock code** after site pass), **`#join-testing`**, Web3Forms; **`deploy-website.yml`** → **https://swaniedesigns.com** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
 | Play checklist | `Master_Build_Checklist.md` |
@@ -229,6 +248,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-22 — Beta unlock code design (docs only, no code):** Owner approved **email-bound** codes, **per-code expiry**, **program sunset** (stop accepting new codes → RC/purchases only). **`docs/BETA_UNLOCK_CODE.md`** + handoff/playbook updated; recruiting deferred until implemented. Push **`main`**.
 - **2026-05-21 — Beta tester email playbook + handoff:** **`index.html`** — 1 year **RC promotional Pro**, same Gmail Play + in-app, no in-app purchase; Web3Forms **READY TO REPLY** + RC checklist. Billing: **26** refunds, **$0** earnings, W-9 deferred. **`9c34395`** + handoff push.
 - **2026-05-18 — Website recruit conversion + handoff:** Join-testing copy for FB funnel (**Android only**, free, lifetime beta); hero **gold** link fix. **`a500966`** + handoff. Recruit link: **`#join-testing`** not **`/index.html`**.
 - **2026-05-18 — License vs internal testers (canonical):** Family (3) were on **license testing** → fast sub renewals / 24h blocks. Owner **unchecked** list on **Settings → License testing**. Clarified: need **≥12 internal testers**, **not** license testers; billing QA done; recruits **lifetime** or free. FB recruit **0** signups. **Handoff + push `main`**.
