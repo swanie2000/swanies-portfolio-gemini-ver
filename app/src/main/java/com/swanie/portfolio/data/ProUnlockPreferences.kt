@@ -3,6 +3,7 @@ package com.swanie.portfolio.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -22,6 +23,7 @@ private val Context.proUnlockDataStore: DataStore<Preferences> by preferencesDat
 data class ProUnlockState(
     val email: String = "",
     val expiryEpochDay: Long = 0L,
+    val supersededByRevenueCat: Boolean = false,
 ) {
     val isRedeemed: Boolean = email.isNotBlank() && expiryEpochDay > 0L
 
@@ -41,12 +43,14 @@ class ProUnlockPreferences @Inject constructor(
     private object Keys {
         val EMAIL = stringPreferencesKey("pro_unlock_email")
         val EXPIRY_EPOCH_DAY = longPreferencesKey("pro_unlock_expiry_epoch_day")
+        val SUPERSEDED_BY_REVENUECAT = booleanPreferencesKey("pro_unlock_superseded_by_revenuecat")
     }
 
     val state: Flow<ProUnlockState> = appContext.proUnlockDataStore.data.map { prefs ->
         ProUnlockState(
             email = prefs[Keys.EMAIL].orEmpty(),
             expiryEpochDay = prefs[Keys.EXPIRY_EPOCH_DAY] ?: 0L,
+            supersededByRevenueCat = prefs[Keys.SUPERSEDED_BY_REVENUECAT] ?: false,
         )
     }
 
@@ -59,6 +63,15 @@ class ProUnlockPreferences @Inject constructor(
 
     suspend fun clearUnlock() {
         appContext.proUnlockDataStore.edit { prefs ->
+            prefs.remove(Keys.EMAIL)
+            prefs.remove(Keys.EXPIRY_EPOCH_DAY)
+        }
+    }
+
+    /** RevenueCat entitlement took over; beta code must not apply again after RC expires. */
+    suspend fun markSupersededByRevenueCat() {
+        appContext.proUnlockDataStore.edit { prefs ->
+            prefs[Keys.SUPERSEDED_BY_REVENUECAT] = true
             prefs.remove(Keys.EMAIL)
             prefs.remove(Keys.EXPIRY_EPOCH_DAY)
         }

@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROGRAM_END = process.env.BETA_UNLOCK_PROGRAM_END || "2027-06-01";
+const CODE_VALIDITY_DAYS = 30;
 
 function readSecretFromLocalProperties() {
   const propsPath = path.join(__dirname, "..", "local.properties");
@@ -51,7 +52,7 @@ function parseIsoDate(iso) {
 
 function defaultExpiry() {
   const d = new Date();
-  d.setDate(d.getDate() + 365);
+  d.setDate(d.getDate() + CODE_VALIDITY_DAYS);
   return d;
 }
 

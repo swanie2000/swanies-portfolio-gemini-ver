@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-23 — **Shipped:** **email-bound beta unlock codes** (app **1.0.12 (13)**) + **website form auto-generates code** in Web3Forms admin email. Owner: set **`BETA_UNLOCK_SECRET`** in **`local.properties`** + GitHub Actions secret (same value). Upload **13** to Play before testers use codes. + per-code expiry + **program sunset** → Pro without RevenueCat grants for testers. Full spec **`docs/BETA_UNLOCK_CODE.md`**. **Until shipped:** recruiting blocked on painful RC workflow; free tier too naggy for meaningful beta. **RevenueCat stays** for Play purchases. **Payments:** **26** refunds; **$0** earnings. **License testing** unchecked. **No app/website code today** — docs only, pushed to **`main`**.
+**Last updated:** 2026-05-23 — **Beta unlock:** **30-day** codes; **RevenueCat supersedes** code (RC-only after grant). App **1.0.13 (14)**. Program sunset **2027-06-01** unchanged. Owner: set **`BETA_UNLOCK_SECRET`** in **`local.properties`** + GitHub Actions secret (same value). Upload **13** to Play before testers use codes. + per-code expiry + **program sunset** → Pro without RevenueCat grants for testers. Full spec **`docs/BETA_UNLOCK_CODE.md`**. **Until shipped:** recruiting blocked on painful RC workflow; free tier too naggy for meaningful beta. **RevenueCat stays** for Play purchases. **Payments:** **26** refunds; **$0** earnings. **License testing** unchecked. **No app/website code today** — docs only, pushed to **`main`**.
 
 ### Resume when you reopen (RevenueCat + Play)
 

@@ -95,6 +95,8 @@ fun BetaUnlockCodeSection(
                             R.string.beta_unlock_error_expired
                         BetaUnlockRedeemResult.INVALID ->
                             R.string.beta_unlock_error_invalid
+                        BetaUnlockRedeemResult.SUPERSEDED_BY_REVENUECAT ->
+                            R.string.beta_unlock_error_superseded
                     }
                     context.showPortfolioToast(context.getString(msgRes))
                 }

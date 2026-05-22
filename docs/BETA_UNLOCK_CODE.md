@@ -24,7 +24,7 @@ Testers never open RevenueCat.
 1. Play Console → add Gmail (list 1).
 2. Open Web3Forms inbox — **READY TO REPLY** block already includes the code (or run **`scripts/generate-beta-unlock-code.ps1`**) with:
    - **Email** = same Gmail as Play + in-app account (lowercase).
-   - **Expires** = calendar date (~12 months for “1 year Pro free”).
+   - **Expires** = **30 days** from generation (time to move them to RevenueCat promotional).
 3. Paste code into Web3Forms **READY TO REPLY** email (replace RevenueCat checklist).
 4. Optional: note expiry date in plain English in the email.
 
@@ -44,11 +44,17 @@ Testers never open RevenueCat.
 
 Wrong account → clear error: *code is for a different email*.
 
-### Per-code expiry (paywall returns)
+### Per-code expiry (30 days)
 
-- After redeem, persist **`pro_unlock_expires_at`** (DataStore).
-- **`isProUser`** = `(unlock valid and not expired)` **OR** `(RevenueCat entitlement active)`.
-- When per-code expiry passes → unlock path off → user sees free tier / paywall again unless they **purchased via Play/RevenueCat**.
+- Codes are generated with **30-day** expiry (website form + CLI).
+- After redeem, persist expiry in DataStore.
+- When per-code expiry passes → unlock path off unless RevenueCat already took over.
+
+### RevenueCat supersedes code (shipped)
+
+- When RevenueCat reports **active Pro** (purchase or promotional grant), app sets **`supersededByRevenueCat`** and clears local unlock.
+- After that: **`isProUser` = RevenueCat only** — code ignored even if still within 30 days.
+- When RC entitlement ends → Pro off (unless they subscribe). Use RC **6–12 month** grants for managed testers; **lifetime** for family.
 
 ### Program sunset (global — owner security ask)
 

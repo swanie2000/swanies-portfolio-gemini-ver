@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.R
 import com.swanie.portfolio.BuildConfig
 import com.swanie.portfolio.billing.AccessTier
+import com.swanie.portfolio.billing.BetaUnlockAccess
 import com.swanie.portfolio.billing.BetaUnlockValidator
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.billing.MonetizationPackage
@@ -63,6 +64,7 @@ enum class BetaUnlockRedeemResult {
     SUCCESS,
     NOT_CONFIGURED,
     PROGRAM_ENDED,
+    SUPERSEDED_BY_REVENUECAT,
     MALFORMED,
     WRONG_EMAIL,
     EXPIRED,
@@ -166,9 +168,18 @@ class SettingsViewModel @Inject constructor(
                 proUnlockPreferences.state,
             ) { snapshot, unlock ->
                 val revenueCatPro = snapshot.tier == AccessTier.PRO && snapshot.isActive
-                val unlockPro = unlock.isActive()
-                revenueCatPro || unlockPro
-            }.collect { isPro ->
+                val isPro = BetaUnlockAccess.resolveIsProUser(
+                    revenueCatPro = revenueCatPro,
+                    unlock = unlock,
+                    supersededByRevenueCat = unlock.supersededByRevenueCat,
+                )
+                Triple(isPro, revenueCatPro, unlock.supersededByRevenueCat)
+            }.collect { (isPro, revenueCatPro, superseded) ->
+                if (revenueCatPro && !superseded) {
+                    viewModelScope.launch {
+                        proUnlockPreferences.markSupersededByRevenueCat()
+                    }
+                }
                 _isProUser.value = isPro
             }
         }
@@ -285,6 +296,11 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             if (!isBetaUnlockConfigured) {
                 onComplete(BetaUnlockRedeemResult.NOT_CONFIGURED)
+                return@launch
+            }
+            val unlockState = proUnlockPreferences.state.first()
+            if (unlockState.supersededByRevenueCat) {
+                onComplete(BetaUnlockRedeemResult.SUPERSEDED_BY_REVENUECAT)
                 return@launch
             }
             val profileEmail = userDao.getFirstUser()?.email?.trim()?.lowercase()

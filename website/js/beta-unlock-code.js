@@ -43,9 +43,11 @@
     return d;
   }
 
+  var CODE_VALIDITY_DAYS = 30;
+
   function defaultExpiryDate() {
     var d = new Date();
-    d.setDate(d.getDate() + 365);
+    d.setDate(d.getDate() + CODE_VALIDITY_DAYS);
     return d;
   }
 
@@ -123,6 +125,7 @@
   }
 
   global.BetaUnlock = {
+    CODE_VALIDITY_DAYS: CODE_VALIDITY_DAYS,
     CODE_RE: CODE_RE,
     normalizeEmail: normalizeEmail,
     defaultExpiryDate: defaultExpiryDate,

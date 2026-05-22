@@ -554,4 +554,5 @@
     <string name="beta_unlock_error_expired">This code has expired.</string>
     <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>
     <string name="beta_unlock_error_not_configured">Beta unlock is not available in this build yet.</string>
+    <string name="beta_unlock_error_superseded">Pro is managed by your subscription. Beta unlock codes no longer apply on this account.</string>
 </resources>
