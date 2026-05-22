@@ -545,4 +545,14 @@
     <string name="analytics_live_preset_event_market_shock">• Choque amplo de mercado: -%1$s%% da carteira total</string>
     <string name="analytics_live_preset_event_crypto_rally">• Rali cripto: +%1$s%% da fatia cripto</string>
     <string name="analytics_live_preset_event_inflation_hedge">• Proteção contra inflação: +%1$s%% da fatia de metais</string>
+    <string name="beta_unlock_section_title">Beta unlock code</string>
+    <string name="beta_unlock_section_hint">Paste the personal code from the email Swanie sent you. It only works for the account you signed in with.</string>
+    <string name="beta_unlock_code_label">Unlock code</string>
+    <string name="beta_unlock_submit">UNLOCK PRO</string>
+    <string name="beta_unlock_success">Pro unlocked. Restart the app if features do not appear.</string>
+    <string name="beta_unlock_error_invalid">That code is not valid. Check the code and try again.</string>
+    <string name="beta_unlock_error_email">Sign in with the same Gmail Swanie added to testing, then try again.</string>
+    <string name="beta_unlock_error_expired">This code has expired.</string>
+    <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>
+    <string name="beta_unlock_error_not_configured">Beta unlock is not available in this build yet.</string>
 </resources>

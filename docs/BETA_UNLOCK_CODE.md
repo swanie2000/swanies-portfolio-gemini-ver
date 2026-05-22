@@ -1,6 +1,6 @@
 # Beta unlock codes (planned — not implemented yet)
 
-**Status:** Design approved by owner **2026-05-22**; **no app code** in this commit. Next agent implements per **`docs/AI_HANDOFF.md`** § *Beta unlock codes*.
+**Status:** **Implemented** (app **1.0.12 (13)** + website join-testing form). Owner must set **`BETA_UNLOCK_SECRET`** in **`local.properties`** (Android) and GitHub repo secret (live site deploy).
 
 **Problem:** Free tier is intentionally naggy; beta testers need **Pro** without RevenueCat dashboard grants (sandbox/production confusion, no “add customer” UI). **RevenueCat stays** for real Play purchases and restore.
 
@@ -10,7 +10,7 @@
 
 1. Submit **`https://swaniedesigns.com/#join-testing`** with **Play Store Gmail**.
 2. Owner adds Gmail to **Play Console → Internal testing → Testers** only (not License testing).
-3. Owner emails install steps + a **personal unlock code** (e.g. `SWANIE-K7M2-9X4P`).
+3. Owner emails install steps + a **personal unlock code** (auto-generated in Web3Forms admin email when form is submitted, e.g. `SWANIE-20270521-A1B2C3D4`).
 4. Tester installs from Play, **creates in-app account with the same Gmail**.
 5. **Settings** (or Pro paywall) → **Enter beta unlock code** → Pro features unlock.
 6. **Do not** buy Monthly / Yearly / Lifetime during beta.
@@ -22,7 +22,7 @@ Testers never open RevenueCat.
 ## What the owner does (after implementation)
 
 1. Play Console → add Gmail (list 1).
-2. Run generator (planned **`scripts/generate-beta-unlock-code.ps1`**) with:
+2. Open Web3Forms inbox — **READY TO REPLY** block already includes the code (or run **`scripts/generate-beta-unlock-code.ps1`**) with:
    - **Email** = same Gmail as Play + in-app account (lowercase).
    - **Expires** = calendar date (~12 months for “1 year Pro free”).
 3. Paste code into Web3Forms **READY TO REPLY** email (replace RevenueCat checklist).
@@ -35,7 +35,7 @@ Testers never open RevenueCat.
 ### Email-bound
 
 - Payload signed by app secret: `lowercase_email + "|" + expiry_yyyy-MM-dd`.
-- Code = short readable string derived from **HMAC-SHA256** (e.g. grouped as `SWANIE-XXXX-XXXX`).
+- Code = `SWANIE-YYYYMMDD-HHHHHHHH` (8 hex chars = first 4 bytes of **HMAC-SHA256**).
 - On redeem, app requires:
   - User **logged in**.
   - Profile email (lowercase) **matches** email in signed payload.
@@ -77,18 +77,19 @@ This is **weaker than** server-side keys but **much simpler** than RevenueCat pe
 
 ---
 
-## Implementation checklist (next coding session)
+## Files (shipped)
 
-1. **`ProUnlockPreferences`** (DataStore): `unlocked`, `expires_at`, optional `redeemed_email_hash` for audit.
-2. **`BetaUnlockValidator`**: verify code + email + dates; check program sunset before accept.
-3. **`SettingsViewModel`**: combine RC entitlement + unlock → **`isProUser`**; refresh widgets on change.
-4. **UI**: Settings + Pro gate — code field, submit, error strings (all locales when strings added).
-5. **`app/build.gradle.kts`**: `BETA_UNLOCK_SECRET` from `local.properties`; `BETA_UNLOCK_PROGRAM_END` (string date).
-6. **`scripts/generate-beta-unlock-code.ps1`**: owner runs locally; same algorithm as app.
-7. **`website/index.html`**: admin email template — code + expiry, **remove** RevenueCat grant checklist for testers.
-8. **Tests**: validator unit tests (email match, expired, sunset, valid).
+| Piece | Location |
+|-------|----------|
+| Validator | `app/.../billing/BetaUnlockValidator.kt` |
+| Storage | `app/.../data/ProUnlockPreferences.kt` |
+| UI | `BetaUnlockCodeSection.kt` on Pro paywall |
+| Website generator | `website/js/beta-unlock-code.js` + config injected in **deploy-website.yml** |
+| CLI | `scripts/generate-beta-unlock-code.ps1`, `scripts/beta-unlock-code.mjs` |
 
-**Do not remove RevenueCat** in this pass.
+**Owner setup:** Add to **`local.properties`**: `BETA_UNLOCK_SECRET=your-long-random-string` (same value in GitHub **Settings → Secrets → Actions → BETA_UNLOCK_SECRET**). Optional: `BETA_UNLOCK_PROGRAM_END=2027-06-01`.
+
+**Do not remove RevenueCat** — paid path unchanged.
 
 ---
 

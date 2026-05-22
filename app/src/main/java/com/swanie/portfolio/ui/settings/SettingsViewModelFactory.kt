@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.swanie.portfolio.billing.MonetizationManager
+import com.swanie.portfolio.data.ProUnlockPreferences
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.data.feedback.BugReportSubmitter
@@ -28,6 +29,7 @@ class SettingsViewModelFactory(
                 database,
                 securityManager,
                 monetizationManager,
+                ProUnlockPreferences(context),
                 vaultBackupEngine,
                 bugReportSubmitter,
             ) as T

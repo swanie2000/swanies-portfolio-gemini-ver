@@ -263,6 +263,12 @@ fun ProFeatureGateScreen(
             )
         }
 
+        BetaUnlockCodeSection(
+            settingsViewModel = settingsViewModel,
+            safeText = safeText,
+            accent = accent,
+        )
+
         Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedButton(

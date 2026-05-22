@@ -24,6 +24,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Inject beta unlock config (join-testing form)
+        env:
+          BETA_UNLOCK_SECRET: ${{ secrets.BETA_UNLOCK_SECRET }}
+          BETA_UNLOCK_PROGRAM_END: ${{ secrets.BETA_UNLOCK_PROGRAM_END }}
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const secret = (process.env.BETA_UNLOCK_SECRET || "").trim();
+          const programEnd = (process.env.BETA_UNLOCK_PROGRAM_END || "2027-06-01").trim();
+          const content =
+            "window.BETA_UNLOCK_CONFIG = " +
+            JSON.stringify({ secret, programEnd }) +
+            ";\n";
+          fs.writeFileSync("website/js/beta-unlock-config.js", content);
+          if (!secret) {
+            console.log("Warning: BETA_UNLOCK_SECRET not set — form emails will omit unlock codes.");
+          }
+          NODE
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

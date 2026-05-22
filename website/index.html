@@ -257,7 +257,7 @@
             Use the <strong>same Gmail</strong> you sign into the <strong>Google Play Store</strong> with. Swanie adds you to the tester list by hand — the install link will not work until you get a confirmation email.
           </p>
           <p class="tester-free-note">
-            <strong>Beta benefit:</strong> testers who join get <strong>one year of Pro free</strong> (unlocked on our side — not a Play subscription).
+            <strong>Beta benefit:</strong> testers who join get <strong>one year of Pro free</strong> via a <strong>personal unlock code</strong> in Swanie’s reply email (not a Play subscription).
             Use the <strong>same Gmail</strong> here, in the Play Store, and when you <strong>create your account</strong> in the app.
             <strong>Do not buy</strong> Monthly, Yearly, or Lifetime in the app during testing.
           </p>
@@ -393,6 +393,8 @@
     </footer>
   </div>
   <script src="js/qrcode.min.js"></script>
+  <script src="js/beta-unlock-config.js"></script>
+  <script src="js/beta-unlock-code.js"></script>
   <script>
     const PLAY_URL = "";
     /** Google Play internal (or closed) testing opt-in URL — QR + “Open tester invite” button. */
@@ -434,13 +436,30 @@
      * Email body for Web3Forms: reply-ready text first, Play Console checklist below.
      * Reply-To is the requester's Play email (set on the JSON payload).
      */
-    function buildTesterRequestAdminEmail(name, playEmail, note) {
+    function buildTesterRequestAdminEmail(name, playEmail, note, betaUnlock) {
       var first = testerFirstName(name);
       var invite =
         TESTER_URL && /^https?:\/\//.test(TESTER_URL)
           ? TESTER_URL
           : "(Set TESTER_URL in website/index.html — invite link missing)";
       var joinPage = window.location.href;
+      var codeBlock = "";
+      if (betaUnlock && betaUnlock.ok) {
+        codeBlock =
+          "• Your personal beta unlock code (paste in the app under Settings or any Pro screen):\n" +
+          "  " +
+          betaUnlock.code +
+          "\n" +
+          "• Pro access through: " +
+          betaUnlock.expiryLabel +
+          " (same Gmail as below)\n";
+      } else if (betaUnlock && betaUnlock.error) {
+        codeBlock =
+          "• Beta unlock code: (not generated — " +
+          betaUnlock.error +
+          ")\n" +
+          "  Run scripts/generate-beta-unlock-code.ps1 locally or set GitHub secret BETA_UNLOCK_SECRET for the live site.\n";
+      }
 
       var replyReady =
         "Hi " +
@@ -448,7 +467,8 @@
         ",\n\n" +
         "Thank you for helping test SWANIE'S PORTFOLIO!\n\n" +
         "You're set up for beta:\n" +
-        "• One year of Pro access (free — enabled on our side, not a Play subscription)\n" +
+        "• One year of Pro access (free — personal unlock code, not a Play subscription)\n" +
+        codeBlock +
         "• Use this same Gmail in Google Play AND when you create your account in the app:\n" +
         "  " +
         playEmail +
@@ -463,7 +483,9 @@
         "4) Install or update \"Swanie's Portfolio\" from Google Play.\n\n" +
         "5) Open the app and create your account using the SAME email (" +
         playEmail +
-        "). Pro should unlock after sign-in (restart the app once if needed).\n\n" +
+        ").\n\n" +
+        "6) Open Settings (or any Pro upgrade screen) → enter your beta unlock code above → UNLOCK PRO.\n" +
+        "   Restart the app once if features do not appear right away.\n\n" +
         "If the link says you're not a tester yet, wait a little while and try again — Play can take a short time after you're added.\n\n" +
         "Join testing help page (steps & QR codes):\n" +
         joinPage +
@@ -490,12 +512,20 @@
       lines.push("      " + playEmail);
       lines.push("  [ ] Save");
       lines.push("");
-      lines.push("RevenueCat checklist (1 year Pro for beta):");
-      lines.push("  [ ] app.revenuecat.com → Customers → search:");
-      lines.push("      " + playEmail);
-      lines.push("  [ ] Grant promotional entitlement: Swanies Portfolio Pro");
-      lines.push("  [ ] Duration: 1 year (or set expiration ~12 months out)");
-      lines.push("  [ ] Do BEFORE or right after Reply — same email as Play + in-app account");
+      if (betaUnlock && betaUnlock.ok) {
+        lines.push("Beta unlock (auto-generated — include in Reply above):");
+        lines.push("  Code:     " + betaUnlock.code);
+        lines.push("  Email:    " + betaUnlock.email);
+        lines.push("  Expires:  " + betaUnlock.expiryLabel + " (" + betaUnlock.expiryIso + ")");
+        lines.push("  Program stops accepting new codes: " + betaUnlock.programEnd);
+      } else {
+        lines.push("Beta unlock: NOT GENERATED");
+        if (betaUnlock && betaUnlock.error) {
+          lines.push("  Reason: " + betaUnlock.error);
+        }
+        lines.push("  Fix: GitHub → Settings → Secrets → BETA_UNLOCK_SECRET (same as Android local.properties)");
+        lines.push("       Or run: .\\scripts\\generate-beta-unlock-code.ps1 -Email \"" + playEmail + "\"");
+      }
       lines.push("");
       lines.push("Request summary");
       lines.push("  Name:              " + name);
@@ -576,15 +606,25 @@
           return;
         }
 
-        var fullMessage = buildTesterRequestAdminEmail(name, em, note);
-
         if (submitBtn) {
           submitBtn.disabled = true;
           submitBtn.textContent = "Sending…";
         }
-        setStatus(null, "Sending your request…");
+        setStatus(null, "Preparing your request…");
 
-        fetch(WEB3FORMS_SUBMIT_URL, {
+        var betaPromise =
+          typeof BetaUnlock !== "undefined" && BetaUnlock.generateCode
+            ? BetaUnlock.generateCode(em, BetaUnlock.defaultExpiryDate())
+            : Promise.resolve({
+                ok: false,
+                error: "Beta unlock script not loaded",
+              });
+
+        betaPromise.then(function (betaUnlock) {
+          var fullMessage = buildTesterRequestAdminEmail(name, em, note, betaUnlock);
+          setStatus(null, "Sending your request…");
+
+          return fetch(WEB3FORMS_SUBMIT_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -623,9 +663,19 @@
           .finally(function () {
             if (submitBtn) {
               submitBtn.disabled = false;
-              submitBtn.textContent = "Send request";
+              submitBtn.textContent = "Send testing request";
             }
           });
+        }).catch(function () {
+          setStatus(
+            "error",
+            "Could not prepare the unlock code. Try again or email " + TESTER_REQUEST_EMAIL + " directly."
+          );
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Send testing request";
+          }
+        });
       });
     })();
 

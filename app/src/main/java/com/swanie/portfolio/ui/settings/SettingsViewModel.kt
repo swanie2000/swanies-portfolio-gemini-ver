@@ -15,8 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.R
 import com.swanie.portfolio.BuildConfig
 import com.swanie.portfolio.billing.AccessTier
+import com.swanie.portfolio.billing.BetaUnlockValidator
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.billing.MonetizationPackage
+import com.swanie.portfolio.data.ProUnlockPreferences
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.data.feedback.BugReportSubmitter
@@ -57,6 +59,16 @@ enum class RestorePurchasesResult {
     FAILED
 }
 
+enum class BetaUnlockRedeemResult {
+    SUCCESS,
+    NOT_CONFIGURED,
+    PROGRAM_ENDED,
+    MALFORMED,
+    WRONG_EMAIL,
+    EXPIRED,
+    INVALID,
+}
+
 /**
  * Settings and widget-registry flows. Assets-versus-appearance sub-navigation in the widget manager
  * is local compose state in [WidgetManagerScreen]; this class continues to own vault targeting and sync.
@@ -68,9 +80,12 @@ class SettingsViewModel @Inject constructor(
     private val database: AppDatabase,
     private val securityManager: SecurityManager,
     private val monetizationManager: MonetizationManager,
+    private val proUnlockPreferences: ProUnlockPreferences,
     private val vaultBackupEngine: VaultBackupEngine,
     private val bugReportSubmitter: BugReportSubmitter,
 ) : ViewModel() {
+
+    val isBetaUnlockConfigured: Boolean = BuildConfig.BETA_UNLOCK_SECRET.isNotBlank()
 
     private val userConfigDao = database.userConfigDao()
     private val userDao = database.userDao()
@@ -146,8 +161,15 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            monetizationManager.entitlement.collect { snapshot ->
-                _isProUser.value = snapshot.tier == AccessTier.PRO && snapshot.isActive
+            combine(
+                monetizationManager.entitlement,
+                proUnlockPreferences.state,
+            ) { snapshot, unlock ->
+                val revenueCatPro = snapshot.tier == AccessTier.PRO && snapshot.isActive
+                val unlockPro = unlock.isActive()
+                revenueCatPro || unlockPro
+            }.collect { isPro ->
+                _isProUser.value = isPro
             }
         }
         viewModelScope.launch {
@@ -256,6 +278,47 @@ class SettingsViewModel @Inject constructor(
                     RestorePurchasesResult.NO_ENTITLEMENT_FOUND
                 }
             )
+        }
+    }
+
+    fun redeemBetaUnlockCode(rawCode: String, onComplete: (BetaUnlockRedeemResult) -> Unit) {
+        viewModelScope.launch {
+            if (!isBetaUnlockConfigured) {
+                onComplete(BetaUnlockRedeemResult.NOT_CONFIGURED)
+                return@launch
+            }
+            val profileEmail = userDao.getFirstUser()?.email?.trim()?.lowercase()
+            when (
+                val result = BetaUnlockValidator.validate(
+                    rawCode = rawCode,
+                    loggedInEmail = profileEmail,
+                )
+            ) {
+                is BetaUnlockValidator.Result.Valid -> {
+                    proUnlockPreferences.saveUnlock(
+                        email = result.normalizedEmail,
+                        expiryDate = result.expiryDate,
+                    )
+                    onComplete(BetaUnlockRedeemResult.SUCCESS)
+                }
+                is BetaUnlockValidator.Result.Invalid -> {
+                    val mapped = when (result.reason) {
+                        BetaUnlockValidator.Reason.NOT_CONFIGURED ->
+                            BetaUnlockRedeemResult.NOT_CONFIGURED
+                        BetaUnlockValidator.Reason.PROGRAM_ENDED ->
+                            BetaUnlockRedeemResult.PROGRAM_ENDED
+                        BetaUnlockValidator.Reason.MALFORMED_CODE ->
+                            BetaUnlockRedeemResult.MALFORMED
+                        BetaUnlockValidator.Reason.WRONG_EMAIL ->
+                            BetaUnlockRedeemResult.WRONG_EMAIL
+                        BetaUnlockValidator.Reason.EXPIRED ->
+                            BetaUnlockRedeemResult.EXPIRED
+                        BetaUnlockValidator.Reason.INVALID_SIGNATURE ->
+                            BetaUnlockRedeemResult.INVALID
+                    }
+                    onComplete(mapped)
+                }
+            }
         }
     }
 

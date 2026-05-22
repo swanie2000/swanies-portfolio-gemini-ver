@@ -33,6 +33,10 @@ fun resolveLocalSecret(name: String): String {
 /** Google Play / store builds: RevenueCat *public* SDK key (dashboard → usually `goog_…`). Never use a `test_` key here — the SDK exits the app on release if it sees a test key. */
 fun resolveRevenueCatPublicApiKey(): String = resolveLocalSecret("REVENUECAT_PUBLIC_API_KEY").trim()
 
+/** Last calendar day beta unlock codes can be redeemed (yyyy-MM-dd). Public in APK; not secret. */
+fun resolveBetaUnlockProgramEnd(): String =
+    resolveLocalSecret("BETA_UNLOCK_PROGRAM_END").trim().ifBlank { "2027-06-01" }
+
 /** Fails release bundles if the Play key is missing or still a sandbox `test_` key. */
 fun validateRevenueCatPublicApiKeyForRelease() {
     val key = resolveRevenueCatPublicApiKey()
@@ -61,8 +65,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 12
-        versionName = "1.0.11"
+        versionCode = 13
+        versionName = "1.0.12"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
@@ -76,6 +80,8 @@ android {
             )
             buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
+            buildConfigField("String", "BETA_UNLOCK_SECRET", "\"${resolveLocalSecret("BETA_UNLOCK_SECRET")}\"")
+            buildConfigField("String", "BETA_UNLOCK_PROGRAM_END", "\"${resolveBetaUnlockProgramEnd()}\"")
         }
         release {
             isMinifyEnabled = false
@@ -87,6 +93,8 @@ android {
             )
             buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
+            buildConfigField("String", "BETA_UNLOCK_SECRET", "\"${resolveLocalSecret("BETA_UNLOCK_SECRET")}\"")
+            buildConfigField("String", "BETA_UNLOCK_PROGRAM_END", "\"${resolveBetaUnlockProgramEnd()}\"")
         }
     }
     compileOptions {
