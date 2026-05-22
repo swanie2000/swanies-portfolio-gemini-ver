@@ -1,6 +1,6 @@
 # Beta unlock codes (planned — not implemented yet)
 
-**Status:** **Implemented** (app **1.0.12 (13)** + website join-testing form). Owner must set **`BETA_UNLOCK_SECRET`** in **`local.properties`** (Android) and GitHub repo secret (live site deploy).
+**Status:** **Implemented** (app **1.0.13** + website join-testing form). Play upload: **`versionCode` 13** after current live **12 (1.0.11)**. Owner must set **`BETA_UNLOCK_SECRET`** in **`local.properties`** (Android) and GitHub repo secret (live site deploy).
 
 **Problem:** Free tier is intentionally naggy; beta testers need **Pro** without RevenueCat dashboard grants (sandbox/production confusion, no “add customer” UI). **RevenueCat stays** for real Play purchases and restore.
 

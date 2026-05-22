@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-23 — **Beta unlock:** **30-day** codes; **RevenueCat supersedes** code (RC-only after grant). App **1.0.13 (14)**. Program sunset **2027-06-01** unchanged. Owner: set **`BETA_UNLOCK_SECRET`** in **`local.properties`** + GitHub Actions secret (same value). Upload **13** to Play before testers use codes. + per-code expiry + **program sunset** → Pro without RevenueCat grants for testers. Full spec **`docs/BETA_UNLOCK_CODE.md`**. **Until shipped:** recruiting blocked on painful RC workflow; free tier too naggy for meaningful beta. **RevenueCat stays** for Play purchases. **Payments:** **26** refunds; **$0** earnings. **License testing** unchecked. **No app/website code today** — docs only, pushed to **`main`**.
+**Last updated:** 2026-05-23 — **Beta unlock:** **30-day** codes; **RevenueCat supersedes** code. **Next Play upload:** **`1.0.13`** (repo **`versionCode` 13** — after live **`1.0.11` / 12**). In-app stamp shows **`v1.0.13`** only (no build number). Program sunset **2027-06-01**. Owner: **`BETA_UNLOCK_SECRET`** in **`local.properties`** + GitHub secret; ship signed AAB to internal testing.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -41,7 +41,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **License testing (list 2)** | **Unchecked** — **Swanie's Portfolio Testers** email list **not** selected on **Settings → License testing** (saved). **Do not** check for friends. Publisher account may still get test billing. **`RESPOND_NORMALLY`** when re-enabled for dev-only card QA. |
 | **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family) on **Test and release → Testing → Internal testing → Testers** — install + daily use. Add **all recruits here** (cap **100**). **≥12** needed for **closed** track path, **not** on license list. |
 | **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** in the **Android Studio Terminal** (project root). Default AAB path **`app\release\app-release.aab`** — Studio overwrites each build; **do not** pass **`-AabPath`** unless debugging a one-off export. |
-| **Version on device** | **`BuildVersionLabel`** **top-right** — **`v1.0.11 (12)`** (owner verified). |
+| **Version on device** | Play live **`v1.0.11`**; repo ready **`v1.0.13`** (**`BuildVersionLabel`** — name only, no **`(versionCode)`**). |
 
 **Play Console — where things stand (human progress):**
 

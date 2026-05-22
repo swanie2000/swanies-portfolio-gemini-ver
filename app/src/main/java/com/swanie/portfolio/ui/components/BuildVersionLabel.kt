@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.BuildConfig
 
 /**
- * Small build stamp for auth / onboarding screens so testers can confirm Play version
- * before creating an account or signing in. Pin with [Modifier.align][androidx.compose.ui.Alignment.TopEnd]
+ * Small build stamp for auth / onboarding screens (e.g. v1.0.13 — matches Play versionName).
+ * Pin with [Modifier.align][androidx.compose.ui.Alignment.TopEnd]
  * on a root [androidx.compose.foundation.layout.Box] that does **not** use [imePadding].
  */
 @Composable
@@ -22,7 +22,7 @@ fun BuildVersionLabel(
     contentColor: Color = Color.White.copy(alpha = 0.45f),
 ) {
     Text(
-        text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+        text = "v${BuildConfig.VERSION_NAME}",
         color = contentColor,
         fontSize = 9.sp,
         fontWeight = FontWeight.Normal,
