@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -185,21 +187,34 @@ class AssetRepository @Inject constructor(
         }
     }
 
-    suspend fun pushFreshAssetsToWidget(context: Context, portfolioId: String, freshAssets: List<AssetEntity>) {
+    /** Push latest DB assets to one widget instance (e.g. refresh tap on a specific Glance id). */
+    suspend fun pushAssetsToGlance(context: Context, glanceId: GlanceId) {
+        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val vaultId = prefs[PortfolioWidget.VAULT_ID_KEY]?.takeIf { it > 0 } ?: return
+        val assets = assetDao.getAssetsByVaultOnce(vaultId)
+        pushFreshAssetsToWidget(context, vaultId.toString(), assets, targetGlanceId = glanceId)
+    }
+
+    suspend fun pushFreshAssetsToWidget(
+        context: Context,
+        portfolioId: String,
+        freshAssets: List<AssetEntity>,
+        targetGlanceId: GlanceId? = null,
+    ) {
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val componentName = ComponentName(context, PortfolioWidgetReceiver::class.java)
-        
+        val glanceManager = GlanceAppWidgetManager(context)
+
         val vaultIdInt = portfolioId.toIntOrNull() ?: 1
         val vault = vaultDao.getVaultById(vaultIdInt) ?: return
-        
-        val idsToUpdate = if (vault.appWidgetId != null && vault.appWidgetId != -1) {
-            intArrayOf(vault.appWidgetId)
-        } else {
-            appWidgetManager.getAppWidgetIds(componentName)
+
+        val idsToUpdate = when {
+            targetGlanceId != null -> intArrayOf(glanceManager.getAppWidgetId(targetGlanceId))
+            vault.appWidgetId != null && vault.appWidgetId != -1 -> intArrayOf(vault.appWidgetId)
+            else -> appWidgetManager.getAppWidgetIds(componentName)
         }
 
         if (idsToUpdate.isEmpty()) return
-        val glanceManager = GlanceAppWidgetManager(context)
 
         idsToUpdate.forEach { id ->
             val vSafe = vaultDao.getVaultByAppWidgetId(id) ?: vault
@@ -277,7 +292,8 @@ class AssetRepository @Inject constructor(
                     writeWidgetPackedAssetRows(rowLines)
                     
                     this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
-                    val total = freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }.sumOf { AssetValuation.holdingValueUsd(it) }
+                    this[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
+                    val total = assetDao.getAssetsByVaultOnce(vSafe.id).sumOf { AssetValuation.holdingValueUsd(it) }
                     this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
                 }.toPreferences()
             }

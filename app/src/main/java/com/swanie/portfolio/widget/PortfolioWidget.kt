@@ -1,5 +1,6 @@
 package com.swanie.portfolio.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -763,21 +764,24 @@ class RefreshCallback : ActionCallback {
             try {
                 val entryPoint = EntryPointAccessors.fromApplication(appContext, PortfolioWidget.PortfolioWidgetEntryPoint::class.java)
                 val repo = entryPoint.assetRepository()
-                
-                val prefs = PortfolioWidget().getAppWidgetState<Preferences>(appContext, glanceId)
-                val boundId = prefs[PortfolioWidget.VAULT_ID_KEY] ?: 1
-                
-                try { repo.javaClass.getMethod("invalidatePriceCache").invoke(repo) } catch (e: Exception) {}
-                repo.refreshAssets(force = true, portfolioId = boundId.toString())
 
-                val newTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date())
-                updateAppWidgetState(appContext, PreferencesGlanceStateDefinition, glanceId) { p ->
-                    p.toMutablePreferences().apply {
-                        this[PortfolioWidget.LAST_UPDATED_KEY] = newTime
-                        this[PortfolioWidget.FORCE_UPDATE_KEY] = System.currentTimeMillis()
-                    }.toPreferences()
-                }
+                val prefs = getAppWidgetState(appContext, PreferencesGlanceStateDefinition, glanceId)
+                val boundId = prefs[PortfolioWidget.VAULT_ID_KEY]?.takeIf { it > 0 } ?: return@withContext
+
+                repo.refreshAssets(force = true, portfolioId = boundId.toString())
+                // Full push to the tapped widget (rows + header total). Avoid a partial prefs write here —
+                // it can race with the repo push and leave STATIC_TOTAL_BALANCE_KEY stale while rows update.
+                repo.pushAssetsToGlance(appContext, glanceId)
+
                 PortfolioWidget().update(appContext, glanceId)
+
+                val appWidgetId = GlanceAppWidgetManager(appContext).getAppWidgetId(glanceId)
+                appContext.sendBroadcast(
+                    Intent(appContext, PortfolioWidgetReceiver::class.java).apply {
+                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(appWidgetId))
+                    },
+                )
             } catch (e: Exception) {
                 Log.e("PortfolioWidget", "Refresh failed", e)
             }
