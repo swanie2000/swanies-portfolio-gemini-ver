@@ -3,12 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Swanie's Portfolio — Android app to track crypto and precious metals. Join free testing before Play Store launch." />
+  <meta name="description" content="Swanie's Portfolio — Android app to track crypto and precious metals in one portfolio. Join free internal testing: local-first vault, widgets, 90 days Pro for testers." />
   <meta name="theme-color" content="#000416" />
+  <link rel="canonical" href="https://swaniedesigns.com/" />
+  <meta name="robots" content="index, follow" />
+  <!-- Google Search Console: paste token from Search Console → HTML tag; remove comment markers. See docs/SEARCH_CONSOLE_SETUP.md -->
+  <!-- <meta name="google-site-verification" content="PASTE_TOKEN_HERE" /> -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Swanie's Portfolio" />
+  <meta property="og:title" content="Swanie's Portfolio — Crypto &amp; precious metals tracker for Android" />
+  <meta property="og:description" content="Track crypto and precious metals together. Local-first Android portfolio with widgets and analytics. Join free internal testing before public launch." />
+  <meta property="og:url" content="https://swaniedesigns.com/" />
+  <meta property="og:image" content="https://swaniedesigns.com/play_store_feature_graphic_1024x500.png" />
+  <meta property="og:image:width" content="1024" />
+  <meta property="og:image:height" content="500" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Swanie's Portfolio — Crypto &amp; precious metals" />
+  <meta name="twitter:description" content="Android portfolio app for crypto and bullion. Join free beta testing at swaniedesigns.com." />
+  <meta name="twitter:image" content="https://swaniedesigns.com/play_store_feature_graphic_1024x500.png" />
   <!-- Tab icon: navy #000416 baked into favicon-tab.png so the swan reads on light browser chrome -->
   <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
   <link rel="apple-touch-icon" href="favicon-tab.png?v=2" />
-  <title>Swanie's Portfolio — Crypto &amp; precious metals</title>
+  <title>Swanie's Portfolio — Crypto &amp; precious metals tracker (Android)</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://swaniedesigns.com/#organization",
+        "name": "Swanie Designs",
+        "url": "https://swaniedesigns.com/",
+        "logo": "https://swaniedesigns.com/play_store_app_icon_512.png"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://swaniedesigns.com/#website",
+        "url": "https://swaniedesigns.com/",
+        "name": "Swanie's Portfolio",
+        "publisher": { "@id": "https://swaniedesigns.com/#organization" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Swanie's Portfolio",
+        "operatingSystem": "Android",
+        "applicationCategory": "FinanceApplication",
+        "description": "Local-first Android portfolio tracker for cryptocurrency and precious metals with home-screen widgets, analytics, and encrypted backup.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/PreOrder"
+        },
+        "downloadUrl": "https://swaniedesigns.com/#join-testing",
+        "softwareVersion": "1.0.14",
+        "author": { "@id": "https://swaniedesigns.com/#organization" }
+      }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -28,6 +81,7 @@
       </a>
       <nav class="nav-links" aria-label="Site">
         <a href="#join-testing">Join testing</a>
+        <a href="#faq">FAQ</a>
         <a href="#features">Features</a>
         <a href="privacy.html">Privacy</a>
         <a href="press.html">Press</a>
@@ -235,6 +289,37 @@
           Some capabilities are offered as an in-app subscription where available (themes, deeper analytics,
           widget customization, and related Pro surfaces). Details appear inside the app and at checkout.
         </p>
+      </section>
+
+      <section id="faq" class="faq-section" aria-labelledby="faq-heading">
+        <h2 class="section-title" id="faq-heading">Frequently asked questions</h2>
+        <p class="section-sub">Quick answers for testers and search — Android portfolio app for crypto and precious metals.</p>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>How do I join internal testing?</summary>
+            <p>Fill out the form at <a href="#join-testing">Join testing</a> with the <strong>same Gmail</strong> you use on Google Play. Swanie adds you to the tester list and emails install steps plus a Pro unlock code (usually within a day).</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is the app free during beta?</summary>
+            <p>Yes. Internal testing is free to install. Testers receive <strong>90 days of Pro</strong> via a personal unlock code in email — not a Play subscription. Do not buy Monthly, Yearly, or Lifetime in the app while testing.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Android only?</summary>
+            <p>Yes. Swanie's Portfolio is an <strong>Android</strong> app distributed through Google Play internal testing. There is no iPhone version.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Where is my portfolio data stored?</summary>
+            <p>Your vault stays <strong>on your device</strong> (local-first). Encrypted backup is a file you export and keep. Optional cloud sync is planned for a future release; price lookups and optional feedback use the network when you use those features.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I track gold, silver, and crypto together?</summary>
+            <p>Yes. The app supports <strong>cryptocurrency and precious metals</strong> in one portfolio, with gram, kilo, and troy-ounce valuation, widgets, and on-device analytics.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is this financial advice?</summary>
+            <p>No. Swanie's Portfolio is a tracking tool only. It does not provide investment, tax, or legal advice. See our <a href="privacy.html">privacy policy</a> and in-app terms.</p>
+          </details>
+        </div>
       </section>
 
       <section id="join-testing">

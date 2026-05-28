@@ -15,6 +15,16 @@ Marketing site (**`index.html`**) plus **`privacy.html`**, **`press.html`** (pre
 5. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
 6. **`bg-pattern.svg`** — Very light dot/grid/wave texture behind **`bg-layer`**; tweak opacity in **`styles.css`** (`.bg-pattern` and `prefers-color-scheme` blocks) if you want it stronger or softer.
 
+## SEO & Search Console
+
+- **`robots.txt`** — allows crawlers; points to **`sitemap.xml`**.
+- **`sitemap.xml`** — home, privacy, press (canonical **`https://swaniedesigns.com/`** URLs).
+- **`index.html`**, **`privacy.html`**, **`press.html`** — canonical links, Open Graph / Twitter cards, JSON-LD on the homepage.
+- **Verify Google Search Console** — step-by-step: **`docs/SEARCH_CONSOLE_SETUP.md`** (HTML meta tag, HTML file, or Cloudflare DNS TXT).
+- **Recruit testers (4 → 12+)** — post templates: **`docs/RECRUIT_INTERNAL_TESTERS.md`**.
+
+After deploy, confirm **`https://swaniedesigns.com/robots.txt`** and **`https://swaniedesigns.com/sitemap.xml`** load in a browser.
+
 ## Free hosting options
 
 ### GitHub Pages (this repo)

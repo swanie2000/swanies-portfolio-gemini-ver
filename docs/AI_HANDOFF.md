@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Play internal `14 (1.0.14)` uploaded** (widget refresh total fix; propagation ~few hours). **`website/marketing/`** — FB recruit post PNG tracked in repo. **Beta unlock:** **30-day** codes; **RevenueCat supersedes** code. In-app stamp **`v1.0.14`**. Program sunset **2027-06-01**.
+**Last updated:** 2026-05-18 — **SEO baseline deployed:** `robots.txt`, `sitemap.xml`, Open Graph, canonical URLs, JSON-LD, homepage FAQ. **Search Console:** owner verifies via **`docs/SEARCH_CONSOLE_SETUP.md`**. **Testers:** **4 / 12** internal — recruit playbook **`docs/RECRUIT_INTERNAL_TESTERS.md`**. **Play internal `14 (1.0.14)`** propagating (widget fix).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -51,7 +51,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **14 (1.0.14)** — widget refresh total fix + beta unlock codes; **`#join-testing`** → Play **Testers** + Web3Forms code email. **Recruit:** **`website/marketing/facebook-join-testing-post.png`** for FB; link **`https://swaniedesigns.com/#join-testing`**. **Do not** use Play subs for testers. **Billing incident:** **26** refunds; payments profile **$0**; tax **not** submitted yet (OK for internal-only).
+- **Testing path:** **Internal testing** **14 (1.0.14)** — **4 testers** (need **≥12** for closed track). Recruit: **`docs/RECRUIT_INTERNAL_TESTERS.md`** + **`website/marketing/facebook-join-testing-post.png`** → **`https://swaniedesigns.com/#join-testing`**. SEO live: **`sitemap.xml`**, FAQ — long-term; **direct posts** fill the list faster.
 
 **Marketing site (2026-05-21):** **`website/index.html`** — beta form copy (1 year Pro, same Gmail); **`buildTesterRequestAdminEmail`** reply block + RC grant steps; gold **`.hero-recruit`** link. Deploy: **GitHub Actions** on **`main`** → **https://swaniedesigns.com/#join-testing**.
 
@@ -190,12 +190,12 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Owner QA (widget):** After **`v1.0.14 (14)`** lands from Play — refresh widget **without opening app**; top total + rows + time should update together.
-2. **Recruit internal testers:** Post **`website/marketing/facebook-join-testing-post.png`** → **`https://swaniedesigns.com/#join-testing`**; Web3Forms email → add Gmail on **Internal testing → Testers** → reply with code.
-3. **Closed testing (agent when ≥12 internal):** Promote build to closed; tick checklist.
-4. **Listing:** Screenshots, feature graphic, copy.
-5. **`PLAY_URL`** / **Production** after closed gates.
-6. **i18n:** manual **`values-*`** when new strings added.
+1. **Recruit testers (4 → 12):** Follow **`docs/RECRUIT_INTERNAL_TESTERS.md`** — FB post + 1–2 communities this week; process **`#join-testing`** within 24h.
+2. **Google Search Console:** Follow **`docs/SEARCH_CONSOLE_SETUP.md`** — verify property, submit **`sitemap.xml`** (meta tag in **`website/index.html`** is ready for your token).
+3. **Owner QA (widget):** After **`v1.0.14 (14)`** from Play — refresh widget without opening app; total + rows + time update together.
+4. **Closed testing (agent when ≥12 internal):** Promote build to closed; tick checklist.
+5. **Listing:** Screenshots, feature graphic, copy.
+6. **`PLAY_URL`** / **Production** after closed gates.
 
 ---
 
@@ -235,8 +235,9 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal testing → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Beta unlock (planned) | **`docs/BETA_UNLOCK_CODE.md`** — design; implement **`ProUnlockPreferences`**, **`BetaUnlockValidator`**, **`SettingsViewModel`**, **`scripts/generate-beta-unlock-code.ps1`** |
-| Marketing site | `website/index.html` — **`buildTesterRequestAdminEmail()`** (reply-ready; unlock code in admin email), **`#join-testing`**, Web3Forms; **`deploy-website.yml`** → **https://swaniedesigns.com** |
-| Marketing / recruit assets | **`website/marketing/facebook-join-testing-post.png`** — FB post graphic for internal testing signup (not deployed to site; repo-only source) |
+| Marketing site | `website/index.html` — FAQ, SEO meta, **`#join-testing`**, Web3Forms; **`robots.txt`**, **`sitemap.xml`**; **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — verify **`swaniedesigns.com`**, submit sitemap; placeholder meta tag in **`website/index.html`** |
+| Recruit testers (4→12) | **`docs/RECRUIT_INTERNAL_TESTERS.md`** — FB/Reddit copy; **`website/marketing/facebook-join-testing-post.png`** |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
 | Play checklist | `Master_Build_Checklist.md` |
@@ -248,6 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-18 — Website SEO + Search Console + recruit docs:** **`robots.txt`**, **`sitemap.xml`**, canonical/OG/Twitter/JSON-LD on all pages, homepage **FAQ**; **`docs/SEARCH_CONSOLE_SETUP.md`**, **`docs/RECRUIT_INTERNAL_TESTERS.md`**. Testers **4/12**. **Handoff + push `main`** → Pages deploy.
 - **2026-05-18 — Play 1.0.14 uploaded + marketing assets:** Owner uploaded internal **`14 (1.0.14)`** (widget fix). **`website/marketing/facebook-join-testing-post.png`** added to repo. **Handoff + push `main`**.
 - **2026-05-18 — Widget refresh total fix + 1.0.14:** **`RefreshCallback`** — full **`pushAssetsToGlance`** to tapped widget (rows + header total); removed partial prefs write that could leave **`STATIC_TOTAL_BALANCE_KEY`** stale; **`AssetRepository.pushAssetsToGlance`**, total via **`getAssetsByVaultOnce`**. **`versionCode` 14** / **`1.0.14`**. **Handoff + push `main`** → owner uploads internal **14**.
 - **2026-05-23 — Beta unlock + website auto-code:** App **1.0.13 (13)** — `BetaUnlockValidator`, `ProUnlockPreferences`, paywall unlock UI; website form generates code in admin email; deploy injects secret; **`scripts/generate-beta-unlock-code.ps1`**. Push **`main`**.
