@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SwaniesPortfolio</string>
+    <string name="launcher_short_name">Portfolio</string>
     <string name="language_selector_title">言語を選択</string>
     <string name="language_english">英語</string>
     <string name="language_spanish">スペイン語</string>

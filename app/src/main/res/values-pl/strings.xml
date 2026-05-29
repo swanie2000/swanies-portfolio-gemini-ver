@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SwaniesPortfolio</string>
+    <string name="launcher_short_name">Portfolio</string>
     <string name="language_selector_title">Wybierz język</string>
     <string name="language_english">Angielski</string>
     <string name="language_spanish">Hiszpański</string>
