@@ -12,6 +12,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ fun BetaUnlockCodeSection(
     if (!settingsViewModel.isBetaUnlockConfigured) return
 
     val context = LocalContext.current
+    val profileEmail by settingsViewModel.profileEmail.collectAsState()
     var codeInput by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
@@ -56,6 +58,24 @@ fun BetaUnlockCodeSection(
             fontSize = 12.sp,
             lineHeight = 16.sp,
         )
+        Spacer(modifier = Modifier.height(6.dp))
+        if (profileEmail.contains("@")) {
+            Text(
+                text = stringResource(R.string.beta_unlock_signed_in_as, profileEmail),
+                color = accent.copy(alpha = 0.95f),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 15.sp,
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.beta_unlock_signed_in_missing),
+                color = Color(0xFFFF9800),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 15.sp,
+            )
+        }
         Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             value = codeInput,
@@ -95,6 +115,8 @@ fun BetaUnlockCodeSection(
                             R.string.beta_unlock_error_expired
                         BetaUnlockRedeemResult.INVALID ->
                             R.string.beta_unlock_error_invalid
+                        BetaUnlockRedeemResult.INVALID_SIGNATURE ->
+                            R.string.beta_unlock_error_signature
                         BetaUnlockRedeemResult.SUPERSEDED_BY_REVENUECAT ->
                             R.string.beta_unlock_error_superseded
                     }

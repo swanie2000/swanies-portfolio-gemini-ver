@@ -187,10 +187,13 @@
     <string name="pro_gate_go_back">GO BACK</string>
     <string name="beta_unlock_section_title">Beta unlock code</string>
     <string name="beta_unlock_section_hint">Paste the personal code from the email Swanie sent you. It only works for the account you signed in with.</string>
+    <string name="beta_unlock_signed_in_as">Unlock code must match signed-in Gmail: %1$s</string>
+    <string name="beta_unlock_signed_in_missing">Add your Gmail in account settings — the code is tied to your login email.</string>
     <string name="beta_unlock_code_label">Unlock code</string>
     <string name="beta_unlock_submit">UNLOCK PRO</string>
     <string name="beta_unlock_success">Pro unlocked. Restart the app if features do not appear.</string>
     <string name="beta_unlock_error_invalid">That code is not valid. Check the code and try again.</string>
+    <string name="beta_unlock_error_signature">That code does not match this signed-in Gmail. Confirm the email above, or ask Swanie for a new code generated for this account on the same PC that built the Play app.</string>
     <string name="beta_unlock_error_email">Sign in with the same Gmail Swanie added to testing, then try again.</string>
     <string name="beta_unlock_error_expired">This code has expired.</string>
     <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>

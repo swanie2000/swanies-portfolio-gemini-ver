@@ -54,6 +54,18 @@ fun validateRevenueCatPublicApiKeyForRelease() {
     }
 }
 
+/** Beta unlock codes are HMAC-signed at compile time — empty secret means every code shows "not valid". */
+fun validateBetaUnlockSecretForRelease() {
+    val secret = resolveLocalSecret("BETA_UNLOCK_SECRET").trim()
+    check(secret.isNotBlank()) {
+        "Release build blocked: set BETA_UNLOCK_SECRET in local.properties (same value as GitHub secret). " +
+            "Without it, beta unlock codes never validate in Play builds."
+    }
+    check(secret.length >= 8) {
+        "Release build blocked: BETA_UNLOCK_SECRET must be at least 8 characters."
+    }
+}
+
 /** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
 fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_KEY").trim()
 
@@ -65,8 +77,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 16
-        versionName = "1.0.16"
+        versionCode = 18
+        versionName = "1.0.18"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
     }
@@ -135,13 +147,18 @@ kotlin {
 /** Run before every release AAB/APK so Play never gets a test RevenueCat key again. */
 listOf("bundleRelease", "assembleRelease", "packageRelease").forEach { taskName ->
     tasks.matching { it.name == taskName }.configureEach {
-        dependsOn("validateRevenueCatReleaseKey")
+        dependsOn("validateRevenueCatReleaseKey", "validateBetaUnlockReleaseSecret")
     }
 }
 tasks.register("validateRevenueCatReleaseKey") {
     group = "verification"
     description = "Ensures REVENUECAT_PUBLIC_API_KEY is set to goog_… (not test_…)"
     doLast { validateRevenueCatPublicApiKeyForRelease() }
+}
+tasks.register("validateBetaUnlockReleaseSecret") {
+    group = "verification"
+    description = "Ensures BETA_UNLOCK_SECRET is set so beta codes validate in Play builds"
+    doLast { validateBetaUnlockSecretForRelease() }
 }
 
 /** After bundleRelease, fails if the AAB still embeds a sandbox `test_` RevenueCat key. */
@@ -177,6 +194,39 @@ tasks.register("verifyReleaseBundleRevenueCatKey") {
                 "Set REVENUECAT_PUBLIC_API_KEY in local.properties and rebuild."
         }
         logger.lifecycle("Verified ${aab.name}: production RevenueCat key (goog_…), no test_dz")
+    }
+}
+
+/** After bundleRelease, fails if BETA_UNLOCK_SECRET from local.properties is not embedded in the AAB. */
+tasks.register("verifyReleaseBundleBetaUnlockSecret") {
+    group = "verification"
+    description = "Scans release AAB for BETA_UNLOCK_SECRET from local.properties"
+    dependsOn("bundleRelease")
+    doLast {
+        val secret = resolveLocalSecret("BETA_UNLOCK_SECRET").trim()
+        check(secret.isNotBlank()) {
+            "Set BETA_UNLOCK_SECRET in local.properties before verifying the release bundle."
+        }
+        val needle = secret.take(16)
+        val bundleDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
+        val aab =
+            bundleDir
+                .listFiles()
+                ?.firstOrNull { it.isFile && it.extension == "aab" }
+                ?: error("No release .aab under ${bundleDir.absolutePath} — run bundleRelease first")
+        var found = false
+        ZipFile(aab).use { zip ->
+            zip.entries().asSequence().filter { it.name.endsWith(".dex") }.forEach { entry ->
+                zip.getInputStream(entry).use { input ->
+                    if (input.readBytes().decodeToString().contains(needle)) found = true
+                }
+            }
+        }
+        check(found) {
+            "Release AAB is missing BETA_UNLOCK_SECRET from local.properties. " +
+                "Build → Clean Project, Sync Gradle, rebuild signed bundle, then regenerate unlock codes."
+        }
+        logger.lifecycle("Verified ${aab.name}: BETA_UNLOCK_SECRET embedded — codes from this PC should validate.")
     }
 }
 

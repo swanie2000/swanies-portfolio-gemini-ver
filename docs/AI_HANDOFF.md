@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-28 — **Play internal `15 (1.0.15)`** live (launcher **Portfolio**). **Repo `16 (1.0.16)`** — beta unlock works again when RC inactive (family recovery); paywall code field **`imePadding`**. Wife **`eun.oh70@gmail.com`**: RC customer deleted → use unlock code after **16**. **Testers:** **4 / 12**.
+**Last updated:** 2026-05-18 — **Play internal `17 (1.0.17)`** uploaded by owner; repo **`18 (1.0.18)`** — beta unlock UX (signed-in Gmail hint, signature-specific error), release **`BETA_UNLOCK_SECRET`** gate + **`verify-aab-beta-unlock-secret.ps1`**. Wife **`eun.oh70@gmail.com`**: unlock code failed on **16/17** (generic “not valid” = secret/signature mismatch); **regenerate code on build PC after verify script OK** on **18** AAB. **Testers:** **4 / 12**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -37,11 +37,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 |-------|--------|
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
-| **Play internal testing** | **Active: 15 (1.0.15)** on Play; repo **`16 (1.0.16)`** — beta unlock recovery + keyboard fix. **Recruiting** (internal cap **100**). |
+| **Play internal testing** | **Active: 17 (1.0.17)** on Play (owner upload); repo **`18 (1.0.18)`** — beta unlock verify + clearer redeem errors. **Recruiting** (internal cap **100**). |
 | **License testing (list 2)** | **Unchecked** — **Swanie's Portfolio Testers** email list **not** selected on **Settings → License testing** (saved). **Do not** check for friends. Publisher account may still get test billing. **`RESPOND_NORMALLY`** when re-enabled for dev-only card QA. |
 | **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family) on **Test and release → Testing → Internal testing → Testers** — install + daily use. Add **all recruits here** (cap **100**). **≥12** needed for **closed** track path, **not** on license list. |
-| **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** in the **Android Studio Terminal** (project root). Default AAB path **`app\release\app-release.aab`** — Studio overwrites each build; **do not** pass **`-AabPath`** unless debugging a one-off export. |
-| **Version on device** | Play internal **`v1.0.15 (15)`**; repo **`v1.0.16 (16)`** — family beta-code recovery (**`BuildVersionLabel`** shows version name only). |
+| **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** and **`.\scripts\verify-aab-beta-unlock-secret.ps1`** (project root; default **`app\release\app-release.aab`**). Both must **OK** before Play upload. Generate unlock codes **only on this PC** after beta-unlock verify passes. |
+| **Version on device** | Play internal **`v1.0.17 (17)`**; repo **`v1.0.18 (18)`** — family beta-code path + AAB secret verification. |
 
 **Play Console — where things stand (human progress):**
 
@@ -190,8 +190,8 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Play upload:** internal **`16 (1.0.16)`** — beta unlock when RC inactive; paywall keyboard fix; **`.\scripts\verify-aab-revenuecat-key.ps1`** after AAB.
-2. **Wife Pro:** After **16** → **`.\scripts\generate-beta-unlock-code.ps1 -Email "eun.oh70@gmail.com" -Expires "2027-06-01"`** → redeem on Pro paywall (same Gmail as in-app account).
+1. **Play upload:** internal **`18 (1.0.18)`** — run **`verify-aab-revenuecat-key.ps1`** + **`verify-aab-beta-unlock-secret.ps1`** (both **OK**) → upload.
+2. **Wife Pro:** After **18** on her phone → **`generate-beta-unlock-code.ps1 -Email "eun.oh70@gmail.com" -Expires "2027-06-01"`** → redeem (paywall shows signed-in Gmail; must match).
 3. **Recruit testers (4 → 12):** **`docs/RECRUIT_INTERNAL_TESTERS.md`**
 4. **Closed testing (agent when ≥12 internal):** Promote build to closed.
 5. **Listing / Production** after closed gates.
@@ -202,7 +202,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 - **Stack:** Kotlin, Jetpack Compose, Hilt, Room.
 - **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; list column nests each row (**RemoteViews** direct-child limit); metal **`metalWidgetHeadlinePair`** (3 lines, **9sp** / **7sp**) + **`WidgetAssetCardHeight` (62dp)**; swan → **`widgetLaunchMainActivityIntent`**; **`__METAL_DEFAULT__`** / **`file:`** icon packing on push; **`RefreshCallback`** → **`pushAssetsToGlance`** (full rows + **`STATIC_TOTAL_BALANCE_KEY`**) — no partial prefs race.
-- **Pro:** RevenueCat + Play billing; **beta unlock codes** (email-bound, 30-day) when RC inactive — **`BetaUnlockAccess`** allows unlock after RC lapsed even if **`supersededByRevenueCat`** was set; redeem clears superseded flag.
+- **Pro:** RevenueCat + Play billing; **beta unlock codes** (email-bound, HMAC) when RC inactive — **`validateBetaUnlockReleaseSecret`** + **`verifyReleaseBundleBetaUnlockSecret`** / **`scripts/verify-aab-beta-unlock-secret.ps1`** before Play upload; paywall shows signed-in Gmail + signature-specific redeem error.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
@@ -229,8 +229,8 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **Studio** AAB → verify script; **`15` / `1.0.15`** on Play; repo **`16` / `1.0.16`** (beta unlock recovery + paywall keyboard) ready to upload |
-| Beta unlock / family Pro | **`BetaUnlockAccess.kt`**, **`SettingsViewModel.redeemBetaUnlockCode`**, **`BetaUnlockCodeSection.kt`** (ime + bringIntoView); CLI **`scripts/generate-beta-unlock-code.ps1`** |
+| Play internal ship | **Studio** AAB → **`verify-aab-revenuecat-key.ps1`** + **`verify-aab-beta-unlock-secret.ps1`**; repo **`18` / `1.0.18`** ready to build/upload |
+| Beta unlock / family Pro | **`BetaUnlockAccess.kt`**, **`SettingsViewModel.redeemBetaUnlockCode`**, **`BetaUnlockCodeSection.kt`** (signed-in Gmail hint); CLI **`scripts/generate-beta-unlock-code.ps1`**; verify **`scripts/verify-aab-beta-unlock-secret.ps1`** |
 | Tester recruitment | **`#join-testing`** → **Internal testing → Testers** (list 1). **Not** Settings → License testing (list 2). FB asset: **`website/marketing/facebook-join-testing-post.png`** |
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal testing → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
@@ -249,6 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-18 — Beta unlock verify + UX (1.0.18):** Paywall shows signed-in Gmail; **`INVALID_SIGNATURE`** distinct error; **`validateBetaUnlockReleaseSecret`** + Gradle **`verifyReleaseBundleBetaUnlockSecret`**; **`scripts/verify-aab-beta-unlock-secret.ps1`** (ASCII-only for Windows PS 5). Wife code “not valid” on **17** — regenerate after verify **OK** on **18** AAB. **Handoff + push `main`**.
 - **2026-05-28 — Beta unlock recovery + paywall keyboard (1.0.16):** Codes work when RC inactive despite prior supersede; **`saveUnlock`** clears superseded; **`ProFeatureGateScreen`** **`imePadding`**; code field **`bringIntoView`**. Wife lost RC Pro after customer delete — family path = unlock code on **16**. **Handoff + push `main`**.
 - **2026-05-28 — Launcher label Portfolio + 1.0.15:** **`launcher_short_name`**; **`versionCode` 15**. Owner uploaded internal **15**; verified on device. **Handoff + push `main`**.
 - **2026-05-18 — Website SEO + Search Console + recruit docs:** **`robots.txt`**, **`sitemap.xml`**, canonical/OG/Twitter/JSON-LD, FAQ; **`google4604fa7d884d9a10.html`** verified; **`docs/RECRUIT_INTERNAL_TESTERS.md`**. **Handoff + push `main`**.

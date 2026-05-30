@@ -69,6 +69,7 @@ enum class BetaUnlockRedeemResult {
     WRONG_EMAIL,
     EXPIRED,
     INVALID,
+    INVALID_SIGNATURE,
 }
 
 /**
@@ -88,6 +89,9 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val isBetaUnlockConfigured: Boolean = BuildConfig.BETA_UNLOCK_SECRET.isNotBlank()
+
+    private val _profileEmail = MutableStateFlow("")
+    val profileEmail: StateFlow<String> = _profileEmail.asStateFlow()
 
     private val userConfigDao = database.userConfigDao()
     private val userDao = database.userDao()
@@ -183,6 +187,7 @@ class SettingsViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
+            refreshProfileEmail()
             syncMonetizationUserFromProfile()
             monetizationManager.refreshEntitlement()
         }
@@ -332,7 +337,7 @@ class SettingsViewModel @Inject constructor(
                         BetaUnlockValidator.Reason.EXPIRED ->
                             BetaUnlockRedeemResult.EXPIRED
                         BetaUnlockValidator.Reason.INVALID_SIGNATURE ->
-                            BetaUnlockRedeemResult.INVALID
+                            BetaUnlockRedeemResult.INVALID_SIGNATURE
                     }
                     onComplete(mapped)
                 }
@@ -362,6 +367,10 @@ class SettingsViewModel @Inject constructor(
             }
             onComplete(result.isSuccess)
         }
+    }
+
+    private suspend fun refreshProfileEmail() {
+        _profileEmail.value = userDao.getFirstUser()?.email?.trim().orEmpty()
     }
 
     private suspend fun syncMonetizationUserFromProfile() {
