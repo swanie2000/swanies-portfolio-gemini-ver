@@ -637,8 +637,10 @@ fun WidgetManagerScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxWidth()
+                                    .verticalScroll(rememberScrollState())
+                                    .navigationBarsPadding()
                                     .padding(horizontal = 16.dp)
-                                    .padding(top = 12.dp),
+                                    .padding(top = 12.dp, bottom = 24.dp),
                             ) {
                                 WidgetPreviewSlim(
                                     sampleAsset = styleSampleAsset,
@@ -653,27 +655,21 @@ fun WidgetManagerScreen(
                                 )
                                 Spacer(Modifier.height(10.dp))
                                 HorizontalDivider(color = safeThemeText.copy(alpha = 0.12f))
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth()
-                                        .verticalScroll(rememberScrollState())
-                                        .padding(top = 12.dp, bottom = 16.dp),
-                                ) {
-                                    WidgetStudioInlineCompact(
-                                        draftBg,
-                                        draftBgTxt,
-                                        draftCrd,
-                                        draftCrdTxt,
-                                    ) { target, newHex ->
-                                        when (target) {
-                                            0 -> draftBg = newHex
-                                            1 -> draftBgTxt = newHex
-                                            2 -> draftCrd = newHex
-                                            3 -> draftCrdTxt = newHex
-                                        }
+                                Spacer(Modifier.height(12.dp))
+                                WidgetStudioInlineCompact(
+                                    draftBg,
+                                    draftBgTxt,
+                                    draftCrd,
+                                    draftCrdTxt,
+                                ) { target, newHex ->
+                                    when (target) {
+                                        0 -> draftBg = newHex
+                                        1 -> draftBgTxt = newHex
+                                        2 -> draftCrd = newHex
+                                        3 -> draftCrdTxt = newHex
                                     }
                                 }
+                                Spacer(Modifier.height(24.dp))
                             }
                         }
                         3 -> {
