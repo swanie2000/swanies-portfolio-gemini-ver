@@ -171,7 +171,6 @@ class SettingsViewModel @Inject constructor(
                 val isPro = BetaUnlockAccess.resolveIsProUser(
                     revenueCatPro = revenueCatPro,
                     unlock = unlock,
-                    supersededByRevenueCat = unlock.supersededByRevenueCat,
                 )
                 Triple(isPro, revenueCatPro, unlock.supersededByRevenueCat)
             }.collect { (isPro, revenueCatPro, superseded) ->
@@ -299,7 +298,10 @@ class SettingsViewModel @Inject constructor(
                 return@launch
             }
             val unlockState = proUnlockPreferences.state.first()
-            if (unlockState.supersededByRevenueCat) {
+            val revenueCatPro = monetizationManager.entitlement.value.let {
+                it.tier == AccessTier.PRO && it.isActive
+            }
+            if (unlockState.supersededByRevenueCat && revenueCatPro) {
                 onComplete(BetaUnlockRedeemResult.SUPERSEDED_BY_REVENUECAT)
                 return@launch
             }

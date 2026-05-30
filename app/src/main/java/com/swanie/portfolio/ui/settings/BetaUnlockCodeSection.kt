@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedButton
@@ -15,8 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -27,6 +31,8 @@ import androidx.compose.ui.unit.sp
 import com.swanie.portfolio.R
 import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.ui.theme.ProPalette
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun BetaUnlockCodeSection(
@@ -38,6 +44,8 @@ fun BetaUnlockCodeSection(
     if (!settingsViewModel.isBetaUnlockConfigured) return
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
     var codeInput by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
 
@@ -60,7 +68,17 @@ fun BetaUnlockCodeSection(
         OutlinedTextField(
             value = codeInput,
             onValueChange = { codeInput = it.trim().uppercase() },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewRequester(bringIntoViewRequester)
+                .onFocusEvent { event ->
+                    if (event.isFocused) {
+                        scope.launch {
+                            delay(100)
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                },
             label = { Text(stringResource(R.string.beta_unlock_code_label)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),

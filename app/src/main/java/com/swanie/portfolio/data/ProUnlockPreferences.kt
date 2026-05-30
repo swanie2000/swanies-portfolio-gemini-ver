@@ -58,6 +58,7 @@ class ProUnlockPreferences @Inject constructor(
         appContext.proUnlockDataStore.edit { prefs ->
             prefs[Keys.EMAIL] = email.trim().lowercase()
             prefs[Keys.EXPIRY_EPOCH_DAY] = expiryDate.toEpochDay()
+            prefs[Keys.SUPERSEDED_BY_REVENUECAT] = false
         }
     }
 

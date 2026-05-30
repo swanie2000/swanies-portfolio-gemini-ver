@@ -4,6 +4,7 @@ import com.swanie.portfolio.data.ProUnlockState
 
 /**
  * Beta unlock is temporary until RevenueCat entitlement takes over (promotional or purchase).
+ * If RC was active then lapsed, a valid local unlock can apply again (family / recovery).
  */
 object BetaUnlockAccess {
 
@@ -12,11 +13,8 @@ object BetaUnlockAccess {
     fun resolveIsProUser(
         revenueCatPro: Boolean,
         unlock: ProUnlockState,
-        supersededByRevenueCat: Boolean,
-    ): Boolean =
-        if (supersededByRevenueCat) {
-            revenueCatPro
-        } else {
-            revenueCatPro || unlock.isActive()
-        }
+    ): Boolean {
+        if (revenueCatPro) return true
+        return unlock.isActive()
+    }
 }

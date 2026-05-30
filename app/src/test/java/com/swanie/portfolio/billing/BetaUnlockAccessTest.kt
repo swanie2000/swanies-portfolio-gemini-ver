@@ -19,19 +19,17 @@ class BetaUnlockAccessTest {
             BetaUnlockAccess.resolveIsProUser(
                 revenueCatPro = false,
                 unlock = unlock,
-                supersededByRevenueCat = false,
             ),
         )
     }
 
     @Test
-    fun supersededIgnoresActiveUnlock() {
+    fun supersededStillAllowsUnlockWhenRevenueCatInactive() {
         val unlock = ProUnlockState(email = "a@b.com", expiryEpochDay = future)
-        assertFalse(
+        assertTrue(
             BetaUnlockAccess.resolveIsProUser(
                 revenueCatPro = false,
                 unlock = unlock,
-                supersededByRevenueCat = true,
             ),
         )
     }
@@ -43,7 +41,6 @@ class BetaUnlockAccessTest {
             BetaUnlockAccess.resolveIsProUser(
                 revenueCatPro = true,
                 unlock = unlock,
-                supersededByRevenueCat = true,
             ),
         )
     }
@@ -55,7 +52,6 @@ class BetaUnlockAccessTest {
             BetaUnlockAccess.resolveIsProUser(
                 revenueCatPro = true,
                 unlock = unlock,
-                supersededByRevenueCat = false,
             ),
         )
     }
