@@ -526,10 +526,13 @@
     <string name="analytics_live_preset_event_inflation_hedge">• 通膨對沖：金屬部位 +%1$s%%</string>
     <string name="beta_unlock_section_title">Beta unlock code</string>
     <string name="beta_unlock_section_hint">Paste the personal code from the email Swanie sent you. It only works for the account you signed in with.</string>
+    <string name="beta_unlock_signed_in_as">解鎖碼必須與已登入的 Gmail 一致：%1$s</string>
+    <string name="beta_unlock_signed_in_missing">請在帳戶設定中新增 Gmail——解鎖碼與您的登入電子郵件綁定。</string>
     <string name="beta_unlock_code_label">Unlock code</string>
     <string name="beta_unlock_submit">UNLOCK PRO</string>
     <string name="beta_unlock_success">Pro unlocked. Restart the app if features do not appear.</string>
     <string name="beta_unlock_error_invalid">That code is not valid. Check the code and try again.</string>
+    <string name="beta_unlock_error_signature">此解鎖碼與已登入的 Gmail 不一致。請確認上方電子郵件，或請 Swanie 在建置 Play 應用程式的同一台電腦上重新產生代碼。</string>
     <string name="beta_unlock_error_email">Sign in with the same Gmail Swanie added to testing, then try again.</string>
     <string name="beta_unlock_error_expired">This code has expired.</string>
     <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>

@@ -548,10 +548,13 @@
     <string name="analytics_live_preset_event_inflation_hedge">• Защита от инфляции: +%1$s%% доли металлов</string>
     <string name="beta_unlock_section_title">Beta unlock code</string>
     <string name="beta_unlock_section_hint">Paste the personal code from the email Swanie sent you. It only works for the account you signed in with.</string>
+    <string name="beta_unlock_signed_in_as">Код должен совпадать с Gmail вашей учётной записи: %1$s</string>
+    <string name="beta_unlock_signed_in_missing">Добавьте Gmail в настройках аккаунта — код привязан к вашей почте для входа.</string>
     <string name="beta_unlock_code_label">Unlock code</string>
     <string name="beta_unlock_submit">UNLOCK PRO</string>
     <string name="beta_unlock_success">Pro unlocked. Restart the app if features do not appear.</string>
     <string name="beta_unlock_error_invalid">That code is not valid. Check the code and try again.</string>
+    <string name="beta_unlock_error_signature">Этот код не совпадает с Gmail вашей учётной записи. Проверьте почту выше или попросите Swanie новый код, сгенерированный на ПК, с которого собрано Play-приложение.</string>
     <string name="beta_unlock_error_email">Sign in with the same Gmail Swanie added to testing, then try again.</string>
     <string name="beta_unlock_error_expired">This code has expired.</string>
     <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>
