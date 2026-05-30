@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Play internal `19 (1.0.19)`** live (Theme Manager scroll OK). Repo **`20 (1.0.20)`** — Widget Manager **Style** tab scroll (hue bar on tall phones). Wife Pro + RC OK. **Testers:** **4 / 12**.
+**Last updated:** 2026-05-18 (EOD) — **Play internal `20 (1.0.20)`** live and verified. **Wins tonight:** wife Pro (beta unlock + RC lifetime); Theme Manager + Widget Manager **Style** scroll on tall phones; i18n beta-unlock strings (**537** keys). **No open app blockers.** **Testers:** **4 / 12** — next priority is recruiting.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -37,8 +37,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 |-------|--------|
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
-| **Play internal testing** | **Active: 19 (1.0.19)** on Play; repo **`20 (1.0.20)`** — Widget Manager Style tab scroll. **Recruiting** (internal cap **100**). |
-| **Version on device** | Play internal **`v1.0.19 (19)`**; repo **`v1.0.20 (20)`** — Widget Manager color picker scroll. |
+| **Play internal testing** | **Active: 20 (1.0.20)** on Play + repo aligned. Theme Manager + Widget Manager Style scroll verified (family phones). **Recruiting** (internal cap **100**). |
+| **Version on device** | Play internal **`v1.0.20 (20)`** — owner verified **2026-05-18** EOD. |
 | **License testing (list 2)** | **Unchecked** — **Swanie's Portfolio Testers** email list **not** selected on **Settings → License testing** (saved). **Do not** check for friends. Publisher account may still get test billing. **`RESPOND_NORMALLY`** when re-enabled for dev-only card QA. |
 | **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family) on **Test and release → Testing → Internal testing → Testers** — install + daily use. Add **all recruits here** (cap **100**). **≥12** needed for **closed** track path, **not** on license list. |
 | **Verify build** | After Studio **Generate Signed Bundle**, run **`.\scripts\verify-aab-revenuecat-key.ps1`** and **`.\scripts\verify-aab-beta-unlock-secret.ps1`** (project root; default **`app\release\app-release.aab`**). Both must **OK** before Play upload. Generate unlock codes **only on this PC** after beta-unlock verify passes. |
@@ -51,7 +51,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Internal testing** **14 (1.0.14)** — **4 testers** (need **≥12** for closed track). Recruit: **`docs/RECRUIT_INTERNAL_TESTERS.md`** + **`website/marketing/facebook-join-testing-post.png`** → **`https://swaniedesigns.com/#join-testing`**. SEO live: **`sitemap.xml`**, FAQ — long-term; **direct posts** fill the list faster.
+- **Testing path:** **Internal testing** **20 (1.0.20)** — **4 testers** (need **≥12** for closed track). Recruit: **`docs/RECRUIT_INTERNAL_TESTERS.md`** + **`website/marketing/facebook-join-testing-post.png`** → **`https://swaniedesigns.com/#join-testing`**. SEO live: **`sitemap.xml`**, FAQ — long-term; **direct posts** fill the list faster.
 
 **Marketing site (2026-05-21):** **`website/index.html`** — beta form copy (1 year Pro, same Gmail); **`buildTesterRequestAdminEmail`** reply block + RC grant steps; gold **`.hero-recruit`** link. Deploy: **GitHub Actions** on **`main`** → **https://swaniedesigns.com/#join-testing**.
 
@@ -190,10 +190,10 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Play upload:** internal **`20 (1.0.20)`** — verify scripts **OK** → upload. Wife: verify Widget Manager **Style** tab scroll.
-2. **Recruit testers (4 → 12):** **`docs/RECRUIT_INTERNAL_TESTERS.md`**
-3. **Closed testing (agent when ≥12 internal):** Promote build to closed.
-4. **Listing / Production** after closed gates.
+1. **Recruit testers (4 → 12):** **`docs/RECRUIT_INTERNAL_TESTERS.md`** — FB profile + groups, **`#join-testing`** link.
+2. **Closed testing (agent when ≥12 internal):** Promote build to closed.
+3. **Listing / Production** after closed gates + Dashboard clear.
+4. **Optional:** Confirm GitHub **`BETA_UNLOCK_SECRET`** matches **`local.properties`** if generating codes from website form (laptop script is canonical today).
 
 ---
 
@@ -228,7 +228,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — scrollable color picker (saturation + hue bar); `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **Studio** AAB → verify scripts; repo **`20` / `1.0.20`** ready to build/upload |
+| Play internal ship | **20 / 1.0.20** on Play internal — verified EOD **2026-05-18** |
 | Beta unlock / family Pro | **`BetaUnlockAccess.kt`**, **`SettingsViewModel.redeemBetaUnlockCode`**, **`BetaUnlockCodeSection.kt`** (signed-in Gmail hint); CLI **`scripts/generate-beta-unlock-code.ps1`**; verify **`scripts/verify-aab-beta-unlock-secret.ps1`** |
 | Tester recruitment | **`#join-testing`** → **Internal testing → Testers** (list 1). **Not** Settings → License testing (list 2). FB asset: **`website/marketing/facebook-join-testing-post.png`** |
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal testing → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits |
@@ -248,6 +248,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-18 (EOD) — 1.0.20 shipped + family QA pass:** Owner uploaded internal **20**; Theme Manager + Widget Manager Style scroll OK on wife’s phone; wife Pro stable (unlock code + RC lifetime promo, restore → already active). **`18`–`20`** arc: beta-unlock verify, i18n, scroll fixes. **Handoff + push `main`**. **Next:** recruit testers **4 → 12**.
 - **2026-05-18 — Widget Manager Style scroll (1.0.20):** **`WidgetManagerScreen.kt`** Style tab — single **`verticalScroll`** + **`navigationBarsPadding`** (preview + color picker); same fix pattern as Theme Manager. Owner verified **19** Theme Manager OK. **Handoff + push `main`**.
 - **2026-05-18 — i18n beta-unlock + Theme Manager scroll (1.0.19):** **3** strings in all **`values-*`**; **`ThemeStudioScreen.kt`** scroll + nav bar padding. Wife Pro + RC confirmed on **18**. **Handoff + push `main`** → owner uploads **19**.
 - **2026-05-18 — Theme Manager scroll + i18n note:** **`ThemeStudioScreen.kt`** — **`verticalScroll`** + **`navigationBarsPadding`** so saturation/hue bars reachable on tall phones / large display size. Handoff: **3** beta-unlock strings still missing in **`values-*`** (next release). Wife Pro + RC lifetime confirmed on **1.0.18**.
