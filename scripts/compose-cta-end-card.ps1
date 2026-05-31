@@ -111,9 +111,8 @@ public static class CtaEndCardComposer {
           "AVAILABLE NOW ON ANDROID");
         y += btnH + 36;
 
-        DrawCenteredWrapped(g,
-          "Track crypto & precious metals \u2014 local-first vault on your phone.",
-          footer, textBrush, cx, y, w - 96);
+        y = DrawCentered(g, "Track crypto & precious metals", footer, textBrush, cx, y) + 8;
+        DrawCentered(g, "local-first vault on your phone.", footer, textBrush, cx, y);
       }
 
       canvas.Save(outputPath, ImageFormat.Png);
