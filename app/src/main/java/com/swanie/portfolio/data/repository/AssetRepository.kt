@@ -11,8 +11,6 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.billing.AccessTier
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.api.SearchEngineRegistry
@@ -28,6 +26,8 @@ import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import com.swanie.portfolio.widget.SparklineDrawUtils
 import com.swanie.portfolio.widget.WidgetAssetLimits
+import com.swanie.portfolio.widget.appWidgetIdsForPortfolioVault
+import com.swanie.portfolio.widget.resolveVaultForAppWidgetId
 import com.swanie.portfolio.widget.writeWidgetPackedAssetRows
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -201,24 +201,22 @@ class AssetRepository @Inject constructor(
         freshAssets: List<AssetEntity>,
         targetGlanceId: GlanceId? = null,
     ) {
-        val appWidgetManager = AppWidgetManager.getInstance(context)
-        val componentName = ComponentName(context, PortfolioWidgetReceiver::class.java)
         val glanceManager = GlanceAppWidgetManager(context)
 
         val vaultIdInt = portfolioId.toIntOrNull() ?: 1
-        val vault = vaultDao.getVaultById(vaultIdInt) ?: return
+        if (vaultDao.getVaultById(vaultIdInt) == null) return
 
-        val idsToUpdate = when {
-            targetGlanceId != null -> intArrayOf(glanceManager.getAppWidgetId(targetGlanceId))
-            vault.appWidgetId != null && vault.appWidgetId != -1 -> intArrayOf(vault.appWidgetId)
-            else -> appWidgetManager.getAppWidgetIds(componentName)
-        }
+        val targetWidgetId = targetGlanceId?.let { glanceManager.getAppWidgetId(it) }
+        val idsToUpdate = appWidgetIdsForPortfolioVault(context, vaultIdInt, vaultDao, targetWidgetId)
 
         if (idsToUpdate.isEmpty()) return
 
         idsToUpdate.forEach { id ->
-            val vSafe = vaultDao.getVaultByAppWidgetId(id) ?: vault
+            val vSafe = resolveVaultForAppWidgetId(context, id, vaultDao) ?: return@forEach
+            if (vSafe.id != vaultIdInt) return@forEach
+
             val glanceId = try { glanceManager.getGlanceIdBy(id) } catch (e: Exception) { null } ?: return@forEach
+            val assetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
 
             updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
                 prefs.toMutablePreferences().apply {
@@ -245,11 +243,11 @@ class AssetRepository @Inject constructor(
                             } else {
                                 WidgetAssetLimits.FREE_MAX
                             }
-                        freshAssets.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }
+                        assetsForVault.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }
                             .take(emptyFallbackCap)
                     } else {
-                        selectedIds.take(tierCap).mapNotNull { id ->
-                            freshAssets.find { it.coinId == id }
+                        selectedIds.take(tierCap).mapNotNull { coinId ->
+                            assetsForVault.find { it.coinId == coinId }
                         }
                     }
 
@@ -288,6 +286,14 @@ class AssetRepository @Inject constructor(
                         "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                     }
 
+                    if (rowLines.isEmpty() && selectedIds.isNotEmpty()) {
+                        Log.w(
+                            "SWANIE_WIDGET",
+                            "Skipping empty widget push for widget $id vault ${vSafe.id} — selection not in vault assets",
+                        )
+                        return@updateAppWidgetState prefs
+                    }
+
                     // 🚀 ANTI-GHOSTING: Always update the state, even if empty, to ensure deleted assets are cleared from view
                     writeWidgetPackedAssetRows(rowLines)
                     
@@ -298,11 +304,6 @@ class AssetRepository @Inject constructor(
                 }.toPreferences()
             }
             PortfolioWidget().update(context, glanceId)
-        }
-
-        // 🚚 Ensure final delivery across all instances
-        ProcessLifecycleOwner.get().lifecycleScope.launch {
-            PortfolioWidget().updateAll(context.applicationContext)
         }
     }
 

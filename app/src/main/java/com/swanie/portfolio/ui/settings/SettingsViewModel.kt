@@ -29,6 +29,8 @@ import com.swanie.portfolio.widget.PortfolioWidget
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import com.swanie.portfolio.widget.SparklineDrawUtils
 import com.swanie.portfolio.widget.WidgetAssetLimits
+import com.swanie.portfolio.widget.appWidgetIdsForPortfolioVault
+import com.swanie.portfolio.widget.resolveVaultForAppWidgetId
 import com.swanie.portfolio.widget.writeWidgetPackedAssetRows
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -658,90 +660,90 @@ class SettingsViewModel @Inject constructor(
     suspend fun triggerWidgetUpdate(vaultId: Int? = null) {
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val componentName = ComponentName(context, PortfolioWidgetReceiver::class.java)
+        val allWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        if (allWidgetIds.isEmpty()) return
         val idsToUpdate = if (vaultId != null) {
-            val vault = vaultDao.getVaultById(vaultId)
-            if (vault?.appWidgetId != null && vault.appWidgetId != -1) intArrayOf(vault.appWidgetId!!)
-            else appWidgetManager.getAppWidgetIds(componentName)
+            appWidgetIdsForPortfolioVault(context, vaultId, vaultDao)
         } else {
-            appWidgetManager.getAppWidgetIds(componentName)
+            allWidgetIds
         }
         if (idsToUpdate.isEmpty()) return
-        val vault = vaultId?.let { vaultDao.getVaultById(it) }
         val glanceManager = GlanceAppWidgetManager(context)
         
         // 🚀 NON-CANCELLABLE DELIVERY: Ensure the suitcase is packed even if the VM is cleared
         withContext(NonCancellable) {
             idsToUpdate.forEach { id ->
-                val v = if (vaultId != null) vault else vaultDao.getVaultByAppWidgetId(id)
-                v?.let { vSafe ->
-                    val glanceId = glanceManager.getGlanceIdBy(id)
-                    androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, glanceId) { prefs ->
-                        prefs.toMutablePreferences().apply {
-                            this[PortfolioWidget.VAULT_ID_KEY] = vSafe.id
-                            this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = vSafe.name
-                            this[PortfolioWidget.WIDGET_BG_COLOR_KEY] = vSafe.widgetBgColor
-                            this[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = vSafe.widgetBgTextColor
-                            this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = vSafe.widgetCardColor
-                            this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
-                            this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
-                            this[PortfolioWidget.IS_PRO_USER_KEY] = _isProUser.value
-                            val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
-                            val selectedIds = vSafe.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
-                            val widgetCap =
-                                if (_isProUser.value) WidgetAssetLimits.PRO_MAX else WidgetAssetLimits.FREE_MAX
-                            val filteredAssets = if (selectedIds.isEmpty()) {
-                                allAssetsForVault.take(widgetCap)
-                            } else {
-                                selectedIds.take(widgetCap).mapNotNull { coinId -> allAssetsForVault.find { it.coinId == coinId } }
-                            }
-                            val rowLines = withContext(Dispatchers.IO) {
-                                filteredAssets.map { asset ->
-                                    val iconSource = when {
-                                        // Custom metal (or any) photo icons must win over packaged res:ic_* metal art.
-                                        asset.imageUrl.startsWith("file:") -> asset.imageUrl
-                                        asset.localIconPath != null -> "file:${asset.localIconPath}"
-                                        asset.category == AssetCategory.METAL || asset.isMetal -> "__METAL_DEFAULT__"
-                                        else -> asset.imageUrl
-                                    }
-                                    val assetValue = AssetValuation.holdingValueUsd(asset)
-                                    val formattedTotal = formatBoutiquePrice(assetValue)
-
-                                    // Prefer DB history; fallback to provider sparkline stored on the asset.
-                                    val history = database.priceHistoryDao().getRecentHistory(asset.coinId).map { it.price }.reversed()
-                                    val sparklinePoints = when {
-                                        history.size >= 2 -> history
-                                        asset.sparklineData.size >= 2 -> asset.sparklineData
-                                        else -> emptyList()
-                                    }
-                                    val sparklinePath = if (sparklinePoints.size >= 2) {
-                                        val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
-                                        val bitmap = SparklineDrawUtils.drawSparklineBitmap(sparklinePoints, color)
-                                        persistWidgetSparkline(asset.coinId, bitmap) ?: "none"
-                                    } else "none"
-
-                                    // 🛡️ Packing 10 parts: coinId|symbol|displayName|imageUrl|lineSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
-                                    val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
-                                    val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
-                                    
-                                    // 🎯 Same per-line spot as holdings cards + AssetRepository widget push (gram/kilo/oz aware)
-                                    val linePrice = AssetValuation.cardPriceRowUsd(asset)
-                                    val formattedPrice = formatBoutiquePrice(linePrice)
-                                    "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
+                val vSafe = resolveVaultForAppWidgetId(context, id, vaultDao) ?: return@forEach
+                if (vaultId != null && vSafe.id != vaultId) return@forEach
+                val glanceId = glanceManager.getGlanceIdBy(id)
+                androidx.glance.appwidget.state.updateAppWidgetState(context, androidx.glance.state.PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                    prefs.toMutablePreferences().apply {
+                        this[PortfolioWidget.VAULT_ID_KEY] = vSafe.id
+                        this[PortfolioWidget.STATIC_VAULT_NAME_KEY] = vSafe.name
+                        this[PortfolioWidget.WIDGET_BG_COLOR_KEY] = vSafe.widgetBgColor
+                        this[PortfolioWidget.WIDGET_BG_TEXT_COLOR_KEY] = vSafe.widgetBgTextColor
+                        this[PortfolioWidget.WIDGET_CARD_COLOR_KEY] = vSafe.widgetCardColor
+                        this[PortfolioWidget.WIDGET_CARD_TEXT_COLOR_KEY] = vSafe.widgetCardTextColor
+                        this[PortfolioWidget.SHOW_TOTAL_KEY] = vSafe.showWidgetTotal
+                        this[PortfolioWidget.IS_PRO_USER_KEY] = _isProUser.value
+                        val allAssetsForVault = assetDao.getAssetsByVaultOnce(vSafe.id)
+                        val selectedIds = vSafe.selectedWidgetAssets.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                        val widgetCap =
+                            if (_isProUser.value) WidgetAssetLimits.PRO_MAX else WidgetAssetLimits.FREE_MAX
+                        val filteredAssets = if (selectedIds.isEmpty()) {
+                            allAssetsForVault.take(widgetCap)
+                        } else {
+                            selectedIds.take(widgetCap).mapNotNull { coinId -> allAssetsForVault.find { it.coinId == coinId } }
+                        }
+                        val rowLines = withContext(Dispatchers.IO) {
+                            filteredAssets.map { asset ->
+                                val iconSource = when {
+                                    // Custom metal (or any) photo icons must win over packaged res:ic_* metal art.
+                                    asset.imageUrl.startsWith("file:") -> asset.imageUrl
+                                    asset.localIconPath != null -> "file:${asset.localIconPath}"
+                                    asset.category == AssetCategory.METAL || asset.isMetal -> "__METAL_DEFAULT__"
+                                    else -> asset.imageUrl
                                 }
+                                val assetValue = AssetValuation.holdingValueUsd(asset)
+                                val formattedTotal = formatBoutiquePrice(assetValue)
+
+                                // Prefer DB history; fallback to provider sparkline stored on the asset.
+                                val history = database.priceHistoryDao().getRecentHistory(asset.coinId).map { it.price }.reversed()
+                                val sparklinePoints = when {
+                                    history.size >= 2 -> history
+                                    asset.sparklineData.size >= 2 -> asset.sparklineData
+                                    else -> emptyList()
+                                }
+                                val sparklinePath = if (sparklinePoints.size >= 2) {
+                                    val color = if (asset.priceChange24h >= 0) androidx.compose.ui.graphics.Color.Green else androidx.compose.ui.graphics.Color.Red
+                                    val bitmap = SparklineDrawUtils.drawSparklineBitmap(sparklinePoints, color)
+                                    persistWidgetSparkline(asset.coinId, bitmap) ?: "none"
+                                } else "none"
+
+                                // 🛡️ Packing 10 parts: coinId|symbol|displayName|imageUrl|lineSpotPrice|priceChange24h|weight|amountHeld|calculatedTotal|sparklinePath
+                                val safeSymbol = asset.symbol.replace("|", " ").replace("\n", "").trim()
+                                val safeDisplayName = (asset.displayName.ifBlank { asset.name }).replace("|", " ").replace("\n", "").trim()
+                                
+                                // 🎯 Same per-line spot as holdings cards + AssetRepository widget push (gram/kilo/oz aware)
+                                val linePrice = AssetValuation.cardPriceRowUsd(asset)
+                                val formattedPrice = formatBoutiquePrice(linePrice)
+                                "${asset.coinId}|$safeSymbol|$safeDisplayName|$iconSource|$formattedPrice|${asset.priceChange24h}|${asset.weight}|${asset.amountHeld}|$formattedTotal|$sparklinePath"
                             }
-                            writeWidgetPackedAssetRows(rowLines)
-                            this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
-                            val total = allAssetsForVault.sumOf { AssetValuation.holdingValueUsd(it) }
-                            this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
-                        }.toPreferences()
-                    }
-                    PortfolioWidget().update(context, glanceId)
+                        }
+                        if (rowLines.isEmpty() && selectedIds.isNotEmpty()) {
+                            Log.w(
+                                "SWANIE_WIDGET",
+                                "Skipping empty widget update for widget $id vault ${vSafe.id}",
+                            )
+                            return@updateAppWidgetState prefs
+                        }
+                        writeWidgetPackedAssetRows(rowLines)
+                        this[PortfolioWidget.LAST_UPDATED_KEY] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.getDefault()).format(java.util.Date())
+                        val total = allAssetsForVault.sumOf { AssetValuation.holdingValueUsd(it) }
+                        this[PortfolioWidget.STATIC_TOTAL_BALANCE_KEY] = NumberFormat.getCurrencyInstance(Locale.US).format(total)
+                    }.toPreferences()
                 }
-            }
-            
-            // 🚚 Using ProcessLifecycleOwner to ensure the update isn't tied to the fragment's death
-            ProcessLifecycleOwner.get().lifecycleScope.launch {
-                PortfolioWidget().updateAll(context)
+                PortfolioWidget().update(context, glanceId)
             }
 
             context.sendBroadcast(Intent(context, PortfolioWidgetReceiver::class.java).apply {

@@ -24,6 +24,7 @@ import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.local.VaultDao
 import com.swanie.portfolio.data.repository.*
 import com.swanie.portfolio.widget.WidgetAssetLimits
+import com.swanie.portfolio.widget.appWidgetIdsForPortfolioVault
 import com.swanie.portfolio.data.remote.GoogleDriveService // 🛰️ Essential Import
 import com.swanie.portfolio.widget.PortfolioWidgetReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -416,13 +417,14 @@ class AssetViewModel @Inject constructor(
                     portfolioVaultId.toString(),
                     fresh,
                 )
-                val widgetIdsToRefresh =
-                    if (appWidgetId != null && appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                        intArrayOf(appWidgetId)
-                    } else {
-                        val component = ComponentName(context, PortfolioWidgetReceiver::class.java)
-                        AppWidgetManager.getInstance(context).getAppWidgetIds(component)
-                    }
+                val targetId =
+                    appWidgetId?.takeIf { it != AppWidgetManager.INVALID_APPWIDGET_ID }
+                val widgetIdsToRefresh = appWidgetIdsForPortfolioVault(
+                    context.applicationContext,
+                    portfolioVaultId,
+                    vaultDao,
+                    targetWidgetId = targetId,
+                )
                 context.sendBroadcast(
                     Intent(context, PortfolioWidgetReceiver::class.java).apply {
                         action = AppWidgetManager.ACTION_APPWIDGET_UPDATE

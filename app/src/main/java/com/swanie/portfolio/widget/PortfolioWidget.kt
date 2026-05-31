@@ -1,6 +1,7 @@
 package com.swanie.portfolio.widget
 
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -42,6 +43,8 @@ import com.swanie.portfolio.MainActivity
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
+import com.swanie.portfolio.data.local.VaultDao
+import com.swanie.portfolio.data.local.VaultEntity
 import com.swanie.portfolio.data.repository.AssetRepository
 import com.swanie.portfolio.ui.holdings.metalCardPrimaryLabel
 import com.swanie.portfolio.ui.holdings.metalWidgetCenterLabel
@@ -86,6 +89,44 @@ internal fun widgetLaunchMainActivityIntent(context: Context): Intent =
     Intent(context, MainActivity::class.java).apply {
         addFlags(FLAG_ACTIVITY_NEW_TASK or FLAG_ACTIVITY_REORDER_TO_FRONT)
     }
+
+/** Resolve which portfolio a widget instance shows (DB binding first, then Glance prefs). */
+internal suspend fun resolveVaultForAppWidgetId(
+    context: Context,
+    widgetId: Int,
+    vaultDao: VaultDao,
+): VaultEntity? {
+    vaultDao.getVaultByAppWidgetId(widgetId)?.let { return it }
+    return try {
+        val glanceId = GlanceAppWidgetManager(context).getGlanceIdBy(widgetId)
+        val prefs = getAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId)
+        val vaultId = prefs[PortfolioWidget.VAULT_ID_KEY]?.takeIf { it > 0 } ?: return null
+        vaultDao.getVaultById(vaultId)
+    } catch (e: Exception) {
+        null
+    }
+}
+
+/**
+ * Widget ids that belong to [vaultId] only. Never returns every homscreen widget — that caused other
+ * portfolios to receive the wrong asset list and go blank.
+ */
+internal suspend fun appWidgetIdsForPortfolioVault(
+    context: Context,
+    vaultId: Int,
+    vaultDao: VaultDao,
+    targetWidgetId: Int? = null,
+): IntArray {
+    if (targetWidgetId != null) return intArrayOf(targetWidgetId)
+    val component = ComponentName(context, PortfolioWidgetReceiver::class.java)
+    val allIds = AppWidgetManager.getInstance(context).getAppWidgetIds(component) ?: return intArrayOf()
+    val bound = allIds.filter { widgetId ->
+        resolveVaultForAppWidgetId(context, widgetId, vaultDao)?.id == vaultId
+    }
+    if (bound.isNotEmpty()) return bound.toIntArray()
+    val legacyId = vaultDao.getVaultById(vaultId)?.appWidgetId?.takeIf { it != -1 } ?: return intArrayOf()
+    return intArrayOf(legacyId)
+}
 
 class PortfolioWidget : GlanceAppWidget() {
 
