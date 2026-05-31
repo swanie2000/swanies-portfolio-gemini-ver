@@ -136,30 +136,14 @@
                     class="shot-demo-video"
                     src="marketing/final_swanies_portfolio_demo_video_web.mp4"
                     poster="images/01_sp_start_page.jpg"
-                    autoplay
-                    loop
+                    controls
                     playsinline
-                    preload="auto"
+                    preload="metadata"
                     aria-label="Swanie's Portfolio app demo video"
                   ></video>
                 </div>
               </div>
-              <figcaption>App demo</figcaption>
-              <button
-                type="button"
-                class="shot-audio-toggle"
-                aria-pressed="false"
-                aria-label="Turn sound on"
-              >
-                <span class="shot-audio-icon" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor"/>
-                    <path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M17 9l4-4M17 15l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                </span>
-                <span class="shot-audio-label">Turn sound on</span>
-              </button>
+              <figcaption>App demo<br /><span class="shot-caption-sub">Use controls to play, scrub, and adjust sound</span></figcaption>
             </figure>
             <figure class="shot-card">
               <div class="shot-frame">
@@ -488,84 +472,11 @@
       { passive: true }
     );
 
-    (function wireDemoVideos() {
-      var cards = document.querySelectorAll(".shot-card-video");
-      if (!cards.length) return;
-
-      cards.forEach(function (card) {
-        var video = card.querySelector(".shot-demo-video");
-        var btn = card.querySelector(".shot-audio-toggle");
-        if (!video) return;
-
-        video.defaultMuted = true;
-        video.muted = true;
-        video.volume = 1;
-
-        function setSoundUi(isOn, hint) {
-          if (!btn) return;
-          btn.setAttribute("aria-pressed", isOn ? "true" : "false");
-          btn.setAttribute("aria-label", isOn ? "Turn sound off" : "Turn sound on");
-          var label = btn.querySelector(".shot-audio-label");
-          var icon = btn.querySelector(".shot-audio-icon");
-          if (label) {
-            label.textContent = hint || (isOn ? "Turn sound off" : "Turn sound on");
-          }
-          if (icon) {
-            icon.innerHTML = isOn
-              ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
-              : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 5L6 9H3v6h3l5 4V5z" fill="currentColor"/><path d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a9 9 0 010 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 9l4-4M17 15l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-          }
-        }
-
-        function enableSound() {
-          video.removeAttribute("muted");
-          video.defaultMuted = false;
-          video.muted = false;
-          video.volume = 1;
-          setSoundUi(true);
-          return video.play().catch(function () {
-            setSoundUi(false, "Sound blocked — tap again");
-            video.defaultMuted = true;
-            video.muted = true;
-          });
-        }
-
-        function disableSound() {
-          video.muted = true;
-          video.defaultMuted = true;
-          video.setAttribute("muted", "");
-          setSoundUi(false);
-        }
-
-        if (btn) {
-          btn.addEventListener("click", function () {
-            if (video.muted) {
-              enableSound();
-            } else {
-              disableSound();
-            }
-          });
-        }
-
-        video.play().catch(function () {});
-
-        if (!("IntersectionObserver" in window)) return;
-        var observer = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                video.play().catch(function () {});
-              } else {
-                video.pause();
-                if (!video.muted) {
-                  disableSound();
-                }
-              }
-            });
-          },
-          { threshold: 0.35 }
-        );
-        observer.observe(video);
+    (function wireDemoVideoControls() {
+      document.querySelectorAll(".shot-demo-video").forEach(function (video) {
+        video.addEventListener("pointerdown", function (e) {
+          e.stopPropagation();
+        });
       });
     })();
 
