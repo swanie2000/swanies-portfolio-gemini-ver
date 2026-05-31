@@ -803,64 +803,85 @@ section {
   object-fit: cover;
 }
 
-.shot-device-screen video {
+.shot-device-screen-video .shot-demo-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  object-position: center center;
   background: #05060f;
 }
 
 .shot-card-video {
-  width: clamp(176px, 44vw, 228px);
+  width: clamp(152px, 38vw, 196px);
 }
 
 .shot-card-video .shot-frame {
   border-color: rgba(212, 168, 83, 0.32);
 }
 
+.shot-frame-video {
+  aspect-ratio: 9 / 16;
+  padding: 9px 8px 11px;
+}
+
 .shot-device-screen-video {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.shot-card-video figcaption {
+  margin-bottom: 0.35rem;
 }
 
 .shot-audio-toggle {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  z-index: 3;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.38rem 0.55rem;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 13rem;
+  margin: 0 auto;
+  padding: 0.62rem 0.85rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 168, 83, 0.45);
-  background: rgba(0, 4, 22, 0.82);
-  color: var(--text);
+  border: 1px solid rgba(212, 168, 83, 0.55);
+  background: linear-gradient(180deg, rgba(212, 168, 83, 0.22) 0%, rgba(154, 122, 61, 0.18) 100%);
+  color: #f4e6c8;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  line-height: 1;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.1;
   cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease, color 0.2s ease;
 }
 
 .shot-audio-toggle:hover {
-  border-color: rgba(212, 168, 83, 0.75);
-  background: rgba(12, 18, 42, 0.92);
+  border-color: rgba(212, 168, 83, 0.85);
+  background: linear-gradient(180deg, rgba(212, 168, 83, 0.32) 0%, rgba(154, 122, 61, 0.26) 100%);
+  color: #fff8ea;
 }
 
 .shot-audio-toggle:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .shot-audio-toggle[aria-pressed="true"] {
-  border-color: rgba(94, 234, 212, 0.55);
-  background: rgba(8, 28, 32, 0.9);
+  border-color: rgba(94, 234, 212, 0.65);
+  background: linear-gradient(180deg, rgba(94, 234, 212, 0.22) 0%, rgba(45, 120, 110, 0.2) 100%);
+  color: #eafffa;
 }
 
 .shot-audio-icon {
-  font-size: 0.95rem;
-  line-height: 1;
+  display: inline-flex;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.shot-audio-icon svg {
+  display: block;
 }
 
 .shot-placeholder {

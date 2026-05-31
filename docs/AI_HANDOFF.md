@@ -249,7 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
-- **2026-05-18 — Carousel video UX + audio:** Narrower video card, **`object-fit: contain`**; **Sound off/on** button (autoplay stays muted); re-encoded **`final_swanies_portfolio_demo_video_web.mp4`** with **AAC** (~**7 MB**). **Handoff + push `main`** → owner tests live site.
+- **2026-05-18 — Carousel video fit + sound button:** Video frame **9:16** (full end CTA visible); smaller card; **Turn sound on** gold button **below** phone (was hidden on dark CTA). **Push `main`**.
 - **2026-05-18 — Production website + promo assets:** **`index.html`** — **`#get-app`**, removed join-testing / Web3Forms / beta-unlock page scripts; demo video first in carousel; **`CTA_end_picture.png`** production end card; **`compose-cta-end-card.ps1`**, **`generate-qr-png.js`**. **`press.html`**, **`deploy-website.yml`**, **`website/README.md`** updated. **Next:** closed testing + Testers Community.
 - **2026-05-18 — Multi-widget blank fix (1.0.21):** One portfolio refresh was pushing empty/wrong asset rows to **all** homscreen widgets — **`appWidgetIdsForPortfolioVault`**, per-vault DB load, skip empty wipe when selection intact. Owner saw blank widgets during website video (3 widgets). **Handoff + push `main`** → upload **21**.
 - **2026-05-18 (EOD) — 1.0.20 shipped + family QA pass:** Owner uploaded internal **20**; Theme Manager + Widget Manager Style scroll OK on wife’s phone; wife Pro stable (unlock code + RC lifetime promo, restore → already active). **`18`–`20`** arc: beta-unlock verify, i18n, scroll fixes. **Handoff + push `main`**. **Next:** recruit testers **4 → 12**.
