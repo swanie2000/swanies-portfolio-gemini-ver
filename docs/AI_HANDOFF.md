@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 — **Marketing site production pivot** shipped (**`#get-app`**, demo video carousel, CTA end card). **Play internal `21 (1.0.21)`** live on device. **Closed testing next:** Testers Community (**25** testers) — site no longer recruits via **`#join-testing`**.
+**Last updated:** 2026-05-18 — **Live site:** production **`#get-app`**, carousel demo video (**autoplay muted**, **Sound off/on** button, **~7 MB** web export **with audio**). Owner verifying on **swaniedesigns.com** after deploy.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -52,7 +52,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Closed testing** next — promote **21** to **Closed testing** track; submit **closed-test opt-in URL** to **Testers Community** (**testerscommunity.com**, **25** testers paid). **≥12 opted-in for 14 consecutive days** before **Production access** application. **Do not** add TC testers to **License testing**.
-- **Marketing site (2026-05-18):** **`website/index.html`** — **production** copy; **`#get-app`** (Play CTA + site QR); **removed** **`#join-testing`** form, beta-unlock scripts, tester QR. **Carousel:** **`marketing/final_swanies_portfolio_demo_video_web.mp4`** first card (**autoplay muted loop**); **165 MB** master **`final_swanies_portfolio_demo_video.mp4`** gitignored (regenerate web export if needed). **`marketing/CTA_end_picture.png`** — production end card (QR → **swaniedesigns.com**); regen **`scripts/compose-cta-end-card.ps1`**. Set **`PLAY_URL`** in **`index.html`** when Play listing is public. Deploy: **GitHub Actions** → **https://swaniedesigns.com/**. Owner testing site after push.
+- **Marketing site (2026-05-18):** **`website/index.html`** — **production** copy; **`#get-app`**; carousel **`final_swanies_portfolio_demo_video_web.mp4`** (~**7 MB**, **720p + AAC**); **Sound off/on** toggle; **`object-fit: contain`** + narrower video card; master **165 MB** gitignored (**GitHub hard limit 100 MB/file**). Set **`PLAY_URL`** when listing live.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -189,7 +189,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Owner:** Test **https://swaniedesigns.com** after deploy — video autoplay, **`#get-app`**, FAQ, press links.
+1. **Owner:** Verify **https://swaniedesigns.com** — demo video size, **Sound off/on**, **`#get-app`**.
 2. **Play closed testing:** Release **21** on **Closed** track → **Testers Community** (**25** testers, **14–16** days).
 3. **Set `PLAY_URL`** in **`website/index.html`** when Google Play public listing URL is ready.
 4. **Production access + listing** after closed-test gates + Dashboard clear.
@@ -249,7 +249,8 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
-- **2026-05-18 — Production website + promo assets:** **`index.html`** — **`#get-app`**, removed join-testing / Web3Forms / beta-unlock page scripts; demo video first in carousel (**`final_swanies_portfolio_demo_video_web.mp4`**, ~5 MB); **`CTA_end_picture.png`** production end card; **`compose-cta-end-card.ps1`**, **`generate-qr-png.js`**. **`press.html`**, **`deploy-website.yml`**, **`website/README.md`** updated. Owner testing site after push. **Next:** closed testing + Testers Community.
+- **2026-05-18 — Carousel video UX + audio:** Narrower video card, **`object-fit: contain`**; **Sound off/on** button (autoplay stays muted); re-encoded **`final_swanies_portfolio_demo_video_web.mp4`** with **AAC** (~**7 MB**). **Handoff + push `main`** → owner tests live site.
+- **2026-05-18 — Production website + promo assets:** **`index.html`** — **`#get-app`**, removed join-testing / Web3Forms / beta-unlock page scripts; demo video first in carousel; **`CTA_end_picture.png`** production end card; **`compose-cta-end-card.ps1`**, **`generate-qr-png.js`**. **`press.html`**, **`deploy-website.yml`**, **`website/README.md`** updated. **Next:** closed testing + Testers Community.
 - **2026-05-18 — Multi-widget blank fix (1.0.21):** One portfolio refresh was pushing empty/wrong asset rows to **all** homscreen widgets — **`appWidgetIdsForPortfolioVault`**, per-vault DB load, skip empty wipe when selection intact. Owner saw blank widgets during website video (3 widgets). **Handoff + push `main`** → upload **21**.
 - **2026-05-18 (EOD) — 1.0.20 shipped + family QA pass:** Owner uploaded internal **20**; Theme Manager + Widget Manager Style scroll OK on wife’s phone; wife Pro stable (unlock code + RC lifetime promo, restore → already active). **`18`–`20`** arc: beta-unlock verify, i18n, scroll fixes. **Handoff + push `main`**. **Next:** recruit testers **4 → 12**.
 - **2026-05-18 — Widget Manager Style scroll (1.0.20):** **`WidgetManagerScreen.kt`** Style tab — single **`verticalScroll`** + **`navigationBarsPadding`** (preview + color picker); same fix pattern as Theme Manager. Owner verified **19** Theme Manager OK. **Handoff + push `main`**.
