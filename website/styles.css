@@ -522,7 +522,8 @@ section {
   margin: 0 0 1.75rem;
 }
 
-.join-testing-kicker {
+.join-testing-kicker,
+.get-app-kicker {
   display: inline-block;
   margin: 0 0 0.5rem;
   padding: 0.35rem 0.65rem;
@@ -791,11 +792,20 @@ section {
   }
 }
 
-.shot-frame img {
+.shot-frame img,
+.shot-device-screen video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.shot-device-screen video {
+  background: #05060f;
+}
+
+.shot-card-video .shot-frame {
+  border-color: rgba(212, 168, 83, 0.32);
 }
 
 .shot-placeholder {
@@ -1017,6 +1027,46 @@ section {
   min-width: 0;
   max-width: 100%;
   overflow-wrap: anywhere;
+}
+
+.get-app-card {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.get-app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.get-app-support {
+  margin: 0 0 1.35rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.get-app-support a {
+  color: var(--gold);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.get-app-support a:hover {
+  text-decoration: underline;
+}
+
+.qr-deck-compact {
+  margin-top: 0.25rem;
+}
+
+.qr-deck-grid-single {
+  grid-template-columns: minmax(0, 320px);
+  justify-content: center;
 }
 
 .testing-card h3 {

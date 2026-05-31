@@ -42,3 +42,7 @@ gen/
 captures/
 .externalNativeBuild/
 .cxx/
+
+# Website — uncompressed demo master stays local; commit the *_web.mp4 export only
+website/marketing/final_swanies_portfolio_demo_video.mp4
+website/js/beta-unlock-config.js
