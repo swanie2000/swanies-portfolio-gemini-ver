@@ -1139,6 +1139,10 @@ section {
     color: rgba(212, 168, 83, 0.95);
   }
 
+  .shots-swipe-hint-arrow[hidden] {
+    display: none;
+  }
+
   .shot-frame {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.11),
