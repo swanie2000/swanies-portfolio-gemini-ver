@@ -21,6 +21,13 @@
   var honey = form.querySelector('input[name="_honey"]');
   var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  if (topicInput) {
+    var topicParam = new URLSearchParams(window.location.search).get("topic");
+    if (topicParam === "tester" || topicParam === "tester-feedback") {
+      topicInput.value = "Tester feedback";
+    }
+  }
+
   function setStatus(kind, text) {
     if (!statusEl) return;
     statusEl.hidden = false;
