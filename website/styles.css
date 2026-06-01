@@ -5,6 +5,8 @@
   --border: rgba(212, 168, 83, 0.18);
   --gold: #d4a853;
   --gold-dim: #9a7a3d;
+  --play-red: #e62117;
+  --play-red-hover: #ff2a1a;
   --cyan: #5eead4;
   --text: #e8ecf4;
   --muted: #8b95a8;
@@ -87,26 +89,7 @@ body {
   background:
     radial-gradient(ellipse 55% 45% at 75% 45%, rgba(94, 234, 212, 0.14), transparent 55%),
     radial-gradient(ellipse 50% 40% at 15% 55%, rgba(212, 168, 83, 0.12), transparent 52%);
-  animation: aurora-drift 22s ease-in-out infinite alternate;
-}
-
-@keyframes aurora-drift {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    transform: translate(-4%, 3%) scale(1.06);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bg-layer::after {
-    animation: none;
-  }
-}
-
-html.is-scrolling-page .bg-layer::after {
-  animation-play-state: paused;
+  /* Static only — animated drift caused scroll jank with fixed layers */
 }
 
 .wrap {
@@ -135,16 +118,10 @@ html.is-scrolling-page .bg-layer::after {
   margin-bottom: 0.25rem;
   padding-top: max(0.65rem, env(safe-area-inset-top, 0px));
   padding-bottom: 0.85rem;
-  background: rgba(0, 4, 22, 0.82);
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  background: rgba(0, 4, 22, 0.94);
   border-bottom: 1px solid transparent;
   box-shadow: 0 4px 28px rgba(0, 0, 0, 0.35);
-  transition:
-    background 0.28s ease,
-    box-shadow 0.28s ease,
-    border-color 0.28s ease,
-    backdrop-filter 0.28s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .site-header-inner {
@@ -163,14 +140,12 @@ html.is-scrolling-page .bg-layer::after {
 }
 
 html.is-scrolled .site-header {
-  background: rgba(0, 4, 22, 0.94);
+  background: rgba(0, 4, 22, 0.98);
   border-bottom-color: rgba(212, 168, 83, 0.32);
   box-shadow:
     0 10px 36px rgba(0, 0, 0, 0.55),
     0 0 0 1px rgba(94, 234, 212, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
 }
 
 .logo {
@@ -694,11 +669,12 @@ section {
   width: 100%;
   min-width: 0;
   overflow-x: auto;
-  overflow-y: visible;
-  /* Keep horizontal panning inside this row so it does not nudge the page (Firefox). */
+  overflow-y: hidden;
+  /* Vertical wheel should pass to the page when this row cannot scroll vertically. */
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: none;
   scroll-padding-left: 0.5rem;
   scroll-padding-right: 0.5rem;
   margin-left: 0;
@@ -856,23 +832,20 @@ section {
   width: 3.35rem;
   height: 3.35rem;
   padding: 0;
-  border: 2px solid rgba(212, 168, 83, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.92);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(212, 168, 83, 0.92) 0%, rgba(154, 122, 61, 0.88) 100%);
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.45),
-    0 0 0 4px rgba(5, 6, 15, 0.35);
-  color: #0a0a12;
+  background: var(--play-red);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+  color: #fff;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  isolation: isolate;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .shot-demo-video-play:hover {
   transform: translate(-50%, -50%) scale(1.06);
-  border-color: rgba(94, 234, 212, 0.75);
-  box-shadow:
-    0 10px 28px rgba(0, 0, 0, 0.5),
-    0 0 0 4px rgba(94, 234, 212, 0.12);
+  background: var(--play-red-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 .shot-demo-video-play:active {
@@ -926,12 +899,24 @@ section {
   color: #fff8ea;
 }
 
+.shot-demo-bar-play {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: var(--play-red);
+  color: #fff;
+}
+
+.shot-demo-bar-play:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: var(--play-red-hover);
+  color: #fff;
+}
+
 .shot-demo-bar-seek {
   flex: 1 1 auto;
   min-width: 0;
   height: 0.35rem;
   margin: 0;
-  accent-color: var(--gold);
+  accent-color: var(--play-red);
   cursor: pointer;
 }
 
@@ -1700,8 +1685,6 @@ section {
   }
 
   .bg-layer::after {
-    animation: none;
-    transform: none;
     opacity: 0.35;
   }
 

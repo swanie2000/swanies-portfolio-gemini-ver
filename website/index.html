@@ -658,15 +658,6 @@
       next.addEventListener("click", function () {
         sc.scrollBy({ left: amount(), behavior: "auto" });
       });
-      sc.addEventListener(
-        "wheel",
-        function (e) {
-          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-          e.preventDefault();
-          window.scrollBy(0, e.deltaY);
-        },
-        { passive: false }
-      );
       sc.addEventListener("scroll", function () {
         sc.classList.add("is-scrolling");
         if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);
@@ -686,30 +677,24 @@
     (function () {
       var threshold = 12;
       var scrollHeaderTicking = false;
-      var scrollPerfTimer = null;
 
       function syncScrollHeader() {
         document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
       }
 
-      function onPageScroll() {
-        document.documentElement.classList.add("is-scrolling-page");
-        if (scrollPerfTimer) window.clearTimeout(scrollPerfTimer);
-        scrollPerfTimer = window.setTimeout(function () {
-          document.documentElement.classList.remove("is-scrolling-page");
-          scrollPerfTimer = null;
-        }, 180);
-
-        if (scrollHeaderTicking) return;
-        scrollHeaderTicking = true;
-        window.requestAnimationFrame(function () {
-          syncScrollHeader();
-          scrollHeaderTicking = false;
-        });
-      }
-
+      window.addEventListener(
+        "scroll",
+        function () {
+          if (scrollHeaderTicking) return;
+          scrollHeaderTicking = true;
+          window.requestAnimationFrame(function () {
+            syncScrollHeader();
+            scrollHeaderTicking = false;
+          });
+        },
+        { passive: true }
+      );
       syncScrollHeader();
-      window.addEventListener("scroll", onPageScroll, { passive: true });
     })();
   </script>
 </body>
