@@ -1096,12 +1096,7 @@ section {
     pointer-events: none;
     z-index: 4;
     border-radius: 32px;
-    background: linear-gradient(
-      to top,
-      rgba(5, 6, 15, 0.78) 0%,
-      rgba(5, 6, 15, 0.42) 38%,
-      transparent 72%
-    );
+    background: transparent;
     opacity: 1;
     visibility: visible;
     transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -1110,15 +1105,6 @@ section {
   .shots-swipe-hint.is-dismissed {
     opacity: 0;
     visibility: hidden;
-  }
-
-  .shots-swipe-hint.is-first-show {
-    background: linear-gradient(
-      to top,
-      rgba(5, 6, 15, 0.92) 0%,
-      rgba(5, 6, 15, 0.62) 42%,
-      rgba(5, 6, 15, 0.18) 78%
-    );
   }
 
   .shots-swipe-hint.is-first-show .shots-swipe-hint-inner {
