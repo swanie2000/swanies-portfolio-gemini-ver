@@ -140,12 +140,7 @@
         form.reset();
         if (topicInput) topicInput.value = "General question";
         showSentCopy(name, em, topic, body);
-        setStatus(
-          "success",
-          "Thanks — your message was sent. A copy is below so you can confirm what we received. We will reply to " +
-            em +
-            " when we can."
-        );
+        setStatus("success", "Thanks — your message was sent. A copy is below.");
       })
       .catch(function () {
         setStatus("error", "Could not send right now. Please try again in a moment.");
