@@ -124,56 +124,61 @@
 
       <section id="screenshots" aria-labelledby="screenshots-heading">
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
-        <p class="section-sub">App demo video plus twelve real-device screenshots — swipe or drag sideways; on desktop use the arrows below.</p>
-        <div class="shots-carousel" id="shots-carousel">
-          <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App demo and screenshots carousel">
-            <div class="shots-track">
-            <figure class="shot-card shot-card-video">
-              <div class="shot-frame">
-                <div class="shot-device-screen shot-device-screen-video">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <div class="shot-demo-video-stage">
-                    <video
-                      class="shot-demo-video"
-                      src="marketing/final_swanies_portfolio_demo_video_web.mp4"
-                      poster="marketing/CTA_end_picture.png"
-                      playsinline
-                      preload="none"
-                      aria-label="Swanie's Portfolio app demo video"
-                    ></video>
-                    <div class="shot-demo-video-cta-layer is-visible">
-                      <img
-                        class="shot-demo-video-cta"
-                        src="marketing/CTA_end_picture.png"
-                        alt=""
-                        aria-hidden="true"
-                        decoding="async"
-                      />
-                      <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
-                        <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
-                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
-                    <input
-                      type="range"
-                      class="shot-demo-bar-seek"
-                      min="0"
-                      max="1000"
-                      value="0"
-                      step="1"
-                      aria-label="Seek"
-                      aria-valuemin="0"
-                      aria-valuemax="1000"
-                      aria-valuenow="0"
+        <p class="section-sub">Watch the demo video, then browse twelve real-device screenshots — swipe sideways or use the arrows below.</p>
+
+        <div class="demo-video-block" id="app-demo">
+          <figure class="demo-video-card">
+            <div class="shot-frame">
+              <div class="shot-device-screen shot-device-screen-video">
+                <span class="shot-device-earpiece" aria-hidden="true"></span>
+                <div class="shot-demo-video-stage">
+                  <video
+                    class="shot-demo-video"
+                    src="marketing/final_swanies_portfolio_demo_video_web.mp4"
+                    poster="marketing/CTA_end_picture.png"
+                    playsinline
+                    preload="none"
+                    aria-label="Swanie's Portfolio app demo video"
+                  ></video>
+                  <div class="shot-demo-video-cta-layer is-visible">
+                    <img
+                      class="shot-demo-video-cta"
+                      src="marketing/CTA_end_picture.png"
+                      alt=""
+                      aria-hidden="true"
+                      decoding="async"
                     />
-                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
+                    <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
+                      <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
+                    </button>
                   </div>
                 </div>
+                <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
+                  <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
+                  <input
+                    type="range"
+                    class="shot-demo-bar-seek"
+                    min="0"
+                    max="1000"
+                    value="0"
+                    step="1"
+                    aria-label="Seek"
+                    aria-valuemin="0"
+                    aria-valuemax="1000"
+                    aria-valuenow="0"
+                  />
+                  <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
+                </div>
               </div>
-              <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
-            </figure>
+            </div>
+            <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
+          </figure>
+        </div>
+
+        <h3 class="shots-gallery-heading">Screenshots</h3>
+        <div class="shots-carousel" id="shots-carousel">
+          <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App screenshots carousel">
+            <div class="shots-track">
             <figure class="shot-card">
               <div class="shot-frame">
                 <div class="shot-device-screen">
@@ -658,19 +663,6 @@
       next.addEventListener("click", function () {
         sc.scrollBy({ left: amount(), behavior: "auto" });
       });
-
-      function forwardVerticalWheel(e) {
-        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-        e.preventDefault();
-        e.stopPropagation();
-        window.scrollBy(0, e.deltaY);
-      }
-
-      var carousel = document.getElementById("shots-carousel");
-      if (carousel) {
-        carousel.addEventListener("wheel", forwardVerticalWheel, { passive: false });
-      }
-
       sc.addEventListener("scroll", function () {
         sc.classList.add("is-scrolling");
         if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);

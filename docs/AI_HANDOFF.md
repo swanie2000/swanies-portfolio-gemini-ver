@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-01 — **Live site:** carousel — **3 full cards** across strip (container queries), **vertical wheel forwarded** over carousel; demo **red Play + bar**, CTA idle/ended; scroll perf (**no header blur**, static bg). Owner verifying on **swaniedesigns.com** after deploy.
+**Last updated:** 2026-06-01 — **Live site:** demo video **standalone** (centered ~240px phone); **compact screenshot carousel** below (~**4 cards**, images only); **red Play + bar**, CTA idle/ended; scroll perf (**no header blur**, static bg). Owner verifying on **swaniedesigns.com** after deploy.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -52,7 +52,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Closed testing** next — promote **21** to **Closed testing** track; submit **closed-test opt-in URL** to **Testers Community** (**testerscommunity.com**, **25** testers paid). **≥12 opted-in for 14 consecutive days** before **Production access** application. **Do not** add TC testers to **License testing**.
-- **Marketing site (2026-06-01):** **`website/index.html`** — **production** copy; **`#get-app`**; carousel **container-query** card width (**3 full cards**, no clipped fourth); **wheel → page scroll** over carousel strip; demo **red Play + bar**, CTA idle/ended (~**13 MB** MP4); **no hover lift**; **no header blur** / static bg. Set **`PLAY_URL`** when listing live.
+- **Marketing site (2026-06-01):** **`website/index.html`** — **`#get-app`**; **`#app-demo`** — demo video **outside** carousel (centered phone, red Play + CTA); **Screenshots** row — **12 images only**, **`clamp(168px–220px)`** (~**4 cards** visible); **no hover lift**; **no header blur** / static bg. Set **`PLAY_URL`** when listing live.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -189,7 +189,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Owner:** Verify **https://swaniedesigns.com** — **3 full carousel cards**, scroll over carousel row, red Play, **`#get-app`**.
+1. **Owner:** Verify **https://swaniedesigns.com** — standalone demo video, compact screenshot carousel, scroll feel, **`#get-app`**.
 2. **Play closed testing:** Release **21** on **Closed** track → **Testers Community** (**25** testers, **14–16** days).
 3. **Set `PLAY_URL`** in **`website/index.html`** when Google Play public listing URL is ready.
 4. **Production access + listing** after closed-test gates + Dashboard clear.
@@ -249,6 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-06-01 — Split demo video from screenshot carousel:** Video moved to **`#app-demo`** (centered, ~**240px**); carousel **images only**, compact **`clamp(168–220px)`** cards (~**4** visible); removed video from horizontal scroll strip (scroll perf). **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Carousel layout + wheel over strip:** **Container-query** card sizing (**3 full cards**, dropped **`52vw`** + **`scrollbar-gutter: stable`**); **wheel forward** on carousel (Chrome latch); **`overscroll-behavior: none`**. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Scroll perf + red Play buttons:** **Solid red** center + bar Play (**`#e62117`**, no gold bleed-through); removed **header `backdrop-filter`**, **aurora animation**, custom **wheel** handler; carousel **`overflow-y: hidden`**. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Carousel scroll + no hover lift:** Removed **phone-frame hover lift** on all screenshot cards; **wheel pass-through** over horizontal carousel (fixes Chrome scroll latch); dropped carousel **`tabindex`**; pause **aurora** bg while scrolling; instant carousel arrow scroll. **Handoff + push `main`** → Pages deploy.
