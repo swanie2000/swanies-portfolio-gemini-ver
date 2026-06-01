@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Contact Swanie's Portfolio — questions, support, and feedback. Send a message without opening your email app." />
+  <meta name="theme-color" content="#000416" />
+  <link rel="canonical" href="https://swaniedesigns.com/contact.html" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Swanie's Portfolio" />
+  <meta property="og:title" content="Contact — Swanie's Portfolio" />
+  <meta property="og:description" content="Send a message to the Swanie's Portfolio team — support and questions about the Android app." />
+  <meta property="og:url" content="https://swaniedesigns.com/contact.html" />
+  <meta property="og:image" content="https://swaniedesigns.com/play_store_app_icon_512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Contact — Swanie's Portfolio" />
+  <meta name="twitter:description" content="Contact the Swanie's Portfolio team via our website form." />
+  <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
+  <link rel="apple-touch-icon" href="favicon-tab.png?v=2" />
+  <title>Contact us — Swanie's Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260518m7" />
+</head>
+<body>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="bg-layer" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="logo" href="index.html">
+        <img class="logo-mark" src="ic_swan_website.png" alt="" aria-hidden="true" />
+        <div class="logo-text-stack">
+          <span class="logo-text">Swanie's Portfolio</span><br aria-hidden="true" />
+          <span class="logo-tagline">Crypto &amp; Precious Metals</span>
+        </div>
+      </a>
+      <nav class="nav-links" aria-label="Site">
+        <a href="index.html#get-app">Get the app</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="index.html#features">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="press.html">Press</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <div class="wrap">
+    <main class="legal-page contact-page">
+      <a class="back-link" href="index.html">← Back to home</a>
+      <p class="contact-kicker">Support</p>
+      <h1>Contact us</h1>
+      <p class="meta">
+        Questions about Swanie's Portfolio, feedback, or help before the Play listing goes live?
+        Send a message below — we read every submission and reply by email when needed.
+      </p>
+
+      <div class="tester-request contact-form-wrap">
+        <form class="tester-request-form" id="contact-form" action="#" method="post" novalidate>
+          <label for="contact-name">Your name</label>
+          <input
+            type="text"
+            id="contact-name"
+            name="name"
+            required
+            autocomplete="name"
+            maxlength="120"
+            placeholder="Your name"
+          />
+
+          <label for="contact-email">Your email</label>
+          <input
+            type="email"
+            id="contact-email"
+            name="email"
+            required
+            autocomplete="email"
+            inputmode="email"
+            maxlength="254"
+            placeholder="you@example.com"
+          />
+          <p class="tester-request-hint">We use this only to reply to you — it does not open your email app.</p>
+
+          <label for="contact-topic">Topic</label>
+          <select id="contact-topic" name="topic">
+            <option value="General question">General question</option>
+            <option value="App support">App support</option>
+            <option value="Billing or Pro">Billing or Pro</option>
+            <option value="Press or partnership">Press or partnership</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="contact-message">Message</label>
+          <textarea
+            id="contact-message"
+            name="message"
+            required
+            rows="5"
+            maxlength="4000"
+            placeholder="How can we help?"
+          ></textarea>
+
+          <input type="text" name="_honey" class="tester-request-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <button type="submit" class="btn btn-secondary" id="contact-submit">Send message</button>
+          <p class="tester-request-status" id="contact-status" role="status" aria-live="polite" hidden></p>
+        </form>
+      </div>
+
+      <p class="contact-privacy-note">
+        Submissions are delivered through
+        <a href="https://web3forms.com" rel="noopener noreferrer">Web3Forms</a>
+        to our inbox. See the <a href="privacy.html">privacy policy</a> for how we handle data.
+        For in-app bug reports, use <strong>Settings → Send feedback</strong> inside the app.
+      </p>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="y"></span> Swanie's Portfolio</span>
+      <span><a href="privacy.html">Privacy</a> · <a href="press.html">Press</a> · <a href="contact.html">Contact</a> · Not financial advice</span>
+    </footer>
+  </div>
+  <script src="js/contact-form.js"></script>
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

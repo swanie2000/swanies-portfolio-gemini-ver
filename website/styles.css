@@ -508,7 +508,8 @@ section {
 }
 
 .join-testing-kicker,
-.get-app-kicker {
+.get-app-kicker,
+.contact-kicker {
   display: inline-block;
   margin: 0 0 0.5rem;
   padding: 0.35rem 0.65rem;
@@ -1445,6 +1446,7 @@ section {
 
 .tester-request-form input[type="text"],
 .tester-request-form input[type="email"],
+.tester-request-form select,
 .tester-request-form textarea {
   display: block;
   width: 100%;
@@ -1468,6 +1470,7 @@ section {
 
 .tester-request-form input[type="text"]:focus,
 .tester-request-form input[type="email"]:focus,
+.tester-request-form select:focus,
 .tester-request-form textarea:focus {
   outline: 2px solid rgba(94, 234, 212, 0.45);
   outline-offset: 1px;
@@ -1859,6 +1862,28 @@ section {
   padding: 1rem 1rem 1rem 1.15rem;
   margin: 1.5rem 0;
   border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.contact-page .contact-form-wrap {
+  max-width: 28rem;
+  margin-top: 1.5rem;
+}
+
+.contact-privacy-note {
+  margin: 1.25rem 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 36rem;
+}
+
+.contact-privacy-note a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+.contact-privacy-note a:hover {
+  text-decoration: underline;
 }
 
 .back-link {

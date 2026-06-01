@@ -6,16 +6,17 @@ Marketing site (**`index.html`**) plus **`privacy.html`**, **`press.html`** (pre
 
 1. **Tab icon** — **`favicon-tab.png`** is a **512×512** composite: **`#000416`** background with **`ic_swan_website.png`** centered so the swan reads on light browser chrome. After you change **`ic_swan_website.png`**, regenerate **`favicon-tab.png`** the same way (or bump **`?v=`** on the `<link>` tags in **`index.html`** / **`privacy.html`** after replacing it). Header logo still uses **`ic_swan_website.png`** directly.
 2. **Demo video + screenshots** — **`website/marketing/final_swanies_portfolio_demo_video_web.mp4`** (720p web export with **audio**, ~**5–15 MB** target) is the first card in the **See the app in action** carousel (**autoplay muted**, **Sound off/on** button). **Do not commit** the uncompressed master (**`final_swanies_portfolio_demo_video.mp4`**, gitignored) — GitHub rejects files **> 100 MB**. Regenerate web export from master (ffmpeg example in repo scripts or below). **`website/images/01_sp_*.jpg`** … follow in the same row.
-3. **`index.html` — Get the app** — Production **`#get-app`** section: Google Play CTA (set **`PLAY_URL`** in the page script when the listing is live), support email, and a **site QR** for **`SITE_SHARE_URL`** (defaults to **`https://swaniedesigns.com/`**). QR is drawn in-browser via **`website/js/qrcode.min.js`** (MIT — **`website/js/NOTICE-qrcodejs.txt`**).
-4. **`press.html`** — One-pager for reviewers (facts, package id, links). Update the “Last updated” line when you change copy.
-5. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
-6. **`bg-pattern.svg`** — Very light dot/grid/wave texture behind **`bg-layer`**; tweak opacity in **`styles.css`** (`.bg-pattern` and `prefers-color-scheme` blocks) if you want it stronger or softer.
+3. **`index.html` — Get the app** — Production **`#get-app`** section: Google Play CTA (set **`PLAY_URL`** in the page script when the listing is live), **contact form** at **`contact.html`** (Web3Forms — same key as in-app feedback), and a **site QR** for **`SITE_SHARE_URL`** (defaults to **`https://swaniedesigns.com/`**). QR is drawn in-browser via **`website/js/qrcode.min.js`** (MIT — **`website/js/NOTICE-qrcodejs.txt`**).
+4. **`contact.html`** — Support / contact page; **`js/contact-form.js`** posts to Web3Forms (no mailto). Key must match **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`**; restrict domains in the Web3Forms dashboard.
+5. **`press.html`** — One-pager for reviewers (facts, package id, links). Update the “Last updated” line when you change copy.
+6. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
+7. **`bg-pattern.svg`** — Very light dot/grid/wave texture behind **`bg-layer`**; tweak opacity in **`styles.css`** (`.bg-pattern` and `prefers-color-scheme` blocks) if you want it stronger or softer.
 
 ## SEO & Search Console
 
 - **`robots.txt`** — allows crawlers; points to **`sitemap.xml`**.
-- **`sitemap.xml`** — home, privacy, press (canonical **`https://swaniedesigns.com/`** URLs).
-- **`index.html`**, **`privacy.html`**, **`press.html`** — canonical links, Open Graph / Twitter cards, JSON-LD on the homepage.
+- **`sitemap.xml`** — home, privacy, press, contact (canonical **`https://swaniedesigns.com/`** URLs).
+- **`index.html`**, **`privacy.html`**, **`press.html`**, **`contact.html`** — canonical links, Open Graph / Twitter cards, JSON-LD on the homepage.
 - **Verify Google Search Console** — step-by-step: **`docs/SEARCH_CONSOLE_SETUP.md`** (HTML meta tag, HTML file, or Cloudflare DNS TXT).
 - **Recruit testers (legacy)** — organic beta posts: **`docs/RECRUIT_INTERNAL_TESTERS.md`** (site is now production-focused; use closed testing / Testers Community for Play gates).
 
