@@ -65,7 +65,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260518m1" />
+  <link rel="stylesheet" href="styles.css?v=20260518m2" />
 </head>
 <body>
   <div class="bg-pattern" aria-hidden="true"></div>
@@ -287,6 +287,13 @@
               </div>
               <figcaption>Home Screen Widget<br /><span class="shot-caption-sub">Create Widgets For Each Portfolio</span></figcaption>
             </figure>
+              <div class="shots-swipe-hint" id="shots-swipe-hint" aria-hidden="true">
+                <span class="shots-swipe-hint-inner">
+                  <span class="shots-swipe-hint-arrow" aria-hidden="true">←</span>
+                  <span class="shots-swipe-hint-label">SWIPE</span>
+                  <span class="shots-swipe-hint-arrow" aria-hidden="true">→</span>
+                </span>
+              </div>
               </div>
               <div class="shots-viewer-nav" role="group" aria-label="Screenshot navigation">
                 <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-label="Previous screenshot">‹</button>
@@ -637,6 +644,7 @@
       var prev = document.getElementById("shots-arrow-prev");
       var next = document.getElementById("shots-arrow-next");
       var countEl = document.getElementById("shots-viewer-count");
+      var swipeHint = document.getElementById("shots-swipe-hint");
       if (!stage || !prev || !next) return;
 
       var slides = Array.prototype.slice.call(stage.querySelectorAll(".shot-slide"));
@@ -659,6 +667,11 @@
       var touchStartX = 0;
       var touchStartY = 0;
 
+      function dismissSwipeHint() {
+        if (!swipeHint || swipeHint.classList.contains("is-dismissed")) return;
+        swipeHint.classList.add("is-dismissed");
+      }
+
       function render() {
         slides.forEach(function (slide, i) {
           var active = i === index;
@@ -678,6 +691,7 @@
         var nextIndex = index + delta;
         if (nextIndex < 0 || nextIndex >= slides.length) return;
         index = nextIndex;
+        dismissSwipeHint();
         render();
       }
 

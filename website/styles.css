@@ -678,6 +678,10 @@ section {
   touch-action: pan-y;
 }
 
+.shots-swipe-hint {
+  display: none;
+}
+
 .shot-slide {
   margin: 0;
   width: 100%;
@@ -992,6 +996,19 @@ section {
   margin-top: 0.12rem;
 }
 
+@keyframes shots-swipe-hint-pulse {
+  0%,
+  100% {
+    opacity: 0.88;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+}
+
 @media (max-width: 767px) {
   html {
     scroll-padding-top: 0.5rem;
@@ -1063,6 +1080,65 @@ section {
     letter-spacing: 0.02em;
   }
 
+  .shots-swipe-hint {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(236px, 88vw);
+    aspect-ratio: 9 / 19.5;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 10px 13%;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 4;
+    border-radius: 32px;
+    background: linear-gradient(
+      to top,
+      rgba(5, 6, 15, 0.78) 0%,
+      rgba(5, 6, 15, 0.42) 38%,
+      transparent 72%
+    );
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .shots-swipe-hint.is-dismissed {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .shots-swipe-hint-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 168, 83, 0.45);
+    background: rgba(5, 6, 15, 0.72);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    animation: shots-swipe-hint-pulse 2.4s ease-in-out infinite;
+  }
+
+  .shots-swipe-hint-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.94);
+  }
+
+  .shots-swipe-hint-arrow {
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1;
+    color: rgba(212, 168, 83, 0.95);
+  }
+
   .shot-frame {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.11),
@@ -1106,6 +1182,11 @@ section {
   .shots-viewer-count {
     font-size: 0.66rem;
     min-width: 2.45rem;
+  }
+
+  .shots-swipe-hint {
+    max-width: min(224px, 90vw);
+    padding-bottom: 12%;
   }
 }
 
@@ -1840,6 +1921,10 @@ section {
 
   .shot-caption-sub {
     transition: none;
+  }
+
+  .shots-swipe-hint-inner {
+    animation: none;
   }
 
   .nav-links a::after {
