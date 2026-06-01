@@ -126,7 +126,7 @@
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
         <p class="section-sub">App demo video plus twelve real-device screenshots — swipe or drag sideways; on desktop use the arrows below.</p>
         <div class="shots-carousel" id="shots-carousel">
-          <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App demo and screenshots carousel" tabindex="0">
+          <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App demo and screenshots carousel">
             <div class="shots-track">
             <figure class="shot-card shot-card-video">
               <div class="shot-frame">
@@ -653,11 +653,20 @@
       }
 
       prev.addEventListener("click", function () {
-        sc.scrollBy({ left: -amount(), behavior: "smooth" });
+        sc.scrollBy({ left: -amount(), behavior: "auto" });
       });
       next.addEventListener("click", function () {
-        sc.scrollBy({ left: amount(), behavior: "smooth" });
+        sc.scrollBy({ left: amount(), behavior: "auto" });
       });
+      sc.addEventListener(
+        "wheel",
+        function (e) {
+          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+          e.preventDefault();
+          window.scrollBy(0, e.deltaY);
+        },
+        { passive: false }
+      );
       sc.addEventListener("scroll", function () {
         sc.classList.add("is-scrolling");
         if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);
@@ -676,11 +685,31 @@
 
     (function () {
       var threshold = 12;
+      var scrollHeaderTicking = false;
+      var scrollPerfTimer = null;
+
       function syncScrollHeader() {
         document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
       }
+
+      function onPageScroll() {
+        document.documentElement.classList.add("is-scrolling-page");
+        if (scrollPerfTimer) window.clearTimeout(scrollPerfTimer);
+        scrollPerfTimer = window.setTimeout(function () {
+          document.documentElement.classList.remove("is-scrolling-page");
+          scrollPerfTimer = null;
+        }, 180);
+
+        if (scrollHeaderTicking) return;
+        scrollHeaderTicking = true;
+        window.requestAnimationFrame(function () {
+          syncScrollHeader();
+          scrollHeaderTicking = false;
+        });
+      }
+
       syncScrollHeader();
-      window.addEventListener("scroll", syncScrollHeader, { passive: true });
+      window.addEventListener("scroll", onPageScroll, { passive: true });
     })();
   </script>
 </body>

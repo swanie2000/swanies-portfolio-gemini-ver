@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-01 — **Live site:** carousel demo — **custom Play + control bar** (always visible), **CTA overlay** (idle/ended), **`preload="none"`**, page scroll **`auto`** (nav anchors smooth only). Owner verifying on **swaniedesigns.com** after deploy.
+**Last updated:** 2026-06-01 — **Live site:** carousel demo (**custom Play + bar**, CTA idle/ended); **no phone-frame hover lift**; scroll fixes (**wheel pass-through** over carousel, no carousel **`tabindex`**, pause bg animation while scrolling). Owner verifying on **swaniedesigns.com** after deploy.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -52,7 +52,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Closed testing** next — promote **21** to **Closed testing** track; submit **closed-test opt-in URL** to **Testers Community** (**testerscommunity.com**, **25** testers paid). **≥12 opted-in for 14 consecutive days** before **Production access** application. **Do not** add TC testers to **License testing**.
-- **Marketing site (2026-06-01):** **`website/index.html`** — **production** copy; **`#get-app`**; carousel **`final_swanies_portfolio_demo_video_web.mp4`** (~**13 MB**, **720×1280 H.264 + AAC**, **2× audio**); **custom** gold **Play** + bottom bar (play/seek/mute, no fade); **CTA_end_picture** on **idle/ended**; **`preload="none"`**; **`scroll-behavior: auto`** on page (fixes wheel lag). Set **`PLAY_URL`** when listing live.
+- **Marketing site (2026-06-01):** **`website/index.html`** — **production** copy; **`#get-app`**; carousel demo (**custom Play + bar**, CTA idle/ended, ~**13 MB** MP4); **no screenshot hover lift**; carousel **wheel → page scroll** (Chrome latch fix), **no `tabindex`** on strip, **bg animation paused** while scrolling. Set **`PLAY_URL`** when listing live.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -189,7 +189,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Next steps (priority order)
 
-1. **Owner:** Verify **https://swaniedesigns.com** — demo Play button, control bar, CTA idle/ended, scroll feel, **`#get-app`**.
+1. **Owner:** Verify **https://swaniedesigns.com** — demo controls, no frame lift, scroll wheel + arrow keys over carousel, **`#get-app`**.
 2. **Play closed testing:** Release **21** on **Closed** track → **Testers Community** (**25** testers, **14–16** days).
 3. **Set `PLAY_URL`** in **`website/index.html`** when Google Play public listing URL is ready.
 4. **Production access + listing** after closed-test gates + Dashboard clear.
@@ -249,6 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-06-01 — Carousel scroll + no hover lift:** Removed **phone-frame hover lift** on all screenshot cards; **wheel pass-through** over horizontal carousel (fixes Chrome scroll latch); dropped carousel **`tabindex`**; pause **aurora** bg while scrolling; instant carousel arrow scroll. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Demo video custom controls + scroll fix:** Replaced native **`controls`** (hidden by CTA overlay, auto-fade) with **custom Play button** + **always-visible bar**; **`preload="none"`**; **`scroll-behavior: auto`** on **`html`** (nav **`#`** links smooth on click). **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Carousel video UX polish:** **`index.html`** / **`styles.css`** — **always-visible** native controls (WebKit); **CTA_end_picture** poster + overlay on **idle/ended**; **`wireDemoVideo`** sync. **ffmpeg** **2× audio** on web MP4 (~**13 MB**). **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Demo video re-export on site:** Replaced **`final_swanies_portfolio_demo_video_web.mp4`** (~**14 MB**, H.264 + AAC, **720×1280**) with owner export including **production CTA end card**; same carousel path in **`index.html`**. **Handoff + push `main`** → Pages deploy.
