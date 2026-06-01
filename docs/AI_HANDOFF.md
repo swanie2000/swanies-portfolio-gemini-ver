@@ -249,6 +249,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-06-01 — Scroll perf + red Play buttons:** **Solid red** center + bar Play (**`#e62117`**, no gold bleed-through); removed **header `backdrop-filter`**, **aurora animation**, custom **wheel** handler; carousel **`overflow-y: hidden`**. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Carousel scroll + no hover lift:** Removed **phone-frame hover lift** on all screenshot cards; **wheel pass-through** over horizontal carousel (fixes Chrome scroll latch); dropped carousel **`tabindex`**; pause **aurora** bg while scrolling; instant carousel arrow scroll. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Demo video custom controls + scroll fix:** Replaced native **`controls`** (hidden by CTA overlay, auto-fade) with **custom Play button** + **always-visible bar**; **`preload="none"`**; **`scroll-behavior: auto`** on **`html`** (nav **`#`** links smooth on click). **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Carousel video UX polish:** **`index.html`** / **`styles.css`** — **always-visible** native controls (WebKit); **CTA_end_picture** poster + overlay on **idle/ended**; **`wireDemoVideo`** sync. **ffmpeg** **2× audio** on web MP4 (~**13 MB**). **Handoff + push `main`** → Pages deploy.
