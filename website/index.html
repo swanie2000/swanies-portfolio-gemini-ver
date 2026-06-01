@@ -135,12 +135,19 @@
                   <video
                     class="shot-demo-video"
                     src="marketing/final_swanies_portfolio_demo_video_web.mp4"
-                    poster="images/01_sp_start_page.jpg"
+                    poster="marketing/CTA_end_picture.png"
                     controls
                     playsinline
                     preload="metadata"
                     aria-label="Swanie's Portfolio app demo video"
                   ></video>
+                  <img
+                    class="shot-demo-video-cta is-visible"
+                    src="marketing/CTA_end_picture.png"
+                    alt=""
+                    aria-hidden="true"
+                    decoding="async"
+                  />
                 </div>
               </div>
               <figcaption>App demo<br /><span class="shot-caption-sub">Use controls to play, scrub, and adjust sound</span></figcaption>
@@ -472,11 +479,32 @@
       { passive: true }
     );
 
-    (function wireDemoVideoControls() {
-      document.querySelectorAll(".shot-demo-video").forEach(function (video) {
+    (function wireDemoVideo() {
+      document.querySelectorAll(".shot-device-screen-video").forEach(function (screen) {
+        var video = screen.querySelector(".shot-demo-video");
+        var cta = screen.querySelector(".shot-demo-video-cta");
+        if (!video) return;
+
+        video.volume = 1;
+
+        function shouldShowCta() {
+          return video.paused && (video.ended || video.currentTime < 0.05);
+        }
+
+        function syncCta() {
+          if (!cta) return;
+          cta.classList.toggle("is-visible", shouldShowCta());
+        }
+
         video.addEventListener("pointerdown", function (e) {
           e.stopPropagation();
         });
+
+        ["play", "pause", "ended", "seeked", "loadedmetadata"].forEach(function (ev) {
+          video.addEventListener(ev, syncCta);
+        });
+
+        syncCta();
       });
     })();
 

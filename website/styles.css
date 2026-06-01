@@ -810,6 +810,39 @@ section {
   object-position: center center;
   display: block;
   background: #05060f;
+  z-index: 0;
+}
+
+.shot-device-screen-video .shot-demo-video::-webkit-media-controls-enclosure,
+.shot-device-screen-video .shot-demo-video::-webkit-media-controls,
+.shot-device-screen-video .shot-demo-video::-webkit-media-controls-panel {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.shot-device-screen-video .shot-demo-video::-webkit-media-controls-panel {
+  display: flex !important;
+}
+
+.shot-demo-video-cta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 2.75rem;
+  width: 100%;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.shot-demo-video-cta.is-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .shot-card-video .shot-frame {
