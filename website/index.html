@@ -124,62 +124,62 @@
 
       <section id="screenshots" aria-labelledby="screenshots-heading">
         <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
-        <p class="section-sub">Watch the demo video, then browse twelve real-device screenshots — swipe sideways or use the arrows below.</p>
+        <p class="section-sub">Demo video and screenshots side by side — swipe the shots or use the arrows.</p>
 
-        <div class="demo-video-block" id="app-demo">
-          <figure class="demo-video-card">
-            <div class="shot-frame">
-              <div class="shot-device-screen shot-device-screen-video">
-                <span class="shot-device-earpiece" aria-hidden="true"></span>
-                <div class="shot-demo-video-stage">
-                  <video
-                    class="shot-demo-video"
-                    src="marketing/final_swanies_portfolio_demo_video_web.mp4"
-                    poster="marketing/CTA_end_picture.png"
-                    playsinline
-                    preload="none"
-                    aria-label="Swanie's Portfolio app demo video"
-                  ></video>
-                  <div class="shot-demo-video-cta-layer is-visible">
-                    <img
-                      class="shot-demo-video-cta"
-                      src="marketing/CTA_end_picture.png"
-                      alt=""
-                      aria-hidden="true"
-                      decoding="async"
+        <div class="app-showcase" id="app-showcase">
+          <div class="app-showcase-video" id="app-demo">
+            <figure class="demo-video-card">
+              <div class="shot-frame">
+                <div class="shot-device-screen shot-device-screen-video">
+                  <span class="shot-device-earpiece" aria-hidden="true"></span>
+                  <div class="shot-demo-video-stage">
+                    <video
+                      class="shot-demo-video"
+                      src="marketing/final_swanies_portfolio_demo_video_web.mp4"
+                      poster="marketing/CTA_end_picture.png"
+                      playsinline
+                      preload="none"
+                      aria-label="Swanie's Portfolio app demo video"
+                    ></video>
+                    <div class="shot-demo-video-cta-layer is-visible">
+                      <img
+                        class="shot-demo-video-cta"
+                        src="marketing/CTA_end_picture.png"
+                        alt=""
+                        aria-hidden="true"
+                        decoding="async"
+                      />
+                      <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
+                        <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
+                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
+                    <input
+                      type="range"
+                      class="shot-demo-bar-seek"
+                      min="0"
+                      max="1000"
+                      value="0"
+                      step="1"
+                      aria-label="Seek"
+                      aria-valuemin="0"
+                      aria-valuemax="1000"
+                      aria-valuenow="0"
                     />
-                    <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
-                      <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
-                    </button>
+                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
                   </div>
                 </div>
-                <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
-                  <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
-                  <input
-                    type="range"
-                    class="shot-demo-bar-seek"
-                    min="0"
-                    max="1000"
-                    value="0"
-                    step="1"
-                    aria-label="Seek"
-                    aria-valuemin="0"
-                    aria-valuemax="1000"
-                    aria-valuenow="0"
-                  />
-                  <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
-                </div>
               </div>
-            </div>
-            <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
-          </figure>
-        </div>
+              <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
+            </figure>
+          </div>
 
-        <h3 class="shots-gallery-heading">Screenshots</h3>
-        <div class="shots-carousel" id="shots-carousel">
-          <div class="shots-scroll" id="shots-scroll" role="region" aria-label="App screenshots carousel">
-            <div class="shots-track">
-            <figure class="shot-card">
+          <div class="app-showcase-shots" id="app-screenshots">
+            <div class="shots-viewer" id="shots-viewer" role="region" aria-label="App screenshots" aria-live="polite" tabindex="0">
+              <div class="shots-viewer-stage" id="shots-viewer-stage">
+            <figure class="shot-slide is-active" aria-hidden="false">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -188,7 +188,7 @@
               </div>
               <figcaption>Start Screen<br /><span class="shot-caption-sub">Swanie's Portfolio</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -197,7 +197,7 @@
               </div>
               <figcaption>Create Account<br /><span class="shot-caption-sub">Secure Local Profile</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -206,7 +206,7 @@
               </div>
               <figcaption>Login<br /><span class="shot-caption-sub">Unlock Your Vault</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -215,7 +215,7 @@
               </div>
               <figcaption>Home Screen<br /><span class="shot-caption-sub">Live Asset Values</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -224,7 +224,7 @@
               </div>
               <figcaption>Settings Screen<br /><span class="shot-caption-sub">Preferences &amp; Tools</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -233,7 +233,7 @@
               </div>
               <figcaption>Language Drop Down<br /><span class="shot-caption-sub">Supports 20 Locales</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -242,7 +242,7 @@
               </div>
               <figcaption>More Settings<br /><span class="shot-caption-sub">Customize the App</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -251,7 +251,7 @@
               </div>
               <figcaption>Analytics Hub<br /><span class="shot-caption-sub">Mix &amp; Concentration</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -260,7 +260,7 @@
               </div>
               <figcaption>Analytics Pie Chart<br /><span class="shot-caption-sub">View your data in different ways</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -269,7 +269,7 @@
               </div>
               <figcaption>Widget Manager<br /><span class="shot-caption-sub">Select Assets for Widget</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -278,7 +278,7 @@
               </div>
               <figcaption>Widget Manager<br /><span class="shot-caption-sub">Custom Colors</span></figcaption>
             </figure>
-            <figure class="shot-card">
+            <figure class="shot-slide" aria-hidden="true">
               <div class="shot-frame">
                 <div class="shot-device-screen">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
@@ -287,11 +287,13 @@
               </div>
               <figcaption>Home Screen Widget<br /><span class="shot-caption-sub">Create Widgets For Each Portfolio</span></figcaption>
             </figure>
+              </div>
+              <div class="shots-viewer-nav" role="group" aria-label="Screenshot navigation">
+                <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-label="Previous screenshot">‹</button>
+                <span class="shots-viewer-count" id="shots-viewer-count" aria-hidden="true">1 / 12</span>
+                <button type="button" class="shots-arrow shots-arrow-next" id="shots-arrow-next" aria-label="Next screenshot">›</button>
+              </div>
             </div>
-          </div>
-          <div class="shots-nav" role="group" aria-label="Screenshot navigation">
-            <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-controls="shots-scroll" aria-label="Scroll screenshots left">‹</button>
-            <button type="button" class="shots-arrow shots-arrow-next" id="shots-arrow-next" aria-controls="shots-scroll" aria-label="Scroll screenshots right">›</button>
           </div>
         </div>
       </section>
@@ -629,54 +631,84 @@
       });
     })();
 
-    (function wireShotsCarousel() {
-      var sc = document.getElementById("shots-scroll");
+    (function wireShotsViewer() {
+      var stage = document.getElementById("shots-viewer-stage");
+      var viewer = document.getElementById("shots-viewer");
       var prev = document.getElementById("shots-arrow-prev");
       var next = document.getElementById("shots-arrow-next");
-      if (!sc || !prev || !next) return;
+      var countEl = document.getElementById("shots-viewer-count");
+      if (!stage || !prev || !next) return;
 
-      var scrollIdleTimer = null;
+      var slides = Array.prototype.slice.call(stage.querySelectorAll(".shot-slide"));
+      if (!slides.length) return;
 
-      function amount() {
-        return Math.max(220, Math.floor(sc.clientWidth * 0.82));
-      }
+      var index = 0;
+      var touchStartX = 0;
+      var touchStartY = 0;
 
-      function updateDisabled() {
-        var max = sc.scrollWidth - sc.clientWidth;
-        if (max <= 0) {
-          prev.disabled = true;
-          next.disabled = true;
-        } else {
-          var left = sc.scrollLeft;
-          prev.disabled = left <= 1;
-          next.disabled = left >= max - 1;
-        }
+      function render() {
+        slides.forEach(function (slide, i) {
+          var active = i === index;
+          slide.classList.toggle("is-active", active);
+          slide.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+        prev.disabled = index <= 0;
+        next.disabled = index >= slides.length - 1;
         prev.classList.toggle("is-disabled", prev.disabled);
         next.classList.toggle("is-disabled", next.disabled);
         prev.setAttribute("aria-disabled", prev.disabled ? "true" : "false");
         next.setAttribute("aria-disabled", next.disabled ? "true" : "false");
+        if (countEl) countEl.textContent = index + 1 + " / " + slides.length;
+      }
+
+      function go(delta) {
+        var nextIndex = index + delta;
+        if (nextIndex < 0 || nextIndex >= slides.length) return;
+        index = nextIndex;
+        render();
       }
 
       prev.addEventListener("click", function () {
-        sc.scrollBy({ left: -amount(), behavior: "auto" });
+        go(-1);
       });
       next.addEventListener("click", function () {
-        sc.scrollBy({ left: amount(), behavior: "auto" });
+        go(1);
       });
-      sc.addEventListener("scroll", function () {
-        sc.classList.add("is-scrolling");
-        if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);
-        scrollIdleTimer = window.setTimeout(function () {
-          sc.classList.remove("is-scrolling");
-          scrollIdleTimer = null;
-        }, 160);
-        window.requestAnimationFrame(updateDisabled);
-      }, { passive: true });
-      window.addEventListener("resize", updateDisabled, { passive: true });
-      if ("ResizeObserver" in window) {
-        new ResizeObserver(updateDisabled).observe(sc);
+
+      stage.addEventListener(
+        "touchstart",
+        function (e) {
+          if (!e.touches[0]) return;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        },
+        { passive: true }
+      );
+      stage.addEventListener(
+        "touchend",
+        function (e) {
+          if (!e.changedTouches[0]) return;
+          var dx = e.changedTouches[0].clientX - touchStartX;
+          var dy = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy)) return;
+          go(dx < 0 ? 1 : -1);
+        },
+        { passive: true }
+      );
+
+      if (viewer) {
+        viewer.addEventListener("keydown", function (e) {
+          if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            go(-1);
+          } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            go(1);
+          }
+        });
       }
-      updateDisabled();
+
+      render();
     })();
 
     (function () {
