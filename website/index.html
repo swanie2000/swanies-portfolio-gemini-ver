@@ -387,12 +387,12 @@
         <h2 class="section-title">Get Swanie's Portfolio</h2>
         <p class="section-sub">
           Download on Google Play when the listing is live. Android only — crypto and precious metals in one local-first portfolio.
-          Family and internal testers: use the <strong>Play internal test</strong> QR below to install or update from Google Play.
+          Family and closed testers: use the <strong>Play closed test</strong> QR below to opt in and install from Google Play.
         </p>
         <div class="card get-app-card">
           <div class="get-app-actions">
             <a class="btn btn-primary is-disabled" id="play-cta-bottom" href="#" aria-disabled="true">Get it on Google Play</a>
-            <a class="btn btn-secondary" id="tester-cta" href="#">Open Play internal test</a>
+            <a class="btn btn-secondary" id="tester-cta" href="#">Open Play closed test</a>
             <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
             <a class="btn btn-ghost" href="press.html">Press kit</a>
             <a class="btn btn-ghost" href="contact.html">Contact us</a>
@@ -405,7 +405,7 @@
           <div class="qr-deck qr-deck-compact" id="qr-deck">
             <p class="qr-deck-intro">
               <strong>This page</strong> opens the marketing site on your phone.
-              <strong>Play internal test</strong> is the Google Play opt-in / install link for testers on the internal track.
+              <strong>Play closed test</strong> is the Google Play opt-in / install link for <strong>Closed testing - Alpha</strong>.
             </p>
             <details class="qr-help">
               <summary>About these QR codes &amp; privacy</summary>
@@ -415,8 +415,8 @@
                   (<code>website/js/qrcode.min.js</code>). No third-party QR image API is called.
                 </p>
                 <p>
-                  The <strong>Play internal test</strong> QR encodes your Google Play tester invite URL
-                  (<code>play.google.com/apps/internaltest/…</code>). Use the same Gmail that is on the Play Console tester list.
+                  The <strong>Play closed test</strong> QR encodes your Google Play closed-testing invite URL
+                  (from <strong>Join on Android</strong> → Copy link on the Testers tab). Use the same Gmail that is on the Play Console tester list.
                 </p>
               </div>
             </details>
@@ -431,22 +431,22 @@
               </div>
               <div class="qr-card qr-card-tester">
                 <div id="tester-qr-pending" class="tester-qr-pending" hidden>
-                  <h4 class="qr-card-title">Play internal test</h4>
+                  <h4 class="qr-card-title">Play closed test</h4>
                   <p class="qr-card-sub">Set <code>TESTER_URL</code> in the page script to show this QR.</p>
                   <div class="tester-qr-placeholder-box" role="status">
                     <p class="tester-qr-placeholder-text">
-                      Paste your Play Console <strong>Copy link</strong> from Internal testing → Testers into
-                      <code>TESTER_URL</code> at the bottom of this file, then redeploy.
+                      Paste <strong>Join on Android</strong> → Copy link from
+                      Closed testing - Alpha → Testers into <code>TESTER_URL</code>, then redeploy.
                     </p>
                   </div>
                 </div>
                 <div id="tester-qr-live" class="tester-qr-live" hidden>
-                  <h4 class="qr-card-title">Play internal test</h4>
-                  <p class="qr-card-sub">Scan to open the opt-in / install flow in Google Play.</p>
+                  <h4 class="qr-card-title">Play closed test</h4>
+                  <p class="qr-card-sub">Scan to opt in and install from Google Play (closed testing).</p>
                   <div class="tester-qr-frame">
                     <div id="tester-qr-host" class="qr-host"></div>
                   </div>
-                  <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open internal test link</a>
+                  <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open closed test link</a>
                 </div>
               </div>
             </div>
@@ -475,8 +475,8 @@
   <script src="js/qrcode.min.js"></script>
   <script>
     const PLAY_URL = "";
-    /** Google Play internal testing opt-in URL — QR + “Open Play internal test” button. Copy from Play Console → Internal testing → Testers. */
-    const TESTER_URL = "https://play.google.com/apps/internaltest/4700913622589567786";
+    /** Google Play closed testing opt-in URL — QR + button. Paste exact URL from Closed testing - Alpha → Testers → Join on Android → Copy link. */
+    const TESTER_URL = "https://play.google.com/apps/testing/com.swanie.portfolio";
     /** Optional: force the site QR to a public https URL. Leave "" to use the current page URL. */
     const SITE_SHARE_URL = "https://swaniedesigns.com/";
 
@@ -493,7 +493,7 @@
 
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("play-cta-bottom", PLAY_URL, "Get it on Google Play");
-    wireCta("tester-cta", TESTER_URL, "Open Play internal test");
+    wireCta("tester-cta", TESTER_URL, "Open Play closed test");
     document.getElementById("y").textContent = new Date().getFullYear();
 
     function siteShareTarget() {
