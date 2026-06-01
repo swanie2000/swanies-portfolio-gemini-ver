@@ -213,7 +213,8 @@
 - [x] **Play app record + initial Dashboard setup (owner, 2026-05-08):** App **created** in Console; **Finish setting up your app** checklist (policy, listing, data safety, etc.) **complete** on Dashboard snapshot — confirm in Console if anything reopens.
 - [x] **Internal testing:** **21 (1.0.21)** on track — owner verified; **3** family on **internal testers**; **Closed testing** next via **Testers Community** (not **`#join-testing`** funnel).
 - [x] **License testing policy:** **Swanie's Portfolio Testers** **unchecked** on **Settings → License testing** — friends/family on **internal testers only**; see **`docs/AI_HANDOFF.md`** § *Play testing — two lists*.
-- [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf; owner **good for now** — read-through over next **1–2 days**.
+- [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf.
+- [x] **Marketing site contact + owner QA (2026-05-19):** **`contact.html`** — Web3Forms, on-page confirmation; owner reviewed site and approved.
 - [ ] **Closed testing:** Promote **21** to **Closed** track → **Testers Community** (**≥12** opted-in, **14+** consecutive days). **Do not** add TC emails to **License testing**.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.

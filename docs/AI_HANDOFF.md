@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-05-18 (EOD) — **Marketing site showcase locked** — owner **good for now**; will read the live site over the **next 1–2 days** for copy/link errors. **Next focus:** **Play closed testing** → **production**.
+**Last updated:** 2026-05-19 — **Marketing site + contact form done** — owner reviewed live site and approved **`contact.html`** (Web3Forms, on-page confirmation copy; **no** mailto / **no** unreliable email-copy checkbox). **Next focus:** **Play closed testing** → **production**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -52,7 +52,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Closed testing** next — promote **21** to **Closed testing** track; submit **closed-test opt-in URL** to **Testers Community** (**testerscommunity.com**, **25** testers paid). **≥12 opted-in for 14 consecutive days** before **Production access** application. **Do not** add TC testers to **License testing**.
-- **Marketing site (2026-05-18 — locked for now):** **`website/index.html`** + **`styles.css`** — **`#get-app`**; **`#app-showcase`** — demo **video left**, **stacked screenshot viewer** right (**12** slides, **`wireShotsViewer`**: arrows + swipe; **carousel removed** for scroll perf); **desktop** wider column gap; **mobile** larger phone frames, compact **`‹ 1 / 12 ›`** nav; **touch-triggered swipe hint** on phone screen (**contextual ← / →** at ends, **no dimming**, auto-fade after pause); screenshot **`loading="eager"`** + JS preload (no first-pass black flash); **red Play + bar**, CTA idle/ended; **no header blur** / static bg; CSS cache-bust query on **`styles.css`**. Set **`PLAY_URL`** when Play **public** listing URL exists.
+- **Marketing site (2026-05-19):** **`website/contact.html`** + **`js/contact-form.js`** — **Contact** nav on all pages; **`#get-app`** links to contact form (replaced **`mailto:`**). Web3Forms submit → owner inbox; success shows **“Thanks — your message was sent. A copy is below.”** + on-page **“Message sent”** copy block (reliable confirmation; **not** Web3Forms Pro email autoresponder). Showcase + swipe hint unchanged from **2026-05-18** lock. Set **`PLAY_URL`** when Play **public** listing URL exists.
+- **Marketing site (2026-05-18 — showcase):** **`#app-showcase`** — demo **video left**, **stacked screenshot viewer** (**12** slides, arrows + swipe); mobile swipe hint (touch, contextual arrows, no dimming); screenshot preload; scroll perf. See commits **`17565c2`**–**`b634553`** on **`main`**.
 
 **Marketing site (2026-05-11 + 2026-05-16):** **Sticky header** — **`.site-header`** sibling of **`.wrap`** (not inside **`overflow-x: clip`** on wrap); **`html.is-scrolled`** gold underline on scroll; do **not** put **`overflow-x: hidden`** on **`html`/`body`** (breaks sticky). **Screenshots** carousel, **feature grid** breakpoints, **QR** responsive sizing, **`overscroll-behavior-x`** on **`html`** (Firefox). **`index.html`** / **`privacy.html`** / **`press.html`** share layout.
 
@@ -179,7 +180,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 ### Play Console — ordered steps (next session; do in order)
 
 1. **Closed testing (primary):** Promote **21 (1.0.21)** to **Closed testing**; create **opt-in link**; self-test install; submit URL to **Testers Community** (**25** testers paid — target **≥12 opted in** for **14 consecutive days**). **Do not** add TC emails to **License testing**.
-2. **Owner (next 1–2 days):** Final read of **https://swaniedesigns.com** — copy, links, **`#get-app`**, video, screenshots (mobile + desktop), **`privacy.html`**. Log fixes for a follow-up session if needed.
+2. **Owner site QA:** **Done** — owner read **https://swaniedesigns.com**; showcase OK; **contact form** approved (**`b634553`**).
 3. **Listing (parallel):** Finish Play **store listing** uploads (**screenshots**, **512** icon, **1024×500** feature graphic); resolve **short description** flags if any; **`docs/play_store_long_description_en-US.txt`** → Console.
 4. **Console hygiene:** Confirm **Dashboard** / **App content** / **Data safety** complete; paste live **`privacy.html`** deletion URLs if not saved yet.
 5. **Production access:** After closed-test gate (**14+** days, **≥12** opted-in) — apply in Play Console.
@@ -194,17 +195,16 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 ### Closed testing → production (ship path)
 
 1. **Closed testing:** Release **21 (1.0.21)** on **Closed** track → **Testers Community** opt-in (**25** paid, **≥12** opted-in, **14+** consecutive days). **License testing** stays **unchecked** for recruits.
-2. **Owner site QA (1–2 days):** Read **https://swaniedesigns.com** for errors — showcase, **`#get-app`**, legal pages. Website **feature-complete for now** unless fixes found.
-3. **Play listing:** Screenshots, feature graphic, short/long copy; clear **Dashboard** blockers.
+2. **Play listing:** Screenshots, feature graphic, short/long copy; clear **Dashboard** blockers.
 4. **Data safety / privacy URLs:** Live **`privacy.html`** anchors in Console if not pasted.
 5. **Production access:** Apply after closed-test gate passes.
 6. **Production release:** Promote bundle, **Send app for review**, staged rollout when ready.
 7. **Set `PLAY_URL`** on site when Google Play **public** listing URL exists → redeploy **`website/`**.
 8. **App production copy pass** (beta/testing strings) before broad public launch — separate from closed-test run.
 
-### Website (paused unless owner finds issues)
+### Website
 
-- No further marketing-site work unless owner’s read-through surfaces bugs or copy fixes.
+- **Shipped** — showcase, swipe hint, **contact page** (**`contact.html`**). No further site work unless owner requests a change.
 
 ---
 
@@ -216,7 +216,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
-- **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties` + public key in **`website/index.html`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. **`validateRevenueCatReleaseKey`** + **`verifyReleaseBundleRevenueCatKey`** / **`scripts/verify-aab-revenuecat-key.ps1`** before Play upload.
+- **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. **`validateRevenueCatReleaseKey`** + **`verifyReleaseBundleRevenueCatKey`** / **`scripts/verify-aab-revenuecat-key.ps1`** before Play upload.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
 - **i18n:** `LanguageDisplay.kt`; **`values-*`** — **537** keys match **`values/strings.xml`** (incl. **3** beta-unlock strings from **1.0.18**); **no batch scripts** on locale XML (owner rule).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, `:app:lintDebug` (`app/lint.xml` policy).
@@ -233,8 +233,9 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Custom asset icons | `IconManager.kt`, `HoldingsUIComponents.kt` (`MetalIcon`, edit funnels), `MyHoldingsScreen.kt`, `AssetArchitectScreen.kt` |
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`** (Style tab scroll), **`WidgetConfigActivity.kt`** |
-| Marketing site layout | **`website/styles.css`** — **`#app-showcase`** grid; **`#app-screenshots`** stacked viewer + mobile **swipe hint**; **`#get-app`**; CSS cache-bust on **`styles.css?v=…`** |
-| Marketing site / video | **`website/index.html`** — **`wireShotsViewer`**, **`wireDemoVideo`**; **`#get-app`**, **`PLAY_URL`**, **`SITE_SHARE_URL`**; **`marketing/final_swanies_portfolio_demo_video_web.mp4`**; **`scripts/compose-cta-end-card.ps1`**, **`scripts/generate-qr-png.js`** |
+| Marketing site layout | **`website/styles.css`** — **`#app-showcase`**; mobile swipe hint; **`#get-app`** |
+| Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms contact (no mailto) |
+| Marketing site / video | **`website/index.html`** — **`wireShotsViewer`**, **`wireDemoVideo`**; **`#get-app`**, **`PLAY_URL`**, **`SITE_SHARE_URL`**; **`marketing/final_swanies_portfolio_demo_video_web.mp4`** |
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | App / launcher | **`AndroidManifest.xml`** → **`@string/launcher_short_name`** (**Portfolio** under icon); **`app_name`** / Play listing still full brand; widget label unchanged |
@@ -247,7 +248,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal / Closed → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits and TC testers |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
 | Beta unlock (app) | **`docs/BETA_UNLOCK_CODE.md`** — shipped in app; sunset via **`BETA_UNLOCK_PROGRAM_END`** |
-| Marketing site | **`website/index.html`** — FAQ, SEO meta, **`#get-app`**, site QR; **`robots.txt`**, **`sitemap.xml`**; **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| Marketing site | **`website/index.html`**, **`website/contact.html`** — FAQ, SEO, **`#get-app`**, site QR; **`robots.txt`**, **`sitemap.xml`** (incl. contact); **`deploy-website.yml`** → **https://swaniedesigns.com** |
 | SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — verify **`swaniedesigns.com`**, submit sitemap |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
@@ -260,6 +261,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-05-19 — Contact page + owner site sign-off:** **`contact.html`** / **`contact-form.js`** — Web3Forms (no mailto); on-page **“Message sent”** confirmation copy; rejected unreliable **email-me-a-copy** (Web3Forms Pro). Owner reviewed site — **likes contact flow**. **Handoff + push `main`**. **Next:** **closed testing**.
 - **2026-05-18 (EOD) — Marketing site showcase locked:** Owner **good for now**; will read live site over **1–2 days**. **`app-showcase`** final polish — desktop gap, mobile sizing/nav, **touch** swipe hint (contextual end arrows, no dimming, auto-fade), screenshot preload, CSS cache bust (**`17565c2`**–**`1f73936`**). **Handoff + push `main`**. **Next:** owner QA → **closed testing** → **production**.
 - **2026-06-01 — App showcase (no carousel):** **`app-showcase`** grid — video **left**, **stacked** screenshot viewer **right** (**`wireShotsViewer`**, swipe + arrows); removed horizontal scroll carousel entirely. **Handoff + push `main`** → Pages deploy.
 - **2026-06-01 — Split demo video from screenshot carousel:** Video moved to **`#app-demo`** (centered, ~**240px**); carousel **images only**, compact **`clamp(168–220px)`** cards (~**4** visible); removed video from horizontal scroll strip (scroll perf). **Handoff + push `main`** → Pages deploy.
