@@ -65,7 +65,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260601a1" />
+  <link rel="stylesheet" href="styles.css?v=20260601a2" />
 </head>
 <body>
   <div class="bg-pattern" aria-hidden="true"></div>
@@ -391,6 +391,7 @@
         <div class="card get-app-card">
           <div class="get-app-actions">
             <a class="btn btn-primary is-disabled" id="play-cta-bottom" href="#" aria-disabled="true">Get it on Google Play</a>
+            <a class="btn btn-secondary" id="tester-cta" href="https://play.google.com/apps/internaltest/4700913622589567786">Install test app (invite only)</a>
             <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
             <a class="btn btn-ghost" href="press.html">Press kit</a>
             <a class="btn btn-ghost" href="contact.html">Contact us</a>
@@ -431,13 +432,13 @@
                     </p>
                   </div>
                 </div>
-                <div id="tester-qr-live" class="tester-qr-live" hidden>
+                <div id="tester-qr-live" class="tester-qr-live">
                   <h4 class="qr-card-title">Google Play test app</h4>
                   <p class="qr-card-sub">Scan with your phone camera, tap <strong>Become a tester</strong>, then install from Play.</p>
                   <div class="tester-qr-frame">
-                    <div id="tester-qr-host" class="qr-host"></div>
+                    <div id="tester-qr-host" class="qr-host" aria-label="QR code for internal testing invite link"></div>
                   </div>
-                  <a id="tester-qr-fallback" class="tester-qr-link" href="#">Open invite link</a>
+                  <a id="tester-qr-fallback" class="tester-qr-link" href="https://play.google.com/apps/internaltest/4700913622589567786">Open invite link</a>
                 </div>
               </div>
             </div>
@@ -482,6 +483,7 @@
 
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("play-cta-bottom", PLAY_URL, "Get it on Google Play");
+    wireCta("tester-cta", TESTER_URL, "Install test app (invite only)");
     document.getElementById("y").textContent = new Date().getFullYear();
 
     function qrPixelSize(hostEl) {
