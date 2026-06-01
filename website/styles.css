@@ -1112,6 +1112,24 @@ section {
     visibility: hidden;
   }
 
+  .shots-swipe-hint.is-first-show {
+    background: linear-gradient(
+      to top,
+      rgba(5, 6, 15, 0.92) 0%,
+      rgba(5, 6, 15, 0.62) 42%,
+      rgba(5, 6, 15, 0.18) 78%
+    );
+  }
+
+  .shots-swipe-hint.is-first-show .shots-swipe-hint-inner {
+    background: rgba(5, 6, 15, 0.96);
+    border-color: rgba(212, 168, 83, 0.72);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
   .shots-swipe-hint-inner {
     display: inline-flex;
     align-items: center;

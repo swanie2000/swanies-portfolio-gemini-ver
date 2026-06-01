@@ -65,7 +65,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260518m3" />
+  <link rel="stylesheet" href="styles.css?v=20260518m4" />
 </head>
 <body>
   <div class="bg-pattern" aria-hidden="true"></div>
@@ -668,6 +668,9 @@
       var touchStartY = 0;
       var hintFadeTimer = null;
       var hintFadeMs = 2500;
+      var hintFirstShowFadeMs = 4500;
+      var hintSectionVisible = false;
+      var hintFirstShow = true;
       var hintPrevArrow = swipeHint ? swipeHint.querySelector(".shots-swipe-hint-arrow-prev") : null;
       var hintNextArrow = swipeHint ? swipeHint.querySelector(".shots-swipe-hint-arrow-next") : null;
       var mobileHintMq = window.matchMedia("(max-width: 767px)");
@@ -683,24 +686,34 @@
         }
       }
 
+      function updateSwipeHintArrows() {
+        if (!swipeHint) return;
+        var atStart = index <= 0;
+        var atEnd = index >= slides.length - 1;
+        if (hintPrevArrow) hintPrevArrow.hidden = atEnd;
+        if (hintNextArrow) hintNextArrow.hidden = atStart;
+      }
+
       function syncSwipeHint() {
         if (!swipeHint) return;
         clearHintFadeTimer();
+        updateSwipeHintArrows();
 
-        if (!isMobileHint()) {
+        if (!isMobileHint() || !hintSectionVisible) {
+          swipeHint.classList.remove("is-first-show");
           swipeHint.classList.add("is-dismissed");
           return;
         }
 
-        var atStart = index <= 0;
-        var atEnd = index >= slides.length - 1;
-        if (hintPrevArrow) hintPrevArrow.hidden = atStart;
-        if (hintNextArrow) hintNextArrow.hidden = atEnd;
-
         swipeHint.classList.remove("is-dismissed");
+        swipeHint.classList.toggle("is-first-show", hintFirstShow);
+
+        var fadeDelay = hintFirstShow ? hintFirstShowFadeMs : hintFadeMs;
         hintFadeTimer = setTimeout(function () {
           swipeHint.classList.add("is-dismissed");
-        }, hintFadeMs);
+          swipeHint.classList.remove("is-first-show");
+          hintFirstShow = false;
+        }, fadeDelay);
       }
 
       function render() {
@@ -716,7 +729,8 @@
         prev.setAttribute("aria-disabled", prev.disabled ? "true" : "false");
         next.setAttribute("aria-disabled", next.disabled ? "true" : "false");
         if (countEl) countEl.textContent = index + 1 + " / " + slides.length;
-        syncSwipeHint();
+        updateSwipeHintArrows();
+        if (hintSectionVisible) syncSwipeHint();
       }
 
       function go(delta) {
@@ -770,6 +784,30 @@
         mobileHintMq.addEventListener("change", syncSwipeHint);
       } else if (typeof mobileHintMq.addListener === "function") {
         mobileHintMq.addListener(syncSwipeHint);
+      }
+
+      if (viewer && "IntersectionObserver" in window) {
+        var hintObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                hintSectionVisible = true;
+                syncSwipeHint();
+              } else {
+                hintSectionVisible = false;
+                clearHintFadeTimer();
+                if (swipeHint) {
+                  swipeHint.classList.add("is-dismissed");
+                  swipeHint.classList.remove("is-first-show");
+                }
+              }
+            });
+          },
+          { threshold: 0.35 }
+        );
+        hintObserver.observe(viewer);
+      } else {
+        hintSectionVisible = true;
       }
 
       render();
