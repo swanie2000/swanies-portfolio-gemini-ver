@@ -33,9 +33,25 @@ fun resolveLocalSecret(name: String): String {
 /** Google Play / store builds: RevenueCat *public* SDK key (dashboard → usually `goog_…`). Never use a `test_` key here — the SDK exits the app on release if it sees a test key. */
 fun resolveRevenueCatPublicApiKey(): String = resolveLocalSecret("REVENUECAT_PUBLIC_API_KEY").trim()
 
-/** Last calendar day beta unlock codes can be redeemed (yyyy-MM-dd). Public in APK; not secret. */
-fun resolveBetaUnlockProgramEnd(): String =
-    resolveLocalSecret("BETA_UNLOCK_PROGRAM_END").trim().ifBlank { "2027-06-01" }
+/**
+ * Closed-test auto-Pro: days from this build's configure time (default 30).
+ * Production: set CLOSED_TEST_PRO_GRANT_DAYS=0 in local.properties before release.
+ * Optional override: CLOSED_TEST_PRO_UNTIL_EPOCH_MS (millis, exclusive end).
+ */
+fun resolveClosedTestProGrantDays(): Int {
+    val raw = resolveLocalSecret("CLOSED_TEST_PRO_GRANT_DAYS").trim()
+    return raw.toIntOrNull() ?: 30
+}
+
+fun resolveClosedTestProUntilEpochMs(): Long {
+    val explicit = resolveLocalSecret("CLOSED_TEST_PRO_UNTIL_EPOCH_MS").trim()
+    if (explicit.isNotBlank()) {
+        return explicit.toLongOrNull() ?: 0L
+    }
+    val grantDays = resolveClosedTestProGrantDays()
+    if (grantDays <= 0) return 0L
+    return System.currentTimeMillis() + grantDays.toLong() * 24L * 60 * 60 * 1000
+}
 
 /** Fails release bundles if the Play key is missing or still a sandbox `test_` key. */
 fun validateRevenueCatPublicApiKeyForRelease() {
@@ -54,18 +70,6 @@ fun validateRevenueCatPublicApiKeyForRelease() {
     }
 }
 
-/** Beta unlock codes are HMAC-signed at compile time — empty secret means every code shows "not valid". */
-fun validateBetaUnlockSecretForRelease() {
-    val secret = resolveLocalSecret("BETA_UNLOCK_SECRET").trim()
-    check(secret.isNotBlank()) {
-        "Release build blocked: set BETA_UNLOCK_SECRET in local.properties (same value as GitHub secret). " +
-            "Without it, beta unlock codes never validate in Play builds."
-    }
-    check(secret.length >= 8) {
-        "Release build blocked: BETA_UNLOCK_SECRET must be at least 8 characters."
-    }
-}
-
 /** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
 fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_KEY").trim()
 
@@ -77,10 +81,15 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 21
-        versionName = "1.0.21"
+        versionCode = 23
+        versionName = "1.0.23"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
+        buildConfigField(
+            "long",
+            "CLOSED_TEST_PRO_UNTIL_EPOCH_MS",
+            "${resolveClosedTestProUntilEpochMs()}L",
+        )
     }
 
     buildTypes {
@@ -92,8 +101,6 @@ android {
             )
             buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
-            buildConfigField("String", "BETA_UNLOCK_SECRET", "\"${resolveLocalSecret("BETA_UNLOCK_SECRET")}\"")
-            buildConfigField("String", "BETA_UNLOCK_PROGRAM_END", "\"${resolveBetaUnlockProgramEnd()}\"")
         }
         release {
             isMinifyEnabled = false
@@ -105,8 +112,6 @@ android {
             )
             buildConfigField("String", "REVENUECAT_PRO_ENTITLEMENT", "\"Swanies Portfolio Pro\"")
             buildConfigField("String", "REVENUECAT_OFFERING_ID", "\"default\"")
-            buildConfigField("String", "BETA_UNLOCK_SECRET", "\"${resolveLocalSecret("BETA_UNLOCK_SECRET")}\"")
-            buildConfigField("String", "BETA_UNLOCK_PROGRAM_END", "\"${resolveBetaUnlockProgramEnd()}\"")
         }
     }
     compileOptions {
@@ -147,18 +152,13 @@ kotlin {
 /** Run before every release AAB/APK so Play never gets a test RevenueCat key again. */
 listOf("bundleRelease", "assembleRelease", "packageRelease").forEach { taskName ->
     tasks.matching { it.name == taskName }.configureEach {
-        dependsOn("validateRevenueCatReleaseKey", "validateBetaUnlockReleaseSecret")
+        dependsOn("validateRevenueCatReleaseKey")
     }
 }
 tasks.register("validateRevenueCatReleaseKey") {
     group = "verification"
     description = "Ensures REVENUECAT_PUBLIC_API_KEY is set to goog_… (not test_…)"
     doLast { validateRevenueCatPublicApiKeyForRelease() }
-}
-tasks.register("validateBetaUnlockReleaseSecret") {
-    group = "verification"
-    description = "Ensures BETA_UNLOCK_SECRET is set so beta codes validate in Play builds"
-    doLast { validateBetaUnlockSecretForRelease() }
 }
 
 /** After bundleRelease, fails if the AAB still embeds a sandbox `test_` RevenueCat key. */
@@ -197,36 +197,54 @@ tasks.register("verifyReleaseBundleRevenueCatKey") {
     }
 }
 
-/** After bundleRelease, fails if BETA_UNLOCK_SECRET from local.properties is not embedded in the AAB. */
-tasks.register("verifyReleaseBundleBetaUnlockSecret") {
+/** After bundleRelease, confirms auto-Pro grant in the AAB matches local.properties. */
+tasks.register("verifyReleaseBundleClosedTestPro") {
     group = "verification"
-    description = "Scans release AAB for BETA_UNLOCK_SECRET from local.properties"
+    description = "Checks CLOSED_TEST_PRO_UNTIL_EPOCH_MS in release BuildConfig vs local.properties"
     dependsOn("bundleRelease")
     doLast {
-        val secret = resolveLocalSecret("BETA_UNLOCK_SECRET").trim()
-        check(secret.isNotBlank()) {
-            "Set BETA_UNLOCK_SECRET in local.properties before verifying the release bundle."
+        val buildConfigFile =
+            layout.buildDirectory
+                .file("generated/source/buildConfig/release/com/swanie/portfolio/BuildConfig.java")
+                .get()
+                .asFile
+        check(buildConfigFile.isFile) {
+            "Release BuildConfig not found at ${buildConfigFile.path} — run bundleRelease first."
         }
-        val needle = secret.take(16)
-        val bundleDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
-        val aab =
-            bundleDir
-                .listFiles()
-                ?.firstOrNull { it.isFile && it.extension == "aab" }
-                ?: error("No release .aab under ${bundleDir.absolutePath} — run bundleRelease first")
-        var found = false
-        ZipFile(aab).use { zip ->
-            zip.entries().asSequence().filter { it.name.endsWith(".dex") }.forEach { entry ->
-                zip.getInputStream(entry).use { input ->
-                    if (input.readBytes().decodeToString().contains(needle)) found = true
-                }
+        val content = buildConfigFile.readText()
+        val untilRegex = Regex("""CLOSED_TEST_PRO_UNTIL_EPOCH_MS\s*=\s*(\d+)L""")
+        val untilMs =
+            untilRegex.find(content)?.groupValues?.get(1)?.toLongOrNull()
+                ?: error("CLOSED_TEST_PRO_UNTIL_EPOCH_MS not found in ${buildConfigFile.path}")
+        val versionRegex = Regex("""VERSION_NAME\s*=\s*"([^"]+)"""")
+        val versionName = versionRegex.find(content)?.groupValues?.get(1).orEmpty()
+        val grantDays = resolveClosedTestProGrantDays()
+        val nowMs = System.currentTimeMillis()
+        val dayMs = 86_400_000L
+
+        check(grantDays > 0 || untilMs == 0L) {
+            "CLOSED_TEST_PRO_GRANT_DAYS=$grantDays but AAB has CLOSED_TEST_PRO_UNTIL_EPOCH_MS=$untilMs. " +
+                "Sync Gradle, Clean, rebuild signed bundle."
+        }
+        if (grantDays > 0) {
+            check(untilMs > 0L) {
+                "CLOSED_TEST_PRO_GRANT_DAYS=$grantDays but auto-Pro is disabled in AAB (until=0). Rebuild."
+            }
+            check(untilMs > nowMs) {
+                "Auto-Pro expiry is in the past ($untilMs). Rebuild with CLOSED_TEST_PRO_GRANT_DAYS=$grantDays."
+            }
+            check(untilMs <= nowMs + grantDays * dayMs + 600_000L) {
+                "Auto-Pro expiry is more than $grantDays days out ($untilMs). Check local.properties."
             }
         }
-        check(found) {
-            "Release AAB is missing BETA_UNLOCK_SECRET from local.properties. " +
-                "Build → Clean Project, Sync Gradle, rebuild signed bundle, then regenerate unlock codes."
-        }
-        logger.lifecycle("Verified ${aab.name}: BETA_UNLOCK_SECRET embedded — codes from this PC should validate.")
+
+        val grantLabel =
+            if (grantDays <= 0) {
+                "auto-Pro disabled"
+            } else {
+                "auto-Pro until epoch $untilMs"
+            }
+        logger.lifecycle("Verified $versionName: $grantLabel (CLOSED_TEST_PRO_GRANT_DAYS=$grantDays)")
     }
 }
 

@@ -24,11 +24,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,6 +77,38 @@ fun ProFeatureGateScreen(
     var packagesLoadAttempted by remember { mutableStateOf(false) }
     val availablePackages by settingsViewModel.availableProPackages.collectAsState()
     val scroll = rememberScrollState()
+    var showClosedTestProNotice by remember {
+        mutableStateOf(settingsViewModel.isClosedTestProGrantActive())
+    }
+
+    if (showClosedTestProNotice) {
+        AlertDialog(
+            onDismissRequest = { },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+            ),
+            title = {
+                Text(
+                    text = stringResource(R.string.closed_test_pro_dialog_title),
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(
+                        R.string.closed_test_pro_dialog_message,
+                        settingsViewModel.closedTestProExpiryLabel(),
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showClosedTestProNotice = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+        )
+    }
 
     LaunchedEffect(Unit) {
         settingsViewModel.refreshProPackages {
@@ -264,14 +299,6 @@ fun ProFeatureGateScreen(
                 fontSize = 13.sp,
             )
         }
-
-        BetaUnlockCodeSection(
-            settingsViewModel = settingsViewModel,
-            safeText = safeText,
-            accent = accent,
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedButton(
             onClick = {

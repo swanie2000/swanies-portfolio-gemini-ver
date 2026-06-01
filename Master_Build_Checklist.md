@@ -211,11 +211,12 @@
 - [x] **Release signing sanity-check (2026-05-05):** **`swanie_portfolio_release.jks`** ↔ **`app/release/app-release.aab`** — matching **SHA256** (`keytool` / `printcert`); no blocker on signing **AAB** for Play tracks when ready.
 - [x] **Widget metal display parity (2026-05-07):** Glance **`AssetCardOriginal`** uses same **metal title + optional XAG subtitle** as holdings cards; **`SettingsViewModel`** widget price string uses **`AssetValuation.cardPriceRowUsd`** (matches **`AssetRepository`** widget push).
 - [x] **Play app record + initial Dashboard setup (owner, 2026-05-08):** App **created** in Console; **Finish setting up your app** checklist (policy, listing, data safety, etc.) **complete** on Dashboard snapshot — confirm in Console if anything reopens.
-- [x] **Internal testing:** **21 (1.0.21)** on track — owner verified; **3** family on **internal testers**; **Closed testing** next via **Testers Community** (not **`#join-testing`** funnel).
+- [x] **Internal testing:** **23 (1.0.23)** on track — auto-Pro QA (**22** grant=0 / **23** grant=30) owner verified **2026-06-01**; family on **internal testers**; **Testers Community** next.
+- [x] **Closed-test auto-Pro:** **`ClosedTestProAccess`** + paywall dialog; **`verify-play-release.ps1`**; beta unlock removed (**1.0.22+**).
 - [x] **License testing policy:** **Swanie's Portfolio Testers** **unchecked** on **Settings → License testing** — friends/family on **internal testers only**; see **`docs/AI_HANDOFF.md`** § *Play testing — two lists*.
 - [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf.
 - [x] **Marketing site contact + owner QA (2026-05-19):** **`contact.html`** — Web3Forms, on-page confirmation; owner reviewed site and approved.
-- [ ] **Closed testing:** Promote **21** to **Closed** track → **Testers Community** (**≥12** opted-in, **14+** consecutive days). **Do not** add TC emails to **License testing**.
+- [ ] **Closed testing:** Promote **23** to **Closed** track → **Testers Community** opt-in URL (**≥12** opted-in, **14+** consecutive days). **License testing** **unchecked** for TC.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
 - [x] **Monetization (internal QA):** Subscribe/expire/restore matrix on **1.0.10** **2026-05-18**; sufficient for ship. **Beta Pro:** **lifetime** or promotional — avoid monthly/yearly for daily use on internal.

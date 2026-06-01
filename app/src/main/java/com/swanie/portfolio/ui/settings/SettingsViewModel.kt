@@ -15,11 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import com.swanie.portfolio.R
 import com.swanie.portfolio.BuildConfig
 import com.swanie.portfolio.billing.AccessTier
-import com.swanie.portfolio.billing.BetaUnlockAccess
-import com.swanie.portfolio.billing.BetaUnlockValidator
+import com.swanie.portfolio.billing.ClosedTestProAccess
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.billing.MonetizationPackage
-import com.swanie.portfolio.data.ProUnlockPreferences
 import com.swanie.portfolio.data.ThemePreferences
 import com.swanie.portfolio.data.backup.VaultBackupEngine
 import com.swanie.portfolio.data.feedback.BugReportSubmitter
@@ -62,18 +60,6 @@ enum class RestorePurchasesResult {
     FAILED
 }
 
-enum class BetaUnlockRedeemResult {
-    SUCCESS,
-    NOT_CONFIGURED,
-    PROGRAM_ENDED,
-    SUPERSEDED_BY_REVENUECAT,
-    MALFORMED,
-    WRONG_EMAIL,
-    EXPIRED,
-    INVALID,
-    INVALID_SIGNATURE,
-}
-
 /**
  * Settings and widget-registry flows. Assets-versus-appearance sub-navigation in the widget manager
  * is local compose state in [WidgetManagerScreen]; this class continues to own vault targeting and sync.
@@ -85,12 +71,9 @@ class SettingsViewModel @Inject constructor(
     private val database: AppDatabase,
     private val securityManager: SecurityManager,
     private val monetizationManager: MonetizationManager,
-    private val proUnlockPreferences: ProUnlockPreferences,
     private val vaultBackupEngine: VaultBackupEngine,
     private val bugReportSubmitter: BugReportSubmitter,
 ) : ViewModel() {
-
-    val isBetaUnlockConfigured: Boolean = BuildConfig.BETA_UNLOCK_SECRET.isNotBlank()
 
     private val _profileEmail = MutableStateFlow("")
     val profileEmail: StateFlow<String> = _profileEmail.asStateFlow()
@@ -167,25 +150,23 @@ class SettingsViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    fun isClosedTestProGrantActive(): Boolean =
+        ClosedTestProAccess.isGrantActive(BuildConfig.CLOSED_TEST_PRO_UNTIL_EPOCH_MS)
+
+    fun closedTestProExpiryLabel(): String =
+        ClosedTestProAccess.formatExpiryDate(
+            BuildConfig.CLOSED_TEST_PRO_UNTIL_EPOCH_MS,
+            Locale.getDefault(),
+        )
+
     init {
         viewModelScope.launch {
-            combine(
-                monetizationManager.entitlement,
-                proUnlockPreferences.state,
-            ) { snapshot, unlock ->
+            monetizationManager.entitlement.collect { snapshot ->
                 val revenueCatPro = snapshot.tier == AccessTier.PRO && snapshot.isActive
-                val isPro = BetaUnlockAccess.resolveIsProUser(
+                _isProUser.value = ClosedTestProAccess.resolveIsProUser(
                     revenueCatPro = revenueCatPro,
-                    unlock = unlock,
+                    untilEpochMs = BuildConfig.CLOSED_TEST_PRO_UNTIL_EPOCH_MS,
                 )
-                Triple(isPro, revenueCatPro, unlock.supersededByRevenueCat)
-            }.collect { (isPro, revenueCatPro, superseded) ->
-                if (revenueCatPro && !superseded) {
-                    viewModelScope.launch {
-                        proUnlockPreferences.markSupersededByRevenueCat()
-                    }
-                }
-                _isProUser.value = isPro
             }
         }
         viewModelScope.launch {
@@ -295,55 +276,6 @@ class SettingsViewModel @Inject constructor(
                     RestorePurchasesResult.NO_ENTITLEMENT_FOUND
                 }
             )
-        }
-    }
-
-    fun redeemBetaUnlockCode(rawCode: String, onComplete: (BetaUnlockRedeemResult) -> Unit) {
-        viewModelScope.launch {
-            if (!isBetaUnlockConfigured) {
-                onComplete(BetaUnlockRedeemResult.NOT_CONFIGURED)
-                return@launch
-            }
-            val unlockState = proUnlockPreferences.state.first()
-            val revenueCatPro = monetizationManager.entitlement.value.let {
-                it.tier == AccessTier.PRO && it.isActive
-            }
-            if (unlockState.supersededByRevenueCat && revenueCatPro) {
-                onComplete(BetaUnlockRedeemResult.SUPERSEDED_BY_REVENUECAT)
-                return@launch
-            }
-            val profileEmail = userDao.getFirstUser()?.email?.trim()?.lowercase()
-            when (
-                val result = BetaUnlockValidator.validate(
-                    rawCode = rawCode,
-                    loggedInEmail = profileEmail,
-                )
-            ) {
-                is BetaUnlockValidator.Result.Valid -> {
-                    proUnlockPreferences.saveUnlock(
-                        email = result.normalizedEmail,
-                        expiryDate = result.expiryDate,
-                    )
-                    onComplete(BetaUnlockRedeemResult.SUCCESS)
-                }
-                is BetaUnlockValidator.Result.Invalid -> {
-                    val mapped = when (result.reason) {
-                        BetaUnlockValidator.Reason.NOT_CONFIGURED ->
-                            BetaUnlockRedeemResult.NOT_CONFIGURED
-                        BetaUnlockValidator.Reason.PROGRAM_ENDED ->
-                            BetaUnlockRedeemResult.PROGRAM_ENDED
-                        BetaUnlockValidator.Reason.MALFORMED_CODE ->
-                            BetaUnlockRedeemResult.MALFORMED
-                        BetaUnlockValidator.Reason.WRONG_EMAIL ->
-                            BetaUnlockRedeemResult.WRONG_EMAIL
-                        BetaUnlockValidator.Reason.EXPIRED ->
-                            BetaUnlockRedeemResult.EXPIRED
-                        BetaUnlockValidator.Reason.INVALID_SIGNATURE ->
-                            BetaUnlockRedeemResult.INVALID_SIGNATURE
-                    }
-                    onComplete(mapped)
-                }
-            }
         }
     }
 

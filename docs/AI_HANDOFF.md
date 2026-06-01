@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-01 — **App 1.0.22 (local / upload pending):** closed-test **auto-Pro** (`ClosedTestProAccess`, **`CLOSED_TEST_PRO_GRANT_DAYS`** in **`local.properties`**); **beta unlock removed**; paywall blocking dialog when auto-Pro active. Owner **phone-only QA:** **`GRANT_DAYS=0`**, RC entitlement expired → Pro off as expected. **Pre-upload verify (canonical):** **`.\scripts\verify-play-release.ps1`** after Signed Bundle — owner **verified OK**; use this from now on (replaces separate RC + beta-unlock scripts).
+**Last updated:** 2026-06-01 — **Ready for Testers Community:** Internal **23 (1.0.23)** live with **auto-Pro** (**`GRANT_DAYS=30`**, expiry **~July 1** baked at build). Owner verified **22** (**grant=0**, Pro off) and **23** (Pro on + paywall dialog). **Beta unlock removed**; **`ClosedTestProAccess`** + **`verify-play-release.ps1`**. Site **`TESTER_URL`** QR restored (**`938dc58`**). **Next:** promote **23** to **Closed testing** → submit opt-in URL to **Testers Community**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -37,11 +37,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 |-------|--------|
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
-| **Play internal testing** | **Active: 21 (1.0.21)** on Play (owner verified). Family on **Internal testing → Testers** (list 1). **Organic recruit form retired** on live site. |
-| **Version on device** | Play internal **`v1.0.21 (21)`**. |
+| **Play internal testing** | **Active: 23 (1.0.23)** — auto-Pro until **~2026-07-01** (build-time cutoff). Prior **22 (1.0.22)** = **grant=0** control build (owner verified Pro off). Family on **Internal testing → Testers** (list 1). |
+| **Version on device** | Play internal **`v1.0.23 (23)`** (owner verified Pro + dialog). |
 | **License testing (list 2)** | **Unchecked** — **Swanie's Portfolio Testers** email list **not** selected on **Settings → License testing** (saved). **Do not** check for friends or Testers Community. |
-| **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family) — install + daily use. **Closed-test gate:** use **Closed testing** track + **Testers Community** (paid **25** testers, **14+** days) — **not** the old **`#join-testing`** funnel. |
-| **Verify build** | **Before build:** **`.\scripts\verify-release-config.ps1`**. **After Signed Bundle:** **`.\scripts\verify-play-release.ps1`** (RC key + auto-Pro vs **`local.properties`**) — **owner verified OK** on **1.0.22** test build; **always run before Play upload**. Optional Gradle: **`:app:verifyReleaseBundleRevenueCatKey`** + **`:app:verifyReleaseBundleClosedTestPro`**. **`verify-aab-beta-unlock-secret.ps1`** **removed** (beta unlock gone). |
+| **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family). **Closed-test gate:** promote **23** to **Closed testing** → **Testers Community** opt-in URL (**25** testers paid, **≥12** opted-in **14+** consecutive days). **Not** **`#join-testing`** / **not** license testing. |
+| **Verify build** | **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** — owner verified on **22** and **23**; **always before Play upload**. |
 
 **Play Console — where things stand (human progress):**
 
@@ -51,7 +51,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Closed testing** next — promote **21** to **Closed testing** track; submit **closed-test opt-in URL** to **Testers Community** (**testerscommunity.com**, **25** testers paid). **≥12 opted-in for 14 consecutive days** before **Production access** application. **Do not** add TC testers to **License testing**.
+- **Testing path:** **Testers Community (now):** Play Console → **Promote release** **23** to **Closed testing** → copy **closed-test opt-in URL** → submit to **testerscommunity.com** (**25** paid). **≥12 opted-in for 14 consecutive days** before **Production access**. **License testing** stays **unchecked** for TC testers. **Site:** **`#get-app`** has **Play internal test** QR (**`TESTER_URL`**) for family; switch to closed-test URL on site when closed track is live.
+- **Marketing site (2026-06-01):** Restored **dual QR** on **`#get-app`** — site + **Play internal test** (**`TESTER_URL`**). Push **`938dc58`**.
 - **Marketing site (2026-05-19):** **`website/contact.html`** + **`js/contact-form.js`** — **Contact** nav on all pages; **`#get-app`** links to contact form (replaced **`mailto:`**). Web3Forms submit → owner inbox; success shows **“Thanks — your message was sent. A copy is below.”** + on-page **“Message sent”** copy block (reliable confirmation; **not** Web3Forms Pro email autoresponder). Showcase + swipe hint unchanged from **2026-05-18** lock. Set **`PLAY_URL`** when Play **public** listing URL exists.
 - **Marketing site (2026-05-18 — showcase):** **`#app-showcase`** — demo **video left**, **stacked screenshot viewer** (**12** slides, arrows + swipe); mobile swipe hint (touch, contextual arrows, no dimming); screenshot preload; scroll perf. See commits **`17565c2`**–**`b634553`** on **`main`**.
 
@@ -106,7 +107,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Internal testing** **14 (1.0.14)** uploaded (propagating); **13 (1.0.13)** prior. Family **real use** (crypto/metals). **License testing** list **unchecked** — see **§ Play testing — two lists** below. **Production** inactive.
+**Play / Google:** **Internal testing** **23 (1.0.23)** live with **auto-Pro** QA passed. **License testing** **unchecked**. **Production** inactive. **Next:** **Closed testing** + **Testers Community**.
 
 ### Play AAB verify — copy-paste (Android Studio Terminal)
 
@@ -146,7 +147,7 @@ Individual scripts (only if debugging one check): **`verify-aab-revenuecat-key.p
 | Reinstall, **no** active sub, Restore | No purchase found | OK |
 | Subscribe → uninstall → reinstall → Restore | Pro without paying again | OK |
 
-**Lifetime:** owner hit Play purchase limit during license-tester yearly renewals; **refunded 26** orders. **Beta policy (target):** **Unlock code** ~1 year per tester email — **not** Play subs; RC grants **deprecated** for beta once unlock ships.
+**Lifetime:** owner hit Play purchase limit during license-tester yearly renewals; **refunded 26** orders. **Closed-test Pro:** **auto-Pro** via **`CLOSED_TEST_PRO_GRANT_DAYS=30`** in release builds — paywall dialog warns testers **not to purchase**; production builds use **`GRANT_DAYS=0`**.
 
 ### Play testing — two lists (canonical; owner asked to re-read when recruiting)
 
@@ -160,18 +161,15 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | **Family / friends** | **Add here** | **Do not add** (leave unchecked) |
 | **Owner billing QA** | N/A | Optional: small dev-only list or publisher account only |
 
-**When someone requests to test (playbook — target after unlock codes ship):**
+**When recruiting closed testers (Testers Community playbook):**
 
-1. They submit **`https://swaniedesigns.com/#join-testing`** (name + **Play Store Gmail**).
-2. **Play Console** → **Internal testing → Testers** → add that Gmail (list 1).
-3. Run **`scripts/generate-beta-unlock-code.ps1`** (planned) with that email + expiry (~**1 year**). Paste code into reply email.
-4. Web3Forms email → **READY TO REPLY** with install steps + **personal code** (not RevenueCat steps).
-5. **Do not** check email on **Settings → License testing**.
-6. Tester: install → **account with same Gmail** → **Settings → Enter beta unlock code** → Pro (no in-app purchase).
+1. Promote **23 (1.0.23)** (or current **grant=30** build) to **Closed testing** in Play Console.
+2. Copy **closed testing opt-in URL** (not internal-test URL) — submit to **Testers Community**.
+3. **Do not** add TC emails to **Settings → License testing**.
+4. Tell testers: install from Play opt-in link; **Pro is included until [date]** — **do not purchase** (dialog on paywall repeats this).
+5. **`local.properties`:** **`CLOSED_TEST_PRO_GRANT_DAYS=30`** for closed-test AABs; **`0`** for production store builds.
 
-**Unlock shipped:** form email includes code; Play add + Reply. See **`docs/BETA_UNLOCK_CODE.md`**.
-
-**Family (owner, wife, mom):** internal testers; **target** unlock codes per email; **no** Play subscriptions. Subs canceled; orders refunded.
+**Family (owner, wife, mom):** internal testers via **`TESTER_URL`** QR on **`swaniedesigns.com/#get-app`**; **no** Play subscriptions for beta.
 
 ### Closed-test auto-Pro (shipped in app **1.0.22** — replaces beta unlock)
 
@@ -186,15 +184,13 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Owner phone QA (now):** **`1.0.22`** with **`CLOSED_TEST_PRO_GRANT_DAYS=0`**, RC entitlement off — confirm Pro locked + paywall (no auto-Pro dialog). Upload to Play when ready.
-2. **Closed testing (next):** Rebuild **`1.0.22+`** with **`CLOSED_TEST_PRO_GRANT_DAYS=30`** → **`verify-play-release.ps1`** → closed track → Testers Community.
-2. **Owner site QA:** **Done** — owner read **https://swaniedesigns.com**; showcase OK; **contact form** approved (**`b634553`**).
-3. **Listing (parallel):** Finish Play **store listing** uploads (**screenshots**, **512** icon, **1024×500** feature graphic); resolve **short description** flags if any; **`docs/play_store_long_description_en-US.txt`** → Console.
-4. **Console hygiene:** Confirm **Dashboard** / **App content** / **Data safety** complete; paste live **`privacy.html`** deletion URLs if not saved yet.
-5. **Production access:** After closed-test gate (**14+** days, **≥12** opted-in) — apply in Play Console.
-6. **Production release:** Promote vetted bundle to **Production**; **Publishing overview** → **Send app for review** when enabled.
-7. **At public listing:** Set **`PLAY_URL`** in **`website/index.html`** → push **`main`** (Pages redeploy); optional Search Console re-index (**`docs/SEARCH_CONSOLE_SETUP.md`**).
-8. **App polish (pre-public, not blocking closed test):** Tone down in-app **beta unlock** UI/copy; sync **`values-*`** with site privacy/deletion wording if needed.
+1. **Closed testing + Testers Community (primary):** **Promote release** **23 (1.0.23)** to **Closed testing** → copy **opt-in URL** → submit on **testerscommunity.com** (**25** paid). Target **≥12 opted-in for 14 consecutive days**. **License testing** **unchecked** for TC.
+2. **Optional site update:** When closed-test URL is live, consider replacing **`TESTER_URL`** on **`index.html`** with closed-test opt-in link (or add second QR).
+3. **Listing (parallel):** Finish Play **store listing** uploads; **`docs/play_store_long_description_en-US.txt`** → Console.
+4. **Console hygiene:** **Dashboard** / **App content** / **Data safety** — nothing blocking.
+5. **Production access:** After closed-test gate passes.
+6. **Production release:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`**, bump version, **`verify-play-release.ps1`**, promote to **Production**, **Send app for review**.
+7. **At public listing:** Set **`PLAY_URL`** in **`website/index.html`** → push **`main`**.
 
 ---
 
@@ -202,14 +198,12 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ### Closed testing → production (ship path)
 
-1. **Phone QA → upload:** Finish **`1.0.22`** owner test (**grant=0**, Pro off); **`verify-play-release.ps1`** before every Play upload.
-2. **Closed testing:** **`GRANT_DAYS=30`** build → verify → closed track → **Testers Community** (**≥12** opted-in, **14+** days). **License testing** stays **unchecked**.
+1. **Testers Community:** Promote **23 (1.0.23)** to **Closed testing** → submit **opt-in URL** → **≥12** opted-in, **14+** consecutive days. **License testing** **unchecked**.
 2. **Play listing:** Screenshots, feature graphic, short/long copy; clear **Dashboard** blockers.
-4. **Data safety / privacy URLs:** Live **`privacy.html`** anchors in Console if not pasted.
-5. **Production access:** Apply after closed-test gate passes.
-6. **Production release:** Promote bundle, **Send app for review**, staged rollout when ready.
-7. **Set `PLAY_URL`** on site when Google Play **public** listing URL exists → redeploy **`website/`**.
-8. **App production copy pass** (beta/testing strings) before broad public launch — separate from closed-test run.
+3. **Data safety / privacy URLs:** Live **`privacy.html`** anchors in Console if not pasted.
+4. **Production access:** Apply after closed-test gate passes.
+5. **Production release:** **`GRANT_DAYS=0`** build → **`verify-play-release.ps1`** → **Send app for review** → staged rollout.
+6. **Set `PLAY_URL`** on site when public listing URL exists.
 
 ### Website
 
@@ -227,7 +221,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. See **Pro** bullet for verify scripts.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **i18n:** `LanguageDisplay.kt`; **`values-*`** — **537** keys match **`values/strings.xml`** (incl. **3** beta-unlock strings from **1.0.18**); **no batch scripts** on locale XML (owner rule).
+- **i18n:** `LanguageDisplay.kt`; **`values-*`** — keys match **`values/strings.xml`** (beta_unlock strings removed **2026-06-01**; add **`closed_test_pro_*`** to locales when translating paywall dialog).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, **`:app:lintVitalRelease`** before Play AAB (required — **ExtraTranslation** fails release if locale keys drift from default).
 
 ---
@@ -251,7 +245,8 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 | Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — scrollable color picker (saturation + hue bar); `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
-| Play internal ship | **22 / 1.0.22** — **`verify-play-release.ps1`** before upload |
+| Play internal ship | **23 / 1.0.23** on Play — auto-Pro **grant=30**; **`verify-play-release.ps1`** |
+| Marketing site / internal QR | **`website/index.html`** — **`TESTER_URL`** + **`#get-app`** dual QR (**`938dc58`**) |
 | Closed-test auto-Pro | **`ClosedTestProAccess.kt`**, **`SettingsViewModel`**, **`ProFeatureGateScreen`** dialog; **`scripts/verify-play-release.ps1`**, **`verify-release-config.ps1`**, **`verify-aab-closed-test-pro.ps1`** |
 | Tester recruitment (legacy) | **`docs/RECRUIT_INTERNAL_TESTERS.md`**, **`facebook-join-testing-post.png`** — use **Closed testing + Testers Community** instead |
 | Play Console — license vs internal | **List 1:** App → **Testing → Internal / Closed → Testers**. **List 2:** **Settings → License testing** — leave **unchecked** for recruits and TC testers |
@@ -269,6 +264,7 @@ Google Play uses **two different lists**. Confusing them caused **5‑min / 30�
 
 ## Session history (newest first)
 
+- **2026-06-01 — Auto-Pro shipped + Testers Community ready:** App **1.0.22** (**grant=0**, Pro off) + **1.0.23** (**grant=30**, Pro until **~July 1**, dialog OK) on **internal** — owner verified both. **`ClosedTestProAccess`**, beta unlock removed, **`verify-play-release.ps1`**, **`lintVitalRelease`** locale cleanup. Site **TESTER_URL** QR (**`938dc58`**). **Handoff + push `main`**. **Next:** promote **23** → **Closed testing** → **Testers Community**.
 - **2026-06-01 — Auto-Pro 1.0.22 + Play verify workflow:** Replaced beta unlock with **`ClosedTestProAccess`** (**`CLOSED_TEST_PRO_GRANT_DAYS`**); paywall dialog; **`verify-play-release.ps1`** (+ **`verify-release-config.ps1`**, **`verify-aab-closed-test-pro.ps1`**); removed **`verify-aab-beta-unlock-secret.ps1`**. Owner phone QA: **grant=0**, RC expired → Pro off. **`lintVitalRelease`**: stripped **`beta_unlock_*`** from all **`values-*`**. **Handoff + push `main`**. **Next:** upload **1.0.22** owner test → **`GRANT_DAYS=30`** closed-test build.
 - **2026-05-19 — Contact page + owner site sign-off:** **`contact.html`** / **`contact-form.js`** — Web3Forms (no mailto); on-page **“Message sent”** confirmation copy; rejected unreliable **email-me-a-copy** (Web3Forms Pro). Owner reviewed site — **likes contact flow**. **Handoff + push `main`**. **Next:** **closed testing**.
 - **2026-05-18 (EOD) — Marketing site showcase locked:** Owner **good for now**; will read live site over **1–2 days**. **`app-showcase`** final polish — desktop gap, mobile sizing/nav, **touch** swipe hint (contextual end arrows, no dimming, auto-fade), screenshot preload, CSS cache bust (**`17565c2`**–**`1f73936`**). **Handoff + push `main`**. **Next:** owner QA → **closed testing** → **production**.

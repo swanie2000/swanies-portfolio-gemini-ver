@@ -524,18 +524,4 @@
     <string name="analytics_live_preset_event_market_shock">• 광범위 시장 충격: 전체 포트폴리오 -%1$s%%</string>
     <string name="analytics_live_preset_event_crypto_rally">• 크립토 랠리: 크립토 비중 +%1$s%%</string>
     <string name="analytics_live_preset_event_inflation_hedge">• 인플레이션 헤지: 금속 비중 +%1$s%%</string>
-    <string name="beta_unlock_section_title">Beta unlock code</string>
-    <string name="beta_unlock_section_hint">Paste the personal code from the email Swanie sent you. It only works for the account you signed in with.</string>
-    <string name="beta_unlock_signed_in_as">잠금 해제 코드는 로그인한 Gmail과 일치해야 합니다: %1$s</string>
-    <string name="beta_unlock_signed_in_missing">계정 설정에서 Gmail을 추가하세요. 코드는 로그인 이메일에 연결됩니다.</string>
-    <string name="beta_unlock_code_label">Unlock code</string>
-    <string name="beta_unlock_submit">UNLOCK PRO</string>
-    <string name="beta_unlock_success">Pro unlocked. Restart the app if features do not appear.</string>
-    <string name="beta_unlock_error_invalid">That code is not valid. Check the code and try again.</string>
-    <string name="beta_unlock_error_signature">이 코드는 로그인한 Gmail과 일치하지 않습니다. 위 이메일을 확인하거나 Play 앱을 빌드한 PC에서 생성된 새 코드를 Swanie에게 요청하세요.</string>
-    <string name="beta_unlock_error_email">Sign in with the same Gmail Swanie added to testing, then try again.</string>
-    <string name="beta_unlock_error_expired">This code has expired.</string>
-    <string name="beta_unlock_error_program_ended">Beta unlock codes are no longer accepted. Subscribe or restore a purchase for Pro.</string>
-    <string name="beta_unlock_error_not_configured">Beta unlock is not available in this build yet.</string>
-    <string name="beta_unlock_error_superseded">Pro is managed by your subscription. Beta unlock codes no longer apply on this account.</string>
 </resources>
