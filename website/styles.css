@@ -619,6 +619,8 @@ section {
   margin-left: -1.25rem;
   margin-right: -1.25rem;
   padding: 0 0.15rem;
+  /* Let vertical wheel reach the page when the pointer is over this strip. */
+  overscroll-behavior: none;
 }
 
 .shots-nav {
@@ -668,11 +670,11 @@ section {
 .shots-scroll {
   width: 100%;
   min-width: 0;
+  container-type: inline-size;
+  container-name: shots-strip;
   overflow-x: auto;
   overflow-y: hidden;
-  /* Vertical wheel should pass to the page when this row cannot scroll vertically. */
-  overscroll-behavior-x: contain;
-  overscroll-behavior-y: auto;
+  overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: none;
   scroll-padding-left: 0.5rem;
@@ -680,7 +682,6 @@ section {
   margin-left: 0;
   margin-right: 0;
   padding: 0.5rem 0.35rem 1rem;
-  scrollbar-gutter: stable;
   scrollbar-color: rgba(212, 168, 83, 0.45) rgba(5, 6, 15, 0.5);
 }
 
@@ -709,8 +710,24 @@ section {
   flex-direction: column;
   align-items: center;
   flex: 0 0 auto;
-  width: clamp(200px, 52vw, 260px);
-  scroll-snap-align: start;
+  /* Exactly three full cards across the strip on desktop — no clipped fourth peek. */
+  width: calc((100cqw - 2 * 1rem) / 3);
+  min-width: 168px;
+}
+
+@container shots-strip (max-width: 720px) {
+  .shot-card {
+    width: calc((100cqw - 1rem) / 1.12);
+    max-width: 240px;
+  }
+}
+
+@container shots-strip (max-width: 420px) {
+  .shot-card {
+    width: calc((100cqw - 0.5rem) / 1.05);
+    min-width: 156px;
+    max-width: none;
+  }
 }
 
 /* Screenshot “device” — bezel + screen; earpiece is decorative chrome only */

@@ -658,6 +658,19 @@
       next.addEventListener("click", function () {
         sc.scrollBy({ left: amount(), behavior: "auto" });
       });
+
+      function forwardVerticalWheel(e) {
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.scrollBy(0, e.deltaY);
+      }
+
+      var carousel = document.getElementById("shots-carousel");
+      if (carousel) {
+        carousel.addEventListener("wheel", forwardVerticalWheel, { passive: false });
+      }
+
       sc.addEventListener("scroll", function () {
         sc.classList.add("is-scrolling");
         if (scrollIdleTimer) window.clearTimeout(scrollIdleTimer);
