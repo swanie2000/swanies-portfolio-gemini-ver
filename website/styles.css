@@ -1646,6 +1646,20 @@ section {
   line-height: 1.45;
 }
 
+.qr-invite-badge {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bg, #0a0a12);
+  background: linear-gradient(135deg, var(--gold-dim, #d4a853), var(--gold, #f0c674));
+  border: 1px solid rgba(212, 168, 83, 0.45);
+}
+
 .tester-qr-pending,
 .tester-qr-live {
   display: flex;
