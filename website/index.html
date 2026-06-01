@@ -132,25 +132,47 @@
               <div class="shot-frame">
                 <div class="shot-device-screen shot-device-screen-video">
                   <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <video
-                    class="shot-demo-video"
-                    src="marketing/final_swanies_portfolio_demo_video_web.mp4"
-                    poster="marketing/CTA_end_picture.png"
-                    controls
-                    playsinline
-                    preload="metadata"
-                    aria-label="Swanie's Portfolio app demo video"
-                  ></video>
-                  <img
-                    class="shot-demo-video-cta is-visible"
-                    src="marketing/CTA_end_picture.png"
-                    alt=""
-                    aria-hidden="true"
-                    decoding="async"
-                  />
+                  <div class="shot-demo-video-stage">
+                    <video
+                      class="shot-demo-video"
+                      src="marketing/final_swanies_portfolio_demo_video_web.mp4"
+                      poster="marketing/CTA_end_picture.png"
+                      playsinline
+                      preload="none"
+                      aria-label="Swanie's Portfolio app demo video"
+                    ></video>
+                    <div class="shot-demo-video-cta-layer is-visible">
+                      <img
+                        class="shot-demo-video-cta"
+                        src="marketing/CTA_end_picture.png"
+                        alt=""
+                        aria-hidden="true"
+                        decoding="async"
+                      />
+                      <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
+                        <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
+                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
+                    <input
+                      type="range"
+                      class="shot-demo-bar-seek"
+                      min="0"
+                      max="1000"
+                      value="0"
+                      step="1"
+                      aria-label="Seek"
+                      aria-valuemin="0"
+                      aria-valuemax="1000"
+                      aria-valuenow="0"
+                    />
+                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
+                  </div>
                 </div>
               </div>
-              <figcaption>App demo<br /><span class="shot-caption-sub">Use controls to play, scrub, and adjust sound</span></figcaption>
+              <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
             </figure>
             <figure class="shot-card">
               <div class="shot-frame">
@@ -479,10 +501,27 @@
       { passive: true }
     );
 
+    (function wireInPageAnchors() {
+      document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+        link.addEventListener("click", function (e) {
+          var hash = link.getAttribute("href");
+          if (!hash || hash.length < 2) return;
+          var target = document.getElementById(hash.slice(1));
+          if (!target) return;
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    })();
+
     (function wireDemoVideo() {
       document.querySelectorAll(".shot-device-screen-video").forEach(function (screen) {
         var video = screen.querySelector(".shot-demo-video");
-        var cta = screen.querySelector(".shot-demo-video-cta");
+        var ctaLayer = screen.querySelector(".shot-demo-video-cta-layer");
+        var playOverlay = screen.querySelector(".shot-demo-video-play");
+        var barPlay = screen.querySelector(".shot-demo-bar-play");
+        var seek = screen.querySelector(".shot-demo-bar-seek");
+        var muteBtn = screen.querySelector(".shot-demo-bar-mute");
         if (!video) return;
 
         video.volume = 1;
@@ -492,19 +531,96 @@
         }
 
         function syncCta() {
-          if (!cta) return;
-          cta.classList.toggle("is-visible", shouldShowCta());
+          if (!ctaLayer) return;
+          ctaLayer.classList.toggle("is-visible", shouldShowCta());
         }
 
-        video.addEventListener("pointerdown", function (e) {
-          e.stopPropagation();
+        function syncPlayButtons() {
+          var playing = !video.paused && !video.ended;
+          var label = playing ? "Pause" : video.ended ? "Replay" : "Play";
+          if (barPlay) {
+            barPlay.textContent = playing ? "⏸" : "▶";
+            barPlay.setAttribute("aria-label", label);
+          }
+          if (playOverlay) {
+            playOverlay.setAttribute("aria-label", video.ended ? "Replay app demo" : "Play app demo");
+          }
+        }
+
+        function syncSeek() {
+          if (!seek) return;
+          if (!video.duration || !isFinite(video.duration)) {
+            seek.value = "0";
+            seek.setAttribute("aria-valuenow", "0");
+            return;
+          }
+          var pct = Math.round((video.currentTime / video.duration) * 1000);
+          seek.value = String(pct);
+          seek.setAttribute("aria-valuenow", String(pct));
+        }
+
+        function playVideo() {
+          if (video.ended) video.currentTime = 0;
+          video.play().catch(function () {});
+        }
+
+        function togglePlay() {
+          if (video.paused || video.ended) {
+            playVideo();
+          } else {
+            video.pause();
+          }
+        }
+
+        if (playOverlay) {
+          playOverlay.addEventListener("click", function (e) {
+            e.stopPropagation();
+            playVideo();
+          });
+        }
+
+        if (barPlay) {
+          barPlay.addEventListener("click", function (e) {
+            e.stopPropagation();
+            togglePlay();
+          });
+        }
+
+        if (seek) {
+          seek.addEventListener("input", function () {
+            if (!video.duration || !isFinite(video.duration)) return;
+            video.currentTime = (parseFloat(seek.value) / 1000) * video.duration;
+          });
+        }
+
+        if (muteBtn) {
+          muteBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            video.muted = !video.muted;
+            muteBtn.textContent = video.muted ? "🔇" : "🔊";
+            muteBtn.setAttribute("aria-label", video.muted ? "Unmute" : "Mute");
+          });
+        }
+
+        screen.querySelectorAll(".shot-demo-video-bar, .shot-demo-video-play").forEach(function (el) {
+          el.addEventListener("pointerdown", function (e) {
+            e.stopPropagation();
+          });
         });
 
-        ["play", "pause", "ended", "seeked", "loadedmetadata"].forEach(function (ev) {
-          video.addEventListener(ev, syncCta);
+        video.addEventListener("timeupdate", syncSeek);
+        video.addEventListener("loadedmetadata", syncSeek);
+        ["play", "pause", "ended", "seeked"].forEach(function (ev) {
+          video.addEventListener(ev, function () {
+            syncCta();
+            syncPlayButtons();
+            syncSeek();
+          });
         });
 
         syncCta();
+        syncPlayButtons();
+        syncSeek();
       });
     })();
 

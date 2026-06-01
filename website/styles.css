@@ -22,7 +22,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   /* Anchor targets (#features) land below sticky header */
   scroll-padding-top: calc(7rem + env(safe-area-inset-top, 0px));
   max-width: 100%;
@@ -96,6 +96,12 @@ body {
   }
   100% {
     transform: translate(-4%, 3%) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-layer::after {
+    animation: none;
   }
 }
 
@@ -792,6 +798,10 @@ section {
       0 24px 56px rgba(0, 0, 0, 0.5),
       0 0 48px rgba(94, 234, 212, 0.1);
   }
+
+  .shot-card-video:hover .shot-frame {
+    transform: none;
+  }
 }
 
 .shot-frame img {
@@ -799,6 +809,21 @@ section {
   height: 100%;
   display: block;
   object-fit: cover;
+}
+
+.shot-device-screen-video {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.shot-demo-video-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .shot-device-screen-video .shot-demo-video {
@@ -810,50 +835,127 @@ section {
   object-position: center center;
   display: block;
   background: #05060f;
-  z-index: 0;
 }
 
-.shot-device-screen-video .shot-demo-video::-webkit-media-controls-enclosure,
-.shot-device-screen-video .shot-demo-video::-webkit-media-controls,
-.shot-device-screen-video .shot-demo-video::-webkit-media-controls-panel {
-  opacity: 1 !important;
-  visibility: visible !important;
+.shot-demo-video-cta-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
-.shot-device-screen-video .shot-demo-video::-webkit-media-controls-panel {
-  display: flex !important;
+.shot-demo-video-cta-layer.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .shot-demo-video-cta {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 2.75rem;
+  inset: 0;
   width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center center;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease;
 }
 
-.shot-demo-video-cta.is-visible {
-  opacity: 1;
-  visibility: visible;
+.shot-demo-video-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.35rem;
+  height: 3.35rem;
+  padding: 0;
+  border: 2px solid rgba(212, 168, 83, 0.85);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(212, 168, 83, 0.92) 0%, rgba(154, 122, 61, 0.88) 100%);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 0 4px rgba(5, 6, 15, 0.35);
+  color: #0a0a12;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.shot-demo-video-play:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+  border-color: rgba(94, 234, 212, 0.75);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(94, 234, 212, 0.12);
+}
+
+.shot-demo-video-play:active {
+  transform: translate(-50%, -50%) scale(0.97);
+}
+
+.shot-demo-video-play-icon {
+  display: block;
+  width: 0;
+  height: 0;
+  margin-left: 0.2rem;
+  border-style: solid;
+  border-width: 0.55rem 0 0.55rem 0.95rem;
+  border-color: transparent transparent transparent currentColor;
+}
+
+.shot-demo-video-bar {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.45rem;
+  background: rgba(5, 6, 15, 0.96);
+  border-top: 1px solid rgba(212, 168, 83, 0.22);
+}
+
+.shot-demo-bar-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(212, 168, 83, 0.28);
+  border-radius: 8px;
+  background: rgba(12, 18, 42, 0.85);
+  color: var(--gold);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.shot-demo-bar-btn:hover {
+  border-color: rgba(212, 168, 83, 0.65);
+  background: rgba(212, 168, 83, 0.14);
+  color: #fff8ea;
+}
+
+.shot-demo-bar-seek {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 0.35rem;
+  margin: 0;
+  accent-color: var(--gold);
+  cursor: pointer;
 }
 
 .shot-card-video .shot-frame {
   border-color: rgba(212, 168, 83, 0.32);
-}
-
-.shot-device-screen-video {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
 }
 
 .shot-placeholder {
