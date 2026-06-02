@@ -161,12 +161,18 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            var previousPro: Boolean? = null
             monetizationManager.entitlement.collect { snapshot ->
                 val revenueCatPro = snapshot.tier == AccessTier.PRO && snapshot.isActive
-                _isProUser.value = ClosedTestProAccess.resolveIsProUser(
+                val pro = ClosedTestProAccess.resolveIsProUser(
                     revenueCatPro = revenueCatPro,
                     untilEpochMs = BuildConfig.CLOSED_TEST_PRO_UNTIL_EPOCH_MS,
                 )
+                _isProUser.value = pro
+                if (previousPro != pro && (previousPro != null || pro)) {
+                    triggerWidgetUpdate()
+                }
+                previousPro = pro
             }
         }
         viewModelScope.launch {

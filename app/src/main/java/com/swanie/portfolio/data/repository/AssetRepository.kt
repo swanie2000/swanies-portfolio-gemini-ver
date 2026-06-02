@@ -11,7 +11,6 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import com.swanie.portfolio.billing.AccessTier
 import com.swanie.portfolio.billing.MonetizationManager
 import com.swanie.portfolio.data.api.SearchEngineRegistry
 import com.swanie.portfolio.data.local.AssetCategory
@@ -230,21 +229,14 @@ class AssetRepository @Inject constructor(
 
                     val entitlement = monetizationManager.entitlement.value
                     val tierCap = WidgetAssetLimits.capFor(entitlement)
-                    this[PortfolioWidget.IS_PRO_USER_KEY] =
-                        entitlement.tier == AccessTier.PRO && entitlement.isActive
+                    this[PortfolioWidget.IS_PRO_USER_KEY] = WidgetAssetLimits.isProForWidget(entitlement)
 
                     val selectedIds = vSafe.selectedWidgetAssets.split(",").filter { it.isNotBlank() }
                     
                     // 🚀 SEQUENTIAL ORDER FIX: Map the selectedIds list to maintain user numbering/sorting
                     val filteredAssets = if (selectedIds.isEmpty()) {
-                        val emptyFallbackCap =
-                            if (entitlement.tier == AccessTier.PRO && entitlement.isActive) {
-                                WidgetAssetLimits.PRO_MAX
-                            } else {
-                                WidgetAssetLimits.FREE_MAX
-                            }
                         assetsForVault.filter { it.portfolioId == vSafe.id.toString() || it.portfolioId == "MAIN" }
-                            .take(emptyFallbackCap)
+                            .take(tierCap)
                     } else {
                         selectedIds.take(tierCap).mapNotNull { coinId ->
                             assetsForVault.find { it.coinId == coinId }

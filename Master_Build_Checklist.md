@@ -217,6 +217,7 @@
 - [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf.
 - [x] **Marketing site contact + owner QA (2026-05-19):** **`contact.html`** — Web3Forms, on-page confirmation; owner reviewed site and approved.
 - [x] **Closed testing track (2026-06-01):** **23** on **Closed Alpha**; **Google Groups** TC list; opt-in URL submitted; feedback **`contact.html?topic=tester`**.
+- [ ] **Play upload 1.0.24 (24):** Widget auto-Pro fix — replace **23** on internal + closed after **`verify-play-release.ps1`** + phone QA (app + widget Pro).
 - [ ] **Production access gate:** **≥12** opted-in **14+** consecutive days on closed track; **Google review** pending (owner). **License testing** **unchecked** for TC.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
