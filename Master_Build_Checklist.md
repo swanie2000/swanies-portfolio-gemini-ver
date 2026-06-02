@@ -216,9 +216,12 @@
 - [x] **License testing policy:** **Swanie's Portfolio Testers** **unchecked** on **Settings → License testing** — friends/family on **internal testers only**; see **`docs/AI_HANDOFF.md`** § *Play testing — two lists*.
 - [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf.
 - [x] **Marketing site contact + owner QA (2026-05-19):** **`contact.html`** — Web3Forms, on-page confirmation; owner reviewed site and approved.
-- [x] **Closed testing track (2026-06-01):** **23** on **Closed Alpha**; **Google Groups** TC list; opt-in URL submitted; feedback **`contact.html?topic=tester`**.
-- [ ] **Play upload 1.0.24 (24):** Widget auto-Pro fix — replace **23** on internal + closed after **`verify-play-release.ps1`** + phone QA (app + widget Pro).
-- [ ] **Production access gate:** **≥12** opted-in **14+** consecutive days on closed track; **Google review** pending (owner). **License testing** **unchecked** for TC.
+- [x] **Closed testing track (2026-06-01):** **24** on **Closed Alpha** + **internal**; **Google Groups** TC list; opt-in **`apps/testing/com.swanie.portfolio`**; feedback **`contact.html?topic=tester`**.
+- [x] **Play upload 1.0.24 (24):** Widget auto-Pro fix on internal + closed (**2026-06-01**).
+- [x] **Testers Community:** Submitted **2026-06-01** (Day 0 / 16); see **`docs/AI_HANDOFF.md`** § *Production access — Google requirements*.
+- [ ] **Closed test window:** **≥12** opted-in **14+** consecutive days (**Day 0 = 2026-06-01**). **License testing** **unchecked** for TC.
+- [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ — ship **25**, **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer (app-specific, not generic templates).
+- [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
 - [x] **Monetization (internal QA):** Subscribe/expire/restore matrix on **1.0.10** **2026-05-18**; sufficient for ship. **Beta Pro:** **lifetime** or promotional — avoid monthly/yearly for daily use on internal.
