@@ -219,7 +219,8 @@
 - [x] **Closed testing track (2026-06-01):** **24** on **Closed Alpha** + **internal**; **Google Groups** TC list; opt-in **`apps/testing/com.swanie.portfolio`**; feedback **`contact.html?topic=tester`**.
 - [x] **Play upload 1.0.24 (24):** Widget auto-Pro fix on internal + closed (**2026-06-01**).
 - [x] **Testers Community:** Submitted **2026-06-01** (Day 0 / 16); see **`docs/AI_HANDOFF.md`** § *Production access — Google requirements*.
-- [ ] **Closed test window:** **≥12** opted-in **14+** consecutive days (**Day 0 = 2026-06-01**). **License testing** **unchecked** for TC.
+- [x] **Closed test opt-in (2026-06-02):** Play Dashboard **✓ 12+ testers opted-in** on Closed Alpha.
+- [ ] **Closed test window:** **14+** consecutive days with **12+** testers (**Day 0 = 2026-06-01**). **License testing** **unchecked** for TC.
 - [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ — ship **25**, **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer (app-specific, not generic templates).
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.

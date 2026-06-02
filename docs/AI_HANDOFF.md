@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-01 — **Closed testing clock started (Day 0).** **Internal + Closed Alpha:** **24 (1.0.24)** live (widget auto-Pro fix). **Testers Community** submitted (**`https://play.google.com/apps/testing/com.swanie.portfolio`**); TC dashboard **Day 0 / 16**. **Managed publishing** used for closed **24**. **Production access:** follow **`§ Production access — Google requirements`** — **≥3 closed releases** during test window, **pre-launch** quality, **250+ char** answers on the **10-question** form (do **not** paste generic chess-app boilerplate). **Next:** monitor opted-in count; ship **25** + **26** on closed with real release notes; pre-launch fixes.
+**Last updated:** 2026-06-02 — **Closed test Day 0 = 2026-06-01.** **24** on internal + closed; **TC** submitted (**25/25** recruited, **Day 0/16**). **Play Dashboard:** ✓ **12+ opted in** to closed; **14-day run** still open (Apply for production greyed until that completes). **Do not use RevenueCat customer counts as tester metrics** — see **`§ RevenueCat vs Play vs Testers Community`**. **Next:** ship **25** + **26** on closed; pre-launch; save feedback for production form (~**2026-06-15** earliest apply if Day 0 holds).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,7 +40,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family on **Internal testing → Testers**; **`swaniedesigns.com/#get-app`** internal invite QR. |
 | **Play closed testing (Alpha)** | **Active: 24 (1.0.24)** — **Available to selected testers** (published **2026-06-01**). **Google Groups** **`testers-community@googlegroups.com`**; feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. **TC** campaign **Day 0 / 16** (started **2026-06-01**). Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Version on device** | **24** on internal + closed (owner verified internal; closed live for TC). **23** obsolete — widget Pro bug fixed in **24**. |
-| **Production access clock** | **Day 0 = 2026-06-01** — need **≥12** opted-in **14+ consecutive days** + strong **production form** + **≥3 closed releases** during window (see **`§ Production access — Google requirements`**). |
+| **Production access clock** | **Day 0 = 2026-06-01**. **✓ 12+ opted-in** (Play Dashboard). Still need **14+ consecutive days** with **12+** testers + **≥3 closed releases** + production form (**§ Production access — Google requirements**). |
 | **License testing (list 2)** | **Unchecked** — **Swanie's Portfolio Testers** email list **not** selected on **Settings → License testing** (saved). **Do not** check for friends or Testers Community. |
 | **Internal testers (list 1)** | **Swanie's Portfolio Testers** (3 family). **Closed track live** — TC via **Google Group** (not email list). **Not** license testing. |
 | **Verify build** | **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** — owner verified on **22** and **23**; **always before Play upload**. |
@@ -209,9 +209,30 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 
 **References:** Testers Community guarantee/docs; owner-shared blog on 2025–2026 rejections (recruit TC, 3 releases, form length, pre-launch).
 
+### RevenueCat vs Play vs Testers Community (do not confuse)
+
+Three separate systems — **only Play** counts for the **12 / 14-day** production gate.
+
+| System | What it measures | Swanie’s Portfolio notes |
+|--------|------------------|-------------------------|
+| **Play Console** | **Opted-in** Google accounts on **Closed Alpha**; **14-day** continuous test | **Canonical** for production access. Owner has **✓ 12+ opted-in**; wait for **14 days** on track. |
+| **Testers Community** | Paid recruitment (**25/25** on TC dashboard) | Submitted **2026-06-01**; **Day 0/16** on TC. Does **not** replace Play metrics. |
+| **RevenueCat** | SDK **App User IDs** (billing), not Play tester list | **Not** a closed-test headcount. |
+
+**When RevenueCat shows a customer**
+
+1. **App launch** → `Purchases.configure` → **`$RCAnonymousID:…`** (happens **before** login).
+2. **Create account** or **successful login** → `MainViewModel.syncMonetizationUser` → `Purchases.logIn(email)` (email required on create-account form).
+
+**Owner observation (2026-06-02):** Custom list **“last seen”** (First seen filter) showed **~23** rows, all **anonymous**, **$0** — means **app opens without a completed `logIn` on those IDs**, not “23 TC testers.” Overview **“171 new customers (28d)”** includes **dev history**, promo **Granted entitlement** rows (family emails), and repeated anonymous first-sees — **not** TC **25**.
+
+**Finding a tester in RC:** **`Ctrl+K`** → exact **in-app email** they used at signup (not Play opt-in Gmail unless they typed the same). Closed **auto-Pro** → no purchase rows; many testers never appear as paid subscribers.
+
+**RC dashboard limits:** Customer lists show **100 most recently seen** only; **no column sort** — use **Export CSV** and sort `last_seen_at` / `first_seen_at` if needed.
+
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Monitor closed test:** **Dashboard** opted-in; **TC** Day counter; no **License testing** for TC.
+1. **Monitor closed test:** **✓ 12+ opted-in** done — run **14-day** clock; **TC** Day counter; no **License testing** for TC. **Ignore RC customer totals** for gate.
 2. **Ship 25 + 26** on **Closed Alpha** during the 14-day window — meaningful release notes; **Add from library**.
 3. **Pre-launch report** — fix issues; mention fixes in release notes.
 4. **Save feedback** for production form (TC, contact form, in-app).
@@ -224,7 +245,7 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 
 ### Closed testing → production (ship path)
 
-1. **Day 0 = 2026-06-01** — **24** on closed + **TC** active; watch opted-in count.
+1. **Day 0 = 2026-06-01** — **24** on closed + **TC** active; **12+ opted-in** ✓ — wait **14 days**.
 2. **≥3 closed releases** during window — **24** done; plan **25**, **26** (see **`§ Production access — Google requirements`**).
 3. **Pre-launch report** + feedback paper trail for production form.
 4. **≥12** opted-in, **14+** consecutive days → apply with **250+ char** answers per question.
@@ -283,6 +304,7 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
 | Play checklist | `Master_Build_Checklist.md` |
 | Production access (Google 2025–2026) | **`docs/AI_HANDOFF.md`** → **§ Production access — Google requirements** |
+| RevenueCat vs closed testers | **`docs/AI_HANDOFF.md`** → **§ RevenueCat vs Play vs Testers Community**; `MainViewModel.syncMonetizationUser`, `RevenueCatMonetizationManager.setAppUser` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
 | Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
 | Repo / IDE noise | **`.gitignore`** — **`/.idea/assetWizardSettings.xml`**, **`/docs/drawable-backups/`** (local icon raster dumps; not shipped) |
@@ -291,6 +313,7 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 
 ## Session history (newest first)
 
+- **2026-06-02 — Play ✓12 opted-in; RevenueCat vs testers clarified:** **24** internal + closed; **TC** **25/25**, Day **0/16**. Play **Apply for production** still blocked on **14-day** run. Owner: RC **anonymous** list ≠ TC testers; **`logIn`** only after in-app account — use **Play Dashboard** for gate, not RC **171** / **23** counts. **Handoff + push `main`**.
 - **2026-06-01 — TC started + production-access playbook in handoff:** **24** live internal + closed; **TC** submitted (**Day 0 / 16**). Documented **Google production-access** requirements (**≥3 closed releases**, pre-launch, **250+ char** form, engagement). **Handoff + push `main`**.
 - **2026-06-02 — Widget auto-Pro fix (1.0.24):** **23** gave app Pro but widget stayed free (RevenueCat-only in **`AssetRepository`** / **`WidgetAssetLimits`**). **`isProForWidget`** + widget refresh on Pro change; **`versionCode` 24**. Unit test **`WidgetAssetLimitsTest`**. **Handoff + push `main`**. **Next:** upload **24**, QA widget on phone.
 - **2026-06-01 — Closed Alpha live + tester feedback; waiting on Google review:** **Closed Test 23** on **Alpha**; TC **Google Group** + opt-in submitted; Play **feedback URL** → **`contact.html?topic=tester`** (**`4f6197f`**). Site **invite-only internal** QR (**`d64e728`**). Owner **waiting on Google review**; closed opt-in **1** (need **≥12** / **14+** days). **Handoff + push `main`**.
