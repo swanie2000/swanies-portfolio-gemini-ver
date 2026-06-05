@@ -216,11 +216,13 @@
 - [x] **License testing policy:** **Swanie's Portfolio Testers** **unchecked** on **Settings → License testing** — friends/family on **internal testers only**; see **`docs/AI_HANDOFF.md`** § *Play testing — two lists*.
 - [x] **Marketing site production showcase (2026-05-18):** **`#app-showcase`** — video + stacked screenshots, mobile swipe hint, scroll perf.
 - [x] **Marketing site contact + owner QA (2026-05-19):** **`contact.html`** — Web3Forms, on-page confirmation; owner reviewed site and approved.
-- [x] **Closed testing track (2026-06-01):** **24** on **Closed Alpha** + **internal**; **Google Groups** TC list; opt-in **`apps/testing/com.swanie.portfolio`**; feedback **`contact.html?topic=tester`**.
+- [x] **Closed testing track (2026-06-01):** **24** on **Closed Alpha** + **internal**; opt-in **`apps/testing/com.swanie.portfolio`**; feedback **`contact.html?topic=tester`**.
 - [x] **Play upload 1.0.24 (24):** Widget auto-Pro fix on internal + closed (**2026-06-01**).
-- [x] **Testers Community:** Submitted **2026-06-01** (Day 0 / 16); see **`docs/AI_HANDOFF.md`** § *Production access — Google requirements*.
-- [x] **Closed test opt-in (2026-06-02):** Play Dashboard **✓ 12+ testers opted-in** on Closed Alpha.
-- [ ] **Closed test window:** **14+** consecutive days with **12+** testers (**Day 0 = 2026-06-01**). **License testing** **unchecked** for TC.
+- [x] **Testers Community (2026-06-01):** Submitted; **stopped** **2026-06-04** — opt-in-only cohort; replaced by **Fiverr**.
+- [x] **Closed test opt-in (2026-06-02):** Play Dashboard **✓ 12+ testers opted-in** (TC era).
+- [x] **Fiverr closed testers (2026-06-04):** **FIVERR** email list (**20**) + **Swanie's Portfolio Testers** (**3**) on **Closed Alpha**; Google Group removed; **24–48h** rollout; form assistance.
+- [x] **Site closed-test QR (2026-06-04):** **`#get-app`** **`TESTER_URL`** → **`apps/testing/com.swanie.portfolio`** (family closed opt-in).
+- [ ] **Closed test window:** **14+** consecutive days with **12+** opted-in — re-watch after **Fiverr** swap. **License testing** **unchecked**.
 - [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ — ship **25**, **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer (app-specific, not generic templates).
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
