@@ -55,6 +55,11 @@ import com.swanie.portfolio.ui.holdings.formatAmount
 import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.entry.AssetArchitectScreen
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.TakeTourInviteButton
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.ui.settings.SettingsViewModel
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import com.swanie.portfolio.ui.theme.ProPalette
@@ -66,6 +71,7 @@ import kotlin.math.absoluteValue
 fun MyHoldingsScreen(
     mainViewModel: MainViewModel,
     navController: NavController,
+    walkthroughViewModel: HoldingsWalkthroughViewModel,
     modifier: Modifier = Modifier,
     requestedVaultId: Int? = null
 ) {
@@ -73,6 +79,12 @@ fun MyHoldingsScreen(
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val haptic = LocalHapticFeedback.current
+    val walkthroughController = walkthroughViewModel.controller
+    val walkthroughStep by walkthroughController.step.collectAsState()
+    val showTakeTourButtonPref by walkthroughViewModel.showTakeTourButton.collectAsStateWithLifecycle()
+    val isTourActive = walkthroughStep != HoldingsWalkthroughStep.INACTIVE &&
+        walkthroughStep != HoldingsWalkthroughStep.COMPLETE
+    val showTakeTourButton = showTakeTourButtonPref && !isTourActive
 
     val allVaults by viewModel.allVaults.collectAsStateWithLifecycle(initialValue = null)
     val activeVault by mainViewModel.activeVault.collectAsStateWithLifecycle()
@@ -125,6 +137,10 @@ fun MyHoldingsScreen(
     }
     var expandedAssetId by remember { mutableStateOf<String?>(null) }
     var editingAssetId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(expandedAssetId, editingAssetId) {
+        walkthroughController.onHoldingsCardInteraction(expandedAssetId, editingAssetId)
+    }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
     val isDraggingActive = remember { mutableStateOf(false) }
     val isOverTrash = remember { mutableStateOf(false) }
@@ -218,10 +234,18 @@ fun MyHoldingsScreen(
                         IconButton(
                             onClick = {
                                 val activeVaultIdFromPager = accessibleVaults.getOrNull(pagerState.currentPage)?.id ?: activeVault.id
+                                walkthroughController.onAddButtonClicked()
                                 isExiting = true
                                 navController.navigate(Routes.addAssetRoute(activeVaultIdFromPager))
                             },
-                            modifier = Modifier.size(40.dp).clip(CircleShape).background(Color.Yellow)
+                            modifier = Modifier
+                                .walkthroughAnchor(
+                                    anchor = WalkthroughAnchor.ADD_BUTTON,
+                                    controller = walkthroughController,
+                                )
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.Yellow),
                         ) { Icon(Icons.Default.Add, null, tint = Color.Black) }
                     }
                 }
@@ -403,7 +427,18 @@ fun MyHoldingsScreen(
                                             fontWeight = FontWeight.Medium,
                                             textAlign = TextAlign.Center,
                                         )
-                                        Spacer(modifier = Modifier.weight(1f))
+                                        Box(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            if (showTakeTourButton && vaultForPage.id == activeVault.id) {
+                                                TakeTourInviteButton(
+                                                    onClick = { walkthroughViewModel.startTour() },
+                                                )
+                                            }
+                                        }
                                     }
                                 } else {
                                     LazyColumn(
@@ -494,11 +529,24 @@ fun MyHoldingsScreen(
                                                 "${a.coinId}_${epoch}_${a.localIconPath ?: "default"}"
                                             },
                                         ) { asset ->
+                                            val isWalkthroughCardTarget = filteredHoldingsForPage.firstOrNull()?.coinId == asset.coinId &&
+                                                walkthroughStep == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD
                                             val iconReloadNonce = iconReloadEpochByCoinId[asset.coinId] ?: 0
                                             val listItemKey =
                                                 "${asset.coinId}_${iconReloadNonce}_${asset.localIconPath ?: "default"}"
                                             ReorderableItem(reorderableLazyListState, key = listItemKey) { isDragging ->
-                                            val hndl = Modifier.longPressDraggableHandle(
+                                            val hndl = Modifier
+                                                .then(
+                                                    if (isWalkthroughCardTarget) {
+                                                        Modifier.walkthroughAnchor(
+                                                            anchor = WalkthroughAnchor.ASSET_CARD,
+                                                            controller = walkthroughController,
+                                                        )
+                                                    } else {
+                                                        Modifier
+                                                    },
+                                                )
+                                                .longPressDraggableHandle(
                                                 onDragStarted = {
                                                     draggingVaultId = vaultForPage.id
                                                     localHoldingsForPage = holdingsMergedOptimistic
@@ -571,6 +619,18 @@ fun MyHoldingsScreen(
                                     }
                                 }
                             }
+                        }
+                    }
+                    if (showTakeTourButton && activeVaultHoldings.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .padding(bottom = 8.dp),
+                            contentAlignment = Alignment.BottomCenter,
+                        ) {
+                            TakeTourInviteButton(
+                                onClick = { walkthroughViewModel.startTour() },
+                            )
                         }
                     }
                 }

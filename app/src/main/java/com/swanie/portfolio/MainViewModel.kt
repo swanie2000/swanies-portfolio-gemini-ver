@@ -87,7 +87,7 @@ class MainViewModel @Inject constructor(
     val cardTextColor = themePreferences.cardTextColor.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "#FFFFFF")
     val useGradient = themePreferences.useGradient.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val gradientAmount = themePreferences.gradientAmount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.5f)
-    val isCompactViewEnabled = themePreferences.isCompactViewEnabled.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val isCompactViewEnabled = themePreferences.isCompactViewEnabled.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val isHighVisibilityMode = themePreferences.isHighVisibilityMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val isDarkMode = themePreferences.isDarkMode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
     val confirmDelete = themePreferences.confirmDelete.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
@@ -309,6 +309,12 @@ class MainViewModel @Inject constructor(
 
     fun toggleCompactView() = viewModelScope.launch {
         themePreferences.saveIsCompactViewEnabled(!isCompactViewEnabled.value)
+    }
+
+    fun enableCompactView() = viewModelScope.launch {
+        if (!isCompactViewEnabled.value) {
+            themePreferences.saveIsCompactViewEnabled(true)
+        }
     }
 
     fun setHighVisibilityMode(enabled: Boolean) = viewModelScope.launch {

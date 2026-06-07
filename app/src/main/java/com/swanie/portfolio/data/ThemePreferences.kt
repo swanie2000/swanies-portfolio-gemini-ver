@@ -47,6 +47,8 @@ class ThemePreferences @Inject constructor(
         val WIDGET_BG_TEXT_COLOR = stringPreferencesKey("widget_bg_text_color")
         val WIDGET_CARD_COLOR = stringPreferencesKey("widget_card_color")
         val WIDGET_CARD_TEXT_COLOR = stringPreferencesKey("widget_card_text_color")
+        val HOLDINGS_WALKTHROUGH_COMPLETED = booleanPreferencesKey("holdings_walkthrough_completed")
+        val SHOW_TAKE_TOUR_BUTTON = booleanPreferencesKey("show_take_tour_button")
     }
 
     // High-Resolution Theme Flows
@@ -56,7 +58,7 @@ class ThemePreferences @Inject constructor(
     val cardTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.CARD_TEXT_COLOR] ?: "#FFFFFF" }
     val useGradient: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.USE_GRADIENT] ?: false }
     val gradientAmount: Flow<Float> = appContext.dataStore.data.map { it[PreferencesKeys.GRADIENT_AMOUNT] ?: 0.5f }
-    val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: false }
+    val isCompactViewEnabled: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_COMPACT_VIEW_ENABLED] ?: true }
     val isHighVisibilityMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_HIGH_VISIBILITY_MODE] ?: false }
     val isDarkMode: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.IS_DARK_MODE] ?: true }
     val confirmDelete: Flow<Boolean> = appContext.dataStore.data.map { it[PreferencesKeys.CONFIRM_DELETE] ?: true }
@@ -80,6 +82,10 @@ class ThemePreferences @Inject constructor(
     val widgetBgTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] ?: "#FFFFFF" }
     val widgetCardColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_CARD_COLOR] ?: "#2C2C2E" }
     val widgetCardTextColor: Flow<String> = appContext.dataStore.data.map { it[PreferencesKeys.WIDGET_CARD_TEXT_COLOR] ?: "#FFFFFF" }
+    val holdingsWalkthroughCompleted: Flow<Boolean> =
+        appContext.dataStore.data.map { it[PreferencesKeys.HOLDINGS_WALKTHROUGH_COMPLETED] ?: false }
+    val showTakeTourButton: Flow<Boolean> =
+        appContext.dataStore.data.map { it[PreferencesKeys.SHOW_TAKE_TOUR_BUTTON] ?: true }
 
     // Persistence Functions
     suspend fun saveSiteBackgroundColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.SITE_BACKGROUND_COLOR] = color } }
@@ -115,6 +121,13 @@ class ThemePreferences @Inject constructor(
     suspend fun saveWidgetBgTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_BG_TEXT_COLOR] = color } }
     suspend fun saveWidgetCardColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_COLOR] = color } }
     suspend fun saveWidgetCardTextColor(color: String) { appContext.dataStore.edit { it[PreferencesKeys.WIDGET_CARD_TEXT_COLOR] = color } }
+    suspend fun saveHoldingsWalkthroughCompleted(completed: Boolean) {
+        appContext.dataStore.edit { it[PreferencesKeys.HOLDINGS_WALKTHROUGH_COMPLETED] = completed }
+    }
+
+    suspend fun saveShowTakeTourButton(show: Boolean) {
+        appContext.dataStore.edit { it[PreferencesKeys.SHOW_TAKE_TOUR_BUTTON] = show }
+    }
 
     suspend fun clearAllPreferences() {
         appContext.dataStore.edit { it.clear() }

@@ -17,11 +17,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughController
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
+    walkthroughController: HoldingsWalkthroughController? = null,
     onNavigate: () -> Unit = {}
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
@@ -70,12 +74,22 @@ fun BottomNavigationBar(
                 }) {
                     Icon(Icons.Default.PieChart, null, tint = if(currentRoute == Routes.ANALYTICS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { 
-                    if (currentRoute != Routes.SETTINGS) {
-                        onNavigate()
-                        navController.navigate(Routes.SETTINGS) 
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        if (currentRoute != Routes.SETTINGS) {
+                            onNavigate()
+                            navController.navigate(Routes.SETTINGS)
+                        }
+                    },
+                    modifier = if (walkthroughController != null) {
+                        Modifier.walkthroughAnchor(
+                            anchor = WalkthroughAnchor.SETTINGS_TAB,
+                            controller = walkthroughController,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ) {
                     Icon(Icons.Default.Settings, null, tint = if(currentRoute == Routes.SETTINGS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
             }

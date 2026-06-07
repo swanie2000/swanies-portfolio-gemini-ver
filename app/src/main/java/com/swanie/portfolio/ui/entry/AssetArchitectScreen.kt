@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.compose.LocalActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetCategory
@@ -37,6 +39,10 @@ import com.swanie.portfolio.ui.holdings.AssetViewModel
 import com.swanie.portfolio.ui.holdings.FunnelGrid
 import com.swanie.portfolio.ui.holdings.MetalIcon
 import com.swanie.portfolio.ui.holdings.formatCurrency
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 
 /**
  * 🛠️ V7.2.8 MISSION: ARCHITECT PRECISION & LAYOUT TIGHTENING
@@ -54,6 +60,11 @@ fun AssetArchitectScreen(
     onCancel: () -> Unit
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
+    val activity = LocalActivity.current as AppCompatActivity
+    val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
+    val walkthroughController = walkthroughViewModel.controller
+    val walkthroughStep by walkthroughController.step.collectAsState()
+    val tourCreateFlow = existingAsset == null
     val res = LocalContext.current.resources
     val draftKey = existingAsset?.coinId ?: "create_${initialSymbol}_${initialPrice}"
     var architectStage by remember(draftKey) { mutableStateOf(ArchitectStage.BLUEPRINT) }
@@ -71,6 +82,15 @@ fun AssetArchitectScreen(
                 focusManager.clearFocus()
             }
             ArchitectStage.LIVE_CARD -> Unit
+        }
+    }
+
+    LaunchedEffect(architectStage, walkthroughStep, tourCreateFlow) {
+        if (tourCreateFlow &&
+            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD &&
+            architectStage == ArchitectStage.ICON_PICK
+        ) {
+            walkthroughController.onMetalArchitectSaving()
         }
     }
 
@@ -263,10 +283,21 @@ fun AssetArchitectScreen(
                     }
 
                     Button(
-                        onClick = { architectStage = ArchitectStage.LIVE_CARD },
+                        onClick = {
+                            if (tourCreateFlow) {
+                                walkthroughController.onMetalArchitectBlueprintContinued()
+                            }
+                            architectStage = ArchitectStage.LIVE_CARD
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 8.dp),
+                            .padding(top = 8.dp, bottom = 8.dp)
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.METAL_ARCHITECT_CONTINUE,
+                                controller = walkthroughController,
+                                enabled = tourCreateFlow &&
+                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT,
+                            ),
                         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         shape = RoundedCornerShape(12.dp),
@@ -354,7 +385,14 @@ fun AssetArchitectScreen(
                     }
 
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.METAL_ARCHITECT_CARD,
+                                controller = walkthroughController,
+                                enabled = tourCreateFlow &&
+                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD,
+                            ),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))

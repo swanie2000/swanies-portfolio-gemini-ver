@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-04 — **Closed Alpha 24** on internal + closed. **Testers Community stopped** — **Fiverr (Grayo)** now runs closed test (**20**-tester list + **3** family on **email lists**; **Google Group removed** — Play allows **list or group, not both**). Fiverr **24–48h** rollout; seller will help with **production-access form**. **Play gate:** **≥12 opted-in** + **14 days** (TC had **12+** on **2026-06-01** — re-watch after pool swap). **Real app headcount (owner):** identifiable **RevenueCat** emails after create-account/login — see **`§ RevenueCat vs Play vs closed testers`**. **Site:** **`#get-app`** QR → **closed** opt-in (**`apps/testing/com.swanie.portfolio`**). **Next:** Fiverr rollout + family closed opt-in (wife/mom); ship **25**/**26**; RC CSV + feedback for form.
+**Last updated:** 2026-06-02 — **Holdings walkthrough tour (release 25 / `1.0.25`)** implemented and **owner device-QA’d** on laptop — **not uploaded to Play yet** (owner stepping away; **metal tour polish** next). **Closed Alpha 24** still live on internal + closed. **Fiverr (Grayo)** closed cohort (**20** + **3** family emails); **≥12 opted-in** + **14 days** production gate — see **`§ RevenueCat vs Play vs closed testers`**. **Site:** **`#get-app`** → closed opt-in. **Next:** polish **metal** tour fork → optional **`values-*`** walkthrough strings → upload **25** to **Closed Alpha** when ready (not this session).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -39,7 +39,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 24 (1.0.24)** — **Email lists only** (no Google Group): **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. **Fiverr (Grayo)** replacing **TC** — **24–48h** rollout; daily use + in-app account promised. |
-| **Version on device** | **24** on internal + closed. **23** obsolete — widget Pro bug fixed in **24**. |
+| **Version on device** | **24** on Play tracks. **25 (`1.0.25`)** on laptop only — **holdings walkthrough tour**; **not** uploaded to Console yet. |
 | **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). Still need **≥3 closed releases** + production form (**§ Production access — Google requirements**). |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -245,11 +245,17 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
+### App — release 25 walkthrough (local; not on Play)
+
+1. **Polish metal tour fork** — device pass after **METAL** provider pick → **Asset Architect** blueprint + live card → save → holdings **End Tour** (owner paused here).
+2. **Optional before Play upload:** mirror new **`walkthrough_*`** / **`settings_help_feedback`** strings into **`values-*`** (manual per locale rule).
+3. **When ready:** bump if needed → **`verify-release-config.ps1`** + Signed Bundle → **`verify-play-release.ps1`** → **Closed Alpha** upload **25** (tour in release notes).
+
 ### Closed testing → production (ship path)
 
 1. **Fiverr rollout** — **20** + **3** family on closed email lists; watch **opted-in ≥12**; family **closed opt-in** + app update.
 2. **14-day clock** — started with **TC** (**2026-06-01**); confirm Dashboard after pool swap; wait **14 consecutive days** at **≥12**.
-3. **≥3 closed releases** — **24** done; ship **25**, **26** (see **`§ Production access — Google requirements`**).
+3. **≥3 closed releases** — **24** done; ship **25** (walkthrough), **26** (see **`§ Production access — Google requirements`**).
 4. **RevenueCat CSV** after rollout — non-anonymous emails since Fiverr start = real testers.
 5. **Pre-launch report** + feedback; **Fiverr** helps production-access form (**250+ char** answers).
 6. **Production release:** **`GRANT_DAYS=0`** → **`verify-play-release.ps1`** → staged rollout; **`PLAY_URL`** when public.
@@ -270,7 +276,9 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. See **Pro** bullet for verify scripts.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **i18n:** `LanguageDisplay.kt`; **`values-*`** — keys match **`values/strings.xml`** (beta_unlock strings removed **2026-06-01**; add **`closed_test_pro_*`** to locales when translating paywall dialog).
+- **Holdings walkthrough (25):** `HoldingsWalkthrough.kt`, `HoldingsWalkthroughViewModel.kt`, overlay in **`MainActivity`**; **`Take Tour`** on holdings (Settings toggle **Show Take Tour button**); yellow pill hints + glossy arrows + target rings; exit dialog with **Don't show tour again** (= hide Take Tour). **Crypto path:** add → provider → search → amount → card gestures → **End Tour**. **Metal fork:** **METAL** provider → **AssetArchitectScreen** steps (**blueprint** / **live card**) → save → rejoin holdings card step. **`walkthroughAnchor`** + window bounds for popups. **Not on Play yet.**
+- **Settings UX (25):** **HELP & FEEDBACK** section near top — **Take Tour** toggle + **Report a BUG** card (tour no longer routes to feedback).
+- **i18n:** `LanguageDisplay.kt`; **`values-*`** — keys match **`values/strings.xml`** (beta_unlock strings removed **2026-06-01**; **`walkthrough_*`** added in default **`values/`** only as of **2026-06-02** — sync locales before Play **25**).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, **`:app:lintVitalRelease`** before Play AAB (required — **ExtraTranslation** fails release if locale keys drift from default).
 
 ---
@@ -308,6 +316,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 | Production access (Google 2025–2026) | **`docs/AI_HANDOFF.md`** → **§ Production access — Google requirements** |
 | RevenueCat vs closed testers | **`docs/AI_HANDOFF.md`** → **§ RevenueCat vs Play vs closed testers**; `MainViewModel.syncMonetizationUser`, `RevenueCatMonetizationManager.setAppUser` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
+| Holdings walkthrough | **`ui/onboarding/HoldingsWalkthrough.kt`**, **`HoldingsWalkthroughViewModel.kt`**, **`MainActivity.kt`** (overlay), **`MyHoldingsScreen.kt`**, **`AssetPickerScreen.kt`**, **`AmountEntryScreen.kt`**, **`AssetArchitectScreen.kt`**, **`NavGraph.kt`**, **`SettingsScreen.kt`**, **`ThemePreferences.kt`** (`showTakeTourButton`, `holdingsWalkthroughCompleted`) |
 | Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
 | Repo / IDE noise | **`.gitignore`** — **`/.idea/assetWizardSettings.xml`**, **`/docs/drawable-backups/`** (local icon raster dumps; not shipped) |
 
@@ -315,6 +324,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-02 — Holdings walkthrough tour (25, local only):** Shipped replayable **Take Tour** for closed-test onboarding: yellow pill hints, arrows, highlights, exit + **Don't show tour again**, **HELP & FEEDBACK** on Settings. Full **crypto** path (add → search → amount → card gestures → **End Tour**). **Metal fork** when user picks **METAL** provider → **Asset Architect** tour steps → save → holdings. **`versionCode` 25** / **`1.0.25`**; owner QA OK on device; **not** uploaded to Play — **metal polish** next. **Handoff + push `main`**.
 - **2026-06-04 — Fiverr closed test + site QR → closed:** **TC stopped**; **Fiverr (Grayo)** **20** testers + family **3** on **Closed Alpha email lists** (Google Group removed; Play **list or group, not both**). **`website/index.html`** **`TESTER_URL`** → closed opt-in for wife/mom. Owner: **RC email** = real app tester; Fiverr promises account + daily use + form help. **Handoff + push `main`**.
 - **2026-06-02 — Play ✓12 opted-in; RevenueCat vs testers clarified:** **24** internal + closed; **TC** **25/25**, Day **0/16**. Play **Apply for production** still blocked on **14-day** run. Owner: RC **anonymous** list ≠ TC testers; **`logIn`** only after in-app account — use **Play Dashboard** for gate, not RC **171** / **23** counts. **Handoff + push `main`**.
 - **2026-06-01 — TC started + production-access playbook in handoff:** **24** live internal + closed; **TC** submitted (**Day 0 / 16**). Documented **Google production-access** requirements (**≥3 closed releases**, pre-launch, **250+ char** form, engagement). **Handoff + push `main`**.

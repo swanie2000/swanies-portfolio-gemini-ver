@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.activity.compose.LocalActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -37,6 +39,9 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import kotlinx.coroutines.delay
 
@@ -64,6 +69,10 @@ fun AmountEntryScreen(
     val dialogBg = remember(cardBgHex) { Color(cardBgHex.ifBlank { "#121212" }.toColorInt()) }
 
     val viewModel: AmountEntryViewModel = hiltViewModel()
+    val activity = LocalActivity.current as AppCompatActivity
+    val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
+    val walkthroughController = walkthroughViewModel.controller
+    val deferAmountFocus = walkthroughController.shouldDeferKeyboardFocus()
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
 
@@ -76,8 +85,14 @@ fun AmountEntryScreen(
     var showCheckmark by remember { mutableStateOf(false) }
 
     var amountText by remember { mutableStateOf("") }
-    
+
     val focusRequester = remember { FocusRequester() }
+
+    fun submitAmount() {
+        if (amountText.isBlank() || isSaving) return
+        walkthroughController.onAmountEntrySubmitted()
+        isSaving = true
+    }
     var showExitDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -173,17 +188,23 @@ fun AmountEntryScreen(
                     OutlinedTextField(
                         value = amountText,
                         onValueChange = { if (!isSaving) { amountText = it; errorMessage = null } },
-                        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.AMOUNT_INPUT,
+                                controller = walkthroughController,
+                            ),
                         label = { Text(stringResource(R.string.amount_entry_label, symbol), color = textColor.copy(alpha = 0.6f)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { if(amountText.isNotBlank()) isSaving = true }),
+                        keyboardActions = KeyboardActions(onDone = { submitAmount() }),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textColor, unfocusedTextColor = textColor, cursorColor = textColor, focusedBorderColor = textColor, unfocusedBorderColor = textColor.copy(alpha = 0.5f))
                     )
                     errorMessage?.let { Text(text = it, color = Color.Red, modifier = Modifier.padding(top = 8.dp)) }
                     Spacer(Modifier.weight(1f))
                     Button(
-                        onClick = { isSaving = true },
+                        onClick = { submitAmount() },
                         modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         enabled = amountText.isNotBlank() && !isSaving
@@ -234,5 +255,8 @@ fun AmountEntryScreen(
     }
 
     BackHandler { if (!isSaving) showExitDialog = true }
-    LaunchedEffect(category) { if(category == AssetCategory.CRYPTO) focusRequester.requestFocus() }
+    LaunchedEffect(category, deferAmountFocus) {
+        if (deferAmountFocus) return@LaunchedEffect
+        if (category == AssetCategory.CRYPTO) focusRequester.requestFocus()
+    }
 }

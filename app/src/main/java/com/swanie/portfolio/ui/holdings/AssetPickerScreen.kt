@@ -18,8 +18,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.activity.compose.LocalActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +38,10 @@ import coil.compose.AsyncImage
 import com.swanie.portfolio.R
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.ui.components.BoutiqueHeader
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.ui.settings.ThemeViewModel
 import java.net.URLEncoder
 import kotlinx.coroutines.delay
@@ -52,6 +59,11 @@ fun AssetPickerScreen(
 ) {
     val viewModel: AssetViewModel = hiltViewModel()
     val themeViewModel: ThemeViewModel = hiltViewModel()
+    val activity = LocalActivity.current as AppCompatActivity
+    val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
+    val walkthroughController = walkthroughViewModel.controller
+    val walkthroughStep by walkthroughController.step.collectAsState()
+    val deferSearchFocus = walkthroughController.shouldDeferKeyboardFocus()
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
@@ -85,8 +97,35 @@ fun AssetPickerScreen(
 
     LaunchedEffect(Unit) {
         if (selectedProvider == null) viewModel.selectProvider("CoinGecko")
+    }
+
+    LaunchedEffect(selectedProvider, deferSearchFocus) {
+        if (deferSearchFocus) return@LaunchedEffect
         delay(300)
         if (selectedProvider != "YahooFinance") focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(searchQuery, searchResults) {
+        if (searchQuery.isNotBlank() && searchResults.isNotEmpty()) {
+            walkthroughController.onPickerSearchResultsReady()
+        }
+    }
+
+    val useInlineProviderMenu =
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER && menuExpanded
+
+    val onProviderSelected: (String) -> Unit = { provider ->
+        menuExpanded = false
+        searchQuery = ""
+        if (provider == "YahooFinance") {
+            walkthroughController.onMetalProviderSelected()
+            viewModel.selectProvider("CoinGecko")
+            val enc = URLEncoder.encode("Manual", "UTF-8")
+            navController.navigate("asset_architect/CUSTOM/0.0/$enc/$vaultId")
+        } else {
+            walkthroughController.onPickerProviderSelected()
+            viewModel.selectProvider(provider)
+        }
     }
 
     Box(modifier = Modifier
@@ -125,39 +164,70 @@ fun AssetPickerScreen(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (isSearchBusy) {
-                                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = textColor)
-                            } else {
-                                Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                                if (searchQuery.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.holdings_tab_crypto),
-                                        color = cardText.copy(alpha = 0.4f),
-                                        fontSize = 10.5.sp,
-                                        letterSpacing = (-0.3).sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .walkthroughAnchor(
+                                        anchor = WalkthroughAnchor.PICKER_SEARCH_BOX,
+                                        controller = walkthroughController,
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                if (isSearchBusy) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = textColor)
+                                } else {
+                                    Icon(Icons.Default.Search, null, tint = cardText.copy(alpha = 0.6f))
                                 }
-                                innerTextField()
+                                Spacer(Modifier.width(12.dp))
+                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                                    if (searchQuery.isEmpty()) {
+                                        Text(
+                                            text = stringResource(R.string.holdings_tab_crypto),
+                                            color = cardText.copy(alpha = 0.4f),
+                                            fontSize = 10.5.sp,
+                                            letterSpacing = (-0.3).sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    innerTextField()
+                                }
                             }
                             Box(modifier = Modifier.padding(start = 8.dp)) {
                                 Surface(
-                                    onClick = { menuExpanded = true },
+                                    onClick = {
+                                        walkthroughController.onPickerDropdownOpened()
+                                        menuExpanded = true
+                                    },
                                     color = Color.White.copy(alpha = 0.05f),
                                     shape = RoundedCornerShape(8.dp),
-                                    modifier = Modifier.width(130.dp).height(32.dp),
-                                    border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f))
+                                    modifier = Modifier
+                                        .width(130.dp)
+                                        .height(32.dp)
+                                        .walkthroughAnchor(
+                                            anchor = WalkthroughAnchor.PICKER_PROVIDER_BUTTON,
+                                            controller = walkthroughController,
+                                        ),
+                                    border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f)),
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Center
+                                        horizontalArrangement = Arrangement.Center,
+                                        modifier = Modifier.fillMaxSize(),
                                     ) {
-                                        Text(text = (selectedProvider ?: stringResource(R.string.settings_system_actions)).uppercase(), color = cardText, fontSize = 9.sp, fontWeight = FontWeight.Black)
-                                        Icon(Icons.Default.ArrowDropDown, null, tint = cardText.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                                        Text(
+                                            text = (selectedProvider ?: stringResource(R.string.settings_system_actions)).uppercase(),
+                                            color = cardText,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Black,
+                                        )
+                                        Icon(
+                                            Icons.Default.ArrowDropDown,
+                                            null,
+                                            tint = cardText.copy(alpha = 0.5f),
+                                            modifier = Modifier.size(16.dp),
+                                        )
                                     }
                                 }
                             }
@@ -165,26 +235,58 @@ fun AssetPickerScreen(
                     }
                 )
 
+                if (useInlineProviderMenu) {
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 60.dp)
+                            .width(200.dp)
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.PICKER_DROPDOWN,
+                                controller = walkthroughController,
+                            ),
+                        color = Color(0xFF1A1A1A),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+                    ) {
+                        Column {
+                            providers.forEach { provider ->
+                                val menuLabel = if (provider == "YahooFinance") {
+                                    stringResource(R.string.holdings_tab_metal)
+                                } else {
+                                    provider
+                                }
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { onProviderSelected(provider) }
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = menuLabel.uppercase(),
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 DropdownMenu(
-                    expanded = menuExpanded,
+                    expanded = menuExpanded && !useInlineProviderMenu,
                     onDismissRequest = { menuExpanded = false },
-                    modifier = Modifier.background(Color(0xFF1A1A1A)).border(1.dp, Color.White.copy(0.1f))
+                    modifier = Modifier
+                        .background(Color(0xFF1A1A1A))
+                        .border(1.dp, Color.White.copy(0.1f)),
                 ) {
                     providers.forEach { provider ->
                         val menuLabel = if (provider == "YahooFinance") stringResource(R.string.holdings_tab_metal) else provider
                         DropdownMenuItem(
                             text = { Text(menuLabel.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                            onClick = {
-                                menuExpanded = false
-                                searchQuery = ""
-                                if (provider == "YahooFinance") {
-                                    viewModel.selectProvider("CoinGecko")
-                                    val enc = URLEncoder.encode("Manual", "UTF-8")
-                                    navController.navigate("asset_architect/CUSTOM/0.0/$enc/$vaultId")
-                                } else {
-                                    viewModel.selectProvider(provider)
-                                }
-                            }
+                            onClick = { onProviderSelected(provider) },
                         )
                     }
                 }

@@ -35,6 +35,7 @@ import androidx.compose.ui.zIndex
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.swanie.portfolio.MainViewModel
 import com.swanie.portfolio.R
@@ -43,6 +44,9 @@ import com.swanie.portfolio.security.AuthPolicy
 import com.swanie.portfolio.ui.components.showPortfolioToast
 import com.swanie.portfolio.ui.i18n.languageDisplayNameForOption
 import com.swanie.portfolio.ui.navigation.Routes
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +54,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     navController: NavHostController,
     settingsViewModel: SettingsViewModel,
+    walkthroughViewModel: HoldingsWalkthroughViewModel,
     mainViewModel: MainViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel()
 ) {
@@ -596,6 +601,63 @@ fun SettingsScreen(
                         }
                     }
 
+                    // --- HELP & FEEDBACK ---
+                    Text(
+                        text = stringResource(R.string.settings_help_feedback),
+                        color = safeText.copy(0.5f),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+
+                    val showTakeTourButton by walkthroughViewModel.showTakeTourButton.collectAsStateWithLifecycle()
+
+                    SettingsToggleItem(
+                        title = stringResource(R.string.settings_show_take_tour),
+                        subtitle = stringResource(R.string.settings_show_take_tour_subtitle),
+                        checked = showTakeTourButton,
+                        onCheckedChange = { walkthroughViewModel.setShowTakeTourButton(it) },
+                        themeColor = safeText,
+                    )
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.FEEDBACK_ROW,
+                                controller = walkthroughViewModel.controller,
+                            )
+                            .clickable {
+                                walkthroughViewModel.controller.onFeedbackOpened()
+                                showBugReportDialog = true
+                            },
+                        color = safeText.copy(alpha = 0.06f),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+                            Text(
+                                text = stringResource(R.string.settings_bug_report_button),
+                                color = safeText,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start,
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_bug_report_hint),
+                                color = safeText.copy(alpha = 0.65f),
+                                fontSize = 13.sp,
+                                lineHeight = 18.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 6.dp),
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
                     // --- SECURITY ---
                     Text(stringResource(R.string.settings_security), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
 
@@ -709,31 +771,6 @@ fun SettingsScreen(
 
                     // --- INTERFACE ---
                     Text(stringResource(R.string.settings_interface), color = safeText.copy(0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { showBugReportDialog = true }
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.settings_bug_report_button),
-                            color = safeText,
-                            fontWeight = FontWeight.SemiBold,
-                            lineHeight = 22.sp,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Start
-                        )
-                    }
-                    Text(
-                        text = stringResource(R.string.settings_bug_report_hint),
-                        color = safeText.copy(alpha = 0.6f),
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp)
-                    )
 
                     SettingsToggleItem(
                         title = stringResource(R.string.settings_compact_cards),

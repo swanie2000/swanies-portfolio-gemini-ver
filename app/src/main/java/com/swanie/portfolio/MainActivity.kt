@@ -1,6 +1,7 @@
 package com.swanie.portfolio
 
 import android.os.Bundle
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -21,7 +22,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.swanie.portfolio.security.AuthPolicy
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.swanie.portfolio.ui.components.BottomNavigationBar
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughOverlay
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.navigation.NavGraph
 import com.swanie.portfolio.ui.navigation.Routes
@@ -77,9 +81,17 @@ class MainActivity : AppCompatActivity() {
                 isGradientEnabled = useGradient,
                 gradientAmount = gradientAmount
             ) {
+                val activity = LocalActivity.current as AppCompatActivity
+                val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+
+                LaunchedEffect(currentRoute) {
+                    if (currentRoute == Routes.SETTINGS) {
+                        walkthroughViewModel.controller.onSettingsOpened()
+                    }
+                }
 
                 val hideBottomBarRoutes = listOf(
                     Routes.HOME,
@@ -101,7 +113,10 @@ class MainActivity : AppCompatActivity() {
                         containerColor = Color.Transparent,
                         bottomBar = {
                             if (shouldShowBottomBar) {
-                                BottomNavigationBar(navController = navController)
+                                BottomNavigationBar(
+                                    navController = navController,
+                                    walkthroughController = walkthroughViewModel.controller,
+                                )
                             }
                         }
                     ) { innerPadding ->
@@ -113,10 +128,25 @@ class MainActivity : AppCompatActivity() {
                             NavGraph(
                                 navController = navController,
                                 mainViewModel = viewModel,
+                                walkthroughViewModel = walkthroughViewModel,
                                 startDestination = Routes.HOME
                             )
                         }
                     }
+                    HoldingsWalkthroughOverlay(
+                        controller = walkthroughViewModel.controller,
+                        onCompleted = {
+                            walkthroughViewModel.markCompleted()
+                            walkthroughViewModel.controller.acknowledgeComplete()
+                        },
+                        onSkipTour = { dontShowAgain ->
+                            if (dontShowAgain) {
+                                walkthroughViewModel.setShowTakeTourButton(false)
+                            }
+                            walkthroughViewModel.controller.skip()
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
             }
         }

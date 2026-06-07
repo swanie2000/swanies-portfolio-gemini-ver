@@ -33,6 +33,8 @@ import com.swanie.portfolio.ui.features.TermsAndConditionsScreen
 import com.swanie.portfolio.ui.features.AuthViewModel
 import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen // ✅ Fixed: Added missing import
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
 import com.swanie.portfolio.ui.settings.*
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -42,6 +44,7 @@ import java.net.URLEncoder
 fun NavGraph(
     navController: NavHostController,
     mainViewModel: MainViewModel,
+    walkthroughViewModel: HoldingsWalkthroughViewModel,
     startDestination: String = Routes.HOME
 ) {
     val activity = LocalActivity.current as androidx.fragment.app.FragmentActivity
@@ -100,7 +103,8 @@ fun NavGraph(
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 SettingsScreen(
                     navController = navController,
-                    settingsViewModel = settingsViewModel
+                    settingsViewModel = settingsViewModel,
+                    walkthroughViewModel = walkthroughViewModel,
                 )
             }
 
@@ -170,7 +174,8 @@ fun NavGraph(
                 } else {
                     MyHoldingsScreen(
                         mainViewModel = mainViewModel,
-                        navController = navController
+                        navController = navController,
+                        walkthroughViewModel = walkthroughViewModel,
                     )
                 }
             }
@@ -195,7 +200,8 @@ fun NavGraph(
                     MyHoldingsScreen(
                         mainViewModel = mainViewModel,
                         navController = navController,
-                        requestedVaultId = targetVaultId
+                        requestedVaultId = targetVaultId,
+                        walkthroughViewModel = walkthroughViewModel,
                     )
                 }
             }
@@ -222,6 +228,7 @@ fun NavGraph(
                     navController = navController,
                     vaultId = vaultId,
                     onAssetSelected = { asset ->
+                        walkthroughViewModel.controller.onAssetSelected(asset.symbol)
                         scope.launch {
                             val healedAsset = assetViewModel.healMetadata(asset)
                             val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "NONE", "UTF-8")
@@ -270,6 +277,11 @@ fun NavGraph(
                     officialSpotPrice = price,
                     priceSource = priceSource,
                     onSave = { targetVaultId ->
+                        val duringWalkthroughAmount =
+                            walkthroughViewModel.controller.step.value ==
+                                HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE
+                        walkthroughViewModel.controller.onAmountSaved()
+                        if (duringWalkthroughAmount) mainViewModel.enableCompactView()
                         navController.navigate(Routes.holdingsRoute(targetVaultId)) {
                             popUpTo(Routes.HOLDINGS) { inclusive = false }
                         }
@@ -304,13 +316,27 @@ fun NavGraph(
                     initialPrice = price,
                     initialSource = source,
                     onSave = { entity: AssetEntity ->
+                        val walkthroughStep = walkthroughViewModel.controller.step.value
+                        val duringWalkthroughAdd = walkthroughStep == HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE ||
+                            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT ||
+                            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD
+                        if (walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD) {
+                            walkthroughViewModel.controller.onMetalArchitectSaving()
+                        }
                         amountEntryViewModel.performSurgicalAdd(entity) {
+                            if (duringWalkthroughAdd) {
+                                walkthroughViewModel.controller.onAmountSaved()
+                                mainViewModel.enableCompactView()
+                            }
                             navController.navigate(Routes.holdingsRoute(vaultId)) {
                                 popUpTo(Routes.HOLDINGS) { inclusive = false }
                             }
                         }
                     },
-                    onCancel = { navController.popBackStack() }
+                    onCancel = {
+                        walkthroughViewModel.controller.onMetalArchitectCancelled()
+                        navController.popBackStack()
+                    },
                 )
             }
         }
