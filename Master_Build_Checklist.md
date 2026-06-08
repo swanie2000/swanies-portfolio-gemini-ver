@@ -223,7 +223,7 @@
 - [x] **Fiverr closed testers (2026-06-04):** **FIVERR** email list (**20**) + **Swanie's Portfolio Testers** (**3**) on **Closed Alpha**; Google Group removed; **24–48h** rollout; form assistance.
 - [x] **Site closed-test QR (2026-06-04):** **`#get-app`** **`TESTER_URL`** → **`apps/testing/com.swanie.portfolio`** (family closed opt-in).
 - [ ] **Closed test window:** **14+** consecutive days with **12+** opted-in — re-watch after **Fiverr** swap. **License testing** **unchecked**.
-- [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ — ship **25**, **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer (app-specific, not generic templates).
+- [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ · **25** submitted **2026-06-02**, in review · **26** pending); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
