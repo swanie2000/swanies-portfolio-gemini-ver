@@ -81,6 +81,7 @@ fun MyHoldingsScreen(
     val haptic = LocalHapticFeedback.current
     val walkthroughController = walkthroughViewModel.controller
     val walkthroughStep by walkthroughController.step.collectAsState()
+    val highlightCoinId by walkthroughController.highlightCoinId.collectAsState()
     val showTakeTourButtonPref by walkthroughViewModel.showTakeTourButton.collectAsStateWithLifecycle()
     val isTourActive = walkthroughStep != HoldingsWalkthroughStep.INACTIVE &&
         walkthroughStep != HoldingsWalkthroughStep.COMPLETE
@@ -334,6 +335,17 @@ fun MyHoldingsScreen(
                             // non-reorderable Pro banner item before the holdings rows.
                             val holdingsLazyListStartIndex = if (isProUser) 0 else 1
 
+                            LaunchedEffect(walkthroughStep, highlightCoinId, filteredHoldingsForPage) {
+                                if (walkthroughStep == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD &&
+                                    highlightCoinId != null
+                                ) {
+                                    val idx = filteredHoldingsForPage.indexOfFirst { it.coinId == highlightCoinId }
+                                    if (idx >= 0) {
+                                        pageLazyListState.animateScrollToItem(idx + holdingsLazyListStartIndex)
+                                    }
+                                }
+                            }
+
                             val reorderableLazyListState = rememberReorderableLazyListState(
                                 lazyListState = pageLazyListState,
                                 onMove = { from, to ->
@@ -529,8 +541,9 @@ fun MyHoldingsScreen(
                                                 "${a.coinId}_${epoch}_${a.localIconPath ?: "default"}"
                                             },
                                         ) { asset ->
-                                            val isWalkthroughCardTarget = filteredHoldingsForPage.firstOrNull()?.coinId == asset.coinId &&
-                                                walkthroughStep == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD
+                                            val isWalkthroughCardTarget = walkthroughStep == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD &&
+                                                highlightCoinId != null &&
+                                                asset.coinId == highlightCoinId
                                             val iconReloadNonce = iconReloadEpochByCoinId[asset.coinId] ?: 0
                                             val listItemKey =
                                                 "${asset.coinId}_${iconReloadNonce}_${asset.localIconPath ?: "default"}"

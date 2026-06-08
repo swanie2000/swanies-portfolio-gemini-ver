@@ -35,6 +35,9 @@ import com.swanie.portfolio.ui.holdings.*
 import com.swanie.portfolio.ui.metals.MetalsAuditScreen // ✅ Fixed: Added missing import
 import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
 import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
+import com.swanie.portfolio.ui.onboarding.metalArchitectBlueprintSteps
+import com.swanie.portfolio.ui.onboarding.metalArchitectIconPickSteps
+import com.swanie.portfolio.ui.onboarding.metalArchitectLiveCardSteps
 import com.swanie.portfolio.ui.settings.*
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
@@ -228,7 +231,7 @@ fun NavGraph(
                     navController = navController,
                     vaultId = vaultId,
                     onAssetSelected = { asset ->
-                        walkthroughViewModel.controller.onAssetSelected(asset.symbol)
+                        walkthroughViewModel.controller.onAssetSelected(asset.coinId, asset.symbol)
                         scope.launch {
                             val healedAsset = assetViewModel.healMetadata(asset)
                             val encodedThumb = URLEncoder.encode(healedAsset.iconUrl ?: healedAsset.imageUrl ?: "NONE", "UTF-8")
@@ -276,11 +279,11 @@ fun NavGraph(
                     category = category,
                     officialSpotPrice = price,
                     priceSource = priceSource,
-                    onSave = { targetVaultId ->
+                    onSave = { targetVaultId, savedCoinId ->
                         val duringWalkthroughAmount =
                             walkthroughViewModel.controller.step.value ==
                                 HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE
-                        walkthroughViewModel.controller.onAmountSaved()
+                        walkthroughViewModel.controller.onAmountSaved(savedCoinId)
                         if (duringWalkthroughAmount) mainViewModel.enableCompactView()
                         navController.navigate(Routes.holdingsRoute(targetVaultId)) {
                             popUpTo(Routes.HOLDINGS) { inclusive = false }
@@ -318,14 +321,17 @@ fun NavGraph(
                     onSave = { entity: AssetEntity ->
                         val walkthroughStep = walkthroughViewModel.controller.step.value
                         val duringWalkthroughAdd = walkthroughStep == HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE ||
-                            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT ||
-                            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD
-                        if (walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD) {
+                            walkthroughStep in metalArchitectBlueprintSteps ||
+                            walkthroughStep in metalArchitectLiveCardSteps ||
+                            walkthroughStep in metalArchitectIconPickSteps
+                        if (walkthroughStep in metalArchitectLiveCardSteps ||
+                            walkthroughStep in metalArchitectIconPickSteps
+                        ) {
                             walkthroughViewModel.controller.onMetalArchitectSaving()
                         }
                         amountEntryViewModel.performSurgicalAdd(entity) {
                             if (duringWalkthroughAdd) {
-                                walkthroughViewModel.controller.onAmountSaved()
+                                walkthroughViewModel.controller.onAmountSaved(entity.coinId)
                                 mainViewModel.enableCompactView()
                             }
                             navController.navigate(Routes.holdingsRoute(vaultId)) {

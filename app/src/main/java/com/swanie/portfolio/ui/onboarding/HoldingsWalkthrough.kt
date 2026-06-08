@@ -56,8 +56,18 @@ enum class WalkthroughAnchor {
     PICKER_PROVIDER_BUTTON,
     PICKER_DROPDOWN,
     PICKER_SEARCH_BOX,
+    METAL_ARCHITECT_METAL_HEADER,
+    METAL_ARCHITECT_METAL_GRID,
+    METAL_ARCHITECT_SHAPE_HEADER,
+    METAL_ARCHITECT_SHAPE_GRID,
+    METAL_ARCHITECT_UNIT_HEADER,
+    METAL_ARCHITECT_UNIT_GRID,
     METAL_ARCHITECT_CONTINUE,
-    METAL_ARCHITECT_CARD,
+    METAL_ARCHITECT_LIVE_WEIGHT,
+    METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+    METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+    METAL_ARCHITECT_LIVE_ICON_NEXT,
+    METAL_ARCHITECT_ICON_ADD,
     SETTINGS_TAB,
     FEEDBACK_ROW,
 }
@@ -74,8 +84,15 @@ enum class HoldingsWalkthroughStep {
     PICKER_CHOOSE_PROVIDER,
     PICKER_TYPE_SEARCH,
     PICKER_SCROLL_RESULTS,
-    METAL_ARCHITECT_BLUEPRINT,
-    METAL_ARCHITECT_LIVE_CARD,
+    METAL_ARCHITECT_SELECT_METAL,
+    METAL_ARCHITECT_SELECT_SHAPE,
+    METAL_ARCHITECT_SELECT_UNIT,
+    METAL_ARCHITECT_TAP_NEXT,
+    METAL_ARCHITECT_LIVE_WEIGHT,
+    METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+    METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+    METAL_ARCHITECT_LIVE_TAP_NEXT,
+    METAL_ARCHITECT_ICON_PICK,
     AMOUNT_ENTER_SAVE,
     HOLDINGS_TAP_CARD,
     HOLDINGS_EDIT,
@@ -93,6 +110,10 @@ private enum class CalloutPlacement {
     SCREEN_TOP,
     ANCHOR_BELOW,
     ANCHOR_ABOVE,
+    /** Pill + down-arrow in one row, positioned just above the anchor (no arrow stacked under pill). */
+    ANCHOR_ABOVE_INLINE,
+    /** Pill + up-arrow in one row, positioned just below the anchor. */
+    ANCHOR_BELOW_INLINE,
     ANCHOR_LEFT,
 }
 
@@ -145,19 +166,26 @@ private data class HintStep(
     val arrowAlign: HintHorizontalAlign = HintHorizontalAlign.Center,
     val arrowHorizontalFraction: Float? = null,
     val anchor: WalkthroughAnchor? = null,
+    val highlightAnchor: WalkthroughAnchor? = null,
     val showNext: Boolean = false,
     val nextLabelRes: Int = R.string.walkthrough_next,
     val styledFinishButton: Boolean = false,
     val maxLabelLines: Int = 1,
     val maxLabelWidth: Dp = 240.dp,
     val maxCalloutWidth: Dp = 340.dp,
+    /** Vertical stack: arrow on top, pill below (used on metal live-card page). */
+    val arrowAbovePill: Boolean = false,
 )
 
 private fun arrowDirectionFor(placement: CalloutPlacement): WalkthroughArrowDirection =
     when (placement) {
         CalloutPlacement.ANCHOR_LEFT -> WalkthroughArrowDirection.Right
-        CalloutPlacement.ANCHOR_BELOW, CalloutPlacement.SCREEN_BOTTOM -> WalkthroughArrowDirection.Up
-        CalloutPlacement.ANCHOR_ABOVE, CalloutPlacement.SCREEN_TOP -> WalkthroughArrowDirection.Down
+        CalloutPlacement.ANCHOR_BELOW,
+        CalloutPlacement.ANCHOR_BELOW_INLINE,
+        CalloutPlacement.SCREEN_BOTTOM -> WalkthroughArrowDirection.Up
+        CalloutPlacement.ANCHOR_ABOVE,
+        CalloutPlacement.ANCHOR_ABOVE_INLINE,
+        CalloutPlacement.SCREEN_TOP -> WalkthroughArrowDirection.Down
     }
 
 private fun horizontalOffsetX(
@@ -188,10 +216,20 @@ class HoldingsWalkthroughController {
     private val _selectedAssetSymbol = MutableStateFlow<String?>(null)
     val selectedAssetSymbol: StateFlow<String?> = _selectedAssetSymbol.asStateFlow()
 
+    private val _highlightCoinId = MutableStateFlow<String?>(null)
+    val highlightCoinId: StateFlow<String?> = _highlightCoinId.asStateFlow()
+
     private val _chromeHidden = MutableStateFlow(false)
     val chromeHidden: StateFlow<Boolean> = _chromeHidden.asStateFlow()
 
+    private val _overlaySuppressed = MutableStateFlow(false)
+    val overlaySuppressed: StateFlow<Boolean> = _overlaySuppressed.asStateFlow()
+
     private val _path = MutableStateFlow(WalkthroughPath.CRYPTO)
+
+    fun setOverlaySuppressed(suppressed: Boolean) {
+        _overlaySuppressed.value = suppressed
+    }
 
     fun updateAnchor(anchor: WalkthroughAnchor, bounds: Rect?) {
         val next = _anchors.value.toMutableMap()
@@ -252,22 +290,84 @@ class HoldingsWalkthroughController {
             HoldingsWalkthroughStep.PICKER_SCROLL_RESULTS -> {
                 _path.value = WalkthroughPath.METAL
                 _selectedAssetSymbol.value = "METAL"
-                _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT
+                _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_METAL
             }
             else -> Unit
         }
     }
 
+    fun onMetalArchitectMetalSelected() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_METAL) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_SHAPE
+        }
+    }
+
+    fun onMetalArchitectShapeSelected() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_SHAPE) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_UNIT
+        }
+    }
+
+    fun onMetalArchitectUnitSelected() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_UNIT) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_TAP_NEXT
+        }
+    }
+
     fun onMetalArchitectBlueprintContinued() {
-        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT) {
-            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD
+        if (_path.value == WalkthroughPath.METAL &&
+            _step.value in metalArchitectBlueprintSteps
+        ) {
+            _chromeHidden.value = false
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT
+        }
+    }
+
+    fun onMetalArchitectLiveEditorSaved(field: String?) {
+        when (_step.value) {
+            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT ->
+                if (field == "WEIGHT") {
+                    _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME
+                }
+            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME ->
+                if (field == "QUANTITY" || field == "NAME") {
+                    _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE
+                }
+            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE ->
+                if (field == "PREMIUM") {
+                    _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT
+                }
+            else -> Unit
+        }
+    }
+
+    fun onMetalArchitectLiveCardContinued() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT) {
+            _chromeHidden.value = false
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK
+        }
+    }
+
+    fun onMetalArchitectIconPickBack() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK) {
+            _chromeHidden.value = false
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT
+        }
+    }
+
+    fun onMetalArchitectIconSaving() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK) {
+            _chromeHidden.value = true
         }
     }
 
     fun onMetalArchitectCancelled() {
         when (_step.value) {
-            HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT,
-            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD -> {
+            in metalArchitectBlueprintSteps,
+            in metalArchitectLiveCardSteps,
+            HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK -> {
+                _chromeHidden.value = false
+                _overlaySuppressed.value = false
                 _path.value = WalkthroughPath.CRYPTO
                 _step.value = HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER
             }
@@ -281,7 +381,8 @@ class HoldingsWalkthroughController {
         }
     }
 
-    fun onAssetSelected(symbol: String) {
+    fun onAssetSelected(coinId: String, symbol: String) {
+        _highlightCoinId.value = coinId
         _selectedAssetSymbol.value = symbol
         when (_step.value) {
             HoldingsWalkthroughStep.PICKER_SELECT_PROVIDER,
@@ -301,19 +402,22 @@ class HoldingsWalkthroughController {
     }
 
     fun onMetalArchitectSaving() {
-        when (_step.value) {
-            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD ->
-                _chromeHidden.value = true
-            else -> Unit
+        if (_step.value in metalArchitectLiveCardSteps ||
+            _step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK
+        ) {
+            _chromeHidden.value = true
         }
     }
 
-    fun onAmountSaved() {
+    fun onAmountSaved(savedCoinId: String? = null) {
+        savedCoinId?.let { _highlightCoinId.value = it }
         when (_step.value) {
             HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE,
-            HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT,
-            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD -> {
+            in metalArchitectBlueprintSteps,
+            in metalArchitectLiveCardSteps,
+            HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK -> {
                 _chromeHidden.value = false
+                _overlaySuppressed.value = false
                 _path.value = WalkthroughPath.CRYPTO
                 _step.value = HoldingsWalkthroughStep.HOLDINGS_TAP_CARD
             }
@@ -341,7 +445,9 @@ class HoldingsWalkthroughController {
         _step.value = HoldingsWalkthroughStep.INACTIVE
         _anchors.value = emptyMap()
         _selectedAssetSymbol.value = null
+        _highlightCoinId.value = null
         _chromeHidden.value = false
+        _overlaySuppressed.value = false
         _path.value = WalkthroughPath.CRYPTO
     }
 
@@ -365,11 +471,28 @@ class HoldingsWalkthroughController {
         HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER,
         HoldingsWalkthroughStep.PICKER_TYPE_SEARCH,
         HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE,
-        HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT,
-        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD -> true
+        in metalArchitectBlueprintSteps -> true
         else -> false
     }
 }
+
+internal val metalArchitectBlueprintSteps = setOf(
+    HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_METAL,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_SHAPE,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_UNIT,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_TAP_NEXT,
+)
+
+internal val metalArchitectLiveCardSteps = setOf(
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT,
+)
+
+internal val metalArchitectIconPickSteps = setOf(
+    HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK,
+)
 
 @Composable
 fun Modifier.walkthroughAnchor(
@@ -401,6 +524,7 @@ fun HoldingsWalkthroughOverlay(
     val anchors by controller.anchors.collectAsState()
     val selectedSymbol by controller.selectedAssetSymbol.collectAsState()
     val chromeHidden by controller.chromeHidden.collectAsState()
+    val overlaySuppressed by controller.overlaySuppressed.collectAsState()
 
     LaunchedEffect(step) {
         if (step == HoldingsWalkthroughStep.COMPLETE) {
@@ -408,14 +532,16 @@ fun HoldingsWalkthroughOverlay(
         }
     }
 
-    if (!controller.isActive() || chromeHidden) {
+    if (!controller.isActive() || chromeHidden || overlaySuppressed) {
         return
     }
 
     val hint = hintForStep(step, selectedSymbol)
     val anchorRect = hint.anchor?.let { anchors[it] }
+    val highlightRect = (hint.highlightAnchor ?: hint.anchor)?.let { anchors[it] }
     var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
     val overlayAnchor = anchorRect?.relativeTo(overlayOrigin)
+    val overlayHighlight = highlightRect?.relativeTo(overlayOrigin)
 
     Box(
         modifier = modifier
@@ -436,10 +562,11 @@ fun HoldingsWalkthroughOverlay(
             maxLabelLines = hint.maxLabelLines,
             maxLabelWidth = hint.maxLabelWidth,
             maxCalloutWidth = hint.maxCalloutWidth,
+            arrowAbovePill = hint.arrowAbovePill,
             onSkip = onSkipTour,
             onNext = { controller.onNextFromMessageOnly() },
         )
-        overlayAnchor?.let { rect ->
+        overlayHighlight?.let { rect ->
             WalkthroughTargetHighlight(rect = rect)
         }
     }
@@ -488,25 +615,88 @@ private fun hintForStep(
             maxLabelWidth = 300.dp,
             maxCalloutWidth = 360.dp,
         )
-        HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT -> HintStep(
-            label = stringResource(R.string.walkthrough_hint_metal_blueprint),
-            placement = CalloutPlacement.ANCHOR_ABOVE,
+        HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_METAL -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_select_metal),
+            placement = CalloutPlacement.ANCHOR_ABOVE_INLINE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_METAL_GRID,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_SHAPE -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_select_shape),
+            placement = CalloutPlacement.ANCHOR_ABOVE_INLINE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_SHAPE_GRID,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_UNIT -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_select_unit),
+            placement = CalloutPlacement.ANCHOR_ABOVE_INLINE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_UNIT_GRID,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_TAP_NEXT -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_tap_next),
+            placement = CalloutPlacement.ANCHOR_ABOVE_INLINE,
             horizontalAlign = HintHorizontalAlign.Center,
             arrowAlign = HintHorizontalAlign.Center,
             anchor = WalkthroughAnchor.METAL_ARCHITECT_CONTINUE,
-            maxLabelLines = 2,
-            maxLabelWidth = 280.dp,
-            maxCalloutWidth = 320.dp,
         )
-        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD -> HintStep(
-            label = stringResource(R.string.walkthrough_hint_metal_live_card),
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_weight),
             placement = CalloutPlacement.ANCHOR_BELOW,
             horizontalAlign = HintHorizontalAlign.Center,
             arrowAlign = HintHorizontalAlign.Center,
-            anchor = WalkthroughAnchor.METAL_ARCHITECT_CARD,
-            maxLabelLines = 2,
-            maxLabelWidth = 280.dp,
-            maxCalloutWidth = 320.dp,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_WEIGHT,
+            arrowAbovePill = true,
+            maxLabelLines = 6,
+            maxLabelWidth = 320.dp,
+            maxCalloutWidth = 380.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_quantity),
+            placement = CalloutPlacement.ANCHOR_BELOW,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+            arrowAbovePill = true,
+            maxLabelLines = 4,
+            maxLabelWidth = 320.dp,
+            maxCalloutWidth = 380.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_premium_mode),
+            placement = CalloutPlacement.ANCHOR_BELOW,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+            arrowAbovePill = true,
+            maxLabelLines = 10,
+            maxLabelWidth = 320.dp,
+            maxCalloutWidth = 380.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_tap_next),
+            placement = CalloutPlacement.ANCHOR_ABOVE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_ICON_NEXT,
+            arrowAbovePill = true,
+            maxLabelLines = 3,
+            maxLabelWidth = 320.dp,
+            maxCalloutWidth = 380.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_icon_pick),
+            placement = CalloutPlacement.ANCHOR_ABOVE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_ICON_ADD,
+            arrowAbovePill = true,
+            maxLabelLines = 5,
+            maxLabelWidth = 320.dp,
+            maxCalloutWidth = 380.dp,
         )
         HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE -> HintStep(
             label = stringResource(R.string.walkthrough_hint_amount, symbol),
@@ -601,13 +791,17 @@ private fun WalkthroughPointerHint(
     maxLabelLines: Int,
     maxLabelWidth: Dp,
     maxCalloutWidth: Dp,
+    arrowAbovePill: Boolean,
     onSkip: (dontShowAgain: Boolean) -> Unit,
     onNext: () -> Unit,
 ) {
     val arrowDirection = arrowDirectionFor(placement)
-    val pillFirst = placement == CalloutPlacement.ANCHOR_ABOVE ||
-        placement == CalloutPlacement.SCREEN_TOP ||
-        placement == CalloutPlacement.ANCHOR_LEFT
+    val pillFirst = (placement == CalloutPlacement.ANCHOR_ABOVE && !arrowAbovePill) ||
+        placement == CalloutPlacement.SCREEN_TOP
+    val arrowFirstInColumn = placement == CalloutPlacement.ANCHOR_BELOW ||
+        (placement == CalloutPlacement.ANCHOR_ABOVE && arrowAbovePill)
+    val inlineArrowBesidePill = placement == CalloutPlacement.ANCHOR_ABOVE_INLINE ||
+        placement == CalloutPlacement.ANCHOR_BELOW_INLINE
     val columnArrowAlign = hintHorizontalAlignment(arrowAlign)
     val density = LocalDensity.current
     var calloutSize by remember { mutableStateOf(IntSize.Zero) }
@@ -658,11 +852,20 @@ private fun WalkthroughPointerHint(
                 )
             }
             CalloutPlacement.ANCHOR_BELOW -> if (anchor != null) {
-                val x = coerceInRange(
-                    anchor.center.x - calloutSize.width / 2f,
-                    horizontalPad,
-                    maxX,
-                )
+                val x = when (horizontalAlign) {
+                    HintHorizontalAlign.Center -> horizontalOffsetX(
+                        HintHorizontalAlign.Center,
+                        screenW,
+                        calloutSize.width,
+                        horizontalPad,
+                    ).toFloat()
+                    HintHorizontalAlign.Start -> coerceInRange(anchor.left, horizontalPad, maxX)
+                    HintHorizontalAlign.End -> coerceInRange(
+                        anchor.right - calloutSize.width,
+                        horizontalPad,
+                        maxX,
+                    )
+                }
                 IntOffset(
                     x = x.roundToInt(),
                     y = (anchor.bottom + gap).roundToInt(),
@@ -671,26 +874,69 @@ private fun WalkthroughPointerHint(
                 IntOffset(horizontalPad.roundToInt(), (screenH * 0.2f).roundToInt())
             }
             CalloutPlacement.ANCHOR_ABOVE -> if (anchor != null) {
-                val anchorX = when (horizontalAlign) {
-                    HintHorizontalAlign.Start -> anchor.left
-                    HintHorizontalAlign.End -> anchor.right - calloutSize.width
-                    HintHorizontalAlign.Center -> anchor.center.x - calloutSize.width / 2f
+                val x = when (horizontalAlign) {
+                    HintHorizontalAlign.Center -> horizontalOffsetX(
+                        HintHorizontalAlign.Center,
+                        screenW,
+                        calloutSize.width,
+                        horizontalPad,
+                    ).toFloat()
+                    HintHorizontalAlign.Start -> coerceInRange(anchor.left, horizontalPad, maxX)
+                    HintHorizontalAlign.End -> coerceInRange(
+                        anchor.right - calloutSize.width,
+                        horizontalPad,
+                        maxX,
+                    )
                 }
-                val x = coerceInRange(
-                    anchorX,
-                    horizontalPad,
-                    maxX,
-                )
+                val aboveY = if (arrowAbovePill) {
+                    anchor.top - gap - calloutSize.height
+                } else {
+                    anchor.top - gap - arrowAlongAxis - calloutSize.height
+                }
                 IntOffset(
                     x = x.roundToInt(),
                     y = coerceInRange(
-                        anchor.top - gap - arrowAlongAxis - calloutSize.height,
+                        aboveY,
                         minHeaderY,
                         maxY,
                     ).roundToInt(),
                 )
             } else {
                 IntOffset(horizontalPad.roundToInt(), (screenH * 0.65f).roundToInt())
+            }
+            CalloutPlacement.ANCHOR_ABOVE_INLINE -> if (anchor != null) {
+                val anchorX = when (horizontalAlign) {
+                    HintHorizontalAlign.Start -> anchor.left
+                    HintHorizontalAlign.End -> anchor.right - calloutSize.width
+                    HintHorizontalAlign.Center -> anchor.center.x - calloutSize.width / 2f
+                }
+                IntOffset(
+                    x = coerceInRange(anchorX, horizontalPad, maxX).roundToInt(),
+                    y = coerceInRange(
+                        anchor.top - gap - calloutSize.height,
+                        minHeaderY,
+                        maxY,
+                    ).roundToInt(),
+                )
+            } else {
+                IntOffset(horizontalPad.roundToInt(), (screenH * 0.65f).roundToInt())
+            }
+            CalloutPlacement.ANCHOR_BELOW_INLINE -> if (anchor != null) {
+                val anchorX = when (horizontalAlign) {
+                    HintHorizontalAlign.Start -> anchor.left
+                    HintHorizontalAlign.End -> anchor.right - calloutSize.width
+                    HintHorizontalAlign.Center -> anchor.center.x - calloutSize.width / 2f
+                }
+                IntOffset(
+                    x = coerceInRange(anchorX, horizontalPad, maxX).roundToInt(),
+                    y = coerceInRange(
+                        anchor.bottom + gap,
+                        minHeaderY,
+                        maxY,
+                    ).roundToInt(),
+                )
+            } else {
+                IntOffset(horizontalPad.roundToInt(), (screenH * 0.35f).roundToInt())
             }
             CalloutPlacement.ANCHOR_LEFT -> if (anchor != null) {
                 val desiredX = anchor.left - gap - calloutSize.width
@@ -731,11 +977,12 @@ private fun WalkthroughPointerHint(
                 .onGloballyPositioned { calloutSize = it.size }
                 .widthIn(max = maxCalloutWidth),
         ) {
-            if (placement == CalloutPlacement.ANCHOR_LEFT) {
+            if (placement == CalloutPlacement.ANCHOR_LEFT || inlineArrowBesidePill) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
+                    WalkthroughGlossyArrow(direction = arrowDirection)
                     WalkthroughHintPill(
                         label = label,
                         showNext = showNext,
@@ -745,16 +992,28 @@ private fun WalkthroughPointerHint(
                         maxLabelWidth = maxLabelWidth,
                         onSkip = onSkip,
                         onNext = onNext,
+                        modifier = if (inlineArrowBesidePill) {
+                            Modifier.onGloballyPositioned { pillWidthPx = it.size.width }
+                        } else {
+                            Modifier
+                        },
                     )
-                    WalkthroughGlossyArrow(direction = arrowDirection)
                 }
             } else {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.wrapContentWidth(),
                     horizontalAlignment = columnArrowAlign,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    if (pillFirst) {
+                    if (arrowFirstInColumn) {
+                        WalkthroughFractionalArrow(
+                            arrowDirection = arrowDirection,
+                            pillWidthPx = pillWidthPx,
+                            arrowHorizontalFraction = arrowHorizontalFraction,
+                            tipOffsetX = tipOffsetX,
+                            fractionArrowOffsetX = fractionArrowOffsetX,
+                            columnArrowAlign = columnArrowAlign,
+                        )
                         WalkthroughHintPill(
                             label = label,
                             showNext = showNext,
@@ -765,24 +1024,8 @@ private fun WalkthroughPointerHint(
                             onSkip = onSkip,
                             onNext = onNext,
                             modifier = Modifier.onGloballyPositioned { pillWidthPx = it.size.width },
-                        )
-                        WalkthroughFractionalArrow(
-                            arrowDirection = arrowDirection,
-                            pillWidthPx = pillWidthPx,
-                            arrowHorizontalFraction = arrowHorizontalFraction,
-                            tipOffsetX = tipOffsetX,
-                            fractionArrowOffsetX = fractionArrowOffsetX,
-                            columnArrowAlign = columnArrowAlign,
                         )
                     } else {
-                        WalkthroughFractionalArrow(
-                            arrowDirection = arrowDirection,
-                            pillWidthPx = pillWidthPx,
-                            arrowHorizontalFraction = arrowHorizontalFraction,
-                            tipOffsetX = tipOffsetX,
-                            fractionArrowOffsetX = fractionArrowOffsetX,
-                            columnArrowAlign = columnArrowAlign,
-                        )
                         WalkthroughHintPill(
                             label = label,
                             showNext = showNext,
@@ -793,6 +1036,14 @@ private fun WalkthroughPointerHint(
                             onSkip = onSkip,
                             onNext = onNext,
                             modifier = Modifier.onGloballyPositioned { pillWidthPx = it.size.width },
+                        )
+                        WalkthroughFractionalArrow(
+                            arrowDirection = arrowDirection,
+                            pillWidthPx = pillWidthPx,
+                            arrowHorizontalFraction = arrowHorizontalFraction,
+                            tipOffsetX = tipOffsetX,
+                            fractionArrowOffsetX = fractionArrowOffsetX,
+                            columnArrowAlign = columnArrowAlign,
                         )
                     }
                 }

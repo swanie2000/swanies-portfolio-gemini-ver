@@ -69,6 +69,10 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.yalantis.ucrop.UCrop
 import com.swanie.portfolio.R
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughController
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
+import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.data.local.AssetCategory
 import com.swanie.portfolio.data.local.AssetEntity
 import com.swanie.portfolio.data.local.AssetValuation
@@ -391,7 +395,7 @@ fun WatermarkBadge(source: String, color: Color, modifier: Modifier = Modifier) 
 @Composable
 fun FunnelGrid(
     options: List<String>,
-    selected: String,
+    selected: String?,
     compact: Boolean = false,
     labelForOption: (String) -> String = { it },
     onSelect: (String) -> Unit,
@@ -404,7 +408,7 @@ fun FunnelGrid(
         options.chunked(2).forEach { rowItems ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(colGap)) {
                 rowItems.forEach { option ->
-                    val isSelected = option.equals(selected, ignoreCase = true)
+                    val isSelected = selected != null && option.equals(selected, ignoreCase = true)
                     val label = labelForOption(option)
                     Box(modifier = Modifier.weight(1f).height(cellHeight).clip(RoundedCornerShape(12.dp)).background(if (isSelected) Color.Yellow else Color.White.copy(0.05f)).clickable { onSelect(option) }.border(1.dp, if (isSelected) Color.Transparent else Color.White.copy(0.1f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
                         Text(text = label.uppercase(), color = if (isSelected) Color.Black else Color.White, fontWeight = FontWeight.Black, fontSize = fontSize)
@@ -965,6 +969,9 @@ fun ArchitectIconSelectionStep(
     persistCustomIcon: suspend (String, Uri) -> String?,
     deleteCustomIcon: suspend (String) -> Unit,
     onFinished: (localIconPath: String?) -> Unit,
+    walkthroughController: HoldingsWalkthroughController? = null,
+    walkthroughStep: HoldingsWalkthroughStep = HoldingsWalkthroughStep.INACTIVE,
+    onTourIconSaving: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -1120,6 +1127,7 @@ fun ArchitectIconSelectionStep(
         Spacer(Modifier.height(12.dp))
         Button(
             onClick = {
+                onTourIconSaving?.invoke()
                 scope.launch {
                     isSaving = true
                     try {
@@ -1142,7 +1150,18 @@ fun ArchitectIconSelectionStep(
             enabled = !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(56.dp)
+                .then(
+                    if (walkthroughController != null) {
+                        Modifier.walkthroughAnchor(
+                            anchor = WalkthroughAnchor.METAL_ARCHITECT_ICON_ADD,
+                            controller = walkthroughController,
+                            enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK,
+                        )
+                    } else {
+                        Modifier
+                    },
+                ),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
             shape = RoundedCornerShape(12.dp),
         ) {

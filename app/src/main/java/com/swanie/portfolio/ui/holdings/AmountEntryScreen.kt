@@ -55,7 +55,7 @@ fun AmountEntryScreen(
     category: AssetCategory,
     officialSpotPrice: Double,
     priceSource: String,
-    onSave: (Int) -> Unit,
+    onSave: (vaultId: Int, savedCoinId: String) -> Unit,
     onCancel: () -> Unit,
     onNavigateToArchitect: (String, Double, String) -> Unit // 🛠️ V7.2.5 Handshake
 ) {
@@ -149,7 +149,7 @@ fun AmountEntryScreen(
             while (!isActualWorkDone) { delay(100) }
             delay(800)
             val activeVaultId = viewModel.currentVaultId()
-            onSave(activeVaultId)
+            onSave(activeVaultId, uniqueId)
         }
     }
 

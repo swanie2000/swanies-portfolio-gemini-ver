@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import android.content.res.Resources
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -42,6 +44,8 @@ import com.swanie.portfolio.ui.holdings.formatCurrency
 import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
 import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughViewModel
 import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
+import com.swanie.portfolio.ui.onboarding.metalArchitectBlueprintSteps
+import com.swanie.portfolio.ui.onboarding.metalArchitectLiveCardSteps
 import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 
 /**
@@ -65,6 +69,10 @@ fun AssetArchitectScreen(
     val walkthroughController = walkthroughViewModel.controller
     val walkthroughStep by walkthroughController.step.collectAsState()
     val tourCreateFlow = existingAsset == null
+    val metalTourBlueprintActive = tourCreateFlow &&
+        walkthroughStep in metalArchitectBlueprintSteps
+    val metalTourLiveCardActive = tourCreateFlow &&
+        walkthroughStep in metalArchitectLiveCardSteps
     val res = LocalContext.current.resources
     val draftKey = existingAsset?.coinId ?: "create_${initialSymbol}_${initialPrice}"
     var architectStage by remember(draftKey) { mutableStateOf(ArchitectStage.BLUEPRINT) }
@@ -85,14 +93,28 @@ fun AssetArchitectScreen(
         }
     }
 
-    LaunchedEffect(architectStage, walkthroughStep, tourCreateFlow) {
-        if (tourCreateFlow &&
-            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD &&
-            architectStage == ArchitectStage.ICON_PICK
-        ) {
-            walkthroughController.onMetalArchitectSaving()
+    LaunchedEffect(imeVisible, activeEditor, walkthroughStep, tourCreateFlow) {
+        if (tourCreateFlow && walkthroughStep in metalArchitectLiveCardSteps) {
+            walkthroughController.setOverlaySuppressed(imeVisible && activeEditor != null)
+        } else {
+            walkthroughController.setOverlaySuppressed(false)
         }
     }
+
+    LaunchedEffect(walkthroughStep, metalTourLiveCardActive) {
+        if (metalTourLiveCardActive) {
+            activeEditor = null
+            focusManager.clearFocus()
+        }
+    }
+
+    val blockQuantityNameDuringTour = metalTourLiveCardActive &&
+        walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT
+    val blockWeightDuringTour = metalTourLiveCardActive &&
+        walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME
+    val blockPremiumDuringEarlyTour = metalTourLiveCardActive &&
+        (walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT ||
+            walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME)
 
     val defaultTicker = when (initialSymbol.uppercase()) {
         "XAU", "GOLD", "CUSTOM" -> "XAU"
@@ -103,6 +125,8 @@ fun AssetArchitectScreen(
     }
     val defaultShape = "Bar"
     val defaultName = buildLocalizedMetalDisplayName(res, defaultTicker, defaultShape)
+    val startMetalTourBlank = tourCreateFlow &&
+        walkthroughController.step.value in metalArchitectBlueprintSteps
 
     // Step 1: new row uses defaults; edit (holdings pencil) hydrates from [existingAsset].
     var draftAsset by remember(draftKey) {
@@ -111,6 +135,24 @@ fun AssetArchitectScreen(
                 existingAsset.copy(
                     displayName = existingAsset.displayName.ifBlank { existingAsset.name },
                     name = existingAsset.name,
+                )
+            } else if (startMetalTourBlank) {
+                AssetEntity(
+                    coinId = "CUSTOM_${System.currentTimeMillis()}",
+                    symbol = "",
+                    name = "",
+                    displayName = "",
+                    category = AssetCategory.METAL,
+                    officialSpotPrice = initialPrice,
+                    priceSource = initialSource,
+                    baseSymbol = "",
+                    apiId = "",
+                    weight = 1.0,
+                    weightUnit = "",
+                    physicalForm = "",
+                    isMetal = true,
+                    amountHeld = 1.0,
+                    premium = 0.0,
                 )
             } else {
                 AssetEntity(
@@ -138,6 +180,7 @@ fun AssetArchitectScreen(
     var premiumInputMode by remember { mutableStateOf(PremiumInputMode.PER_UNIT) }
 
     LaunchedEffect(draftAsset.symbol, draftKey) {
+        if (draftAsset.symbol.isBlank()) return@LaunchedEffect
         if (existingAsset != null &&
             draftAsset.symbol == existingAsset.symbol &&
             draftAsset.officialSpotPrice > 0.0
@@ -208,27 +251,41 @@ fun AssetArchitectScreen(
                                 fontWeight = FontWeight.Black,
                             )
                             Spacer(Modifier.height(4.dp))
-                            FunnelGrid(
-                                options = listOf("XAU", "XAG", "XPT", "XPD"),
-                                selected = architectMetalSelectionKey(draftAsset.symbol, draftAsset.name),
-                                compact = true,
-                                labelForOption = { ticker ->
-                                    when (ticker) {
-                                        "XAU" -> res.getString(R.string.architect_metal_gold)
-                                        "XAG" -> res.getString(R.string.architect_metal_silver)
-                                        "XPT" -> res.getString(R.string.architect_metal_platinum)
-                                        else -> res.getString(R.string.architect_metal_palladium)
+                            Box(
+                                modifier = Modifier.walkthroughAnchor(
+                                    anchor = WalkthroughAnchor.METAL_ARCHITECT_METAL_GRID,
+                                    controller = walkthroughController,
+                                    enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_METAL,
+                                ),
+                            ) {
+                                FunnelGrid(
+                                    options = listOf("XAU", "XAG", "XPT", "XPD"),
+                                    selected = draftAsset.symbol.takeIf { it.isNotBlank() }?.let { symbol ->
+                                        architectMetalSelectionKey(symbol, draftAsset.name)
+                                    },
+                                    compact = true,
+                                    labelForOption = { ticker ->
+                                        when (ticker) {
+                                            "XAU" -> res.getString(R.string.architect_metal_gold)
+                                            "XAG" -> res.getString(R.string.architect_metal_silver)
+                                            "XPT" -> res.getString(R.string.architect_metal_platinum)
+                                            else -> res.getString(R.string.architect_metal_palladium)
+                                        }
+                                    },
+                                ) { ticker ->
+                                    val formForName = draftAsset.physicalForm.takeIf { it.isNotBlank() } ?: "Bar"
+                                    val displayName = buildLocalizedMetalDisplayName(res, ticker, formForName)
+                                    draftAsset = draftAsset.copy(
+                                        symbol = ticker,
+                                        apiId = ticker,
+                                        baseSymbol = ticker,
+                                        name = displayName,
+                                        displayName = displayName,
+                                    )
+                                    if (tourCreateFlow) {
+                                        walkthroughController.onMetalArchitectMetalSelected()
                                     }
-                                },
-                            ) { ticker ->
-                                val displayName = buildLocalizedMetalDisplayName(res, ticker, draftAsset.physicalForm)
-                                draftAsset = draftAsset.copy(
-                                    symbol = ticker,
-                                    apiId = ticker,
-                                    baseSymbol = ticker,
-                                    name = displayName,
-                                    displayName = displayName,
-                                )
+                                }
                             }
                         }
 
@@ -240,20 +297,35 @@ fun AssetArchitectScreen(
                                 fontWeight = FontWeight.Black,
                             )
                             Spacer(Modifier.height(4.dp))
-                            FunnelGrid(
-                                options = listOf("Bar", "Coin", "Round"),
-                                selected = draftAsset.physicalForm,
-                                compact = true,
-                                labelForOption = { form ->
-                                    when (form) {
-                                        "Coin" -> res.getString(R.string.architect_shape_coin)
-                                        "Round" -> res.getString(R.string.architect_shape_round)
-                                        else -> res.getString(R.string.architect_shape_bar)
+                            Box(
+                                modifier = Modifier.walkthroughAnchor(
+                                    anchor = WalkthroughAnchor.METAL_ARCHITECT_SHAPE_GRID,
+                                    controller = walkthroughController,
+                                    enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_SHAPE,
+                                ),
+                            ) {
+                                FunnelGrid(
+                                    options = listOf("Bar", "Coin", "Round"),
+                                    selected = draftAsset.physicalForm.takeIf { it.isNotBlank() },
+                                    compact = true,
+                                    labelForOption = { form ->
+                                        when (form) {
+                                            "Coin" -> res.getString(R.string.architect_shape_coin)
+                                            "Round" -> res.getString(R.string.architect_shape_round)
+                                            else -> res.getString(R.string.architect_shape_bar)
+                                        }
+                                    },
+                                ) { form ->
+                                    val displayName = buildLocalizedMetalDisplayName(res, draftAsset.symbol, form)
+                                    draftAsset = draftAsset.copy(
+                                        physicalForm = form,
+                                        name = displayName,
+                                        displayName = displayName,
+                                    )
+                                    if (tourCreateFlow) {
+                                        walkthroughController.onMetalArchitectShapeSelected()
                                     }
-                                },
-                            ) { form ->
-                                val displayName = buildLocalizedMetalDisplayName(res, draftAsset.symbol, form)
-                                draftAsset = draftAsset.copy(physicalForm = form, name = displayName, displayName = displayName)
+                                }
                             }
                         }
 
@@ -265,23 +337,39 @@ fun AssetArchitectScreen(
                                 fontWeight = FontWeight.Black,
                             )
                             Spacer(Modifier.height(4.dp))
-                            FunnelGrid(
-                                options = listOf("OZ", "KILO", "GRAM"),
-                                selected = draftAsset.weightUnit,
-                                compact = true,
-                                labelForOption = { unit ->
-                                    when (unit) {
-                                        "KILO" -> res.getString(R.string.architect_unit_choice_kilo)
-                                        "GRAM" -> res.getString(R.string.architect_unit_choice_gram)
-                                        else -> res.getString(R.string.architect_unit_choice_oz)
+                            Box(
+                                modifier = Modifier.walkthroughAnchor(
+                                    anchor = WalkthroughAnchor.METAL_ARCHITECT_UNIT_GRID,
+                                    controller = walkthroughController,
+                                    enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_SELECT_UNIT,
+                                ),
+                            ) {
+                                FunnelGrid(
+                                    options = listOf("OZ", "KILO", "GRAM"),
+                                    selected = draftAsset.weightUnit.takeIf { it.isNotBlank() },
+                                    compact = true,
+                                    labelForOption = { unit ->
+                                        when (unit) {
+                                            "KILO" -> res.getString(R.string.architect_unit_choice_kilo)
+                                            "GRAM" -> res.getString(R.string.architect_unit_choice_gram)
+                                            else -> res.getString(R.string.architect_unit_choice_oz)
+                                        }
+                                    },
+                                ) { unit ->
+                                    draftAsset = draftAsset.copy(weightUnit = unit)
+                                    if (tourCreateFlow) {
+                                        walkthroughController.onMetalArchitectUnitSelected()
                                     }
-                                },
-                            ) { draftAsset = draftAsset.copy(weightUnit = it) }
+                                }
+                            }
                         }
 
                         Spacer(Modifier.height(8.dp))
                     }
 
+                    val metalTourBlueprintComplete = draftAsset.symbol.isNotBlank() &&
+                        draftAsset.physicalForm.isNotBlank() &&
+                        draftAsset.weightUnit.isNotBlank()
                     Button(
                         onClick = {
                             if (tourCreateFlow) {
@@ -289,6 +377,7 @@ fun AssetArchitectScreen(
                             }
                             architectStage = ArchitectStage.LIVE_CARD
                         },
+                        enabled = !metalTourBlueprintActive || metalTourBlueprintComplete,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 8.dp, bottom = 8.dp)
@@ -296,7 +385,7 @@ fun AssetArchitectScreen(
                                 anchor = WalkthroughAnchor.METAL_ARCHITECT_CONTINUE,
                                 controller = walkthroughController,
                                 enabled = tourCreateFlow &&
-                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_BLUEPRINT,
+                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_TAP_NEXT,
                             ),
                         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
@@ -357,6 +446,8 @@ fun AssetArchitectScreen(
                                         }
                                         null -> Unit
                                     }
+                                    activeEditor = null
+                                    focusManager.clearFocus()
                                 },
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             ) {
@@ -369,8 +460,19 @@ fun AssetArchitectScreen(
                             }
                             TextButton(
                                 onClick = {
+                                    val savedField = activeEditor
                                     activeEditor = null
                                     focusManager.clearFocus()
+                                    if (tourCreateFlow && savedField != null) {
+                                        walkthroughController.onMetalArchitectLiveEditorSaved(
+                                            when (savedField) {
+                                                ArchitectEditorField.WEIGHT -> "WEIGHT"
+                                                ArchitectEditorField.QUANTITY -> "QUANTITY"
+                                                ArchitectEditorField.NAME -> "NAME"
+                                                ArchitectEditorField.PREMIUM -> "PREMIUM"
+                                            },
+                                        )
+                                    }
                                 },
                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                             ) {
@@ -385,14 +487,7 @@ fun AssetArchitectScreen(
                     }
 
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .walkthroughAnchor(
-                                anchor = WalkthroughAnchor.METAL_ARCHITECT_CARD,
-                                controller = walkthroughController,
-                                enabled = tourCreateFlow &&
-                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_CARD,
-                            ),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
@@ -413,77 +508,145 @@ fun AssetArchitectScreen(
                                     )
                                     Spacer(Modifier.height(8.dp))
                                     // INLINE WEIGHT INPUT (Abbreviated Unit)
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        SmartNumericField(
-                                            value = draftAsset.weight,
-                                            onValueChange = { draftAsset = draftAsset.copy(weight = it) },
-                                            textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.Black, fontSize = 12.sp, textAlign = TextAlign.Center),
-                                            modifier = Modifier
-                                                .width(45.dp)
-                                                .onFocusChanged {
-                                                    activeEditor = when {
-                                                        it.isFocused -> ArchitectEditorField.WEIGHT
-                                                        activeEditor == ArchitectEditorField.WEIGHT -> null
-                                                        else -> activeEditor
-                                                    }
-                                                }
-                                        )
-                                        Text(
-                                            text = formatUnitAbbreviation(res, draftAsset.weightUnit),
-                                            color = Color.White.copy(alpha = 0.6f),
-                                            fontWeight = FontWeight.Black,
-                                            fontSize = 10.sp
-                                        )
+                                    Box {
+                                        Box(
+                                            modifier = Modifier.walkthroughAnchor(
+                                                anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_WEIGHT,
+                                                controller = walkthroughController,
+                                                enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT,
+                                            ),
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                SmartNumericField(
+                                                    value = draftAsset.weight,
+                                                    onValueChange = { draftAsset = draftAsset.copy(weight = it) },
+                                                    textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.Black, fontSize = 12.sp, textAlign = TextAlign.Center),
+                                                    editingEnabled = liveCardFieldEnabled(
+                                                        metalTourLiveCardActive,
+                                                        walkthroughStep,
+                                                        ArchitectEditorField.WEIGHT,
+                                                    ),
+                                                    modifier = Modifier
+                                                        .width(45.dp)
+                                                        .onFocusChanged {
+                                                            if (!liveCardFieldEnabled(
+                                                                    metalTourLiveCardActive,
+                                                                    walkthroughStep,
+                                                                    ArchitectEditorField.WEIGHT,
+                                                                )
+                                                            ) {
+                                                                return@onFocusChanged
+                                                            }
+                                                            activeEditor = when {
+                                                                it.isFocused -> ArchitectEditorField.WEIGHT
+                                                                activeEditor == ArchitectEditorField.WEIGHT -> null
+                                                                else -> activeEditor
+                                                            }
+                                                        },
+                                                )
+                                                Text(
+                                                    text = formatUnitAbbreviation(res, draftAsset.weightUnit),
+                                                    color = Color.White.copy(alpha = 0.6f),
+                                                    fontWeight = FontWeight.Black,
+                                                    fontSize = 10.sp,
+                                                )
+                                            }
+                                        }
+                                        TourTouchBlocker(blocked = blockWeightDuringTour)
                                     }
                                 }
 
                                 // IDENTITY AREA
                                 Column(modifier = Modifier.weight(1.4f), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text(stringResource(R.string.architect_quantity), color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                                    SmartNumericField(
-                                        value = draftAsset.amountHeld,
-                                        onValueChange = { draftAsset = draftAsset.copy(amountHeld = it) },
-                                        textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, textAlign = TextAlign.Center),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .onFocusChanged {
-                                                activeEditor = when {
-                                                    it.isFocused -> ArchitectEditorField.QUANTITY
-                                                    activeEditor == ArchitectEditorField.QUANTITY -> null
-                                                    else -> activeEditor
-                                                }
+                                    Box(modifier = Modifier.fillMaxWidth()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .walkthroughAnchor(
+                                                    anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+                                                    controller = walkthroughController,
+                                                    enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME,
+                                                ),
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                            ) {
+                                            Text(stringResource(R.string.architect_quantity), color = Color.White.copy(0.6f), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                            SmartNumericField(
+                                                value = draftAsset.amountHeld,
+                                                onValueChange = { draftAsset = draftAsset.copy(amountHeld = it) },
+                                                textStyle = TextStyle(color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, textAlign = TextAlign.Center),
+                                                editingEnabled = liveCardFieldEnabled(
+                                                    metalTourLiveCardActive,
+                                                    walkthroughStep,
+                                                    ArchitectEditorField.QUANTITY,
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .onFocusChanged {
+                                                        if (!liveCardFieldEnabled(
+                                                                metalTourLiveCardActive,
+                                                                walkthroughStep,
+                                                                ArchitectEditorField.QUANTITY,
+                                                            )
+                                                        ) {
+                                                            return@onFocusChanged
+                                                        }
+                                                        activeEditor = when {
+                                                            it.isFocused -> ArchitectEditorField.QUANTITY
+                                                            activeEditor == ArchitectEditorField.QUANTITY -> null
+                                                            else -> activeEditor
+                                                        }
+                                                    },
+                                            )
+                                            Spacer(Modifier.height(4.dp))
+                                            // INLINE NAME INPUT
+                                            BasicTextField(
+                                                value = draftAsset.displayName,
+                                                onValueChange = { next ->
+                                                    val normalized = next
+                                                        .replace("\r", "")
+                                                        .lines()
+                                                        .take(2)
+                                                        .joinToString("\n")
+                                                    draftAsset = draftAsset.copy(displayName = normalized, name = normalized)
+                                                },
+                                                textStyle = TextStyle(color = Color.White, fontSize = 12.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold),
+                                                cursorBrush = SolidColor(Color.Yellow),
+                                                singleLine = false,
+                                                minLines = 2,
+                                                maxLines = 2,
+                                                readOnly = !liveCardFieldEnabled(
+                                                    metalTourLiveCardActive,
+                                                    walkthroughStep,
+                                                    ArchitectEditorField.NAME,
+                                                ),
+                                                keyboardOptions = KeyboardOptions(
+                                                    keyboardType = KeyboardType.Text,
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .onFocusChanged {
+                                                        if (!liveCardFieldEnabled(
+                                                                metalTourLiveCardActive,
+                                                                walkthroughStep,
+                                                                ArchitectEditorField.NAME,
+                                                            )
+                                                        ) {
+                                                            return@onFocusChanged
+                                                        }
+                                                        activeEditor = when {
+                                                            it.isFocused -> ArchitectEditorField.NAME
+                                                            activeEditor == ArchitectEditorField.NAME -> null
+                                                            else -> activeEditor
+                                                        }
+                                                    },
+                                            )
                                             }
-                                    )
-                                    Spacer(Modifier.height(4.dp))
-                                    // INLINE NAME INPUT
-                                    BasicTextField(
-                                        value = draftAsset.displayName,
-                                        onValueChange = { next ->
-                                            val normalized = next
-                                                .replace("\r", "")
-                                                .lines()
-                                                .take(2)
-                                                .joinToString("\n")
-                                            draftAsset = draftAsset.copy(displayName = normalized, name = normalized)
-                                        },
-                                        textStyle = TextStyle(color = Color.White, fontSize = 12.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold),
-                                        cursorBrush = SolidColor(Color.Yellow),
-                                        singleLine = false,
-                                        minLines = 2,
-                                        maxLines = 2,
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Text,
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .onFocusChanged {
-                                                activeEditor = when {
-                                                    it.isFocused -> ArchitectEditorField.NAME
-                                                    activeEditor == ArchitectEditorField.NAME -> null
-                                                    else -> activeEditor
-                                                }
-                                            },
-                                    )
+                                        }
+                                        TourTouchBlocker(blocked = blockQuantityNameDuringTour)
+                                    }
                                 }
 
                                 // SPOT PRICE (premium controls moved to full-width row below)
@@ -494,66 +657,98 @@ fun AssetArchitectScreen(
                             }
 
                             Spacer(Modifier.height(12.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                FilterChip(
-                                    selected = premiumInputMode == PremiumInputMode.PER_UNIT,
-                                    onClick = { premiumInputMode = PremiumInputMode.PER_UNIT },
-                                    label = { Text(stringResource(R.string.architect_premium_mode_per), fontSize = 9.sp, fontWeight = FontWeight.Black) },
-                                    modifier = Modifier.height(30.dp),
-                                )
-                                FilterChip(
-                                    selected = premiumInputMode == PremiumInputMode.ONCE,
-                                    onClick = { premiumInputMode = PremiumInputMode.ONCE },
-                                    label = { Text(stringResource(R.string.architect_premium_mode_once), fontSize = 9.sp, fontWeight = FontWeight.Black) },
-                                    modifier = Modifier.height(30.dp),
-                                )
-                            }
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                text = when (premiumInputMode) {
-                                    PremiumInputMode.PER_UNIT -> stringResource(R.string.architect_premium_per_unit)
-                                    PremiumInputMode.ONCE -> stringResource(R.string.architect_premium_once)
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                color = Color.White.copy(0.6f),
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.End,
-                            )
-                            val premiumDisplay = when (premiumInputMode) {
-                                PremiumInputMode.PER_UNIT ->
-                                    if (draftAsset.amountHeld > 0.0) draftAsset.premium / draftAsset.amountHeld else 0.0
-                                PremiumInputMode.ONCE -> draftAsset.premium
-                            }
-                            SmartNumericField(
-                                value = premiumDisplay,
-                                onValueChange = { v ->
-                                    draftAsset = when (premiumInputMode) {
-                                        PremiumInputMode.PER_UNIT ->
-                                            if (draftAsset.amountHeld > 0.0) {
-                                                draftAsset.copy(premium = v * draftAsset.amountHeld)
-                                            } else {
-                                                draftAsset.copy(premium = v)
-                                            }
-                                        PremiumInputMode.ONCE -> draftAsset.copy(premium = v)
-                                    }
-                                },
-                                textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 14.sp, textAlign = TextAlign.End),
-                                ghostPlaceholder = stringResource(R.string.architect_premium_placeholder),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .onFocusChanged {
-                                        activeEditor = when {
-                                            it.isFocused -> ArchitectEditorField.PREMIUM
-                                            activeEditor == ArchitectEditorField.PREMIUM -> null
-                                            else -> activeEditor
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .walkthroughAnchor(
+                                            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+                                            controller = walkthroughController,
+                                            enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+                                        ),
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            FilterChip(
+                                                selected = premiumInputMode == PremiumInputMode.PER_UNIT,
+                                                onClick = { premiumInputMode = PremiumInputMode.PER_UNIT },
+                                                enabled = !metalTourLiveCardActive ||
+                                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+                                                label = { Text(stringResource(R.string.architect_premium_mode_per), fontSize = 9.sp, fontWeight = FontWeight.Black) },
+                                                modifier = Modifier.height(30.dp),
+                                            )
+                                            FilterChip(
+                                                selected = premiumInputMode == PremiumInputMode.ONCE,
+                                                onClick = { premiumInputMode = PremiumInputMode.ONCE },
+                                                enabled = !metalTourLiveCardActive ||
+                                                    walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+                                                label = { Text(stringResource(R.string.architect_premium_mode_once), fontSize = 9.sp, fontWeight = FontWeight.Black) },
+                                                modifier = Modifier.height(30.dp),
+                                            )
                                         }
+                                        Spacer(Modifier.height(6.dp))
+                                        Text(
+                                            text = when (premiumInputMode) {
+                                                PremiumInputMode.PER_UNIT -> stringResource(R.string.architect_premium_per_unit)
+                                                PremiumInputMode.ONCE -> stringResource(R.string.architect_premium_once)
+                                            },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = Color.White.copy(0.6f),
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.End,
+                                        )
+                                        val premiumDisplay = when (premiumInputMode) {
+                                            PremiumInputMode.PER_UNIT ->
+                                                if (draftAsset.amountHeld > 0.0) draftAsset.premium / draftAsset.amountHeld else 0.0
+                                            PremiumInputMode.ONCE -> draftAsset.premium
+                                        }
+                                        SmartNumericField(
+                                            value = premiumDisplay,
+                                            onValueChange = { v ->
+                                                draftAsset = when (premiumInputMode) {
+                                                    PremiumInputMode.PER_UNIT ->
+                                                        if (draftAsset.amountHeld > 0.0) {
+                                                            draftAsset.copy(premium = v * draftAsset.amountHeld)
+                                                        } else {
+                                                            draftAsset.copy(premium = v)
+                                                        }
+                                                    PremiumInputMode.ONCE -> draftAsset.copy(premium = v)
+                                                }
+                                            },
+                                            textStyle = TextStyle(color = Color.Yellow, fontWeight = FontWeight.Black, fontSize = 14.sp, textAlign = TextAlign.End),
+                                            ghostPlaceholder = stringResource(R.string.architect_premium_placeholder),
+                                            editingEnabled = liveCardFieldEnabled(
+                                                metalTourLiveCardActive,
+                                                walkthroughStep,
+                                                ArchitectEditorField.PREMIUM,
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .onFocusChanged {
+                                                    if (!liveCardFieldEnabled(
+                                                            metalTourLiveCardActive,
+                                                            walkthroughStep,
+                                                            ArchitectEditorField.PREMIUM,
+                                                        )
+                                                    ) {
+                                                        return@onFocusChanged
+                                                    }
+                                                    activeEditor = when {
+                                                        it.isFocused -> ArchitectEditorField.PREMIUM
+                                                        activeEditor == ArchitectEditorField.PREMIUM -> null
+                                                        else -> activeEditor
+                                                    }
+                                                },
+                                        )
                                     }
-                            )
+                                }
+                                TourTouchBlocker(blocked = blockPremiumDuringEarlyTour)
+                            }
 
                             Spacer(Modifier.height(12.dp))
                             Divider(color = Color.White.copy(alpha = 0.05f))
@@ -573,8 +768,22 @@ fun AssetArchitectScreen(
                     if (!imeVisible) {
                         // Step 3: icon selection (hidden while IME is up so layout stays clean).
                         Button(
-                            onClick = { architectStage = ArchitectStage.ICON_PICK },
-                            modifier = Modifier.fillMaxWidth().height(60.dp),
+                            onClick = {
+                                if (tourCreateFlow) {
+                                    walkthroughController.onMetalArchitectLiveCardContinued()
+                                }
+                                architectStage = ArchitectStage.ICON_PICK
+                            },
+                            enabled = !metalTourLiveCardActive ||
+                                walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                                .walkthroughAnchor(
+                                    anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_ICON_NEXT,
+                                    controller = walkthroughController,
+                                    enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT,
+                                ),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -601,9 +810,21 @@ fun AssetArchitectScreen(
                     existingLocalIconPath = draftAsset.localIconPath,
                     imageUrl = draftAsset.imageUrl,
                     isEditingExisting = existingAsset != null,
-                    onBack = { architectStage = ArchitectStage.LIVE_CARD },
+                    onBack = {
+                        if (tourCreateFlow) {
+                            walkthroughController.onMetalArchitectIconPickBack()
+                        }
+                        architectStage = ArchitectStage.LIVE_CARD
+                    },
                     persistCustomIcon = { id, uri -> viewModel.persistCustomIconFromUri(id, uri) },
                     deleteCustomIcon = { id -> viewModel.deleteCustomAssetIcon(id) },
+                    walkthroughController = if (tourCreateFlow) walkthroughController else null,
+                    walkthroughStep = walkthroughStep,
+                    onTourIconSaving = if (tourCreateFlow) {
+                        { walkthroughController.onMetalArchitectIconSaving() }
+                    } else {
+                        null
+                    },
                     onFinished = { path ->
                         val fallback = buildLocalizedMetalDisplayName(res, draftAsset.symbol, draftAsset.physicalForm)
                         val label = draftAsset.displayName.trim()
@@ -635,6 +856,7 @@ fun SmartNumericField(
     textStyle: TextStyle,
     modifier: Modifier = Modifier,
     ghostPlaceholder: String? = null,
+    editingEnabled: Boolean = true,
 ) {
     // 🛠️ V7.2.8: Whole Number Fix - Use toString().removeSuffix(".0") for display
     var textState by remember(value) { 
@@ -664,11 +886,13 @@ fun SmartNumericField(
         BasicTextField(
             value = textState,
             onValueChange = {
+                if (!editingEnabled) return@BasicTextField
                 if (it.length <= 10) {
                     textState = it
                     onValueChange(it.toDoubleOrNull() ?: 0.0)
                 }
             },
+            readOnly = !editingEnabled,
             modifier = modifier
                 .fillMaxWidth()
                 .then(
@@ -686,6 +910,42 @@ fun SmartNumericField(
             cursorBrush = SolidColor(Color.Yellow),
             singleLine = true
         )
+    }
+}
+
+@Composable
+private fun BoxScope.TourTouchBlocker(blocked: Boolean) {
+    if (!blocked) return
+    Box(
+        modifier = Modifier
+            .matchParentSize()
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        event.changes.forEach { it.consume() }
+                    }
+                }
+            },
+    )
+}
+
+private fun liveCardFieldEnabled(
+    metalTourLiveCardActive: Boolean,
+    walkthroughStep: HoldingsWalkthroughStep,
+    field: ArchitectEditorField,
+): Boolean {
+    if (!metalTourLiveCardActive) return true
+    return when (walkthroughStep) {
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT ->
+            field == ArchitectEditorField.WEIGHT
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME ->
+            field == ArchitectEditorField.QUANTITY || field == ArchitectEditorField.NAME
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE ->
+            field == ArchitectEditorField.PREMIUM
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT ->
+            false
+        else -> true
     }
 }
 

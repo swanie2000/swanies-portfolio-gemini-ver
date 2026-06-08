@@ -201,8 +201,15 @@
     <string name="walkthrough_hint_scroll_results">Scroll the search results.\nTap on an asset to continue.</string>
     <string name="walkthrough_hint_amount">Enter how many \"%1$s\" you have.\nThen press Enter to continue.</string>
     <string name="walkthrough_hint_card_gestures">Tap to expand. Tap again to edit.\nPress and hold to drag, move, and delete.</string>
-    <string name="walkthrough_hint_metal_blueprint">Choose metal, shape, and unit.\nThen tap Next.</string>
-    <string name="walkthrough_hint_metal_live_card">Enter quantity and details.\nThen continue to save your metal.</string>
+    <string name="walkthrough_hint_metal_select_metal">Choose precious metal type.</string>
+    <string name="walkthrough_hint_metal_select_shape">Select shape.</string>
+    <string name="walkthrough_hint_metal_select_unit">Select the base unit.</string>
+    <string name="walkthrough_hint_metal_tap_next">Tap Next to continue.</string>
+    <string name="walkthrough_hint_metal_live_weight">This is the weight of one piece — not how many you own.\nA 1 oz coin is 1. A 10 oz bar is 10.\nTap the number to change it, then Save.\nClear resets the field and closes the keyboard.</string>
+    <string name="walkthrough_hint_metal_live_quantity">How many pieces do you hold?\nTap the large number for quantity.\nThe two lines below are the name shown on your card.\nEdit either, then Save. Clear closes the keyboard to re-read this hint.</string>
+    <string name="walkthrough_hint_metal_live_premium_mode">Optional: Premium or discount\nabove or below the spot price.\n\nPer Each applies it to every unit.\nExample: a discount on each coin.\n\nOnce applies it only one time.\nExample: a premium on a silver statue.\n\nTap a button, enter the yellow amount, then Save.</string>
+    <string name="walkthrough_hint_metal_live_tap_next">Your card is set up.\nTap Next to pick an icon and save this metal to your holdings.</string>
+    <string name="walkthrough_hint_metal_icon_pick">You can keep the default icon shown above,\nor tap Choose Photo to add your own.\nWhen you are ready, tap Add Asset to save.</string>
     <string name="walkthrough_hint_settings">Open Settings.</string>
     <string name="walkthrough_hint_feedback">Report a bug.</string>
     <string name="settings_help_feedback">HELP &amp; FEEDBACK</string>
