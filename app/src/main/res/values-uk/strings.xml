@@ -233,7 +233,9 @@
     <string name="walkthrough_hint_metal_tap_next">Натисніть Далі, щоб продовжити.</string>
     <string name="walkthrough_hint_metal_live_weight">Це вага однієї одиниці — не скільки у вас їх.\nМонета 1 унція = 1. Злиток 10 унций = 10.\nНатисніть число для зміни, потім Зберегти.\nОчистити скидає поле та закриває клавіатуру.</string>
     <string name="walkthrough_hint_metal_live_quantity">Скільки одиниць у вас?\nНатисніть велике число для кількості.\nДва рядки нижче — назва на вашій картці.\nВідредагуйте будь-який, потім Зберегти. Очистити закриває клавіатуру, щоб перечитати підказку.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Необов\'язково: премія або знижка\nвище або нижче спотової ціни.\n\nЗа кожну застосовується до кожної одиниці.\nПриклад: знижка на кожну монету.\n\nОдин раз застосовується лише один раз.\nПриклад: премія на срібну статуетку.\n\nНатисніть кнопку, введіть жовту суму, потім Зберегти.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Бажаєте додати премію або знижку до цього активу?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">За кожну застосовується до кожної одиниці.\nОдин раз застосовується лише один раз.\nНатисніть один варіант нижче.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Введіть коригування в жовтому полі.\nВід\'ємне значення — знижка.\nЗалиште порожнім або нуль, щоб пропустити премію, потім Зберегти.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Ваша картка готова.\nНатисніть Далі, щоб вибрати значок і зберегти цей метал у активах.</string>
     <string name="walkthrough_hint_metal_icon_pick">Можна залишити значок за замовчуванням вище,\nабо натисніть Вибрати фото, щоб додати свій.\nКоли готові, натисніть Додати актив для збереження.</string>
     <string name="walkthrough_hint_settings">Відкрити Налаштування.</string>
@@ -390,6 +392,8 @@
     <string name="architect_premium_mode_per">За кожну</string>
     <string name="architect_premium_mode_once">Один раз</string>
     <string name="architect_estimated_value">ОРІЄНТОВНА ВАРТІСТЬ</string>
+    <string name="architect_tour_value_required">Введіть значення більше нуля, потім натисніть Зберегти.</string>
+    <string name="architect_tour_skip_premium">Пропустити премію (необов\'язково)</string>
     <string name="architect_icon_cta_add">ДОДАТИ АКТИВ</string>
     <string name="architect_icon_cta_update">ОНОВИТИ</string>
     <string name="architect_finalize_vault">ЗАВЕРШИТИ Й ДОДАТИ ДО СХОВИЩА</string>

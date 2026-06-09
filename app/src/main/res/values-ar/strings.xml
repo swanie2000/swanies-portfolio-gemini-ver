@@ -236,7 +236,9 @@
     <string name="walkthrough_hint_metal_tap_next">اضغط التالي للمتابعة.</string>
     <string name="walkthrough_hint_metal_live_weight">هذا وزن قطعة واحدة — وليس عدد ما تملكه.\nعملة 1 أونصة = 1. سبيكة 10 أونصة = 10.\nاضغط الرقم لتغييره ثم احفظ.\nمسح يعيد الحقل ويغلق لوحة المفاتيح.</string>
     <string name="walkthrough_hint_metal_live_quantity">كم قطعة تملك؟\nاضغط الرقم الكبير للكمية.\nالسطران أدناه هما الاسم على بطاقتك.\nعدّل أيًا منهما ثم احفظ. مسح يغلق لوحة المفاتيح لإعادة قراءة التلميح.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">اختياري: علاوة أو خصم\nفوق أو تحت سعر السوق.\n\nلكل وحدة يُطبَّق على كل قطعة.\nمثال: خصم على كل عملة.\n\nمرة واحدة تُطبَّق مرة واحدة فقط.\nمثال: علاوة على تمثال فضي.\n\nاضغط زرًا، أدخل المبلغ الأصفر، ثم احفظ.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">هل تريد إضافة علاوة أو خصم على هذا الأصل؟</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">لكل وحدة يُطبَّق على كل قطعة.\nمرة واحدة تُطبَّق مرة واحدة فقط.\nاضغط أحد الخيارات أدناه.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">أدخل التعديل في الحقل الأصفر.\nاستخدم قيمة سالبة للخصم.\nاتركه فارغًا أو صفرًا لتخطي العلاوة، ثم احفظ.</string>
     <string name="walkthrough_hint_metal_live_tap_next">بطاقتك جاهزة.\nاضغط التالي لاختيار أيقونة وحفظ هذا المعدن في ممتلكاتك.</string>
     <string name="walkthrough_hint_metal_icon_pick">يمكنك الإبقاء على الأيقونة الافتراضية أعلاه،\nأو اضغط اختيار صورة لإضافة أيقونتك.\nعندما تكون جاهزًا، اضغط إضافة أصل للحفظ.</string>
     <string name="walkthrough_hint_settings">افتح الإعدادات.</string>
@@ -399,6 +401,8 @@
     <string name="architect_premium_mode_per">لكل وحدة</string>
     <string name="architect_premium_mode_once">مرة واحدة</string>
     <string name="architect_estimated_value">القيمة المقدرة</string>
+    <string name="architect_tour_value_required">أدخل قيمة أكبر من صفر، ثم اضغط حفظ.</string>
+    <string name="architect_tour_skip_premium">تخطي العلاوة (اختياري)</string>
     <string name="architect_icon_cta_add">إضافة أصل</string>
     <string name="architect_icon_cta_update">تحديث</string>
     <string name="architect_finalize_vault">إنهاء الخزينة</string>

@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Ketuk Berikutnya untuk melanjutkan.</string>
     <string name="walkthrough_hint_metal_live_weight">Ini berat satu keping — bukan berapa banyak yang Anda miliki.\nKoin 1 oz adalah 1. Batangan 10 oz adalah 10.\nKetuk angka untuk mengubah, lalu Simpan.\nHapus mengatur ulang kolom dan menutup keyboard.</string>
     <string name="walkthrough_hint_metal_live_quantity">Berapa keping yang Anda miliki?\nKetuk angka besar untuk jumlah.\nDua baris di bawah adalah nama di kartu Anda.\nEdit salah satu, lalu Simpan. Hapus menutup keyboard untuk membaca ulang petunjuk ini.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Opsional: premi atau diskon\ndi atas atau di bawah harga spot.\n\nPer satuan berlaku untuk setiap unit.\nContoh: diskon pada setiap koin.\n\nSekali hanya berlaku satu kali.\nContoh: premi pada patung perak.\n\nKetuk tombol, masukkan jumlah kuning, lalu Simpan.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Apakah Anda ingin menambahkan premi atau diskon pada aset ini?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Per satuan berlaku untuk setiap unit.\nSekali hanya berlaku satu kali.\nKetuk satu opsi di bawah.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Masukkan penyesuaian di kolom kuning.\nGunakan nilai negatif untuk diskon.\nBiarkan kosong atau nol untuk lewati premi, lalu Simpan.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Kartu Anda sudah siap.\nKetuk Berikutnya untuk memilih ikon dan menyimpan logam ini ke kepemilikan.</string>
     <string name="walkthrough_hint_metal_icon_pick">Anda bisa mempertahankan ikon default di atas,\natau ketuk Pilih foto untuk menambahkan sendiri.\nSaat siap, ketuk Tambah aset untuk menyimpan.</string>
     <string name="walkthrough_hint_settings">Buka Pengaturan.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Per satuan</string>
     <string name="architect_premium_mode_once">Sekali</string>
     <string name="architect_estimated_value">ESTIMASI NILAI</string>
+    <string name="architect_tour_value_required">Masukkan nilai lebih besar dari nol, lalu ketuk Simpan.</string>
+    <string name="architect_tour_skip_premium">Lewati premi (opsional)</string>
     <string name="architect_icon_cta_add">TAMBAH ASET</string>
     <string name="architect_icon_cta_update">PERBARUI</string>
     <string name="architect_finalize_vault">FINALISASI &amp; VAULT</string>

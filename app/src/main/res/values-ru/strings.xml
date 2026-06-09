@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Нажмите Далее, чтобы продолжить.</string>
     <string name="walkthrough_hint_metal_live_weight">Это вес одной единицы — не сколько у вас их.\nМонета 1 унция = 1. Слиток 10 унций = 10.\nНажмите число для изменения, затем Сохранить.\nОчистить сбрасывает поле и закрывает клавиатуру.</string>
     <string name="walkthrough_hint_metal_live_quantity">Сколько единиц у вас?\nНажмите большое число для количества.\nДве строки ниже — имя на вашей карточке.\nОтредактируйте любую, затем Сохранить. Очистить закрывает клавиатуру, чтобы перечитать подсказку.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Необязательно: премия или скидка\nвыше или ниже спотовой цены.\n\nЗа каждую применяется к каждой единице.\nПример: скидка на каждую монету.\n\nОдин раз применяется только один раз.\nПример: премия на серебряную статуэтку.\n\nНажмите кнопку, введите жёлтую сумму, затем Сохранить.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Хотите добавить премию или скидку к этому активу?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">За каждую применяется к каждой единице.\nОдин раз применяется только один раз.\nНажмите один вариант ниже.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Введите корректировку в жёлтом поле.\nОтрицательное значение — скидка.\nОставьте пустым или ноль, чтобы пропустить премию, затем Сохранить.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Ваша карточка настроена.\nНажмите Далее, чтобы выбрать значок и сохранить этот металл в активах.</string>
     <string name="walkthrough_hint_metal_icon_pick">Можно оставить значок по умолчанию выше,\nили нажать Выбрать фото, чтобы добавить свой.\nКогда готовы, нажмите Добавить актив для сохранения.</string>
     <string name="walkthrough_hint_settings">Открыть Настройки.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">За каждую</string>
     <string name="architect_premium_mode_once">Один раз</string>
     <string name="architect_estimated_value">ОЦЕНОЧНАЯ СТОИМОСТЬ</string>
+    <string name="architect_tour_value_required">Введите значение больше нуля, затем нажмите Сохранить.</string>
+    <string name="architect_tour_skip_premium">Пропустить премию (необязательно)</string>
     <string name="architect_icon_cta_add">ДОБАВИТЬ АКТИВ</string>
     <string name="architect_icon_cta_update">ОБНОВИТЬ</string>
     <string name="architect_finalize_vault">ЗАВЕРШИТЬ И СОХРАНИТЬ</string>

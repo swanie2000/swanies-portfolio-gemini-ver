@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Auf Weiter tippen, um fortzufahren.</string>
     <string name="walkthrough_hint_metal_live_weight">Das ist das Gewicht eines Stücks — nicht wie viele Sie besitzen.\nEine 1-oz-Münze ist 1. Ein 10-oz-Barren ist 10.\nZahl antippen zum Ändern, dann Speichern.\nLeeren setzt das Feld zurück und schließt die Tastatur.</string>
     <string name="walkthrough_hint_metal_live_quantity">Wie viele Stücke besitzen Sie?\nGroße Zahl für die Menge antippen.\nDie zwei Zeilen darunter sind der Name auf Ihrer Karte.\nBearbeiten und speichern. Leeren schließt die Tastatur, um diesen Hinweis erneut zu lesen.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Optional: Aufschlag oder Abschlag\nüber oder unter dem Spotpreis.\n\nPro Stück gilt für jede Einheit.\nBeispiel: Rabatt auf jede Münze.\n\nEinmalig gilt nur einmal.\nBeispiel: Aufschlag auf eine Silberstatue.\n\nSchaltfläche antippen, gelben Betrag eingeben, dann Speichern.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Möchten Sie diesem Asset einen Auf- oder Abschlag hinzufügen?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Pro Stück gilt für jede Einheit.\nEinmalig gilt nur einmal.\nTippen Sie unten eine Option an.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Geben Sie die Anpassung im gelben Feld ein.\nNegativer Wert = Abschlag.\nLeer oder null zum Überspringen, dann Speichern.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Ihre Karte ist eingerichtet.\nAuf Weiter tippen, um ein Symbol zu wählen und dieses Metall zu speichern.</string>
     <string name="walkthrough_hint_metal_icon_pick">Sie können das oben gezeigte Standardsymbol behalten\noder Foto wählen antippen für ein eigenes.\nWenn Sie bereit sind, Anlage hinzufügen antippen zum Speichern.</string>
     <string name="walkthrough_hint_settings">Einstellungen öffnen.</string>
@@ -405,6 +407,8 @@
     <string name="architect_premium_mode_per">Pro Stück</string>
     <string name="architect_premium_mode_once">Einmalig</string>
     <string name="architect_estimated_value">GESCHÄTZTER WERT</string>
+    <string name="architect_tour_value_required">Geben Sie einen Wert größer als null ein, dann Speichern antippen.</string>
+    <string name="architect_tour_skip_premium">Aufschlag überspringen (optional)</string>
     <string name="architect_icon_cta_add">ANLAGE HINZUFÜGEN</string>
     <string name="architect_icon_cta_update">AKTUALISIEREN</string>
     <string name="architect_finalize_vault">ABSCHLIESSEN UND VAULT</string>

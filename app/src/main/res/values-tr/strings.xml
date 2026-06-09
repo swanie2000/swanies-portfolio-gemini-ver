@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Devam etmek için İleri\'ye dokunun.</string>
     <string name="walkthrough_hint_metal_live_weight">Bu bir parçanın ağırlığıdır — kaç tane sahip olduğunuz değil.\n1 ons madeni para 1\'dir. 10 ons külçe 10\'dur.\nDeğiştirmek için sayıya dokunun, sonra Kaydet.\nTemizle alanı sıfırlar ve klavyeyi kapatır.</string>
     <string name="walkthrough_hint_metal_live_quantity">Kaç parça sahipsiniz?\nMiktar için büyük sayıya dokunun.\nAlttaki iki satır kartınızdaki isimdir.\nDüzenleyin ve kaydedin. Temizle klavyeyi kapatır, bu ipucunu yeniden okuyabilirsiniz.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">İsteğe bağlı: Spot fiyatın üstünde veya altında prim veya indirim\n\nHer biri için her birime uygulanır.\nÖrnek: her madeni paraya indirim.\n\nBir kez yalnızca bir kez uygulanır.\nÖrnek: gümüş heykele prim.\n\nBir düğmeye dokunun, sarı tutarı girin, sonra Kaydet.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Bu varlığa prim veya indirim eklemek ister misiniz?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Her biri için her birime uygulanır.\nBir kez yalnızca bir kez uygulanır.\nAşağıdan bir seçeneğe dokunun.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Sarı alana ayarı girin.\nİndirim için negatif değer kullanın.\nPrimi atlamak için boş veya sıfır bırakın, sonra Kaydet.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Kartınız hazır.\nSimge seçmek ve bu metali varlıklarınıza kaydetmek için İleri\'ye dokunun.</string>
     <string name="walkthrough_hint_metal_icon_pick">Yukarıdaki varsayılan simgeyi tutabilirsiniz,\nveya kendi simgenizi eklemek için Fotoğraf seç\'e dokunun.\nHazır olduğunuzda kaydetmek için Varlık ekle\'ye dokunun.</string>
     <string name="walkthrough_hint_settings">Ayarları açın.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Her biri için</string>
     <string name="architect_premium_mode_once">Bir kez</string>
     <string name="architect_estimated_value">TAHMİNİ DEĞER</string>
+    <string name="architect_tour_value_required">Sıfırdan büyük bir değer girin, ardından Kaydet\'e dokunun.</string>
+    <string name="architect_tour_skip_premium">Primi atla (isteğe bağlı)</string>
     <string name="architect_icon_cta_add">VARLIK EKLE</string>
     <string name="architect_icon_cta_update">GÜNCELLE</string>
     <string name="architect_finalize_vault">TAMAMLA VE KASA</string>

@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Tik op Volgende om door te gaan.</string>
     <string name="walkthrough_hint_metal_live_weight">Dit is het gewicht van één stuk — niet hoeveel u bezit.\nEen munt van 1 oz is 1. Een staaf van 10 oz is 10.\nTik op het getal om het te wijzigen en sla op.\nWissen reset het veld en sluit het toetsenbord.</string>
     <string name="walkthrough_hint_metal_live_quantity">Hoeveel stuks bezit u?\nTik op het grote getal voor de hoeveelheid.\nDe twee regels hieronder zijn de naam op uw kaart.\nBewerk een van beide en sla op. Wissen sluit het toetsenbord om deze hint opnieuw te lezen.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Optioneel: premie of korting\nboven of onder de spotprijs.\n\nPer stuk geldt voor elke eenheid.\nVoorbeeld: korting op elke munt.\n\nEenmalig geldt slechts één keer.\nVoorbeeld: premie op een zilveren standbeeld.\n\nTik op een knop, voer het gele bedrag in en sla op.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Wilt u een premie of korting aan dit actief toevoegen?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Per stuk geldt voor elke eenheid.\nEenmalig geldt slechts één keer.\nTik hieronder op een optie.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Voer de aanpassing in het gele veld in.\nGebruik een negatieve waarde voor korting.\nLaat leeg of nul om premie over te slaan, dan Opslaan.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Uw kaart is ingesteld.\nTik op Volgende om een pictogram te kiezen en dit metaal op te slaan.</string>
     <string name="walkthrough_hint_metal_icon_pick">U kunt het standaardpictogram hierboven behouden,\nof tik op Foto kiezen om uw eigen toe te voegen.\nWanneer u klaar bent, tik op Activum toevoegen om op te slaan.</string>
     <string name="walkthrough_hint_settings">Open Instellingen.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Per stuk</string>
     <string name="architect_premium_mode_once">Eenmalig</string>
     <string name="architect_estimated_value">GESCHATTE WAARDE</string>
+    <string name="architect_tour_value_required">Voer een waarde groter dan nul in en tik op Opslaan.</string>
+    <string name="architect_tour_skip_premium">Premie overslaan (optioneel)</string>
     <string name="architect_icon_cta_add">ACTIVA TOEVOEGEN</string>
     <string name="architect_icon_cta_update">BIJWERKEN</string>
     <string name="architect_finalize_vault">AFRONDEN EN KLUIS</string>

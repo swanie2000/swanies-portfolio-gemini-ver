@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Appuyez sur Suivant pour continuer.</string>
     <string name="walkthrough_hint_metal_live_weight">C\'est le poids d\'une pièce — pas combien vous en possédez.\nUne pièce de 1 oz vaut 1. Un lingot de 10 oz vaut 10.\nAppuyez sur le nombre pour le modifier, puis Enregistrer.\nEffacer réinitialise le champ et ferme le clavier.</string>
     <string name="walkthrough_hint_metal_live_quantity">Combien de pièces possédez-vous ?\nAppuyez sur le grand nombre pour la quantité.\nLes deux lignes ci-dessous sont le nom sur votre carte.\nModifiez l\'une ou l\'autre, puis Enregistrer. Effacer ferme le clavier pour relire cette indication.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Facultatif : prime ou remise\nau-dessus ou en dessous du cours spot.\n\nPar unité s\'applique à chaque unité.\nExemple : une remise sur chaque pièce.\n\nUne fois ne s\'applique qu\'une seule fois.\nExemple : une prime sur une statue en argent.\n\nAppuyez sur un bouton, saisissez le montant jaune, puis Enregistrer.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Souhaitez-vous ajouter une prime ou une remise à cet actif ?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Par unité s\'applique à chaque unité.\nUne fois ne s\'applique qu\'une seule fois.\nAppuyez sur une option ci-dessous.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Saisissez l\'ajustement dans le champ jaune.\nUtilisez une valeur négative pour une remise.\nLaissez vide ou à zéro pour ignorer la prime, puis Enregistrer.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Votre carte est prête.\nAppuyez sur Suivant pour choisir une icône et enregistrer ce métal dans vos avoirs.</string>
     <string name="walkthrough_hint_metal_icon_pick">Vous pouvez garder l\'icône par défaut ci-dessus,\nou appuyer sur Choisir une photo pour ajouter la vôtre.\nQuand vous êtes prêt, appuyez sur Ajouter l\'actif pour enregistrer.</string>
     <string name="walkthrough_hint_settings">Ouvrir les paramètres.</string>
@@ -405,6 +407,8 @@
     <string name="architect_premium_mode_per">Par unité</string>
     <string name="architect_premium_mode_once">Une fois</string>
     <string name="architect_estimated_value">VALEUR ESTIMÉE</string>
+    <string name="architect_tour_value_required">Saisissez une valeur supérieure à zéro, puis appuyez sur Enregistrer.</string>
+    <string name="architect_tour_skip_premium">Ignorer la prime (facultatif)</string>
     <string name="architect_icon_cta_add">AJOUTER L\'ACTIF</string>
     <string name="architect_icon_cta_update">METTRE À JOUR</string>
     <string name="architect_finalize_vault">FINALISER ET COFFRE</string>

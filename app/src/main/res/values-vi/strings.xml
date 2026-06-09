@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Chạm Tiếp theo để tiếp tục.</string>
     <string name="walkthrough_hint_metal_live_weight">Đây là trọng lượng một mảnh — không phải số lượng bạn sở hữu.\nĐồng xu 1 oz là 1. Thỏi 10 oz là 10.\nChạm số để thay đổi, rồi Lưu.\nXóa đặt lại trường và đóng bàn phím.</string>
     <string name="walkthrough_hint_metal_live_quantity">Bạn có bao nhiêu mảnh?\nChạm số lớn cho số lượng.\nHai dòng bên dưới là tên trên thẻ của bạn.\nChỉnh sửa rồi Lưu. Xóa đóng bàn phím để đọc lại gợi ý này.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Tùy chọn: phí bổ sung hoặc giảm giá\ntrên hoặc dưới giá spot.\n\nMỗi đơn vị áp dụng cho mọi đơn vị.\nVí dụ: giảm giá trên mỗi đồng xu.\n\nMột lần chỉ áp dụng một lần.\nVí dụ: phí bổ sung trên tượng bạc.\n\nChạm nút, nhập số tiền vàng, rồi Lưu.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Bạn có muốn thêm phí bổ sung hoặc giảm giá cho tài sản này không?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Mỗi đơn vị áp dụng cho mọi đơn vị.\nMột lần chỉ áp dụng một lần.\nChạm một tùy chọn bên dưới.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Nhập điều chỉnh vào ô vàng.\nDùng giá trị âm cho giảm giá.\nĐể trống hoặc bằng không để bỏ qua phí bổ sung, rồi Lưu.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Thẻ của bạn đã sẵn sàng.\nChạm Tiếp theo để chọn biểu tượng và lưu kim loại này vào tài sản.</string>
     <string name="walkthrough_hint_metal_icon_pick">Bạn có thể giữ biểu tượng mặc định ở trên,\nhoặc chạm Chọn ảnh để thêm của riêng bạn.\nKhi sẵn sàng, chạm Thêm tài sản để lưu.</string>
     <string name="walkthrough_hint_settings">Mở Cài đặt.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Mỗi cái</string>
     <string name="architect_premium_mode_once">Một lần</string>
     <string name="architect_estimated_value">GIÁ TRỊ ƯỚC TÍNH</string>
+    <string name="architect_tour_value_required">Nhập giá trị lớn hơn không, rồi chạm Lưu.</string>
+    <string name="architect_tour_skip_premium">Bỏ qua phí bổ sung (tùy chọn)</string>
     <string name="architect_icon_cta_add">THÊM TÀI SẢN</string>
     <string name="architect_icon_cta_update">CẬP NHẬT</string>
     <string name="architect_finalize_vault">HOÀN TẤT &amp; LƯU KHO</string>

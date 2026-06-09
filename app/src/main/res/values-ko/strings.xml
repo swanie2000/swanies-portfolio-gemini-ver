@@ -202,7 +202,9 @@
     <string name="walkthrough_hint_metal_tap_next">다음을 탭하여 계속하세요.</string>
     <string name="walkthrough_hint_metal_live_weight">한 개의 무게입니다 — 보유 개수가 아닙니다.\n1온스 코인은 1. 10온스 바는 10.\n숫자를 탭하여 변경한 뒤 저장하세요.\n지우기는 필드를 초기화하고 키보드를 닫습니다.</string>
     <string name="walkthrough_hint_metal_live_quantity">몇 개를 보유하나요?\n큰 숫자를 탭하여 수량을 입력하세요.\n아래 두 줄은 카드에 표시되는 이름입니다.\n편집 후 저장. 지우기는 키보드를 닫아 이 안내를 다시 읽을 수 있게 합니다.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">선택 사항: 현물 가격 위 또는 아래의 프리미엄/할인\n\n개당은 모든 단위에 적용됩니다.\n예: 각 코인에 할인.\n\n한 번은 한 번만 적용됩니다.\n예: 은 동상에 프리미엄.\n\n버튼을 탭하고 노란 금액을 입력한 뒤 저장하세요.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">이 자산에 프리미엄 또는 할인을 추가하시겠습니까?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">개당은 모든 단위에 적용됩니다.\n한 번은 한 번만 적용됩니다.\n아래 옵션을 탭하세요.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">노란 필드에 조정값을 입력하세요.\n할인은 음수 값을 사용하세요.\n프리미엄을 건너뛰려면 비우거나 0으로 두고 저장하세요.</string>
     <string name="walkthrough_hint_metal_live_tap_next">카드 설정이 완료되었습니다.\n다음을 탭하여 아이콘을 선택하고 이 금속을 보유에 저장하세요.</string>
     <string name="walkthrough_hint_metal_icon_pick">위에 표시된 기본 아이콘을 유지하거나\n사진 선택을 탭하여 직접 추가할 수 있습니다.\n준비되면 자산 추가를 탭하여 저장하세요.</string>
     <string name="walkthrough_hint_settings">설정을 여세요.</string>
@@ -344,6 +346,8 @@
     <string name="architect_premium_mode_per">개당</string>
     <string name="architect_premium_mode_once">한 번</string>
     <string name="architect_estimated_value">예상 가치</string>
+    <string name="architect_tour_value_required">0보다 큰 값을 입력한 뒤 저장을 탭하세요.</string>
+    <string name="architect_tour_skip_premium">프리미엄 건너뛰기(선택)</string>
     <string name="architect_icon_cta_add">자산 추가</string>
     <string name="architect_icon_cta_update">업데이트</string>
     <string name="architect_finalize_vault">금고 저장</string>

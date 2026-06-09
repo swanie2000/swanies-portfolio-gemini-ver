@@ -233,7 +233,9 @@
     <string name="walkthrough_hint_metal_tap_next">แตะถัดไปเพื่อดำเนินการต่อ</string>
     <string name="walkthrough_hint_metal_live_weight">นี่คือน้ำหนักชิ้นเดียว — ไม่ใช่จำนวนที่คุณมี\nเหรียญ 1 ออนซ์ คือ 1 แท่ง 10 ออนซ์ คือ 10\nแตะตัวเลขเพื่อเปลี่ยน แล้วบันทึก\nล้างจะรีเซ็ตช่องและปิดคีย์บอร์ด</string>
     <string name="walkthrough_hint_metal_live_quantity">คุณมีกี่ชิ้น?\nแตะตัวเลขใหญ่สำหรับจำนวน\nสองบรรทัดด้านล่างคือชื่อบนการ์ดของคุณ\nแก้ไขแล้วบันทึก ล้างปิดคีย์บอร์ดเพื่ออ่านคำแนะนำนี้อีกครั้ง</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">ทางเลือก: พรีเมียมหรือส่วนลด\nเหนือหรือต่ำกว่าราคาสปอต\n\nต่อชิ้นใช้กับทุกหน่วย\nตัวอย่าง: ส่วนลดต่อเหรียญ\n\nครั้งเดียวใช้ครั้งเดียวเท่านั้น\nตัวอย่าง: พรีเมียมบนรูปปั้นเงิน\n\nแตะปุ่ม ใส่จำนวนสีเหลือง แล้วบันทึก</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">ต้องการเพิ่มพรีเมียมหรือส่วนลดให้สินทรัพย์นี้หรือไม่?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">ต่อชิ้นใช้กับทุกหน่วย\nครั้งเดียวใช้ครั้งเดียวเท่านั้น\nแตะตัวเลือกด้านล่าง</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">ใส่การปรับในช่องสีเหลือง\nใช้ค่าติดลบสำหรับส่วนลด\nเว้นว่างหรือศูนย์เพื่อข้ามพรีเมียม แล้วบันทึก</string>
     <string name="walkthrough_hint_metal_live_tap_next">การ์ดของคุณพร้อมแล้ว\nแตะถัดไปเพื่อเลือกไอคอนและบันทึกโลหะนี้ในสินทรัพย์</string>
     <string name="walkthrough_hint_metal_icon_pick">คุณสามารถใช้ไอคอนเริ่มต้นด้านบน\nหรือแตะเลือกรูปเพื่อเพิ่มของคุณเอง\nเมื่อพร้อม แตะเพิ่มสินทรัพย์เพื่อบันทึก</string>
     <string name="walkthrough_hint_settings">เปิดการตั้งค่า</string>
@@ -390,6 +392,8 @@
     <string name="architect_premium_mode_per">ต่อหน่วย</string>
     <string name="architect_premium_mode_once">หนึ่งครั้ง</string>
     <string name="architect_estimated_value">มูลค่าโดยประมาณ</string>
+    <string name="architect_tour_value_required">ใส่ค่ามากกว่าศูนย์ แล้วแตะบันทึก</string>
+    <string name="architect_tour_skip_premium">ข้ามพรีเมียม (ทางเลือก)</string>
     <string name="architect_icon_cta_add">เพิ่มสินทรัพย์</string>
     <string name="architect_icon_cta_update">อัปเดต</string>
     <string name="architect_finalize_vault">เสร็จสิ้นและเก็บในห้องนิรภัย</string>

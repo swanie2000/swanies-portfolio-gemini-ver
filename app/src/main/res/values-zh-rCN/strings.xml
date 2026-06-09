@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">点击下一步继续。</string>
     <string name="walkthrough_hint_metal_live_weight">这是一件的重量 — 不是您拥有多少件。\n1 盎司硬币为 1。10 盎司银条为 10。\n点击数字修改，然后保存。\n清除会重置字段并关闭键盘。</string>
     <string name="walkthrough_hint_metal_live_quantity">您持有多少件？\n点击大数字输入数量。\n下方两行是卡片上显示的名称。\n编辑后保存。清除会关闭键盘以便重新阅读此提示。</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">可选：高于或低于现货价的溢价或折扣\n\n每件适用于每个单位。\n示例：每枚硬币的折扣。\n\n一次性仅适用一次。\n示例：银像的溢价。\n\n点击按钮，输入黄色金额，然后保存。</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">是否要为该资产添加溢价或折扣？</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">每件适用于每个单位。\n一次性仅适用一次。\n请点击下方一个选项。</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">在黄色字段中输入调整金额。\n折扣请使用负值。\n留空或为零可跳过溢价，然后保存。</string>
     <string name="walkthrough_hint_metal_live_tap_next">您的卡片已设置完成。\n点击下一步选择图标并将此金属保存到持仓。</string>
     <string name="walkthrough_hint_metal_icon_pick">您可以保留上方显示的默认图标，\n或点击选择照片添加自己的图标。\n准备好后，点击添加资产保存。</string>
     <string name="walkthrough_hint_settings">打开设置。</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">每件</string>
     <string name="architect_premium_mode_once">一次</string>
     <string name="architect_estimated_value">估算价值</string>
+    <string name="architect_tour_value_required">请输入大于零的数值，然后点击保存。</string>
+    <string name="architect_tour_skip_premium">跳过溢价（可选）</string>
     <string name="architect_icon_cta_add">添加资产</string>
     <string name="architect_icon_cta_update">更新</string>
     <string name="architect_finalize_vault">完成并存入保管库</string>

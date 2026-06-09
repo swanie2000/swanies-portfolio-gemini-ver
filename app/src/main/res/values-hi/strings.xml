@@ -233,7 +233,9 @@
     <string name="walkthrough_hint_metal_tap_next">जारी रखने के लिए अगला पर टैप करें।</string>
     <string name="walkthrough_hint_metal_live_weight">यह एक टुकड़े का वजन है — आपके पास कितने हैं, यह नहीं।\n1 oz सिक्का 1 है। 10 oz बार 10 है।\nबदलने के लिए संख्या पर टैप करें, फिर सहेजें।\nसाफ़ करें फ़ील्ड रीसेट करता है और कीबोर्ड बंद करता है।</string>
     <string name="walkthrough_hint_metal_live_quantity">आपके पास कितने टुकड़े हैं?\nमात्रा के लिए बड़ी संख्या पर टैप करें।\nनीचे की दो पंक्तियाँ आपके कार्ड पर दिखने वाला नाम हैं।\nसंपादित करें और सहेजें। साफ़ करें कीबोर्ड बंद करता है ताकि यह संकेत फिर पढ़ सकें।</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">वैकल्पिक: स्पॉट मूल्य के ऊपर या नीचे प्रीमियम या छूट\n\nप्रति इकाई हर इकाई पर लागू होता है।\nउदाहरण: प्रत्येक सिक्के पर छूट।\n\nएक बार केवल एक बार लागू होता है।\nउदाहरण: चांदी की मूर्ति पर प्रीमियम।\n\nबटन पर टैप करें, पीली राशि दर्ज करें, फिर सहेजें।</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">क्या आप इस संपत्ति में प्रीमियम या छूट जोड़ना चाहते हैं?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">प्रति इकाई हर इकाई पर लागू होता है।\nएक बार केवल एक बार लागू होता है।\nनीचे एक विकल्प पर टैप करें।</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">पीले फ़ील्ड में समायोजन दर्ज करें।\nछूट के लिए ऋणात्मक मान उपयोग करें।\nप्रीमियम छोड़ने के लिए खाली या शून्य छोड़ें, फिर सहेजें।</string>
     <string name="walkthrough_hint_metal_live_tap_next">आपका कार्ड तैयार है।\nआइकन चुनने और इस धातु को अपनी होल्डिंग में सहेजने के लिए अगला पर टैप करें।</string>
     <string name="walkthrough_hint_metal_icon_pick">आप ऊपर दिखाया डिफ़ॉल्ट आइकन रख सकते हैं,\nया अपना जोड़ने के लिए फ़ोटो चुनें पर टैप करें।\nतैयार होने पर सहेजने के लिए संपत्ति जोड़ें पर टैप करें।</string>
     <string name="walkthrough_hint_settings">सेटिंग्स खोलें।</string>
@@ -390,6 +392,8 @@
     <string name="architect_premium_mode_per">प्रति इकाई</string>
     <string name="architect_premium_mode_once">एक बार</string>
     <string name="architect_estimated_value">अनुमानित मूल्य</string>
+    <string name="architect_tour_value_required">शून्य से बड़ा मान दर्ज करें, फिर सहेजें पर टैप करें।</string>
+    <string name="architect_tour_skip_premium">प्रीमियम छोड़ें (वैकल्पिक)</string>
     <string name="architect_icon_cta_add">संपत्ति जोड़ें</string>
     <string name="architect_icon_cta_update">अपडेट करें</string>
     <string name="architect_finalize_vault">समाप्त करें और वॉल्ट में सहेजें</string>

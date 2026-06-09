@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Dotknij Dalej, aby kontynuować.</string>
     <string name="walkthrough_hint_metal_live_weight">To waga jednej sztuki — nie ile ich posiadasz.\nMoneta 1 oz to 1. Sztabka 10 oz to 10.\nDotknij liczby, aby zmienić, potem Zapisz.\nWyczyść resetuje pole i zamyka klawiaturę.</string>
     <string name="walkthrough_hint_metal_live_quantity">Ile sztuk posiadasz?\nDotknij dużej liczby dla ilości.\nDwie linie poniżej to nazwa na karcie.\nEdytuj którąkolwiek, potem Zapisz. Wyczyść zamyka klawiaturę, aby ponownie przeczytać podpowiedź.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Opcjonalnie: premia lub rabat\npowyżej lub poniżej ceny spot.\n\nZa sztukę dotyczy każdej jednostki.\nPrzykład: rabat na każdą monetę.\n\nJednorazowo dotyczy tylko raz.\nPrzykład: premia na srebrną statuetkę.\n\nDotknij przycisku, wpisz żółtą kwotę, potem Zapisz.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Czy chcesz dodać premię lub rabat do tego aktywa?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Za sztukę dotyczy każdej jednostki.\nJednorazowo dotyczy tylko raz.\nDotknij jednej opcji poniżej.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Wpisz korektę w żółtym polu.\nUżyj wartości ujemnej dla rabatu.\nZostaw puste lub zero, aby pominąć premię, potem Zapisz.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Twoja karta jest gotowa.\nDotknij Dalej, aby wybrać ikonę i zapisać ten metal w posiadaniach.</string>
     <string name="walkthrough_hint_metal_icon_pick">Możesz zachować domyślną ikonę powyżej,\nlub dotknij Wybierz zdjęcie, aby dodać własną.\nGdy będziesz gotowy, dotknij Dodaj aktywo, aby zapisać.</string>
     <string name="walkthrough_hint_settings">Otwórz Ustawienia.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Za sztukę</string>
     <string name="architect_premium_mode_once">Jednorazowo</string>
     <string name="architect_estimated_value">SZACOWANA WARTOŚĆ</string>
+    <string name="architect_tour_value_required">Wpisz wartość większą od zera, potem dotknij Zapisz.</string>
+    <string name="architect_tour_skip_premium">Pomiń premię (opcjonalnie)</string>
     <string name="architect_icon_cta_add">DODAJ AKTYW</string>
     <string name="architect_icon_cta_update">AKTUALIZUJ</string>
     <string name="architect_finalize_vault">ZAKOŃCZ I ZAPISZ</string>

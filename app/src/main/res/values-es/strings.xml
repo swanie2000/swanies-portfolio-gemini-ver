@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Pulsa Siguiente para continuar.</string>
     <string name="walkthrough_hint_metal_live_weight">Este es el peso de una pieza — no cuántas tienes.\nUna moneda de 1 oz es 1. Una barra de 10 oz es 10.\nToca el número para cambiarlo y guarda.\nLimpiar restablece el campo y cierra el teclado.</string>
     <string name="walkthrough_hint_metal_live_quantity">¿Cuántas piezas tienes?\nToca el número grande para la cantidad.\nLas dos líneas de abajo son el nombre en tu tarjeta.\nEdita cualquiera y guarda. Limpiar cierra el teclado para releer esta pista.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Opcional: prima o descuento\npor encima o por debajo del precio spot.\n\nPor cada uno se aplica a cada unidad.\nEjemplo: un descuento en cada moneda.\n\nUna vez se aplica solo una vez.\nEjemplo: una prima en una estatua de plata.\n\nToca un botón, introduce el importe amarillo y guarda.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">¿Desea añadir una prima o un descuento a este activo?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Por cada uno se aplica a cada unidad.\nUna vez se aplica solo una vez.\nToca una opción abajo.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Introduce el ajuste en el campo amarillo.\nUsa un valor negativo para un descuento.\nDeja en blanco o cero para omitir la prima, luego Guardar.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Tu tarjeta está lista.\nPulsa Siguiente para elegir un icono y guardar este metal en tus tenencias.</string>
     <string name="walkthrough_hint_metal_icon_pick">Puedes conservar el icono predeterminado mostrado arriba,\no pulsar Elegir foto para añadir el tuyo.\nCuando estés listo, pulsa Añadir activo para guardar.</string>
     <string name="walkthrough_hint_settings">Abrir Ajustes.</string>
@@ -403,6 +405,8 @@
     <string name="architect_premium_mode_per">Por cada uno</string>
     <string name="architect_premium_mode_once">Una vez</string>
     <string name="architect_estimated_value">VALOR ESTIMADO</string>
+    <string name="architect_tour_value_required">Introduce un valor mayor que cero y toca Guardar.</string>
+    <string name="architect_tour_skip_premium">Omitir prima (opcional)</string>
     <string name="architect_icon_cta_add">AÑADIR ACTIVO</string>
     <string name="architect_icon_cta_update">ACTUALIZAR</string>
     <string name="architect_finalize_vault">FINALIZAR Y BÓVEDA</string>

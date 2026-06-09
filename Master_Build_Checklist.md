@@ -224,7 +224,8 @@
 - [x] **Site closed-test QR (2026-06-04):** **`#get-app`** **`TESTER_URL`** → **`apps/testing/com.swanie.portfolio`** (family closed opt-in).
 - [ ] **Closed test window:** **14+** consecutive days with **12+** opted-in — re-watch after **Fiverr** swap. **License testing** **unchecked**.
 - [x] **Holdings Take Tour polish (26, 2026-06-08):** Touch lockdown, accidental-exit prevention, metal/picker/finale bug fixes; owner stress QA OK on laptop.
-- [ ] **Play upload 1.0.26 (26):** Sync new tour strings to **19 locales** → **`lintVitalRelease`** → verify scripts → **Closed Alpha** release notes (tour polish).
+- [ ] **Play upload 1.0.26 (26):** **i18n synced** ✓ · **`lintVitalRelease`** ✓ · verify scripts → **Closed Alpha** release notes (tour polish).
+- [ ] **v27 backlog (deferred):** In-app **exit button** to close the app — ship with **second round of tester recommendations**, not as a standalone release before that.
 - [ ] **Production access prep:** **≥3** closed releases during window (**24** ✓ · **25** ✓ · **26** upload pending); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.

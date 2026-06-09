@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">次へをタップして続行します。</string>
     <string name="walkthrough_hint_metal_live_weight">これは1枚の重量です — 保有数ではありません。\n1オンスのコインは1。10オンスのバーは10。\n数字をタップして変更し、保存します。\nクリアでフィールドをリセットしキーボードを閉じます。</string>
     <string name="walkthrough_hint_metal_live_quantity">何枚保有していますか？\n大きな数字をタップして数量を入力します。\n下の2行はカードに表示される名前です。\n編集して保存。クリアでキーボードを閉じ、このヒントを再読できます。</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">任意：スポット価格の上または下のプレミアム／割引\n\n各単位ごとはすべての単位に適用されます。\n例：各コインへの割引。\n\n一度だけは1回だけ適用されます。\n例：銀像へのプレミアム。\n\nボタンをタップし、黄色の金額を入力して保存します。</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">この資産にプレミアムまたは割引を追加しますか？</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">各単位ごとはすべての単位に適用されます。\n一度だけは1回だけ適用されます。\n下のオプションをタップしてください。</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">黄色のフィールドに調整額を入力します。\n割引には負の値を使用します。\nプレミアムをスキップする場合は空白またはゼロのままにして保存します。</string>
     <string name="walkthrough_hint_metal_live_tap_next">カードの設定が完了しました。\n次へをタップしてアイコンを選び、この金属を保有に保存します。</string>
     <string name="walkthrough_hint_metal_icon_pick">上に表示されているデフォルトアイコンをそのまま使うか、\n写真を選択をタップして独自のアイコンを追加できます。\n準備ができたら資産を追加をタップして保存します。</string>
     <string name="walkthrough_hint_settings">設定を開きます。</string>
@@ -405,6 +407,8 @@
     <string name="architect_premium_mode_per">各単位ごと</string>
     <string name="architect_premium_mode_once">一度だけ</string>
     <string name="architect_estimated_value">推定価値</string>
+    <string name="architect_tour_value_required">ゼロより大きい値を入力し、保存をタップしてください。</string>
+    <string name="architect_tour_skip_premium">プレミアムをスキップ（任意）</string>
     <string name="architect_icon_cta_add">資産を追加</string>
     <string name="architect_icon_cta_update">更新</string>
     <string name="architect_finalize_vault">確定して保管庫へ</string>

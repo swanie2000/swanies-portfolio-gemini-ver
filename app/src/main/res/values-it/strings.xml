@@ -238,7 +238,9 @@
     <string name="walkthrough_hint_metal_tap_next">Tocca Avanti per continuare.</string>
     <string name="walkthrough_hint_metal_live_weight">Questo è il peso di un pezzo — non quanti ne possiedi.\nUna moneta da 1 oz è 1. Una barra da 10 oz è 10.\nTocca il numero per modificarlo, poi Salva.\nCancella reimposta il campo e chiude la tastiera.</string>
     <string name="walkthrough_hint_metal_live_quantity">Quanti pezzi possiedi?\nTocca il numero grande per la quantità.\nLe due righe sotto sono il nome sulla tua scheda.\nModifica una delle due, poi Salva. Cancella chiude la tastiera per rileggere questo suggerimento.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Opzionale: premio o sconto\nsopra o sotto il prezzo spot.\n\nPer ciascuno si applica a ogni unità.\nEsempio: uno sconto su ogni moneta.\n\nUna volta si applica solo una volta.\nEsempio: un premio su una statua d\'argento.\n\nTocca un pulsante, inserisci l\'importo giallo, poi Salva.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Vuoi aggiungere un premio o uno sconto a questo asset?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Per ciascuno si applica a ogni unità.\nUna volta si applica solo una volta.\nTocca un\'opzione qui sotto.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Inserisci la rettifica nel campo giallo.\nUsa un valore negativo per uno sconto.\nLascia vuoto o zero per saltare il premio, poi Salva.</string>
     <string name="walkthrough_hint_metal_live_tap_next">La tua scheda è pronta.\nTocca Avanti per scegliere un\'icona e salvare questo metallo nelle tue posizioni.</string>
     <string name="walkthrough_hint_metal_icon_pick">Puoi mantenere l\'icona predefinita mostrata sopra,\no toccare Scegli foto per aggiungere la tua.\nQuando sei pronto, tocca Aggiungi asset per salvare.</string>
     <string name="walkthrough_hint_settings">Apri Impostazioni.</string>
@@ -406,6 +408,8 @@
     <string name="architect_premium_mode_per">Per ciascuno</string>
     <string name="architect_premium_mode_once">Una volta</string>
     <string name="architect_estimated_value">VALORE STIMATO</string>
+    <string name="architect_tour_value_required">Inserisci un valore maggiore di zero, poi tocca Salva.</string>
+    <string name="architect_tour_skip_premium">Salta premio (opzionale)</string>
     <string name="architect_icon_cta_add">AGGIUNGI ASSET</string>
     <string name="architect_icon_cta_update">AGGIORNA</string>
     <string name="architect_finalize_vault">FINALIZZA E VAULT</string>
