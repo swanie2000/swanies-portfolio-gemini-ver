@@ -72,6 +72,7 @@ fun AmountEntryScreen(
     val activity = LocalActivity.current as AppCompatActivity
     val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
     val walkthroughController = walkthroughViewModel.controller
+    val tourActive = walkthroughController.isActive()
     val deferAmountFocus = walkthroughController.shouldDeferKeyboardFocus()
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
@@ -142,7 +143,10 @@ fun AmountEntryScreen(
                     baseSymbol = symbol,
                     priceSource = priceSource
                 )
-                viewModel.performSurgicalAdd(asset) { isActualWorkDone = true }
+                viewModel.performSurgicalAdd(
+                    asset = asset,
+                    pinToTopOfVault = walkthroughController.shouldPinSavedAssetToTop(),
+                ) { isActualWorkDone = true }
             }
 
             showCheckmark = true
@@ -176,7 +180,12 @@ fun AmountEntryScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        IconButton(onClick = { if (!isSaving) showExitDialog = true }, modifier = Modifier.align(Alignment.CenterStart)) {
+                        IconButton(
+                            onClick = {
+                                if (!isSaving && !tourActive) showExitDialog = true
+                            },
+                            modifier = Modifier.align(Alignment.CenterStart),
+                        ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.amount_entry_back), tint = textColor)
                         }
                     }
@@ -205,7 +214,14 @@ fun AmountEntryScreen(
                     Spacer(Modifier.weight(1f))
                     Button(
                         onClick = { submitAmount() },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).height(56.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                            .height(56.dp)
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.AMOUNT_SAVE_BUTTON,
+                                controller = walkthroughController,
+                            ),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow, contentColor = Color.Black),
                         enabled = amountText.isNotBlank() && !isSaving
                     ) {
@@ -254,7 +270,9 @@ fun AmountEntryScreen(
         )
     }
 
-    BackHandler { if (!isSaving) showExitDialog = true }
+    BackHandler {
+        if (!isSaving && !tourActive) showExitDialog = true
+    }
     LaunchedEffect(category, deferAmountFocus) {
         if (deferAmountFocus) return@LaunchedEffect
         if (category == AssetCategory.CRYPTO) focusRequester.requestFocus()

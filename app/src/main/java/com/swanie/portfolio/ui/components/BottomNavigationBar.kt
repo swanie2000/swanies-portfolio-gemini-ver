@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.swanie.portfolio.ui.navigation.Routes
 import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughController
+import com.swanie.portfolio.ui.onboarding.HoldingsWalkthroughStep
 import com.swanie.portfolio.ui.onboarding.WalkthroughAnchor
 import com.swanie.portfolio.ui.onboarding.walkthroughAnchor
 import com.swanie.portfolio.ui.settings.ThemeViewModel
@@ -30,6 +31,10 @@ fun BottomNavigationBar(
 ) {
     val themeViewModel: ThemeViewModel = hiltViewModel()
     val siteTextColor by themeViewModel.siteTextColor.collectAsState()
+    val tourActive = walkthroughController?.isActive() == true
+    val tourStep = walkthroughController?.step?.collectAsState()?.value
+        ?: HoldingsWalkthroughStep.INACTIVE
+    val allowSettingsNav = tourStep == HoldingsWalkthroughStep.OPEN_SETTINGS
 
     val textColorInt = siteTextColor.ifBlank { "#FFFFFF" }.toColorInt()
 
@@ -50,37 +55,51 @@ fun BottomNavigationBar(
                 val isHoldingsRoute = currentRoute == Routes.HOLDINGS || currentRoute == Routes.HOLDINGS_WITH_VAULT
                 val baseTextColor = Color(textColorInt)
 
-                IconButton(onClick = { 
-                    if (currentRoute != Routes.HOME) {
-                        onNavigate()
-                        navController.navigate(Routes.HOME) 
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        if (tourActive) return@IconButton
+                        if (currentRoute != Routes.HOME) {
+                            onNavigate()
+                            navController.navigate(Routes.HOME)
+                        }
+                    },
+                    enabled = !tourActive,
+                ) {
                     Icon(Icons.Default.Home, null, tint = if(currentRoute == Routes.HOME) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { 
-                    if (!isHoldingsRoute) {
-                        onNavigate()
-                        navController.navigate(Routes.HOLDINGS) 
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        if (tourActive) return@IconButton
+                        if (!isHoldingsRoute) {
+                            onNavigate()
+                            navController.navigate(Routes.HOLDINGS)
+                        }
+                    },
+                    enabled = !tourActive,
+                ) {
                     Icon(Icons.AutoMirrored.Filled.FormatListBulleted, null, tint = if(isHoldingsRoute) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
-                IconButton(onClick = { 
-                    if (currentRoute != Routes.ANALYTICS) {
-                        onNavigate()
-                        navController.navigate(Routes.ANALYTICS) 
-                    }
-                }) {
+                IconButton(
+                    onClick = {
+                        if (tourActive) return@IconButton
+                        if (currentRoute != Routes.ANALYTICS) {
+                            onNavigate()
+                            navController.navigate(Routes.ANALYTICS)
+                        }
+                    },
+                    enabled = !tourActive,
+                ) {
                     Icon(Icons.Default.PieChart, null, tint = if(currentRoute == Routes.ANALYTICS) baseTextColor else baseTextColor.copy(alpha = 0.3f))
                 }
                 IconButton(
                     onClick = {
+                        if (tourActive && !allowSettingsNav) return@IconButton
                         if (currentRoute != Routes.SETTINGS) {
                             onNavigate()
                             navController.navigate(Routes.SETTINGS)
                         }
                     },
+                    enabled = !tourActive || allowSettingsNav,
                     modifier = if (walkthroughController != null) {
                         Modifier.walkthroughAnchor(
                             anchor = WalkthroughAnchor.SETTINGS_TAB,

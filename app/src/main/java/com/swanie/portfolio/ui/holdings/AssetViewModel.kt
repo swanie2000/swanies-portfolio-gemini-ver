@@ -287,10 +287,19 @@ class AssetViewModel @Inject constructor(
         viewModelScope.launch { repository.refreshMarketWatch() }
     }
 
-    fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
+    fun performSurgicalAdd(
+        asset: AssetEntity,
+        pinToTopOfVault: Boolean = false,
+        onComplete: () -> Unit,
+    ) {
         viewModelScope.launch {
-            val taggedAsset = asset.copy(vaultId = currentVaultId.value)
-            repository.executeSurgicalAdd(taggedAsset) { _, _ -> }
+            val vaultId = currentVaultId.value
+            val taggedAsset = asset.copy(vaultId = vaultId)
+            var success = false
+            repository.executeSurgicalAdd(taggedAsset) { ok, _ -> success = ok }
+            if (success && pinToTopOfVault) {
+                repository.prependAssetToVaultTop(vaultId, taggedAsset.coinId)
+            }
             triggerCloudSync() // 🛰️ Backup to Cloud
             onComplete()
         }

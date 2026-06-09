@@ -1,6 +1,11 @@
 package com.swanie.portfolio.ui.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -8,6 +13,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +34,7 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -44,10 +51,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 private fun coerceInRange(value: Float, min: Float, max: Float): Float =
-    if (max < min) value else value.coerceIn(min, max)
+    if (!value.isFinite() || max < min) value else value.coerceIn(min, max)
+
+private fun Rect.isValidForAnchor(): Boolean =
+    left.isFinite() && top.isFinite() && right.isFinite() && bottom.isFinite() &&
+        right > left && bottom > top
 
 enum class WalkthroughAnchor {
     ADD_BUTTON,
@@ -56,6 +68,8 @@ enum class WalkthroughAnchor {
     PICKER_PROVIDER_BUTTON,
     PICKER_DROPDOWN,
     PICKER_SEARCH_BOX,
+    PICKER_RESULTS_LIST,
+    AMOUNT_SAVE_BUTTON,
     METAL_ARCHITECT_METAL_HEADER,
     METAL_ARCHITECT_METAL_GRID,
     METAL_ARCHITECT_SHAPE_HEADER,
@@ -65,8 +79,11 @@ enum class WalkthroughAnchor {
     METAL_ARCHITECT_CONTINUE,
     METAL_ARCHITECT_LIVE_WEIGHT,
     METAL_ARCHITECT_LIVE_QUANTITY_NAME,
-    METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+    METAL_ARCHITECT_LIVE_PREMIUM_SECTION,
+    METAL_ARCHITECT_LIVE_PREMIUM_CHIPS,
+    METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT,
     METAL_ARCHITECT_LIVE_ICON_NEXT,
+    METAL_ARCHITECT_ICON_CHOOSE_PHOTO,
     METAL_ARCHITECT_ICON_ADD,
     SETTINGS_TAB,
     FEEDBACK_ROW,
@@ -90,7 +107,9 @@ enum class HoldingsWalkthroughStep {
     METAL_ARCHITECT_TAP_NEXT,
     METAL_ARCHITECT_LIVE_WEIGHT,
     METAL_ARCHITECT_LIVE_QUANTITY_NAME,
-    METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+    METAL_ARCHITECT_LIVE_PREMIUM_ASK,
+    METAL_ARCHITECT_LIVE_PREMIUM_PICK_MODE,
+    METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT,
     METAL_ARCHITECT_LIVE_TAP_NEXT,
     METAL_ARCHITECT_ICON_PICK,
     AMOUNT_ENTER_SAVE,
@@ -167,7 +186,12 @@ private data class HintStep(
     val arrowHorizontalFraction: Float? = null,
     val anchor: WalkthroughAnchor? = null,
     val highlightAnchor: WalkthroughAnchor? = null,
+    /** Extra regions where touches reach the screen below the overlay (e.g. Save beside the input). */
+    val touchPassThroughAnchors: List<WalkthroughAnchor> = emptyList(),
+    /** When false, the target is highlighted visually but touches stay blocked (Yes/No-only steps). */
+    val allowTargetPassThrough: Boolean = true,
     val showNext: Boolean = false,
+    val showYesNo: Boolean = false,
     val nextLabelRes: Int = R.string.walkthrough_next,
     val styledFinishButton: Boolean = false,
     val maxLabelLines: Int = 1,
@@ -225,18 +249,33 @@ class HoldingsWalkthroughController {
     private val _overlaySuppressed = MutableStateFlow(false)
     val overlaySuppressed: StateFlow<Boolean> = _overlaySuppressed.asStateFlow()
 
+    private val _freezeAssetCardAnchor = MutableStateFlow(false)
+
     private val _path = MutableStateFlow(WalkthroughPath.CRYPTO)
 
     fun setOverlaySuppressed(suppressed: Boolean) {
         _overlaySuppressed.value = suppressed
     }
 
+    fun setHoldingsCardDragActive(active: Boolean) {
+        when (_step.value) {
+            HoldingsWalkthroughStep.HOLDINGS_TAP_CARD,
+            HoldingsWalkthroughStep.HOLDINGS_EDIT,
+            HoldingsWalkthroughStep.HOLDINGS_DELETE -> {
+                _freezeAssetCardAnchor.value = active
+            }
+            else -> _freezeAssetCardAnchor.value = false
+        }
+    }
+
     fun updateAnchor(anchor: WalkthroughAnchor, bounds: Rect?) {
+        if (_freezeAssetCardAnchor.value && anchor == WalkthroughAnchor.ASSET_CARD) {
+            return
+        }
         val next = _anchors.value.toMutableMap()
-        if (bounds == null) {
-            next.remove(anchor)
-        } else {
-            next[anchor] = bounds
+        when {
+            bounds == null -> next.remove(anchor)
+            bounds.isValidForAnchor() -> next[anchor] = bounds
         }
         _anchors.value = next
     }
@@ -331,13 +370,31 @@ class HoldingsWalkthroughController {
                 }
             HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME ->
                 if (field == "QUANTITY" || field == "NAME") {
-                    _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE
+                    _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_ASK
                 }
-            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE ->
+            HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT ->
                 if (field == "PREMIUM") {
                     _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT
                 }
             else -> Unit
+        }
+    }
+
+    fun onMetalArchitectPremiumAskYes() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_ASK) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_PICK_MODE
+        }
+    }
+
+    fun onMetalArchitectPremiumAskNo() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_ASK) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT
+        }
+    }
+
+    fun onMetalArchitectPremiumModePicked() {
+        if (_step.value == HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_PICK_MODE) {
+            _step.value = HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT
         }
     }
 
@@ -409,6 +466,15 @@ class HoldingsWalkthroughController {
         }
     }
 
+    /** Tour saves should land at list top so the final card hint stays on screen. */
+    fun shouldPinSavedAssetToTop(): Boolean = when (_step.value) {
+        HoldingsWalkthroughStep.AMOUNT_ENTER_SAVE,
+        in metalArchitectBlueprintSteps,
+        in metalArchitectLiveCardSteps,
+        HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK -> true
+        else -> false
+    }
+
     fun onAmountSaved(savedCoinId: String? = null) {
         savedCoinId?.let { _highlightCoinId.value = it }
         when (_step.value) {
@@ -427,6 +493,13 @@ class HoldingsWalkthroughController {
 
     fun onHoldingsCardInteraction(expandedAssetId: String?, editingAssetId: String?) {
         // Card gestures are explained in one summary step; user taps End when ready.
+    }
+
+    /** Full edit funnel opened during the card-gestures finale — tour is complete. */
+    fun onHoldingsEditOpened() {
+        if (_step.value == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD) {
+            _step.value = HoldingsWalkthroughStep.COMPLETE
+        }
     }
 
     fun onSettingsOpened() {
@@ -448,6 +521,7 @@ class HoldingsWalkthroughController {
         _highlightCoinId.value = null
         _chromeHidden.value = false
         _overlaySuppressed.value = false
+        _freezeAssetCardAnchor.value = false
         _path.value = WalkthroughPath.CRYPTO
     }
 
@@ -483,10 +557,16 @@ internal val metalArchitectBlueprintSteps = setOf(
     HoldingsWalkthroughStep.METAL_ARCHITECT_TAP_NEXT,
 )
 
+internal val metalArchitectPremiumSteps = setOf(
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_ASK,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_PICK_MODE,
+    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT,
+)
+
 internal val metalArchitectLiveCardSteps = setOf(
     HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_WEIGHT,
     HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_QUANTITY_NAME,
-    HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+) + metalArchitectPremiumSteps + setOf(
     HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT,
 )
 
@@ -513,6 +593,63 @@ private fun Rect.relativeTo(origin: Offset): Rect = Rect(
     bottom - origin.y,
 )
 
+private fun Rect.padded(pad: Float): Rect = Rect(
+    left - pad,
+    top - pad,
+    right + pad,
+    bottom + pad,
+)
+
+private fun subtractRect(source: Rect, hole: Rect): List<Rect> {
+    if (!source.overlaps(hole)) return listOf(source)
+    val result = mutableListOf<Rect>()
+    if (hole.top > source.top) {
+        result.add(Rect(source.left, source.top, source.right, hole.top))
+    }
+    if (hole.bottom < source.bottom) {
+        result.add(Rect(source.left, hole.bottom, source.right, source.bottom))
+    }
+    val midTop = max(source.top, hole.top)
+    val midBottom = min(source.bottom, hole.bottom)
+    if (hole.left > source.left) {
+        result.add(Rect(source.left, midTop, hole.left, midBottom))
+    }
+    if (hole.right < source.right) {
+        result.add(Rect(hole.right, midTop, source.right, midBottom))
+    }
+    return result.filter { it.width > 0f && it.height > 0f }
+}
+
+private fun Rect.isMeaningfulTouchHole(minSizePx: Float): Boolean =
+    width >= minSizePx && height >= minSizePx
+
+private fun blockedRegions(screen: Rect, holes: List<Rect>): List<Rect> {
+    var regions = listOf(screen)
+    holes.forEach { hole ->
+        val clipped = hole.intersect(screen)
+        if (clipped.width > 0f && clipped.height > 0f) {
+            regions = regions.flatMap { subtractRect(it, clipped) }
+        }
+    }
+    return regions.filter { it.width > 0f && it.height > 0f }
+}
+
+private fun passThroughRectsForHint(
+    hint: HintStep,
+    anchors: Map<WalkthroughAnchor, Rect>,
+    origin: Offset,
+    padPx: Float,
+): List<Rect> {
+    if (!hint.allowTargetPassThrough) return emptyList()
+    val keys = buildList {
+        (hint.highlightAnchor ?: hint.anchor)?.let { add(it) }
+        addAll(hint.touchPassThroughAnchors)
+    }.distinct()
+    return keys.mapNotNull { key ->
+        anchors[key]?.relativeTo(origin)?.padded(padPx)
+    }
+}
+
 @Composable
 fun HoldingsWalkthroughOverlay(
     controller: HoldingsWalkthroughController,
@@ -525,6 +662,11 @@ fun HoldingsWalkthroughOverlay(
     val selectedSymbol by controller.selectedAssetSymbol.collectAsState()
     val chromeHidden by controller.chromeHidden.collectAsState()
     val overlaySuppressed by controller.overlaySuppressed.collectAsState()
+    val tourActive = controller.isActive()
+
+    BackHandler(enabled = tourActive) {
+        // Intentional exit only via the tour pill × button.
+    }
 
     LaunchedEffect(step) {
         if (step == HoldingsWalkthroughStep.COMPLETE) {
@@ -532,7 +674,7 @@ fun HoldingsWalkthroughOverlay(
         }
     }
 
-    if (!controller.isActive() || chromeHidden || overlaySuppressed) {
+    if (!tourActive || chromeHidden || overlaySuppressed) {
         return
     }
 
@@ -540,16 +682,37 @@ fun HoldingsWalkthroughOverlay(
     val anchorRect = hint.anchor?.let { anchors[it] }
     val highlightRect = (hint.highlightAnchor ?: hint.anchor)?.let { anchors[it] }
     var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
+    val density = LocalDensity.current
+    val passThroughPadPx = with(density) { 12.dp.toPx() }
     val overlayAnchor = anchorRect?.relativeTo(overlayOrigin)
     val overlayHighlight = highlightRect?.relativeTo(overlayOrigin)
+    val passThroughRects = passThroughRectsForHint(hint, anchors, overlayOrigin, passThroughPadPx)
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
-            .fillMaxSize()
             .zIndex(200f)
-            .onGloballyPositioned { overlayOrigin = it.boundsInWindow().topLeft },
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(0, 0) { placeable.place(0, 0) }
+            },
     ) {
+        val screenSize = IntSize(constraints.maxWidth, constraints.maxHeight)
+
+        Spacer(
+            modifier = Modifier
+                .size(0.dp)
+                .onGloballyPositioned { coordinates ->
+                    overlayOrigin = coordinates.boundsInWindow().topLeft
+                },
+        )
+
+        WalkthroughTouchScrim(
+            screenSize = screenSize,
+            passThroughRects = passThroughRects,
+            highlightRects = listOfNotNull(overlayHighlight),
+        )
         WalkthroughPointerHint(
+            screenSize = screenSize,
             label = hint.label,
             placement = hint.placement,
             horizontalAlign = hint.horizontalAlign,
@@ -557,6 +720,7 @@ fun HoldingsWalkthroughOverlay(
             arrowHorizontalFraction = hint.arrowHorizontalFraction,
             anchor = overlayAnchor,
             showNext = hint.showNext,
+            showYesNo = hint.showYesNo,
             nextLabelRes = hint.nextLabelRes,
             styledFinishButton = hint.styledFinishButton,
             maxLabelLines = hint.maxLabelLines,
@@ -565,10 +729,9 @@ fun HoldingsWalkthroughOverlay(
             arrowAbovePill = hint.arrowAbovePill,
             onSkip = onSkipTour,
             onNext = { controller.onNextFromMessageOnly() },
+            onYes = { controller.onMetalArchitectPremiumAskYes() },
+            onNo = { controller.onMetalArchitectPremiumAskNo() },
         )
-        overlayHighlight?.let { rect ->
-            WalkthroughTargetHighlight(rect = rect)
-        }
     }
 }
 
@@ -591,6 +754,7 @@ private fun hintForStep(
             horizontalAlign = HintHorizontalAlign.End,
             arrowHorizontalFraction = 0.7f,
             anchor = WalkthroughAnchor.PICKER_PROVIDER_BUTTON,
+            highlightAnchor = WalkthroughAnchor.PICKER_PROVIDER_BUTTON,
         )
         HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER -> HintStep(
             label = stringResource(R.string.walkthrough_hint_choose_provider),
@@ -598,6 +762,7 @@ private fun hintForStep(
             horizontalAlign = HintHorizontalAlign.End,
             arrowAlign = HintHorizontalAlign.End,
             anchor = WalkthroughAnchor.PICKER_DROPDOWN,
+            highlightAnchor = WalkthroughAnchor.PICKER_DROPDOWN,
         )
         HoldingsWalkthroughStep.PICKER_TYPE_SEARCH -> HintStep(
             label = stringResource(R.string.walkthrough_hint_type_search),
@@ -605,12 +770,15 @@ private fun hintForStep(
             horizontalAlign = HintHorizontalAlign.Start,
             arrowAlign = HintHorizontalAlign.Start,
             anchor = WalkthroughAnchor.PICKER_SEARCH_BOX,
+            highlightAnchor = WalkthroughAnchor.PICKER_SEARCH_BOX,
         )
         HoldingsWalkthroughStep.PICKER_SCROLL_RESULTS -> HintStep(
             label = stringResource(R.string.walkthrough_hint_scroll_results),
             placement = CalloutPlacement.SCREEN_TOP,
             horizontalAlign = HintHorizontalAlign.Center,
             arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.PICKER_RESULTS_LIST,
+            highlightAnchor = WalkthroughAnchor.PICKER_RESULTS_LIST,
             maxLabelLines = 2,
             maxLabelWidth = 300.dp,
             maxCalloutWidth = 360.dp,
@@ -665,16 +833,43 @@ private fun hintForStep(
             maxLabelWidth = 320.dp,
             maxCalloutWidth = 380.dp,
         )
-        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_MODE -> HintStep(
-            label = stringResource(R.string.walkthrough_hint_metal_live_premium_mode),
-            placement = CalloutPlacement.ANCHOR_BELOW,
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_ASK -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_premium_ask),
+            placement = CalloutPlacement.ANCHOR_ABOVE,
             horizontalAlign = HintHorizontalAlign.Center,
             arrowAlign = HintHorizontalAlign.Center,
-            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_MODE,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_SECTION,
+            highlightAnchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_SECTION,
+            allowTargetPassThrough = false,
             arrowAbovePill = true,
-            maxLabelLines = 10,
-            maxLabelWidth = 320.dp,
-            maxCalloutWidth = 380.dp,
+            showYesNo = true,
+            maxLabelLines = 3,
+            maxLabelWidth = 280.dp,
+            maxCalloutWidth = 340.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_PICK_MODE -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_premium_pick_mode),
+            placement = CalloutPlacement.ANCHOR_ABOVE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_CHIPS,
+            highlightAnchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_CHIPS,
+            arrowAbovePill = true,
+            maxLabelLines = 4,
+            maxLabelWidth = 300.dp,
+            maxCalloutWidth = 360.dp,
+        )
+        HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT -> HintStep(
+            label = stringResource(R.string.walkthrough_hint_metal_live_premium_amount),
+            placement = CalloutPlacement.ANCHOR_ABOVE,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            anchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT,
+            highlightAnchor = WalkthroughAnchor.METAL_ARCHITECT_LIVE_PREMIUM_AMOUNT,
+            arrowAbovePill = true,
+            maxLabelLines = 5,
+            maxLabelWidth = 300.dp,
+            maxCalloutWidth = 360.dp,
         )
         HoldingsWalkthroughStep.METAL_ARCHITECT_LIVE_TAP_NEXT -> HintStep(
             label = stringResource(R.string.walkthrough_hint_metal_live_tap_next),
@@ -693,6 +888,7 @@ private fun hintForStep(
             horizontalAlign = HintHorizontalAlign.Center,
             arrowAlign = HintHorizontalAlign.Center,
             anchor = WalkthroughAnchor.METAL_ARCHITECT_ICON_ADD,
+            touchPassThroughAnchors = listOf(WalkthroughAnchor.METAL_ARCHITECT_ICON_CHOOSE_PHOTO),
             arrowAbovePill = true,
             maxLabelLines = 5,
             maxLabelWidth = 320.dp,
@@ -704,32 +900,39 @@ private fun hintForStep(
             horizontalAlign = HintHorizontalAlign.Start,
             arrowAlign = HintHorizontalAlign.Start,
             anchor = WalkthroughAnchor.AMOUNT_INPUT,
+            touchPassThroughAnchors = listOf(WalkthroughAnchor.AMOUNT_SAVE_BUTTON),
             maxLabelLines = 2,
             maxLabelWidth = 300.dp,
             maxCalloutWidth = 360.dp,
         )
         HoldingsWalkthroughStep.HOLDINGS_TAP_CARD -> HintStep(
             label = stringResource(R.string.walkthrough_hint_card_gestures),
-            placement = CalloutPlacement.ANCHOR_BELOW,
+            placement = CalloutPlacement.SCREEN_TOP,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            arrowHorizontalFraction = 0.5f,
             anchor = WalkthroughAnchor.ASSET_CARD,
             showNext = true,
             nextLabelRes = R.string.walkthrough_end,
             styledFinishButton = true,
-            maxLabelLines = 2,
-            maxLabelWidth = 260.dp,
-            maxCalloutWidth = 300.dp,
+            maxLabelLines = 3,
+            maxLabelWidth = 280.dp,
+            maxCalloutWidth = 320.dp,
         )
         HoldingsWalkthroughStep.HOLDINGS_EDIT,
         HoldingsWalkthroughStep.HOLDINGS_DELETE -> HintStep(
             label = stringResource(R.string.walkthrough_hint_card_gestures),
-            placement = CalloutPlacement.ANCHOR_BELOW,
+            placement = CalloutPlacement.SCREEN_TOP,
+            horizontalAlign = HintHorizontalAlign.Center,
+            arrowAlign = HintHorizontalAlign.Center,
+            arrowHorizontalFraction = 0.5f,
             anchor = WalkthroughAnchor.ASSET_CARD,
             showNext = true,
             nextLabelRes = R.string.walkthrough_end,
             styledFinishButton = true,
-            maxLabelLines = 2,
-            maxLabelWidth = 260.dp,
-            maxCalloutWidth = 300.dp,
+            maxLabelLines = 3,
+            maxLabelWidth = 280.dp,
+            maxCalloutWidth = 320.dp,
         )
         HoldingsWalkthroughStep.OPEN_SETTINGS -> HintStep(
             label = stringResource(R.string.walkthrough_hint_settings),
@@ -779,6 +982,7 @@ fun TakeTourInviteButton(
 
 @Composable
 private fun WalkthroughPointerHint(
+    screenSize: IntSize,
     label: String,
     placement: CalloutPlacement,
     horizontalAlign: HintHorizontalAlign,
@@ -786,6 +990,7 @@ private fun WalkthroughPointerHint(
     arrowHorizontalFraction: Float?,
     anchor: Rect?,
     showNext: Boolean,
+    showYesNo: Boolean,
     nextLabelRes: Int,
     styledFinishButton: Boolean,
     maxLabelLines: Int,
@@ -794,6 +999,8 @@ private fun WalkthroughPointerHint(
     arrowAbovePill: Boolean,
     onSkip: (dontShowAgain: Boolean) -> Unit,
     onNext: () -> Unit,
+    onYes: () -> Unit,
+    onNo: () -> Unit,
 ) {
     val arrowDirection = arrowDirectionFor(placement)
     val pillFirst = (placement == CalloutPlacement.ANCHOR_ABOVE && !arrowAbovePill) ||
@@ -812,15 +1019,9 @@ private fun WalkthroughPointerHint(
     val gap = with(density) { 8.dp.toPx() }
     val arrowAlongAxis = with(density) { 40.dp.toPx() }
 
-    val screenBox = remember { mutableStateOf(IntSize.Zero) }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .onGloballyPositioned { screenBox.value = it.size },
-    ) {
-        val screenW = screenBox.value.width.toFloat()
-        val screenH = screenBox.value.height.toFloat()
-        val minTopY = with(density) { 72.dp.toPx() }
+    val screenW = screenSize.width.toFloat()
+    val screenH = screenSize.height.toFloat()
+    val minTopY = with(density) { 72.dp.toPx() }
         val minHeaderY = with(density) { 56.dp.toPx() }
         val maxBottomPad = with(density) { 24.dp.toPx() }
         val maxY = if (screenH > 0f) {
@@ -986,12 +1187,15 @@ private fun WalkthroughPointerHint(
                     WalkthroughHintPill(
                         label = label,
                         showNext = showNext,
+                        showYesNo = showYesNo,
                         nextLabelRes = nextLabelRes,
                         styledFinishButton = styledFinishButton,
                         maxLabelLines = maxLabelLines,
                         maxLabelWidth = maxLabelWidth,
                         onSkip = onSkip,
                         onNext = onNext,
+                        onYes = onYes,
+                        onNo = onNo,
                         modifier = if (inlineArrowBesidePill) {
                             Modifier.onGloballyPositioned { pillWidthPx = it.size.width }
                         } else {
@@ -1017,24 +1221,30 @@ private fun WalkthroughPointerHint(
                         WalkthroughHintPill(
                             label = label,
                             showNext = showNext,
+                            showYesNo = showYesNo,
                             nextLabelRes = nextLabelRes,
                             styledFinishButton = styledFinishButton,
                             maxLabelLines = maxLabelLines,
                             maxLabelWidth = maxLabelWidth,
                             onSkip = onSkip,
                             onNext = onNext,
+                            onYes = onYes,
+                            onNo = onNo,
                             modifier = Modifier.onGloballyPositioned { pillWidthPx = it.size.width },
                         )
                     } else {
                         WalkthroughHintPill(
                             label = label,
                             showNext = showNext,
+                            showYesNo = showYesNo,
                             nextLabelRes = nextLabelRes,
                             styledFinishButton = styledFinishButton,
                             maxLabelLines = maxLabelLines,
                             maxLabelWidth = maxLabelWidth,
                             onSkip = onSkip,
                             onNext = onNext,
+                            onYes = onYes,
+                            onNo = onNo,
                             modifier = Modifier.onGloballyPositioned { pillWidthPx = it.size.width },
                         )
                         WalkthroughFractionalArrow(
@@ -1049,7 +1259,6 @@ private fun WalkthroughPointerHint(
                 }
             }
         }
-    }
 }
 
 @Composable
@@ -1097,12 +1306,15 @@ private fun WalkthroughFractionalArrow(
 private fun WalkthroughHintPill(
     label: String,
     showNext: Boolean,
+    showYesNo: Boolean,
     nextLabelRes: Int,
     styledFinishButton: Boolean,
     maxLabelLines: Int,
     maxLabelWidth: Dp,
     onSkip: (dontShowAgain: Boolean) -> Unit,
     onNext: () -> Unit,
+    onYes: () -> Unit,
+    onNo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showExitDialog by remember { mutableStateOf(false) }
@@ -1195,7 +1407,41 @@ private fun WalkthroughHintPill(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.widthIn(max = maxLabelWidth),
                 )
-                if (showNext) {
+                if (showYesNo) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Surface(
+                            onClick = onYes,
+                            shape = RoundedCornerShape(50),
+                            color = Color.Black,
+                            shadowElevation = 2.dp,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.walkthrough_exit_yes),
+                                color = TourYellow,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
+                            )
+                        }
+                        Surface(
+                            onClick = onNo,
+                            shape = RoundedCornerShape(50),
+                            color = Color.White,
+                            shadowElevation = 2.dp,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.walkthrough_exit_no),
+                                color = Color.Black,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp),
+                            )
+                        }
+                    }
+                } else if (showNext) {
                     if (styledFinishButton) {
                         Surface(
                             onClick = onNext,
@@ -1231,8 +1477,8 @@ private fun WalkthroughHintPill(
             onClick = { showExitDialog = true },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = 4.dp, y = (-2).dp)
-                .size(22.dp)
+                .offset(x = 14.dp, y = (-14).dp)
+                .size(36.dp)
                 .zIndex(1f),
             shape = CircleShape,
             color = Color(0xFFE53935),
@@ -1243,9 +1489,9 @@ private fun WalkthroughHintPill(
                 Text(
                     text = "×",
                     color = Color.White,
-                    fontSize = 15.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Black,
-                    lineHeight = 15.sp,
+                    lineHeight = 20.sp,
                 )
             }
         }
@@ -1257,8 +1503,9 @@ private fun WalkthroughGlossyArrow(
     direction: WalkthroughArrowDirection,
     modifier: Modifier = Modifier,
     horizontalBias: Dp? = null,
+    enablePulse: Boolean = false,
 ) {
-    val pulse = rememberWalkthroughPulse()
+    val pulse = if (enablePulse) rememberWalkthroughPulse() else WalkthroughPulse(1f, 1f)
     val isHorizontal = direction == WalkthroughArrowDirection.Left ||
         direction == WalkthroughArrowDirection.Right
     val arrowWidth = if (isHorizontal) 52.dp else 36.dp
@@ -1281,8 +1528,9 @@ private fun WalkthroughGlossyArrow(
             )
             .size(width = arrowWidth, height = arrowHeight)
             .graphicsLayer {
-                scaleX = pulse.scale
-                scaleY = pulse.scale
+                val scale = pulse.scale.takeIf { it.isFinite() && it > 0f } ?: 1f
+                scaleX = scale
+                scaleY = scale
             },
         contentAlignment = Alignment.Center,
     ) {
@@ -1297,7 +1545,9 @@ private fun WalkthroughGlossyArrow(
                 drawPath(path = arrowPath, color = Color.White, style = Stroke(width = 3.5f))
                 drawPath(
                     path = arrowPath,
-                    color = TourYellow.copy(alpha = pulse.glowAlpha),
+                    color = TourYellow.copy(
+                        alpha = pulse.glowAlpha.takeIf { it.isFinite() }?.coerceIn(0f, 1f) ?: 1f,
+                    ),
                     style = Fill,
                 )
                 clipPath(arrowPath) {
@@ -1337,30 +1587,158 @@ private fun buildGlossyArrowPath(width: Float, height: Float): Path {
 }
 
 @Composable
-private fun WalkthroughTargetHighlight(rect: Rect) {
+private fun WalkthroughTouchScrim(
+    screenSize: IntSize,
+    passThroughRects: List<Rect>,
+    highlightRects: List<Rect> = emptyList(),
+) {
+    if (screenSize.width <= 0 || screenSize.height <= 0) return
+
+    val scrimColor = Color.Black.copy(alpha = 0.62f)
     val density = LocalDensity.current
-    val pad = with(density) { 4.dp.toPx() }
-    Canvas(
+    val minHolePx = with(density) { 24.dp.toPx() }
+    val screenRect = Rect(0f, 0f, screenSize.width.toFloat(), screenSize.height.toFloat())
+    val holes = passThroughRects
+        .map { it.intersect(screenRect) }
+        .filter { it.isMeaningfulTouchHole(minHolePx) }
+    val blocked = if (holes.isEmpty()) {
+        listOf(screenRect)
+    } else {
+        blockedRegions(screenRect, holes)
+    }
+
+    blocked.forEach { region ->
+        WalkthroughScrimPanel(rect = region, color = scrimColor)
+    }
+    holes.forEach { hole ->
+        WalkthroughHoleRing(hole = hole)
+    }
+    highlightRects
+        .map { it.intersect(screenRect).padded(4f) }
+        .filter { it.isMeaningfulTouchHole(minHolePx) }
+        .filter { highlight -> holes.none { it.overlaps(highlight) } }
+        .forEach { highlight ->
+            WalkthroughHoleRing(hole = highlight, includeGlow = true)
+        }
+}
+
+@Composable
+private fun WalkthroughScrimPanel(
+    rect: Rect,
+    color: Color,
+) {
+    val density = LocalDensity.current
+    if (!rect.isValidForAnchor()) return
+
+    Box(
         modifier = Modifier
             .offset {
                 IntOffset(
-                    (rect.left - pad).roundToInt(),
-                    (rect.top - pad).roundToInt(),
+                    rect.left.roundToInt().coerceAtLeast(0),
+                    rect.top.roundToInt().coerceAtLeast(0),
                 )
             }
             .size(
-                width = with(density) { (rect.width + pad * 2).toDp() },
-                height = with(density) { (rect.height + pad * 2).toDp() },
-            ),
-    ) {
-        drawRoundRect(
-            color = TourYellow.copy(alpha = 0.35f),
-            cornerRadius = CornerRadius(12f, 12f),
-        )
-        drawRoundRect(
-            color = TourYellow,
-            cornerRadius = CornerRadius(12f, 12f),
-            style = Stroke(width = 2.5f),
+                width = with(density) { rect.width.toDp() },
+                height = with(density) { rect.height.toDp() },
+            )
+            .background(color)
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        event.changes.forEach { it.consume() }
+                    }
+                }
+            },
+    )
+}
+
+@Composable
+private fun WalkthroughHoleRing(
+    hole: Rect,
+    includeGlow: Boolean = false,
+) {
+    if (!hole.isValidForAnchor()) return
+
+    val density = LocalDensity.current
+    val strokePx = 2.5f
+    val stroke = with(density) { strokePx.toDp() }
+    val glowPad = if (includeGlow) 4f else 0f
+    val ringRect = hole.padded(glowPad)
+
+    if (includeGlow) {
+        Box(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        (ringRect.left - strokePx).roundToInt(),
+                        (ringRect.top - strokePx).roundToInt(),
+                    )
+                }
+                .size(
+                    width = with(density) { (ringRect.width + strokePx * 2).toDp() },
+                    height = with(density) { (ringRect.height + strokePx * 2).toDp() },
+                )
+                .background(TourYellow.copy(alpha = 0.35f), RoundedCornerShape(12.dp)),
         )
     }
+
+    Box(
+        modifier = Modifier
+            .offset {
+                IntOffset(
+                    (hole.left - strokePx).roundToInt(),
+                    (hole.top - strokePx).roundToInt(),
+                )
+            }
+            .size(
+                width = with(density) { (hole.width + strokePx * 2).toDp() },
+                height = stroke,
+            )
+            .background(TourYellow),
+    )
+    Box(
+        modifier = Modifier
+            .offset {
+                IntOffset(
+                    (hole.left - strokePx).roundToInt(),
+                    hole.bottom.roundToInt(),
+                )
+            }
+            .size(
+                width = with(density) { (hole.width + strokePx * 2).toDp() },
+                height = stroke,
+            )
+            .background(TourYellow),
+    )
+    Box(
+        modifier = Modifier
+            .offset {
+                IntOffset(
+                    (hole.left - strokePx).roundToInt(),
+                    hole.top.roundToInt(),
+                )
+            }
+            .size(
+                width = stroke,
+                height = with(density) { hole.height.toDp() },
+            )
+            .background(TourYellow),
+    )
+    Box(
+        modifier = Modifier
+            .offset {
+                IntOffset(
+                    hole.right.roundToInt(),
+                    hole.top.roundToInt(),
+                )
+            }
+            .size(
+                width = stroke,
+                height = with(density) { hole.height.toDp() },
+            )
+            .background(TourYellow),
+    )
 }
+

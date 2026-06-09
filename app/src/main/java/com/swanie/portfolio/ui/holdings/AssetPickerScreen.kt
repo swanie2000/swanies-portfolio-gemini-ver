@@ -19,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.activity.compose.LocalActivity
@@ -63,7 +65,17 @@ fun AssetPickerScreen(
     val walkthroughViewModel: HoldingsWalkthroughViewModel = hiltViewModel(activity)
     val walkthroughController = walkthroughViewModel.controller
     val walkthroughStep by walkthroughController.step.collectAsState()
+    val tourActive = walkthroughController.isActive()
     val deferSearchFocus = walkthroughController.shouldDeferKeyboardFocus()
+    val tourSearchEnabled = !tourActive ||
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_TYPE_SEARCH ||
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_SCROLL_RESULTS
+    val tourProviderButtonEnabled = !tourActive ||
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_SELECT_PROVIDER
+    val tourProviderMenuEnabled = !tourActive ||
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER
+    val tourResultsEnabled = !tourActive ||
+        walkthroughStep == HoldingsWalkthroughStep.PICKER_SCROLL_RESULTS
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val focusRequester = remember { FocusRequester() }
@@ -99,13 +111,36 @@ fun AssetPickerScreen(
         if (selectedProvider == null) viewModel.selectProvider("CoinGecko")
     }
 
-    LaunchedEffect(selectedProvider, deferSearchFocus) {
-        if (deferSearchFocus) return@LaunchedEffect
+    LaunchedEffect(selectedProvider, deferSearchFocus, tourSearchEnabled) {
+        if (deferSearchFocus || !tourSearchEnabled) return@LaunchedEffect
         delay(300)
         if (selectedProvider != "YahooFinance") focusRequester.requestFocus()
     }
 
-    LaunchedEffect(searchQuery, searchResults) {
+    LaunchedEffect(walkthroughStep, tourActive) {
+        if (!tourActive) return@LaunchedEffect
+        when (walkthroughStep) {
+            HoldingsWalkthroughStep.PICKER_SELECT_PROVIDER -> {
+                focusManager.clearFocus()
+                menuExpanded = false
+                if (searchQuery.isNotBlank()) {
+                    searchQuery = ""
+                    viewModel.searchCoins("")
+                }
+            }
+            HoldingsWalkthroughStep.PICKER_CHOOSE_PROVIDER -> {
+                focusManager.clearFocus()
+                if (searchQuery.isNotBlank()) {
+                    searchQuery = ""
+                    viewModel.searchCoins("")
+                }
+            }
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(searchQuery, searchResults, tourSearchEnabled) {
+        if (!tourSearchEnabled) return@LaunchedEffect
         if (searchQuery.isNotBlank() && searchResults.isNotEmpty()) {
             walkthroughController.onPickerSearchResultsReady()
         }
@@ -137,7 +172,11 @@ fun AssetPickerScreen(
             // --- 🦢 BOUTIQUE HEADER ---
             BoutiqueHeader(
                 title = stringResource(R.string.add_asset_screen_title),
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    if (!walkthroughController.isActive()) {
+                        navController.popBackStack()
+                    }
+                },
                 textColor = textColor
             )
 
@@ -145,11 +184,21 @@ fun AssetPickerScreen(
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
                 androidx.compose.foundation.text.BasicTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it; viewModel.searchCoins(it) },
+                    onValueChange = { next ->
+                        if (!tourSearchEnabled) return@BasicTextField
+                        searchQuery = next
+                        viewModel.searchCoins(next)
+                    },
+                    readOnly = !tourSearchEnabled,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
                         .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused && !tourSearchEnabled) {
+                                focusManager.clearFocus()
+                            }
+                        }
                         .background(cardBg, RoundedCornerShape(16.dp))
                         .border(1.dp, textColor.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
                     textStyle = LocalTextStyle.current.copy(
@@ -168,9 +217,24 @@ fun AssetPickerScreen(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight()
+                                    .then(
+                                        if (!tourSearchEnabled) {
+                                            Modifier.pointerInput(tourSearchEnabled) {
+                                                awaitPointerEventScope {
+                                                    while (true) {
+                                                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                                                        event.changes.forEach { it.consume() }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            Modifier
+                                        },
+                                    )
                                     .walkthroughAnchor(
                                         anchor = WalkthroughAnchor.PICKER_SEARCH_BOX,
                                         controller = walkthroughController,
+                                        enabled = tourSearchEnabled,
                                     ),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
@@ -197,9 +261,11 @@ fun AssetPickerScreen(
                             Box(modifier = Modifier.padding(start = 8.dp)) {
                                 Surface(
                                     onClick = {
+                                        if (!tourProviderButtonEnabled) return@Surface
                                         walkthroughController.onPickerDropdownOpened()
                                         menuExpanded = true
                                     },
+                                    enabled = tourProviderButtonEnabled,
                                     color = Color.White.copy(alpha = 0.05f),
                                     shape = RoundedCornerShape(8.dp),
                                     modifier = Modifier
@@ -208,6 +274,7 @@ fun AssetPickerScreen(
                                         .walkthroughAnchor(
                                             anchor = WalkthroughAnchor.PICKER_PROVIDER_BUTTON,
                                             controller = walkthroughController,
+                                            enabled = tourProviderButtonEnabled,
                                         ),
                                     border = BorderStroke(1.dp, cardText.copy(alpha = 0.1f)),
                                 ) {
@@ -244,6 +311,7 @@ fun AssetPickerScreen(
                             .walkthroughAnchor(
                                 anchor = WalkthroughAnchor.PICKER_DROPDOWN,
                                 controller = walkthroughController,
+                                enabled = tourProviderMenuEnabled && useInlineProviderMenu,
                             ),
                         color = Color(0xFF1A1A1A),
                         shape = RoundedCornerShape(8.dp),
@@ -259,7 +327,10 @@ fun AssetPickerScreen(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { onProviderSelected(provider) }
+                                        .clickable(
+                                            enabled = tourProviderMenuEnabled,
+                                            onClick = { onProviderSelected(provider) },
+                                        )
                                         .padding(horizontal = 16.dp, vertical = 12.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
@@ -286,7 +357,8 @@ fun AssetPickerScreen(
                         val menuLabel = if (provider == "YahooFinance") stringResource(R.string.holdings_tab_metal) else provider
                         DropdownMenuItem(
                             text = { Text(menuLabel.uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp) },
-                            onClick = { onProviderSelected(provider) },
+                            onClick = { if (tourProviderMenuEnabled) onProviderSelected(provider) },
+                            enabled = tourProviderMenuEnabled,
                         )
                     }
                 }
@@ -297,13 +369,22 @@ fun AssetPickerScreen(
                 Column(modifier = Modifier.fillMaxSize()) {
                     LazyColumn(
                         state = listState,
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .walkthroughAnchor(
+                                anchor = WalkthroughAnchor.PICKER_RESULTS_LIST,
+                                controller = walkthroughController,
+                                enabled = walkthroughStep == HoldingsWalkthroughStep.PICKER_SCROLL_RESULTS,
+                            ),
                         contentPadding = PaddingValues(top = 8.dp)
                     ) {
                         items(searchResults) { asset ->
-                            AssetPickerItem(asset, textColor) {
-                                onAssetSelected(asset)
-                            }
+                            AssetPickerItem(
+                                asset = asset,
+                                textColor = textColor,
+                                enabled = tourResultsEnabled,
+                                onClick = { onAssetSelected(asset) },
+                            )
                         }
                     }
                 }
@@ -329,9 +410,17 @@ fun BrandingLogo(alpha: Float) {
 }
 
 @Composable
-fun AssetPickerItem(asset: AssetEntity, textColor: Color, onClick: () -> Unit) {
+fun AssetPickerItem(
+    asset: AssetEntity,
+    textColor: Color,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(horizontal = 20.dp, vertical = 14.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val iconKey = "${asset.coinId}|${asset.imageUrl}"

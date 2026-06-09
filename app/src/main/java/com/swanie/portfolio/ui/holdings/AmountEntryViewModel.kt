@@ -51,7 +51,11 @@ class AmountEntryViewModel @Inject constructor(
      * Updated to fetch live price and sparkline data before saving,
      * immediately seed history, and download icons on-demand.
      */
-    fun performSurgicalAdd(asset: AssetEntity, onComplete: () -> Unit) {
+    fun performSurgicalAdd(
+        asset: AssetEntity,
+        pinToTopOfVault: Boolean = false,
+        onComplete: () -> Unit,
+    ) {
         viewModelScope.launch {
             // 🌐 GLOBAL VISTA: Dynamically fetch currentVaultId from ThemePreferences
             val activeVaultId = themePreferences.currentVaultId.first()
@@ -80,23 +84,26 @@ class AmountEntryViewModel @Inject constructor(
             )
             
             // 3. Save the complete asset to the database
-            repository.executeSurgicalAdd(populatedAsset) { success, _ ->
-                if (success) {
-                    // 🚀 SEED PRICE HISTORY: Ensure sparkline appears immediately
-                    seedPriceHistory(populatedAsset.coinId, populatedAsset.officialSpotPrice)
-                    
-                    // 🛡️ LOCAL SYNC: Keeping code structure for future local backup logic
-                    viewModelScope.launch {
-                        try {
-                            val allAssets = assetDao.getAllAssetsGlobal()
-                            googleDriveService.uploadFullVaultBackup(allAssets)
-                        } catch (e: Exception) {
-                            Log.e("VAULT_DEBUG", "Local Backup Failed", e)
-                        }
-                    }
-
-                    onComplete()
+            var success = false
+            repository.executeSurgicalAdd(populatedAsset) { ok, _ -> success = ok }
+            if (success) {
+                if (pinToTopOfVault) {
+                    repository.prependAssetToVaultTop(activeVaultId, populatedAsset.coinId)
                 }
+                // 🚀 SEED PRICE HISTORY: Ensure sparkline appears immediately
+                seedPriceHistory(populatedAsset.coinId, populatedAsset.officialSpotPrice)
+
+                // 🛡️ LOCAL SYNC: Keeping code structure for future local backup logic
+                viewModelScope.launch {
+                    try {
+                        val allAssets = assetDao.getAllAssetsGlobal()
+                        googleDriveService.uploadFullVaultBackup(allAssets)
+                    } catch (e: Exception) {
+                        Log.e("VAULT_DEBUG", "Local Backup Failed", e)
+                    }
+                }
+
+                onComplete()
             }
         }
     }

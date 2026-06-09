@@ -1069,7 +1069,19 @@ fun ArchitectIconSelectionStep(
                     pickLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
                 enabled = !isSaving,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .then(
+                        if (walkthroughController != null) {
+                            Modifier.walkthroughAnchor(
+                                anchor = WalkthroughAnchor.METAL_ARCHITECT_ICON_CHOOSE_PHOTO,
+                                controller = walkthroughController,
+                                enabled = walkthroughStep == HoldingsWalkthroughStep.METAL_ARCHITECT_ICON_PICK,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Yellow),
                 border = BorderStroke(1.dp, Color.Yellow.copy(0.5f)),
             ) {

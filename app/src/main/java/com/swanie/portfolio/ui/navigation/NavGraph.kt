@@ -329,7 +329,10 @@ fun NavGraph(
                         ) {
                             walkthroughViewModel.controller.onMetalArchitectSaving()
                         }
-                        amountEntryViewModel.performSurgicalAdd(entity) {
+                        amountEntryViewModel.performSurgicalAdd(
+                            asset = entity,
+                            pinToTopOfVault = walkthroughViewModel.controller.shouldPinSavedAssetToTop(),
+                        ) {
                             if (duringWalkthroughAdd) {
                                 walkthroughViewModel.controller.onAmountSaved(entity.coinId)
                                 mainViewModel.enableCompactView()

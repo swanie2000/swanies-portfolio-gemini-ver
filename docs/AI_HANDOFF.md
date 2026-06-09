@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-02 — **Closed release 25 (`1.0.25`) submitted to Play** — **Publishing overview** in review on **Closed Alpha** + **Closed testers community** (same AAB, **Add from library** on second track). **Holdings Take Tour** shipped (crypto + metal **Asset Architect** path, **19** locales). Pre-upload: **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`**. **Closed Alpha 24** superseded when **25** approves. **Fiverr (Grayo)** **20** + family **3** on Alpha email lists; **≥12 opted-in** + **14 days** gate — **`§ Production access — activity log`** for form copy. **Next:** wait for **25** approval → tester updates → plan **26**; **Pre-launch report**.
+**Last updated:** 2026-06-08 — **Release 26 (`1.0.26`) built on laptop** — **Holdings Take Tour** polish + bug fixes (touch lockdown, picker/metal/architect/finale QA). **`versionCode` 26** in repo; **not yet uploaded** to Play. **Closed release 25 (`1.0.25`)** may still be in review or live on **Alpha** + **testers community** — confirm in Console. Owner **stress-tested tour** (could not break normal paths). **Before Play upload:** sync **new English-only tour strings** to **all 19 `values-*`** → **`lintVitalRelease`** → **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`**. **Fiverr** **20** + family **3**; **≥12 opted-in** + **14 days** gate — **`§ Production access — activity log`**. **Next:** upload **26** to **Closed Alpha** (meaningful release notes) → tester updates.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,7 +40,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **25 (1.0.25) in review** — full rollout submitted **2026-06-02**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **25 (1.0.25) in review** — same bundle via **Add from library** (Google Group track); batched with Alpha in one publishing change (quick checks restarted — expected). |
-| **Version on device** | **24** on Play until **25** approves. **25** built on laptop, uploaded to Console; owner device QA **OK** before upload. |
+| **Version on device** | **25** or **26** depending on Play approval / local Studio install. **26** tour polish **QA OK** on laptop (**2026-06-08**); upload pending locale sync + verify scripts. |
 | **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). Still need **≥3 closed releases** + production form (**§ Production access — Google requirements**). |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -196,7 +196,7 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 |--------|-------------|-------------------------|
 | **1. Multiple closed releases** | **≥3** closed-track releases **during** the 14-day test (not one build sitting idle) | **24** = release **1** (widget auto-Pro, closed live **2026-06-01**). **25** = release **2** (Take Tour — submitted **2026-06-02**, in review). Plan **26** with notes from **Pre-launch report** / tester feedback. Use **Add from library** for extra tracks (owner did for **testers community**). |
 | **2. App quality** | Professional UI/UX; fix pre-launch issues | **Test and release → Pre-launch report** — fix high-impact items; keep open issue count low before applying. **24** already fixes real tester-facing bug (widget Pro). |
-| **3. Production access form** | **~250–300+ characters per answer** on **10 questions**; accurate, app-specific | **Fiverr (Grayo)** assisting. Mention **email-list** closed cohort, closed opt-in link, **Web3Forms** + **`contact.html?topic=tester`**, in-app **Settings → Send feedback**, **build numbers** and **what changed**. **Do not** copy generic templates verbatim. |
+| **3. Production access form** | **~250–300+ characters per answer** on **10 questions**; accurate, app-specific | **Fiverr (Grayo)** assisting. Mention **email-list** closed cohort, closed opt-in link, **Web3Forms** + **`contact.html?topic=tester`**, in-app **Settings → Send feedback**, **build numbers** and **what changed**. **Do not** copy generic templates verbatim. Release **26** = tour polish + harder accidental exit (see activity log). |
 | **Engagement** | Testers actually use the app | Fiverr promised daily use + account creation; **RevenueCat** identifiable emails + feedback for form. **releases + form depth** are the lever. |
 
 **Common rejection themes (email / community):** incomplete production form; no visible app updates after feedback; perceived low tester engagement.
@@ -215,6 +215,16 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 ### Production access form — activity log (copy for 250+ char answers)
 
 **Purpose:** Factual bullets for the **10-question Production access** form and **Fiverr (Grayo)** draft — expand each into app-specific paragraphs; do not paste generic templates.
+
+**2026-06-08 — Release 26 tour polish (local build, upload pending)**
+
+| Item | Detail |
+|------|--------|
+| **Build** | **`versionCode` 26** / **`versionName` `1.0.26`**. Laptop QA **OK**; owner could not break tour on normal or stress paths after fixes. |
+| **Tour — accidental exit** | **Back** / bottom nav / system back blocked during tour; intentional exit via red **×** only; larger **×** hit target; edit pencil on finale **completes** tour cleanly. |
+| **Tour — touch lockdown** | Panel scrim + pass-through holes only on intended targets; metal live-card **Save** survives keyboard **Return**; premium split into **ask → mode → amount**; icon **Choose Photo** tappable; picker **search locked** until type-search step. |
+| **Tour — finale** | Card-gestures hint **pinned top**; arrow fixed; highlight ring hidden when card dragged off-screen; anchor **frozen** while dragging. |
+| **Pre-upload** | New strings in **`values/strings.xml` only** (premium hints, **`architect_tour_value_required`**) — **sync all 19 locales** before AAB (owner rule: manual per file, no bulk scripts). |
 
 **2026-06-02 — Closed release 25 submitted**
 
@@ -235,7 +245,7 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 
 - *How did you recruit testers?* — Paid Fiverr closed-test cohort (20 Gmail addresses on Play email list FIVERR) plus three family testers on Swanie's Portfolio Testers list; closed opt-in link on marketing site and Play; Testers Community track also receives builds; license testing not used.
 - *How do testers give feedback?* — Play feedback URL to website contact form with Tester topic preselect; in-app bug report under Settings with automatic account email; owner reads Web3Forms inbox and Play Console feedback during the 14-day closed test.
-- *What have you shipped during closed testing?* — Release 24 fixed widget Pro for closed-test grant; release 25 added localized Holdings Take Tour for crypto and precious metals including Asset Architect onboarding; release 26 planned from pre-launch report and tester input.
+- *What have you shipped during closed testing?* — Release 24 fixed widget Pro for closed-test grant; release 25 added localized Holdings Take Tour for crypto and precious metals including Asset Architect onboarding; release 26 polished the tour (touch lockdown, bug fixes, harder accidental exit) from closed-test and owner QA.
 
 ### RevenueCat vs Play vs closed testers (do not confuse)
 
@@ -271,17 +281,18 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
-### App — release 25 (submitted; awaiting Play approval)
+### App — release 26 (ready to upload)
 
-1. **Wait** for **Publishing overview** — **25** on **Alpha** + **testers community** (quick checks → review).
-2. After **Active:** nudge testers to update; optional **KO/DE** tour spot-check on Play build.
-3. **Pre-launch report** — fix issues; feed into **26** release notes.
+1. **Sync i18n** — copy new **`walkthrough_hint_metal_live_premium_*`**, **`architect_tour_value_required`**, **`architect_tour_skip_premium`** from **`values/strings.xml`** into **all 18 other `values-*`** (manual edits).
+2. **`lintVitalRelease`** → **`verify-release-config.ps1`** → **Signed Bundle** → **`verify-play-release.ps1`**.
+3. Upload **26** to **Closed Alpha** (+ **Add from library** for testers community if desired). Release notes: *Tour polish, bug fixes, harder to leave tour by accident.*
+4. Owner QA on Play build; nudge **Fiverr** testers to update.
 
 ### Closed testing → production (ship path)
 
-1. **Fiverr rollout** — **20** + **3** family on closed email lists; watch **opted-in ≥12**; testers update to **25** after approval.
+1. **Fiverr rollout** — **20** + **3** family on closed email lists; watch **opted-in ≥12**; testers update to **26** after upload.
 2. **14-day clock** — started with **TC** (**2026-06-01**); confirm Dashboard after pool swap; wait **14 consecutive days** at **≥12**.
-3. **≥3 closed releases** — **24** ✓ · **25** submitted **2026-06-02** (in review) · **26** next — use **`§ Production access form — activity log`** for form copy.
+3. **≥3 closed releases** — **24** ✓ · **25** ✓ (submitted **2026-06-02**) · **26** ready **2026-06-08** — use **`§ Production access form — activity log`** for form copy.
 4. **RevenueCat CSV** after rollout — non-anonymous emails since Fiverr start = real testers.
 5. **Pre-launch report** + feedback; **Fiverr** helps production-access form (**250+ char** answers).
 6. **Production release:** **`GRANT_DAYS=0`** → **`verify-play-release.ps1`** → staged rollout; **`PLAY_URL`** when public.
@@ -302,7 +313,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. See **Pro** bullet for verify scripts.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **Holdings walkthrough (25):** `HoldingsWalkthrough.kt`, `HoldingsWalkthroughViewModel.kt`, overlay in **`MainActivity`**; **`Take Tour`** on holdings (Settings toggle **Show Take Tour button**); yellow pill hints + glossy arrows + target rings; exit dialog with **Don't show tour again** (= hide Take Tour). **Crypto path:** add → provider → search → amount → card gestures → **End Tour**. **Metal fork:** **METAL** provider → **AssetArchitectScreen** (**blueprint** 4 steps → **live card** 4 steps → **icon pick** → save) → holdings card highlights **newly added** asset via **`highlightCoinId`**. **`walkthroughAnchor`** + window bounds for popups. Owner QA **OK**; **Play closed upload submitted 2026-06-02** (in review).
+- **Holdings walkthrough (25–26):** `HoldingsWalkthrough.kt`, `HoldingsWalkthroughViewModel.kt`, overlay in **`MainActivity`**; **`Take Tour`** on holdings (Settings toggle **Show Take Tour button**); yellow pill hints + glossy arrows + panel scrim with pass-through holes; red **×** exit + **Don't show tour again**. **Tour lockdown (26):** system/back/bottom-nav blocked during tour; picker steps gate search/provider/results; metal premium **ask → mode → amount**; live-card **Return** = **Save**; icon **Choose Photo** + **Add Asset** pass-through; finale hint pinned top; drag anchor freeze. **Crypto path:** add → provider → search → amount → card gestures → **End** (pencil opens edit → tour completes). **Metal fork:** **AssetArchitectScreen** → save → **`highlightCoinId`** card. **`walkthroughAnchor`** + window bounds. **26** laptop QA **OK** (**2026-06-08**).
 - **Settings UX (25):** **HELP & FEEDBACK** section near top — **Take Tour** toggle + **Report a BUG** card (tour no longer routes to feedback).
 - **i18n:** `LanguageDisplay.kt`; **`values-*`** — **574** keys each, match **`values/strings.xml`** (**2026-06-02:** **`walkthrough_*`**, **`settings_help_feedback`**, **`closed_test_pro_dialog_*`** in all **19** locales — manual per-file edits, no bulk scripts).
 - **Quality gates before “done”:** `:app:compileDebugKotlin`, **`:app:lintVitalRelease`** before Play AAB (required — **ExtraTranslation** fails release if locale keys drift from default).
@@ -350,6 +361,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-08 — Tour polish release 26 (local; handoff + push):** **`versionCode` 26** / **`1.0.26`**. Major **Holdings Take Tour** hardening: touch scrim lockdown, back/nav blocked, metal premium sub-steps + currency display, keyboard **Save** on live-card fields, icon pick **Choose Photo**, picker search gated by step, finale drag/arrow/highlight fixes, edit pencil ends tour cleanly, stress-test guards (anchor freeze, invalid bounds). Owner **could not break** tour after fixes. **English-only** new strings — **sync 19 locales** before Play upload. **Handoff + push `main`**. **Next:** i18n → verify scripts → upload **26** Closed Alpha.
 - **2026-06-02 — Play closed release 25 submitted (in review):** Owner built **`1.0.25`** AAB (**`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`**). Uploaded **Closed Alpha** full rollout + release notes (Take Tour). Added **testers community** track via **Add from library** (batched review). **`§ Production access form — activity log`** added for Google **10-question** draft. **Handoff + push `main`**. **Next:** approval → tester updates → **26**.
 - **2026-06-02 — Tour polish + i18n (25, local only):** **Metal** tour fork polished (**Asset Architect** blueprint/live-card/icon steps, touch blockers, **`highlightCoinId`** holdings card fix). **`walkthrough_*`** + settings + **`closed_test_pro_dialog_*`** added to **all 19 `values-*`** (manual edits; **574** keys; **`lintVitalRelease`** OK). Owner QA **tour good**; **not** uploaded to Play. **Handoff + push `main`**.
 - **2026-06-02 — Holdings walkthrough tour (25, local only):** Shipped replayable **Take Tour** for closed-test onboarding: yellow pill hints, arrows, highlights, exit + **Don't show tour again**, **HELP & FEEDBACK** on Settings. Full **crypto** path (add → search → amount → card gestures → **End Tour**). **Metal fork** when user picks **METAL** provider → **Asset Architect** tour steps → save → holdings. **`versionCode` 25** / **`1.0.25`**; owner QA OK on device; **not** uploaded to Play — **metal polish** next. **Handoff + push `main`**.

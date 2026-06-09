@@ -145,7 +145,6 @@ class MainActivity : AppCompatActivity() {
                             }
                             walkthroughViewModel.controller.skip()
                         },
-                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }

@@ -112,6 +112,14 @@ fun MyHoldingsScreen(
 
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
+
+    fun openAssetEditor(asset: AssetEntity) {
+        if (walkthroughStep == HoldingsWalkthroughStep.HOLDINGS_TAP_CARD) {
+            walkthroughController.onHoldingsEditOpened()
+        }
+        assetBeingEdited = asset
+    }
+
     /** Until Room Flow catches up after asset edit save; avoids stale list + Coil same-path cache. */
     var optimisticAssetEdit by remember { mutableStateOf<AssetEntity?>(null) }
     /** Per-asset icon generation; same [AssetEntity.localIconPath] can point at new bytes after re-crop. */
@@ -144,6 +152,10 @@ fun MyHoldingsScreen(
     }
     val trashBoundsInRoot = remember { mutableStateOf<Rect?>(null) }
     val isDraggingActive = remember { mutableStateOf(false) }
+
+    LaunchedEffect(isDraggingActive.value) {
+        walkthroughController.setHoldingsCardDragActive(isDraggingActive.value)
+    }
     val isOverTrash = remember { mutableStateOf(false) }
     var draggingVaultId by remember { mutableIntStateOf(-1) }
     var isExiting by remember { mutableStateOf(false) }
@@ -594,7 +606,7 @@ fun MyHoldingsScreen(
                                                             else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
                                                             else { expandedAssetId = null; editingAssetId = null }
                                                         },
-                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        onEditRequest = { openAssetEditor(asset) },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
                                                         localIconReloadNonce = iconReloadNonce,
                                                         )
@@ -606,7 +618,7 @@ fun MyHoldingsScreen(
                                                             else if (editingAssetId != asset.coinId) { editingAssetId = asset.coinId }
                                                             else { expandedAssetId = null; editingAssetId = null }
                                                         },
-                                                        onEditRequest = { assetBeingEdited = asset },
+                                                        onEditRequest = { openAssetEditor(asset) },
                                                         modifier = hndl, isExpanded = isExpanded, showEditButton = showEdit,
                                                         localIconReloadNonce = iconReloadNonce,
                                                         )
@@ -617,7 +629,7 @@ fun MyHoldingsScreen(
                                                     onExpandToggle = {
                                                         if (editingAssetId != asset.coinId) editingAssetId = asset.coinId else editingAssetId = null
                                                     },
-                                                    onEditRequest = { assetBeingEdited = asset },
+                                                    onEditRequest = { openAssetEditor(asset) },
                                                     onSave = { newName, newAmount, newWeight, weightUnit, decimals ->
                                                         viewModel.updateAsset(asset, newName, newAmount, newWeight, weightUnit, decimals)
                                                     },

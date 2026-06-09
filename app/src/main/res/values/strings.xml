@@ -207,7 +207,9 @@
     <string name="walkthrough_hint_metal_tap_next">Tap Next to continue.</string>
     <string name="walkthrough_hint_metal_live_weight">This is the weight of one piece — not how many you own.\nA 1 oz coin is 1. A 10 oz bar is 10.\nTap the number to change it, then Save.\nClear resets the field and closes the keyboard.</string>
     <string name="walkthrough_hint_metal_live_quantity">How many pieces do you hold?\nTap the large number for quantity.\nThe two lines below are the name shown on your card.\nEdit either, then Save. Clear closes the keyboard to re-read this hint.</string>
-    <string name="walkthrough_hint_metal_live_premium_mode">Optional: Premium or discount\nabove or below the spot price.\n\nPer Each applies it to every unit.\nExample: a discount on each coin.\n\nOnce applies it only one time.\nExample: a premium on a silver statue.\n\nTap a button, enter the yellow amount, then Save.</string>
+    <string name="walkthrough_hint_metal_live_premium_ask">Would you like to add a premium or discount to this asset?</string>
+    <string name="walkthrough_hint_metal_live_premium_pick_mode">Per Each applies to every unit.\nOnce applies only one time.\nTap one option below.</string>
+    <string name="walkthrough_hint_metal_live_premium_amount">Enter the adjustment in the yellow field.\nUse a negative value for a discount.\nLeave blank or zero to skip premium, then Save.</string>
     <string name="walkthrough_hint_metal_live_tap_next">Your card is set up.\nTap Next to pick an icon and save this metal to your holdings.</string>
     <string name="walkthrough_hint_metal_icon_pick">You can keep the default icon shown above,\nor tap Choose Photo to add your own.\nWhen you are ready, tap Add Asset to save.</string>
     <string name="walkthrough_hint_settings">Open Settings.</string>
@@ -390,6 +392,8 @@
     <string name="architect_premium_mode_per">Per each</string>
     <string name="architect_premium_mode_once">Once</string>
     <string name="architect_estimated_value">ESTIMATED VALUE</string>
+    <string name="architect_tour_value_required">Enter a value greater than zero, then tap Save.</string>
+    <string name="architect_tour_skip_premium">Skip premium (optional)</string>
     <string name="architect_icon_cta_add">ADD ASSET</string>
     <string name="architect_icon_cta_update">UPDATE</string>
     <string name="architect_back_to_blueprint">BACK TO BLUEPRINT</string>

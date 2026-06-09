@@ -406,6 +406,14 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun updateAssetOrder(assets: List<AssetEntity>) { assetDao.updateAssetOrder(assets) }
+
+    /** Move [coinId] to the top of [vaultId] holdings list (displayOrder 0). */
+    suspend fun prependAssetToVaultTop(vaultId: Int, coinId: String) {
+        val assets = assetDao.getAssetsByVaultOnce(vaultId).sortedBy { it.displayOrder }
+        val target = assets.find { it.coinId == coinId } ?: return
+        val reordered = listOf(target) + assets.filter { it.coinId != coinId }
+        assetDao.updateAssetOrder(reordered)
+    }
     suspend fun updateAssetEntity(asset: AssetEntity) {
         val resolvedIcon = iconManager.resolvedCustomIconPath(asset.coinId, asset.localIconPath)
         assetDao.updateAssetEntity(
