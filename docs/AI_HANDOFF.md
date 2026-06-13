@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-09 — **Release 27 (`1.0.27`)** dev complete on **`main`** — owner QA **OK** (exit, refresh, header spacing). **Play closed tracks still on 26** until owner uploads **27**. **`≥4` closed releases** ready for production form (**24** · **25** · **26** · **27**). **v28 backlog:** quit confirmation + **`GRANT_DAYS=0`** production build — not in **27**.
+**Last updated:** 2026-06-10 — **Release 27 (`1.0.27`) live** on **Closed Alpha** + **testers community**; both cohorts **notified**. **Store listing** — **preview video live** on public Play page (Trailer + **8** screenshots; **What's new** matches **27** release notes). **`≥4` closed releases** shipped (**24** · **25** · **26** · **27**). **Monitor** Dashboard **14-day** clock + tester feedback. **v28 backlog:** quit confirmation + **`GRANT_DAYS=0`** production build.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -38,10 +38,10 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
-| **Play closed testing (Alpha)** | **Active: 26 (1.0.26)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
-| **Play closed testing (testers community)** | **Active: 26 (1.0.26)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **27 (1.0.27)** on laptop after Studio build; Play closed tracks **26 (1.0.26)** until **27** upload. Studio **`main`** matches **`versionCode` 27**. |
-| **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). **≥4 closed releases** ready (**24** · **25** · **26** · **27** on **`main`**). Still need **14 consecutive days** at **≥12** + production form (**§ Production access — Google requirements**). |
+| **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
+| **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
+| **Version on device** | **27 (1.0.27)** on Play closed tracks after update; Studio **`main`** matches **`versionCode` 27**. |
+| **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). **≥4 closed releases** ✓ (**24** · **25** · **26** · **27**). Still need **14 consecutive days** at **≥12** + production form (**§ Production access — Google requirements**). |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
 | **Verify build** | **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** — owner verified on **22** and **23**; **always before Play upload**. |
@@ -51,11 +51,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Data safety:** Questionnaire **saved** (optional **Export to CSV** archive); canonical answers remain **`§ Play Data safety — facts from codebase`** below.
 - **Declarations / App content:** Owner stepped through multiple forms (**financial features**, **advertising ID** = no ads SDK / no **`AD_ID`** in manifest, **health**, **government apps**, store listing–adjacent tasks). Continue until **Dashboard** shows nothing blocking.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
-- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`** (~**3948** characters on Windows checkout / **4000** Play cap — re-count in Console before save). **Short description** — Play may flag wording that looks like **ranking / performance** claims (e.g. rewrite **"local-first"** if **"first"** triggers the automated hint); finish **screenshots**, **512 app icon**, **1024×500 feature graphic** uploads.
+- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic; **What's new** shows **27** release notes on public listing card. **Short description** — rewrite if Play flags ranking claims. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — set **`PLAY_URL`** on site at **production** (closed testers still use opt-in link).
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
 - **Testing path:** **Closed Alpha 24**; **Fiverr** closed cohort (**20** + **3** family emails). **≥12 opted-in for 14 consecutive days** → **Production access** — watch **Dashboard** during Fiverr rollout. **License testing** **unchecked**. **Site:** **`#get-app`** = **closed** opt-in QR (**`TESTER_URL`** → **`apps/testing/com.swanie.portfolio`**).
-- **Closed tester onboarding:** Opt in → install **24** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
+- **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
 - **Marketing site (2026-05-19):** **`website/contact.html`** + **`js/contact-form.js`** — **Contact** nav on all pages; **`#get-app`** links to contact form (replaced **`mailto:`**). Web3Forms submit → owner inbox; success shows **“Thanks — your message was sent. A copy is below.”** + on-page **“Message sent”** copy block (reliable confirmation; **not** Web3Forms Pro email autoresponder). Showcase + swipe hint unchanged from **2026-05-18** lock. Set **`PLAY_URL`** when Play **public** listing URL exists.
@@ -231,15 +231,25 @@ Exit button on Holdings — closes the app and removes it from Recents. Refresh 
 3. **Header layout** — Compact/normal view toggle shifted slightly **left** for clearer separation from the yellow **+** add button (add button position unchanged).
 4. **Fourth closed release** — **27** ships **after** tour polish (**26**) in direct response to closed-tester feedback — demonstrates **ongoing iteration** during the 14-day window (**24** widget fix · **25** Take Tour · **26** tour hardening · **27** exit + refresh).
 
-**2026-06-09 — Closed release 27 (dev complete; Play upload pending)**
+**2026-06-10 — Closed release 27 live**
 
 | Item | Detail |
 |------|--------|
-| **Build** | **`versionCode` 27** / **`versionName` `1.0.27`**. Laptop owner QA **OK** — exit, refresh per vault, header spacing. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** (auto-Pro until **~July 2026**). **Not** uploaded to Play yet. |
+| **Build** | **`versionCode` 27** / **`versionName` `1.0.27`**. Signed AAB after **`verify-release-config.ps1`** + **`verify-play-release.ps1`**. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** (auto-Pro until **~July 2026**). |
+| **What changed** | **Holdings exit** — **`ExitToApp`** top-left; **`finishAndRemoveTask()`** (Recents removed). **Refresh** — portfolio card top-left; **`refreshAssetsForVault`**. **Layout** — compact toggle spacing; card title/total centered. |
+| **Play release notes (en-US)** | See **copy-paste block** above (live on public listing **What's new**). |
+| **Tracks rolled out** | **Closed testing — Alpha** + **testers community** (same **27** bundle, **Publishing overview** submission after quick checks). Owner **notified both groups**. |
+| **Store listing** | **Preview video** change approved — **Trailer** visible on public Play listing; listing looks polished with video + screenshots. |
+| **Closed-release milestone** | **Fourth** closed release during test window (**24** · **25** · **26** · **27**). |
+
+**2026-06-09 — Closed release 27 (dev complete)**
+
+| Item | Detail |
+|------|--------|
+| **Build** | **`versionCode` 27** / **`versionName` `1.0.27`**. Laptop owner QA **OK** — exit, refresh per vault, header spacing. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** (auto-Pro until **~July 2026**). |
 | **What changed** | **Holdings exit** — **`ExitToApp`** top-left; **`finishAndRemoveTask()`** (Recents removed). **Refresh** — header bar → portfolio card top-left; **`AssetViewModel.refreshAssetsForVault`**. **Layout** — compact toggle **`offset`** left; card title/total centered (no asymmetric padding). **No new strings** (icons only). |
 | **Why it matters for testers** | Addresses closed-test feedback on how to leave the app and where refresh lives; small polish shows the developer is still shipping during the test window. |
 | **Play release notes (en-US)** | See **copy-paste block** above. |
-| **Tracks to roll out** | **Closed Alpha** + **testers community** via **Add from library** after **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`**. |
 | **Closed-release milestone** | **Fourth** closed release during test window (**24** · **25** · **26** · **27**) — exceeds **≥3 releases** requirement. |
 
 **2026-06-02 — Closed release 26 live**
@@ -306,13 +316,13 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Upload 27** — **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** → **Closed Alpha** + **testers community** (**Add from library**); paste release notes from **`§ Production access form — activity log`** (Play **27** block).
-2. **Monitor closed test** — **26** live until **27** rolls out; watch **opted-in ≥12** on Dashboard; no **License testing**. **RC emails** = real app use, not Play gate.
+1. **Monitor closed test** — **27** live on **Alpha** + **testers community**; watch **opted-in ≥12** on Dashboard; no **License testing**. **RC emails** = real app use, not Play gate.
+2. ~~**Upload 27**~~ — **Done** (**2026-06-10**); both groups **notified**.
 3. ~~**Ship 25 + 26**~~ — **Done** (**25** **2026-06-02**, **26** **2026-06-02**).
-3. **Pre-launch report** — fix issues; mention fixes in release notes.
-4. **Save feedback** for production form (Fiverr, contact form, in-app); seller assists form draft.
-5. After **14+ days** + **≥12** opted-in → **Apply for production access** (long form per **`§ Production access — Google requirements`**).
-6. **Production release:** **`GRANT_DAYS=0`**, verify, rollout; set **`PLAY_URL`** on site when listing is public.
+4. **Pre-launch report** — fix issues; mention fixes in release notes.
+5. **Save feedback** for production form (Fiverr, contact form, in-app); seller assists form draft.
+6. After **14+ days** + **≥12** opted-in → **Apply for production access** (long form per **`§ Production access — Google requirements`**).
+7. **Production release:** **`GRANT_DAYS=0`**, verify, rollout; set **`PLAY_URL`** on site when listing is public.
 
 ---
 
@@ -320,11 +330,10 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### When you reopen — closed test monitoring
 
-1. **Upload 27** if not done — verify scripts → both closed tracks → notify testers.
-2. **Dashboard** — keep **≥12 opted-in** for **14 consecutive days**; confirm clock after **Fiverr** pool swap.
-3. **Tester engagement** — Fiverr + family on latest closed build; export **RevenueCat** CSV for non-anonymous emails.
-4. **Feedback** — save bullets for production-access form (**four facts** for **27** in activity log).
-5. **Pre-launch report** — fix any issues; reference in release notes if needed.
+1. **Dashboard** — keep **≥12 opted-in** for **14 consecutive days**; confirm clock after **Fiverr** pool swap.
+2. **Tester engagement** — Fiverr + family on **27**; export **RevenueCat** CSV for non-anonymous emails.
+3. **Feedback** — Play Console, **`contact.html?topic=tester`**, in-app **Report a BUG**; **`§ Production access form — activity log`** has **27** facts.
+4. **Pre-launch report** — fix any issues; reference in future release notes if needed.
 
 ### v28 backlog (production ship)
 
@@ -334,12 +343,12 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 ### Closed testing → production (ship path)
 
 1. ~~**Ship 26**~~ — **Live 2026-06-02** on **Alpha** + **testers community**; both groups **notified**.
-2. **Ship 27** — dev complete **2026-06-09**; owner QA OK; **Play upload** next.
+2. ~~**Ship 27**~~ — **Live 2026-06-10** on **Alpha** + **testers community**; both groups **notified**; store listing **video** live.
 3. **14-day clock** — started with **TC** (**2026-06-01**); confirm Dashboard after pool swap; wait **14 consecutive days** at **≥12**.
 4. **≥4 closed releases** — **24** ✓ · **25** ✓ · **26** ✓ · **27** ✓ — use **`§ Production access form — activity log`** for form copy.
-4. **RevenueCat CSV** — non-anonymous emails since Fiverr start = real testers.
-5. **Pre-launch report** + feedback; **Fiverr** helps production-access form (**250+ char** answers).
-6. **Production release:** **`GRANT_DAYS=0`** → **`verify-play-release.ps1`** → staged rollout; **`PLAY_URL`** when public.
+5. **RevenueCat CSV** — non-anonymous emails since Fiverr start = real testers.
+6. **Pre-launch report** + feedback; **Fiverr** helps production-access form (**250+ char** answers).
+7. **Production release:** **`GRANT_DAYS=0`** → **`verify-play-release.ps1`** → staged rollout; set **`PLAY_URL`** on site when public.
 
 ### Website
 
@@ -406,6 +415,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-10 — Play closed release 27 live + listing video (handoff + push):** **`1.0.27`** approved and **live** on **Closed Alpha** + **testers community**; owner **notified both groups**. **Store listing** — **preview video** approved (**Trailer** on public Play page); **What's new** shows **27** notes; listing looks polished. **`≥4` closed releases** complete. **Next:** monitor Dashboard **14-day** clock + feedback; **v28** quit confirm + **`GRANT_DAYS=0`** at production. **Handoff + push `main`**.
 - **2026-06-09 — Release 27 exit + refresh UX (handoff + push):** **`versionCode` 27** / **`1.0.27`**. **Exit** top-left — **`finishAndRemoveTask()`** (Recents cleared); tour-shielded. **Refresh** on portfolio card top-left, per-vault; title/total centered. **Header** — compact toggle shifted left. Owner QA **OK**. **Play upload pending**; release notes + **four** production-form facts in **`§ Production access form — activity log`**. **v28:** quit confirm + **`GRANT_DAYS=0`**. **Handoff + push `main`**.
 - **2026-06-02 — Play closed release 26 live (EOD):** **`1.0.26`** approved and **live** on **Closed Alpha** + **testers community**; owner **notified both groups**. **`≥3` closed releases** complete (**24** · **25** · **26**). **Good for now** — monitor Dashboard + feedback; **v27** (exit button) deferred until second tester recommendations. **Handoff + push `main`**.
 - **2026-06-02 — Release 26 locale sync pushed + v27 note:** Manual **`values-*`** for premium tour hints + **`architect_tour_*`** (all **19** locales); **`lintVitalRelease`** OK; **`main`** pushed. **v27 backlog:** **exit button** to close app — **deferred** until second round of tester recommendations. **Next:** verify scripts → upload **26** Closed Alpha.
