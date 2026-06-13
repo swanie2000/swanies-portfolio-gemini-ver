@@ -283,6 +283,14 @@ class AssetViewModel @Inject constructor(
         }
     }
 
+    /** Refresh holdings for a specific vault (portfolio header control on the active pager page). */
+    fun refreshAssetsForVault(vaultId: Int) {
+        if (vaultId <= 0) return
+        viewModelScope.launch {
+            repository.refreshAssets(force = true, portfolioId = vaultId.toString())
+        }
+    }
+
     fun refreshMarketWatch() {
         viewModelScope.launch { repository.refreshMarketWatch() }
     }

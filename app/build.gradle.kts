@@ -81,8 +81,8 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 26
-        versionName = "1.0.26"
+        versionCode = 27
+        versionName = "1.0.27"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
         buildConfigField(

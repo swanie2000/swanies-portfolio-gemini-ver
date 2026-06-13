@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.ViewList
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -111,6 +112,10 @@ fun MyHoldingsScreen(
     )
 
     val isViewModelRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle(initialValue = false)
+    var refreshTargetVaultId by remember { mutableIntStateOf(-1) }
+    LaunchedEffect(isViewModelRefreshing) {
+        if (!isViewModelRefreshing) refreshTargetVaultId = -1
+    }
     var assetBeingEdited by remember { mutableStateOf<AssetEntity?>(null) }
 
     fun openAssetEditor(asset: AssetEntity) {
@@ -236,14 +241,26 @@ fun MyHoldingsScreen(
                     Row(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(
                             onClick = {
-                                if (!isViewModelRefreshing) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.refreshAssets()
-                                }
+                                if (isTourActive) return@IconButton
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                (view.context as? Activity)?.finishAndRemoveTask()
                             },
-                        ) { Icon(Icons.Default.Refresh, null, tint = textColor) }
+                            enabled = !isTourActive,
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, tint = textColor)
+                        }
                         Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = { mainViewModel.toggleCompactView() }) { Icon(if (isCompactViewEnabled) Icons.Default.ViewModule else Icons.AutoMirrored.Filled.ViewList, null, tint = textColor) }
+                        IconButton(
+                            onClick = { mainViewModel.toggleCompactView() },
+                            modifier = Modifier.offset(x = (-12).dp),
+                        ) {
+                            Icon(
+                                if (isCompactViewEnabled) Icons.Default.ViewModule
+                                else Icons.AutoMirrored.Filled.ViewList,
+                                contentDescription = null,
+                                tint = textColor,
+                            )
+                        }
                         IconButton(
                             onClick = {
                                 val activeVaultIdFromPager = accessibleVaults.getOrNull(pagerState.currentPage)?.id ?: activeVault.id
@@ -381,39 +398,80 @@ fun MyHoldingsScreen(
                             Column(modifier = Modifier.fillMaxSize().alpha(pageAlpha)) {
                                 Box(modifier = Modifier.fillMaxWidth().height(140.dp).zIndex(5f).padding(horizontal = 24.dp)) {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth().height(110.dp).align(Alignment.Center).graphicsLayer {
-                                            scaleX = deckScale
-                                            scaleY = deckScale
-                                        }.clip(RoundedCornerShape(12.dp)).background(nightVaultColor).border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)).clickable { isExiting = true; navController.navigate(Routes.PORTFOLIO_MANAGER) }
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(110.dp)
+                                            .align(Alignment.Center)
+                                            .graphicsLayer {
+                                                scaleX = deckScale
+                                                scaleY = deckScale
+                                            }
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(nightVaultColor)
+                                            .border(1.dp, textColor.copy(alpha = 0.2f), RoundedCornerShape(12.dp)),
                                     ) {
-                                        Column(modifier = Modifier.fillMaxSize().padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
-                                                Text(
-                                                    text = vaultForPage.name.uppercase(),
-                                                    color = textColor,
-                                                    fontSize = 18.sp,
-                                                    fontWeight = FontWeight.Black,
-                                                    letterSpacing = 2.sp
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                                                val vaultTotalMaxSp = with(LocalDensity.current) {
-                                                    (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp()
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .clickable {
+                                                    isExiting = true
+                                                    navController.navigate(Routes.PORTFOLIO_MANAGER)
+                                                },
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(12.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                            ) {
+                                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.BottomCenter) {
+                                                    Text(
+                                                        text = vaultForPage.name.uppercase(),
+                                                        color = textColor,
+                                                        fontSize = 18.sp,
+                                                        fontWeight = FontWeight.Black,
+                                                        letterSpacing = 2.sp,
+                                                    )
                                                 }
-                                                AutoResizingText(
-                                                    text = totalValueFormatted,
-                                                    style = TextStyle(
-                                                        color = textColor.copy(0.7f),
-                                                        fontSize = vaultTotalMaxSp,
-                                                        fontWeight = FontWeight.Bold,
-                                                        textAlign = TextAlign.Center
-                                                    ),
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    maxFontSize = vaultTotalMaxSp,
-                                                    minFontSize = 10.sp,
-                                                )
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
+                                                    val vaultTotalMaxSp = with(LocalDensity.current) {
+                                                        (20.sp.toPx() / fontScale.coerceAtMost(1.15f)).toSp()
+                                                    }
+                                                    AutoResizingText(
+                                                        text = totalValueFormatted,
+                                                        style = TextStyle(
+                                                            color = textColor.copy(0.7f),
+                                                            fontSize = vaultTotalMaxSp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            textAlign = TextAlign.Center,
+                                                        ),
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        maxFontSize = vaultTotalMaxSp,
+                                                        minFontSize = 10.sp,
+                                                    )
+                                                }
                                             }
+                                        }
+                                        IconButton(
+                                            onClick = {
+                                                if (isViewModelRefreshing) return@IconButton
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                refreshTargetVaultId = vaultForPage.id
+                                                viewModel.refreshAssetsForVault(vaultForPage.id)
+                                            },
+                                            enabled = !isViewModelRefreshing,
+                                            modifier = Modifier
+                                                .align(Alignment.TopStart)
+                                                .size(48.dp)
+                                                .zIndex(1f),
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Refresh,
+                                                contentDescription = null,
+                                                tint = textColor,
+                                                modifier = Modifier.size(26.dp),
+                                            )
                                         }
                                     }
                                 }
@@ -428,7 +486,7 @@ fun MyHoldingsScreen(
                                     }
                                 }
 
-                                if (isViewModelRefreshing && vaultForPage.id == activeVault.id) {
+                                if (isViewModelRefreshing && vaultForPage.id == refreshTargetVaultId) {
                                     LinearProgressIndicator(
                                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(2.dp),
                                         color = Color.Yellow,

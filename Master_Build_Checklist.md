@@ -225,7 +225,9 @@
 - [ ] **Closed test window:** **14+** consecutive days with **12+** opted-in — re-watch after **Fiverr** swap. **License testing** **unchecked**.
 - [x] **Holdings Take Tour polish (26, 2026-06-08):** Touch lockdown, accidental-exit prevention, metal/picker/finale bug fixes; owner stress QA OK on laptop.
 - [x] **Play upload 1.0.26 (26):** **Live** on **Closed Alpha** + **testers community** (**2026-06-02**); both groups notified; tour polish release notes.
-- [ ] **v27 backlog (deferred):** In-app **exit button** to close the app — ship with **second round of tester recommendations**, not as a standalone release before that.
+- [x] **Holdings exit + refresh UX (27, 2026-06-09):** Exit button (`finishAndRemoveTask`), refresh on portfolio card per vault, header spacing; owner QA OK on laptop.
+- [ ] **Play upload 1.0.27 (27):** Verify scripts → closed tracks → release notes in handoff activity log.
+- [ ] **v28 backlog:** Quit confirmation + **`confirmQuit`** toggle; production **`GRANT_DAYS=0`**.
 - [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
