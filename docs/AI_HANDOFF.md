@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-10 — **Release 27 (`1.0.27`) live** on **Closed Alpha** + **testers community**; both cohorts **notified**. **Store listing** — **preview video live** on public Play page (Trailer + **8** screenshots; **What's new** matches **27** release notes). **`≥4` closed releases** shipped (**24** · **25** · **26** · **27**). **Monitor** Dashboard **14-day** clock + tester feedback. **v28 backlog:** quit confirmation + **`GRANT_DAYS=0`** production build.
+**Last updated:** 2026-06-11 — **`main`** at **28 (`1.0.28`)** — CryptoCompare price-feed fix ready for Play upload; **27** still live on closed tracks until **28** rolls out. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** stays on **28** (closed test). **After closed test:** wire **MEXC**, remove **CryptoCompare** from picker (owner only needed CC for **ATLA**). **Production store build:** **`GRANT_DAYS=0`** (no auto-Pro) — **not** in **28**.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,7 +40,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **27 (1.0.27)** on Play closed tracks after update; Studio **`main`** matches **`versionCode` 27**. |
+| **Version on device** | **28 (1.0.28)** on laptop after Studio build; Play closed tracks **27 (1.0.27)** until **28** upload. Studio **`main`** matches **`versionCode` 28**. |
 | **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). **≥4 closed releases** ✓ (**24** · **25** · **26** · **27**). Still need **14 consecutive days** at **≥12** + production form (**§ Production access — Google requirements**). |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -216,6 +216,18 @@ Many personal accounts are **rejected** after closed testing even with 12+ teste
 
 **Purpose:** Factual bullets for the **10-question Production access** form and **Fiverr (Grayo)** draft — expand each into app-specific paragraphs; do not paste generic templates.
 
+### Play release 28 — copy-paste (owner upload)
+
+**Prereq:** **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** before Signed Bundle (key baked into AAB). **`verify-release-config.ps1`** checks RC + CC keys.
+
+**Play Console → Release notes (en-US):**
+
+```
+Fix: CryptoCompare price feed (provider now requires an API key). Tokens not on CoinGecko—such as ATLA—update on refresh instead of showing a stuck price. Pro for closed testers until ~July 2026—do not purchase during test.
+```
+
+**Production questionnaire (tester-found bug):** Owner/tester found **stale CryptoCompare prices** (e.g. **ATLA**) during closed test; root cause **401 without API key** + refresh keeping old DB price; fixed in **28**; demonstrates responsive iteration (~**35** testers; **CryptoCompare** was only needed for tokens CoinGecko does not list).
+
 ### Play release 27 — copy-paste (owner upload)
 
 **Play Console → Release notes (en-US):**
@@ -291,7 +303,15 @@ Exit button on Holdings — closes the app and removes it from Recents. Refresh 
 
 - *How did you recruit testers?* — Paid Fiverr closed-test cohort (20 Gmail addresses on Play email list FIVERR) plus three family testers on Swanie's Portfolio Testers list; closed opt-in link on marketing site and Play; Testers Community track also receives builds; license testing not used.
 - *How do testers give feedback?* — Play feedback URL to website contact form with Tester topic preselect; in-app bug report under Settings with automatic account email; owner reads Web3Forms inbox and Play Console feedback during the 14-day closed test.
-- *What have you shipped during closed testing?* — Release 24 fixed widget Pro for closed-test grant; release 25 added localized Holdings Take Tour for crypto and precious metals including Asset Architect onboarding; release 26 polished the tour (touch lockdown, bug fixes, harder accidental exit); release 27 added an exit button that removes the app from Recents, moved per-vault refresh onto each portfolio card, and adjusted holdings header spacing from tester feedback.
+- *What have you shipped during closed testing?* — … release 27 exit + refresh UX; release **28** fixed CryptoCompare stuck prices (tester-reported, tokens not on CoinGecko such as ATLA).
+
+### Post–closed-test search engines (planned — not in 28)
+
+| Item | Plan |
+|------|------|
+| **MEXC** | Wire unfinished **`MexcSearchProvider`** (registry + **`NetworkModule`** + **`healMetadata`**); **free** public API; **ATLA/USDT** primary listing. **After** **28** closed upload. |
+| **CryptoCompare** | **Remove** from picker after MEXC QA — owner added CC only for **ATLA**; ~**35** testers unlikely all use CC. Existing CC holdings: re-add via MEXC or one-time migration. |
+| **Production Pro grant** | **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** → production AAB only (**`verify-play-release.ps1`** shows auto-Pro disabled). **Keep `30` on closed-test builds** until production apply. |
 
 ### RevenueCat vs Play vs closed testers (do not confuse)
 
@@ -316,8 +336,8 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Play Console — ordered steps (next session; do in order)
 
-1. **Monitor closed test** — **27** live on **Alpha** + **testers community**; watch **opted-in ≥12** on Dashboard; no **License testing**. **RC emails** = real app use, not Play gate.
-2. ~~**Upload 27**~~ — **Done** (**2026-06-10**); both groups **notified**.
+1. **Upload 28** — **`verify-release-config.ps1`** (RC + **`CRYPTOCOMPARE_API_KEY`**) → Signed Bundle → **`verify-play-release.ps1`** → **Closed Alpha** + **testers community**; **`GRANT_DAYS=30`** unchanged.
+2. **Monitor closed test** — watch **opted-in ≥12**; ~**35** testers after Fiverr growth.
 3. ~~**Ship 25 + 26**~~ — **Done** (**25** **2026-06-02**, **26** **2026-06-02**).
 4. **Pre-launch report** — fix issues; mention fixes in release notes.
 5. **Save feedback** for production form (Fiverr, contact form, in-app); seller assists form draft.
@@ -328,27 +348,42 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
+### Upload 28 now (closed test — do not break cohort)
+
+1. **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** (owner has key).
+2. **`.\scripts\verify-release-config.ps1`** → Signed Bundle → **`.\scripts\verify-play-release.ps1`**.
+3. Upload **28** to **Closed Alpha** + **testers community**; release notes in **`§ Play release 28`**; notify testers.
+4. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** — **keep** on this build (auto-Pro until **~July 2026**).
+
 ### When you reopen — closed test monitoring
 
-1. **Dashboard** — keep **≥12 opted-in** for **14 consecutive days**; confirm clock after **Fiverr** pool swap.
-2. **Tester engagement** — Fiverr + family on **27**; export **RevenueCat** CSV for non-anonymous emails.
-3. **Feedback** — Play Console, **`contact.html?topic=tester`**, in-app **Report a BUG**; **`§ Production access form — activity log`** has **27** facts.
-4. **Pre-launch report** — fix any issues; reference in future release notes if needed.
+1. **Dashboard** — **≥12 opted-in** for **14 consecutive days**.
+2. **Tester engagement** — ~**35** opted-in; **RevenueCat** CSV for in-app accounts.
+3. **Feedback** — save bullets for production form (**28** = tester-found price fix).
 
-### v28 backlog (production ship)
+### After closed test (before / alongside production apply)
 
-1. **Quit confirmation** — **QUIT?** dialog + **`confirmQuit`** settings toggle (mirror **`confirmDelete`**); exit button triggers confirm when enabled.
-2. **Production AAB** — **`CLOSED_TEST_PRO_GRANT_DAYS=0`** + **`verify-play-release.ps1`** when applying for production access.
+1. **MEXC** — wire provider + picker entry; QA **ATLA**; **drop CryptoCompare** from registry (free exchange API, no monthly aggregator fee).
+2. **`healMetadata`** — skip exchange providers (MEXC/KuCoin/etc.) so CoinGecko does not corrupt **`apiId`**.
+
+### Production store release (when Console allows)
+
+1. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** → production AAB (**no** 30-day auto-Pro).
+2. **`verify-play-release.ps1`** — confirm auto-Pro disabled line.
+3. Optional: **quit confirmation** dialog + **`confirmQuit`** toggle (backlog).
+4. Staged rollout; **`PLAY_URL`** on site.
 
 ### Closed testing → production (ship path)
 
-1. ~~**Ship 26**~~ — **Live 2026-06-02** on **Alpha** + **testers community**; both groups **notified**.
-2. ~~**Ship 27**~~ — **Live 2026-06-10** on **Alpha** + **testers community**; both groups **notified**; store listing **video** live.
-3. **14-day clock** — started with **TC** (**2026-06-01**); confirm Dashboard after pool swap; wait **14 consecutive days** at **≥12**.
-4. **≥4 closed releases** — **24** ✓ · **25** ✓ · **26** ✓ · **27** ✓ — use **`§ Production access form — activity log`** for form copy.
-5. **RevenueCat CSV** — non-anonymous emails since Fiverr start = real testers.
-6. **Pre-launch report** + feedback; **Fiverr** helps production-access form (**250+ char** answers).
-7. **Production release:** **`GRANT_DAYS=0`** → **`verify-play-release.ps1`** → staged rollout; set **`PLAY_URL`** on site when public.
+1. ~~**Ship 27**~~ — **Live 2026-06-10**.
+2. **Ship 28** — CryptoCompare fix on **`main`**; **Play upload** next.
+3. **14-day clock** + **≥4** closed releases (**24–27** live; **28** = fifth).
+4. **MEXC + drop CC** — post–**28**, pre-production or early production track.
+5. **Production:** **`GRANT_DAYS=0`** AAB — separate from closed **28**.
+
+### v28 backlog (deferred from 28 scope)
+
+1. **Quit confirmation** — **QUIT?** + **`confirmQuit`** settings toggle.
 
 ### Website
 
@@ -366,7 +401,8 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. See **Pro** bullet for verify scripts.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
-- **Holdings UX (27):** **`MyHoldingsScreen.kt`** — top-left **exit** (`ExitToApp`, **`finishAndRemoveTask()`**, disabled during tour); **refresh** on portfolio card (`refreshAssetsForVault`); compact toggle spacing. **`AssetViewModel.refreshAssetsForVault`**.
+- **Holdings UX (27):** **`MyHoldingsScreen.kt`** — exit, per-vault refresh, header spacing. **`AssetViewModel.refreshAssetsForVault`**.
+- **CryptoCompare (28):** **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** → **`BuildConfig`** → **`NetworkModule`** `Apikey` header; **`healMetadata`** skips CC; **`providerPriceQueryId`** uses symbol for CC refresh. **Planned:** replace with **MEXC** for **ATLA** post–closed test.
 - **Holdings walkthrough (25–26):** `HoldingsWalkthrough.kt`, `HoldingsWalkthroughViewModel.kt`, overlay in **`MainActivity`**; **`Take Tour`** on holdings (Settings toggle **Show Take Tour button**); yellow pill hints + glossy arrows + panel scrim with pass-through holes; red **×** exit + **Don't show tour again**. **Tour lockdown (26):** system/back/bottom-nav blocked during tour; picker steps gate search/provider/results; metal premium **ask → mode → amount**; live-card **Return** = **Save**; icon **Choose Photo** + **Add Asset** pass-through; finale hint pinned top; drag anchor freeze. **Crypto path:** add → provider → search → amount → card gestures → **End** (pencil opens edit → tour completes). **Metal fork:** **AssetArchitectScreen** → save → **`highlightCoinId`** card. **`walkthroughAnchor`** + window bounds. **26** laptop QA **OK** (**2026-06-08**).
 - **Settings UX (25):** **HELP & FEEDBACK** section near top — **Take Tour** toggle + **Report a BUG** card (tour no longer routes to feedback).
 - **i18n:** `LanguageDisplay.kt`; **`values-*`** — **574** keys each, match **`values/strings.xml`** (**2026-06-02:** **`walkthrough_*`**, **`settings_help_feedback`**, **`closed_test_pro_dialog_*`** in all **19** locales — manual per-file edits, no bulk scripts).
@@ -415,6 +451,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-11 — Release 28 CryptoCompare fix (handoff + push):** **`1.0.28`** on **`main`** — CC API key wiring, **`healMetadata`** / refresh fixes for stuck prices (**ATLA** / tokens not on CoinGecko). Owner QA OK. **Keep `GRANT_DAYS=30`** for closed **28** upload; **production** = **`GRANT_DAYS=0`** later. **Post-test plan:** wire **MEXC**, drop **CryptoCompare** from picker. **Handoff + push `main`**. **Next:** verify scripts → upload **28** both closed tracks.
 - **2026-06-10 — Play closed release 27 live + listing video (handoff + push):** **`1.0.27`** approved and **live** on **Closed Alpha** + **testers community**; owner **notified both groups**. **Store listing** — **preview video** approved (**Trailer** on public Play page); **What's new** shows **27** notes; listing looks polished. **`≥4` closed releases** complete. **Next:** monitor Dashboard **14-day** clock + feedback; **v28** quit confirm + **`GRANT_DAYS=0`** at production. **Handoff + push `main`**.
 - **2026-06-09 — Release 27 exit + refresh UX (handoff + push):** **`versionCode` 27** / **`1.0.27`**. **Exit** top-left — **`finishAndRemoveTask()`** (Recents cleared); tour-shielded. **Refresh** on portfolio card top-left, per-vault; title/total centered. **Header** — compact toggle shifted left. Owner QA **OK**. **Play upload pending**; release notes + **four** production-form facts in **`§ Production access form — activity log`**. **v28:** quit confirm + **`GRANT_DAYS=0`**. **Handoff + push `main`**.
 - **2026-06-02 — Play closed release 26 live (EOD):** **`1.0.26`** approved and **live** on **Closed Alpha** + **testers community**; owner **notified both groups**. **`≥3` closed releases** complete (**24** · **25** · **26**). **Good for now** — monitor Dashboard + feedback; **v27** (exit button) deferred until second tester recommendations. **Handoff + push `main`**.

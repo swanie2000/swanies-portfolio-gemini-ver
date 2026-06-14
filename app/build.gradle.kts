@@ -70,6 +70,9 @@ fun validateRevenueCatPublicApiKeyForRelease() {
     }
 }
 
+/** Free key from https://www.cryptocompare.com/cryptopian/api-keys — required for min-api price/search (401 without). */
+fun resolveCryptoCompareApiKey(): String = resolveLocalSecret("CRYPTOCOMPARE_API_KEY").trim()
+
 /** Free key from https://web3forms.com — bug reports + website join-testing form (domain-restrict in dashboard). */
 fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_KEY").trim()
 
@@ -81,10 +84,11 @@ android {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
         targetSdk = 35
-        versionCode = 27
-        versionName = "1.0.27"
+        versionCode = 28
+        versionName = "1.0.28"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
+        buildConfigField("String", "CRYPTOCOMPARE_API_KEY", "\"${resolveCryptoCompareApiKey()}\"")
         buildConfigField(
             "long",
             "CLOSED_TEST_PRO_UNTIL_EPOCH_MS",

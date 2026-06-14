@@ -54,6 +54,15 @@ if ([string]::IsNullOrWhiteSpace($rcKey)) {
     Write-Host "OK: REVENUECAT_PUBLIC_API_KEY looks like a Play production key." -ForegroundColor Green
 }
 
+$ccKey = Read-LocalProperty "CRYPTOCOMPARE_API_KEY"
+if ([string]::IsNullOrWhiteSpace($ccKey)) {
+    Write-Host "WARN: CRYPTOCOMPARE_API_KEY missing — CryptoCompare search/prices will fail (401)." -ForegroundColor Yellow
+} elseif ($ccKey.Length -lt 10) {
+    Write-Host "WARN: CRYPTOCOMPARE_API_KEY looks too short." -ForegroundColor Yellow
+} else {
+    Write-Host "OK: CRYPTOCOMPARE_API_KEY is set." -ForegroundColor Green
+}
+
 if ($failed) {
     exit 1
 }

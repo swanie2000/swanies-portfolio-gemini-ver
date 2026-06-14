@@ -1,5 +1,6 @@
 package com.swanie.portfolio.di
 
+import com.swanie.portfolio.BuildConfig
 import com.swanie.portfolio.data.network.*
 import dagger.Module
 import dagger.Provides
@@ -71,7 +72,21 @@ object NetworkModule {
         .addConverterFactory(GsonConverterFactory.create()).build()
 
     @Provides @Singleton @Named("CryptoCompare")
-    fun provideCryptoCompareRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideCryptoCompareOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val builder = chain.request().newBuilder()
+                .header("User-Agent", "SwaniesPortfolio/1.0")
+                .header("Accept", "application/json")
+            val apiKey = BuildConfig.CRYPTOCOMPARE_API_KEY.trim()
+            if (apiKey.isNotEmpty()) {
+                builder.header("authorization", "Apikey $apiKey")
+            }
+            chain.proceed(builder.build())
+        }
+        .build()
+
+    @Provides @Singleton @Named("CryptoCompare")
+    fun provideCryptoCompareRetrofit(@Named("CryptoCompare") client: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl("https://min-api.cryptocompare.com/").client(client)
         .addConverterFactory(GsonConverterFactory.create()).build()
 

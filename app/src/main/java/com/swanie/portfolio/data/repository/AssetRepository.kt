@@ -87,6 +87,12 @@ class AssetRepository @Inject constructor(
         return if (unitLabel.isEmpty()) metalType else "$metalType $unitLabel"
     }
 
+    /** CryptoCompare prices are keyed by ticker; apiId may be stale (e.g. CG_ from old healMetadata). */
+    private fun providerPriceQueryId(asset: AssetEntity): String = when (asset.priceSource) {
+        "CryptoCompare" -> asset.symbol
+        else -> asset.apiId
+    }
+
     suspend fun refreshAssets(force: Boolean = false, portfolioId: String = "MAIN") {
         if (!syncCoordinator.canRefresh(force)) return
 
@@ -105,7 +111,7 @@ class AssetRepository @Inject constructor(
 
             assets.groupBy { it.priceSource }.forEach { (sourceName, providerAssets) ->
                 val provider = searchRegistry.getProvider(sourceName) ?: return@forEach
-                val idString = providerAssets.joinToString(",") { it.apiId }
+                val idString = providerAssets.joinToString(",") { providerPriceQueryId(it) }
                 val updatedList = try { provider.getPrices(idString) } catch (e: Exception) { emptyList() }
 
                 val updatesToSave = providerAssets.map { existing ->
@@ -132,6 +138,11 @@ class AssetRepository @Inject constructor(
                             },
                             displayName = finalDisplayName,
                             isMetal = isMetal,
+                            apiId = if (existing.priceSource == "CryptoCompare") {
+                                "CC_${existing.symbol.uppercase(Locale.ROOT)}"
+                            } else {
+                                existing.apiId
+                            },
                             officialSpotPrice = update.officialSpotPrice,
                             priceChange24h = update.priceChange24h,
                             sparklineData = if (update.sparklineData.isNotEmpty()) update.sparklineData else existing.sparklineData,
@@ -335,7 +346,9 @@ class AssetRepository @Inject constructor(
     }
 
     suspend fun healMetadata(asset: AssetEntity): AssetEntity {
-        if (asset.priceSource == "CoinGecko" || asset.category == AssetCategory.METAL) return asset
+        if (asset.priceSource == "CoinGecko"
+            || asset.priceSource == "CryptoCompare"
+            || asset.category == AssetCategory.METAL) return asset
         return try {
             val cgProvider = searchRegistry.getProvider("CoinGecko") ?: return asset
             val results = cgProvider.search(asset.symbol)
@@ -349,7 +362,7 @@ class AssetRepository @Inject constructor(
     suspend fun fetchLiveAssetData(asset: AssetEntity): AssetEntity {
         return try {
             val provider = searchRegistry.getProvider(asset.priceSource) ?: return asset
-            val updates = provider.getPrices(asset.apiId)
+            val updates = provider.getPrices(providerPriceQueryId(asset))
             val liveMatch = updates.find { it.apiId.equals(asset.apiId, true) || it.symbol.equals(asset.symbol, true) }
             if (liveMatch != null) {
                 asset.copy(

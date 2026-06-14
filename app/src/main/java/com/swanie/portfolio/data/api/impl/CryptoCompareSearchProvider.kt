@@ -73,6 +73,8 @@ class CryptoCompareSearchProvider @Inject constructor(
                         lastUpdated = System.currentTimeMillis()
                     ))
                 }
+            } else {
+                Log.e("ADD_TRACE", "CryptoCompare Price HTTP ${response.code()}: ${response.message()}")
             }
         } catch (e: Exception) {
             Log.e("ADD_TRACE", "CryptoCompare Price Exception: ${e.message}")

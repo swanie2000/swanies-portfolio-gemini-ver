@@ -227,8 +227,10 @@
 - [x] **Play upload 1.0.26 (26):** **Live** on **Closed Alpha** + **testers community** (**2026-06-02**); both groups notified; tour polish release notes.
 - [x] **Holdings exit + refresh UX (27, 2026-06-09):** Exit button (`finishAndRemoveTask`), refresh on portfolio card per vault, header spacing; owner QA OK on laptop.
 - [x] **Play upload 1.0.27 (27):** **Live** on **Closed Alpha** + **testers community** (**2026-06-10**); both groups notified; release notes on public listing.
-- [x] **Store listing preview video (2026-06-10):** Approved on public Play listing (**Trailer** visible with screenshots).
-- [ ] **v28 backlog:** Quit confirmation + **`confirmQuit`** toggle; production **`GRANT_DAYS=0`**.
+- [ ] **Play upload 1.0.28 (28):** CryptoCompare price fix; **`CRYPTOCOMPARE_API_KEY`** required at build; **`GRANT_DAYS=30`**.
+- [ ] **Post–closed test:** Wire **MEXC** search engine; remove **CryptoCompare** from picker (**ATLA** via free exchange API).
+- [ ] **Production store AAB:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** (remove 30-day auto-Pro) + **`verify-play-release.ps1`**.
+- [ ] **v29+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
 - [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.
