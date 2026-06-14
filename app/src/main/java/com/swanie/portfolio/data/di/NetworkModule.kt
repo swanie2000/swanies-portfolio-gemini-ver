@@ -117,6 +117,27 @@ object NetworkModule {
         .baseUrl("https://api.mexc.com/").client(client)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
+    @Provides @Singleton @Named("WEEX")
+    fun provideWeexOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36",
+                )
+                .header("Accept", "application/json")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+    @Provides @Singleton @Named("WEEX")
+    fun provideWeexRetrofit(@Named("WEEX") client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api-spot.weex.com/").client(client)
+        .addConverterFactory(GsonConverterFactory.create()).build()
+
     @Provides @Singleton @Named("Jupiter")
     fun provideJupiterLiteRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl("https://lite-api.jup.ag/").client(client)
@@ -158,6 +179,11 @@ object NetworkModule {
     @Singleton
     fun provideMexcApiService(@Named("MEXC") r: Retrofit): MexcApiService =
         r.create(MexcApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideWeexApiService(@Named("WEEX") r: Retrofit): WeexApiService =
+        r.create(WeexApiService::class.java)
 
     @Provides
     @Singleton

@@ -4,9 +4,9 @@ import com.swanie.portfolio.data.api.impl.CoinGeckoSearchProvider
 import com.swanie.portfolio.data.api.impl.MetalSearchProvider
 import com.swanie.portfolio.data.api.impl.KuCoinSearchProvider
 import com.swanie.portfolio.data.api.impl.CoinbaseSearchProvider
-import com.swanie.portfolio.data.api.impl.CryptoCompareSearchProvider
 import com.swanie.portfolio.data.api.impl.AzbitSearchProvider
 import com.swanie.portfolio.data.api.impl.MexcSearchProvider
+import com.swanie.portfolio.data.api.impl.WeexSearchProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,9 +16,9 @@ class SearchEngineRegistry @Inject constructor(
     metalProvider: MetalSearchProvider,
     kuCoinProvider: KuCoinSearchProvider,
     coinbaseProvider: CoinbaseSearchProvider,
-    cryptoCompareProvider: CryptoCompareSearchProvider,
     azbitSearchProvider: AzbitSearchProvider,
     mexcSearchProvider: MexcSearchProvider,
+    weexSearchProvider: WeexSearchProvider,
 ) {
     private val providers = mutableMapOf<String, SearchProvider>()
 
@@ -27,9 +27,9 @@ class SearchEngineRegistry @Inject constructor(
         providers[metalProvider.name] = metalProvider
         providers[kuCoinProvider.name] = kuCoinProvider
         providers[coinbaseProvider.name] = coinbaseProvider
-        providers[cryptoCompareProvider.name] = cryptoCompareProvider
         providers[azbitSearchProvider.name] = azbitSearchProvider
         providers[mexcSearchProvider.name] = mexcSearchProvider
+        providers[weexSearchProvider.name] = weexSearchProvider
     }
 
     fun getProvider(name: String): SearchProvider? = providers[name]

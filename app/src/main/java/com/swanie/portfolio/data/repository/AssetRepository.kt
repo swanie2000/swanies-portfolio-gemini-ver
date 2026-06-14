@@ -91,11 +91,12 @@ class AssetRepository @Inject constructor(
     private fun providerPriceQueryId(asset: AssetEntity): String = when (asset.priceSource) {
         "CryptoCompare" -> asset.symbol
         "MEXC" -> asset.apiId.removePrefix("MX_").ifBlank { "${asset.symbol.uppercase()}USDT" }
+        "WEEX" -> asset.apiId.removePrefix("WX_").ifBlank { "${asset.symbol.uppercase()}USDT" }
         else -> asset.apiId
     }
 
     private val exchangePriceSources = setOf(
-        "MEXC", "KuCoin", "Coinbase", "Azbit", "Binance", "Weex",
+        "MEXC", "WEEX", "KuCoin", "Coinbase", "Azbit",
     )
 
     suspend fun refreshAssets(force: Boolean = false, portfolioId: String = "MAIN") {
@@ -147,6 +148,8 @@ class AssetRepository @Inject constructor(
                                 "CC_${existing.symbol.uppercase(Locale.ROOT)}"
                             } else if (existing.priceSource == "MEXC") {
                                 update.apiId.removePrefix("MX_").ifBlank { existing.apiId }
+                            } else if (existing.priceSource == "WEEX") {
+                                update.apiId.removePrefix("WX_").ifBlank { existing.apiId }
                             } else {
                                 existing.apiId
                             },

@@ -5,40 +5,36 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-// --- WRAPPER MODELS ---
-
-data class WeexResponse<T>(
-    @SerializedName("code") val code: String,
-    @SerializedName("msg") val msg: String,
-    @SerializedName("data") val data: T
+data class WeexExchangeInfo(
+    @SerializedName("symbols") val symbols: List<WeexSymbol>
 )
-
-// --- DATA MODELS ---
 
 data class WeexSymbol(
     @SerializedName("symbol") val symbol: String,
     @SerializedName("baseAsset") val baseAsset: String,
-    @SerializedName("quoteAsset") val quoteAsset: String
+    @SerializedName("quoteAsset") val quoteAsset: String,
+    @SerializedName("status") val status: String? = null
 )
 
-data class WeexTicker(
+data class WeexTicker24h(
     @SerializedName("symbol") val symbol: String,
     @SerializedName("lastPrice") val lastPrice: String,
     @SerializedName("priceChangePercent") val priceChangePercent: String
 )
 
 interface WeexApiService {
-    // Standard WEEX V1 Public Market endpoints
-    @GET("api/v1/market/symbols")
-    suspend fun getExchangeInfo(): WeexResponse<List<WeexSymbol>>
+  @GET("api/v3/exchangeInfo")
+  suspend fun getExchangeInfo(
+      @Query("symbolStatus") symbolStatus: String = "TRADING",
+  ): WeexExchangeInfo
 
-    @GET("api/v1/market/ticker")
-    suspend fun getTicker24h(@Query("symbol") symbol: String): WeexResponse<WeexTicker>
+  @GET("api/v3/market/ticker/24hr")
+  suspend fun getTicker24h(@Query("symbol") symbol: String): Response<WeexTicker24h>
 
-    @GET("api/v1/market/candles")
-    suspend fun getKlines(
-        @Query("symbol") symbol: String,
-        @Query("interval") interval: String = "1h",
-        @Query("limit") limit: Int = 24
-    ): WeexResponse<List<List<String>>>
+  @GET("api/v3/market/klines")
+  suspend fun getKlines(
+      @Query("symbol") symbol: String,
+      @Query("interval") interval: String,
+      @Query("limit") limit: Int = 168,
+  ): List<List<Any>>
 }

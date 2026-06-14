@@ -228,8 +228,11 @@
 - [x] **Holdings exit + refresh UX (27, 2026-06-09):** Exit button (`finishAndRemoveTask`), refresh on portfolio card per vault, header spacing; owner QA OK on laptop.
 - [x] **Play upload 1.0.27 (27):** **Live** on **Closed Alpha** + **testers community** (**2026-06-10**); both groups notified; release notes on public listing.
 - [ ] **Play upload 1.0.28 (28):** CryptoCompare price fix; **`CRYPTOCOMPARE_API_KEY`** required at build; **`GRANT_DAYS=30`**.
-- [x] **MEXC search engine** — wired on **`main`** (**registry**, **`NetworkModule`**, **`healMetadata`**, **`60m`** sparkline); owner QA **2026-06-02**.
-- [ ] **Play upload 1.0.29 (29):** Ship MEXC; **remove CryptoCompare** from picker; **`GRANT_DAYS=30`**.
+- [x] **MEXC search engine** — wired; owner QA **2026-06-02**.
+- [x] **WEEX search engine** — v3 API wired; owner QA **2026-06-02**.
+- [x] **Remove CryptoCompare from picker** — **29**; legacy CC holdings re-add via MEXC.
+- [x] **Delete Binance** — US geo-block; code removed from repo.
+- [ ] **Play upload 1.0.29 (29):** MEXC + WEEX; **`GRANT_DAYS=30`**; verify scripts → both closed tracks.
 - [ ] **Production store AAB:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** (remove 30-day auto-Pro) + **`verify-play-release.ps1`**.
 - [ ] **v29+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
 - [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
