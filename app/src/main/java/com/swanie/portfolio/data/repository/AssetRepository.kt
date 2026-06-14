@@ -87,11 +87,16 @@ class AssetRepository @Inject constructor(
         return if (unitLabel.isEmpty()) metalType else "$metalType $unitLabel"
     }
 
-    /** CryptoCompare prices are keyed by ticker; apiId may be stale (e.g. CG_ from old healMetadata). */
+    /** Exchange APIs use pair ids (e.g. ATLAUSDT); apiId may carry MX_ prefix from SearchResult. */
     private fun providerPriceQueryId(asset: AssetEntity): String = when (asset.priceSource) {
         "CryptoCompare" -> asset.symbol
+        "MEXC" -> asset.apiId.removePrefix("MX_").ifBlank { "${asset.symbol.uppercase()}USDT" }
         else -> asset.apiId
     }
+
+    private val exchangePriceSources = setOf(
+        "MEXC", "KuCoin", "Coinbase", "Azbit", "Binance", "Weex",
+    )
 
     suspend fun refreshAssets(force: Boolean = false, portfolioId: String = "MAIN") {
         if (!syncCoordinator.canRefresh(force)) return
@@ -140,6 +145,8 @@ class AssetRepository @Inject constructor(
                             isMetal = isMetal,
                             apiId = if (existing.priceSource == "CryptoCompare") {
                                 "CC_${existing.symbol.uppercase(Locale.ROOT)}"
+                            } else if (existing.priceSource == "MEXC") {
+                                update.apiId.removePrefix("MX_").ifBlank { existing.apiId }
                             } else {
                                 existing.apiId
                             },
@@ -348,6 +355,7 @@ class AssetRepository @Inject constructor(
     suspend fun healMetadata(asset: AssetEntity): AssetEntity {
         if (asset.priceSource == "CoinGecko"
             || asset.priceSource == "CryptoCompare"
+            || asset.priceSource in exchangePriceSources
             || asset.category == AssetCategory.METAL) return asset
         return try {
             val cgProvider = searchRegistry.getProvider("CoinGecko") ?: return asset

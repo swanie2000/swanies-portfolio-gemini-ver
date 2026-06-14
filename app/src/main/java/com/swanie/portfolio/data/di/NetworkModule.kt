@@ -95,6 +95,28 @@ object NetworkModule {
         .baseUrl("https://data.azbit.com/").client(client)
         .addConverterFactory(GsonConverterFactory.create()).build()
 
+    /** MEXC public API — browser UA helps some regional blocks (see MexcSearchProvider). */
+    @Provides @Singleton @Named("MEXC")
+    fun provideMexcOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36",
+                )
+                .header("Accept", "application/json")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+    @Provides @Singleton @Named("MEXC")
+    fun provideMexcRetrofit(@Named("MEXC") client: OkHttpClient): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.mexc.com/").client(client)
+        .addConverterFactory(GsonConverterFactory.create()).build()
+
     @Provides @Singleton @Named("Jupiter")
     fun provideJupiterLiteRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl("https://lite-api.jup.ag/").client(client)
@@ -131,6 +153,11 @@ object NetworkModule {
     @Singleton
     fun provideAzbitApiService(@Named("Azbit") r: Retrofit): AzbitApiService =
         r.create(AzbitApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMexcApiService(@Named("MEXC") r: Retrofit): MexcApiService =
+        r.create(MexcApiService::class.java)
 
     @Provides
     @Singleton

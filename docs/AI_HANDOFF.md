@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-11 — **`main`** at **28 (`1.0.28`)** — CryptoCompare price-feed fix ready for Play upload; **27** still live on closed tracks until **28** rolls out. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** stays on **28** (closed test). **After closed test:** wire **MEXC**, remove **CryptoCompare** from picker (owner only needed CC for **ATLA**). **Production store build:** **`GRANT_DAYS=0`** (no auto-Pro) — **not** in **28**.
+**Last updated:** 2026-06-02 — **`main`** — **MEXC** wired + owner QA OK (search, live price, sparkline on load); sparkline uses **`60m`** klines (MEXC rejects Binance **`1h`**). **28 (`1.0.28`)** in Play review (CryptoCompare fix). **`versionCode` still 28** — ship **MEXC** as **29** after **28** rolls out; **drop CryptoCompare** from picker in same release. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** on closed builds until production (**`GRANT_DAYS=0`**).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -305,12 +305,12 @@ Exit button on Holdings — closes the app and removes it from Recents. Refresh 
 - *How do testers give feedback?* — Play feedback URL to website contact form with Tester topic preselect; in-app bug report under Settings with automatic account email; owner reads Web3Forms inbox and Play Console feedback during the 14-day closed test.
 - *What have you shipped during closed testing?* — … release 27 exit + refresh UX; release **28** fixed CryptoCompare stuck prices (tester-reported, tokens not on CoinGecko such as ATLA).
 
-### Post–closed-test search engines (planned — not in 28)
+### Post–closed-test search engines
 
 | Item | Plan |
 |------|------|
-| **MEXC** | Wire unfinished **`MexcSearchProvider`** (registry + **`NetworkModule`** + **`healMetadata`**); **free** public API; **ATLA/USDT** primary listing. **After** **28** closed upload. |
-| **CryptoCompare** | **Remove** from picker after MEXC QA — owner added CC only for **ATLA**; ~**35** testers unlikely all use CC. Existing CC holdings: re-add via MEXC or one-time migration. |
+| **MEXC** | **Done on `main` (2026-06-02):** **`MexcSearchProvider`** in **`SearchEngineRegistry`**; **`NetworkModule`** Retrofit **`api.mexc.com`**; **`healMetadata`** / **`providerPriceQueryId`** in **`AssetRepository`**; sparkline via **`60m`** klines (**168** closes). Owner QA **ATLA/USDT** OK. **Play:** bump **29** after **28** live. |
+| **CryptoCompare** | **Remove** from picker in **29** — owner added CC only for **ATLA**; MEXC replaces it. Existing **`priceSource=CryptoCompare`** holdings: re-add via MEXC or one-time migration. **`CRYPTOCOMPARE_API_KEY`** still needed for **28** builds until CC removed. |
 | **Production Pro grant** | **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** → production AAB only (**`verify-play-release.ps1`** shows auto-Pro disabled). **Keep `30` on closed-test builds** until production apply. |
 
 ### RevenueCat vs Play vs closed testers (do not confuse)
@@ -348,12 +348,11 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
-### Upload 28 now (closed test — do not break cohort)
+### Upload 28 / ship 29 (closed test)
 
-1. **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** (owner has key).
-2. **`.\scripts\verify-release-config.ps1`** → Signed Bundle → **`.\scripts\verify-play-release.ps1`**.
-3. Upload **28** to **Closed Alpha** + **testers community**; release notes in **`§ Play release 28`**; notify testers.
-4. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** — **keep** on this build (auto-Pro until **~July 2026**).
+1. **28 in review** — CryptoCompare fix; **`GRANT_DAYS=30`**; notify testers when Play approves.
+2. **29 (`1.0.29`)** — bump **`versionCode`**; **remove CryptoCompare** from **`SearchEngineRegistry`**; release notes (**ATLA** via MEXC, no CC key needed); **`verify-release-config.ps1`** → bundle → **`verify-play-release.ps1`** → both closed tracks.
+3. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** — **keep** on **29** closed upload.
 
 ### When you reopen — closed test monitoring
 
@@ -363,8 +362,9 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### After closed test (before / alongside production apply)
 
-1. **MEXC** — wire provider + picker entry; QA **ATLA**; **drop CryptoCompare** from registry (free exchange API, no monthly aggregator fee).
-2. **`healMetadata`** — skip exchange providers (MEXC/KuCoin/etc.) so CoinGecko does not corrupt **`apiId`**.
+1. ~~**MEXC**~~ — **wired + QA OK** on **`main`**; ship in **29**.
+2. **Drop CryptoCompare** from registry in **29** (with MEXC Play upload).
+3. **`healMetadata`** — exchange providers (MEXC/KuCoin/etc.) already skipped in **`AssetRepository`**.
 
 ### Production store release (when Console allows)
 
@@ -376,10 +376,10 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 ### Closed testing → production (ship path)
 
 1. ~~**Ship 27**~~ — **Live 2026-06-10**.
-2. **Ship 28** — CryptoCompare fix on **`main`**; **Play upload** next.
-3. **14-day clock** + **≥4** closed releases (**24–27** live; **28** = fifth).
-4. **MEXC + drop CC** — post–**28**, pre-production or early production track.
-5. **Production:** **`GRANT_DAYS=0`** AAB — separate from closed **28**.
+2. **28** — in Play review (CryptoCompare fix).
+3. **Ship 29** — MEXC + drop CC; after **28** live on closed tracks.
+4. **14-day clock** + **≥4** closed releases (**24–27** live; **28** fifth when approved).
+5. **Production:** **`GRANT_DAYS=0`** AAB — separate from closed builds.
 
 ### v28 backlog (deferred from 28 scope)
 
@@ -402,7 +402,8 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 - **Feedback:** `BugReportSubmitter` → **Web3Forms** (`WEB3FORMS_ACCESS_KEY` in `local.properties`; same key in **`website/js/contact-form.js`**). **`RevenueCatInitializer`:** skips `test_` key in release (avoids SDK force-close); log tag **`SwanieRevenueCat`**. See **Pro** bullet for verify scripts.
 - **Play Data safety:** See **§ Current session** → **Play Data safety — facts from codebase** (RevenueCat `logIn` id = email or username; purchases; local Room profile).
 - **Holdings UX (27):** **`MyHoldingsScreen.kt`** — exit, per-vault refresh, header spacing. **`AssetViewModel.refreshAssetsForVault`**.
-- **CryptoCompare (28):** **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** → **`BuildConfig`** → **`NetworkModule`** `Apikey` header; **`healMetadata`** skips CC; **`providerPriceQueryId`** uses symbol for CC refresh. **Planned:** replace with **MEXC** for **ATLA** post–closed test.
+- **CryptoCompare (28):** **`CRYPTOCOMPARE_API_KEY`** in **`local.properties`** → **`BuildConfig`** → **`NetworkModule`** `Apikey` header; **`healMetadata`** skips CC; **`providerPriceQueryId`** uses symbol for CC refresh. **Remove from picker in 29** (MEXC replaces for **ATLA**).
+- **MEXC (29):** **`MexcSearchProvider`** + **`MexcApiService`** — registry, DI, **`healMetadata`** skip, **`providerPriceQueryId`**; sparkline **`GET /api/v3/klines`** interval **`60m`** (not **`1h`**). Owner QA **2026-06-02** OK.
 - **Holdings walkthrough (25–26):** `HoldingsWalkthrough.kt`, `HoldingsWalkthroughViewModel.kt`, overlay in **`MainActivity`**; **`Take Tour`** on holdings (Settings toggle **Show Take Tour button**); yellow pill hints + glossy arrows + panel scrim with pass-through holes; red **×** exit + **Don't show tour again**. **Tour lockdown (26):** system/back/bottom-nav blocked during tour; picker steps gate search/provider/results; metal premium **ask → mode → amount**; live-card **Return** = **Save**; icon **Choose Photo** + **Add Asset** pass-through; finale hint pinned top; drag anchor freeze. **Crypto path:** add → provider → search → amount → card gestures → **End** (pencil opens edit → tour completes). **Metal fork:** **AssetArchitectScreen** → save → **`highlightCoinId`** card. **`walkthroughAnchor`** + window bounds. **26** laptop QA **OK** (**2026-06-08**).
 - **Settings UX (25):** **HELP & FEEDBACK** section near top — **Take Tour** toggle + **Report a BUG** card (tour no longer routes to feedback).
 - **i18n:** `LanguageDisplay.kt`; **`values-*`** — **574** keys each, match **`values/strings.xml`** (**2026-06-02:** **`walkthrough_*`**, **`settings_help_feedback`**, **`closed_test_pro_dialog_*`** in all **19** locales — manual per-file edits, no bulk scripts).
@@ -430,6 +431,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — scrollable color picker (saturation + hue bar); `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
 | Play internal ship | **23 / 1.0.23** on Play — auto-Pro **grant=30**; **`verify-play-release.ps1`** |
+| MEXC price / sparkline | **`MexcSearchProvider.kt`**, **`MexcApiService.kt`**, **`NetworkModule.kt`** (`@Named("MEXC")`), **`SearchEngineRegistry.kt`**, **`AssetRepository.kt`** (`providerPriceQueryId`, `exchangePriceSources`) |
 | Marketing site / closed-test QR | **`website/index.html`** — **`TESTER_URL`** = **`apps/testing/com.swanie.portfolio`** invite-only QR on **`#get-app`** |
 | Closed-test auto-Pro | **`ClosedTestProAccess.kt`**, **`SettingsViewModel`**, **`ProFeatureGateScreen`** dialog; **`WidgetAssetLimits.isProForWidget`**, **`AssetRepository`** widget push; **`scripts/verify-play-release.ps1`** |
 | Tester recruitment (legacy) | **`docs/RECRUIT_INTERNAL_TESTERS.md`**, **`facebook-join-testing-post.png`** — superseded by **Fiverr closed email lists** |
@@ -451,6 +453,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-02 — MEXC wired + sparkline fix (handoff + push):** **`MexcSearchProvider`** registered; **`NetworkModule`** + **`AssetRepository`** exchange-provider paths; sparkline **`60m`** klines (MEXC rejects **`1h`**). Owner QA **ATLA** — price, refresh on load, sparkline OK. **`versionCode` still 28**; ship **29** with **drop CryptoCompare** after **28** Play approval. **Handoff + push `main`**. **Next:** **28** rollout → bump **29** → Play upload.
 - **2026-06-11 — Release 28 CryptoCompare fix (handoff + push):** **`1.0.28`** on **`main`** — CC API key wiring, **`healMetadata`** / refresh fixes for stuck prices (**ATLA** / tokens not on CoinGecko). Owner QA OK. **Keep `GRANT_DAYS=30`** for closed **28** upload; **production** = **`GRANT_DAYS=0`** later. **Post-test plan:** wire **MEXC**, drop **CryptoCompare** from picker. **Handoff + push `main`**. **Next:** verify scripts → upload **28** both closed tracks.
 - **2026-06-10 — Play closed release 27 live + listing video (handoff + push):** **`1.0.27`** approved and **live** on **Closed Alpha** + **testers community**; owner **notified both groups**. **Store listing** — **preview video** approved (**Trailer** on public Play page); **What's new** shows **27** notes; listing looks polished. **`≥4` closed releases** complete. **Next:** monitor Dashboard **14-day** clock + feedback; **v28** quit confirm + **`GRANT_DAYS=0`** at production. **Handoff + push `main`**.
 - **2026-06-09 — Release 27 exit + refresh UX (handoff + push):** **`versionCode` 27** / **`1.0.27`**. **Exit** top-left — **`finishAndRemoveTask()`** (Recents cleared); tour-shielded. **Refresh** on portfolio card top-left, per-vault; title/total centered. **Header** — compact toggle shifted left. Owner QA **OK**. **Play upload pending**; release notes + **four** production-form facts in **`§ Production access form — activity log`**. **v28:** quit confirm + **`GRANT_DAYS=0`**. **Handoff + push `main`**.
