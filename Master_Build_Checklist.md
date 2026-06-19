@@ -234,12 +234,13 @@
 - [x] **Delete Binance** — US geo-block; code removed from repo.
 - [ ] **Play upload 1.0.29 (29):** MEXC + WEEX — optional closed track; owner tested **29** on device.
 - [x] **Production access** — **Granted** (closed test + application form).
-- [ ] **Play upload 1.0.30 (30) — Production:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** + widget wake fix; **`verify-play-release.ps1`** → staged rollout.
+- [x] **Play upload 1.0.30 (30) — Production:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** + widget wake fix; live **Jun 19, 2026**.
 - [x] **Site:** **`PLAY_URL`** when public listing live.
+- [ ] **v31+ — Play recommendations (backlog):** Edge-to-edge Android 15+; replace deprecated **`setStatusBarColor`** / **`setNavigationBarColor`**; large-screen resizability vs **`AndroidManifest.xml`** portrait lock.
 - [ ] **v30+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
-- [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
-- [ ] **Production access gate:** Apply after metrics + prep above.
-- [ ] **Production:** Apply / staged rollout when Console requirements met.
+- [x] **Production access prep:** **≥3** closed releases; form submitted.
+- [x] **Production access gate:** Granted.
+- [x] **Production:** Staged/full rollout **30** live on Play.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
 - [x] **Monetization (internal QA):** Subscribe/expire/restore matrix on **1.0.10** **2026-05-18**; sufficient for ship. **Beta Pro:** **lifetime** or promotional — avoid monthly/yearly for daily use on internal.
 - [ ] Tracks & quality: Crash/ANR; **local vault backup restore** on Play build (purchase + **Play restore** verified **2026-05-18**).

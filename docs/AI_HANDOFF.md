@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-19 — **`main`** at **30 (`1.0.30`)** — **Production 30** **submitted for review** (full rollout, 177 countries; **`GRANT_DAYS=0`**). **Publishing overview “Last published June 19”** = **IARC age ratings** live (email), **not** the APK yet — public store still **Last updated ~June 14** until **30** approves. **RevenueCat** verified. **Site:** **`PLAY_URL`** live; **closed-test button removed** from **`#get-app`** (no **`TESTER_URL`**). **Next:** Play approval → paywall smoke test on Play install.
+**Last updated:** 2026-06-19 — **`main`** at **`e27c88a`** — **Production 30 (1.0.30) LIVE** on Google Play (177 countries; **`GRANT_DAYS=0`**). Store **Updated Jun 19, 2026**; **Release dashboard** active. **Site:** **`PLAY_URL`** + no closed-test button (**`e27c88a`**). **RevenueCat** verified pre-launch. **Win:** v1 public ship. **Next:** paywall smoke test on Play install; optional listing typo polish (**MEXC/WEEX** in What's new if mangled). **Backlog (Play recommendations, v31+):** edge-to-edge Android 15+, replace deprecated **`setStatusBarColor`** / **`setNavigationBarColor`**, large-screen resizability (**`AndroidManifest.xml`** portrait lock).
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,8 +40,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **30 (1.0.30)** — **Production** track uploaded; public rollout when review completes. Studio **`main`** = **`versionCode` 30**. |
-| **Production access** | **Granted** — **Production** release **in review** (177 countries). |
+| **Version on device** | **30 (1.0.30)** — **Production live** on Play (**Jun 19, 2026** listing update). Studio **`main`** = **`versionCode` 30**. |
+| **Production access** | **Granted** — **Production 30 (1.0.30)** **rolled out** (177 countries). |
 | **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -54,7 +54,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic. **Production release 30** release notes uploaded. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** live on **`swaniedesigns.com`** (**2026-06-02**).
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
-- **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
+- **Publishing overview:** **Production 30** published; **IARC** age ratings also went live **Jun 19** (separate email). **Production → Release dashboard** shows Play **recommendations** (not blockers) — see **§ Next steps → Post-launch backlog**.
 - **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#get-app`** = public **Play** CTA + QR only (**`PLAY_URL`**); closed-test join button **removed** (**2026-06-19**).
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
@@ -113,7 +113,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Production 30 (1.0.30)** **in review** — **`GRANT_DAYS=0`**, 177 countries, managed publishing off. Closed tracks may lag; public users get store build without auto-Pro. **License testing** **unchecked**.
+**Play / Google:** **Production 30 (1.0.30) LIVE** — **`GRANT_DAYS=0`**, 177 countries. Public listing **Updated Jun 19, 2026**. Closed tracks may still serve older builds to opted-in testers. **License testing** **unchecked**.
 
 ### Play AAB verify — copy-paste (Android Studio Terminal)
 
@@ -351,15 +351,23 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
-### Launch — waiting on Play (now)
+### Post-launch (now)
 
-1. **Watch Play Console** — **Publishing overview** until **Production 30** approved (auto-publish when review completes).
-2. **On-device smoke test** (production build from Play): paywall shows 3 plans → optional license-tester purchase → **Restore purchases** → RC **Customers** shows **Swanies Portfolio Pro**.
-3. **Optional:** **Search Console** re-index **`swaniedesigns.com`** after deploy (**`docs/SEARCH_CONSOLE_SETUP.md`**) so Google sees live **`PLAY_URL`**.
+1. **Paywall smoke test** on **Play-installed** build: **Settings → Pro** → 3 plans → optional purchase → **Restore purchases** → RC **Customers** shows **Swanies Portfolio Pro**.
+2. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any (**MEXC/WEEX**); remove stale **closed beta / Pro through July 2026** copy from long description if still present.
+3. **Optional:** **Search Console** re-index **`swaniedesigns.com`** (**`docs/SEARCH_CONSOLE_SETUP.md`**).
+
+### Post-launch backlog — Play Console recommendations (v31+, not urgent)
+
+Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — informational; app works on phones today.
+
+1. **Edge-to-edge (Android 15+):** App targets SDK 35; some screens may not draw edge-to-edge for all users. Adopt Android 15 edge-to-edge guidance (Compose **`enableEdgeToEdge`**, inset handling).
+2. **Deprecated status/nav bar colors:** Replace **`Window.setStatusBarColor`** / **`setNavigationBarColor`** (Play cites **`HoldingsUIComponents.kt`** and related Compose/system UI). Migrate to **`WindowInsetsController`** / Material 3 system bar APIs.
+3. **Large screens / resizability:** Play recommends relaxing **`android:screenOrientation="portrait"`** and **`android:resizableActivity="false"`** in **`AndroidManifest.xml`** (activities **`MainActivity`**, **`WidgetConfigActivity`**) for tablets/foldables — or document intentional phone-only portrait if owner keeps scope narrow.
 
 ### Optional — closed track
 
-- Upload **30** to closed tracks with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
+- Upload **30** with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
 
 ### Backlog
 
@@ -367,7 +375,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Website
 
-- **Shipped (2026-06-19)** — removed **Join closed testing** button + **`TESTER_URL`** wiring; **`PLAY_URL`** only for CTA + QR. Prior **2026-06-02:** JSON-LD **`1.0.30`**, **`press.html`**. Deploy via push **`main`** → GitHub Actions.
+- **Shipped (2026-06-19)** — **`PLAY_URL`** only; closed-test button removed. Deploy via push **`main`** → GitHub Actions.
 
 ---
 
@@ -428,6 +436,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 | RevenueCat vs closed testers | **`docs/AI_HANDOFF.md`** → **§ RevenueCat vs Play vs closed testers**; `MainViewModel.syncMonetizationUser`, `RevenueCatMonetizationManager.setAppUser` |
 | Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
 | Holdings walkthrough | **`ui/onboarding/HoldingsWalkthrough.kt`**, **`HoldingsWalkthroughViewModel.kt`**, **`MainActivity.kt`** (overlay), **`MyHoldingsScreen.kt`**, **`AssetPickerScreen.kt`**, **`AmountEntryScreen.kt`**, **`AssetArchitectScreen.kt`**, **`NavGraph.kt`**, **`SettingsScreen.kt`**, **`ThemePreferences.kt`** (`showTakeTourButton`, `holdingsWalkthroughCompleted`) |
+| Play Console post-launch | **`§ Next steps`** → *Post-launch backlog — Play Console recommendations*; **`AndroidManifest.xml`**, **`HoldingsUIComponents.kt`** |
 | Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
 | Repo / IDE noise | **`.gitignore`** — **`/.idea/assetWizardSettings.xml`**, **`/docs/drawable-backups/`** (local icon raster dumps; not shipped) |
 
@@ -435,6 +444,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-19 — Production 30 LIVE + Play backlog in handoff (handoff + push):** **Production 30 (1.0.30)** approved and live; store **Updated Jun 19**; Release dashboard active. Documented Play **recommendations** for **v31+** (edge-to-edge Android 15+, deprecated status-bar APIs, large-screen resizability). **Site** already pushed (**`e27c88a`**). **Next:** paywall smoke test.
 - **2026-06-19 — Site: remove closed-test button + Production 30 in review (handoff + push):** **`website/index.html`** — deleted **Join closed testing** CTA; QR/CTA **`PLAY_URL`** only. Owner submitted **Production 30 (1.0.30)** after catching **1.0.20** in draft; **Publishing overview** in review. **IARC** ratings live (**June 19** email) ≠ APK publish. **Handoff + push `main`**.
 - **2026-06-02 — Production go-live: site PLAY_URL + RevenueCat verified (handoff + push):** Owner walked **RevenueCat** checklist (Apps → Products → Entitlements → **`default`** offering) — all pass. **`website/index.html`** — **`PLAY_URL`** → public listing; closed-test QR/button removed; JSON-LD **1.0.30**; **`press.html`** + checklist tick. **Production 30** already **in review** on Play. **Handoff + push `main`** for Pages deploy.
 - **2026-06-17 — Release 30 production + widget wake fix (handoff + push):** **`1.0.30`** — **`GRANT_DAYS=0`** for Production AAB; removed widget **`SCREEN_ON`** refresh (stuck spinner); parse fallback for widget loading state. **Production access granted.** Owner QA **29** on device. **Handoff + push `main`**. **Next:** verify scripts → **Production** upload → **`PLAY_URL`**.
