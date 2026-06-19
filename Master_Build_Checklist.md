@@ -243,6 +243,7 @@
 - [x] **Production:** Staged/full rollout **30** live on Play.
 - [ ] **Publishing overview:** **Send app for review** when enabled (listing/metadata); optional **Managed publishing**.
 - [x] **Monetization (internal QA):** Subscribe/expire/restore matrix on **1.0.10** **2026-05-18**; sufficient for ship. **Beta Pro:** **lifetime** or promotional — avoid monthly/yearly for daily use on internal.
+- [x] **Monetization (Production QA):** Play install **30** → **pro_monthly** purchase → **RC Refund** (**2026-06-19**); see **`docs/AI_HANDOFF.md`** § *Refund dev test purchases*.
 - [ ] Tracks & quality: Crash/ANR; **local vault backup restore** on Play build (purchase + **Play restore** verified **2026-05-18**).
 - [ ] Listing assets: screenshots, feature graphic, short/long description polish as needed per track.
 - [ ] Go / no-go: stable internal/closed metrics before broad **production**; watch refunds / entitlements.

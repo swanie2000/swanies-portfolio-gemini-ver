@@ -29,13 +29,13 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-19 — **`main`** at **`e27c88a`** — **Production 30 (1.0.30) LIVE** on Google Play (177 countries; **`GRANT_DAYS=0`**). Store **Updated Jun 19, 2026**; **Release dashboard** active. **Site:** **`PLAY_URL`** + no closed-test button (**`e27c88a`**). **RevenueCat** verified pre-launch. **Win:** v1 public ship. **Next:** paywall smoke test on Play install; optional listing typo polish (**MEXC/WEEX** in What's new if mangled). **Backlog (Play recommendations, v31+):** edge-to-edge Android 15+, replace deprecated **`setStatusBarColor`** / **`setNavigationBarColor`**, large-screen resizability (**`AndroidManifest.xml`** portrait lock).
+**Last updated:** 2026-06-19 — **`main`** at **`247ca19`** — **Production 30 (1.0.30) LIVE**; **production billing smoke test complete** (Play install → monthly sub → Pro → **RC Refund** → paywall back). **Site:** **`PLAY_URL`**, no closed-test button. **Win:** v1 public ship + monetization verified. **Next:** optional listing polish; **v31+** Play dashboard recommendations in backlog.
 
 ### Resume when you reopen (RevenueCat + Play)
 
 | Where | State |
 |-------|--------|
-| **RevenueCat** | **Verified 2026-06-02** — Play products **Published**; entitlement **Swanies Portfolio Pro** (3 Play + 3 Test Store products); offering **`default`** → **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Release AAB uses **`goog_…`** (no **`test_`**). **$0** revenue pre-launch expected. |
+| **RevenueCat** | **Verified** — offering **`default`** → Play **`pro_*`**; **`goog_…`** in release AAB. **Production billing QA (2026-06-19):** monthly purchase **`GPA.3314-0009-6695-24453`** → refund via dashboard (**§ Refund dev test purchases**). **Owner rule:** refund Play subs in **RC**, not Play Console order management (often missing in sidebar). |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
@@ -337,6 +337,24 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 **RC dashboard limits:** Customer lists show **100 most recently seen** only; **no column sort** — use **Export CSV** and sort `last_seen_at` / `first_seen_at` if needed.
 
+### Refund dev test purchases (canonical — use RevenueCat)
+
+When the owner (or support) needs to **refund a real Google Play subscription** after a smoke test — **use RevenueCat**, not Play Console **Order management** (often absent from the left nav on this account).
+
+**Workflow (verified 2026-06-19 on Production `pro_monthly`):**
+
+1. **Sandbox data → OFF** (top of RC dashboard — production purchases only).
+2. **Customers** → search **in-app email** (same as **`Purchases.logIn`** — e.g. owner Gmail).
+3. Open **Customer profile** → **Customer history** → **View details** on **`INITIAL_PURCHASE`** (or **`⋯` → Refund** on **Entitlements → Pro**).
+4. Click **Refund** on **Event details** (shows **Google Play Order Id** `GPA.…`).
+5. Confirm → **Entitlements** show **Inactive · refunded**; **Total spent** → **0**; app **paywall returns** on reopen.
+
+**Do not use for refunds:** Play Console **Order management** hunt; **Report a problem** on order history (slow 1–4 day review) unless RC **Refund** is unavailable (inactive sub). **Do not** double-refund if both paths were triggered.
+
+**Optional:** **License testing** in Play Console for **owner Gmail only** → test purchases not charged (Fiverr list stays **unchecked**).
+
+**Docs:** [RevenueCat — Handling Refunds](https://www.revenuecat.com/docs/subscription-guidance/refunds) · [Customer profile — Refunding](https://www.revenuecat.com/docs/dashboard-and-metrics/customer-profile)
+
 ### Play Console — ordered steps (next session; do in order)
 
 1. **Upload 28** — **`verify-release-config.ps1`** (RC + **`CRYPTOCOMPARE_API_KEY`**) → Signed Bundle → **`verify-play-release.ps1`** → **Closed Alpha** + **testers community**; **`GRANT_DAYS=30`** unchanged.
@@ -353,7 +371,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Post-launch (now)
 
-1. **Paywall smoke test** on **Play-installed** build: **Settings → Pro** → 3 plans → optional purchase → **Restore purchases** → RC **Customers** shows **Swanies Portfolio Pro**.
+1. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** $9.99 → Pro → **RC Refund** → paywall back.
 2. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any (**MEXC/WEEX**); remove stale **closed beta / Pro through July 2026** copy from long description if still present.
 3. **Optional:** **Search Console** re-index **`swaniedesigns.com`** (**`docs/SEARCH_CONSOLE_SETUP.md`**).
 
@@ -383,7 +401,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 - **Stack:** Kotlin, Jetpack Compose, Hilt, Room.
 - **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; **`pushFreshAssetsToWidget`** targets only widgets bound to that vault (**`appWidgetIdsForPortfolioVault`** / **`resolveVaultForAppWidgetId`**) — fixes multi-widget blanking; **`RefreshCallback`** → full per-widget push; metal **`metalWidgetHeadlinePair`**; swan → **`widgetLaunchMainActivityIntent`**. **30:** removed **`ACTION_SCREEN_ON`** → **`updateAll()`** (stuck **`glance_default_layout`** spinner on wake); parse-fallback shows vault total instead of endless loading. **30-min `updatePeriodMillis`** redraws cached prefs only — **not** live price fetch; manual widget/app refresh updates prices.
-- **Pro:** RevenueCat + Play billing; **closed-test auto-Pro** via **`ClosedTestProAccess`** + **`CLOSED_TEST_PRO_GRANT_DAYS`** / **`CLOSED_TEST_PRO_UNTIL_EPOCH_MS`**. **Widget Pro** must use **`WidgetAssetLimits.isProForWidget`** (same rules as app) — **`AssetRepository.pushFreshAssetsToWidget`** + **`SettingsViewModel.triggerWidgetUpdate`** on tier change. **Before Play upload:** **`.\scripts\verify-play-release.ps1`**.
+- **Pro:** RevenueCat + Play billing; **closed-test auto-Pro** via **`ClosedTestProAccess`** + **`CLOSED_TEST_PRO_GRANT_DAYS`** / **`CLOSED_TEST_PRO_UNTIL_EPOCH_MS`**. **Widget Pro** must use **`WidgetAssetLimits.isProForWidget`** (same rules as app). **Before Play upload:** **`.\scripts\verify-play-release.ps1`**. **Dev/test refunds:** **RevenueCat** → **Customers** → purchase event → **Refund** (**§ Refund dev test purchases**); keep **Sandbox data OFF** for production charges.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
 - **Custom asset icons:** `IconManager` (`custom_icons/{coinId}.png`), `HoldingsUIComponents` (`MetalIcon`, `CryptoEditFunnel`, `ArchitectIconSelectionStep`), `MyHoldingsScreen` (optimistic merge + per-coin reload epoch); `AssetRepository.refreshAssets` preserves user icon fields at upsert time.
@@ -416,7 +434,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | App / launcher | **`AndroidManifest.xml`** → **`@string/launcher_short_name`** (**Portfolio** under icon); **`app_name`** / Play listing still full brand; widget label unchanged |
-| Pro / billing | **`ProFeatureGateScreen.kt`** — branded plan cards; **11.sp** label while purchasing. **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`** → Play products |
+| Pro / billing | **`ProFeatureGateScreen.kt`** — **`pro_gate_manage_subscription`** opens Play subscription URL; **`RevenueCatMonetizationManager.kt`**. Play SKUs: **`pro_monthly`**, **`pro_yearly`**, **`pro_lifetime`**. RC offering **`default`**. **Refunds:** **`§ Refund dev test purchases`** (RC dashboard, not Play Order management) |
 | About | **`AboutScreen.kt`** — intro + **Privacy & terms** button; no Play Console placeholder footer |
 | Theme Manager | **`ThemeStudioScreen.kt`** — scrollable color picker (saturation + hue bar); `userInitiatedEdit`; dropdown until real color edit; red Cancel reverts |
 | Play internal ship | **23 / 1.0.23** on Play — auto-Pro **grant=30**; **`verify-play-release.ps1`** |
@@ -444,6 +462,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ## Session history (newest first)
 
+- **2026-06-19 — Production billing smoke test + RC refund playbook (handoff + push):** Owner installed **Production 30** from Play; **pro_monthly** purchase → Pro → **RevenueCat Refund** on event **`GPA.3314-0009-6695-24453`** → paywall restored. Documented **`§ Refund dev test purchases`** — **always use RC** (Sandbox **OFF**), not Play Console Order management. **Handoff + push `main`**.
 - **2026-06-19 — Production 30 LIVE + Play backlog in handoff (handoff + push):** **Production 30 (1.0.30)** approved and live; store **Updated Jun 19**; Release dashboard active. Documented Play **recommendations** for **v31+** (edge-to-edge Android 15+, deprecated status-bar APIs, large-screen resizability). **Site** already pushed (**`e27c88a`**). **Next:** paywall smoke test.
 - **2026-06-19 — Site: remove closed-test button + Production 30 in review (handoff + push):** **`website/index.html`** — deleted **Join closed testing** CTA; QR/CTA **`PLAY_URL`** only. Owner submitted **Production 30 (1.0.30)** after catching **1.0.20** in draft; **Publishing overview** in review. **IARC** ratings live (**June 19** email) ≠ APK publish. **Handoff + push `main`**.
 - **2026-06-02 — Production go-live: site PLAY_URL + RevenueCat verified (handoff + push):** Owner walked **RevenueCat** checklist (Apps → Products → Entitlements → **`default`** offering) — all pass. **`website/index.html`** — **`PLAY_URL`** → public listing; closed-test QR/button removed; JSON-LD **1.0.30**; **`press.html`** + checklist tick. **Production 30** already **in review** on Play. **Handoff + push `main`** for Pages deploy.
