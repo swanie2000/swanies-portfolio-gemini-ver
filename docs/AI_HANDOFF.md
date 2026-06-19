@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-02 — **`main`** at **29 (`1.0.29`)** — **MEXC** + **WEEX** exchange providers wired and owner QA OK; **CryptoCompare** removed from picker; **Binance** code deleted (US geo-block). Custom asset icons cover missing exchange logos. **28** may still be in Play review; **29** ready for closed-track upload after **28** rolls out. **`CLOSED_TEST_PRO_GRANT_DAYS=30`** on closed builds until production (**`GRANT_DAYS=0`**).
+**Last updated:** 2026-06-17 — **`main`** at **30 (`1.0.30`)** — **production access granted**; first **store** AAB uses **`CLOSED_TEST_PRO_GRANT_DAYS=0`** (owner set in **`local.properties`**). **Widget fix:** removed **`SCREEN_ON`** forced Glance rebuild (stuck loading spinner on wake). **29** on device QA (**MEXC** / **WEEX**). **Next:** **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** → **Production** rollout; **`PLAY_URL`** on site when live.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,8 +40,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **29 (1.0.29)** on laptop after Studio build; Play closed tracks on **27** or **28** until owner uploads **29**. Studio **`main`** = **`versionCode` 29**. |
-| **Production access clock** | **TC Day 0 = 2026-06-01** had **✓ 12+ opted-in**; owner swapped tester pool to **Fiverr** — **watch Dashboard** (swap may affect consecutive **14-day** run). **≥4 closed releases** ✓ (**24** · **25** · **26** · **27**). Still need **14 consecutive days** at **≥12** + production form (**§ Production access — Google requirements**). |
+| **Version on device** | **30 (1.0.30)** on laptop / owner phone after build; **Production** upload pending. Studio **`main`** = **`versionCode` 30**. |
+| **Production access** | **Granted** — application approved; **Create and publish a release** in progress. |
+| **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
 | **Verify build** | **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** — owner verified on **22** and **23**; **always before Play upload**. |
@@ -350,42 +351,21 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
-### Ship 29 (closed test — next Play upload)
+### Ship 30 to Production (now)
 
-1. **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** (**`GRANT_DAYS=30`**).
-2. Upload **29** to **Closed Alpha** + **testers community** after **28** live (or batched if Console allows).
-3. **Release notes (en-US):** MEXC + WEEX exchange search; CryptoCompare removed — use MEXC for tokens not on CoinGecko (e.g. ATLA); custom photo icons for exchange assets. Pro for closed testers until ~July 2026 — do not purchase during test.
+1. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** (owner set) — **do not** commit **`local.properties`**.
+2. **`.\scripts\verify-release-config.ps1`** → Signed Bundle → **`.\scripts\verify-play-release.ps1`** (must show auto-Pro **disabled**).
+3. **Production** → finish release → review → **staged rollout**.
+4. **Release notes (en-US):** MEXC + WEEX exchanges; custom asset icons; widget wake fix; closed-test polish. Public users pay for Pro via Play — no closed-test auto-Pro.
+5. **`PLAY_URL`** on **`swaniedesigns.com`** when listing is public.
 
-### When 28 / 29 on Play
+### Optional — closed track
 
-1. **Dashboard** — **≥12 opted-in** for **14 consecutive days**.
-2. **Tester engagement** — ~**35** opted-in; **RevenueCat** CSV for in-app accounts.
-3. **Feedback** — save bullets for production form.
+- Upload **29** or **30** to closed tracks with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
 
-### After closed test (before / alongside production apply)
+### Backlog
 
-1. ~~**MEXC**~~ — **shipped in 29**.
-2. ~~**WEEX**~~ — **shipped in 29**.
-3. ~~**Drop CryptoCompare**~~ — **picker removed in 29**.
-
-### Production store release (when Console allows)
-
-1. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** → production AAB (**no** 30-day auto-Pro).
-2. **`verify-play-release.ps1`** — confirm auto-Pro disabled line.
-3. Optional: **quit confirmation** dialog + **`confirmQuit`** toggle (backlog).
-4. Staged rollout; **`PLAY_URL`** on site.
-
-### Closed testing → production (ship path)
-
-1. ~~**Ship 27**~~ — **Live 2026-06-10**.
-2. **28** — CryptoCompare fix (may be live or in review).
-3. **29** — on **`main`**; **Play upload** next after verify scripts.
-4. **14-day clock** + **≥4** closed releases (**24–27** live; **28** fifth when approved).
-5. **Production:** **`GRANT_DAYS=0`** AAB — separate from closed builds.
-
-### v28 backlog (deferred from 28 scope)
-
-1. **Quit confirmation** — **QUIT?** + **`confirmQuit`** settings toggle.
+- Quit confirmation + **`confirmQuit`** toggle.
 
 ### Website
 
@@ -396,7 +376,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 ## Engineering snapshot (v1 ship stack)
 
 - **Stack:** Kotlin, Jetpack Compose, Hilt, Room.
-- **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; **`pushFreshAssetsToWidget`** targets only widgets bound to that vault (**`appWidgetIdsForPortfolioVault`** / **`resolveVaultForAppWidgetId`**) — fixes multi-widget blanking; **`RefreshCallback`** → full per-widget push; metal **`metalWidgetHeadlinePair`**; swan → **`widgetLaunchMainActivityIntent`**.
+- **Widget (Glance):** Pro **8** / free **3** holdings rows; per-line preference packing + pipe-tolerant parse; **`pushFreshAssetsToWidget`** targets only widgets bound to that vault (**`appWidgetIdsForPortfolioVault`** / **`resolveVaultForAppWidgetId`**) — fixes multi-widget blanking; **`RefreshCallback`** → full per-widget push; metal **`metalWidgetHeadlinePair`**; swan → **`widgetLaunchMainActivityIntent`**. **30:** removed **`ACTION_SCREEN_ON`** → **`updateAll()`** (stuck **`glance_default_layout`** spinner on wake); parse-fallback shows vault total instead of endless loading. **30-min `updatePeriodMillis`** redraws cached prefs only — **not** live price fetch; manual widget/app refresh updates prices.
 - **Pro:** RevenueCat + Play billing; **closed-test auto-Pro** via **`ClosedTestProAccess`** + **`CLOSED_TEST_PRO_GRANT_DAYS`** / **`CLOSED_TEST_PRO_UNTIL_EPOCH_MS`**. **Widget Pro** must use **`WidgetAssetLimits.isProForWidget`** (same rules as app) — **`AssetRepository.pushFreshAssetsToWidget`** + **`SettingsViewModel.triggerWidgetUpdate`** on tier change. **Before Play upload:** **`.\scripts\verify-play-release.ps1`**.
 - **Backup:** `VaultBackupEngine.kt` + `BackupRestoreScreen.kt` / `Routes.BACKUP_RESTORE` / `SettingsViewModel` — encrypted `.swpb`, WAL checkpoint via `query`, SAF, cold restart after restore.
 - **Metals:** `MetalSpotMath.kt` + `AssetValuation` — GRAM/KILO/G → troy oz, USD valuation across holdings, analytics, `AssetRepository`, widget, theme, architect, settings.
@@ -457,6 +437,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-17 — Release 30 production + widget wake fix (handoff + push):** **`1.0.30`** — **`GRANT_DAYS=0`** for Production AAB; removed widget **`SCREEN_ON`** refresh (stuck spinner); parse fallback for widget loading state. **Production access granted.** Owner QA **29** on device. **Handoff + push `main`**. **Next:** verify scripts → **Production** upload → **`PLAY_URL`**.
 - **2026-06-02 — Release 29 MEXC + WEEX; drop CC picker; delete Binance (handoff + push):** **`1.0.29`** on **`main`** — **WEEX** v3 wired; **Binance** removed (US geo-block); **CryptoCompare** removed from **`SearchEngineRegistry`**; owner QA **MEXC** + **WEEX** OK. **`GRANT_DAYS=30`** for closed upload. **Handoff + push `main`**. **Next:** verify scripts → upload **29** both closed tracks (after **28** live if needed).
 - **2026-06-02 — MEXC wired + sparkline fix (handoff + push):** **`MexcSearchProvider`** registered; **`NetworkModule`** + **`AssetRepository`** exchange-provider paths; sparkline **`60m`** klines (MEXC rejects **`1h`**). Owner QA **ATLA** — price, refresh on load, sparkline OK. **`versionCode` still 28**; ship **29** with **drop CryptoCompare** after **28** Play approval. **Handoff + push `main`**. **Next:** **28** rollout → bump **29** → Play upload.
 - **2026-06-11 — Release 28 CryptoCompare fix (handoff + push):** **`1.0.28`** on **`main`** — CC API key wiring, **`healMetadata`** / refresh fixes for stuck prices (**ATLA** / tokens not on CoinGecko). Owner QA OK. **Keep `GRANT_DAYS=30`** for closed **28** upload; **production** = **`GRANT_DAYS=0`** later. **Post-test plan:** wire **MEXC**, drop **CryptoCompare** from picker. **Handoff + push `main`**. **Next:** verify scripts → upload **28** both closed tracks.

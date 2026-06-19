@@ -232,9 +232,11 @@
 - [x] **WEEX search engine** — v3 API wired; owner QA **2026-06-02**.
 - [x] **Remove CryptoCompare from picker** — **29**; legacy CC holdings re-add via MEXC.
 - [x] **Delete Binance** — US geo-block; code removed from repo.
-- [ ] **Play upload 1.0.29 (29):** MEXC + WEEX; **`GRANT_DAYS=30`**; verify scripts → both closed tracks.
-- [ ] **Production store AAB:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** (remove 30-day auto-Pro) + **`verify-play-release.ps1`**.
-- [ ] **v29+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
+- [ ] **Play upload 1.0.29 (29):** MEXC + WEEX — optional closed track; owner tested **29** on device.
+- [x] **Production access** — **Granted** (closed test + application form).
+- [ ] **Play upload 1.0.30 (30) — Production:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** + widget wake fix; **`verify-play-release.ps1`** → staged rollout.
+- [ ] **Site:** **`PLAY_URL`** when public listing live.
+- [ ] **v30+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
 - [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
 - [ ] **Production:** Apply / staged rollout when Console requirements met.

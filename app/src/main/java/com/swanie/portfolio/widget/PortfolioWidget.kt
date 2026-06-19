@@ -213,7 +213,19 @@ class PortfolioWidget : GlanceAppWidget() {
                             EmptyWidgetContent(context = context, bgColor = bgColor, textColor = bgTextColor, appWidgetId = appWidgetId)
                         }
                     } else {
-                        SyncingContent(context = context, bgColor = bgColor, textColor = bgTextColor)
+                        if (totalValue.isNotBlank()) {
+                            ZombieFallbackContent(
+                                context = context,
+                                appWidgetId = appWidgetId,
+                                vaultName = vaultName,
+                                totalValue = totalValue,
+                                lastUpdated = prefs[LAST_UPDATED_KEY] ?: "--:--",
+                                bgColor = bgColor,
+                                textColor = bgTextColor
+                            )
+                        } else {
+                            SyncingContent(context = context, bgColor = bgColor, textColor = bgTextColor)
+                        }
                     }
                 } else {
                     WidgetContent(
