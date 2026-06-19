@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-02 — **`main`** at **30 (`1.0.30`)** — **Production** AAB uploaded (**in review**, managed publishing off → auto-publish when approved). **`GRANT_DAYS=0`** on store build. **RevenueCat** dashboard verified (Apps, Products **Published**, entitlement **Swanies Portfolio Pro**, offering **`default`** → Play **`pro_*`**). **Site go-live:** **`PLAY_URL`** set on **`swaniedesigns.com`** — public Play CTA + QR; **`TESTER_URL`** cleared. **Blocker:** Play review only. **Next:** approval email → on-device paywall smoke test → optional Search Console re-index.
+**Last updated:** 2026-06-19 — **`main`** at **30 (`1.0.30`)** — **Production 30** **submitted for review** (full rollout, 177 countries; **`GRANT_DAYS=0`**). **Publishing overview “Last published June 19”** = **IARC age ratings** live (email), **not** the APK yet — public store still **Last updated ~June 14** until **30** approves. **RevenueCat** verified. **Site:** **`PLAY_URL`** live; **closed-test button removed** from **`#get-app`** (no **`TESTER_URL`**). **Next:** Play approval → paywall smoke test on Play install.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -55,7 +55,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic. **Production release 30** release notes uploaded. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** live on **`swaniedesigns.com`** (**2026-06-02**).
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#get-app`** = public **Play** CTA + QR (**`PLAY_URL`**); **`TESTER_URL`** empty (closed opt-in de-emphasized).
+- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#get-app`** = public **Play** CTA + QR only (**`PLAY_URL`**); closed-test join button **removed** (**2026-06-19**).
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
@@ -367,7 +367,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Website
 
-- **Shipped (2026-06-02)** — **`PLAY_URL`** public Play CTA + QR; **`TESTER_URL`** cleared; JSON-LD **`1.0.30`**; **`press.html`** updated. Deploy via push **`main`** → GitHub Actions.
+- **Shipped (2026-06-19)** — removed **Join closed testing** button + **`TESTER_URL`** wiring; **`PLAY_URL`** only for CTA + QR. Prior **2026-06-02:** JSON-LD **`1.0.30`**, **`press.html`**. Deploy via push **`main`** → GitHub Actions.
 
 ---
 
@@ -435,6 +435,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-19 — Site: remove closed-test button + Production 30 in review (handoff + push):** **`website/index.html`** — deleted **Join closed testing** CTA; QR/CTA **`PLAY_URL`** only. Owner submitted **Production 30 (1.0.30)** after catching **1.0.20** in draft; **Publishing overview** in review. **IARC** ratings live (**June 19** email) ≠ APK publish. **Handoff + push `main`**.
 - **2026-06-02 — Production go-live: site PLAY_URL + RevenueCat verified (handoff + push):** Owner walked **RevenueCat** checklist (Apps → Products → Entitlements → **`default`** offering) — all pass. **`website/index.html`** — **`PLAY_URL`** → public listing; closed-test QR/button removed; JSON-LD **1.0.30**; **`press.html`** + checklist tick. **Production 30** already **in review** on Play. **Handoff + push `main`** for Pages deploy.
 - **2026-06-17 — Release 30 production + widget wake fix (handoff + push):** **`1.0.30`** — **`GRANT_DAYS=0`** for Production AAB; removed widget **`SCREEN_ON`** refresh (stuck spinner); parse fallback for widget loading state. **Production access granted.** Owner QA **29** on device. **Handoff + push `main`**. **Next:** verify scripts → **Production** upload → **`PLAY_URL`**.
 - **2026-06-02 — Release 29 MEXC + WEEX; drop CC picker; delete Binance (handoff + push):** **`1.0.29`** on **`main`** — **WEEX** v3 wired; **Binance** removed (US geo-block); **CryptoCompare** removed from **`SearchEngineRegistry`**; owner QA **MEXC** + **WEEX** OK. **`GRANT_DAYS=30`** for closed upload. **Handoff + push `main`**. **Next:** verify scripts → upload **29** both closed tracks (after **28** live if needed).

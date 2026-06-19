@@ -391,7 +391,6 @@
         <div class="card get-app-card">
           <div class="get-app-actions">
             <a class="btn btn-primary is-disabled" id="play-cta-bottom" href="#" aria-disabled="true">Get it on Google Play</a>
-            <a class="btn btn-secondary" id="tester-cta" href="#" hidden>Join closed testing (invite only)</a>
             <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
             <a class="btn btn-ghost" href="press.html">Press kit</a>
             <a class="btn btn-ghost" href="contact.html">Contact us</a>
@@ -463,8 +462,6 @@
   <script src="js/qrcode.min.js"></script>
   <script>
     const PLAY_URL = "https://play.google.com/store/apps/details?id=com.swanie.portfolio";
-    /** Optional closed-testing opt-in — leave empty when the public listing is live. */
-    const TESTER_URL = "";
 
     function wireCta(id, url, liveLabel) {
       const el = document.getElementById(id);
@@ -474,13 +471,11 @@
         el.textContent = liveLabel;
         el.removeAttribute("aria-disabled");
         el.classList.remove("is-disabled");
-        el.hidden = false;
       }
     }
 
     wireCta("play-cta", PLAY_URL, "Get it on Google Play");
     wireCta("play-cta-bottom", PLAY_URL, "Get it on Google Play");
-    wireCta("tester-cta", TESTER_URL, "Join closed testing (invite only)");
     document.getElementById("y").textContent = new Date().getFullYear();
 
     function qrPixelSize(hostEl) {
@@ -526,9 +521,7 @@
       }
     }
 
-    const GET_APP_QR_URL =
-      PLAY_URL && /^https?:\/\//.test(PLAY_URL) ? PLAY_URL : TESTER_URL;
-    wireTesterQr(GET_APP_QR_URL);
+    wireTesterQr(PLAY_URL);
 
     var qrResizeTimer = null;
     window.addEventListener(
@@ -536,7 +529,7 @@
       function () {
         window.clearTimeout(qrResizeTimer);
         qrResizeTimer = window.setTimeout(function () {
-          wireTesterQr(GET_APP_QR_URL);
+          wireTesterQr(PLAY_URL);
         }, 200);
       },
       { passive: true }
