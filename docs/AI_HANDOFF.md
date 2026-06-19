@@ -29,19 +29,19 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-17 — **`main`** at **30 (`1.0.30`)** — **production access granted**; first **store** AAB uses **`CLOSED_TEST_PRO_GRANT_DAYS=0`** (owner set in **`local.properties`**). **Widget fix:** removed **`SCREEN_ON`** forced Glance rebuild (stuck loading spinner on wake). **29** on device QA (**MEXC** / **WEEX**). **Next:** **`verify-release-config.ps1`** → Signed Bundle → **`verify-play-release.ps1`** → **Production** rollout; **`PLAY_URL`** on site when live.
+**Last updated:** 2026-06-02 — **`main`** at **30 (`1.0.30`)** — **Production** AAB uploaded (**in review**, managed publishing off → auto-publish when approved). **`GRANT_DAYS=0`** on store build. **RevenueCat** dashboard verified (Apps, Products **Published**, entitlement **Swanies Portfolio Pro**, offering **`default`** → Play **`pro_*`**). **Site go-live:** **`PLAY_URL`** set on **`swaniedesigns.com`** — public Play CTA + QR; **`TESTER_URL`** cleared. **Blocker:** Play review only. **Next:** approval email → on-device paywall smoke test → optional Search Console re-index.
 
 ### Resume when you reopen (RevenueCat + Play)
 
 | Where | State |
 |-------|--------|
-| **RevenueCat** | Play products **Published** + entitlement **Swanies Portfolio Pro** · offering **`default`** (blue check) uses **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Debug **`test_…`** = Test Store only. |
+| **RevenueCat** | **Verified 2026-06-02** — Play products **Published**; entitlement **Swanies Portfolio Pro** (3 Play + 3 Test Store products); offering **`default`** → **`pro_monthly:monthly`**, **`pro_yearly:yearly`**, **`pro_lifetime`**. Release AAB uses **`goog_…`** (no **`test_`**). **$0** revenue pre-launch expected. |
 | **Play products** | **`pro_monthly`** + base **`monthly`** · **`pro_yearly`** + **`yearly`** · **`pro_lifetime`** + purchase option **`lifetime`** — all **Active**, regional prices from US anchor. |
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **30 (1.0.30)** on laptop / owner phone after build; **Production** upload pending. Studio **`main`** = **`versionCode` 30**. |
-| **Production access** | **Granted** — application approved; **Create and publish a release** in progress. |
+| **Version on device** | **30 (1.0.30)** — **Production** track uploaded; public rollout when review completes. Studio **`main`** = **`versionCode` 30**. |
+| **Production access** | **Granted** — **Production** release **in review** (177 countries). |
 | **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -52,10 +52,10 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Data safety:** Questionnaire **saved** (optional **Export to CSV** archive); canonical answers remain **`§ Play Data safety — facts from codebase`** below.
 - **Declarations / App content:** Owner stepped through multiple forms (**financial features**, **advertising ID** = no ads SDK / no **`AD_ID`** in manifest, **health**, **government apps**, store listing–adjacent tasks). Continue until **Dashboard** shows nothing blocking.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
-- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic; **What's new** shows **27** release notes on public listing card. **Short description** — rewrite if Play flags ranking claims. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — set **`PLAY_URL`** on site at **production** (closed testers still use opt-in link).
+- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic. **Production release 30** release notes uploaded. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** live on **`swaniedesigns.com`** (**2026-06-02**).
 - **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
 - **Publishing overview:** **`Send app for review`** stays **disabled** until **Dashboard** + **store listing** requirements are complete — then bundle pending changes.
-- **Testing path:** **Closed Alpha 24**; **Fiverr** closed cohort (**20** + **3** family emails). **≥12 opted-in for 14 consecutive days** → **Production access** — watch **Dashboard** during Fiverr rollout. **License testing** **unchecked**. **Site:** **`#get-app`** = **closed** opt-in QR (**`TESTER_URL`** → **`apps/testing/com.swanie.portfolio`**).
+- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#get-app`** = public **Play** CTA + QR (**`PLAY_URL`**); **`TESTER_URL`** empty (closed opt-in de-emphasized).
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
@@ -113,7 +113,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
 
-**Play / Google:** **Internal + Closed Alpha 24** live; **Fiverr** closed test (**TC stopped**). **License testing** **unchecked**. **Production access:** **14-day** + **≥3 releases** + form — Fiverr assists form; plan **25**/**26** + pre-launch (**§ Production access — Google requirements**). **Production** store build not shipped (**`GRANT_DAYS=0`** when it is).
+**Play / Google:** **Production 30 (1.0.30)** **in review** — **`GRANT_DAYS=0`**, 177 countries, managed publishing off. Closed tracks may lag; public users get store build without auto-Pro. **License testing** **unchecked**.
 
 ### Play AAB verify — copy-paste (Android Studio Terminal)
 
@@ -351,17 +351,15 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Next steps (priority order)
 
-### Ship 30 to Production (now)
+### Launch — waiting on Play (now)
 
-1. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** (owner set) — **do not** commit **`local.properties`**.
-2. **`.\scripts\verify-release-config.ps1`** → Signed Bundle → **`.\scripts\verify-play-release.ps1`** (must show auto-Pro **disabled**).
-3. **Production** → finish release → review → **staged rollout**.
-4. **Release notes (en-US):** MEXC + WEEX exchanges; custom asset icons; widget wake fix; closed-test polish. Public users pay for Pro via Play — no closed-test auto-Pro.
-5. **`PLAY_URL`** on **`swaniedesigns.com`** when listing is public.
+1. **Watch Play Console** — **Publishing overview** until **Production 30** approved (auto-publish when review completes).
+2. **On-device smoke test** (production build from Play): paywall shows 3 plans → optional license-tester purchase → **Restore purchases** → RC **Customers** shows **Swanies Portfolio Pro**.
+3. **Optional:** **Search Console** re-index **`swaniedesigns.com`** after deploy (**`docs/SEARCH_CONSOLE_SETUP.md`**) so Google sees live **`PLAY_URL`**.
 
 ### Optional — closed track
 
-- Upload **29** or **30** to closed tracks with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
+- Upload **30** to closed tracks with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
 
 ### Backlog
 
@@ -369,7 +367,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ### Website
 
-- **Shipped** — showcase, **contact** + **Tester feedback** (**`?topic=tester`**), **`#get-app`** **closed** testing QR (**`TESTER_URL`**). Push **`main`** for Pages deploy after edits.
+- **Shipped (2026-06-02)** — **`PLAY_URL`** public Play CTA + QR; **`TESTER_URL`** cleared; JSON-LD **`1.0.30`**; **`press.html`** updated. Deploy via push **`main`** → GitHub Actions.
 
 ---
 
@@ -437,6 +435,7 @@ Three separate systems — **only Play opted-in** counts for the **12 / 14-day**
 
 ## Session history (newest first)
 
+- **2026-06-02 — Production go-live: site PLAY_URL + RevenueCat verified (handoff + push):** Owner walked **RevenueCat** checklist (Apps → Products → Entitlements → **`default`** offering) — all pass. **`website/index.html`** — **`PLAY_URL`** → public listing; closed-test QR/button removed; JSON-LD **1.0.30**; **`press.html`** + checklist tick. **Production 30** already **in review** on Play. **Handoff + push `main`** for Pages deploy.
 - **2026-06-17 — Release 30 production + widget wake fix (handoff + push):** **`1.0.30`** — **`GRANT_DAYS=0`** for Production AAB; removed widget **`SCREEN_ON`** refresh (stuck spinner); parse fallback for widget loading state. **Production access granted.** Owner QA **29** on device. **Handoff + push `main`**. **Next:** verify scripts → **Production** upload → **`PLAY_URL`**.
 - **2026-06-02 — Release 29 MEXC + WEEX; drop CC picker; delete Binance (handoff + push):** **`1.0.29`** on **`main`** — **WEEX** v3 wired; **Binance** removed (US geo-block); **CryptoCompare** removed from **`SearchEngineRegistry`**; owner QA **MEXC** + **WEEX** OK. **`GRANT_DAYS=30`** for closed upload. **Handoff + push `main`**. **Next:** verify scripts → upload **29** both closed tracks (after **28** live if needed).
 - **2026-06-02 — MEXC wired + sparkline fix (handoff + push):** **`MexcSearchProvider`** registered; **`NetworkModule`** + **`AssetRepository`** exchange-provider paths; sparkline **`60m`** klines (MEXC rejects **`1h`**). Owner QA **ATLA** — price, refresh on load, sparkline OK. **`versionCode` still 28**; ship **29** with **drop CryptoCompare** after **28** Play approval. **Handoff + push `main`**. **Next:** **28** rollout → bump **29** → Play upload.

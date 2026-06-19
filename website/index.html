@@ -55,8 +55,8 @@
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock"
         },
-        "downloadUrl": "https://swaniedesigns.com/#get-app",
-        "softwareVersion": "1.0.21",
+        "downloadUrl": "https://play.google.com/store/apps/details?id=com.swanie.portfolio",
+        "softwareVersion": "1.0.30",
         "author": { "@id": "https://swaniedesigns.com/#organization" }
       }
     ]
@@ -357,7 +357,7 @@
         <div class="faq-list">
           <details class="faq-item">
             <summary>How do I get the app?</summary>
-            <p>Swanie's Portfolio is distributed on <strong>Google Play</strong> for Android. Use the <a href="#get-app">Get the app</a> section on this page — when the listing is live, the Google Play button will open the store directly.</p>
+            <p>Swanie's Portfolio is distributed on <strong>Google Play</strong> for Android. Use the <a href="#get-app">Get the app</a> section — the Google Play button opens the store listing directly.</p>
           </details>
           <details class="faq-item">
             <summary>Is the app free?</summary>
@@ -386,12 +386,12 @@
         <p class="get-app-kicker">Android · Google Play</p>
         <h2 class="section-title">Get Swanie's Portfolio</h2>
         <p class="section-sub">
-          Download on Google Play when the listing is live. Android only — crypto and precious metals in one local-first portfolio.
+          Download on Google Play. Android only — crypto and precious metals in one local-first portfolio.
         </p>
         <div class="card get-app-card">
           <div class="get-app-actions">
             <a class="btn btn-primary is-disabled" id="play-cta-bottom" href="#" aria-disabled="true">Get it on Google Play</a>
-            <a class="btn btn-secondary" id="tester-cta" href="https://play.google.com/apps/testing/com.swanie.portfolio">Join closed testing (invite only)</a>
+            <a class="btn btn-secondary" id="tester-cta" href="#" hidden>Join closed testing (invite only)</a>
             <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
             <a class="btn btn-ghost" href="press.html">Press kit</a>
             <a class="btn btn-ghost" href="contact.html">Contact us</a>
@@ -403,8 +403,7 @@
           </p>
           <div class="qr-deck qr-deck-compact" id="qr-deck">
             <p class="qr-deck-intro">
-              Scan the <strong>invite-only</strong> code below on your phone to install or update the test app from Google Play.
-              Your Gmail must already be on Swanie’s tester list — this is not public download.
+              Scan the code below on your Android phone to open the app on <strong>Google Play</strong>, then tap Install.
             </p>
             <details class="qr-help">
               <summary>About this QR code &amp; privacy</summary>
@@ -414,31 +413,28 @@
                   (<code>website/js/qrcode.min.js</code>). No third-party QR image API is called.
                 </p>
                 <p>
-                  It opens Google Play’s <strong>closed testing</strong> opt-in page for invited testers only.
-                  Your Gmail must be on the Closed Alpha email list in Play Console.
+                  It opens the public <strong>Google Play</strong> listing for Swanie's Portfolio.
                 </p>
               </div>
             </details>
             <div class="qr-deck-grid qr-deck-grid-single">
               <div class="qr-card qr-card-tester">
-                <p class="qr-invite-badge" aria-label="Invite only">Invite only</p>
                 <div id="tester-qr-pending" class="tester-qr-pending" hidden>
-                  <h4 class="qr-card-title">Google Play test app</h4>
-                  <p class="qr-card-sub">Set <code>TESTER_URL</code> in the page script to show this QR.</p>
+                  <h4 class="qr-card-title">Google Play</h4>
+                  <p class="qr-card-sub">Set <code>PLAY_URL</code> in the page script to show this QR.</p>
                   <div class="tester-qr-placeholder-box" role="status">
                     <p class="tester-qr-placeholder-text">
-                      Paste <strong>Closed testing → Testers → Copy link</strong> into
-                      <code>TESTER_URL</code>, then redeploy.
+                      Paste the public Play listing URL into <code>PLAY_URL</code>, then redeploy.
                     </p>
                   </div>
                 </div>
                 <div id="tester-qr-live" class="tester-qr-live">
-                  <h4 class="qr-card-title">Google Play test app</h4>
-                  <p class="qr-card-sub">Scan with your phone camera, tap <strong>Become a tester</strong>, then install from Play.</p>
+                  <h4 class="qr-card-title">Google Play</h4>
+                  <p class="qr-card-sub">Scan with your phone camera, then tap <strong>Install</strong> on Google Play.</p>
                   <div class="tester-qr-frame">
-                    <div id="tester-qr-host" class="qr-host" aria-label="QR code for closed testing opt-in link"></div>
+                    <div id="tester-qr-host" class="qr-host" aria-label="QR code for Google Play listing"></div>
                   </div>
-                  <a id="tester-qr-fallback" class="tester-qr-link" href="https://play.google.com/apps/testing/com.swanie.portfolio">Open closed testing link</a>
+                  <a id="tester-qr-fallback" class="tester-qr-link" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio">Open Google Play listing</a>
                 </div>
               </div>
             </div>
@@ -466,9 +462,9 @@
   </div>
   <script src="js/qrcode.min.js"></script>
   <script>
-    const PLAY_URL = "";
-    /** Google Play closed testing opt-in — invite-only QR. Closed testing → Testers → Copy link. */
-    const TESTER_URL = "https://play.google.com/apps/testing/com.swanie.portfolio";
+    const PLAY_URL = "https://play.google.com/store/apps/details?id=com.swanie.portfolio";
+    /** Optional closed-testing opt-in — leave empty when the public listing is live. */
+    const TESTER_URL = "";
 
     function wireCta(id, url, liveLabel) {
       const el = document.getElementById(id);
@@ -478,6 +474,7 @@
         el.textContent = liveLabel;
         el.removeAttribute("aria-disabled");
         el.classList.remove("is-disabled");
+        el.hidden = false;
       }
     }
 
@@ -529,7 +526,9 @@
       }
     }
 
-    wireTesterQr(TESTER_URL);
+    const GET_APP_QR_URL =
+      PLAY_URL && /^https?:\/\//.test(PLAY_URL) ? PLAY_URL : TESTER_URL;
+    wireTesterQr(GET_APP_QR_URL);
 
     var qrResizeTimer = null;
     window.addEventListener(
@@ -537,7 +536,7 @@
       function () {
         window.clearTimeout(qrResizeTimer);
         qrResizeTimer = window.setTimeout(function () {
-          wireTesterQr(TESTER_URL);
+          wireTesterQr(GET_APP_QR_URL);
         }, 200);
       },
       { passive: true }

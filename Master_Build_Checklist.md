@@ -235,7 +235,7 @@
 - [ ] **Play upload 1.0.29 (29):** MEXC + WEEX — optional closed track; owner tested **29** on device.
 - [x] **Production access** — **Granted** (closed test + application form).
 - [ ] **Play upload 1.0.30 (30) — Production:** **`CLOSED_TEST_PRO_GRANT_DAYS=0`** + widget wake fix; **`verify-play-release.ps1`** → staged rollout.
-- [ ] **Site:** **`PLAY_URL`** when public listing live.
+- [x] **Site:** **`PLAY_URL`** when public listing live.
 - [ ] **v30+ backlog:** Quit confirmation + **`confirmQuit`** toggle.
 - [ ] **Production access prep:** **≥3** closed releases ✓ (**24** · **25** · **26**); **Pre-launch report** fixes; **10-question** form **250+ chars**/answer — draft bullets in **`docs/AI_HANDOFF.md`** § *Production access form — activity log*.
 - [ ] **Production access gate:** Apply after metrics + prep above.
