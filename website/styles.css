@@ -327,7 +327,7 @@ section {
 }
 
 #privacy {
-  padding-top: 44px;
+  padding-top: 52px;
 }
 
 .section-head {
@@ -425,9 +425,9 @@ h2 {
   flex: 1;
 }
 
-/* Screenshots */
+/* Screenshots — carousel */
 .showcase {
-  padding: 72px 0;
+  padding: 92px 0 100px;
   background:
     radial-gradient(circle at 20% 20%, rgba(58, 116, 205, 0.18), transparent 34rem),
     rgba(255, 255, 255, 0.025);
@@ -435,16 +435,49 @@ h2 {
   border-bottom: 1px solid var(--line);
 }
 
-.shots {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  align-items: start;
+.showcase .section-head {
+  margin-bottom: 44px;
+}
+
+.showcase .section-head p {
+  margin-top: 22px;
+}
+
+.shot-carousel {
+  --shot-visible: 4;
+  --shot-gap: 22px;
+  --shot-carousel-max: 1520px;
+  position: relative;
+  width: min(96vw, var(--shot-carousel-max));
+  margin: 0 auto;
+}
+
+.shot-carousel-viewport {
+  overflow: hidden;
+  margin: 0 52px;
+  touch-action: pan-y pinch-zoom;
+}
+
+.shot-carousel-track {
+  display: flex;
+  gap: var(--shot-gap);
+  transition: transform 680ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+}
+
+.shot-carousel.is-dragging .shot-carousel-track {
+  transition: none;
+}
+
+.shot-slide {
+  flex: 0 0 calc((100% - (var(--shot-gap) * (var(--shot-visible) - 1))) / var(--shot-visible));
+  min-width: 0;
+  margin: 0;
 }
 
 .shot {
   border-radius: 24px;
-  padding: 10px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--line);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.23);
@@ -475,11 +508,94 @@ h2 {
   background: #071023;
 }
 
-.shot figcaption {
-  padding: 14px 8px 5px;
+.shot-carousel-arrow {
+  position: absolute;
+  top: 42%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 4, 22, 0.72);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.shot-carousel-arrow:hover {
+  border-color: rgba(212, 175, 55, 0.45);
+  color: var(--gold);
+  background: rgba(0, 4, 22, 0.88);
+}
+
+.shot-carousel-arrow:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.shot-carousel-prev {
+  left: 0;
+}
+
+.shot-carousel-next {
+  right: 0;
+}
+
+.shot-carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.shot-carousel-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.25s ease, width 0.25s ease;
+}
+
+.shot-carousel-dot.is-active {
+  width: 24px;
+  background: var(--gold);
+}
+
+.shot-carousel-dot:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
+
+.shot-carousel-caption {
+  max-width: 640px;
+  margin: 36px auto 0;
+  text-align: center;
+  min-height: 4.5rem;
+}
+
+.shot-caption-title {
+  margin: 0 0 10px;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.shot-caption-desc {
+  margin: 0;
   color: var(--muted);
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 17px;
+  line-height: 1.6;
 }
 
 /* Screenshot lightbox */
@@ -1020,8 +1136,13 @@ details p {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .shots {
-    grid-template-columns: repeat(2, 1fr);
+  .shot-carousel {
+    --shot-visible: 2;
+    --shot-carousel-max: 920px;
+  }
+
+  .shot-carousel-viewport {
+    margin: 0 46px;
   }
 
   .nav-links {
@@ -1048,9 +1169,28 @@ details p {
   }
 
   .features,
-  .stats-grid,
-  .shots {
+  .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .shot-carousel {
+    --shot-visible: 1;
+    --shot-gap: 16px;
+    --shot-carousel-max: 420px;
+  }
+
+  .shot-carousel-viewport {
+    margin: 0 40px;
+  }
+
+  .shot-carousel-arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .showcase {
+    padding: 76px 0 88px;
   }
 
   .stat,
@@ -1067,5 +1207,9 @@ details p {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .shot-carousel-track {
+    transition: none;
   }
 }
