@@ -21,7 +21,6 @@
   <meta name="twitter:title" content="Swanie's Portfolio — Crypto &amp; precious metals" />
   <meta name="twitter:description" content="Android portfolio app for crypto and bullion. Local-first command center for serious holders." />
   <meta name="twitter:image" content="https://swaniedesigns.com/play_store_feature_graphic_1024x500.png" />
-  <!-- Tab icon: navy #000416 baked into favicon-tab.png so the swan reads on light browser chrome -->
   <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
   <link rel="apple-touch-icon" href="favicon-tab.png?v=2" />
   <title>Swanie's Portfolio — Crypto &amp; precious metals tracker (Android)</title>
@@ -64,418 +63,200 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260601a2" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260709a1" />
 </head>
 <body>
-  <div class="bg-pattern" aria-hidden="true"></div>
-  <div class="bg-layer" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a class="logo" href="index.html">
-        <img class="logo-mark" src="ic_swan_website.png" alt="" aria-hidden="true" />
-        <div class="logo-text-stack">
-          <span class="logo-text">Swanie's Portfolio</span><br aria-hidden="true" />
-          <span class="logo-tagline">Crypto &amp; Precious Metals</span>
-        </div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Swanie's Portfolio home">
+        <img src="images/swan-no-background.png" alt="" width="54" height="54" />
+        <span class="brand-title"><strong>SWANIE'S</strong><span>PORTFOLIO</span></span>
       </a>
-      <nav class="nav-links" aria-label="Site">
-        <a href="#get-app">Get the app</a>
-        <a href="#faq">FAQ</a>
+      <nav class="nav-links" aria-label="Main navigation">
         <a href="#features">Features</a>
+        <a href="#screenshots">Screenshots</a>
         <a href="privacy.html">Privacy</a>
+        <a href="#faq">FAQ</a>
         <a href="press.html">Press</a>
         <a href="contact.html">Contact</a>
+        <a href="#download">Get the app</a>
       </nav>
     </div>
   </header>
-  <div class="wrap">
-    <main>
-      <section class="hero">
-        <p class="hero-badge">Android app</p>
-        <h1>Track every ounce, coin, and move with <span>confidence</span></h1>
-        <p class="hero-lead">
-          Swanie's Portfolio gives serious holders a clean, local-first command center for crypto and precious metals.
-          Stay organized, monitor value changes fast, and keep control of your own data.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary is-disabled" id="play-cta" href="#" aria-disabled="true">Get it on Google Play</a>
-          <a class="btn btn-secondary" href="#screenshots">Watch demo</a>
-          <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
-        </div>
-        <p class="hero-recruit">
-          <strong>Android only.</strong> Your vault stays on your device — organized holdings, live values, and widgets without spreadsheet overhead.
-        </p>
-      </section>
 
-      <section class="pitch-strip" aria-label="Why Swanie's Portfolio">
-        <div class="pitch-item">
-          <h3>Built for real portfolios</h3>
-          <p>Track crypto and precious metals together, including gram, kilo, and troy-ounce valuation support.</p>
-        </div>
-        <div class="pitch-item">
-          <h3>Local-first security mindset</h3>
-          <p>Your vault stays on your device. Encrypted backup is a file you keep; optional Google Drive sync is planned for a future release. Play billing, feedback, and price data only touch the network when you use those features.</p>
-        </div>
-        <div class="pitch-item">
-          <h3>Daily-use clarity</h3>
-          <p>Fast cards, widgets, and analytics help you understand position value without spreadsheet overhead.</p>
-        </div>
-      </section>
-
-      <section id="screenshots" aria-labelledby="screenshots-heading">
-        <h2 class="section-title" id="screenshots-heading">See the app in action</h2>
-        <p class="section-sub">Demo video and screenshots side by side — swipe the shots or use the arrows.</p>
-
-        <div class="app-showcase" id="app-showcase">
-          <div class="app-showcase-video" id="app-demo">
-            <figure class="demo-video-card">
-              <div class="shot-frame">
-                <div class="shot-device-screen shot-device-screen-video">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <div class="shot-demo-video-stage">
-                    <video
-                      class="shot-demo-video"
-                      src="marketing/final_swanies_portfolio_demo_video_web.mp4"
-                      poster="marketing/CTA_end_picture.png"
-                      playsinline
-                      preload="none"
-                      aria-label="Swanie's Portfolio app demo video"
-                    ></video>
-                    <div class="shot-demo-video-cta-layer is-visible">
-                      <img
-                        class="shot-demo-video-cta"
-                        src="marketing/CTA_end_picture.png"
-                        alt=""
-                        aria-hidden="true"
-                        decoding="async"
-                      />
-                      <button type="button" class="shot-demo-video-play" aria-label="Play app demo">
-                        <span class="shot-demo-video-play-icon" aria-hidden="true"></span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="shot-demo-video-bar" role="group" aria-label="Video controls">
-                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-play" aria-label="Play">▶</button>
-                    <input
-                      type="range"
-                      class="shot-demo-bar-seek"
-                      min="0"
-                      max="1000"
-                      value="0"
-                      step="1"
-                      aria-label="Seek"
-                      aria-valuemin="0"
-                      aria-valuemax="1000"
-                      aria-valuenow="0"
-                    />
-                    <button type="button" class="shot-demo-bar-btn shot-demo-bar-mute" aria-label="Mute">🔊</button>
-                  </div>
-                </div>
-              </div>
-              <figcaption>App demo<br /><span class="shot-caption-sub">Tap Play or use the bar below</span></figcaption>
-            </figure>
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Android portfolio tracker</div>
+          <h1>All your investments.<span>One app.</span></h1>
+          <p class="hero-copy">Track cryptocurrency and precious metals with customizable home widgets, multiple portfolios, interactive analytics, encrypted backups, and complete on-device privacy.</p>
+          <div class="hero-actions">
+            <a class="btn" id="play-cta" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio" target="_blank" rel="noopener">Get it on Google Play</a>
+            <a class="btn secondary" href="#screenshots">View screenshots</a>
           </div>
-
-          <div class="app-showcase-shots" id="app-screenshots">
-            <div class="shots-viewer" id="shots-viewer" role="region" aria-label="App screenshots" aria-live="polite" tabindex="0">
-              <div class="shots-viewer-stage" id="shots-viewer-stage">
-            <figure class="shot-slide is-active" aria-hidden="false">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/01_sp_start_page.jpg" alt="Swanie's Portfolio start screen with swan branding and sign-in options" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Start Screen<br /><span class="shot-caption-sub">Swanie's Portfolio</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/02_sp_create_account.jpg" alt="Create account form with username, email, and password fields" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Create Account<br /><span class="shot-caption-sub">Secure Local Profile</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/03_sp_login.jpg" alt="Login or unlock vault screen" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Login<br /><span class="shot-caption-sub">Unlock Your Vault</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/04_sp_main.jpg" alt="Main portfolio home with holdings and totals" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Home Screen<br /><span class="shot-caption-sub">Live Asset Values</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/05_sp_settings.jpg" alt="Settings screen with preferences and tools" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Settings Screen<br /><span class="shot-caption-sub">Preferences &amp; Tools</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/06_sp_language.jpg" alt="Language selector with multiple locales" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Language Drop Down<br /><span class="shot-caption-sub">Supports 20 Locales</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/07_sp_settings_2.jpg" alt="Additional settings options" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>More Settings<br /><span class="shot-caption-sub">Customize the App</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/08_sp_analytics.jpg" alt="In-app analytics and portfolio insights" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Analytics Hub<br /><span class="shot-caption-sub">Mix &amp; Concentration</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/09_sp_pie_chart.jpg" alt="Pie chart of portfolio allocation" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Analytics Pie Chart<br /><span class="shot-caption-sub">View your data in different ways</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/10_sp_widget_manager.jpg" alt="Widget manager to choose assets for the home screen widget" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Widget Manager<br /><span class="shot-caption-sub">Select Assets for Widget</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/11_sp_wm_style.jpg" alt="Widget style and appearance customization" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Widget Manager<br /><span class="shot-caption-sub">Custom Colors</span></figcaption>
-            </figure>
-            <figure class="shot-slide" aria-hidden="true">
-              <div class="shot-frame">
-                <div class="shot-device-screen">
-                  <span class="shot-device-earpiece" aria-hidden="true"></span>
-                  <img src="images/12_sp_widget.jpg" alt="Home screen widget showing portfolio totals on the device" loading="eager" decoding="async" />
-                </div>
-              </div>
-              <figcaption>Home Screen Widget<br /><span class="shot-caption-sub">Create Widgets For Each Portfolio</span></figcaption>
-            </figure>
-              <div class="shots-swipe-hint is-dismissed" id="shots-swipe-hint" aria-hidden="true">
-                <span class="shots-swipe-hint-inner">
-                  <span class="shots-swipe-hint-arrow shots-swipe-hint-arrow-prev" aria-hidden="true">←</span>
-                  <span class="shots-swipe-hint-label">SWIPE</span>
-                  <span class="shots-swipe-hint-arrow shots-swipe-hint-arrow-next" aria-hidden="true">→</span>
-                </span>
-              </div>
-              </div>
-              <div class="shots-viewer-nav" role="group" aria-label="Screenshot navigation">
-                <button type="button" class="shots-arrow shots-arrow-prev" id="shots-arrow-prev" aria-label="Previous screenshot">‹</button>
-                <span class="shots-viewer-count" id="shots-viewer-count" aria-hidden="true">1 / 12</span>
-                <button type="button" class="shots-arrow shots-arrow-next" id="shots-arrow-next" aria-label="Next screenshot">›</button>
-              </div>
-            </div>
+          <div class="trust" aria-label="Key benefits">
+            <span>Crypto and precious metals together</span>
+            <span>Multiple portfolios and customizable widgets</span>
+            <span>Your portfolio stays on your device by default</span>
           </div>
         </div>
-      </section>
-
-      <section id="features">
-        <h2 class="section-title">Built for serious holders</h2>
-        <p class="section-sub">Local-first design with the extras you need when you want them.</p>
-        <div class="feature-grid">
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">🔐</div>
-            <h3>Vault &amp; unlock</h3>
-            <p>Lock your portfolio behind a password and biometrics. You control when it opens.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">🪙</div>
-            <h3>Crypto &amp; metals</h3>
-            <p>Track digital assets and bullion with spot-aware valuation tuned for grams, kilos, and troy ounces.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">📊</div>
-            <h3>Analytics &amp; widgets</h3>
-            <p>Dig into concentration and mix on-device; home-screen widgets keep totals in view.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">💾</div>
-            <h3>Backup &amp; restore</h3>
-            <p>Encrypted export you store yourself. Google Drive vault sync is planned for a future release—not in the current app.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">🎨</div>
-            <h3>Themes</h3>
-            <p>Make the app yours with customizable colors and a theme studio on supported tiers.</p>
-          </article>
-          <article class="card">
-            <div class="card-icon" aria-hidden="true">🌍</div>
-            <h3>Many languages</h3>
-            <p>Interface localized for a wide set of locales so you can use the app comfortably.</p>
-          </article>
+        <div class="phone-card" aria-label="Swanie's Portfolio app screenshot">
+          <img src="images/PlayStore_01_Everything_You_Own_One_Portfolio.png" alt="Swanie's Portfolio holdings dashboard showing crypto and precious metals" width="382" height="680" />
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="pro-strip" aria-labelledby="pro-heading">
-        <h2 id="pro-heading">Pro (subscription)</h2>
-        <p>
-          Some capabilities are offered as an in-app subscription where available (themes, deeper analytics,
-          widget customization, and related Pro surfaces). Details appear inside the app and at checkout.
-        </p>
-      </section>
+    <section class="stats">
+      <div class="wrap stats-grid">
+        <div class="stat"><strong>Crypto</strong><span>Track Bitcoin, Ethereum, XRP, and other digital assets in one portfolio.</span></div>
+        <div class="stat"><strong>Metals</strong><span>Track gold, silver, coins, bars, grams, kilograms, and troy ounces.</span></div>
+        <div class="stat"><strong>Widgets</strong><span>Create home screen widgets for the portfolios you check every day.</span></div>
+        <div class="stat"><strong>Private</strong><span>Local-first storage with encrypted backup files you control.</span></div>
+      </div>
+    </section>
 
-      <section id="faq" class="faq-section" aria-labelledby="faq-heading">
-        <h2 class="section-title" id="faq-heading">Frequently asked questions</h2>
-        <p class="section-sub">Quick answers about the Android portfolio app for crypto and precious metals.</p>
-        <div class="faq-list">
-          <details class="faq-item">
-            <summary>How do I get the app?</summary>
-            <p>Swanie's Portfolio is distributed on <strong>Google Play</strong> for Android. Use the <a href="#get-app">Get the app</a> section — the Google Play button opens the store listing directly.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Is the app free?</summary>
-            <p>Yes — the core app is free to install. Optional <strong>Pro</strong> features are available through in-app subscription where offered (themes, deeper analytics, widget customization, and related Pro surfaces).</p>
-          </details>
-          <details class="faq-item">
-            <summary>Android only?</summary>
-            <p>Yes. Swanie's Portfolio is an <strong>Android</strong> app on Google Play. There is no iPhone version.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Where is my portfolio data stored?</summary>
-            <p>Your vault stays <strong>on your device</strong> (local-first). Encrypted backup is a file you export and keep. Optional cloud sync is planned for a future release; price lookups and optional feedback use the network when you use those features.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Can I track gold, silver, and crypto together?</summary>
-            <p>Yes. The app supports <strong>cryptocurrency and precious metals</strong> in one portfolio, with gram, kilo, and troy-ounce valuation, widgets, and on-device analytics.</p>
-          </details>
-          <details class="faq-item">
-            <summary>Is this financial advice?</summary>
-            <p>No. Swanie's Portfolio is a tracking tool only. It does not provide investment, tax, or legal advice. See our <a href="privacy.html">privacy policy</a> and in-app terms.</p>
-          </details>
+    <section id="features">
+      <div class="wrap">
+        <div class="section-head center">
+          <h2>Built for serious holders.</h2>
+          <p>Swanie's Portfolio is designed for people who want a clear ledger, quick review, and control over their own data without spreadsheet sprawl.</p>
+          <div class="gold-line"><span class="diamond" aria-hidden="true"></span></div>
         </div>
-      </section>
+        <div class="features">
+          <article class="feature-card"><div class="icon" aria-hidden="true">◆</div><h3>Multiple portfolios</h3><p>Create separate portfolios for crypto, retirement, precious metals, family accounts, or any strategy you choose.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">▣</div><h3>Home screen widgets</h3><p>Keep totals visible without opening the app. Choose the assets, layout, colors, and style for each widget.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">◔</div><h3>Analytics built in</h3><p>View allocation, concentration, composition, and charts directly on your device.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">◇</div><h3>Custom themes</h3><p>Personalize backgrounds, cards, fonts, app colors, and widget appearance to match your style.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">⛓</div><h3>Encrypted backups</h3><p>Export a passphrase-protected .swpb backup file and keep your own offline copy.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">◎</div><h3>Metals support</h3><p>Use gram, kilogram, and troy-ounce thinking where it applies to coins, bars, gold, and silver.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">▤</div><h3>Detailed holdings</h3><p>Review pricing, quantity, allocation, and performance information with clean asset cards.</p></article>
+          <article class="feature-card"><div class="icon" aria-hidden="true">●</div><h3>No ads</h3><p>Designed as a focused portfolio tracker, not an ad-supported content feed.</p></article>
+        </div>
+      </div>
+    </section>
 
-      <section id="get-app">
-        <p class="get-app-kicker">Android · Google Play</p>
-        <h2 class="section-title">Get Swanie's Portfolio</h2>
-        <p class="section-sub">
-          Download on Google Play. Android only — crypto and precious metals in one local-first portfolio.
-        </p>
-        <div class="card get-app-card">
-          <div class="get-app-actions">
-            <a class="btn btn-primary is-disabled" id="play-cta-bottom" href="#" aria-disabled="true">Get it on Google Play</a>
-            <a class="btn btn-ghost" href="privacy.html">Privacy policy</a>
-            <a class="btn btn-ghost" href="press.html">Press kit</a>
-            <a class="btn btn-ghost" href="contact.html">Contact us</a>
-          </div>
-          <p class="get-app-support">
-            Questions or support?
-            <a href="contact.html">Send us a message</a>
-            — no email app required.
-          </p>
-          <div class="qr-deck qr-deck-compact" id="qr-deck">
-            <p class="qr-deck-intro">
-              Scan the code below on your Android phone to open the app on <strong>Google Play</strong>, then tap Install.
-            </p>
+    <section id="screenshots" class="showcase">
+      <div class="wrap">
+        <div class="section-head center">
+          <h2>See the app before you install.</h2>
+          <p>These are real app screens showing the same story as the Play Store listing: track everything, organize portfolios, customize widgets, and understand your holdings.</p>
+        </div>
+        <div class="shots">
+          <figure class="shot"><img src="images/PlayStore_01_Everything_You_Own_One_Portfolio.png" alt="All investments in one portfolio screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>One portfolio view</strong><br />Crypto and precious metals together.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_02_Home_Screen_Widget_FINAL_v2.png" alt="Home screen widget screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Home screen widgets</strong><br />See your portfolio without opening the app.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_03_Multiple_Portfolios_One_App.png" alt="Multiple portfolios screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Multiple portfolios</strong><br />Retirement, crypto, metals, family, and more.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_04_Customize_Every_Widget.png" alt="Widget manager customization screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Widget manager</strong><br />Choose assets, colors, layout, and style.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_05_Personalize_Your_App.png" alt="Theme manager screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Theme manager</strong><br />Personalize the app to match your style.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_06_Powerful_Analytics.png" alt="Analytics hub screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Analytics hub</strong><br />Powerful tools built into the app.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_07_PieChart.png" alt="Pie chart allocation screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Visual charts</strong><br />Understand allocation and diversification.</figcaption></figure>
+          <figure class="shot"><img src="images/PlayStore_08_Detailed_Holdings.png" alt="Detailed holdings screenshot" width="270" height="480" loading="lazy" /><figcaption><strong>Detailed holdings</strong><br />Track every asset with context.</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="wrap split">
+        <div class="panel">
+          <h2>Private by design.</h2>
+          <p>Your portfolio remains stored on your device by default. Network access is used only for features that require it, such as price data, optional Google Play purchases, or feedback that you choose to send.</p>
+          <p>Your holdings are not automatically uploaded to cloud storage in this release, and there are no ads in the app. Read the full <a href="privacy.html" style="color:var(--link)">privacy policy</a>.</p>
+        </div>
+        <div class="panel">
+          <h3>Backup when you choose</h3>
+          <p>Export your portfolio as an encrypted <strong>.swpb</strong> file protected by your own passphrase. Restore through the in-app backup and restore flow when you are ready.</p>
+          <ul>
+            <li>Local-first storage</li>
+            <li>Encrypted backup file</li>
+            <li>Optional biometric unlock on supported devices</li>
+            <li>No automatic cloud portfolio upload in this release</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="pro">
+      <div class="wrap split">
+        <div class="panel">
+          <h2>Free to start. Pro when you want more.</h2>
+          <p>The core tracker remains useful without Pro. Optional Pro features expand customization, analytics, widgets, themes, and multi-portfolio capabilities where enabled in the app.</p>
+        </div>
+        <div class="panel">
+          <h3>Built for daily review</h3>
+          <p>If you check your portfolio every day, the app is built to make that habit fast, clear, and personal. Widgets keep totals visible, while analytics and details help you understand what changed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Frequently asked questions.</h2>
+          <p>Quick answers about Swanie's Portfolio for Android.</p>
+        </div>
+        <div class="faq">
+          <details><summary>How do I get the app?</summary><p>Swanie's Portfolio is available on <a href="https://play.google.com/store/apps/details?id=com.swanie.portfolio" style="color:var(--link)">Google Play</a> for Android. Use the Google Play button on this page to open the store listing.</p></details>
+          <details><summary>Is the app free?</summary><p>Yes. The app is free to install. Optional Pro features are available through Google Play Billing where offered.</p></details>
+          <details><summary>Can I track gold, silver, and crypto together?</summary><p>Yes. The app supports cryptocurrency and precious metals in one portfolio, including metals units such as grams, kilograms, and troy ounces.</p></details>
+          <details><summary>Where is my portfolio data stored?</summary><p>Portfolio data is stored locally on your device by default. You can export an encrypted backup file when you want your own backup copy.</p></details>
+          <details><summary>Is this investment advice?</summary><p>No. Swanie's Portfolio is a tracking and organization tool. It is not a broker, bank, or investment adviser. Always verify critical decisions independently.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="download" class="cta">
+      <div class="wrap">
+        <div class="cta-box">
+          <h2>All your investments. One app.</h2>
+          <p>Track crypto and precious metals, customize home widgets, manage multiple portfolios, and keep your data private on your device.</p>
+          <a class="btn" id="play-cta-bottom" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio" target="_blank" rel="noopener">Get it on Google Play</a>
+          <p class="note">Android only. Not financial advice. Optional Pro features are handled through Google Play Billing.<br />Questions? <a href="contact.html" style="color:var(--link)">Send us a message</a>.</p>
+          <div class="qr-deck" id="qr-deck">
+            <p class="qr-deck-intro">Scan on your Android phone to open Google Play, then tap <strong>Install</strong>.</p>
             <details class="qr-help">
-              <summary>About this QR code &amp; privacy</summary>
+              <summary>About this QR code</summary>
               <div class="qr-help-body">
-                <p>
-                  The code is drawn <strong>entirely in your browser</strong> using <strong>QRCode.js</strong>
-                  (<code>website/js/qrcode.min.js</code>). No third-party QR image API is called.
-                </p>
-                <p>
-                  It opens the public <strong>Google Play</strong> listing for Swanie's Portfolio.
-                </p>
+                <p>The code is drawn in your browser with <strong>QRCode.js</strong> (<code>website/js/qrcode.min.js</code>). No third-party QR image API is called.</p>
               </div>
             </details>
-            <div class="qr-deck-grid qr-deck-grid-single">
-              <div class="qr-card qr-card-tester">
-                <div id="tester-qr-pending" class="tester-qr-pending" hidden>
-                  <h4 class="qr-card-title">Google Play</h4>
-                  <p class="qr-card-sub">Set <code>PLAY_URL</code> in the page script to show this QR.</p>
-                  <div class="tester-qr-placeholder-box" role="status">
-                    <p class="tester-qr-placeholder-text">
-                      Paste the public Play listing URL into <code>PLAY_URL</code>, then redeploy.
-                    </p>
-                  </div>
-                </div>
-                <div id="tester-qr-live" class="tester-qr-live">
-                  <h4 class="qr-card-title">Google Play</h4>
-                  <p class="qr-card-sub">Scan with your phone camera, then tap <strong>Install</strong> on Google Play.</p>
-                  <div class="tester-qr-frame">
-                    <div id="tester-qr-host" class="qr-host" aria-label="QR code for Google Play listing"></div>
-                  </div>
-                  <a id="tester-qr-fallback" class="tester-qr-link" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio">Open Google Play listing</a>
-                </div>
+            <div class="qr-card">
+              <h4 class="qr-card-title">Google Play</h4>
+              <p class="qr-card-sub">Scan with your phone camera, then tap <strong>Install</strong>.</p>
+              <div class="tester-qr-frame">
+                <div id="tester-qr-host" class="qr-host" aria-label="QR code for Google Play listing"></div>
               </div>
+              <a id="tester-qr-fallback" class="tester-qr-link" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio">Open Google Play listing</a>
             </div>
           </div>
-          <details class="reviewers-details">
-            <summary>For reviewers &amp; press</summary>
-            <div class="reviewers-details-body">
-              <ul>
-                <li><strong>What it is:</strong> Android portfolio tracker for crypto and precious metals; local-first vault; encrypted file backup you control. (Google Drive sync planned for a future release.)</li>
-                <li><strong>Package ID:</strong> <code>com.swanie.portfolio</code></li>
-                <li><strong>Policy:</strong> <a href="privacy.html">Privacy policy</a></li>
-                <li><strong>Contact:</strong> <a href="contact.html">Contact form</a> on this site.</li>
-              </ul>
-              <p class="reviewers-details-more"><a class="btn btn-ghost" href="press.html">Full press kit</a></p>
-            </div>
-          </details>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <footer class="site-footer">
-      <span>© <span id="y"></span> Swanie's Portfolio</span>
-      <span><a href="privacy.html">Privacy</a> · <a href="press.html">Press</a> · <a href="contact.html">Contact</a> · Not financial advice</span>
-    </footer>
-  </div>
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>© <span id="y"></span> Swanie's Portfolio · Not financial advice</div>
+      <div>
+        <a href="privacy.html">Privacy</a>
+        <a href="press.html">Press</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+
   <script src="js/qrcode.min.js"></script>
   <script>
     const PLAY_URL = "https://play.google.com/store/apps/details?id=com.swanie.portfolio";
 
-    function wireCta(id, url, liveLabel) {
+    function wireCta(id, url) {
       const el = document.getElementById(id);
-      if (!el) return;
-      if (url && /^https?:\/\//.test(url)) {
-        el.href = url;
-        el.textContent = liveLabel;
-        el.removeAttribute("aria-disabled");
-        el.classList.remove("is-disabled");
-      }
+      if (!el || !url || !/^https?:\/\//.test(url)) return;
+      el.href = url;
     }
 
-    wireCta("play-cta", PLAY_URL, "Get it on Google Play");
-    wireCta("play-cta-bottom", PLAY_URL, "Get it on Google Play");
+    wireCta("play-cta", PLAY_URL);
+    wireCta("play-cta-bottom", PLAY_URL);
     document.getElementById("y").textContent = new Date().getFullYear();
 
     function qrPixelSize(hostEl) {
@@ -484,383 +265,38 @@
         var w = Math.floor(frame.getBoundingClientRect().width);
         if (w > 24) return Math.max(120, Math.min(200, w - 24));
       }
-      var vw = document.documentElement.clientWidth || window.innerWidth || 400;
-      return Math.max(120, Math.min(200, Math.floor(vw * 0.46)));
+      return 160;
     }
 
     function drawQr(hostId, text) {
       var el = document.getElementById(hostId);
       if (!el || typeof QRCode === "undefined") return;
       el.innerHTML = "";
-      var side = qrPixelSize(el);
       new QRCode(el, {
         text: text,
-        width: side,
-        height: side,
+        width: qrPixelSize(el),
+        height: qrPixelSize(el),
         colorDark: "#0a0a12",
         colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M,
+        correctLevel: QRCode.CorrectLevel.M
       });
     }
 
     function wireTesterQr(url) {
-      var pending = document.getElementById("tester-qr-pending");
-      var live = document.getElementById("tester-qr-live");
       var fallback = document.getElementById("tester-qr-fallback");
-      if (!pending || !live || !fallback) return;
       if (url && /^https?:\/\//.test(url)) {
         drawQr("tester-qr-host", url);
-        fallback.href = url;
-        pending.hidden = true;
-        live.hidden = false;
-      } else {
-        pending.hidden = false;
-        live.hidden = true;
-        var host = document.getElementById("tester-qr-host");
-        if (host) host.innerHTML = "";
+        if (fallback) fallback.href = url;
       }
     }
 
     wireTesterQr(PLAY_URL);
 
     var qrResizeTimer = null;
-    window.addEventListener(
-      "resize",
-      function () {
-        window.clearTimeout(qrResizeTimer);
-        qrResizeTimer = window.setTimeout(function () {
-          wireTesterQr(PLAY_URL);
-        }, 200);
-      },
-      { passive: true }
-    );
-
-    (function wireInPageAnchors() {
-      document.querySelectorAll('a[href^="#"]').forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          var hash = link.getAttribute("href");
-          if (!hash || hash.length < 2) return;
-          var target = document.getElementById(hash.slice(1));
-          if (!target) return;
-          e.preventDefault();
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-      });
-    })();
-
-    (function wireDemoVideo() {
-      document.querySelectorAll(".shot-device-screen-video").forEach(function (screen) {
-        var video = screen.querySelector(".shot-demo-video");
-        var ctaLayer = screen.querySelector(".shot-demo-video-cta-layer");
-        var playOverlay = screen.querySelector(".shot-demo-video-play");
-        var barPlay = screen.querySelector(".shot-demo-bar-play");
-        var seek = screen.querySelector(".shot-demo-bar-seek");
-        var muteBtn = screen.querySelector(".shot-demo-bar-mute");
-        if (!video) return;
-
-        video.volume = 1;
-
-        function shouldShowCta() {
-          return video.paused && (video.ended || video.currentTime < 0.05);
-        }
-
-        function syncCta() {
-          if (!ctaLayer) return;
-          ctaLayer.classList.toggle("is-visible", shouldShowCta());
-        }
-
-        function syncPlayButtons() {
-          var playing = !video.paused && !video.ended;
-          var label = playing ? "Pause" : video.ended ? "Replay" : "Play";
-          if (barPlay) {
-            barPlay.textContent = playing ? "⏸" : "▶";
-            barPlay.setAttribute("aria-label", label);
-          }
-          if (playOverlay) {
-            playOverlay.setAttribute("aria-label", video.ended ? "Replay app demo" : "Play app demo");
-          }
-        }
-
-        function syncSeek() {
-          if (!seek) return;
-          if (!video.duration || !isFinite(video.duration)) {
-            seek.value = "0";
-            seek.setAttribute("aria-valuenow", "0");
-            return;
-          }
-          var pct = Math.round((video.currentTime / video.duration) * 1000);
-          seek.value = String(pct);
-          seek.setAttribute("aria-valuenow", String(pct));
-        }
-
-        function playVideo() {
-          if (video.ended) video.currentTime = 0;
-          video.play().catch(function () {});
-        }
-
-        function togglePlay() {
-          if (video.paused || video.ended) {
-            playVideo();
-          } else {
-            video.pause();
-          }
-        }
-
-        if (playOverlay) {
-          playOverlay.addEventListener("click", function (e) {
-            e.stopPropagation();
-            playVideo();
-          });
-        }
-
-        if (barPlay) {
-          barPlay.addEventListener("click", function (e) {
-            e.stopPropagation();
-            togglePlay();
-          });
-        }
-
-        if (seek) {
-          seek.addEventListener("input", function () {
-            if (!video.duration || !isFinite(video.duration)) return;
-            video.currentTime = (parseFloat(seek.value) / 1000) * video.duration;
-          });
-        }
-
-        if (muteBtn) {
-          muteBtn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            video.muted = !video.muted;
-            muteBtn.textContent = video.muted ? "🔇" : "🔊";
-            muteBtn.setAttribute("aria-label", video.muted ? "Unmute" : "Mute");
-          });
-        }
-
-        screen.querySelectorAll(".shot-demo-video-bar, .shot-demo-video-play").forEach(function (el) {
-          el.addEventListener("pointerdown", function (e) {
-            e.stopPropagation();
-          });
-        });
-
-        video.addEventListener("timeupdate", syncSeek);
-        video.addEventListener("loadedmetadata", syncSeek);
-        ["play", "pause", "ended", "seeked"].forEach(function (ev) {
-          video.addEventListener(ev, function () {
-            syncCta();
-            syncPlayButtons();
-            syncSeek();
-          });
-        });
-
-        syncCta();
-        syncPlayButtons();
-        syncSeek();
-      });
-    })();
-
-    (function wireShotsViewer() {
-      var stage = document.getElementById("shots-viewer-stage");
-      var viewer = document.getElementById("shots-viewer");
-      var prev = document.getElementById("shots-arrow-prev");
-      var next = document.getElementById("shots-arrow-next");
-      var countEl = document.getElementById("shots-viewer-count");
-      var swipeHint = document.getElementById("shots-swipe-hint");
-      if (!stage || !prev || !next) return;
-
-      var slides = Array.prototype.slice.call(stage.querySelectorAll(".shot-slide"));
-      if (!slides.length) return;
-
-      slides.forEach(function (slide) {
-        var img = slide.querySelector("img");
-        if (!img) return;
-        img.loading = "eager";
-        img.decoding = "async";
-        if (img.complete) return;
-        var src = img.currentSrc || img.src;
-        if (!src) return;
-        var loader = new Image();
-        loader.decoding = "async";
-        loader.src = src;
-      });
-
-      var index = 0;
-      var touchStartX = 0;
-      var touchStartY = 0;
-      var hintFadeTimer = null;
-      var hintFadeMs = 2500;
-      var hintFirstShowFadeMs = 4500;
-      var hintSectionVisible = false;
-      var hintFirstShow = true;
-      var hintPrevArrow = swipeHint ? swipeHint.querySelector(".shots-swipe-hint-arrow-prev") : null;
-      var hintNextArrow = swipeHint ? swipeHint.querySelector(".shots-swipe-hint-arrow-next") : null;
-      var mobileHintMq = window.matchMedia("(max-width: 767px)");
-
-      function isMobileHint() {
-        return mobileHintMq.matches;
-      }
-
-      function clearHintFadeTimer() {
-        if (hintFadeTimer) {
-          clearTimeout(hintFadeTimer);
-          hintFadeTimer = null;
-        }
-      }
-
-      function updateSwipeHintArrows() {
-        if (!swipeHint) return;
-        var atStart = index <= 0;
-        var atEnd = index >= slides.length - 1;
-        if (hintPrevArrow) hintPrevArrow.hidden = atEnd;
-        if (hintNextArrow) hintNextArrow.hidden = atStart;
-      }
-
-      function showSwipeHint() {
-        if (!swipeHint || !hintSectionVisible) return;
-        clearHintFadeTimer();
-        updateSwipeHintArrows();
-
-        if (!isMobileHint()) {
-          swipeHint.classList.remove("is-first-show");
-          swipeHint.classList.add("is-dismissed");
-          return;
-        }
-
-        swipeHint.classList.remove("is-dismissed");
-        swipeHint.classList.toggle("is-first-show", hintFirstShow);
-
-        var fadeDelay = hintFirstShow ? hintFirstShowFadeMs : hintFadeMs;
-        hintFadeTimer = setTimeout(function () {
-          swipeHint.classList.add("is-dismissed");
-          swipeHint.classList.remove("is-first-show");
-          hintFirstShow = false;
-        }, fadeDelay);
-      }
-
-      function hideSwipeHint() {
-        clearHintFadeTimer();
-        if (!swipeHint) return;
-        swipeHint.classList.add("is-dismissed");
-        swipeHint.classList.remove("is-first-show");
-      }
-
-      function render() {
-        slides.forEach(function (slide, i) {
-          var active = i === index;
-          slide.classList.toggle("is-active", active);
-          slide.setAttribute("aria-hidden", active ? "false" : "true");
-        });
-        prev.disabled = index <= 0;
-        next.disabled = index >= slides.length - 1;
-        prev.classList.toggle("is-disabled", prev.disabled);
-        next.classList.toggle("is-disabled", next.disabled);
-        prev.setAttribute("aria-disabled", prev.disabled ? "true" : "false");
-        next.setAttribute("aria-disabled", next.disabled ? "true" : "false");
-        if (countEl) countEl.textContent = index + 1 + " / " + slides.length;
-        updateSwipeHintArrows();
-      }
-
-      function go(delta) {
-        var nextIndex = index + delta;
-        if (nextIndex < 0 || nextIndex >= slides.length) return;
-        index = nextIndex;
-        render();
-      }
-
-      prev.addEventListener("click", function () {
-        go(-1);
-      });
-      next.addEventListener("click", function () {
-        go(1);
-      });
-
-      stage.addEventListener(
-        "touchstart",
-        function (e) {
-          if (!e.touches[0]) return;
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
-          showSwipeHint();
-        },
-        { passive: true }
-      );
-      stage.addEventListener(
-        "touchend",
-        function (e) {
-          if (!e.changedTouches[0]) return;
-          var dx = e.changedTouches[0].clientX - touchStartX;
-          var dy = e.changedTouches[0].clientY - touchStartY;
-          if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy)) return;
-          go(dx < 0 ? 1 : -1);
-        },
-        { passive: true }
-      );
-
-      if (viewer) {
-        viewer.addEventListener("keydown", function (e) {
-          if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            go(-1);
-          } else if (e.key === "ArrowRight") {
-            e.preventDefault();
-            go(1);
-          }
-        });
-      }
-
-      if (typeof mobileHintMq.addEventListener === "function") {
-        mobileHintMq.addEventListener("change", function () {
-          if (!isMobileHint()) hideSwipeHint();
-        });
-      } else if (typeof mobileHintMq.addListener === "function") {
-        mobileHintMq.addListener(function () {
-          if (!isMobileHint()) hideSwipeHint();
-        });
-      }
-
-      if (viewer && "IntersectionObserver" in window) {
-        var hintObserver = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                hintSectionVisible = true;
-              } else {
-                hintSectionVisible = false;
-                hideSwipeHint();
-              }
-            });
-          },
-          { threshold: 0.35 }
-        );
-        hintObserver.observe(viewer);
-      } else {
-        hintSectionVisible = true;
-      }
-
-      render();
-    })();
-
-    (function () {
-      var threshold = 12;
-      var scrollHeaderTicking = false;
-
-      function syncScrollHeader() {
-        document.documentElement.classList.toggle("is-scrolled", window.scrollY > threshold);
-      }
-
-      window.addEventListener(
-        "scroll",
-        function () {
-          if (scrollHeaderTicking) return;
-          scrollHeaderTicking = true;
-          window.requestAnimationFrame(function () {
-            syncScrollHeader();
-            scrollHeaderTicking = false;
-          });
-        },
-        { passive: true }
-      );
-      syncScrollHeader();
-    })();
+    window.addEventListener("resize", function () {
+      window.clearTimeout(qrResizeTimer);
+      qrResizeTimer = window.setTimeout(function () { wireTesterQr(PLAY_URL); }, 200);
+    }, { passive: true });
   </script>
 </body>
 </html>

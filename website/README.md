@@ -1,16 +1,21 @@
 # Swanie's Portfolio — static website
 
-Marketing site (**`index.html`**) plus **`privacy.html`**, **`press.html`** (press kit), and shared **`styles.css`** / **`bg-pattern.svg`**.
+Marketing site (**`index.html`**) plus **`privacy.html`**, **`press.html`** (press kit), **`contact.html`**, and shared **`styles.css`**.
+
+## Brand assets (2026 rebrand)
+
+- **Logo:** **`images/swan-no-background.png`** (header on all pages).
+- **Screenshots:** **`images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** — same set as the Play Store listing.
+- **Feature graphic:** **`play_store_feature_graphic_1024x500.png`** (Open Graph / Twitter cards); source also in **`images/Feature_Graphic_V6_Final_Python.png`**.
+- **Theme:** Navy **`#000416`** + gold **`#d4af37`**, Inter font — see **`styles.css`**. Draft reference: **`index_new_brand_theme.html`** (superseded by **`index.html`**).
 
 ## Before you publish
 
-1. **Tab icon** — **`favicon-tab.png`** is a **512×512** composite: **`#000416`** background with **`ic_swan_website.png`** centered so the swan reads on light browser chrome. After you change **`ic_swan_website.png`**, regenerate **`favicon-tab.png`** the same way (or bump **`?v=`** on the `<link>` tags in **`index.html`** / **`privacy.html`** after replacing it). Header logo still uses **`ic_swan_website.png`** directly.
-2. **Demo video + screenshots** — **`website/marketing/final_swanies_portfolio_demo_video_web.mp4`** (720p web export with **audio**, ~**5–15 MB** target) is the first card in the **See the app in action** carousel (**autoplay muted**, **Sound off/on** button). **Do not commit** the uncompressed master (**`final_swanies_portfolio_demo_video.mp4`**, gitignored) — GitHub rejects files **> 100 MB**. Regenerate web export from master (ffmpeg example in repo scripts or below). **`website/images/01_sp_*.jpg`** … follow in the same row.
-3. **`index.html` — Get the app** — Public Play CTA and QR when **`PLAY_URL`** is set.
-4. **`contact.html`** — Support / contact page; **`js/contact-form.js`** posts to Web3Forms (no mailto). Key must match **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`**; restrict domains in the Web3Forms dashboard.
-5. **`press.html`** — One-pager for reviewers (facts, package id, links). Update the “Last updated” line when you change copy.
-6. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
-7. **`bg-pattern.svg`** — Very light dot/grid/wave texture behind **`bg-layer`**; tweak opacity in **`styles.css`** (`.bg-pattern` and `prefers-color-scheme` blocks) if you want it stronger or softer.
+1. **Tab icon** — **`favicon-tab.png`** is a **512×512** composite with **`#000416`** background. After changing the swan logo, regenerate **`favicon-tab.png`** and bump **`?v=`** on `<link rel="icon">` tags if needed.
+2. **`index.html` — Get the app** — Public Play CTA and QR when **`PLAY_URL`** is set in the page script.
+3. **`contact.html`** — Support / contact page; **`js/contact-form.js`** posts to Web3Forms (no mailto). Key must match **`WEB3FORMS_ACCESS_KEY`** in **`local.properties`**; restrict domains in the Web3Forms dashboard.
+4. **`press.html`** — One-pager for reviewers (facts, package id, links). Update the “Last updated” line when you change copy.
+5. **`privacy.html`** — Keep policy text aligned with Play **Data safety** and your in-app **Privacy & terms** strings.
 
 ## SEO & Search Console
 

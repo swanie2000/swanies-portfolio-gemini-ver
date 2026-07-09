@@ -21,38 +21,33 @@
   <title>Contact us — Swanie's Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260518m9" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260709a1" />
 </head>
 <body>
-  <div class="bg-pattern" aria-hidden="true"></div>
-  <div class="bg-layer" aria-hidden="true"></div>
-  <header class="site-header">
-    <div class="site-header-inner">
-      <a class="logo" href="index.html">
-        <img class="logo-mark" src="ic_swan_website.png" alt="" aria-hidden="true" />
-        <div class="logo-text-stack">
-          <span class="logo-text">Swanie's Portfolio</span><br aria-hidden="true" />
-          <span class="logo-tagline">Crypto &amp; Precious Metals</span>
-        </div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html" aria-label="Swanie's Portfolio home">
+        <img src="images/swan-no-background.png" alt="" width="54" height="54" />
+        <span class="brand-title"><strong>SWANIE'S</strong><span>PORTFOLIO</span></span>
       </a>
       <nav class="nav-links" aria-label="Site">
-        <a href="index.html#get-app">Get the app</a>
-        <a href="index.html#faq">FAQ</a>
         <a href="index.html#features">Features</a>
+        <a href="index.html#screenshots">Screenshots</a>
         <a href="privacy.html">Privacy</a>
+        <a href="index.html#faq">FAQ</a>
         <a href="press.html">Press</a>
         <a href="contact.html" aria-current="page">Contact</a>
+        <a href="index.html#download">Get the app</a>
       </nav>
     </div>
   </header>
-  <div class="wrap">
-    <main class="legal-page contact-page">
+  <main class="wrap page-main legal-page contact-page">
       <a class="back-link" href="index.html">← Back to home</a>
       <p class="contact-kicker">Support</p>
       <h1>Contact us</h1>
       <p class="meta">
-        Questions about Swanie's Portfolio, feedback, or help before the Play listing goes live?
+        Questions about Swanie's Portfolio, feedback, or support with the app on Google Play?
         Send a message below — we read every submission and reply by email when needed.
       </p>
 
@@ -104,7 +99,7 @@
 
           <input type="text" name="_honey" class="tester-request-honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
-          <button type="submit" class="btn btn-secondary" id="contact-submit">Send message</button>
+          <button type="submit" class="btn secondary" id="contact-submit">Send message</button>
           <p class="tester-request-status" id="contact-status" role="status" aria-live="polite" hidden></p>
           <div class="contact-sent-copy" id="contact-sent-copy" hidden>
             <p class="contact-sent-copy-title">Message sent</p>
@@ -119,13 +114,18 @@
         to our inbox. See the <a href="privacy.html">privacy policy</a> for how we handle data.
         For in-app bug reports, use <strong>Settings → Send feedback</strong> inside the app.
       </p>
-    </main>
+  </main>
 
-    <footer class="site-footer">
-      <span>© <span id="y"></span> Swanie's Portfolio</span>
-      <span><a href="privacy.html">Privacy</a> · <a href="press.html">Press</a> · <a href="contact.html">Contact</a> · Not financial advice</span>
-    </footer>
-  </div>
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>© <span id="y"></span> Swanie's Portfolio · Not financial advice</div>
+      <div>
+        <a href="privacy.html">Privacy</a>
+        <a href="press.html">Press</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
   <script src="js/contact-form.js"></script>
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();

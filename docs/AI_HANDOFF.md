@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-06-19 — **`main`** at **`247ca19`** — **Production 30 (1.0.30) LIVE**; **production billing smoke test complete** (Play install → monthly sub → Pro → **RC Refund** → paywall back). **Site:** **`PLAY_URL`**, no closed-test button. **Win:** v1 public ship + monetization verified. **Next:** optional listing polish; **v31+** Play dashboard recommendations in backlog.
+**Last updated:** 2026-07-09 — **`main`** — **Website rebrand shipped** (navy/gold theme, new Play Store screenshots + swan logo, **`#download`** CTA + QR). **Play listing** updated with same brand assets (**2026-07-09**). **Production 30 (1.0.30)** still live. **Next:** owner filming shorter **trailer** video (new images + voiceover) — target **weekend**; add to site when ready. **Maintenance mode** — no new app release unless owner reopens scope.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -52,10 +52,10 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Data safety:** Questionnaire **saved** (optional **Export to CSV** archive); canonical answers remain **`§ Play Data safety — facts from codebase`** below.
 - **Declarations / App content:** Owner stepped through multiple forms (**financial features**, **advertising ID** = no ads SDK / no **`AD_ID`** in manifest, **health**, **government apps**, store listing–adjacent tasks). Continue until **Dashboard** shows nothing blocking.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
-- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing (2026-06-10):** **preview video** approved (**Trailer** on store page), **8** phone screenshots, feature graphic. **Production release 30** release notes uploaded. Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** live on **`swaniedesigns.com`** (**2026-06-02**).
-- **Listing assets (repo):** **`website/play_store_app_icon_512.png`**; **`website/play_store_feature_graphic_1024x500.png`** (required size); optional **`website/play_store_feature_graphic_1024x512.png`**; regenerate feature banner with **`scripts/compose-play-feature-graphic.ps1`** from **`website/play_store_feature_icon_1024x512.png`** (strip edge BG → **`#000416`**, centered scale).
+- **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing:** **preview video** (Trailer), **8** phone screenshots, feature graphic. **Brand refresh (2026-07-09):** owner updated **Play listing** graphics/screenshots to match new navy/gold brand (same asset set now on **`swaniedesigns.com`**). Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** on site.
+- **Listing assets (repo):** **`website/images/swan-no-background.png`** (header logo); **`website/images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** (screenshot grid); **`website/play_store_feature_graphic_1024x500.png`** (OG + Play feature graphic; source **`images/Feature_Graphic_V6_Final_Python.png`**); **`website/play_store_app_icon_512.png`**.
 - **Publishing overview:** **Production 30** published; **IARC** age ratings also went live **Jun 19** (separate email). **Production → Release dashboard** shows Play **recommendations** (not blockers) — see **§ Next steps → Post-launch backlog**.
-- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#get-app`** = public **Play** CTA + QR only (**`PLAY_URL`**); closed-test join button **removed** (**2026-06-19**).
+- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); closed-test join button **removed** (**2026-06-19**). **Site rebrand (2026-07-09):** new **`styles.css`** (navy/gold, Inter); **`index.html`** + **`contact.html`** / **`privacy.html`** / **`press.html`**; draft **`index_new_brand_theme.html`** kept as reference.
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
@@ -371,9 +371,10 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** $9.99 → Pro → **RC Refund** → paywall back.
-2. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any (**MEXC/WEEX**); remove stale **closed beta / Pro through July 2026** copy from long description if still present.
-3. **Optional:** **Search Console** re-index **`swaniedesigns.com`** (**`docs/SEARCH_CONSOLE_SETUP.md`**).
+1. **Website trailer (owner — soon):** Shorter **promo/trailer** video with **new brand images** + **voiceover**; owner targeting **weekend (2026-07-12/13)**. When exported: replace or supplement current Play **Trailer** + embed on **`index.html`** (web export to **`website/marketing/`**, keep under GitHub **100 MB** limit).
+2. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** $9.99 → Pro → **RC Refund** → paywall back.
+3. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any; remove stale **closed beta / Pro through July 2026** copy from long description if still present.
+4. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`** so browser tab matches new swan.
 
 ### Post-launch backlog — Play Console recommendations (v31+, not urgent)
 
@@ -393,7 +394,8 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ### Website
 
-- **Shipped (2026-06-19)** — **`PLAY_URL`** only; closed-test button removed. Deploy via push **`main`** → GitHub Actions.
+- **Shipped (2026-07-09)** — Full **brand rebrand**: **`styles.css`**, **`index.html`**, subpages; **`images/PlayStore_*`** screenshots; **`swan-no-background.png`** logo; feature graphic updated. **`#download`** + **`PLAY_URL`** + QR. Deploy via push **`main`** → GitHub Actions.
+- **Pending (owner)** — New shorter **trailer** video (voiceover + new images); add to site + Play when ready (~**weekend 2026-07-12/13**).
 
 ---
 
@@ -428,9 +430,10 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Custom asset icons | `IconManager.kt`, `HoldingsUIComponents.kt` (`MetalIcon`, edit funnels), `MyHoldingsScreen.kt`, `AssetArchitectScreen.kt` |
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`** (Style tab scroll), **`WidgetConfigActivity.kt`** |
-| Marketing site layout | **`website/styles.css`** — **`#app-showcase`**; mobile swipe hint; **`#get-app`** |
-| Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`** (Play closed-test feedback URL) |
-| Marketing site / video | **`website/index.html`** — **`wireShotsViewer`**, **`wireDemoVideo`**; **`#get-app`**, **`PLAY_URL`**, **`SITE_SHARE_URL`**; **`marketing/final_swanies_portfolio_demo_video_web.mp4`** |
+| Marketing site layout | **`website/styles.css`** — navy/gold brand theme; **`#screenshots`** grid; **`#download`** CTA + QR |
+| Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`** |
+| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/play_store_feature_graphic_1024x500.png`**; draft **`website/index_new_brand_theme.html`** |
+| Marketing site / video (pending) | Owner **trailer** — shorter promo with new images + voiceover (~**weekend 2026-07-12/13**); export to **`website/marketing/`** when ready |
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | App / launcher | **`AndroidManifest.xml`** → **`@string/launcher_short_name`** (**Portfolio** under icon); **`app_name`** / Play listing still full brand; widget label unchanged |
@@ -445,7 +448,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 | Tester recruitment (legacy) | **`docs/RECRUIT_INTERNAL_TESTERS.md`**, **`facebook-join-testing-post.png`** — superseded by **Fiverr closed email lists** |
 | Play Console — license vs testers | **List 1:** **Internal** and/or **Closed → Testers** (email lists). **List 2:** **Settings → License testing** — **unchecked** for Fiverr and family |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | **`website/index.html`**, **`website/contact.html`** — FAQ, SEO, **`#get-app`**, site QR; **`robots.txt`**, **`sitemap.xml`** (incl. contact); **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| Marketing site | **`website/index.html`**, **`website/contact.html`** — FAQ, SEO, **`#download`**, site QR; **`robots.txt`**, **`sitemap.xml`** (incl. contact); **`deploy-website.yml`** → **https://swaniedesigns.com** |
 | SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — verify **`swaniedesigns.com`**, submit sitemap |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
@@ -462,6 +465,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ## Session history (newest first)
 
+- **2026-07-09 — Website rebrand + Play listing brand update (handoff + push):** Owner updated **Google Play listing** with new brand screenshots/graphics. **`website/`** — full rebrand from **`index_new_brand_theme.html`**: navy/gold **`styles.css`**, **`index.html`** + **`contact.html`** / **`privacy.html`** / **`press.html`**, **`images/PlayStore_01`–`08`**, **`swan-no-background.png`**, updated feature graphic. **`#download`** + **`PLAY_URL`** + QR preserved. **Next (owner):** shorter **trailer** video with new images + voiceover — target **weekend**. **Handoff + push `main`** → Pages deploy.
 - **2026-06-19 — Production billing smoke test + RC refund playbook (handoff + push):** Owner installed **Production 30** from Play; **pro_monthly** purchase → Pro → **RevenueCat Refund** on event **`GPA.3314-0009-6695-24453`** → paywall restored. Documented **`§ Refund dev test purchases`** — **always use RC** (Sandbox **OFF**), not Play Console Order management. **Handoff + push `main`**.
 - **2026-06-19 — Production 30 LIVE + Play backlog in handoff (handoff + push):** **Production 30 (1.0.30)** approved and live; store **Updated Jun 19**; Release dashboard active. Documented Play **recommendations** for **v31+** (edge-to-edge Android 15+, deprecated status-bar APIs, large-screen resizability). **Site** already pushed (**`e27c88a`**). **Next:** paywall smoke test.
 - **2026-06-19 — Site: remove closed-test button + Production 30 in review (handoff + push):** **`website/index.html`** — deleted **Join closed testing** CTA; QR/CTA **`PLAY_URL`** only. Owner submitted **Production 30 (1.0.30)** after catching **1.0.20** in draft; **Publishing overview** in review. **IARC** ratings live (**June 19** email) ≠ APK publish. **Handoff + push `main`**.
