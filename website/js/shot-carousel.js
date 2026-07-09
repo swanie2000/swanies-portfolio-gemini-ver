@@ -35,10 +35,21 @@
   }
 
   function slideStepPx() {
+    var gap = parseFloat(getComputedStyle(track).gap) || 22;
+    var slideW = parseFloat(getComputedStyle(root).getPropertyValue("--shot-slide-width"));
+    if (slideW > 0) return slideW + gap;
     var first = slides[0];
     if (!first) return 0;
-    var gap = parseFloat(getComputedStyle(track).gap) || 22;
     return first.getBoundingClientRect().width + gap;
+  }
+
+  function layoutSlides() {
+    var viewport = root.querySelector(".shot-carousel-viewport");
+    if (!viewport) return;
+    var visible = visibleCount();
+    var gap = parseFloat(getComputedStyle(track).gap) || 22;
+    var slideW = (viewport.clientWidth - gap * (visible - 1)) / visible;
+    root.style.setProperty("--shot-slide-width", slideW + "px");
   }
 
   function clampIndex(i) {
@@ -118,6 +129,7 @@
   }
 
   function onResize() {
+    layoutSlides();
     index = clampIndex(index);
     applyTransform();
     renderDots();

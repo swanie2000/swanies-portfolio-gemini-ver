@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260709c1" />
+  <link rel="stylesheet" href="styles.css?v=20260709c2" />
 </head>
 <body>
   <header class="nav">
@@ -143,7 +143,9 @@
           <h2>See the app before you install.</h2>
           <p>These are real app screens showing the same story as the Play Store listing: track everything, organize portfolios, customize widgets, and understand your holdings.</p>
         </div>
-        <div class="shot-carousel" id="shot-carousel" tabindex="0" aria-roledescription="carousel" aria-label="App screenshots">
+      </div>
+      <div class="shot-carousel" id="shot-carousel" tabindex="0" aria-roledescription="carousel" aria-label="App screenshots">
+        <div class="shot-carousel-row">
           <button type="button" class="shot-carousel-arrow shot-carousel-prev" aria-label="Previous screenshot" aria-controls="shot-carousel-track">
             <span aria-hidden="true">&#10094;</span>
           </button>
@@ -178,11 +180,11 @@
           <button type="button" class="shot-carousel-arrow shot-carousel-next" aria-label="Next screenshot" aria-controls="shot-carousel-track">
             <span aria-hidden="true">&#10095;</span>
           </button>
-          <div class="shot-carousel-dots" id="shot-carousel-dots" role="tablist" aria-label="Screenshot pages"></div>
-          <div class="shot-carousel-caption" aria-live="polite">
-            <h3 class="shot-caption-title" id="shot-caption-title">One portfolio view</h3>
-            <p class="shot-caption-desc" id="shot-caption-desc">Crypto and precious metals together.</p>
-          </div>
+        </div>
+        <div class="shot-carousel-dots" id="shot-carousel-dots" role="tablist" aria-label="Screenshot pages"></div>
+        <div class="shot-carousel-caption" aria-live="polite">
+          <h3 class="shot-caption-title" id="shot-caption-title">One portfolio view</h3>
+          <p class="shot-caption-desc" id="shot-caption-desc">Crypto and precious metals together.</p>
         </div>
       </div>
     </section>

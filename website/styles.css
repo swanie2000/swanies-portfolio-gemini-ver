@@ -447,15 +447,21 @@ h2 {
   --shot-visible: 4;
   --shot-gap: 22px;
   --shot-carousel-max: 1520px;
-  position: relative;
-  width: min(96vw, var(--shot-carousel-max));
+  width: min(var(--shot-carousel-max), calc(100% - 36px));
   margin: 0 auto;
+}
+
+.shot-carousel-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
 }
 
 .shot-carousel-viewport {
   overflow: hidden;
-  margin: 0 52px;
   touch-action: pan-y pinch-zoom;
+  min-width: 0;
 }
 
 .shot-carousel-track {
@@ -470,7 +476,7 @@ h2 {
 }
 
 .shot-slide {
-  flex: 0 0 calc((100% - (var(--shot-gap) * (var(--shot-visible) - 1))) / var(--shot-visible));
+  flex: 0 0 var(--shot-slide-width, 280px);
   min-width: 0;
   margin: 0;
 }
@@ -509,10 +515,9 @@ h2 {
 }
 
 .shot-carousel-arrow {
-  position: absolute;
-  top: 42%;
-  transform: translateY(-50%);
-  z-index: 2;
+  position: static;
+  transform: none;
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   display: grid;
@@ -536,14 +541,6 @@ h2 {
 .shot-carousel-arrow:focus-visible {
   outline: 2px solid var(--link);
   outline-offset: 2px;
-}
-
-.shot-carousel-prev {
-  left: 0;
-}
-
-.shot-carousel-next {
-  right: 0;
 }
 
 .shot-carousel-dots {
@@ -1141,10 +1138,6 @@ details p {
     --shot-carousel-max: 920px;
   }
 
-  .shot-carousel-viewport {
-    margin: 0 46px;
-  }
-
   .nav-links {
     display: none;
   }
@@ -1177,16 +1170,11 @@ details p {
     --shot-visible: 1;
     --shot-gap: 16px;
     --shot-carousel-max: 420px;
+    width: min(var(--shot-carousel-max), calc(100% - 24px));
   }
 
-  .shot-carousel-viewport {
-    margin: 0 40px;
-  }
-
-  .shot-carousel-arrow {
-    width: 38px;
-    height: 38px;
-    font-size: 16px;
+  .shot-carousel-row {
+    gap: 10px;
   }
 
   .showcase {
