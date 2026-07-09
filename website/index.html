@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260709a2" />
+  <link rel="stylesheet" href="styles.css?v=20260709b1" />
 </head>
 <body>
   <header class="nav">
@@ -144,14 +144,14 @@
           <p>These are real app screens showing the same story as the Play Store listing: track everything, organize portfolios, customize widgets, and understand your holdings.</p>
         </div>
         <div class="shots">
-          <figure class="shot"><img src="images/PlayStore_01_Everything_You_Own_One_Portfolio.png" alt="All investments in one portfolio screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>One portfolio view</strong><br />Crypto and precious metals together.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_02_Home_Screen_Widget_FINAL_v2.png" alt="Home screen widget screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Home screen widgets</strong><br />See your portfolio without opening the app.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_03_Multiple_Portfolios_One_App.png" alt="Multiple portfolios screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Multiple portfolios</strong><br />Retirement, crypto, metals, family, and more.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_04_Customize_Every_Widget.png" alt="Widget manager customization screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Widget manager</strong><br />Choose assets, colors, layout, and style.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_05_Personalize_Your_App.png" alt="Theme manager screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Theme manager</strong><br />Personalize the app to match your style.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_06_Powerful_Analytics.png" alt="Analytics hub screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Analytics hub</strong><br />Powerful tools built into the app.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_07_PieChart.png" alt="Pie chart allocation screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Visual charts</strong><br />Understand allocation and diversification.</figcaption></figure>
-          <figure class="shot"><img src="images/PlayStore_08_Detailed_Holdings.png" alt="Detailed holdings screenshot" width="1240" height="2208" loading="lazy" /><figcaption><strong>Detailed holdings</strong><br />Track every asset with context.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: One portfolio view"><img src="images/PlayStore_01_Everything_You_Own_One_Portfolio.png" alt="All investments in one portfolio screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>One portfolio view</strong><br />Crypto and precious metals together.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Home screen widgets"><img src="images/PlayStore_02_Home_Screen_Widget_FINAL_v2.png" alt="Home screen widget screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Home screen widgets</strong><br />See your portfolio without opening the app.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Multiple portfolios"><img src="images/PlayStore_03_Multiple_Portfolios_One_App.png" alt="Multiple portfolios screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Multiple portfolios</strong><br />Retirement, crypto, metals, family, and more.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Widget manager"><img src="images/PlayStore_04_Customize_Every_Widget.png" alt="Widget manager customization screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Widget manager</strong><br />Choose assets, colors, layout, and style.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Theme manager"><img src="images/PlayStore_05_Personalize_Your_App.png" alt="Theme manager screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Theme manager</strong><br />Personalize the app to match your style.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Analytics hub"><img src="images/PlayStore_06_Powerful_Analytics.png" alt="Analytics hub screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Analytics hub</strong><br />Powerful tools built into the app.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Visual charts"><img src="images/PlayStore_07_PieChart.png" alt="Pie chart allocation screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Visual charts</strong><br />Understand allocation and diversification.</figcaption></figure>
+          <figure class="shot"><button type="button" class="shot-zoom" aria-label="Enlarge screenshot: Detailed holdings"><img src="images/PlayStore_08_Detailed_Holdings.png" alt="Detailed holdings screenshot" width="1240" height="2208" loading="lazy" /></button><figcaption><strong>Detailed holdings</strong><br />Track every asset with context.</figcaption></figure>
         </div>
       </div>
     </section>
@@ -234,9 +234,14 @@
     </section>
   </main>
 
+  <dialog id="shot-lightbox" class="shot-lightbox" aria-label="Enlarged screenshot">
+    <button type="button" class="shot-lightbox-close" aria-label="Close enlarged screenshot">&times;</button>
+    <img src="" alt="" id="shot-lightbox-img" />
+  </dialog>
+
   <footer class="footer">
     <div class="wrap footer-inner">
-      <div>© <span id="y"></span> Swanie's Portfolio · Not financial advice</div>
+      <div>© <span id="y"></span> Swanie's Portfolio · Designed in the USA · Not financial advice</div>
       <div>
         <a href="privacy.html">Privacy</a>
         <a href="press.html">Press</a>
@@ -263,9 +268,9 @@
       var frame = hostEl && hostEl.closest ? hostEl.closest(".tester-qr-frame") : null;
       if (frame && frame.getBoundingClientRect) {
         var w = Math.floor(frame.getBoundingClientRect().width);
-        if (w > 24) return Math.max(120, Math.min(200, w - 24));
+        if (w > 24) return Math.max(108, Math.min(168, w - 24));
       }
-      return 160;
+      return 148;
     }
 
     function drawQr(hostId, text) {
@@ -297,6 +302,32 @@
       window.clearTimeout(qrResizeTimer);
       qrResizeTimer = window.setTimeout(function () { wireTesterQr(PLAY_URL); }, 200);
     }, { passive: true });
+
+    (function wireShotLightbox() {
+      var dialog = document.getElementById("shot-lightbox");
+      var lightboxImg = document.getElementById("shot-lightbox-img");
+      var closeBtn = dialog && dialog.querySelector(".shot-lightbox-close");
+      if (!dialog || !lightboxImg || !closeBtn) return;
+
+      function openFromThumb(thumb) {
+        lightboxImg.src = thumb.src;
+        lightboxImg.alt = thumb.alt;
+        if (typeof dialog.showModal === "function") dialog.showModal();
+      }
+
+      document.querySelectorAll(".shot-zoom").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var thumb = btn.querySelector("img");
+          if (thumb) openFromThumb(thumb);
+        });
+      });
+
+      closeBtn.addEventListener("click", function () { dialog.close(); });
+      dialog.addEventListener("click", function (e) {
+        if (e.target === dialog) dialog.close();
+      });
+      dialog.addEventListener("cancel", function () { lightboxImg.src = ""; });
+    })();
   </script>
 </body>
 </html>
