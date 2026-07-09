@@ -18,7 +18,9 @@
   var resumeTimer = null;
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var AUTO_MS = 5500;
+  var AUTO_START_MS = 1800;
   var MANUAL_PAUSE_MS = 8000;
+  var initialAdvanceTimer = null;
 
   var touchStartX = 0;
   var touchStartY = 0;
@@ -61,7 +63,7 @@
     if (!slide || !captionTitle || !captionDesc) return;
     var title = slide.getAttribute("data-title") || "";
     var desc = slide.getAttribute("data-desc") || "";
-    captionTitle.textContent = title.replace(/\.\s*$/, "") + ".";
+    captionTitle.textContent = title;
     captionDesc.textContent = desc;
   }
 
@@ -122,10 +124,14 @@
 
   function startAuto() {
     window.clearInterval(autoTimer);
+    window.clearTimeout(initialAdvanceTimer);
     if (reducedMotion) return;
     autoTimer = window.setInterval(function () {
       if (canAutoAdvance()) next(false);
     }, AUTO_MS);
+    initialAdvanceTimer = window.setTimeout(function () {
+      if (canAutoAdvance()) next(false);
+    }, AUTO_START_MS);
   }
 
   function onResize() {
