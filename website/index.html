@@ -400,6 +400,13 @@
         return mq.matches ? landscapeVideo : portraitVideo;
       }
 
+      function disableCaptions(video) {
+        if (!video || !video.textTracks) return;
+        for (var i = 0; i < video.textTracks.length; i += 1) {
+          video.textTracks[i].mode = "disabled";
+        }
+      }
+
       function pause(video) {
         if (!video) return;
         try { video.pause(); } catch (e) {}
@@ -411,11 +418,13 @@
         try { video.currentTime = 0; } catch (e) {}
         /* Reloads metadata so the poster shows again instead of a black end frame */
         try { video.load(); } catch (e) {}
+        disableCaptions(video);
       }
 
       function playIfAllowed(video) {
         if (!video || reducedMotion || !inView) return;
         if (!userUnmuted) video.muted = true;
+        disableCaptions(video);
         var playPromise = video.play();
         if (playPromise && typeof playPromise.catch === "function") {
           playPromise.catch(function () {});
@@ -428,12 +437,21 @@
       }
 
       videos.forEach(function (video) {
+        video.addEventListener("loadedmetadata", function () {
+          disableCaptions(video);
+        });
         video.addEventListener("ended", function () {
           resetToPoster(video);
         });
         video.addEventListener("volumechange", function () {
           if (!video.muted && video.volume > 0) userUnmuted = true;
         });
+        if (video.textTracks && typeof video.textTracks.addEventListener === "function") {
+          video.textTracks.addEventListener("addtrack", function () {
+            disableCaptions(video);
+          });
+        }
+        disableCaptions(video);
       });
 
       if ("IntersectionObserver" in window) {
