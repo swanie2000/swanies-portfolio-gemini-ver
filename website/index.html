@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260712a1" />
+  <link rel="stylesheet" href="styles.css?v=20260712b1" />
 </head>
 <body>
   <header class="nav">
@@ -159,13 +159,13 @@
               <source src="marketing/trailer_landscape_1920x1080.mp4" type="video/mp4" />
             </video>
           </div>
-          <div class="trailer-frame trailer-frame-portrait" data-trailer-variant="portrait" hidden>
+          <div class="trailer-frame trailer-frame-portrait" data-trailer-variant="portrait">
             <video
               id="trailer-video-portrait"
               class="trailer-video"
               controls
               playsinline
-              preload="none"
+              preload="metadata"
               poster="images/feature_graphic_vertical_1080x1920.png"
               width="1080"
               height="1920"
@@ -378,13 +378,12 @@
     }, { passive: true });
 
     (function wireTrailerVariants() {
-      var landscapeFrame = document.querySelector('[data-trailer-variant="landscape"]');
-      var portraitFrame = document.querySelector('[data-trailer-variant="portrait"]');
       var landscapeVideo = document.getElementById("trailer-video-landscape");
       var portraitVideo = document.getElementById("trailer-video-portrait");
-      if (!landscapeFrame || !portraitFrame || !landscapeVideo || !portraitVideo) return;
+      if (!landscapeVideo || !portraitVideo) return;
 
-      var mq = window.matchMedia("(max-width: 560px)");
+      /* Match CSS: portrait trailer on phones/tablets held upright */
+      var mq = window.matchMedia("(orientation: portrait) and (max-width: 1024px)");
 
       function pause(video) {
         if (!video) return;
@@ -392,20 +391,16 @@
       }
 
       function syncVariant() {
-        var usePortrait = mq.matches;
-        landscapeFrame.hidden = usePortrait;
-        portraitFrame.hidden = !usePortrait;
-        if (usePortrait) {
-          pause(landscapeVideo);
-          if (portraitVideo.preload === "none") portraitVideo.preload = "metadata";
-        } else {
-          pause(portraitVideo);
-        }
+        if (mq.matches) pause(landscapeVideo);
+        else pause(portraitVideo);
       }
 
       syncVariant();
       if (mq.addEventListener) mq.addEventListener("change", syncVariant);
       else if (mq.addListener) mq.addListener(syncVariant);
+      window.addEventListener("orientationchange", function () {
+        window.setTimeout(syncVariant, 100);
+      });
     })();
 
     (function wireShotLightbox() {

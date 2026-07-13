@@ -498,7 +498,12 @@ h2 {
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28), 0 0 80px rgba(58, 116, 205, 0.16);
 }
 
+.trailer-frame-landscape {
+  display: block;
+}
+
 .trailer-frame-portrait {
+  display: none;
   max-width: 360px;
   margin: 0 auto;
 }
@@ -519,6 +524,17 @@ h2 {
 .trailer-frame-portrait .trailer-video {
   aspect-ratio: 9 / 16;
   object-fit: contain;
+}
+
+/* Phones & tablets held upright → portrait trailer */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .trailer-frame-landscape {
+    display: none !important;
+  }
+
+  .trailer-frame-portrait {
+    display: block !important;
+  }
 }
 
 /* Screenshots — carousel */
