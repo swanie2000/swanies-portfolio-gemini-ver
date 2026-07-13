@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260709d1" />
+  <link rel="stylesheet" href="styles.css?v=20260712a1" />
 </head>
 <body>
   <header class="nav">
@@ -75,6 +75,7 @@
       </a>
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#features">Features</a>
+        <a href="#trailer">Trailer</a>
         <a href="#screenshots">Screenshots</a>
         <a href="privacy.html">Privacy</a>
         <a href="#faq">FAQ</a>
@@ -94,7 +95,7 @@
           <p class="hero-copy">Track cryptocurrency and precious metals with customizable home widgets, multiple portfolios, interactive analytics, encrypted backups, and complete on-device privacy.</p>
           <div class="hero-actions">
             <a class="btn" id="play-cta" href="https://play.google.com/store/apps/details?id=com.swanie.portfolio" target="_blank" rel="noopener">Get it on Google Play</a>
-            <a class="btn secondary" href="#screenshots">View screenshots</a>
+            <a class="btn secondary" href="#trailer">Watch trailer</a>
           </div>
           <div class="trust" aria-label="Key benefits">
             <span>Crypto and precious metals together</span>
@@ -133,6 +134,45 @@
           <article class="feature-card"><div class="icon" aria-hidden="true">◎</div><h3>Metals support</h3><p>Use gram, kilogram, and troy-ounce thinking where it applies to coins, bars, gold, and silver.</p></article>
           <article class="feature-card"><div class="icon" aria-hidden="true">▤</div><h3>Detailed holdings</h3><p>Review pricing, quantity, allocation, and performance information with clean asset cards.</p></article>
           <article class="feature-card"><div class="icon" aria-hidden="true">●</div><h3>No ads</h3><p>Designed as a focused portfolio tracker, not an ad-supported content feed.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="trailer" class="trailer">
+      <div class="wrap">
+        <div class="section-head center">
+          <h2>See Swanie's Portfolio in action.</h2>
+          <p>A short look at crypto and precious metals tracking, widgets, themes, and analytics — the same story as the Play Store listing.</p>
+        </div>
+        <div class="trailer-stage" id="trailer-stage">
+          <div class="trailer-frame trailer-frame-landscape" data-trailer-variant="landscape">
+            <video
+              id="trailer-video-landscape"
+              class="trailer-video"
+              controls
+              playsinline
+              preload="metadata"
+              poster="play_store_feature_graphic_1024x500.png"
+              width="1920"
+              height="1080"
+            >
+              <source src="marketing/trailer_landscape_1920x1080.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div class="trailer-frame trailer-frame-portrait" data-trailer-variant="portrait" hidden>
+            <video
+              id="trailer-video-portrait"
+              class="trailer-video"
+              controls
+              playsinline
+              preload="none"
+              poster="images/feature_graphic_vertical_1080x1920.png"
+              width="1080"
+              height="1920"
+            >
+              <source src="marketing/trailer_portrait_1080x1920.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
       </div>
     </section>
@@ -336,6 +376,37 @@
       window.clearTimeout(qrResizeTimer);
       qrResizeTimer = window.setTimeout(function () { wireTesterQr(PLAY_URL); }, 200);
     }, { passive: true });
+
+    (function wireTrailerVariants() {
+      var landscapeFrame = document.querySelector('[data-trailer-variant="landscape"]');
+      var portraitFrame = document.querySelector('[data-trailer-variant="portrait"]');
+      var landscapeVideo = document.getElementById("trailer-video-landscape");
+      var portraitVideo = document.getElementById("trailer-video-portrait");
+      if (!landscapeFrame || !portraitFrame || !landscapeVideo || !portraitVideo) return;
+
+      var mq = window.matchMedia("(max-width: 560px)");
+
+      function pause(video) {
+        if (!video) return;
+        try { video.pause(); } catch (e) {}
+      }
+
+      function syncVariant() {
+        var usePortrait = mq.matches;
+        landscapeFrame.hidden = usePortrait;
+        portraitFrame.hidden = !usePortrait;
+        if (usePortrait) {
+          pause(landscapeVideo);
+          if (portraitVideo.preload === "none") portraitVideo.preload = "metadata";
+        } else {
+          pause(portraitVideo);
+        }
+      }
+
+      syncVariant();
+      if (mq.addEventListener) mq.addEventListener("change", syncVariant);
+      else if (mq.addListener) mq.addListener(syncVariant);
+    })();
 
     (function wireShotLightbox() {
       var dialog = document.getElementById("shot-lightbox");

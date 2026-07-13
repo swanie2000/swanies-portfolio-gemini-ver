@@ -476,6 +476,51 @@ h2 {
   flex: 1;
 }
 
+/* Trailer */
+.trailer {
+  padding: 80px 0 88px;
+}
+
+.trailer .section-head {
+  margin-bottom: 36px;
+}
+
+.trailer-stage {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.trailer-frame {
+  border-radius: 28px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28), 0 0 80px rgba(58, 116, 205, 0.16);
+}
+
+.trailer-frame-portrait {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.trailer-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  background: #06102b;
+}
+
+.trailer-frame-landscape .trailer-video {
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+.trailer-frame-portrait .trailer-video {
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+}
+
 /* Screenshots — carousel */
 .showcase {
   padding: 92px 0 100px;
@@ -1335,6 +1380,15 @@ details p {
 
   .showcase {
     padding: 76px 0 88px;
+  }
+
+  .trailer {
+    padding: 64px 0 72px;
+  }
+
+  .trailer-frame {
+    padding: 10px;
+    border-radius: 22px;
   }
 
   .stat,
