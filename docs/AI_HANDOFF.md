@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-07-09 — **`main`** — **Website rebrand + polish live on Pages.** Navy/gold theme, new **Play Store** screenshots/logo, **`#download`** + QR, **screenshot carousel** (4/2/1 responsive, lightbox, auto-advance, hover pause), **Play-aligned captions**, subtle **hover polish**, footer **Designed in the USA**. **Play listing** brand assets updated **2026-07-09**. **Production 30 (1.0.30)** still live. **Next:** owner **trailer** video (new images + voiceover) — target **weekend ~2026-07-12/13**; optional **favicon-tab.png** regen from new swan. **Maintenance mode** — no app release unless owner reopens scope.
+**Last updated:** 2026-07-12 — **`main`** — **Website trailer live on Pages** (owner signed off). **`#trailer`** between Features and Screenshots — landscape **`marketing/trailer_landscape_1920x1080.mp4`** (desktop) + portrait **`marketing/trailer_portrait_1080x1920.mp4`** (phones/tablets upright via **`orientation: portrait`** CSS). Muted **viewport autoplay**, pause off-screen, **poster reset** on end, soft captions forced off when present; nav + hero **Watch trailer**. Obsolete demo/draft site assets removed. **Play Store → YouTube** auto-CC left as-is (Studio delete UI unreliable in Brave/Firefox; owner OK). **Rebrand + carousel** from **2026-07-09** still live. **Production 30 (1.0.30)** still live. **Next:** optional **favicon-tab.png** regen; optional Play listing polish. **Maintenance mode** — no app release unless owner reopens scope.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -55,8 +55,9 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing:** **preview video** (Trailer), **8** phone screenshots, feature graphic. **Brand refresh (2026-07-09):** owner updated **Play listing** graphics/screenshots to match new navy/gold brand (same asset set now on **`swaniedesigns.com`**). Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** on site.
 - **Listing assets (repo):** **`website/images/swan-no-background.png`** (header logo); **`website/images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** (screenshot grid); **`website/play_store_feature_graphic_1024x500.png`** (OG + Play feature graphic; source **`images/Feature_Graphic_V6_Final_Python.png`**); **`website/play_store_app_icon_512.png`**.
 - **Publishing overview:** **Production 30** published; **IARC** age ratings also went live **Jun 19** (separate email). **Production → Release dashboard** shows Play **recommendations** (not blockers) — see **§ Next steps → Post-launch backlog**.
-- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); closed-test join button **removed** (**2026-06-19**). **Site rebrand + polish (2026-07-09):** **`styles.css`**, **`index.html`**, subpages, **`js/shot-carousel.js`**, **`images/PlayStore_*`**, **`swan-no-background.png`**; draft **`index_new_brand_theme.html`** reference only.
+- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); **`#trailer`** live (**2026-07-12**); closed-test join button **removed** (**2026-06-19**). **Site rebrand + polish (2026-07-09):** **`styles.css`**, **`index.html`**, subpages, **`js/shot-carousel.js`**, **`images/PlayStore_*`**, **`swan-no-background.png`**.
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
+- **Marketing site (2026-07-12 — trailer):** **`#trailer`** on **`index.html`** — dual MP4s + orientation CSS; autoplay / poster / caption-disable JS in page; cleanup removed obsolete spaced filenames, old demo MP4 paths, draft theme HTML, unused favicons/CTA leftovers. Commits **`0652bad`** → **`a6362f9`**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
 - **Marketing site (2026-05-19):** **`website/contact.html`** + **`js/contact-form.js`** — **Contact** nav on all pages; **`#get-app`** links to contact form (replaced **`mailto:`**). Web3Forms submit → owner inbox; success shows **“Thanks — your message was sent. A copy is below.”** + on-page **“Message sent”** copy block (reliable confirmation; **not** Web3Forms Pro email autoresponder). Showcase + swipe hint unchanged from **2026-05-18** lock. Set **`PLAY_URL`** when Play **public** listing URL exists.
@@ -371,7 +372,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. **Website trailer (owner — soon):** Shorter **promo/trailer** video with **new brand images** + **voiceover**; owner targeting **weekend (2026-07-12/13)**. When exported: replace or supplement current Play **Trailer** + embed on **`index.html`** (web export to **`website/marketing/`**, keep under GitHub **100 MB** limit).
+1. ~~**Website trailer**~~ ✓ **2026-07-12** — Site **`#trailer`** live (landscape + portrait); owner signed off. Play Store/YouTube auto-CC left alone.
 2. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** $9.99 → Pro → **RC Refund** → paywall back.
 3. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any; remove stale **closed beta / Pro through July 2026** copy from long description if still present.
 4. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`** so browser tab matches new swan.
@@ -394,8 +395,9 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ### Website
 
+- **Shipped (2026-07-12)** — **Trailer** section **`#trailer`**: dual MP4s, orientation switch, muted autoplay + poster reset, obsolete asset cleanup. Live: **https://swaniedesigns.com/#trailer**.
 - **Shipped (2026-07-09)** — Full **brand rebrand** + **same-day polish**: layout/spacing, **screenshot carousel**, lightbox, **Play Store caption copy**, hover states, screenshot **`object-fit: contain`** fix, carousel **page-centered**. **`#download`** + **`PLAY_URL`** + QR. Deploy: push **`main`** → GitHub Actions → **https://swaniedesigns.com**.
-- **Pending (owner)** — New shorter **trailer** video (voiceover + new images); add to site + Play when ready (~**weekend 2026-07-12/13**). Optional: regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
+- **Optional** — Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
 
 ---
 
@@ -430,10 +432,10 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Custom asset icons | `IconManager.kt`, `HoldingsUIComponents.kt` (`MetalIcon`, edit funnels), `MyHoldingsScreen.kt`, `AssetArchitectScreen.kt` |
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`** (Style tab scroll), **`WidgetConfigActivity.kt`** |
-| Marketing site layout | **`website/styles.css`** — navy/gold brand; **`#screenshots`** **`shot-carousel`** (4/2/1); **`website/js/shot-carousel.js`**; lightbox **`#shot-lightbox`**; **`#download`** + QR |
+| Marketing site layout | **`website/styles.css`** — navy/gold brand; **`#trailer`** dual frames + orientation CSS; **`#screenshots`** **`shot-carousel`** (4/2/1); **`website/js/shot-carousel.js`**; lightbox **`#shot-lightbox`**; **`#download`** + QR |
 | Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`** |
-| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/play_store_feature_graphic_1024x500.png`**; draft **`website/index_new_brand_theme.html`** |
-| Marketing site / video (pending) | Owner **trailer** — shorter promo with new images + voiceover (~**weekend 2026-07-12/13**); export to **`website/marketing/`** when ready |
+| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/play_store_feature_graphic_1024x500.png`**; vertical feature **`website/images/feature_graphic_vertical_1080x1920.png`** |
+| Marketing site / trailer | **`website/marketing/trailer_landscape_1920x1080.mp4`**, **`trailer_portrait_1080x1920.mp4`**; section + JS in **`website/index.html`** **`#trailer`** |
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | App / launcher | **`AndroidManifest.xml`** → **`@string/launcher_short_name`** (**Portfolio** under icon); **`app_name`** / Play listing still full brand; widget label unchanged |
@@ -465,6 +467,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ## Session history (newest first)
 
+- **2026-07-12 — Website trailer live + cleanup (handoff + push):** Owner trailer videos on site — **`#trailer`** landscape/portrait, orientation CSS for mobile, muted viewport autoplay, poster on end, soft captions disabled; obsolete assets removed. Owner reviewed live site — **looks good**; Play/YouTube auto-CC left alone. **Handoff + push `main`**.
 - **2026-07-09 — Website carousel, captions, hover polish (handoff + push):** Same-day follow-up to rebrand — **screenshot carousel** (**`shot-carousel.js`**: auto-play on load, hover pause, arrows/dots/swipe, lightbox); **Play Store caption copy** on 8 slides; layout/spacing polish; carousel **centered** on page; **`object-fit: contain`** for screenshots; subtle **desktop hover** on cards/nav/CTA; footer **Designed in the USA**. **Handoff + push `main`** → Pages deploy.
 - **2026-07-09 — Website rebrand + Play listing brand update (handoff + push):** Owner updated **Google Play listing** with new brand screenshots/graphics. **`website/`** — full rebrand from **`index_new_brand_theme.html`**: navy/gold **`styles.css`**, **`index.html`** + subpages, **`images/PlayStore_01`–`08`**, **`swan-no-background.png`**, updated feature graphic. **`#download`** + **`PLAY_URL`** + QR preserved. **Next (owner):** shorter **trailer** video — target **weekend**. **Handoff + push `main`** → Pages deploy.
 - **2026-06-19 — Production billing smoke test + RC refund playbook (handoff + push):** Owner installed **Production 30** from Play; **pro_monthly** purchase → Pro → **RevenueCat Refund** on event **`GPA.3314-0009-6695-24453`** → paywall restored. Documented **`§ Refund dev test purchases`** — **always use RC** (Sandbox **OFF**), not Play Console Order management. **Handoff + push `main`**.
