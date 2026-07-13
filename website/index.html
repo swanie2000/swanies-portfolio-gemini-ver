@@ -64,7 +64,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260712b1" />
+  <link rel="stylesheet" href="styles.css?v=20260712c1" />
 </head>
 <body>
   <header class="nav">
@@ -150,6 +150,7 @@
               id="trailer-video-landscape"
               class="trailer-video"
               controls
+              muted
               playsinline
               preload="metadata"
               poster="play_store_feature_graphic_1024x500.png"
@@ -164,6 +165,7 @@
               id="trailer-video-portrait"
               class="trailer-video"
               controls
+              muted
               playsinline
               preload="metadata"
               poster="images/feature_graphic_vertical_1080x1920.png"
@@ -174,6 +176,7 @@
             </video>
           </div>
         </div>
+        <p class="trailer-hint">Plays muted as you scroll — tap unmute on the player for sound.</p>
       </div>
     </section>
 
@@ -377,29 +380,84 @@
       qrResizeTimer = window.setTimeout(function () { wireTesterQr(PLAY_URL); }, 200);
     }, { passive: true });
 
-    (function wireTrailerVariants() {
+    (function wireTrailerPlayback() {
+      var stage = document.getElementById("trailer-stage");
       var landscapeVideo = document.getElementById("trailer-video-landscape");
       var portraitVideo = document.getElementById("trailer-video-portrait");
-      if (!landscapeVideo || !portraitVideo) return;
+      if (!stage || !landscapeVideo || !portraitVideo) return;
 
-      /* Match CSS: portrait trailer on phones/tablets held upright */
+      var videos = [landscapeVideo, portraitVideo];
       var mq = window.matchMedia("(orientation: portrait) and (max-width: 1024px)");
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var inView = false;
+      var userUnmuted = false;
+
+      function activeVideo() {
+        return mq.matches ? portraitVideo : landscapeVideo;
+      }
+
+      function inactiveVideo() {
+        return mq.matches ? landscapeVideo : portraitVideo;
+      }
 
       function pause(video) {
         if (!video) return;
         try { video.pause(); } catch (e) {}
       }
 
+      function resetToPoster(video) {
+        if (!video) return;
+        pause(video);
+        try { video.currentTime = 0; } catch (e) {}
+        /* Reloads metadata so the poster shows again instead of a black end frame */
+        try { video.load(); } catch (e) {}
+      }
+
+      function playIfAllowed(video) {
+        if (!video || reducedMotion || !inView) return;
+        if (!userUnmuted) video.muted = true;
+        var playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function () {});
+        }
+      }
+
       function syncVariant() {
-        if (mq.matches) pause(landscapeVideo);
-        else pause(portraitVideo);
+        pause(inactiveVideo());
+        if (inView) playIfAllowed(activeVideo());
+      }
+
+      videos.forEach(function (video) {
+        video.addEventListener("ended", function () {
+          resetToPoster(video);
+        });
+        video.addEventListener("volumechange", function () {
+          if (!video.muted && video.volume > 0) userUnmuted = true;
+        });
+      });
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              inView = entry.isIntersecting && entry.intersectionRatio >= 0.4;
+              if (inView) playIfAllowed(activeVideo());
+              else pause(activeVideo());
+            });
+          },
+          { threshold: [0, 0.4, 0.6] }
+        );
+        observer.observe(stage);
+      } else if (!reducedMotion) {
+        inView = true;
+        playIfAllowed(activeVideo());
       }
 
       syncVariant();
       if (mq.addEventListener) mq.addEventListener("change", syncVariant);
       else if (mq.addListener) mq.addListener(syncVariant);
       window.addEventListener("orientationchange", function () {
-        window.setTimeout(syncVariant, 100);
+        window.setTimeout(syncVariant, 120);
       });
     })();
 
