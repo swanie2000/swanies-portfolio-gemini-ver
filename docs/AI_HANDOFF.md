@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-07-22 — **`main`** — **Production 31 (1.0.31) in review** — full rollout submitted (**Publishing overview** → changes in review / quick checks). Meets Play **target API 36** update requirement (gate **2026-08-31**). Owner Studio QA OK (backup/restore); verify scripts OK; ignored Play warnings (no R8 mapping / no native debug symbols — minify off). Repo: **`compileSdk`/`targetSdk` = 36**, temp large-screen portrait opt-out. **Until 31 is live**, store may still show **30**. After live: confirm Policy status API-36 warning cleared. **Required Google target-API work for this cycle: done** (pending approval). Optional backlog only (listing polish, favicon, tablet adaptive before API 37). Website trailer still live.
+**Last updated:** 2026-07-22 — **`main`** — **Production 31 (1.0.31) LIVE** — full rollout **published** (**Submission 21**, ~12:52 PM). **`targetSdk` 36** — Google Play **API 36** update gate satisfied. Policy Aug-31 card may linger briefly until Console refreshes. Owner phone stays on **Studio debug 1.0.31** (no Play install on that device — avoids signature wipe). Public users get Play **31**. Maintenance / optional backlog only (listing polish, favicon, tablet adaptive before API 37). Website trailer still live.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,8 +40,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **31 (1.0.31)** — owner Studio QA OK; **Production full rollout in review** (**2026-07-22**). Until approved, public store may still serve **30**. Studio **`main`** = **`versionCode` 31** / **targetSdk 36**. |
-| **Production access** | **Granted** — **Production 31** submitted (was **30** live). |
+| **Version on device** | **Owner phone:** Studio **debug 1.0.31** (keep for USB iterates; do **not** install Play on that device). **Play Production:** **31 (1.0.31)** **LIVE** (**2026-07-22**). Studio **`main`** = **`versionCode` 31** / **targetSdk 36**. |
+| **Production access** | **Granted** — **Production 31 (1.0.31)** **rolled out**. |
 | **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -54,7 +54,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing:** **preview video** (Trailer), **8** phone screenshots, feature graphic. **Brand refresh (2026-07-09):** owner updated **Play listing** graphics/screenshots to match new navy/gold brand (same asset set now on **`swaniedesigns.com`**). Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** on site.
 - **Listing assets (repo):** **`website/images/swan-no-background.png`** (header logo); **`website/images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** (screenshot grid); **`website/play_store_feature_graphic_1024x500.png`** (OG + Play feature graphic; source **`images/Feature_Graphic_V6_Final_Python.png`**); **`website/play_store_app_icon_512.png`**.
-- **Publishing overview:** **Production 31 (1.0.31)** — **Start full rollout** in review (**2026-07-22**); last published before that **Jul 12, 2026** (**30**). Managed publishing **off**. **IARC** live. Optional Play recommendations → **§ Next steps → Post-launch backlog**.
+- **Publishing overview:** **Production 31 (1.0.31)** **LIVE** — full rollout published **2026-07-22** (~12:52 PM, Submission **21**). Managed publishing **off**. **IARC** live. Optional backlog → **§ Next steps**.
 - **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); **`#trailer`** live (**2026-07-12**); closed-test join button **removed** (**2026-06-19**). **Site rebrand + polish (2026-07-09):** **`styles.css`**, **`index.html`**, subpages, **`js/shot-carousel.js`**, **`images/PlayStore_*`**, **`swan-no-background.png`**.
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-07-12 — trailer):** **`#trailer`** on **`index.html`** — dual MP4s + orientation CSS; autoplay / poster / caption-disable JS in page; cleanup removed obsolete spaced filenames, old demo MP4 paths, draft theme HTML, unused favicons/CTA leftovers. Commits **`0652bad`** → **`a6362f9`**.
@@ -372,7 +372,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. ~~**Release 31 → Production**~~ ✓ **Submitted 2026-07-22** — full rollout **in review** (**targetSdk 36**). Owner: confirm **live** + Policy API-36 warning cleared when Google finishes.
+1. ~~**Release 31 → Production**~~ ✓ **LIVE 2026-07-22** — **1.0.31** / **targetSdk 36**. Optional: confirm Policy Aug-31 API warning cleared after Console refresh.
 2. ~~**Website trailer**~~ ✓ **2026-07-12**
 3. ~~**Paywall smoke test**~~ ✓ **2026-06-19**
 4. **Optional listing polish:** long description / stale closed-beta copy if any.
@@ -466,6 +466,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ## Session history (newest first)
 
+- **2026-07-22 — Production 31 LIVE (handoff + push):** **1.0.31** full rollout **published** (Submission **21**, ~12:52 PM). Google **API 36** update gate done. Owner keeps Studio debug **31** on phone for future USB work. **Handoff + push `main`**.
 - **2026-07-22 — Production 31 submitted (handoff + push):** Owner QA **1.0.31** OK; verify scripts OK; Play **Production** full rollout **in review** (**targetSdk 36**). Meets Google **API 36** update gate. Warnings ignored (no deobfuscation / native symbols). **Handoff + push `main`**.
 - **2026-07-22 — Release 31 target API 36 (handoff + push):** Play Policy: updates must target **API 36** by **2026-08-31**. Bumped **`compileSdk`/`targetSdk` → 36**, **`versionCode` 31** / **`1.0.31`**; temp large-screen resizability opt-out in manifest. Compile + **`lintVitalRelease`** OK. **Production 30** still live. **Next:** owner Studio QA → then Play Production upload help. **Handoff + push `main`**.
 - **2026-07-12 — Website trailer live + cleanup (handoff + push):** Owner trailer videos on site — **`#trailer`** landscape/portrait, orientation CSS for mobile, muted viewport autoplay, poster on end, soft captions disabled; obsolete assets removed. Owner reviewed live site — **looks good**; Play/YouTube auto-CC left alone. **Handoff + push `main`**.
