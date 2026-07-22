@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-07-22 — **`main`** — **Release 31 (1.0.31) — target API 36** prepared for Play’s Aug 31, 2026 update gate. Repo: **`compileSdk`/`targetSdk` = 36**, **`versionCode` 31** / **`1.0.31`**; temporary **`PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY`** (phone portrait on large screens until tablet layouts / API 37). **`enableEdgeToEdge`** already in **`MainActivity`**. **`:app:compileDebugKotlin`** + **`lintVitalRelease`** OK. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** (Production). **Production 30 (1.0.30)** still live on Play. **Next (owner):** Studio device QA of **31** (debug install may need uninstall if Play-signed app present — backup **`.swpb`** first; or install signed release over Play to keep data) → then ask agent for **Play Production upload** help. Website trailer (**2026-07-12**) still live.
+**Last updated:** 2026-07-22 — **`main`** — **Production 31 (1.0.31) in review** — full rollout submitted (**Publishing overview** → changes in review / quick checks). Meets Play **target API 36** update requirement (gate **2026-08-31**). Owner Studio QA OK (backup/restore); verify scripts OK; ignored Play warnings (no R8 mapping / no native debug symbols — minify off). Repo: **`compileSdk`/`targetSdk` = 36**, temp large-screen portrait opt-out. **Until 31 is live**, store may still show **30**. After live: confirm Policy status API-36 warning cleared. **Required Google target-API work for this cycle: done** (pending approval). Optional backlog only (listing polish, favicon, tablet adaptive before API 37). Website trailer still live.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,8 +40,8 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **30 (1.0.30)** — **Production live** on Play. Studio **`main`** = **`versionCode` 31** / **`1.0.31`** (**targetSdk 36**) — owner QA pending, then Production upload. |
-| **Production access** | **Granted** — **Production 30 (1.0.30)** **rolled out** (177 countries). |
+| **Version on device** | **31 (1.0.31)** — owner Studio QA OK; **Production full rollout in review** (**2026-07-22**). Until approved, public store may still serve **30**. Studio **`main`** = **`versionCode` 31** / **targetSdk 36**. |
+| **Production access** | **Granted** — **Production 31** submitted (was **30** live). |
 | **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
 | **Closed testers (email lists)** | **FIVERR** + **Swanie's Portfolio Testers** on **Closed Alpha → Testers**. Each Gmail must **opt in** via closed link (site QR or Play). **Not** license testing. |
@@ -54,7 +54,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Store settings:** **Finance** category; tags (**Cryptocurrency**, **Investment**, **Personal finance**, **Productivity**); **contact email** + **`https://swaniedesigns.com`** (phone optional); **external marketing** opt-in per preference.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing:** **preview video** (Trailer), **8** phone screenshots, feature graphic. **Brand refresh (2026-07-09):** owner updated **Play listing** graphics/screenshots to match new navy/gold brand (same asset set now on **`swaniedesigns.com`**). Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** on site.
 - **Listing assets (repo):** **`website/images/swan-no-background.png`** (header logo); **`website/images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** (screenshot grid); **`website/play_store_feature_graphic_1024x500.png`** (OG + Play feature graphic; source **`images/Feature_Graphic_V6_Final_Python.png`**); **`website/play_store_app_icon_512.png`**.
-- **Publishing overview:** **Production 30** published; **IARC** age ratings also went live **Jun 19** (separate email). **Production → Release dashboard** shows Play **recommendations** (not blockers) — see **§ Next steps → Post-launch backlog**.
+- **Publishing overview:** **Production 31 (1.0.31)** — **Start full rollout** in review (**2026-07-22**); last published before that **Jul 12, 2026** (**30**). Managed publishing **off**. **IARC** live. Optional Play recommendations → **§ Next steps → Post-launch backlog**.
 - **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); **`#trailer`** live (**2026-07-12**); closed-test join button **removed** (**2026-06-19**). **Site rebrand + polish (2026-07-09):** **`styles.css`**, **`index.html`**, subpages, **`js/shot-carousel.js`**, **`images/PlayStore_*`**, **`swan-no-background.png`**.
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
 - **Marketing site (2026-07-12 — trailer):** **`#trailer`** on **`index.html`** — dual MP4s + orientation CSS; autoplay / poster / caption-disable JS in page; cleanup removed obsolete spaced filenames, old demo MP4 paths, draft theme HTML, unused favicons/CTA leftovers. Commits **`0652bad`** → **`a6362f9`**.
@@ -372,17 +372,17 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. **Release 31 → Production (owner in progress):** Device QA **1.0.31** (API 36). Then verify scripts → Signed Bundle (**`GRANT_DAYS=0`**) → **`verify-play-release.ps1`** → Play **Production** upload. **What's new:** *Updated for Android 16 (Google Play target API requirement).* Clears Policy status “must target API 36” (updates blocked after **2026-08-31** without it).
-2. ~~**Website trailer**~~ ✓ **2026-07-12** — Site **`#trailer`** live; owner signed off.
-3. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** → Pro → **RC Refund**.
-4. **Optional listing polish:** **What's new** / long description cleanup if stale closed-beta copy remains.
+1. ~~**Release 31 → Production**~~ ✓ **Submitted 2026-07-22** — full rollout **in review** (**targetSdk 36**). Owner: confirm **live** + Policy API-36 warning cleared when Google finishes.
+2. ~~**Website trailer**~~ ✓ **2026-07-12**
+3. ~~**Paywall smoke test**~~ ✓ **2026-06-19**
+4. **Optional listing polish:** long description / stale closed-beta copy if any.
 5. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
 
-### Post-launch backlog — Play Console recommendations (not blocking 31)
+### Post-launch backlog — not required for this Google deadline
 
-1. ~~**Edge-to-edge**~~ — **`enableEdgeToEdge()`** already in **`MainActivity`**; continue inset polish if any screen clips under system bars on API 36 devices.
-2. **Deprecated status/nav bar colors:** uCrop **`Options.setStatusBarColor`** still used in **`HoldingsUIComponents`** (library API); Window-level bar colors already via **`WindowInsetsController`**.
-3. **Large screens:** Temporary manifest **`PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY`** keeps portrait lock on **sw600dp+** for API 36; plan adaptive layouts before targeting API 37 (opt-out removed).
+1. Inset polish if any screen clips under system bars on API 36.
+2. uCrop **`Options.setStatusBarColor`** (library) — ignore unless Play nags again.
+3. **Large screens / API 37:** remove **`PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY`** and add adaptive layouts before next major target bump.
 
 ### Optional — closed track
 
@@ -466,6 +466,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ## Session history (newest first)
 
+- **2026-07-22 — Production 31 submitted (handoff + push):** Owner QA **1.0.31** OK; verify scripts OK; Play **Production** full rollout **in review** (**targetSdk 36**). Meets Google **API 36** update gate. Warnings ignored (no deobfuscation / native symbols). **Handoff + push `main`**.
 - **2026-07-22 — Release 31 target API 36 (handoff + push):** Play Policy: updates must target **API 36** by **2026-08-31**. Bumped **`compileSdk`/`targetSdk` → 36**, **`versionCode` 31** / **`1.0.31`**; temp large-screen resizability opt-out in manifest. Compile + **`lintVitalRelease`** OK. **Production 30** still live. **Next:** owner Studio QA → then Play Production upload help. **Handoff + push `main`**.
 - **2026-07-12 — Website trailer live + cleanup (handoff + push):** Owner trailer videos on site — **`#trailer`** landscape/portrait, orientation CSS for mobile, muted viewport autoplay, poster on end, soft captions disabled; obsolete assets removed. Owner reviewed live site — **looks good**; Play/YouTube auto-CC left alone. **Handoff + push `main`**.
 - **2026-07-09 — Website carousel, captions, hover polish (handoff + push):** Same-day follow-up to rebrand — **screenshot carousel** (**`shot-carousel.js`**: auto-play on load, hover pause, arrows/dots/swipe, lightbox); **Play Store caption copy** on 8 slides; layout/spacing polish; carousel **centered** on page; **`object-fit: contain`** for screenshots; subtle **desktop hover** on cards/nav/CTA; footer **Designed in the USA**. **Handoff + push `main`** → Pages deploy.
