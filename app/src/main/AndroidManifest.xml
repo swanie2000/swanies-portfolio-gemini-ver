@@ -17,6 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SwaniesPortfolio">
 
+        <!-- Temporary until tablet layouts: keep portrait lock on sw600dp+ when targeting API 36.
+             Removed automatically when targeting API 37 (opt-out no longer applies). -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:exported="false"

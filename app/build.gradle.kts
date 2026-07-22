@@ -78,14 +78,14 @@ fun resolveWeb3FormsAccessKey(): String = resolveLocalSecret("WEB3FORMS_ACCESS_K
 
 android {
     namespace = "com.swanie.portfolio"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.swanie.portfolio"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 30
-        versionName = "1.0.30"
+        targetSdk = 36
+        versionCode = 31
+        versionName = "1.0.31"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEB3FORMS_ACCESS_KEY", "\"${resolveWeb3FormsAccessKey()}\"")
         buildConfigField("String", "CRYPTOCOMPARE_API_KEY", "\"${resolveCryptoCompareApiKey()}\"")

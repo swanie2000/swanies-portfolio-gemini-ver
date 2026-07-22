@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-07-12 — **`main`** — **Website trailer live on Pages** (owner signed off). **`#trailer`** between Features and Screenshots — landscape **`marketing/trailer_landscape_1920x1080.mp4`** (desktop) + portrait **`marketing/trailer_portrait_1080x1920.mp4`** (phones/tablets upright via **`orientation: portrait`** CSS). Muted **viewport autoplay**, pause off-screen, **poster reset** on end, soft captions forced off when present; nav + hero **Watch trailer**. Obsolete demo/draft site assets removed. **Play Store → YouTube** auto-CC left as-is (Studio delete UI unreliable in Brave/Firefox; owner OK). **Rebrand + carousel** from **2026-07-09** still live. **Production 30 (1.0.30)** still live. **Next:** optional **favicon-tab.png** regen; optional Play listing polish. **Maintenance mode** — no app release unless owner reopens scope.
+**Last updated:** 2026-07-22 — **`main`** — **Release 31 (1.0.31) — target API 36** prepared for Play’s Aug 31, 2026 update gate. Repo: **`compileSdk`/`targetSdk` = 36**, **`versionCode` 31** / **`1.0.31`**; temporary **`PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY`** (phone portrait on large screens until tablet layouts / API 37). **`enableEdgeToEdge`** already in **`MainActivity`**. **`:app:compileDebugKotlin`** + **`lintVitalRelease`** OK. **`CLOSED_TEST_PRO_GRANT_DAYS=0`** in **`local.properties`** (Production). **Production 30 (1.0.30)** still live on Play. **Next (owner):** Studio device QA of **31** (debug install may need uninstall if Play-signed app present — backup **`.swpb`** first; or install signed release over Play to keep data) → then ask agent for **Play Production upload** help. Website trailer (**2026-07-12**) still live.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -40,7 +40,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 | **Play internal testing** | **Active: 24 (1.0.24)** — auto-Pro until **~2026-07-01**. Family still on **Internal testing → Testers** (separate track). **Internal opt-in does not count** toward closed **12+** gate. |
 | **Play closed testing (Alpha)** | **Active: 27 (1.0.27)** — full rollout **live**; testers **notified**. **Email lists:** **FIVERR** (**20**) + **Swanie's Portfolio Testers** (**3**). Feedback **`https://swaniedesigns.com/contact.html?topic=tester`**. Opt-in: **`https://play.google.com/apps/testing/com.swanie.portfolio`**. |
 | **Play closed testing (testers community)** | **Active: 27 (1.0.27)** — same bundle via **Add from library**; batched with Alpha; testers **notified**. |
-| **Version on device** | **30 (1.0.30)** — **Production live** on Play (**Jun 19, 2026** listing update). Studio **`main`** = **`versionCode` 30**. |
+| **Version on device** | **30 (1.0.30)** — **Production live** on Play. Studio **`main`** = **`versionCode` 31** / **`1.0.31`** (**targetSdk 36**) — owner QA pending, then Production upload. |
 | **Production access** | **Granted** — **Production 30 (1.0.30)** **rolled out** (177 countries). |
 | **Production access clock** | **Closed test complete** — **12+** opted-in, **14 days**; form submitted. |
 | **License testing (list 2)** | **Unchecked** — **do not** add Fiverr or family emails. |
@@ -372,22 +372,21 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. ~~**Website trailer**~~ ✓ **2026-07-12** — Site **`#trailer`** live (landscape + portrait); owner signed off. Play Store/YouTube auto-CC left alone.
-2. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** $9.99 → Pro → **RC Refund** → paywall back.
-3. **Optional listing polish:** **Grow users → Store presence** — fix **What's new** typos if any; remove stale **closed beta / Pro through July 2026** copy from long description if still present.
-4. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`** so browser tab matches new swan.
+1. **Release 31 → Production (owner in progress):** Device QA **1.0.31** (API 36). Then verify scripts → Signed Bundle (**`GRANT_DAYS=0`**) → **`verify-play-release.ps1`** → Play **Production** upload. **What's new:** *Updated for Android 16 (Google Play target API requirement).* Clears Policy status “must target API 36” (updates blocked after **2026-08-31** without it).
+2. ~~**Website trailer**~~ ✓ **2026-07-12** — Site **`#trailer`** live; owner signed off.
+3. ~~**Paywall smoke test**~~ ✓ **2026-06-19** — Play install → **pro_monthly** → Pro → **RC Refund**.
+4. **Optional listing polish:** **What's new** / long description cleanup if stale closed-beta copy remains.
+5. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
 
-### Post-launch backlog — Play Console recommendations (v31+, not urgent)
+### Post-launch backlog — Play Console recommendations (not blocking 31)
 
-Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — informational; app works on phones today.
-
-1. **Edge-to-edge (Android 15+):** App targets SDK 35; some screens may not draw edge-to-edge for all users. Adopt Android 15 edge-to-edge guidance (Compose **`enableEdgeToEdge`**, inset handling).
-2. **Deprecated status/nav bar colors:** Replace **`Window.setStatusBarColor`** / **`setNavigationBarColor`** (Play cites **`HoldingsUIComponents.kt`** and related Compose/system UI). Migrate to **`WindowInsetsController`** / Material 3 system bar APIs.
-3. **Large screens / resizability:** Play recommends relaxing **`android:screenOrientation="portrait"`** and **`android:resizableActivity="false"`** in **`AndroidManifest.xml`** (activities **`MainActivity`**, **`WidgetConfigActivity`**) for tablets/foldables — or document intentional phone-only portrait if owner keeps scope narrow.
+1. ~~**Edge-to-edge**~~ — **`enableEdgeToEdge()`** already in **`MainActivity`**; continue inset polish if any screen clips under system bars on API 36 devices.
+2. **Deprecated status/nav bar colors:** uCrop **`Options.setStatusBarColor`** still used in **`HoldingsUIComponents`** (library API); Window-level bar colors already via **`WindowInsetsController`**.
+3. **Large screens:** Temporary manifest **`PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY`** keeps portrait lock on **sw600dp+** for API 36; plan adaptive layouts before targeting API 37 (opt-out removed).
 
 ### Optional — closed track
 
-- Upload **30** with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
+- Upload **31** with **`GRANT_DAYS=30`** only if testers still need auto-Pro (separate AAB from Production).
 
 ### Backlog
 
@@ -467,6 +466,7 @@ Play **Production → Release dashboard** flagged these on **30 (1.0.30)** — i
 
 ## Session history (newest first)
 
+- **2026-07-22 — Release 31 target API 36 (handoff + push):** Play Policy: updates must target **API 36** by **2026-08-31**. Bumped **`compileSdk`/`targetSdk` → 36**, **`versionCode` 31** / **`1.0.31`**; temp large-screen resizability opt-out in manifest. Compile + **`lintVitalRelease`** OK. **Production 30** still live. **Next:** owner Studio QA → then Play Production upload help. **Handoff + push `main`**.
 - **2026-07-12 — Website trailer live + cleanup (handoff + push):** Owner trailer videos on site — **`#trailer`** landscape/portrait, orientation CSS for mobile, muted viewport autoplay, poster on end, soft captions disabled; obsolete assets removed. Owner reviewed live site — **looks good**; Play/YouTube auto-CC left alone. **Handoff + push `main`**.
 - **2026-07-09 — Website carousel, captions, hover polish (handoff + push):** Same-day follow-up to rebrand — **screenshot carousel** (**`shot-carousel.js`**: auto-play on load, hover pause, arrows/dots/swipe, lightbox); **Play Store caption copy** on 8 slides; layout/spacing polish; carousel **centered** on page; **`object-fit: contain`** for screenshots; subtle **desktop hover** on cards/nav/CTA; footer **Designed in the USA**. **Handoff + push `main`** → Pages deploy.
 - **2026-07-09 — Website rebrand + Play listing brand update (handoff + push):** Owner updated **Google Play listing** with new brand screenshots/graphics. **`website/`** — full rebrand from **`index_new_brand_theme.html`**: navy/gold **`styles.css`**, **`index.html`** + subpages, **`images/PlayStore_01`–`08`**, **`swan-no-background.png`**, updated feature graphic. **`#download`** + **`PLAY_URL`** + QR preserved. **Next (owner):** shorter **trailer** video — target **weekend**. **Handoff + push `main`** → Pages deploy.
