@@ -29,7 +29,18 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-09-07 — **`main`** — **Production 31 (1.0.31) LIVE** (`targetSdk` **36**). **Android developer verification:** Play Console Home confirms **all apps successfully registered** (owner checked **2026-08-06**; Sep-30 registration email = reminder only). Policy **Aug-31 API** Dashboard card may still linger — ignore if Production **31** shows target **36**. **Website (2026-08-03):** **Swanie Designs hub** — **`index.html`** product hub + **`portfolio.html`** + **`camview.html`** (CamView = Swanies Camera Viewer marketing; **not** on Play). Owner phone stays on **Studio debug 1.0.31**. Docs catch-up this session: Search Console setup refresh + Play “What’s new” draft committed.
+**Last updated:** 2026-09-07 — **`main`** — **Production 31 (1.0.31) LIVE** (`targetSdk` **36**). **Android developer verification:** all Play apps **registered** (owner **2026-08-06**). **Website hub** + CamView page live (**2026-08-03**). **Disaster recovery kit:** folder **`SwaniesPortfolio_RecoveryKit`** built on laptop **`C:\`**, then **moved to a secret USB** for safekeeping (keystore, latest AAB, `local.properties`, passwords doc, GCP JSON, docs snapshots). Owner: **GitHub `main` + that USB** = enough to rebuild/republish; online account passwords live in **password manager** (not depending on the laptop). Owner phone stays on **Studio debug 1.0.31**.
+
+### Laptop loss / rebuild (canonical)
+
+| Piece | Where |
+|-------|--------|
+| **Source code** | GitHub **`swanies-portfolio-gemini-ver`** → branch **`main`** (clone on new PC). |
+| **Secrets + signing** | USB folder **`SwaniesPortfolio_RecoveryKit`** (created **2026-09-07** from **`C:\SwaniesPortfolio_RecoveryKit`**, then **removed from C: / moved to secret USB**). Includes **`swanie_portfolio_release.jks`**, Production **31** AAB, **`local.properties`**, **`Passwords for Swanie Portfolio.docx`**, Play/GCP service-account JSON, debug keystore, handoff snapshot. **Never commit this kit to git.** |
+| **Online logins** | Owner **password manager** (GitHub, Play Console, RevenueCat, Google, etc.). |
+| **Play upload file** | Signed **`.aab`** from Android Studio (**Generate Signed Bundle**) using the release **`.jks`** on the USB. |
+
+**Do not** store the recovery kit inside the repo or cloud sync of the project folder.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -464,7 +475,8 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 | Play checklist | `Master_Build_Checklist.md` |
 | Production access (Google 2025–2026) | **`docs/AI_HANDOFF.md`** → **§ Production access — Google requirements** + **§ Production access form — activity log** |
 | RevenueCat vs closed testers | **`docs/AI_HANDOFF.md`** → **§ RevenueCat vs Play vs closed testers**; `MainViewModel.syncMonetizationUser`, `RevenueCatMonetizationManager.setAppUser` |
-| Play ADI challenge file | `app/src/main/assets/adi-registration.properties` (verification token; optional to remove after registration approved) |
+| Release signing (NOT in git) | USB **`SwaniesPortfolio_RecoveryKit`** — **`swanie_portfolio_release.jks`** (+ passwords doc). Laptop path was **`AndroidStudioProjects\Android-Signing\`**. See **§ Laptop loss / rebuild**. |
+| Play AAB verify scripts | **`scripts/verify-release-config.ps1`**, **`scripts/verify-play-release.ps1`** |
 | Holdings walkthrough | **`ui/onboarding/HoldingsWalkthrough.kt`**, **`HoldingsWalkthroughViewModel.kt`**, **`MainActivity.kt`** (overlay), **`MyHoldingsScreen.kt`**, **`AssetPickerScreen.kt`**, **`AmountEntryScreen.kt`**, **`AssetArchitectScreen.kt`**, **`NavGraph.kt`**, **`SettingsScreen.kt`**, **`ThemePreferences.kt`** (`showTakeTourButton`, `holdingsWalkthroughCompleted`) |
 | Play Console post-launch | **`§ Next steps`** → *Post-launch backlog — Play Console recommendations*; **`AndroidManifest.xml`**, **`HoldingsUIComponents.kt`** |
 | Cursor rules | **`.cursor/rules/git-pull-first.mdc`** (pull before edits), **`update-handoff.mdc`** (handoff + push trigger) |
@@ -474,6 +486,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ## Session history (newest first)
 
+- **2026-09-07 — Disaster recovery kit on secret USB (handoff + push):** Built **`SwaniesPortfolio_RecoveryKit`** (release **`.jks`**, Production **31** AAB, **`local.properties`**, passwords doc, GCP JSON, docs). Owner **moved kit to a secret USB**; online passwords in **password manager**. Rebuild path = **GitHub + that USB**. **Handoff + push `main`**.
 - **2026-09-07 — Handoff catch-up + docs push:** Synced handoff with **Aug hub/CamView** site commits and **ADI registered** (owner Console check **2026-08-06**). Committed leftover safe docs: **`SEARCH_CONSOLE_SETUP.md`** refresh + **`play_store_whats_new_en-US.txt`** (had sat untracked/local only). **Handoff + push `main`**.
 - **2026-08-06 — Play ADI check (no code):** Owner confirmed Console Home — **all apps successfully registered** for Android developer verification. Sep-30 email = mass reminder. CamView stays off Play. *(Recorded in handoff 2026-09-07.)*
 - **2026-08-03 — Website hub + CamView pages:** **`index.html`** hub; **`portfolio.html`** / **`camview.html`**; aspect-ratio polish (**`b4f00ef`**, **`3d1c092`**). Handoff not updated that day — catch-up **2026-09-07**.
@@ -593,6 +606,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 ## Working agreements (Cursor)
 
 - **Git first (owner + agents):** **`git pull`** from **`origin`** (usually **`main`**) **before** starting substantive edits — keeps GitHub as source of truth for the **single laptop** dev checkout. Cursor rule **`.cursor/rules/git-pull-first.mdc`** reinforces this.
+- **Disaster recovery:** Rebuild = **GitHub `main` + USB folder `SwaniesPortfolio_RecoveryKit`** (secret USB; never commit kit/secrets). Online passwords = owner **password manager**. See **§ Laptop loss / rebuild**.
 - Prefer **minimal, safe edits**; don’t refactor unrelated code.
 - **Never batch-edit `values-*/strings.xml` with scripts** — see **§ Current session → Locale files — do not use bulk scripts**.
 - **`git pull`** before edits is for staying aligned with **`origin`** (another machine or an older checkout). If the agent and Android Studio share **the same folder** and edits were saved there, Studio already has the files—**no pull needed** unless **`git status`** shows you’re behind remote.
