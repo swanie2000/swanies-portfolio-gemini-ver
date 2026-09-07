@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-07-22 — **`main`** — **Production 31 (1.0.31) LIVE** — full rollout **published** (**Submission 21**, ~12:52 PM). **`targetSdk` 36** — Google Play **API 36** update gate satisfied. Policy Aug-31 card may linger briefly until Console refreshes. Owner phone stays on **Studio debug 1.0.31** (no Play install on that device — avoids signature wipe). Public users get Play **31**. Maintenance / optional backlog only (listing polish, favicon, tablet adaptive before API 37). Website trailer still live.
+**Last updated:** 2026-09-07 — **`main`** — **Production 31 (1.0.31) LIVE** (`targetSdk` **36**). **Android developer verification:** Play Console Home confirms **all apps successfully registered** (owner checked **2026-08-06**; Sep-30 registration email = reminder only). Policy **Aug-31 API** Dashboard card may still linger — ignore if Production **31** shows target **36**. **Website (2026-08-03):** **Swanie Designs hub** — **`index.html`** product hub + **`portfolio.html`** + **`camview.html`** (CamView = Swanies Camera Viewer marketing; **not** on Play). Owner phone stays on **Studio debug 1.0.31**. Docs catch-up this session: Search Console setup refresh + Play “What’s new” draft committed.
 
 ### Resume when you reopen (RevenueCat + Play)
 
@@ -55,9 +55,11 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Default store listing (en-US):** **App name** + **full description** — canonical draft **`docs/play_store_long_description_en-US.txt`**. **Live listing:** **preview video** (Trailer), **8** phone screenshots, feature graphic. **Brand refresh (2026-07-09):** owner updated **Play listing** graphics/screenshots to match new navy/gold brand (same asset set now on **`swaniedesigns.com`**). Public URL: **`https://play.google.com/store/apps/details?id=com.swanie.portfolio`** — **`PLAY_URL`** on site.
 - **Listing assets (repo):** **`website/images/swan-no-background.png`** (header logo); **`website/images/PlayStore_01_Everything_You_Own_One_Portfolio.png`** … **`PlayStore_08_Detailed_Holdings.png`** (screenshot grid); **`website/play_store_feature_graphic_1024x500.png`** (OG + Play feature graphic; source **`images/Feature_Graphic_V6_Final_Python.png`**); **`website/play_store_app_icon_512.png`**.
 - **Publishing overview:** **Production 31 (1.0.31)** **LIVE** — full rollout published **2026-07-22** (~12:52 PM, Submission **21**). Managed publishing **off**. **IARC** live. Optional backlog → **§ Next steps**.
-- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** **`#download`** = public **Play** CTA + QR (**`PLAY_URL`**); **`#trailer`** live (**2026-07-12**); closed-test join button **removed** (**2026-06-19**). **Site rebrand + polish (2026-07-09):** **`styles.css`**, **`index.html`**, subpages, **`js/shot-carousel.js`**, **`images/PlayStore_*`**, **`swan-no-background.png`**.
+- **Android developer verification (2026-08-06):** Console Home banner — **all apps successfully registered**. No further Play registration action for **`com.swanie.portfolio`**. CamView / Camera Viewer stays **off Play** (sideload / private); no package registration needed for personal USB.
+- **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** hub + product pages (see marketing bullets); Portfolio download CTA + QR use **`PLAY_URL`**; closed-test join button **removed** (**2026-06-19**).
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
-- **Marketing site (2026-07-12 — trailer):** **`#trailer`** on **`index.html`** — dual MP4s + orientation CSS; autoplay / poster / caption-disable JS in page; cleanup removed obsolete spaced filenames, old demo MP4 paths, draft theme HTML, unused favicons/CTA leftovers. Commits **`0652bad`** → **`a6362f9`**.
+- **Marketing site (2026-08-03 — hub):** **`index.html`** = **Swanie Designs** product hub; **`portfolio.html`** = Portfolio marketing (trailer / showcase / Play download); **`camview.html`** = CamView teaser; shared nav on contact/press/privacy; **`sitemap.xml`** updated. Follow-up **`3d1c092`**: hub product images keep natural aspect ratio.
+- **Marketing site (2026-07-12 — trailer):** Trailer section lives on **`portfolio.html`** after hub split (was on old single-page **`index.html`**). Commits **`0652bad`** → **`a6362f9`**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
 - **Marketing site (2026-06-01):** **`contact.html`** — **Tester feedback** topic + **`?topic=tester`** preselect (**`4f6197f`**); Play **Feedback URL** aligned.
 - **Marketing site (2026-05-19):** **`website/contact.html`** + **`js/contact-form.js`** — **Contact** nav on all pages; **`#get-app`** links to contact form (replaced **`mailto:`**). Web3Forms submit → owner inbox; success shows **“Thanks — your message was sent. A copy is below.”** + on-page **“Message sent”** copy block (reliable confirmation; **not** Web3Forms Pro email autoresponder). Showcase + swipe hint unchanged from **2026-05-18** lock. Set **`PLAY_URL`** when Play **public** listing URL exists.
@@ -112,7 +114,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Repo / branch:** `swanies-portfolio-gemini-ver` on GitHub (`swanie2000`), default branch **`main`**. Legacy repo **`swanies-portfolio`** was deleted.
 
-**Public site:** **`https://swaniedesigns.com`** — static marketing + privacy page from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. **`website/privacy.html`**: **§4** with **`#account-deletion`** and **`#data-deletion`** (Play **Data safety** URLs as applicable), **§9** terms (mirrors in-app §7). Push **`main`** after edits so the live URL matches Play.
+**Public site:** **`https://swaniedesigns.com`** — **Swanie Designs hub** + product pages from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. Key URLs: **`/`** (hub), **`/portfolio.html`**, **`/camview.html`**, **`/privacy.html`** (**§4** `#account-deletion` / `#data-deletion` for Play Data safety), **`/contact.html`**. Push **`main`** after edits so the live URL matches Play / marketing.
 
 **Play / Google:** **Production 30 (1.0.30) LIVE** — **`GRANT_DAYS=0`**, 177 countries. Public listing **Updated Jun 19, 2026**. Closed tracks may still serve older builds to opted-in testers. **License testing** **unchecked**.
 
@@ -372,11 +374,13 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Post-launch (now)
 
-1. ~~**Release 31 → Production**~~ ✓ **LIVE 2026-07-22** — **1.0.31** / **targetSdk 36**. Optional: confirm Policy Aug-31 API warning cleared after Console refresh.
-2. ~~**Website trailer**~~ ✓ **2026-07-12**
-3. ~~**Paywall smoke test**~~ ✓ **2026-06-19**
-4. **Optional listing polish:** long description / stale closed-beta copy if any.
-5. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
+1. ~~**Release 31 → Production**~~ ✓ **LIVE 2026-07-22** — **1.0.31** / **targetSdk 36**.
+2. ~~**Android developer verification (Play packages)**~~ ✓ **Registered** (Console Home **2026-08-06**).
+3. ~~**Website hub + CamView page**~~ ✓ **2026-08-03** (`b4f00ef`, `3d1c092`).
+4. ~~**Website trailer**~~ ✓ **2026-07-12** (now on **`portfolio.html`**).
+5. ~~**Paywall smoke test**~~ ✓ **2026-06-19**
+6. **Optional listing polish:** long description / stale closed-beta copy if any; paste **`docs/play_store_whats_new_en-US.txt`** into Play “What’s new” when next release ships.
+7. **Optional:** Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
 
 ### Post-launch backlog — not required for this Google deadline
 
@@ -394,8 +398,10 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Website
 
-- **Shipped (2026-07-12)** — **Trailer** section **`#trailer`**: dual MP4s, orientation switch, muted autoplay + poster reset, obsolete asset cleanup. Live: **https://swaniedesigns.com/#trailer**.
-- **Shipped (2026-07-09)** — Full **brand rebrand** + **same-day polish**: layout/spacing, **screenshot carousel**, lightbox, **Play Store caption copy**, hover states, screenshot **`object-fit: contain`** fix, carousel **page-centered**. **`#download`** + **`PLAY_URL`** + QR. Deploy: push **`main`** → GitHub Actions → **https://swaniedesigns.com**.
+- **Shipped (2026-08-03)** — **Hub** + **`portfolio.html`** + **`camview.html`**; natural-aspect product images. Live: **https://swaniedesigns.com/**.
+- **Shipped (2026-07-12)** — **Trailer** (on Portfolio page after hub split).
+- **Shipped (2026-07-09)** — Brand rebrand + screenshot carousel polish.
+- **Docs (2026-09-07)** — **`docs/SEARCH_CONSOLE_SETUP.md`** updated for hub/live verification file; **`docs/play_store_whats_new_en-US.txt`** added (Play release-notes draft).
 - **Optional** — Regenerate **`favicon-tab.png`** from **`images/swan-no-background.png`**.
 
 ---
@@ -431,10 +437,12 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Custom asset icons | `IconManager.kt`, `HoldingsUIComponents.kt` (`MetalIcon`, edit funnels), `MyHoldingsScreen.kt`, `AssetArchitectScreen.kt` |
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`** (Style tab scroll), **`WidgetConfigActivity.kt`** |
-| Marketing site layout | **`website/styles.css`** — navy/gold brand; **`#trailer`** dual frames + orientation CSS; **`#screenshots`** **`shot-carousel`** (4/2/1); **`website/js/shot-carousel.js`**; lightbox **`#shot-lightbox`**; **`#download`** + QR |
+| Marketing site hub | **`website/index.html`** — Swanie Designs product hub; **`website/portfolio.html`** — Portfolio marketing; **`website/camview.html`** — CamView teaser |
+| Marketing site layout | **`website/styles.css`** — navy/gold brand; hub product-card aspect rules; Portfolio **`#trailer`** / **`#screenshots`** carousel; **`website/js/shot-carousel.js`**; lightbox; download + QR |
 | Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`** |
-| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/play_store_feature_graphic_1024x500.png`**; vertical feature **`website/images/feature_graphic_vertical_1080x1920.png`** |
-| Marketing site / trailer | **`website/marketing/trailer_landscape_1920x1080.mp4`**, **`trailer_portrait_1080x1920.mp4`**; section + JS in **`website/index.html`** **`#trailer`** |
+| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/images/camview-splash.png`**, **`website/play_store_feature_graphic_1024x500.png`**; vertical feature **`website/images/feature_graphic_vertical_1080x1920.png`** |
+| Marketing site / trailer | **`website/marketing/trailer_landscape_1920x1080.mp4`**, **`trailer_portrait_1080x1920.mp4`**; section + JS on **`website/portfolio.html`** **`#trailer`** |
+| Play “What’s new” draft | **`docs/play_store_whats_new_en-US.txt`** |
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
 | App / splash / toast | **Adaptive icon:** **`mipmap-anydpi-v26/ic_launcher.xml`** + **`ic_launcher_round.xml`** (foreground **`@drawable/swan_launcher_extra_small_hq`**); **`drawable/swan_launcher_extra_small_hq.xml`** (vector + group transforms); **`drawable/ic_launcher_foreground.xml`** (layer-list alias). **`swan_splash_icon_wrapper.xml`**, **`ic_toast_swan.xml`**, **`swan_widget_icon_padded.xml`**; **toasts:** **`CustomToast.kt`** (`showPortfolioToast`) + **`layout/toast_portfolio.xml`** + **`toast_chip_background.xml`** (solid **`launcher_navy`** chip); **SVG → vector scripts:** **`scripts/svg_path_to_vector.mjs`** / **`.py`** |
 | App / launcher | **`AndroidManifest.xml`** → **`@string/launcher_short_name`** (**Portfolio** under icon); **`app_name`** / Play listing still full brand; widget label unchanged |
@@ -444,13 +452,13 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 | Play internal ship | **23 / 1.0.23** on Play — auto-Pro **grant=30**; **`verify-play-release.ps1`** |
 | MEXC price / sparkline | **`MexcSearchProvider.kt`**, **`MexcApiService.kt`**, **`NetworkModule.kt`** (`@Named("MEXC")`), **`SearchEngineRegistry.kt`**, **`AssetRepository.kt`** |
 | WEEX price / sparkline | **`WeexSearchProvider.kt`**, **`WeexApiService.kt`**, **`NetworkModule.kt`** (`@Named("WEEX")`) |
-| Marketing site / closed-test QR | **`website/index.html`** — **`TESTER_URL`** = **`apps/testing/com.swanie.portfolio`** invite-only QR on **`#get-app`** |
+| Marketing site / closed-test QR | Historical — closed join CTA removed; Portfolio download uses **`PLAY_URL`** on **`portfolio.html`** |
 | Closed-test auto-Pro | **`ClosedTestProAccess.kt`**, **`SettingsViewModel`**, **`ProFeatureGateScreen`** dialog; **`WidgetAssetLimits.isProForWidget`**, **`AssetRepository`** widget push; **`scripts/verify-play-release.ps1`** |
 | Tester recruitment (legacy) | **`docs/RECRUIT_INTERNAL_TESTERS.md`**, **`facebook-join-testing-post.png`** — superseded by **Fiverr closed email lists** |
 | Play Console — license vs testers | **List 1:** **Internal** and/or **Closed → Testers** (email lists). **List 2:** **Settings → License testing** — **unchecked** for Fiverr and family |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | **`website/index.html`**, **`website/contact.html`** — FAQ, SEO, **`#download`**, site QR; **`robots.txt`**, **`sitemap.xml`** (incl. contact); **`deploy-website.yml`** → **https://swaniedesigns.com** |
-| SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — verify **`swaniedesigns.com`**, submit sitemap |
+| Marketing site | **`website/index.html`** (hub), **`portfolio.html`**, **`camview.html`**, **`contact.html`** — SEO, download, QR; **`robots.txt`**, **`sitemap.xml`**; **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — HTML verify file already live; submit sitemap |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
 | Play checklist | `Master_Build_Checklist.md` |
@@ -466,6 +474,9 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ## Session history (newest first)
 
+- **2026-09-07 — Handoff catch-up + docs push:** Synced handoff with **Aug hub/CamView** site commits and **ADI registered** (owner Console check **2026-08-06**). Committed leftover safe docs: **`SEARCH_CONSOLE_SETUP.md`** refresh + **`play_store_whats_new_en-US.txt`** (had sat untracked/local only). **Handoff + push `main`**.
+- **2026-08-06 — Play ADI check (no code):** Owner confirmed Console Home — **all apps successfully registered** for Android developer verification. Sep-30 email = mass reminder. CamView stays off Play. *(Recorded in handoff 2026-09-07.)*
+- **2026-08-03 — Website hub + CamView pages:** **`index.html`** hub; **`portfolio.html`** / **`camview.html`**; aspect-ratio polish (**`b4f00ef`**, **`3d1c092`**). Handoff not updated that day — catch-up **2026-09-07**.
 - **2026-07-22 — Production 31 LIVE (handoff + push):** **1.0.31** full rollout **published** (Submission **21**, ~12:52 PM). Google **API 36** update gate done. Owner keeps Studio debug **31** on phone for future USB work. **Handoff + push `main`**.
 - **2026-07-22 — Production 31 submitted (handoff + push):** Owner QA **1.0.31** OK; verify scripts OK; Play **Production** full rollout **in review** (**targetSdk 36**). Meets Google **API 36** update gate. Warnings ignored (no deobfuscation / native symbols). **Handoff + push `main`**.
 - **2026-07-22 — Release 31 target API 36 (handoff + push):** Play Policy: updates must target **API 36** by **2026-08-31**. Bumped **`compileSdk`/`targetSdk` → 36**, **`versionCode` 31** / **`1.0.31`**; temp large-screen resizability opt-out in manifest. Compile + **`lintVitalRelease`** OK. **Production 30** still live. **Next:** owner Studio QA → then Play Production upload help. **Handoff + push `main`**.

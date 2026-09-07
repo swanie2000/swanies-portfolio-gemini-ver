@@ -1,8 +1,19 @@
 # Google Search Console — verify swaniedesigns.com
 
-Use this after the SEO deploy is live on **https://swaniedesigns.com**. Goal: prove you own the site so Google can show search performance and index your pages.
+Use this after the SEO deploy is live on **https://swaniedesigns.com**. Goal: prove you own the site so Google can index your pages and show search performance.
 
 **Property to add:** `https://swaniedesigns.com` (URL-prefix property — include `https://`)
+
+**Already deployed (repo + live site):**
+
+| Asset | Location |
+|-------|----------|
+| **HTML file verification** | **`website/google4604fa7d884d9a10.html`** → `https://swaniedesigns.com/google4604fa7d884d9a10.html` |
+| **Sitemap** | **`website/sitemap.xml`** → `https://swaniedesigns.com/sitemap.xml` |
+| **robots.txt** | Points crawlers at the sitemap |
+| **Play link in JSON-LD** | **`website/index.html`** — `downloadUrl` → live Play listing |
+
+**Fastest path:** Search Console → verify with **HTML file** (Option B below) — no code change needed.
 
 ---
 
@@ -42,18 +53,17 @@ If verification fails, wait 2–5 minutes for Pages deploy, hard-refresh `https:
 
 ---
 
-### Option B — HTML file upload
+### Option B — HTML file upload **(recommended — already on site)**
 
 1. On the verification screen, choose **HTML file**.
-2. Google gives you a filename like **`google1234567890abcdef.html`** and a one-line file body.
-3. Create that file in the repo at **`website/google1234567890abcdef.html`** (exact name Google gave you).
-4. File contents are only one line, e.g.:
+2. Google gives you a filename like **`google4604fa7d884d9a10.html`** — **this repo already has that file** at **`website/google4604fa7d884d9a10.html`** (live on site).
+3. Confirm in a browser: `https://swaniedesigns.com/google4604fa7d884d9a10.html` shows one line:
    ```
-   google-site-verification: google1234567890abcdef.html
+   google-site-verification: google4604fa7d884d9a10.html
    ```
-5. Push to **`main`** and wait for deploy.
-6. Open `https://swaniedesigns.com/google1234567890abcdef.html` in a browser — you should see that one line.
-7. Click **Verify** in Search Console.
+4. Click **Verify** in Search Console.
+
+If Google shows a **different** filename, create that file under **`website/`**, push **`main`**, wait for deploy, then verify.
 
 ---
 
@@ -98,7 +108,7 @@ Google will crawl:
 
 1. **URL inspection** (top search bar) → paste `https://swaniedesigns.com/`
 2. Click **Request indexing** if offered.
-3. Repeat for `https://swaniedesigns.com/#join-testing` — Google may treat hash URLs as the same page; the homepage request is enough.
+3. Repeat for `https://swaniedesigns.com/contact.html` if offered (homepage + key pages is enough).
 
 Indexing is not instant. New sites often take **days to a few weeks** for meaningful impressions.
 

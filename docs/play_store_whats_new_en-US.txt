@@ -1,0 +1,7 @@
+Welcome to Swanie's Portfolio on Google Play!
+
+• Track crypto and precious metals in one local-first portfolio
+• Home-screen widgets, on-device analytics, encrypted .swpb backup you control
+• Seven search engines including MEXC and WEEX
+• Custom asset icons and home-screen widget wake fix
+• Optional Pro via Google Play subscription
