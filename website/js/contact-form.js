@@ -25,6 +25,8 @@
     var topicParam = new URLSearchParams(window.location.search).get("topic");
     if (topicParam === "tester" || topicParam === "tester-feedback") {
       topicInput.value = "Tester feedback";
+    } else if (topicParam === "gpsbox" || topicParam === "gps-box") {
+      topicInput.value = "GPS BOX";
     }
   }
 

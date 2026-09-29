@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Swanie's GPS BOX — family location on a box in your house. Android app plus Raspberry Pi server. Sideload from Swanie Designs. No Play Store." />
+  <meta name="theme-color" content="#000416" />
+  <link rel="canonical" href="https://swaniedesigns.com/gpsbox.html" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Swanie Designs" />
+  <meta property="og:title" content="Swanie's GPS BOX — family tracking you own" />
+  <meta property="og:description" content="Your family’s locations live on a Raspberry Pi in your house — shared with each other, not with a tracking company." />
+  <meta property="og:url" content="https://swaniedesigns.com/gpsbox.html" />
+  <meta property="og:image" content="https://swaniedesigns.com/images/gpsbox-icon.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Swanie's GPS BOX" />
+  <meta name="twitter:description" content="Family tracking, without big brother. Android app plus a Pi at home." />
+  <meta name="twitter:image" content="https://swaniedesigns.com/images/gpsbox-icon.png" />
+  <link rel="icon" type="image/png" href="favicon-tab.png?v=2" />
+  <link rel="apple-touch-icon" href="favicon-tab.png?v=2" />
+  <title>Swanie's GPS BOX — family tracking you own</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Swanie's GPS BOX",
+    "url": "https://swaniedesigns.com/gpsbox.html",
+    "operatingSystem": "Android",
+    "applicationCategory": "LifestyleApplication",
+    "description": "Self-hosted family locator. Phones share location with a Raspberry Pi at home. Sideload the Android app; flash a Pi image for the server.",
+    "author": {
+      "@type": "Organization",
+      "name": "Swanie Designs",
+      "url": "https://swaniedesigns.com/"
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=20260929a1" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html" aria-label="Swanie Designs home">
+        <img src="images/swan-no-background.png" alt="" width="54" height="54" />
+        <span class="brand-title"><strong>SWANIE</strong><span>DESIGNS</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="camview.html">Camera Viewer</a>
+        <a href="gpsbox.html" aria-current="page">GPS BOX</a>
+        <a href="#features">Features</a>
+        <a href="#download">Downloads</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow">Family locator you own</div>
+          <h1>Family tracking.<span>Without big brother.</span></h1>
+          <p class="hero-copy">Swanie's GPS BOX is a family locator that lives in your house. Phones update a Raspberry Pi at home. Mom, kids, and work commutes show up on <em>your</em> map — not a tracking company’s.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#download">Get downloads</a>
+            <a class="btn secondary" href="#features">See how it works</a>
+          </div>
+          <div class="trust" aria-label="Key benefits">
+            <span>Locations stay on your Pi</span>
+            <span>Android app, no Play Store</span>
+            <span>Flash, plug in, pair</span>
+          </div>
+        </div>
+        <div class="phone-card phone-card--gpsbox" aria-label="Swanie's GPS BOX app icon">
+          <img src="images/gpsbox-icon.png" alt="Swanie's GPS BOX app icon — a swan holding a map pin" width="1024" height="1024" />
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" id="features">
+      <div class="wrap stats-grid">
+        <div class="stat"><strong>Family</strong><span>See who is where on a map that belongs to your household — not a cloud account you rent.</span></div>
+        <div class="stat"><strong>Places</strong><span>Mark home, work, and school. Get a quiet heads-up when someone arrives or leaves.</span></div>
+        <div class="stat"><strong>Your box</strong><span>A Raspberry Pi at home is the server. The history stays in your house.</span></div>
+        <div class="stat"><strong>Away</strong><span>Phones on cellular still reach <em>your</em> box. We run the pipe. We do not keep the map.</span></div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Built for families who want the map at home</h2>
+          <p>Sideload the Android app, flash a Pi image onto an SD card, power it on, and pair the phones. No Play Store listing — downloads stay on this site.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>Android app</h3>
+            <p>Install the APK on each family phone. Share location with the box, see everyone on the map, and manage places from the same app.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Pi image</h3>
+            <p>Flash the GPS BOX image to a microSD card, plug the Pi in at home, and open setup. Pair with a code — no extra helper apps on the phone.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Your data</h3>
+            <p>The family map lives on your hardware. You are not the product. Your family is the only audience.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="hardware">
+      <div class="wrap split">
+        <div class="panel">
+          <h2>What you download</h2>
+          <p>GPS BOX is not on Google Play. When it ships, you will download the Android app here, plus a Raspberry Pi image you write to an SD card.</p>
+          <p>Home Wi‑Fi is how phones talk to the box when you are in the house. When you are out, a small yearly pipe lets those phones find <em>your</em> Pi. We do not store your trips. If that pipe lapses, we still do not hold your history — the hardware is yours.</p>
+        </div>
+        <div class="panel">
+          <h3>A ready-made box</h3>
+          <p>I may also offer a Raspberry Pi in a case, with a power supply, already set up to run GPS BOX — for people who would rather plug it in than flash an SD card.</p>
+          <p>That kit is not locked in yet. If you want one, say so on the <a href="contact.html?topic=gpsbox" style="color:var(--link)">contact form</a>. Interest will help decide whether it becomes a real product.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Frequently asked questions.</h2>
+          <p>Quick answers about Swanie's GPS BOX.</p>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>How is this different from Life360?</summary>
+            <p>Life360’s cloud is the product. GPS BOX’s product is a box in your house. Phones update your Pi. The family sees the map. A tracking company does not keep a file on every trip to school, the gym, and work.</p>
+          </details>
+          <details>
+            <summary>Will this be on Google Play?</summary>
+            <p>No. Like Swanie's Camera Viewer, GPS BOX is sideloaded from this site — the Android APK and the Pi image, when they are ready.</p>
+          </details>
+          <details>
+            <summary>What hardware do I need?</summary>
+            <p>Android phones for the family, and a Raspberry Pi at home with an SD card you flash from the image on this page. Optionally, a ready-made Pi in a case with power — if I offer it.</p>
+          </details>
+          <details>
+            <summary>Where is location data stored?</summary>
+            <p>On your family’s Pi. A meeting point only helps phones away from home reach that box. It is a pipe, not a second map database.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="download" id="download">
+      <div class="wrap">
+        <div class="panel download-panel">
+          <div class="section-head">
+            <h2>Downloads</h2>
+            <p>Public download links land here when GPS BOX is ready to ship. Need early access, or want a ready-made Pi? Use the <a href="contact.html?topic=gpsbox" style="color:var(--link)">contact form</a>.</p>
+          </div>
+          <div class="gpsbox-download-grid">
+            <div class="camview-download-card">
+              <h3>Android APK</h3>
+              <p>Sideload Swanie's GPS BOX on each family phone.</p>
+              <span class="btn btn-disabled" aria-disabled="true">Coming soon</span>
+            </div>
+            <div class="camview-download-card">
+              <h3>Pi image</h3>
+              <p>Flash to a microSD card and boot GPS BOX at home.</p>
+              <span class="btn btn-disabled" aria-disabled="true">Coming soon</span>
+            </div>
+            <div class="camview-download-card">
+              <h3>Ready-made box</h3>
+              <p>Pi, case, and power — preconfigured, if I offer the kit.</p>
+              <span class="btn btn-disabled" aria-disabled="true">Coming soon</span>
+            </div>
+          </div>
+          <p class="note" style="margin-top: 1.25rem;">Questions or early build requests? <a href="contact.html?topic=gpsbox" style="color:var(--link)">Send a message</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>© <span id="y"></span> Swanie Designs · Swanie's GPS BOX · Designed in the USA</div>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="camview.html">Camera Viewer</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

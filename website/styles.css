@@ -1506,7 +1506,7 @@ details p {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 28px;
 }
 
@@ -1553,6 +1553,21 @@ details p {
   border-radius: 0;
   box-shadow: none;
   filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.45));
+}
+
+.product-tile-visual--gpsbox {
+  align-items: center;
+  min-height: 280px;
+  padding: 28px;
+  background: linear-gradient(180deg, rgba(14, 26, 43, 0.85), rgba(58, 116, 205, 0.16) 72%);
+}
+
+.product-tile-visual--gpsbox img {
+  max-width: min(200px, 70%);
+  max-height: 220px;
+  border-radius: 28px;
+  box-shadow: none;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.5));
 }
 
 .product-tile-body {
@@ -1636,6 +1651,32 @@ details p {
   filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.5));
 }
 
+.phone-card--gpsbox {
+  display: grid;
+  place-items: center;
+  padding: 36px;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(58, 116, 205, 0.32), transparent 62%),
+    rgba(14, 26, 43, 0.55);
+}
+
+.phone-card--gpsbox img {
+  width: min(280px, 100%);
+  height: auto;
+  max-height: 320px;
+  border-radius: 36px;
+  box-shadow: none;
+  background: transparent;
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.55));
+}
+
+.gpsbox-download-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 8px;
+}
+
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1704,14 +1745,22 @@ details p {
   }
 }
 
+@media (max-width: 1100px) {
+  .gpsbox-download-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .product-grid,
   .feature-grid,
-  .camview-download-grid {
+  .camview-download-grid,
+  .gpsbox-download-grid {
     grid-template-columns: 1fr;
   }
 
-  .product-tile-visual--camview {
+  .product-tile-visual--camview,
+  .product-tile-visual--gpsbox {
     min-height: 200px;
   }
 }

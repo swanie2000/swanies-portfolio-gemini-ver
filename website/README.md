@@ -4,9 +4,10 @@ Hub landing (**`index.html`**) for everything Swanie creates, plus product pages
 
 | Page | Role |
 |------|------|
-| **`index.html`** | Swanie Designs hub — Portfolio + Camera Viewer (+ room for future apps) |
+| **`index.html`** | Swanie Designs hub — Portfolio + Camera Viewer + GPS BOX |
 | **`portfolio.html`** | Swanie's Portfolio marketing (Play CTA, trailer, screenshots) |
 | **`camview.html`** | Swanie's Camera Viewer marketing + download placeholders |
+| **`gpsbox.html`** | Swanie's GPS BOX marketing + coming-soon APK, Pi image, optional ready-made box |
 | **`privacy.html`** | Portfolio privacy policy |
 | **`press.html`** | Portfolio press kit |
 | **`contact.html`** | Studio contact form |
@@ -17,6 +18,7 @@ Hub landing (**`index.html`**) for everything Swanie creates, plus product pages
 - **Logo:** **`images/swan-no-background.png`**
 - **Portfolio screenshots:** **`images/PlayStore_01_…`** through **`PlayStore_08_…`**
 - **CamView art:** **`images/camview-splash.png`**
+- **GPS BOX icon:** **`images/gpsbox-icon.png`**
 - **Feature graphics:** **`play_store_feature_graphic_1024x500.png`** (landscape / OG) · **`images/feature_graphic_vertical_1080x1920.png`** (portrait)
 - **Trailers:** **`marketing/trailer_landscape_1920x1080.mp4`** · **`marketing/trailer_portrait_1080x1920.mp4`**
 - **Theme:** Navy **`#000416`** + gold **`#d4af37`**, Inter — see **`styles.css`**
@@ -26,8 +28,9 @@ Hub landing (**`index.html`**) for everything Swanie creates, plus product pages
 1. **Tab icon** — **`favicon-tab.png`**. After changing the swan logo, regenerate and bump **`?v=`** on favicon links if needed.
 2. **`portfolio.html`** — Play CTA + QR via **`PLAY_URL`**; trailer at **`#trailer`**; screenshot carousel at **`#screenshots`**.
 3. **`camview.html`** — Wire Android APK + Windows Setup zip download URLs when storefront files are hosted.
-4. **`contact.html`** — Web3Forms via **`js/contact-form.js`** (key in **`local.properties`** / dashboard domain allowlist).
-5. **`press.html`** / **`privacy.html`** — keep aligned with Play listing and Data safety.
+4. **`gpsbox.html`** — Wire Android APK + Pi image (+ optional ready-made box) when those files are hosted. Keep copy honest: sideload only, map on the family’s Pi.
+5. **`contact.html`** — Web3Forms via **`js/contact-form.js`** (key in **`local.properties`** / dashboard domain allowlist).
+6. **`press.html`** / **`privacy.html`** — keep aligned with Play listing and Data safety.
 
 ## SEO & Search Console
 
