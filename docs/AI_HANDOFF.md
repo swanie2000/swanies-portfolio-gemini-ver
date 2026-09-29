@@ -29,7 +29,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 
 ## Current session
 
-**Last updated:** 2026-09-07 — **`main`** — **Production 31 (1.0.31) LIVE** (`targetSdk` **36**). **Android developer verification:** all Play apps **registered** (owner **2026-08-06**). **Website hub** + CamView page live (**2026-08-03**). **Disaster recovery kit:** folder **`SwaniesPortfolio_RecoveryKit`** built on laptop **`C:\`**, then **moved to a secret USB** for safekeeping (keystore, latest AAB, `local.properties`, passwords doc, GCP JSON, docs snapshots). Owner: **GitHub `main` + that USB** = enough to rebuild/republish; online account passwords live in **password manager** (not depending on the laptop). Owner phone stays on **Studio debug 1.0.31**.
+**Last updated:** 2026-09-29 — **`main`** — **Production 31 (1.0.31) LIVE**. **Website:** hub now includes **Swanie's GPS BOX** (**`gpsbox.html`**, commit **`6aa1544`**). Owner reviewed live pages and said **leave as-is for now**; fine-tune later. GPS BOX is sideload + Pi image (not Play). Optional ready-made Pi kit mentioned, not decided. **Android developer verification:** all Play apps **registered** (owner **2026-08-06**). **Disaster recovery kit:** folder **`SwaniesPortfolio_RecoveryKit`** on secret USB. Owner phone stays on **Studio debug 1.0.31**.
 
 ### Laptop loss / rebuild (canonical)
 
@@ -69,6 +69,7 @@ Do not lecture; a single nudge is enough. If they decline, respect that.
 - **Android developer verification (2026-08-06):** Console Home banner — **all apps successfully registered**. No further Play registration action for **`com.swanie.portfolio`**. CamView / Camera Viewer stays **off Play** (sideload / private); no package registration needed for personal USB.
 - **Testing path:** Closed testing complete → **Production access granted**. **License testing** **unchecked**. **Site:** hub + product pages (see marketing bullets); Portfolio download CTA + QR use **`PLAY_URL`**; closed-test join button **removed** (**2026-06-19**).
 - **Closed tester onboarding:** Opt in → install **27** → **create local account** (email required) → use app; Pro until **~July 2026** — **do not purchase**; feedback **`contact.html?topic=tester`** or in-app **Settings → Send feedback**.
+- **Marketing site (2026-09-29 — GPS BOX):** **`index.html`** hub tile **Swanie's GPS BOX**; **`gpsbox.html`** coming-soon APK + Pi image + optional ready-made box; icon **`website/images/gpsbox-icon.png`**; nav/sitemap/contact topic **GPS BOX**; **`6aa1544`**. Owner: leave as-is. Live: **https://swaniedesigns.com/gpsbox.html**.
 - **Marketing site (2026-08-03 — hub):** **`index.html`** = **Swanie Designs** product hub; **`portfolio.html`** = Portfolio marketing (trailer / showcase / Play download); **`camview.html`** = CamView teaser; shared nav on contact/press/privacy; **`sitemap.xml`** updated. Follow-up **`3d1c092`**: hub product images keep natural aspect ratio.
 - **Marketing site (2026-07-12 — trailer):** Trailer section lives on **`portfolio.html`** after hub split (was on old single-page **`index.html`**). Commits **`0652bad`** → **`a6362f9`**.
 - **Marketing site (2026-06-04):** **`#get-app`** QR switched from **internal** to **closed** testing so family (wife/mom) can count toward closed gate after opt-in + update.
@@ -125,7 +126,7 @@ Use this table so **Data safety** matches the wired app (AI-built; owner should 
 
 **Repo / branch:** `swanies-portfolio-gemini-ver` on GitHub (`swanie2000`), default branch **`main`**. Legacy repo **`swanies-portfolio`** was deleted.
 
-**Public site:** **`https://swaniedesigns.com`** — **Swanie Designs hub** + product pages from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. Key URLs: **`/`** (hub), **`/portfolio.html`**, **`/camview.html`**, **`/privacy.html`** (**§4** `#account-deletion` / `#data-deletion` for Play Data safety), **`/contact.html`**. Push **`main`** after edits so the live URL matches Play / marketing.
+**Public site:** **`https://swaniedesigns.com`** — **Swanie Designs hub** + product pages from **`website/`**, deployed by **GitHub Actions** (`.github/workflows/deploy-website.yml`). Custom domain + **HTTPS** on GitHub Pages. Key URLs: **`/`** (hub), **`/portfolio.html`**, **`/camview.html`**, **`/gpsbox.html`**, **`/privacy.html`** (**§4** `#account-deletion` / `#data-deletion` for Play Data safety), **`/contact.html`**. Push **`main`** after edits so the live URL matches Play / marketing.
 
 **Play / Google:** **Production 30 (1.0.30) LIVE** — **`GRANT_DAYS=0`**, 177 countries. Public listing **Updated Jun 19, 2026**. Closed tracks may still serve older builds to opted-in testers. **License testing** **unchecked**.
 
@@ -388,6 +389,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 1. ~~**Release 31 → Production**~~ ✓ **LIVE 2026-07-22** — **1.0.31** / **targetSdk 36**.
 2. ~~**Android developer verification (Play packages)**~~ ✓ **Registered** (Console Home **2026-08-06**).
 3. ~~**Website hub + CamView page**~~ ✓ **2026-08-03** (`b4f00ef`, `3d1c092`).
+3b. ~~**Website GPS BOX page**~~ ✓ **2026-09-29** (`6aa1544`). Owner: leave as-is until asked to fine-tune.
 4. ~~**Website trailer**~~ ✓ **2026-07-12** (now on **`portfolio.html`**).
 5. ~~**Paywall smoke test**~~ ✓ **2026-06-19**
 6. **Optional listing polish:** long description / stale closed-beta copy if any; paste **`docs/play_store_whats_new_en-US.txt`** into Play “What’s new” when next release ships.
@@ -409,6 +411,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ### Website
 
+- **Shipped (2026-09-29)** — **GPS BOX** hub tile + **`gpsbox.html`**. Live: **https://swaniedesigns.com/gpsbox.html**. Fine-tune later (owner).
 - **Shipped (2026-08-03)** — **Hub** + **`portfolio.html`** + **`camview.html`**; natural-aspect product images. Live: **https://swaniedesigns.com/**.
 - **Shipped (2026-07-12)** — **Trailer** (on Portfolio page after hub split).
 - **Shipped (2026-07-09)** — Brand rebrand + screenshot carousel polish.
@@ -448,10 +451,10 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 | Metals / valuation | `MetalSpotMath.kt`, `AssetRepository.kt`, `HoldingsUIComponents.kt`, `MyHoldingsScreen.kt` |
 | Custom asset icons | `IconManager.kt`, `HoldingsUIComponents.kt` (`MetalIcon`, edit funnels), `MyHoldingsScreen.kt`, `AssetArchitectScreen.kt` |
 | Home screen widget | **`PortfolioWidget.kt`** — **`WidgetAssetLimits`** Pro **8** / free **3**; **`writeWidgetPackedAssetRows`**; **`parseSingleWidgetAssetEntry`**; **`WidgetAssetCardHeight` = 62dp**; **`widgetLaunchMainActivityIntent`**; nested **`Column` + `defaultWeight()`** per row; **`AssetRepository.kt`**, **`SettingsViewModel.kt`**, **`WidgetManagerScreen.kt`** (Style tab scroll), **`WidgetConfigActivity.kt`** |
-| Marketing site hub | **`website/index.html`** — Swanie Designs product hub; **`website/portfolio.html`** — Portfolio marketing; **`website/camview.html`** — CamView teaser |
+| Marketing site hub | **`website/index.html`** — Swanie Designs product hub; **`website/portfolio.html`** — Portfolio marketing; **`website/camview.html`** — CamView teaser; **`website/gpsbox.html`** — GPS BOX teaser (sideload + Pi image) |
 | Marketing site layout | **`website/styles.css`** — navy/gold brand; hub product-card aspect rules; Portfolio **`#trailer`** / **`#screenshots`** carousel; **`website/js/shot-carousel.js`**; lightbox; download + QR |
-| Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`** |
-| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/images/camview-splash.png`**, **`website/play_store_feature_graphic_1024x500.png`**; vertical feature **`website/images/feature_graphic_vertical_1080x1920.png`** |
+| Marketing site / contact | **`website/contact.html`**, **`website/js/contact-form.js`** — Web3Forms; **Tester feedback** topic; **`?topic=tester`**; **GPS BOX** topic; **`?topic=gpsbox`** |
+| Marketing site / brand assets | **`website/images/swan-no-background.png`**, **`website/images/PlayStore_01_…`–`08_…`**, **`website/images/camview-splash.png`**, **`website/images/gpsbox-icon.png`**, **`website/play_store_feature_graphic_1024x500.png`**; vertical feature **`website/images/feature_graphic_vertical_1080x1920.png`** |
 | Marketing site / trailer | **`website/marketing/trailer_landscape_1920x1080.mp4`**, **`trailer_portrait_1080x1920.mp4`**; section + JS on **`website/portfolio.html`** **`#trailer`** |
 | Play “What’s new” draft | **`docs/play_store_whats_new_en-US.txt`** |
 | CTA end card (promo video) | **`website/marketing/CTA_end_picture.png`** — production QR → **swaniedesigns.com** |
@@ -468,7 +471,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 | Tester recruitment (legacy) | **`docs/RECRUIT_INTERNAL_TESTERS.md`**, **`facebook-join-testing-post.png`** — superseded by **Fiverr closed email lists** |
 | Play Console — license vs testers | **List 1:** **Internal** and/or **Closed → Testers** (email lists). **List 2:** **Settings → License testing** — **unchecked** for Fiverr and family |
 | About / legal | `AboutScreen.kt`, `TermsAndConditionsScreen.kt` (§1–§7), `Routes.kt`, `MainActivity.kt`, `values/strings.xml` + `values-*` (incl. **`terms_section_7_*`** per locale) |
-| Marketing site | **`website/index.html`** (hub), **`portfolio.html`**, **`camview.html`**, **`contact.html`** — SEO, download, QR; **`robots.txt`**, **`sitemap.xml`**; **`deploy-website.yml`** → **https://swaniedesigns.com** |
+| Marketing site | **`website/index.html`** (hub), **`portfolio.html`**, **`camview.html`**, **`gpsbox.html`**, **`contact.html`** — SEO, download, QR; **`robots.txt`**, **`sitemap.xml`**; **`deploy-website.yml`** → **https://swaniedesigns.com** |
 | SEO / Search Console | **`docs/SEARCH_CONSOLE_SETUP.md`** — HTML verify file already live; submit sitemap |
 | Play Data safety (truth from code) | **`§ Current session`** → **Play Data safety — facts from codebase**; **`MainViewModel.kt`** (`syncMonetizationUser`), **`billing/RevenueCatMonetizationManager.kt`**, **`data/feedback/BugReportSubmitter.kt`**, **`AndroidManifest.xml`**, **`app/build.gradle.kts`** (deps) |
 | Play listing copy (en-US full description) | **`docs/play_store_long_description_en-US.txt`** — paste into Play Console default listing (**4000** char max; draft ~**3948** on Windows checkout) |
@@ -486,6 +489,7 @@ When the owner (or support) needs to **refund a real Google Play subscription** 
 
 ## Session history (newest first)
 
+- **2026-09-29 — Website GPS BOX page live (handoff):** Hub tile + **`gpsbox.html`** (coming-soon APK, Pi image, optional ready-made box). Site already on **`main`** (**`6aa1544`**). Owner reviewed and said leave as-is. **Handoff + push `main`**.
 - **2026-09-07 — Disaster recovery kit on secret USB (handoff + push):** Built **`SwaniesPortfolio_RecoveryKit`** (release **`.jks`**, Production **31** AAB, **`local.properties`**, passwords doc, GCP JSON, docs). Owner **moved kit to a secret USB**; online passwords in **password manager**. Rebuild path = **GitHub + that USB**. **Handoff + push `main`**.
 - **2026-09-07 — Handoff catch-up + docs push:** Synced handoff with **Aug hub/CamView** site commits and **ADI registered** (owner Console check **2026-08-06**). Committed leftover safe docs: **`SEARCH_CONSOLE_SETUP.md`** refresh + **`play_store_whats_new_en-US.txt`** (had sat untracked/local only). **Handoff + push `main`**.
 - **2026-08-06 — Play ADI check (no code):** Owner confirmed Console Home — **all apps successfully registered** for Android developer verification. Sep-30 email = mass reminder. CamView stays off Play. *(Recorded in handoff 2026-09-07.)*
