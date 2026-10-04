@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="GPS BOX support — pairing, Find GPS BOX, Share, and how to write in. Same page the app opens from Settings → Support." />
+  <meta name="theme-color" content="#000416" />
+  <link rel="canonical" href="https://swaniedesigns.com/gpsbox/support/" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Swanie Designs" />
+  <meta property="og:title" content="GPS BOX support — Swanie Designs" />
+  <meta property="og:description" content="Help for Swanie's GPS BOX: setup, pairing, Share, and how to contact us." />
+  <meta property="og:url" content="https://swaniedesigns.com/gpsbox/support/" />
+  <meta property="og:image" content="https://swaniedesigns.com/images/gpsbox-icon.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="GPS BOX support" />
+  <meta name="twitter:description" content="Setup, pairing, Share, and how to write in." />
+  <meta name="twitter:image" content="https://swaniedesigns.com/images/gpsbox-icon.png" />
+  <link rel="icon" type="image/png" href="../../favicon-tab.png?v=2" />
+  <link rel="apple-touch-icon" href="../../favicon-tab.png?v=2" />
+  <title>GPS BOX support — Swanie Designs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../styles.css?v=20261004a1" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Swanie Designs home">
+        <img src="../../images/swan-no-background.png" alt="" width="54" height="54" />
+        <span class="brand-title"><strong>SWANIE</strong><span>DESIGNS</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Site">
+        <a href="../../index.html">Home</a>
+        <a href="../../portfolio.html">Portfolio</a>
+        <a href="../../camview.html">Camera Viewer</a>
+        <a href="../../gpsbox.html">GPS BOX</a>
+        <a href="./" aria-current="page">Support</a>
+        <a href="../../contact.html?topic=gpsbox">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap page-main legal-page">
+    <a class="back-link" href="../../gpsbox.html">← Back to GPS BOX</a>
+    <p class="contact-kicker">GPS BOX</p>
+    <h1>Support</h1>
+    <p class="meta">
+      This is the same page Settings → Support opens in the app. There is no in-app chat.
+      Take your time. If a step is unclear, write in — we are glad to help.
+    </p>
+
+    <h2>Write in</h2>
+    <p>
+      Use the <a href="../../contact.html?topic=gpsbox">contact form</a> and pick topic <strong>GPS BOX</strong>.
+      Please include:
+    </p>
+    <ul>
+      <li>GPS BOX name (Account / setup page)</li>
+      <li>Whether the Ethernet cable is plugged into the house router</li>
+      <li>Whether Find GPS BOX found an address</li>
+      <li>The app version on the splash screen</li>
+    </ul>
+
+    <h2>If something is wrong</h2>
+    <div class="faq">
+      <details>
+        <summary>No lights on the GPS BOX</summary>
+        <p>Power supply and outlet. Try another outlet. The official supply matters; a weak charger often fails.</p>
+      </details>
+      <details>
+        <summary>Find GPS BOX finds nothing</summary>
+        <p>Stay on house Wi‑Fi, not guest Wi‑Fi, not cellular. Seat the Ethernet cable. Wait 2 full minutes after power, then Find again. On a computer on the same Wi‑Fi, try <code>http://gpsbox.local:8080/setup</code>.</p>
+      </details>
+      <details>
+        <summary>Setup page asks for a password you forgot</summary>
+        <p>That is the setup-page password, not the phone lock. If you never changed it, first time is admin / password. If you changed it and lost it, you will need a new image on the card (that is a fresh start).</p>
+      </details>
+      <details>
+        <summary>Scan does nothing</summary>
+        <p>House Wi‑Fi. Camera permission. First phone QR for the first phone, Family QR for everyone else. Do not scan an old screenshot from last week if you pressed Reset.</p>
+      </details>
+      <details>
+        <summary>Share is on but others see you red</summary>
+        <p>Battery unrestricted. Location all the time. Wait a couple of minutes. If this phone is at home and they are away, they still need an active plan or trial to see live updates.</p>
+      </details>
+      <details>
+        <summary>Setup page used to open, now it does not</summary>
+        <p>The house number probably changed. Find GPS BOX again. Then reserve that address in the router so it stops moving.</p>
+      </details>
+      <details>
+        <summary>I plugged in Wi‑Fi and a cable</summary>
+        <p>The box uses the cable. Unplug the cable only if you intend to run on Wi‑Fi, then Save network on the Network page.</p>
+      </details>
+    </div>
+
+    <h2>Product page</h2>
+    <p>
+      Downloads and the product story live on
+      <a href="../../gpsbox.html">swaniedesigns.com/gpsbox.html</a>.
+      GPS BOX is not on Google Play.
+    </p>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div>© <span id="y"></span> Swanie Designs · Swanie's GPS BOX · Designed in the USA</div>
+      <div>
+        <a href="../../index.html">Home</a>
+        <a href="../../gpsbox.html">GPS BOX</a>
+        <a href="../../contact.html?topic=gpsbox">Contact</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
