@@ -27,6 +27,10 @@
       topicInput.value = "Tester feedback";
     } else if (topicParam === "gpsbox" || topicParam === "gps-box") {
       topicInput.value = "GPS BOX";
+    } else if (topicParam === "camview" || topicParam === "camera" || topicParam === "camera-viewer") {
+      topicInput.value = "Camera Viewer";
+    } else if (topicParam === "portfolio") {
+      topicInput.value = "Swanie's Portfolio";
     }
   }
 
@@ -130,7 +134,7 @@
       },
       body: JSON.stringify({
         access_key: WEB3FORMS_ACCESS_KEY,
-        subject: "Swanie's Portfolio — website contact (" + topic + ")",
+        subject: "Swanie Designs — website contact (" + topic + ")",
         name: name,
         email: em,
         message: buildContactMessage(name, em, topic, body),
