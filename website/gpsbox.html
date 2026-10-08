@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Swanie's GPS BOX — the family map stays on a box in your house. Android app from this site. Up to 8 people. The manager's email is billed." />
+  <meta name="description" content="Swanie's GPS BOX — a family map, places, arrive and leave, check-in, and history. The map stays on a box in your house, not with a tracking company." />
   <meta name="theme-color" content="#000416" />
   <link rel="canonical" href="https://swaniedesigns.com/gpsbox.html" />
   <meta name="robots" content="index, follow" />
@@ -28,7 +28,7 @@
     "url": "https://swaniedesigns.com/gpsbox.html",
     "operatingSystem": "Android",
     "applicationCategory": "LifestyleApplication",
-    "description": "Family locator. Phones share location with a GPS BOX at home. Install the Android app from this site. The manager email is billed for up to 8 people.",
+    "description": "Family locator. The map, places, arrive and leave, check-in, crash, battery, and history stay on a GPS BOX at home. Install the Android app from this site. The manager email is billed for up to 8 people.",
     "author": {
       "@type": "Organization",
       "name": "Swanie Designs",
@@ -40,6 +40,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260929a1" />
+  <style>
+    .price-chart { display: grid; gap: 14px; margin: 8px 0 18px; }
+    .price-row { display: grid; grid-template-columns: minmax(140px, 200px) 1fr auto; gap: 14px; align-items: center; }
+    .price-name { font-weight: 600; }
+    .price-track { height: 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+    .price-bar { display: block; height: 100%; border-radius: inherit; background: rgba(255, 255, 255, 0.45); }
+    .price-row--us .price-bar { background: var(--gold); }
+    .price-amt { font-weight: 700; min-width: 3.2rem; text-align: right; }
+    @media (max-width: 640px) {
+      .price-row { grid-template-columns: 1fr auto; }
+      .price-track { grid-column: 1 / -1; }
+    }
+  </style>
 </head>
 <body>
   <header class="nav">
@@ -55,6 +68,7 @@
         <a href="gpsbox.html" aria-current="page">GPS BOX</a>
         <a href="gpsbox/support/">Support</a>
         <a href="#features">Features</a>
+        <a href="#price">Price</a>
         <a href="#download">Downloads</a>
         <a href="contact.html?topic=gpsbox">Contact</a>
       </nav>
@@ -84,33 +98,148 @@
       </div>
     </section>
 
-    <section class="stats" id="features">
-      <div class="wrap stats-grid">
-        <div class="stat"><strong>Family</strong><span>See who is where. Up to 8 people on one GPS BOX. Each person picks a name. A nickname is fine.</span></div>
-        <div class="stat"><strong>Places</strong><span>Save home, work, and school. This phone can tell you when someone arrives or leaves.</span></div>
-        <div class="stat"><strong>Your box</strong><span>The GPS BOX stays at home. Locations, places, and history stay on it.</span></div>
-        <div class="stat"><strong>Away</strong><span>On house Wi-Fi the phones talk to the box directly. Away from home, a monthly or yearly plan lets them reach that same box.</span></div>
-      </div>
-    </section>
-
-    <section class="showcase">
+    <section class="showcase" id="features">
       <div class="wrap">
         <div class="section-head">
-          <h2>The family map stays at home</h2>
-          <p>Install the Android app from this page, plug in the GPS BOX, and tap Find GPS BOX on house Wi-Fi. The first phone is the manager. Later phones pick a name and join. GPS BOX does not ask a member for an email.</p>
+          <h2>What the app does</h2>
+          <p>The family map, the places, the notices, and the history. The part other family locators skip: the map stays on a box in your house.</p>
         </div>
         <div class="feature-grid">
           <article class="feature-card">
-            <h3>Android app</h3>
-            <p>Install it on each family phone from the file on this page. The map, saved places, check-in, and the last 30 days are in the app. Tap a name to jump to that person. Long-press the name to follow them while they are walking or driving. AUTO shows in green above that name until the trip ends.</p>
+            <h3>No big brother</h3>
+            <p>Locations stay on your GPS BOX. The family sees the map. A tracking company does not keep a file of every trip.</p>
           </article>
           <article class="feature-card">
-            <h3>The GPS BOX</h3>
-            <p>Write the image to a memory card, or use a ready-made GPS BOX. Plug the Ethernet cable into the router, wait 2 minutes, then Find it from the app.</p>
+            <h3>Family map</h3>
+            <p>See who is where. Up to 8 people. A photo or initials, and a car when they are driving. Each person picks a name. A nickname is fine.</p>
           </article>
           <article class="feature-card">
-            <h3>One plan</h3>
-            <p>The manager's email is billed for the family, up to 8 people. That address is not shown on the map. If the plan lapses, the map at home still works. Away-from-home updates need an active plan.</p>
+            <h3>Follow someone</h3>
+            <p>Tap a name to jump to that person. Long-press to follow them. AUTO shows in green while they walk or drive, and turns off after they have been still for 20 minutes. A touch on the map leaves AUTO on.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Saved places</h3>
+            <p>Home, work, and school. This phone can tell you when someone arrives or leaves. Set the size, and a little extra room so a fuzzy GPS reading does not count as left.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Check in</h3>
+            <p>Tell the family you are here. It does not save a place. You can hide that button on this phone. You still hear if someone else checks in.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Sounds you pick</h3>
+            <p>Arrive, leave, check-in, low battery, and a possible crash each start with a GPS BOX sound. Use a phone sound or a file. Default puts the GPS BOX sound back.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Over a speed</h3>
+            <p>Turn it on for one notice when someone else is driving over the speed you pick. It stays quiet until they slow down and go over it again.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Possible crash</h3>
+            <p>A hard stop while driving fills that phone with a red screen. I am fine tells the family they are OK. Nobody is called.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Low battery</h3>
+            <p>One notice when another phone drops under 15%. It stays quiet until that phone charges back up.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Quiet hours</h3>
+            <p>Notices still show. The sound stays off for the hours you set. A possible crash still sounds.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Last 30 days</h3>
+            <p>Arrivals, leaves, and trips stay on the box. A trip shows how long, about how far, and the top speed. Play walks that ride on the map. Lock keeps a trip on this phone after that day drops off.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Minutes away</h3>
+            <p>While someone is driving toward a saved place, the map can say about how many minutes, from how fast they have been moving. A straight estimate, not turn-by-turn directions.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Home screen</h3>
+            <p>A GPSBOX widget lists each person: a photo, where they are, battery, and how long ago they checked in. Tap a person and the map opens on them.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Your box</h3>
+            <p>On house Wi-Fi the phones talk to the GPS BOX directly. Away from home, one monthly or yearly plan on the manager's email reaches that same box. If the plan lapses, the map at home still works. The box is still yours.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Names, not emails</h3>
+            <p>The first phone is the manager. Later phones pick a name and join. GPS BOX does not ask a member for an email, and the manager's email is not shown on the map.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="price">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>One bill per GPS BOX</h2>
+          <p>Up to 8 phones. The phones are the GPS, on the family's own cell plans. You own the box. The plan is how phones away from home reach it.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat"><strong>$79</strong><span>A year, for this GPS BOX.</span></div>
+          <div class="stat"><strong>$8.99</strong><span>A month, same plan.</span></div>
+          <div class="stat"><strong>8</strong><span>Phones on that one bill.</span></div>
+        </div>
+        <div class="panel" style="margin-top: 22px;">
+          <h3>What the fee is for</h3>
+          <p>On house Wi-Fi the phones talk to your GPS BOX directly. Away from home, the plan reaches that same box. We do not keep a second copy of the map. If the year lapses, the map at home still works. The box is still yours.</p>
+        </div>
+        <div class="section-head" style="margin-top: 42px;">
+          <h2>A year for one household</h2>
+          <p>These are phone apps, one price for the family. Life360 and AT&amp;T are a year of the monthly price. iSharing Silver is a yearly price.</p>
+        </div>
+        <div class="price-chart" aria-label="Yearly price for one household">
+          <div class="price-row">
+            <span class="price-name">iSharing Silver</span>
+            <span class="price-track"><span class="price-bar" style="width: 29%"></span></span>
+            <span class="price-amt">$60</span>
+          </div>
+          <div class="price-row price-row--us">
+            <span class="price-name">GPS BOX</span>
+            <span class="price-track"><span class="price-bar" style="width: 39%"></span></span>
+            <span class="price-amt">$79</span>
+          </div>
+          <div class="price-row">
+            <span class="price-name">AT&amp;T Secure Family</span>
+            <span class="price-track"><span class="price-bar" style="width: 47%"></span></span>
+            <span class="price-amt">$96</span>
+          </div>
+          <div class="price-row">
+            <span class="price-name">Life360 Silver</span>
+            <span class="price-track"><span class="price-bar" style="width: 59%"></span></span>
+            <span class="price-amt">$120</span>
+          </div>
+          <div class="price-row">
+            <span class="price-name">Life360 Gold</span>
+            <span class="price-track"><span class="price-bar" style="width: 100%"></span></span>
+            <span class="price-amt">$204</span>
+          </div>
+        </div>
+        <p class="note">Life360 still listed Silver at $9.99 a month and Gold at $16.99 a month on October 8, 2026. Those bars are the monthly price times 12. AT&amp;T is $7.99 a month on the wireless bill, times 12. iSharing Silver is $60 from a $59.99 yearly price checked October 6, 2026. GPS BOX is $79 a year.</p>
+        <div class="section-head" style="margin-top: 42px;">
+          <h2>What this is not</h2>
+          <p>Other family locators sell some of these. GPS BOX does not.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>No iPhone app</h3>
+            <p>GPS BOX is Android. One iPhone in the house cannot join the map.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No browser map</h3>
+            <p>The map is in the phone app. There is no map on a computer.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No call for help</h3>
+            <p>A possible crash tells the family. Nobody is called. There is no monitoring center, roadside help, or insurance plan.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No driving score</h3>
+            <p>A car shows when someone is driving, and a trip shows time, distance, and top speed. There is no phone-use report or parental controls.</p>
+          </article>
+          <article class="feature-card">
+            <h3>No watch, no guest link</h3>
+            <p>Phones only. Someone outside the family is not sent a temporary map link. They join the box, or they do not.</p>
           </article>
         </div>
       </div>
@@ -156,7 +285,7 @@
           </details>
           <details>
             <summary>Who is billed?</summary>
-            <p>One plan per GPS BOX, on the manager's email, for up to 8 people. Members pick a name. GPS BOX does not ask a member for an email. That email is not shown on the map.</p>
+            <p>One plan per GPS BOX, on the manager's email, for up to 8 people. $79 a year, or $8.99 a month. Members pick a name. GPS BOX does not ask a member for an email. That email is not shown on the map.</p>
           </details>
         </div>
       </div>
